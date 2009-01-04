@@ -48,7 +48,6 @@
 
 /* Reads a certain chunk of data from the segment file(s)
  * Will read until the requested size is filled or the entire chunk is read
- * This function swaps byte pairs if specified
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
 ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size )
@@ -366,16 +365,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
-		/* Swap bytes
-		 */
-		if( ( internal_handle->swap_byte_pairs != 0 )
-		 && ( libewf_endian_swap_byte_pairs( chunk_data, chunk_data_size ) != 1 ) )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
-			 function );
-
-			return( -1 );
-		}
 		/* Flag that the chunk was cached
 		 */
 		if( chunk_data == internal_handle->chunk_cache->data )
@@ -435,7 +424,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 /* Reads certain chunk data from the segment file(s)
  * Will read until the requested size is filled or the entire chunk is read
- * This function swaps byte pairs if specified
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
 ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc )
@@ -591,7 +579,6 @@ ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size
 }
 
 /* Reads media data from the last current into a buffer
- * This function swaps byte pairs if specified
  * Returns the amount of bytes read, or -1 on error
  */
 ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
@@ -620,7 +607,6 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 }
 
 /* Reads media data from an offset into a buffer
- * This function swaps byte pairs if specified
  * Returns the amount of bytes read, or -1 on error
  */
 ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset )

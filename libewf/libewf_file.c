@@ -1388,16 +1388,6 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 	return( libewf_hash_values_set_value( internal_handle->hash_values, identifier, value, length ) );
 }
 
-/* Sets the value to swap byte pairs internally, used by both read and write
- * Returns 1 if successful, -1 on error
- */
-int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs )
-{
-	return( libewf_internal_handle_set_swap_byte_pairs(
-	         (LIBEWF_INTERNAL_HANDLE *) handle,
-	         swap_byte_pairs ) );
-}
-
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above
  * Returns 1 if successful, -1 on error

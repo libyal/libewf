@@ -821,22 +821,6 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_swap_byte_pairs( handle, swap_byte_pairs ) != 1 )
-	{
-		fprintf( stderr, "Unable to set swap byte pairs in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		if( libewf_common_close( file_descriptor ) != 0 )
-		{
-			fprintf( stderr, "Unable to close input.\n" );
-		}
-		libewf_common_free( filename );
-
-		return( EXIT_FAILURE );
-	}
 	if( case_number == NULL )
 	{
 		string_length = 0;
@@ -1150,6 +1134,7 @@ int main( int argc, char * const argv[] )
 	               calculate_sha1,
 	               calculated_sha1_hash_string,
 	               LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
+	               swap_byte_pairs,
 	               callback );
 
 	/* Done acquiring data

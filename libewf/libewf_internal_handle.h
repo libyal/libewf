@@ -166,12 +166,6 @@ struct libewf_internal_handle
 	 */
 	uint32_t current_chunk_offset;
 
-	/* Value to indicate if a pair of bytes should be swapped internally
-	 * this allows to convert little endian into big endian data and vice versa
-	 * this is only applicable to the actual media data within the EWF file
-	 */
-	uint8_t swap_byte_pairs;
-
 	/* value to indicate the compression level used
 	 */
 	int8_t compression_level;
@@ -380,8 +374,6 @@ int libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *interna
 int libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_flags );
 int libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t format );
 int libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size );
-
-int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );
 
 int libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors );
 int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );

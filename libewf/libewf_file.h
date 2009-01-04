@@ -114,8 +114,6 @@ LIBEWF_EXTERN int libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t i
 LIBEWF_EXTERN int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 LIBEWF_EXTERN int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
-LIBEWF_EXTERN int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs );
-
 LIBEWF_EXTERN int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format );
 LIBEWF_EXTERN int libewf_parse_hash_values( LIBEWF_HANDLE *handle );
 

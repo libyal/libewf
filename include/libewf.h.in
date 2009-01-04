@@ -99,13 +99,11 @@ LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset 
 LIBEWF_EXTERN ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc );
 
 /* Reads data from the curent offset into a buffer
- * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of bytes read, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 
 /* Reads media data from an offset into a buffer
- * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of bytes read, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
@@ -128,14 +126,12 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buff
 
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs and not in raw mode
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
@@ -632,11 +628,6 @@ LIBEWF_EXTERN int libewf_set_hash_value( LIBEWF_HANDLE *handle, char *identifier
 #define libewf_set_hash_value_sha1( handle, value, length ) \
         libewf_set_hash_value( handle, "SHA1", value, length )
 #endif
-
-/* Sets the value to swap byte pairs internally, used by both read and write
- * Returns 1 if successful, -1 on error
- */
-LIBEWF_EXTERN int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs );
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above

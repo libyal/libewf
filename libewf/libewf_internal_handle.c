@@ -87,7 +87,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->acquiry_amount_of_errors  = 0;
 	internal_handle->current_chunk             = 0;
 	internal_handle->current_chunk_offset      = 0;
-	internal_handle->swap_byte_pairs           = 0;
 	internal_handle->compression_level         = EWF_COMPRESSION_UNKNOWN;
 	internal_handle->md5_hash_set              = 0;
 	internal_handle->amount_of_header_sections = 0;
@@ -759,25 +758,6 @@ int libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *i
 		return( -1 );
 	}
 	internal_handle->write->input_write_size = input_write_size;
-
-	return( 1 );
-}
-
-/* Sets the value to swap byte pairs internally, used by both read and write
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs )
-{
-	static char *function = "libewf_internal_handle_set_swap_byte_pairs";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->swap_byte_pairs = swap_byte_pairs;
 
 	return( 1 );
 }

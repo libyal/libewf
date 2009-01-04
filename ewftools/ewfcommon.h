@@ -248,6 +248,8 @@ extern LIBEWF_CHAR *ewfcommon_yes_no[ 2 ];
 #define EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT	0
 
+int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size );
+
 char *ewfcommon_strerror( int error_number );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
@@ -295,12 +297,12 @@ void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize6
 
 ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error );
 
-ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
-ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
-ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
-ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t read_size, off64_t read_offset, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t read_size, off64_t read_offset, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
 #if defined( __cplusplus )
 }

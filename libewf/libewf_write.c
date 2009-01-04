@@ -836,7 +836,6 @@ ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 /* Writes a new chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
@@ -1177,16 +1176,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	{
 		if( raw_access == 0 )
 		{
-			/* Swap bytes if necessary
-			 */
-			if( ( internal_handle->swap_byte_pairs != 0 )
-			 && ( libewf_endian_swap_byte_pairs( chunk_data, write_size ) != 1 ) )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
-				 function );
-
-				return( -1 );
-			}
 			chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
 
 			/* The compressed data size contains the maximum allowed buffer size
@@ -1345,7 +1334,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 /* Writes an existing chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
@@ -1526,16 +1514,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		chunk_data_size = (size_t) read_count;
 	}
 
-	/* Swap bytes if necessary
-	 */
-	if( ( internal_handle->swap_byte_pairs == 1 )
-	 && ( libewf_endian_swap_byte_pairs( (uint8_t *) chunk_data, chunk_data_size ) != 1 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* Calculate the new CRC
 	 */
 	if( ewf_crc_calculate( &chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
@@ -1689,7 +1667,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 /* Writes a chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
@@ -1779,7 +1756,6 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_
 
 /* Writes chunk data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
@@ -2036,7 +2012,6 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
@@ -2064,7 +2039,6 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset )

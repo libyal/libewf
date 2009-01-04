@@ -150,6 +150,38 @@ LIBEWF_CHAR *ewfcommon_yes_no[ 2 ] = \
  { _S_LIBEWF_CHAR( "yes" ),
    _S_LIBEWF_CHAR( "no" ) };
 
+/* Swaps the byte order of byte pairs within a buffer of a certain size
+ * Returns 1 if successful, -1 on error
+ */
+int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size )
+{
+	static char *function = "ewfcommon_swap_byte_pairs";
+	uint8_t byte          = 0;
+	size_t iterator       = 0;
+
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < size; iterator += 2 )
+	{
+		byte                   = buffer[ iterator ];
+		buffer[ iterator ]     = buffer[ iterator + 1 ];
+		buffer[ iterator + 1 ] = byte;
+	}
+	return( 1 );
+}
+
 /* Function to wrap strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
@@ -2328,7 +2360,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
  * Returns the amount of bytes read if successful, or -1 on error
  */
-ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -2470,6 +2502,16 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 			return( -1 );
 		}
+		/* Swap byte pairs
+		 */
+		if( ( swap_byte_pairs == 1 )
+		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
+			 function );
+
+			return( -1 );
+		}
 		if( calculate_md5 == 1 )
 		{
 			ewfmd5_update( &md5_context, data, read_count );
@@ -2536,7 +2578,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 /* Writes data in EWF format from a file descriptor
  * Returns the amount of bytes written, or -1 on error
  */
-ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -2760,6 +2802,16 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			}
 			break;
 		}
+		/* Swap byte pairs
+		 */
+		if( ( swap_byte_pairs == 1 )
+		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
+			 function );
+
+			return( -1 );
+		}
 		if( calculate_md5 == 1 )
 		{
 /* MSVS C++ does not allow pre compiler macro in macro defintions
@@ -2945,7 +2997,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 /* Reads the media data and exports it in raw format
  * Returns a -1 on error, the amount of bytes read on success
  */
-ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t read_size, off64_t read_offset, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	uint8_t *data              = NULL;
 	static char *function      = "ewfcommon_export_raw";
@@ -3083,6 +3135,16 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 		}
 		read_offset += size;
 
+		/* Swap byte pairs
+		 */
+		if( ( swap_byte_pairs == 1 )
+		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
+			 function );
+
+			return( -1 );
+		}
 		write_count = libewf_common_write( file_descriptor, data, (size_t) read_count );
 
 		if( write_count < read_count )
@@ -3109,7 +3171,7 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 /* Reads the media data and exports it in EWF format
  * Returns a -1 on error, the amount of bytes read on success
  */
-ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t read_size, off64_t read_offset, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	LIBEWF_CHAR header_value[ 128 ];
 
@@ -3254,6 +3316,16 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		}
 		read_offset += size;
 
+		/* Swap byte pairs
+		 */
+		if( ( swap_byte_pairs == 1 )
+		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
+			 function );
+
+			return( -1 );
+		}
 		write_count = libewf_write_buffer( export_handle, data, (size_t) read_count );
 
 		if( write_count < read_count )

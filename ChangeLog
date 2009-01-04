@@ -56,6 +56,7 @@ To do/think about:
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: linux alternative to wmain?
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
+* implement raw split support in ewfexport and ewfacquire?
 
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   - header2 and ltree only affected sections
@@ -75,7 +76,8 @@ Possible performance improvements:
 * remove write_buffer copy to chunk_cache read - chunk cache read really required?
 * tune read and write buffer sizes
   - read/write block size seems to have little effect for dd on average
-* reduce alloc, realloc and free (this reduces breaks) use strace as analyze - pass through of parameters or usage of handle
+* reduce alloc, realloc and free (this reduces breaks) use strace to analyze
+  - pass values as parameters or use of handle
 * optimize empty block test
 * what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
 * optimize string functions
@@ -91,25 +93,26 @@ Next release:
 * raw read/write
 * move md5 calculation out library into ewftools
 * make compilation resilient for missing crypto library
-* move byte swap out library into ewftools
 
 * full platform test
 * profile read and write functions
-* what about read+write and compression?
 * add libewf_convert_date_xheader_value function ?
   - add raw date format to allow to print raw date string
 * change string duplicate function to macro?
 * check if successive headers match first header
 * write api functions to rid ewfcommon of internal_handle
+  - acquiry errors
+  - CRC read errors
+  - the header values amount
+  - the hash values amount
 * have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 * change section start to static definition in libewf_section_last_write and libewf_section_start_write
 * do not create human readable byte string if size <= 1024
 
 * add maximum check to set functions in internal handle
-* move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle
 * move any access to segment table in file, write and read to segment_file
 * move open segment files in file to segment file to read segment table function
-* use LIBEWF_CHAR internally instead of seperate wide functions?
+* update ewfexport man page
 
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
@@ -119,17 +122,17 @@ TODO
 * check if segment table entry 0 is used in read mode make sure to use consistent
   usage of the segment table for read/write
 * make buffer passthrough default behavior
-
-* move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 * remove internal_handle passing from most functions
   only pass the necessary values
 * segment table should only be updated by functions in segment file/table
+
+* move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 * rewrite ewfglob marcros to function macros (including arguments)
-* remove libewf_write_finalize and libewf_write_chunk ?
+
+* remove libewf_write_chunk ?
 * check if chunk_cache_offset is still needed in write_new_chunk
   read is now in write_existing_chunk
-* implement raw split support in ewfexport and ewfacquire?
-* update ewfexport man page
+
 * what about header values parsing with preservation of timestamps?
 
 * change int8_t return values into int return values
@@ -144,7 +147,13 @@ TODO
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
 
-* move libewf_string_copy_from_digest_hash to ewfdigest_hash
+CLOSED
+* use LIBEWF_CHAR internally instead of seperate wide functions?
+  only for none wide support functions
+* what about read+write and compression?
+  solved by delta files
+* move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
+  no, this could be read from the error2 section
 
 Version: 20070908
 * worked on remove of MD5 calculation from library
@@ -160,6 +169,8 @@ Version: 20070908
 * added check to libewf_close to enforce libewf_write_finalize
 * worked on having compound reallocation functions return an integer as result
   - removed libewf_internal_handle_chunk_cache_realloc
+* worked on moving byte swap out library into ewftools
+  - removed libewf_set_swap_byte_pairs from API
 
 Version: 20070905
 * worked on remove of MD5 calculation from library
