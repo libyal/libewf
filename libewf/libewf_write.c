@@ -1442,14 +1442,16 @@ ssize_t libewf_raw_write_chunk_existing(
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle == NULL )
+	segment_file_handle = internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle;
+
+	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - invalid chunk offset - missing segment file handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_file_type = internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle->file_type;
+	segment_file_type = segment_file_handle->file_type;
 
 	LIBEWF_VERBOSE_PRINT( "%s: writing delta chunk of size: %zu with data of size: %zd.\n",
 	 function, chunk_size, chunk_data_size );
@@ -1617,19 +1619,9 @@ ssize_t libewf_raw_write_chunk_existing(
 			}
 			total_write_count += write_count;
 		}
-		LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %jd.\n",
-		 function, segment_file_handle->file_offset );
-
-#ifdef REFACTOR
-		internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-		internal_handle->offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
-		internal_handle->offset_table->chunk_offset[ chunk ].compressed          = 0;
-#endif
 	}
 	else
 	{
-		segment_file_handle = internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle;
-
 		if( libewf_segment_file_handle_seek_offset(
 		      segment_file_handle,
 		      internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
@@ -1640,6 +1632,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			return( -1 );
 		}
 	}
+	LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %jd.\n",
+	 function, segment_file_handle->file_offset );
 
 	/* Write the chunk in the delta segment file
 	 */
