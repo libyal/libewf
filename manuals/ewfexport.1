@@ -1,4 +1,4 @@
-.Dd November 24, 2007
+.Dd November 17, 2007
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -9,7 +9,6 @@
 .Op Fl b Ar amount_of_sectors
 .Op Fl B Ar amount_of_bytes
 .Op Fl c Ar compression_type
-.Op Fl d Ar digest_type
 .Op Fl f Ar format
 .Op Fl o Ar offset
 .Op Fl S Ar segment_file_size
@@ -41,15 +40,10 @@ The options are as follows:
 .Bl -tag -width Ds
 .It Fl b Ar amount_of_sectors
 the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
-(not used for raw format)
 .It Fl B Ar amount_of_bytes
 the amount of bytes to export
 .It Fl c Ar compression_type
 the compression type, options: none (is default), empty_block, fast, best
-(not used for raw format)
-.It Fl d Ar digest_type
-calculate additional digest (hash) types besides md5, options: sha1
-(not used for raw format)
 .It Fl f Ar format
 the file format to write to, options: raw (is default), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
 .It Fl h
@@ -59,8 +53,6 @@ swap byte pairs of the media data (from AB to BA)
 (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
 the segment file size in kibibytes (KiB) (default is 1536000)
-(minimum is 1440, maximum is 9007199254740991 for encase6 format and 2097151 for other EWF formats)
-(not used for raw format)
 .It Fl t Ar target
 specify the target file to export to, use - for stdout (default is export)
 stdout is only supported for the raw format

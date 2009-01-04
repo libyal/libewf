@@ -427,7 +427,7 @@ LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, size_
 
 		return( NULL );
 	}
-	timestamp   = (time_t) libewf_string_to_int64( header_value, header_value_length );
+	timestamp   = libewf_string_to_int64( header_value, header_value_length );
 	date_string = libewf_convert_date_timestamp( timestamp, date_format );
 
 	if( date_string == NULL )

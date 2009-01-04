@@ -114,7 +114,7 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_version_fprint( stdout, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "hqst:vV" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "hsqvV" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -262,24 +262,6 @@ int main( int argc, char * const argv[] )
 		libewf_common_free( buffer );
 
 		return( EXIT_FAILURE );
-	}
-	if( target_filename != NULL )
-	{
-		if( libewf_set_delta_segment_filename(
-		     handle,
-		     target_filename,
-		     CHAR_T_LENGTH( target_filename ) ) != 1 )
-		{
-			fprintf( stderr, "Unable to set delta segment filename in handle.\n" );
-
-			if( libewf_close( handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			libewf_common_free( buffer );
-
-			return( EXIT_FAILURE );
-		}
 	}
 	fprintf( stderr, "\n" );
 

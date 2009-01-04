@@ -1,6 +1,6 @@
 Roadmap:
-* add read/write support for session section - partial read support
-* create iso2ewf tool?
+* add read/write support for session section
+* create iso2ewf tool
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -14,7 +14,7 @@ Further analysis of the EWF format:
 * 16 bytes in hash section (EWF-E01)
 * values in EnCase5 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
-* values in session section (+/-)
+* values in session section
 
 To do/think about:
 * all: add LVF support - ltree section
@@ -27,6 +27,11 @@ To do/think about:
 * file: add function/flag to open segments files progressively using only the basename (like write)
 * libewf_string: enhance UTF16 conversion code
 * read: correct for errors in the table or table2 section for EWF-E01
+* read: reduce multiple successive crc error entries to a single
+* write: reduce multiple successive acquiry error (error2) entries to a single
+* look at integrating support for carvefs (libmodewf.c) - EWF specifics only
+  - put it in contrib for now ?
+  - what about xml based media data output like in libmodewf.c ?
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
   - use io pooling
@@ -86,9 +91,8 @@ Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
   virtualisation could be part of the problem
 * output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
-  - binary mode of the stdout file descriptor
 * The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
-* check chunk size for > 2 GiB table offsets
+* check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
 * MSVS C++ does not allow pre compiler macro in macro defintions
@@ -110,14 +114,24 @@ Next release:
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
+* ewfexport
+  - ewfcommon_export_ewf - add raw access write support
+  - allow to set sha1 and md5 calculation support
+  - > 2Gb segment file support
+* ewfacquire
+  - account for backspace in user input (no issue on Fedora Core 8)
+  - ewfinput_get_size_variable uses strtoul, max is ULONG_MAX
+    change to full 64bit value support?
 * ewfalter
-  - allow to set maximum delta file size default 4 GiB?
+  - allow to set delta segment file path/basename
+    test if no delta files were added before change
+  - allow to set maximum delta file size default 4Gb?
+* ewfacquirestream
+  - > 2Gb segment file support
 
 * work on TODO in write
 * API function get current chunk size? for raw read?
 * do not finalize on write error?
-
-* what to do with libewf_filename_get and libewf_filename_set
 
 * offset table dirty still needed?
   only needed for write
@@ -127,6 +141,8 @@ Next release:
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
 * move libewf_section_read to segment file
+
+* libewf_filename_create set string and length as parameters?
 
 * Try to correct the table
   - add error flag
@@ -148,15 +164,6 @@ CLOSED
 Version: 20071124
 * worked on refactoring code
 * made buffer passthrough default behavior
-* ewfexport added sha1 calculation support
-* fixed error writing segment files > 2 Gib
-* reduced multiple successive crc error entries to a single
-* reduced multiple successive acquiry error (error2) entries to a single
-* ewfcommon_export_ewf added raw access write support
-* change string to (u)int64 conversion routines to use long long equivalents
-* ewfacquirestream and ewfexport added > 2 GiB segment file support
-* libewf_filename_create now takes string and length as parameters
-* ewfalter added functionality to set delta segment file path/basename
 
 Version: 20071123
 * worked on refactoring code
@@ -335,7 +342,7 @@ Version: 20070908
   - added macros libewf_set_hash_value_md5 and libewf_set_hash_value_sha1 to API
   - removed libewf_get_md5_hash from API
   - removed several libewf_internal_handle_get_ and libewf_internal_handle_set_ functions
-* worked on write support for > 2 GiB segment file for EnCase 6.7
+* worked on write support for > 2Gb segment file for EnCase 6.7
 * added check to libewf_close to enforce libewf_write_finalize
 * worked on having compound reallocation functions return an integer as result
   - removed libewf_internal_handle_chunk_cache_realloc
@@ -348,7 +355,7 @@ Version: 20070905
   - implemented MD5 calculation in ewfcommon for ewfverify
   - removed hashed flags in offset table
   - removed libewf_calculate_md5_hash from API
-* worked on read support for > 2 GiB segment file for EnCase 6.7
+* worked on read support for > 2Gb segment file for EnCase 6.7
 
 Version: 20070830
 * changed use of stdout and stderr in ewfacquirestream, ewfinfo, ewfalter
@@ -356,8 +363,8 @@ Version: 20070830
 * fixed duplicate write of delta chunks
 
 Version: 20070829
-* worked on read support for > 2 GiB segment file for EnCase 6.7
-* worked on write support for > 2 GiB segment file for EnCase 6.7
+* worked on read support for > 2Gb segment file for EnCase 6.7
+* worked on write support for > 2Gb segment file for EnCase 6.7
 * worked on session section support
 * changed use of stdout and stderr in ewfverify
 * added errno == 0 check in ewftools after libewf open to prevent
@@ -365,9 +372,9 @@ Version: 20070829
   "Unable to open EWF file(s) with failure: Success."
 
 Version: 20070828
-* worked on read support for > 2 GiB segment file for EnCase 6.7
-* changed off_t to off64_t for Windows > 2 GiB segment file support
-* worked on write support for > 2 GiB segment file for EnCase 6.7
+* worked on read support for > 2Gb segment file for EnCase 6.7
+* changed off_t to off64_t for Windows >2Gb segment file support
+* worked on write support for > 2Gb segment file for EnCase 6.7
 * changed use of stdout and stderr in ewfacquire
 
 Version: 20070827
@@ -821,7 +828,7 @@ Version: 20061219
 * several adjustments thanks to Christophe Grenier
 - manual/libewf.3
 - libewf.spec.in
-- fix for 4 GiB support for native Windows compilation _lseek => _lseeki64
+- fix for 4Gb support for native Windows compilation _lseek => _lseeki64
 
 Version: 20061218
 * added sys/types for Solaris signal.h include
@@ -1163,7 +1170,7 @@ Version: 20061019
   - moved header values set and create to libewf_handle
   - removed set_parameter function
 * Fixed mismatch in segment size and chunks section size calculation for the EWF-S01 format
-* Fixed invalid amount of chunks per segment for 2 GiB segment file for the EWF-S01 and EWF-E01 format
+* Fixed invalid amount of chunks per segment for 2Gb segment file for the EWF-S01 and EWF-E01 format
 * Added maximum input size check
 * Added a generic set function for enabling byte swap
 * Completed redesign write and parameter functions to fallback to a default
@@ -1340,7 +1347,7 @@ Version: 20060906
 
 Version: 20060905
 * worked on code clean up and improved error handling
-* added large file support to configure.in for converting raw images > 4 GiB to EWF files
+* added large file support to configure.in for converting raw images > 4 Gb to EWF files
 * ewfacquire added total acquire time and bytes/second
 
 Version: 20060904
@@ -1415,8 +1422,7 @@ Version: 20060821
 * read: added basic support for L01 files, which are basically EWF files
 * renamed ewf_file_signature to evf_file_signature - closer to the truth
 * ewfacquire: compensate for maximum S01 file size in ewf file size question - determine maximum
-  - not relevant because there is a maximum of chunks within the file but the
-  other data could grow to the 2 GiB
+  - not relevant because there is a maximum of chunks within the file but the other data could grow to the 2 Gb
 
 Version: 20060820
 * ewfacquire: small change to confirmation
@@ -1582,7 +1588,7 @@ Version: 20060414
 * ewfacquire allow for a default value - for fixed values
 * ewfacquire can now acquire devices on works on Mac OS-X/Darwin
 * fix write crc error in chunk on mac os x
-* ewfacquire add EWF file size input possibility - check upper bound 2 GiB, lower bound 1440k
+* ewfacquire add EWF file size input possibility - check upper bound 2Gb, lower bound 1440k
 * fix write bug with small file size 1440k - for floppy image - this has to do if
   both the filesize and the ewf size are the same - write will adjust with one additional segment file
 

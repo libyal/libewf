@@ -1103,7 +1103,8 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	{
 		internal_handle->ewf_format = EWF_FORMAT_E01;
 	}
-	if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
 	{
 		internal_handle->write->maximum_segment_file_size        = INT64_MAX;
 		internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6;

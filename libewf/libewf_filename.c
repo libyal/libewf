@@ -40,7 +40,6 @@
 
 #include "ewf_definitions.h"
 
-#ifdef REFACTOR
 /* Retrieves an internally used filename
  * Returns 1 if succesful, or -1 on error
  */
@@ -159,15 +158,14 @@ int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILEN
 
 	return( 1 );
 }
-#endif
 
 /* Creates the filename extension for a certain segment file
  * For EWF-E01, EWF-S01 segment file extension naming scheme
  * Returns 1 on success, -1 on error
  */
-int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
+int libewf_filename_create_extension( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, LIBEWF_FILENAME *extension )
 {
-	static char *function                           = "libewf_filename_set_extension";
+	static char *function                           = "libewf_filename_create_extension";
 	LIBEWF_FILENAME extension_first_character       = (LIBEWF_FILENAME) '\0';
 	LIBEWF_FILENAME extension_additional_characters = (LIBEWF_FILENAME) '\0';
 
@@ -276,90 +274,76 @@ int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_
 }
 
 /* Creates a filename for a certain segment file
- * Returns 1 if successful, or -1 on error
+ * Returns the pointer to the filename, NULL on error
  */
-int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename, LIBEWF_FILENAME *basename, size_t length_basename, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
+LIBEWF_FILENAME *libewf_filename_create( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, LIBEWF_FILENAME *basename )
 {
-	LIBEWF_FILENAME *new_filename = NULL;
-	static char *function         = "libewf_filename_create";
+	static char *function     = "libewf_filename_create";
+	LIBEWF_FILENAME *filename = NULL;
+	size_t length             = 0;
 
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( *filename != NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: filename already set.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( length_filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid length filename.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( basename == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid basename.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	if( segment_number == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment 0.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
-	/* The actual filename also contains a '.', 3 character extension and a end of string byte
-	 */
-	new_filename = libewf_common_alloc( LIBEWF_FILENAME_SIZE * ( length_basename + 5 ) );
+	length = libewf_filename_length( basename );
 
-	if( new_filename == NULL )
+	if( length == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: basename is empty.\n",
+		 function );
+
+		return( NULL );
+	}
+	/* The actual filename also contain a . 3 character extension and a end of string byte
+	 */
+	filename = libewf_common_alloc( LIBEWF_FILENAME_SIZE * ( length + 5 ) );
+
+	if( filename == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate filename.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	/* Add one additional character for the end of line
 	 */
-	if( libewf_filename_copy( new_filename, basename, ( length_basename + 1 ) ) == NULL )
+	if( libewf_filename_copy( filename, basename, ( length + 1 ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to copy basename.\n",
 		 function );
 
-		libewf_common_free( new_filename );
+		libewf_common_free( filename );
 
-		return( -1 );
+		return( NULL );
 	}
-	new_filename[ length_basename ] = (LIBEWF_FILENAME) '.';
+	filename[ length ] = (LIBEWF_FILENAME) '.';
 
-	if( libewf_filename_set_extension(
-	     &( new_filename[ length_basename + 1 ] ),
+	if( libewf_filename_create_extension(
 	     segment_number,
 	     maximum_amount_of_segments,
 	     segment_file_type,
 	     ewf_format,
-	     format ) != 1 )
+	     format,
+	     &filename[ length + 1 ] ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set extension.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create extension.\n",
 		 function );
 
-		libewf_common_free( new_filename );
+		libewf_common_free( filename );
 
-		return( -1 );
+		return( NULL );
 	}
-	*filename        = new_filename;
-	*length_filename = length_basename + 5;
-
-	return( 1 );
+	return( filename );
 }
 

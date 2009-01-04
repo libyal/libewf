@@ -565,24 +565,24 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	}
 	segment_table->segment_file[ segment_number ] = segment_file;
 
-	if( libewf_filename_create(
-	     &( segment_file->filename ),
-	     &( segment_file->length_filename ),
-	     segment_table->segment_file[ 0 ]->filename,
-	     segment_table->segment_file[ 0 ]->length_filename,
-	     segment_number,
-	     maximum_amount_of_segments,
-	     segment_file_type,
-	     ewf_format,
-	     format ) != 1 )
+	segment_file->filename = libewf_filename_create(
+	                          segment_number,
+	                          maximum_amount_of_segments,
+	                          segment_file_type,
+	                          ewf_format,
+	                          format,
+	                          segment_table->segment_file[ 0 ]->filename );
+
+	if( segment_file->filename == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create segment file filename.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( segment_file->filename == NULL )
-	 || ( segment_file->length_filename == 0 ) )
+	segment_file->length_filename = libewf_filename_length( segment_file->filename );
+
+	if( segment_file->length_filename == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
 		 function );
@@ -1568,7 +1568,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
  * Also write the necessary sections after the actual data chunks to file (like table and table2 sections for EWF-E01 format)
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks )
+ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t chunks_section_offset, size_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks )
 {
 	EWF_CHAR *table_section_string   = NULL;
 	static char *function            = "libewf_segment_file_write_chunks_correction";
@@ -1587,23 +1587,6 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	{
-		if( chunks_section_size >= (size64_t) INT64_MAX )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk section size value exceeds maximum.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else if( chunks_section_size >= (size64_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk section size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -1627,7 +1610,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 	if( ( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: correcting table section size: %" PRIu64 " offset: %jd.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: correcting table section size: %zu offset: %jd.\n",
 		 function, chunks_section_size, chunks_section_offset );
 
 		/* Rewrite table section start
@@ -1640,7 +1623,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		               section_amount_of_chunks,
 		               (EWF_CHAR *) "table",
 		               5,
-		               (size_t) chunks_section_size,
+		               chunks_section_size,
 		               internal_handle->format,
 		               internal_handle->ewf_format,
 		               0 );
