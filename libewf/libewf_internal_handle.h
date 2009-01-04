@@ -288,6 +288,10 @@ struct libewf_internal_handle_write
 	 */
 	size64_t input_write_size;
 
+	/* The maximum segment file size
+	 */
+	size64_t maximum_segment_file_size;
+
 	/* The segment file size
 	 */
 	size64_t segment_file_size;
@@ -306,7 +310,7 @@ struct libewf_internal_handle_write
 
         /* The determined (estimated) amount of chunks per segment
          */
-        uint32_t chunks_per_segment;
+        int64_t chunks_per_segment;
 
         /* The determined (estimated) amount of chunks per chunks section
          */

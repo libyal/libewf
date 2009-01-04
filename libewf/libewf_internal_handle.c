@@ -366,6 +366,7 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 	handle_write->input_write_count          = 0;
 	handle_write->write_count                = 0;
 	handle_write->input_write_size           = 0;
+	handle_write->maximum_segment_file_size  = 0;
 	handle_write->segment_file_size          = 0;
 	handle_write->maximum_amount_of_segments = 0;
 	handle_write->chunks_section_write_count = 0;
@@ -1979,7 +1980,6 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	int64_t amount_of_chunks            = 0;
 	int64_t amount_of_sectors           = 0;
 	uint64_t maximum_input_file_size    = 0;
-	uint64_t maximum_segment_file_size  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2053,13 +2053,13 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
 	{
-		maximum_segment_file_size = INT64_MAX;
+		internal_handle->write->maximum_segment_file_size = INT64_MAX;
 	}
 	else
 	{
-		maximum_segment_file_size = INT32_MAX;
+		internal_handle->write->maximum_segment_file_size = INT32_MAX;
 	}
-	if( internal_handle->write->segment_file_size > maximum_segment_file_size )
+	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
 		 function );

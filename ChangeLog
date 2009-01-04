@@ -1,5 +1,6 @@
 Roadmap:
 * add write support for > 2Gb segment file for EnCase 6.7
+  make sure offsets in table remain within 2Gb limit
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency

@@ -54,7 +54,7 @@
 extern "C" {
 #endif
 
-uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number );
+int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number );
 uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset );
 int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset );

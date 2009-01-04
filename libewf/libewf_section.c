@@ -3182,9 +3182,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		/* Determine the size of the largest segment file for read and write mode only
 		 */
 		if( ( internal_handle->write != NULL )
-		 && ( internal_handle->write->segment_file_size < ( *section_start_offset + EWF_SECTION_SIZE ) ) )
+		 && ( (off64_t) internal_handle->write->segment_file_size < ( *section_start_offset + EWF_SECTION_SIZE ) ) )
 		{
-			internal_handle->write->segment_file_size = (uint32_t) ( *section_start_offset + EWF_SECTION_SIZE );
+			internal_handle->write->segment_file_size = (size64_t) ( *section_start_offset + EWF_SECTION_SIZE );
 		}
 	}
 	/* Read the header2 section
