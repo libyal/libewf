@@ -49,13 +49,15 @@
 LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 {
 	LIBEWF_HEADER_VALUES *header_values = NULL;
+	static char *function               = "libewf_header_values_alloc";
 	size_t header_values_size           = 0;
 
 	header_values = (LIBEWF_HEADER_VALUES *) libewf_common_alloc_cleared( LIBEWF_HEADER_VALUES_SIZE, 0 );
 
 	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_alloc: unable to allocate header values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate header values.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -64,7 +66,8 @@ LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 
 	if( header_values_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_alloc: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		libewf_common_free( header_values );
 
@@ -74,7 +77,8 @@ LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 
 	if( header_values->identifiers == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_alloc: unable to allocate identifiers.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate identifiers.\n",
+		 function );
 
 		libewf_common_free( header_values );
 
@@ -84,7 +88,8 @@ LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 
 	if( header_values->values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_alloc: unable to allocate values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate values.\n",
+		 function );
 
 		libewf_common_free( header_values->identifiers );
 		libewf_common_free( header_values );
@@ -115,30 +120,37 @@ LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount )
 {
 	LIBEWF_CHAR **reallocation = NULL;
+	static char *function      = "libewf_header_values_realloc";
 	size_t previous_size       = previous_amount * sizeof( LIBEWF_CHAR* );
 	size_t new_size            = new_amount * sizeof( LIBEWF_CHAR* );
 
 	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_realloc: invalid header values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		 function );
 
 		return( NULL );
 	}
-	if( ( previous_amount > (uint32_t) INT32_MAX ) || ( new_amount > (uint32_t) INT32_MAX ) )
+	if( ( previous_amount > (uint32_t) INT32_MAX )
+	 || ( new_amount > (uint32_t) INT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_realloc: invalid amount only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( previous_amount >= new_amount )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_realloc: new amount smaller than previous amount.\n" );
+		LIBEWF_WARNING_PRINT( "%s: new amount smaller than previous amount.\n",
+		 function );
 
 		return( NULL );
 	}
-	if( ( previous_size > (size_t) SSIZE_MAX ) || ( new_size > (size_t) SSIZE_MAX ) )
+	if( ( previous_size > (size_t) SSIZE_MAX )
+	 || ( new_size > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_realloc: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -146,7 +158,8 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_realloc: unable to reallocate identifiers.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate identifiers.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -155,7 +168,8 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_realloc: unable to reallocate values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate values.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -169,11 +183,13 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
  */
 void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values )
 {
-	uint32_t iterator = 0;
+	static char *function = "libewf_header_values_free";
+	uint32_t iterator     = 0;
 
 	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_free: invalid header values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		 function );
 
 		return;
 	}
@@ -189,63 +205,25 @@ void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values )
 	libewf_common_free( header_values );
 }
 
-/* Sets the year value in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int8_t libewf_date_string_set_year( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements )
-{
-	size_t string_length = 0;
-
-	if( date_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_year: invalid date string.\n" );
-
-		return( -1 );
-	}
-	if( date_elements == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_year: invalid date elements.\n" );
-
-		return( -1 );
-	}
-	string_length = libewf_string_length( date_elements[ 0 ] );
-
-	if( string_length == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_year: empty year string in date elements.\n" );
-
-		return( -1 );
-	}
-	if( string_length < 4 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_year: invalid year string in date elements.\n" );
-
-		return( -1 );
-	}
-	date_string[ 0 ] = date_elements[ 0 ][ 0 ];
-	date_string[ 1 ] = date_elements[ 0 ][ 1 ];
-	date_string[ 2 ] = date_elements[ 0 ][ 2 ];
-	date_string[ 3 ] = date_elements[ 0 ][ 3 ];
-
-	return( 1 );
-}
-
 /* Sets a 2 digit value for a certain index in the date element at the start of the date string
  * Returns 1 if successful, -1 otherwise
  */
 int8_t libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
 {
-	size_t string_length = 0;
+	static char *function = "libewf_date_string_set_2digit_value";
+	size_t string_length  = 0;
 
 	if( date_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_2digit_value: invalid date string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( date_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_2digit_value: invalid date elements.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid date elements.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -253,7 +231,8 @@ int8_t libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHA
 
 	if( string_length == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_2digit_value: empty string at index: %" PRIu8 " in date elements.\n", index );
+		LIBEWF_WARNING_PRINT( "%s: empty string at index: %" PRIu8 " in date elements.\n",
+		 function, index );
 
 		return( -1 );
 	}
@@ -270,73 +249,49 @@ int8_t libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHA
 	return( 1 );
 }
 
-/* Sets the month value in the date element at the start of the date string
+/* Sets a 4 digit value for a certain index in the date element at the start of the date string
  * Returns 1 if successful, -1 otherwise
  */
-int8_t libewf_date_string_set_month( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements )
+int8_t libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
 {
-	if( libewf_date_string_set_2digit_value( date_string, date_elements, 1 ) == -1 )
+	static char *function = "libewf_date_string_set_4digit_value";
+	size_t string_length  = 0;
+
+	if( date_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_month: unable to set month.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
-}
-
-/* Sets the day of the month value in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int8_t libewf_date_string_set_day_of_month( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements )
-{
-	if( libewf_date_string_set_2digit_value( date_string, date_elements, 2 ) == -1 )
+	if( date_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_month: unable to set day of the month.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid date elements.\n",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
-}
+	string_length = libewf_string_length( date_elements[ index ] );
 
-/* Sets the hours value in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int8_t libewf_date_string_set_hours( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements )
-{
-	if( libewf_date_string_set_2digit_value( date_string, date_elements, 3 ) == -1 )
+	if( string_length == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_month: unable to set hours.\n" );
+		LIBEWF_WARNING_PRINT( "%s: empty string in date elements.\n",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
-}
-
-/* Sets the minutes value in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int8_t libewf_date_string_set_minutes( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements )
-{
-	if( libewf_date_string_set_2digit_value( date_string, date_elements, 4 ) == -1 )
+	if( string_length < 4 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_month: unable to set minutes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string in date elements.\n",
+		 function );
 
 		return( -1 );
 	}
-	return( 1 );
-}
+	date_string[ 0 ] = (LIBEWF_CHAR) date_elements[ index ][ 0 ];
+	date_string[ 1 ] = (LIBEWF_CHAR) date_elements[ index ][ 1 ];
+	date_string[ 2 ] = (LIBEWF_CHAR) date_elements[ index ][ 2 ];
+	date_string[ 3 ] = (LIBEWF_CHAR) date_elements[ index ][ 3 ];
 
-/* Sets the seconds value in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int8_t libewf_date_string_set_seconds( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements )
-{
-	if( libewf_date_string_set_2digit_value( date_string, date_elements, 5 ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_date_string_set_month: unable to set seconds.\n" );
-
-		return( -1 );
-	}
 	return( 1 );
 }
 
@@ -347,12 +302,14 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 {
 	LIBEWF_CHAR **date_elements  = NULL;
 	LIBEWF_CHAR *date_string     = NULL;
+	static char *function        = "libewf_convert_date_header_value";
 	uint32_t date_element_count  = 0;
 	uint8_t date_string_iterator = 0;
 
 	if( header_value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: invalid header value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header value.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -360,7 +317,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unsupported date format.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported date format.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -368,15 +326,21 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 
 	if( date_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to create date string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+		 function );
 
 		return( NULL );
 	}
-	date_elements = libewf_string_split( header_value, libewf_string_length( header_value ), (LIBEWF_CHAR) ' ', &date_element_count );
+	date_elements = libewf_string_split(
+	                 header_value,
+	                 libewf_string_length( header_value ),
+	                 (LIBEWF_CHAR) ' ',
+	                 &date_element_count );
 
 	if( date_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to split date elements in header value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to split date elements in header value.\n",
+		 function );
 
 		libewf_common_free( date_string );
 
@@ -384,7 +348,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	}
 	if( date_element_count != 6 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unsupported amount of date elements in header value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported amount of date elements in header value.\n",
+		 function );
 
 		libewf_common_free( date_string );
 		libewf_string_split_values_free( date_elements, date_element_count );
@@ -397,7 +362,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set month value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set month value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -410,7 +376,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set day of the month value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -423,7 +390,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_year( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set year value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set year value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -437,13 +405,13 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
 	{
-		date_string[ date_string_iterator ] = '/';
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
 
 		date_string_iterator++;
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 	{
-		date_string[ date_string_iterator ] = '-';
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
 
 		date_string_iterator++;
 	}
@@ -453,7 +421,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set day of the month value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -467,7 +436,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set month value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set month value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -481,13 +451,13 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
 	{
-		date_string[ date_string_iterator ] = '/';
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
 
 		date_string_iterator++;
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 	{
-		date_string[ date_string_iterator ] = '-';
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
 
 		date_string_iterator++;
 	}
@@ -498,7 +468,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_year( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set year value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set year value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -511,7 +482,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	{
 		if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set day of the month value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
+			 function );
 
 			libewf_common_free( date_string );
 			libewf_string_split_values_free( date_elements, date_element_count );
@@ -525,13 +497,13 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
 	{
-		date_string[ date_string_iterator ] = ' ';
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) ' ';
 
 		date_string_iterator++;
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 	{
-		date_string[ date_string_iterator ] = 'T';
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) 'T';
 
 		date_string_iterator++;
 	}
@@ -539,7 +511,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	 */
 	if( libewf_date_string_set_hours( &date_string[ date_string_iterator ], date_elements ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set hours value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set hours value.\n",
+		 function );
 
 		libewf_common_free( date_string );
 		libewf_string_split_values_free( date_elements, date_element_count );
@@ -550,7 +523,7 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 
 	/* Set fourth seperator
 	 */
-	date_string[ date_string_iterator ] = ':';
+	date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
 
 	date_string_iterator++;
 
@@ -558,7 +531,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	 */
 	if( libewf_date_string_set_minutes( &date_string[ date_string_iterator ], date_elements ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set minutes value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set minutes value.\n",
+		 function );
 
 		libewf_common_free( date_string );
 		libewf_string_split_values_free( date_elements, date_element_count );
@@ -569,7 +543,7 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 
 	/* Set fifth seperator
 	 */
-	date_string[ date_string_iterator ] = ':';
+	date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
 
 	date_string_iterator++;
 
@@ -577,7 +551,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 	 */
 	if( libewf_date_string_set_seconds( &date_string[ date_string_iterator ], date_elements ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unable to set seconds value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set seconds value.\n",
+		 function );
 
 		libewf_common_free( date_string );
 		libewf_string_split_values_free( date_elements, date_element_count );
@@ -600,12 +575,14 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 {
 	LIBEWF_CHAR *date_string = NULL;
 	struct tm *time_elements = NULL;
+	static char *function    = "libewf_generate_date_header_value";
 
 	time_elements = libewf_common_localtime( &timestamp );
 
 	if( time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_generate_date_header_value: unable to create time elements.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -613,17 +590,26 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 
 	if( date_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_generate_date_header_value: unable to create date string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+		 function );
 
 		libewf_common_free( time_elements );
 
 		return( NULL );
 	}
-	if( libewf_string_snprintf( date_string, 20, _S_LIBEWF_CHAR( "%4d %d %d %d %d %d" ),
-		( time_elements->tm_year + 1900 ), ( time_elements->tm_mon + 1 ), time_elements->tm_mday,
-		time_elements->tm_hour, time_elements->tm_min, time_elements->tm_sec ) <= -1 )
+	if( libewf_string_snprintf(
+	     date_string,
+	     20,
+	     _S_LIBEWF_CHAR( "%4d %d %d %d %d %d" ),
+	     ( time_elements->tm_year + 1900 ),
+	     ( time_elements->tm_mon + 1 ),
+	     time_elements->tm_mday,
+	     time_elements->tm_hour,
+	     time_elements->tm_min,
+	     time_elements->tm_sec ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_generate_date_header_value: unable to fill date string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
+		 function );
 
 		libewf_common_free( date_string );
 		libewf_common_free( time_elements );
@@ -789,7 +775,7 @@ int32_t libewf_header_values_get_index( LIBEWF_HEADER_VALUES *header_values, LIB
 	}
 	if( header_values->amount > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_get_index: invalid header values amount only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_header_values_get_index: invalid header values amount value exceeds maximum.\n" );
 
 		return( -1 );
 	}

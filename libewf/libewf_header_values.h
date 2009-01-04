@@ -87,13 +87,21 @@ LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void );
 LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount );
 void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values );
 
-int8_t libewf_date_string_set_year( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements );
 int8_t libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index );
-int8_t libewf_date_string_set_month( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements );
-int8_t libewf_date_string_set_day_of_month( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements );
-int8_t libewf_date_string_set_hours( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements );
-int8_t libewf_date_string_set_minutes( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements );
-int8_t libewf_date_string_set_seconds( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements );
+int8_t libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index );
+
+#define libewf_date_string_set_year( date_string, date_elements ) \
+	libewf_date_string_set_4digit_value( date_string, date_elements, 0 )
+#define libewf_date_string_set_month( date_string, date_elements ) \
+	libewf_date_string_set_2digit_value( date_string, date_elements, 1 )
+#define libewf_date_string_set_day_of_month( date_string, date_elements ) \
+	libewf_date_string_set_2digit_value( date_string, date_elements, 2 )
+#define libewf_date_string_set_hours( date_string, date_elements ) \
+	libewf_date_string_set_2digit_value( date_string, date_elements, 3 )
+#define libewf_date_string_set_minutes( date_string, date_elements ) \
+	libewf_date_string_set_2digit_value( date_string, date_elements, 4 )
+#define libewf_date_string_set_seconds( date_string, date_elements ) \
+	libewf_date_string_set_2digit_value( date_string, date_elements, 5 )
 
 LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_t date_format );
 LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp );

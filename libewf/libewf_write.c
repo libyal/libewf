@@ -1384,6 +1384,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	size_t chunk_data_size  = 0;
 	uint16_t segment_number = 0;
 	int file_descriptor     = -1;
+	int last_segment_file   = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1548,8 +1549,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		}
 
 		/* TODO */
-
-		internal_handle->offset_table->dirty[ chunk ] = 1;
 	}
 	else
 	{
@@ -1575,7 +1574,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	 */
 	write_count = libewf_section_delta_chunk_write(
 		       internal_handle, 
-		       internal_handle->offset_table->file_descriptor[ chunk ],
+		       internal_handle->delta_segment_table->file_descriptor[ segment_number ],
 		       internal_handle->delta_segment_table->file_offset[ segment_number ],
 		       chunk, 
 		       chunk_data, 
@@ -1587,6 +1586,41 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		 function );
 
 		return( -1 );
+	}
+	if( libewf_section_list_append(
+	     internal_handle->delta_segment_table->section_list[ segment_number ],
+	     (EWF_CHAR *) "delta_chunk",
+	     internal_handle->delta_segment_table->file_offset[ segment_number ],
+	     ( internal_handle->delta_segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to append delta_chunk section to section list.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
+
+	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
+	{
+		/* Write the last section
+		 */
+		write_count = libewf_segment_file_write_last_section(
+			       internal_handle,
+			       internal_handle->delta_segment_table->file_descriptor[ segment_number ],
+			       internal_handle->delta_segment_table->section_list[ segment_number ],
+			       internal_handle->delta_segment_table->file_offset[ segment_number ],
+			       last_segment_file );
+
+		if( write_count == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
+
+		internal_handle->offset_table->dirty[ chunk ] = 1;
 	}
 	/* Report the amount of chunk data written
 	 */
