@@ -6,34 +6,101 @@
  *
  * Refer to AUTHORS for acknowledgements.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of the creator, related organisations, nor the names of
- *   its contributors may be used to endorse or promote products derived from
- *   this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "common.h"
 #include "file_io.h"
 #include "notify.h"
+
+/* Function to determine if a file exists
+ * Return 1 if file exists, 0 if not or -1 on error
+ */
+int libewf_file_io_exists(
+     const char *filename )
+{
+	static char *function = "libewf_file_io_exists";
+	int file_descriptor   = 0;
+
+	if( filename == NULL )
+	{
+		notify_warning_printf( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WINDOWS_API )
+	if( _sopen_s(
+	     &file_descriptor,
+	     filename,
+	     ( _O_RDONLY | _O_BINARY ),
+	     _SH_DENYRW,
+	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+#else
+	file_descriptor = open(
+	                   filename,
+	                   O_RDONLY,
+	                   0644 );
+
+	if( file_descriptor == -1 )
+#endif
+	{
+		return( 0 );
+	}
+	file_io_close(
+	 file_descriptor );
+
+	return( 1 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+/* Function to determine if a file exists
+ * Return 1 if file exists, 0 if not or -1 on error
+ */
+int libewf_file_io_wexists(
+     const wchar_t *filename )
+{
+	static char *function = "libewf_file_io_wexists";
+	int file_descriptor   = 0;
+
+	if( filename == NULL )
+	{
+		notify_warning_printf( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WINDOWS_API )
+	if( _wsopen_s(
+	     &file_descriptor,
+	     filename,
+	     ( _O_RDONLY | _O_BINARY ),
+	     _SH_DENYRW,
+	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+	{
+		return( 0 );
+	}
+	file_io_close(
+	 file_descriptor );
+
+	return( 1 );
+#else
+#error missing wopen()
+#endif
+}
+#endif
 
 /* Function to wrap open()
  */

@@ -6,29 +6,18 @@
  *
  * Refer to AUTHORS for acknowledgements.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of the creator, related organisations, nor the names of
- *   its contributors may be used to endorse or promote products derived from
- *   this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "common.h"
@@ -43,24 +32,8 @@
 
 #if defined( HAVE_STDARG_H )
 #include <stdarg.h>
-
-#define VARARGS( function, type, argument ) \
-	function( type argument, ... )
-#define VASTART( argument_list, type, name ) \
-	va_start( argument_list, name )
-#define VAEND( argument_list ) \
-	va_end( argument_list )
-
 #elif defined( HAVE_VARARGS_H )
 #include <varargs.h>
-
-#define VARARGS( function, type, argument ) \
-	function( va_alist ) va_dcl
-#define VASTART( argument_list, type, name ) \
-	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
-#define VAEND( argument_list ) \
-	va_end( argument_list ); }
-
 #else
 #error No variable argument support available
 #endif
@@ -77,6 +50,24 @@ void libewf_notify_set_values(
 	libewf_notify_stream  = stream;
 	libewf_notify_verbose = verbose;
 }
+
+#if defined( HAVE_STDARG_H )
+#define VARARGS( function, type, argument ) \
+	function( type argument, ... )
+#define VASTART( argument_list, type, name ) \
+	va_start( argument_list, name )
+#define VAEND( argument_list ) \
+	va_end( argument_list )
+
+#elif defined( HAVE_VARARGS_H )
+#define VARARGS( function, type, argument ) \
+	function( va_alist ) va_dcl
+#define VASTART( argument_list, type, name ) \
+	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
+#define VAEND( argument_list ) \
+	va_end( argument_list ); }
+
+#endif
 
 /* Print a formatted string on the notify stream
  */
@@ -104,6 +95,10 @@ void VARARGS(
 	}
 }
 
+#undef VARARGS
+#undef VASTART
+#undef VAEND
+
 /* Prints a dump of data
  */
 void libewf_notify_dump_data(
@@ -123,7 +118,7 @@ void libewf_notify_dump_data(
 			fprintf( libewf_notify_stream, "%.8" PRIzx ": ",
 			 iterator );
 		}
-		fprintf( libewf_notify_stream, "%.2" PRIx8 "",
+		fprintf( libewf_notify_stream, "%.2" PRIx8 " ",
 		 ( (unsigned char *) data )[ iterator++ ] );
 
 		if( iterator % 16 == 0 )
@@ -150,8 +145,17 @@ void libewf_notify_dump_data(
 			fprintf( libewf_notify_stream, "%.8" PRIzx ": ",
 			 iterator );
 		}
-		fprintf( libewf_notify_stream, "%c ",
-		 ( (char *) data )[ iterator++ ] );
+		if( ( ( (char *) data )[ iterator ] >= 0x20 )
+		 && ( ( (char *) data )[ iterator ] <= 0x7e ) )
+		{
+			fprintf( libewf_notify_stream, "%c ",
+			 ( (char *) data )[ iterator ] );
+		}
+		else
+		{
+			fprintf( libewf_notify_stream, ". " );
+		}
+		iterator++;
 
 		if( iterator % 32 == 0 )
 		{

@@ -53,6 +53,7 @@ DOCUMENT_FILES = \
 INCLUDE_FILES = \
 	include/libewf.h.in \
 	include/libewf/definitions.h.in \
+	include/libewf/features.h.in \
 	include/libewf/types.h.in
 
 MANUAL_FILES = \
@@ -114,6 +115,7 @@ include_HEADERS = \
 pkginclude_HEADERS = \
 	include/libewf/definitions.h \
 	include/libewf/extern.h \
+	include/libewf/features.h \
 	include/libewf/handle.h \
 	include/libewf/types.h
 
@@ -132,6 +134,7 @@ distclean: clean
 	/bin/rm -f common/config.h
 	/bin/rm -f include/libewf.h
 	/bin/rm -f include/libewf/definitions.h
+	/bin/rm -f include/libewf/features.h
 	/bin/rm -f include/libewf/types.h
 	/bin/rm -f libewf.pc
 	/bin/rm -f libewf.spec

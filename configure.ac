@@ -716,6 +716,7 @@ AC_CONFIG_FILES([manuals/Makefile])
 dnl Have configure make the include files
 AC_CONFIG_FILES([include/libewf.h])
 AC_CONFIG_FILES([include/libewf/definitions.h])
+AC_CONFIG_FILES([include/libewf/features.h])
 AC_CONFIG_FILES([include/libewf/types.h])
 dnl Have configure make distribution specific files
 AC_CONFIG_FILES([debian/changelog])

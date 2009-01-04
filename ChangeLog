@@ -112,7 +112,6 @@ Code clean up
 * merge alloc and realloc blocks
 
 Next release(s):
-* relicense to LGPL
 
 * implement low memory usage option
   - trade off IO versus memory use
@@ -142,11 +141,6 @@ Next release(s):
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-* change libewf_notify_set_values in libewf_file.c to notify_set_values
-
-* implement features.h like libsmio
-* remove libewf_filename.[ch]
-
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -168,6 +162,11 @@ Version: 20080809
 * Synchronised branches
 * Fixed seek end of file (patch by David Collett)
 * Fixed return at wrong location in libewf_date_time_gmtime
+* Implemented libewf_get_offset API function
+* relicensed to LGPL
+* implement features.h
+* updated common with libpff 20080808 version
+* changed libewf_notify_set_values in libewf_file.c to notify_set_values
 
 Version: 20080705
 * added ewfouput_error_fprint
