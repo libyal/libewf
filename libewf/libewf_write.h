@@ -62,6 +62,9 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK *chunk_data, size_t chunk_data_size, EWF_CHUNK *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc );
 ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK **chunk_data, size_t chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc );
 
+ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write );
+ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write );
+
 ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write );
 ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc );
 

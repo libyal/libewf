@@ -64,7 +64,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	size_t bytes_available   = 0;
 	size_t md5_hash_size     = 0;
 	uint16_t segment_number  = 0;
-	int chunk_cache_used     = 0;
 	int file_descriptor      = 0;
 	int result               = 0;
 
@@ -119,7 +118,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -131,9 +130,10 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 		return( -1 );
 	}
-	if( buffer == internal_handle->chunk_cache->compressed )
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache compressed.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -152,11 +152,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
 		segment_number  = internal_handle->offset_table->segment_number[ chunk ];
 
-		/* Check if chunk cache passthrough is used
-		 * if the chunk cache is used as the chunk data buffer
-		 */
-		chunk_cache_used = (int) ( buffer == internal_handle->chunk_cache->data );
-
 		/* Determine the size of the chunk including the CRC
 		 */
 		chunk_data_size = internal_handle->offset_table->size[ chunk ];
@@ -174,13 +169,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				 function );
 
 				return( -1 );
-			}
-			/* Adjust chunk data buffer if necessary
-			 */
-			if( ( chunk_cache_used == 1 )
-			 && ( buffer != internal_handle->chunk_cache->data ) )
-			{
-				buffer = internal_handle->chunk_cache->data;
 			}
 		}
 		chunk_data = internal_handle->chunk_cache->data;
@@ -494,7 +482,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	ssize_t chunk_read_count = 0;
 	ssize_t total_read_count = 0;
 	size_t chunk_data_size   = 0;
-	int chunk_cache_used     = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -505,7 +492,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -517,9 +504,10 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 		return( -1 );
 	}
-	if( buffer == internal_handle->chunk_cache->compressed )
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - chunk cache compressed cannot be used as buffer.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -555,11 +543,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	LIBEWF_VERBOSE_PRINT( "%s: reading size: %zu.\n",
 	 function, size );
 
-	/* Check if chunk cache passthrough is used
-	 * if the chunk cache is used as the chunk data buffer
-	 */
-	chunk_cache_used = (int) ( buffer == internal_handle->chunk_cache->data );
-
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents multiple reallocations of the chunk cache
 	 */
@@ -577,13 +560,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 			return( -1 );
 		}
-		/* Adjust chunk data buffer if necessary
-		 */
-		if( ( chunk_cache_used == 1 )
-		 && ( buffer != internal_handle->chunk_cache->data ) )
-		{
-			buffer = (void *) internal_handle->chunk_cache->data;
-		}
 	}
 	while( size > 0 )
 	{
@@ -595,14 +571,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		                    (void *) &( (uint8_t *) buffer )[ total_read_count ],
 		                    size );
 
-		/* libewf_read_chunk could relocate the chunk cache
-		 * correct buffer is chunk cache passthrough is used
-		 */
-		if( ( chunk_cache_used == 1 )
-		 && ( buffer != internal_handle->chunk_cache->data ) )
-		{
-			buffer = (void *) internal_handle->chunk_cache->data;
-		}
 		if( chunk_read_count <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",

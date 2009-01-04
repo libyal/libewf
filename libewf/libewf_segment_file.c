@@ -2603,7 +2603,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	filename_length = libewf_common_string_length( filenames[ 0 ] );
 #endif
 
-	if( filename_length == 0 )
+	if( filename_length <= 4 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
 		 function );
@@ -2615,13 +2615,13 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	     internal_handle->segment_table,
 	     0,
 	     filenames[ 0 ],
-	     filename_length ) != 1 )
+	     ( filename_length - 4 ) ) != 1 )
 #else
 	if( libewf_segment_table_set_filename(
 	     internal_handle->segment_table,
 	     0,
 	     filenames[ iterator ],
-	     filename_length ) != 1 )
+	     ( filename_length - 4 ) ) != 1 )
 #endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
@@ -2716,13 +2716,13 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 			if( libewf_segment_table_set_wide_filename(
 			     internal_handle->segment_table,
-			     0,
+			     segment_number,
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 #else
 			if( libewf_segment_table_set_filename(
 			     internal_handle->segment_table,
-			     0,
+			     segment_number,
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 #endif
@@ -2826,13 +2826,13 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 			if( libewf_segment_table_set_wide_filename(
 			     internal_handle->delta_segment_table,
-			     0,
+			     segment_number,
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 #else
 			if( libewf_segment_table_set_filename(
 			     internal_handle->delta_segment_table,
-			     0,
+			     segment_number,
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 #endif
@@ -2860,21 +2860,21 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 			return( -1 );
 		}
-		if( libewf_segment_file_build_segment_table( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to build segment table.\n",
-			 function );
+	}
+	if( libewf_segment_file_build_segment_table( internal_handle ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to build segment table.\n",
+		 function );
 
-			return( -1 );
-		}
-		if( ( internal_handle->delta_segment_table->amount > 1 )
-		 && ( libewf_segment_file_build_delta_segment_table( internal_handle ) != 1 ) )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to build delta segment table.\n",
-			 function );
+		return( -1 );
+	}
+	if( ( internal_handle->delta_segment_table->amount > 1 )
+	 && ( libewf_segment_file_build_delta_segment_table( internal_handle ) != 1 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to build delta segment table.\n",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	return( 1 );
 }

@@ -85,7 +85,6 @@ dnl Check for configure arguments
 LIBEWF_TEST_ENABLE([wide-character-type], [wide_character_type], [enable wide character type support], [no])
 LIBEWF_TEST_ENABLE([buffer-passthrough], [buffer_passthrough], [minimize the usage of the chunk cache by directly accessing data buffers], [no])
 LIBEWF_TEST_ENABLE([raw-access], [raw_access], [use libewf's raw read and write functionality in the ewf tools], [no])
-LIBEWF_TEST_ENABLE([chunk-cache-passthrough], [chunk_cache_passthrough], [use the chunk cache as data buffer in the ewf tools], [no])
 LIBEWF_TEST_ENABLE([verbose-output], [verbose_output], [enable verbose output], [no])
 LIBEWF_TEST_ENABLE([debug-output], [debug_output], [enable debug output], [no])
 
@@ -207,9 +206,6 @@ AS_IF([test "x$ac_libewf_enable_buffer_passthrough" != xno ],
 
 AS_IF([test "x$ac_libewf_enable_raw_access" != xno ],
 	[AC_DEFINE( [HAVE_RAW_ACCESS], [1], [Defines if libewf's read and write raw functionality should be used in the ewf tools] ) ] )
-
-AS_IF([test "x$ac_libewf_enable_chunk_cache_passthrough" != xno ],
-	[AC_DEFINE( [HAVE_CHUNK_CACHE_PASSTHROUGH], [1], [Defines if chunk cache passthrough should be used in the ewf tools] ) ] )
 
 AS_IF([test "x$ac_libewf_enable_verbose_output" != xno ],
 	[AC_DEFINE( [HAVE_VERBOSE_OUTPUT], [1], [Defines if verbose output should be used] ) ] )

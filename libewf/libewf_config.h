@@ -10,9 +10,6 @@
 /* Defines if buffer passthrough should be used */
 /* #undef HAVE_BUFFER_PASSTHROUGH */
 
-/* Defines if chunk cache passthrough should be used in the ewf tools */
-/* #undef HAVE_CHUNK_CACHE_PASSTHROUGH */
-
 /* Defines if compressBound funtion is present in zlib. */
 #define HAVE_COMPRESS_BOUND 1
 

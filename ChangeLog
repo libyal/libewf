@@ -115,6 +115,8 @@ TODO
 * ewfacquire check if last segment file is closed before telling acquiry was completed
 * check if segment table entry 0 is used in read mode make sure to use consistent
   usage of the segment table for read/write
+* remove write_finalized
+* make buffer passthroug default behavior
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
@@ -126,6 +128,7 @@ Version: 20070812
 * moved gmtime function from libewf_common to ewfcommon
 * removed error string from libewf_write_finalize
 * moved strerror functions from libewf_common to ewfcommon
+* removed chunk cache passthrough
 
 Version: 20070811
 * removed external char
