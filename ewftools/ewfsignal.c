@@ -32,9 +32,9 @@
  */
 
 #include <common.h>
+#include <notify.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfsignal.h"
 
@@ -56,7 +56,7 @@ int ewfsignal_attach(
 
 	if( signal_handler == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid signal handler.\n",
+		notify_warning_printf( "%s: invalid signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -65,7 +65,7 @@ int ewfsignal_attach(
 	     SIGINT,
 	     signal_handler ) == SIG_ERR )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to attach signal handler.\n",
+		notify_warning_printf( "%s: unable to attach signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -85,7 +85,7 @@ int ewfsignal_detach(
 	     SIGINT,
 	     SIG_DFL ) == SIG_ERR )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to detach signal handler.\n",
+		notify_warning_printf( "%s: unable to detach signal handler.\n",
 		 function );
 
 		return( -1 );
@@ -123,7 +123,7 @@ int WINAPI ewfsignal_signal_handler( unsigned long signal )
 		 */
 		case CTRL_BREAK_EVENT:
 		case CTRL_C_EVENT:
-			LIBEWF_WARNING_PRINT( "%s: stopping at break signal.\n",
+			notify_warning_printf( "%s: stopping at break signal.\n",
 			 function );
 
 			InterlockedExchange( (long *) &cancelled, 1 );

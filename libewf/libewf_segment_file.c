@@ -33,6 +33,7 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
@@ -40,7 +41,6 @@
 #include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_hash_values.h"
-#include "libewf_notify.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
@@ -66,7 +66,7 @@ int libewf_segment_file_check_file_signature(
 
 	if( file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
@@ -78,14 +78,14 @@ int libewf_segment_file_check_file_signature(
 
 	if( read_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: error reading signature from file.\n",
+		notify_warning_printf( "%s: error reading signature from file.\n",
 		 function );
 
 		return( -1 );
 	}
 	else if( read_count != 8 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file.\n",
+		notify_warning_printf( "%s: unable to read signature from file.\n",
 		 function );
 
 		return( -1 );
@@ -130,14 +130,14 @@ ssize_t libewf_segment_file_read_file_header(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_number == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
+		notify_warning_printf( "%s: invalid segment number.\n",
 		 function );
 
 		return( -1 );
@@ -149,7 +149,7 @@ ssize_t libewf_segment_file_read_file_header(
 
 	if( read_count != (ssize_t) sizeof( ewf_file_header_t ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read file header.\n",
+		notify_warning_printf( "%s: unable to read file header.\n",
 		 function );
 
 		return( -1 );
@@ -179,7 +179,7 @@ ssize_t libewf_segment_file_read_file_header(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: file signature does not match.\n",
+		notify_warning_printf( "%s: file signature does not match.\n",
 		 function );
 
 		return( -1 );
@@ -188,7 +188,7 @@ ssize_t libewf_segment_file_read_file_header(
 	     segment_number,
 	     file_header.fields_segment ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert fields segment number value.\n",
+		notify_warning_printf( "%s: unable to convert fields segment number value.\n",
 		 function );
 
 		return( -1 );
@@ -224,14 +224,14 @@ int libewf_segment_file_read_sections(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( last_segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid last segment file.\n",
+		notify_warning_printf( "%s: invalid last segment file.\n",
 		 function );
 
 		return( -1 );
@@ -263,7 +263,7 @@ int libewf_segment_file_read_sections(
 
 		if( result != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read section.\n",
+			notify_warning_printf( "%s: unable to read section.\n",
 			 function );
 
 			return( -1 );
@@ -301,14 +301,14 @@ ssize_t libewf_segment_file_write_headers(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( header_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header sections.\n",
+		notify_warning_printf( "%s: invalid header sections.\n",
 		 function );
 
 		return( -1 );
@@ -316,7 +316,7 @@ ssize_t libewf_segment_file_write_headers(
 	if( ( header_sections->header == NULL )
 	 || ( header_sections->header_size == 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header.\n",
+		notify_warning_printf( "%s: invalid header.\n",
 		 function );
 
 		return( -1 );
@@ -340,7 +340,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write single header section.\n",
+			notify_warning_printf( "%s: unable to write single header section.\n",
 			 function );
 
 			return( -1 );
@@ -366,7 +366,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write first header section.\n",
+			notify_warning_printf( "%s: unable to write first header section.\n",
 			 function );
 
 			return( -1 );
@@ -381,7 +381,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write second header section.\n",
+			notify_warning_printf( "%s: unable to write second header section.\n",
 			 function );
 
 			return( -1 );
@@ -397,7 +397,7 @@ ssize_t libewf_segment_file_write_headers(
 		if( ( header_sections->header2 == NULL )
 		 && ( header_sections->header2_size == 0 ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+			notify_warning_printf( "%s: invalid header2.\n",
 			 function );
 
 			return( -1 );
@@ -417,7 +417,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write first header2 section.\n",
+			notify_warning_printf( "%s: unable to write first header2 section.\n",
 			 function );
 
 			return( -1 );
@@ -432,7 +432,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write second header2 section.\n",
+			notify_warning_printf( "%s: unable to write second header2 section.\n",
 			 function );
 
 			return( -1 );
@@ -450,7 +450,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write third header section.\n",
+			notify_warning_printf( "%s: unable to write third header section.\n",
 			 function );
 
 			return( -1 );
@@ -466,7 +466,7 @@ ssize_t libewf_segment_file_write_headers(
 		if( ( header_sections->xheader == NULL )
 		 && ( header_sections->xheader_size == 0 ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid xheader.\n",
+			notify_warning_printf( "%s: invalid xheader.\n",
 			 function );
 
 			return( -1 );
@@ -474,7 +474,7 @@ ssize_t libewf_segment_file_write_headers(
 		if( ( header_sections->header2 == NULL )
 		 && ( header_sections->header2_size == 0 ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+			notify_warning_printf( "%s: invalid header2.\n",
 			 function );
 
 			return( -1 );
@@ -494,7 +494,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write firts xheader section.\n",
+			notify_warning_printf( "%s: unable to write firts xheader section.\n",
 			 function );
 
 			return( -1 );
@@ -512,7 +512,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write second header2 section.\n",
+			notify_warning_printf( "%s: unable to write second header2 section.\n",
 			 function );
 
 			return( -1 );
@@ -530,7 +530,7 @@ ssize_t libewf_segment_file_write_headers(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write third header section.\n",
+			notify_warning_printf( "%s: unable to write third header section.\n",
 			 function );
 
 			return( -1 );
@@ -557,7 +557,7 @@ ssize_t libewf_segment_file_write_last_section(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
@@ -581,7 +581,7 @@ ssize_t libewf_segment_file_write_last_section(
 
 	if( write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write %s section.\n",
+		notify_warning_printf( "%s: unable to write %s section.\n",
 		 function, (char *) last_section_type );
 
 		return( -1 );
@@ -612,35 +612,35 @@ ssize_t libewf_segment_file_write_start(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_number == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
+		notify_warning_printf( "%s: invalid segment number.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		notify_warning_printf( "%s: invalid section list.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( cached_data_section == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid cached data section.\n",
+		notify_warning_printf( "%s: invalid cached data section.\n",
 		 function );
 
 		return( -1 );
@@ -662,7 +662,7 @@ ssize_t libewf_segment_file_write_start(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type.\n",
+		notify_warning_printf( "%s: unsupported segment file type.\n",
 		 function );
 
 		return( -1 );
@@ -674,7 +674,7 @@ ssize_t libewf_segment_file_write_start(
 	     file_signature,
 	     8 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set file signature.\n",
+		notify_warning_printf( "%s: unable to set file signature.\n",
 		 function );
 
 		return( -1 );
@@ -683,7 +683,7 @@ ssize_t libewf_segment_file_write_start(
 	     segment_number,
 	     file_header.fields_segment ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert segment number.\n",
+		notify_warning_printf( "%s: unable to revert segment number.\n",
 		 function );
 
 		return( -1 );
@@ -701,7 +701,7 @@ ssize_t libewf_segment_file_write_start(
 
 	if( write_count != (ssize_t) sizeof( ewf_file_header_t ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write file header to file.\n",
+		notify_warning_printf( "%s: unable to write file header to file.\n",
 		 function );
 
 		return( -1 );
@@ -723,7 +723,7 @@ ssize_t libewf_segment_file_write_start(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write header sections.\n",
+				notify_warning_printf( "%s: unable to write header sections.\n",
 				 function );
 
 				return( -1 );
@@ -759,7 +759,7 @@ ssize_t libewf_segment_file_write_start(
 			}
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write volume section.\n",
+				notify_warning_printf( "%s: unable to write volume section.\n",
 				 function );
 
 				return( -1 );
@@ -780,7 +780,7 @@ ssize_t libewf_segment_file_write_start(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write data section.\n",
+				notify_warning_printf( "%s: unable to write data section.\n",
 				 function );
 
 				return( -1 );
@@ -809,14 +809,14 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		notify_warning_printf( "%s: invalid offset table.\n",
 		 function );
 
 		return( -1 );
@@ -829,7 +829,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		     offset_table,
 		     ( total_chunk_amount + segment_chunk_amount ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to reallocate offset table.\n",
 			 function );
 
 			return( -1 );
@@ -855,7 +855,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to write table section.\n",
+			notify_verbose_printf( "%s: unable to write table section.\n",
 			 function );
 
 			return( -1 );
@@ -875,7 +875,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to write sectors section.\n",
+			notify_verbose_printf( "%s: unable to write sectors section.\n",
 			 function );
 
 			return( -1 );
@@ -910,35 +910,35 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		notify_warning_printf( "%s: invalid offset table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk CRC.\n",
+		notify_warning_printf( "%s: invalid chunk CRC.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
@@ -955,7 +955,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		     offset_table,
 		     ( chunk + 1 ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to reallocate offset table.\n",
 			 function );
 
 			return( -1 );
@@ -979,7 +979,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	notify_verbose_printf( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function, chunk_type, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
 #endif
 
@@ -992,7 +992,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 	if( write_count != (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write data.\n",
+		notify_warning_printf( "%s: unable to write data.\n",
 		 function );
 
 		return( -1 );
@@ -1007,7 +1007,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		     *chunk_crc,
 		     calculated_crc_buffer ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+			notify_warning_printf( "%s: unable to revert CRC value.\n",
 			 function );
 
 			return( -1 );
@@ -1019,7 +1019,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write CRC.\n",
+			notify_warning_printf( "%s: unable to write CRC.\n",
 			 function );
 
 			return( -1 );
@@ -1052,7 +1052,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
@@ -1061,7 +1061,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	{
 		if( chunks_section_size >= (size64_t) INT64_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk section size value exceeds maximum.\n",
+			notify_warning_printf( "%s: invalid chunk section size value exceeds maximum.\n",
 			 function );
 
 			return( -1 );
@@ -1069,7 +1069,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	}
 	else if( chunks_section_size >= (size64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk section size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid chunk section size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -1078,14 +1078,14 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 	/* Seek the start of the data chunks
 	*/
-	LIBEWF_VERBOSE_PRINT( "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
+	notify_verbose_printf( "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
 	 function, chunks_section_offset );
 
 	if( libewf_segment_file_handle_seek_offset(
 	     segment_file_handle,
 	     chunks_section_offset ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find offset to correct sectors size.\n",
+		notify_warning_printf( "%s: unable to find offset to correct sectors size.\n",
 		 function );
 
 		return( -1 );
@@ -1093,7 +1093,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	if( ( ewf_format == EWF_FORMAT_S01 )
 	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
+		notify_verbose_printf( "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
 		 function, chunks_section_size, chunks_section_offset );
 
 		/* Rewrite table section start
@@ -1113,7 +1113,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to rewrite %" PRIs " section.\n",
+			notify_warning_printf( "%s: unable to rewrite %" PRIs " section.\n",
 			 function, table_section_string );
 
 			return( -1 );
@@ -1121,7 +1121,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	}
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
+		notify_verbose_printf( "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
 		 function, chunks_section_size, chunks_section_offset );
 
 		/* Rewrite sectors section start
@@ -1133,7 +1133,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to rewrite sectors section.\n",
+			notify_warning_printf( "%s: unable to rewrite sectors section.\n",
 			 function );
 
 			return( -1 );
@@ -1141,14 +1141,14 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	}
 	/* Seek the end of the chunks section
 	*/
-	LIBEWF_VERBOSE_PRINT( "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
+	notify_verbose_printf( "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
 	 function, last_segment_file_offset );
 
 	if( libewf_segment_file_handle_seek_offset(
 	     segment_file_handle,
 	     last_segment_file_offset ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find offset to continue.\n",
+		notify_warning_printf( "%s: unable to find offset to continue.\n",
 		 function );
 
 		return( -1 );
@@ -1178,7 +1178,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to rewrite table section.\n",
+			notify_warning_printf( "%s: unable to rewrite table section.\n",
 			 function );
 
 			return( -1 );
@@ -1202,7 +1202,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to rewrite table2 section.\n",
+			notify_warning_printf( "%s: unable to rewrite table2 section.\n",
 			 function );
 
 			return( -1 );
@@ -1228,14 +1228,14 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		notify_warning_printf( "%s: invalid offset table.\n",
 		 function );
 
 		return( -1 );
@@ -1244,7 +1244,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	 */
 	if( chunk >= offset_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: chunk not in offset table.\n",
+		notify_warning_printf( "%s: chunk not in offset table.\n",
 		 function );
 
 		return( -1 );
@@ -1291,35 +1291,35 @@ ssize_t libewf_segment_file_write_close(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( hash_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash sections.\n",
+		notify_warning_printf( "%s: invalid hash sections.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
+		notify_warning_printf( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( sessions == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sessions.\n",
+		notify_warning_printf( "%s: invalid sessions.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( acquiry_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid acquiry errors.\n",
+		notify_warning_printf( "%s: invalid acquiry errors.\n",
 		 function );
 
 		return( -1 );
@@ -1341,7 +1341,7 @@ ssize_t libewf_segment_file_write_close(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write data section.\n",
+				notify_warning_printf( "%s: unable to write data section.\n",
 				 function );
 
 				return( -1 );
@@ -1363,7 +1363,7 @@ ssize_t libewf_segment_file_write_close(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write sessions section.\n",
+				notify_warning_printf( "%s: unable to write sessions section.\n",
 				 function );
 
 				return( -1 );
@@ -1387,7 +1387,7 @@ ssize_t libewf_segment_file_write_close(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write error2 section.\n",
+				notify_warning_printf( "%s: unable to write error2 section.\n",
 				 function );
 
 				return( -1 );
@@ -1404,7 +1404,7 @@ ssize_t libewf_segment_file_write_close(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write hash section.\n",
+				notify_warning_printf( "%s: unable to write hash section.\n",
 				 function );
 
 				return( -1 );
@@ -1418,7 +1418,7 @@ ssize_t libewf_segment_file_write_close(
 		{
 			if( hash_sections->xhash != NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: xhash already set - cleaning previous defintion.\n",
+				notify_warning_printf( "%s: xhash already set - cleaning previous defintion.\n",
 				 function );
 
 				memory_free(
@@ -1431,7 +1431,7 @@ ssize_t libewf_segment_file_write_close(
 			     &( hash_sections->xhash ),
 			     &( hash_sections->xhash_size ) ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to generate xhash.\n",
+				notify_warning_printf( "%s: unable to generate xhash.\n",
 				 function );
 
 				return( -1 );
@@ -1444,7 +1444,7 @@ ssize_t libewf_segment_file_write_close(
 
 			if( write_count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write xhash section.\n",
+				notify_warning_printf( "%s: unable to write xhash section.\n",
 				 function );
 
 				return( -1 );
@@ -1463,7 +1463,7 @@ ssize_t libewf_segment_file_write_close(
 
 	if( write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write end of segment file.\n",
+		notify_warning_printf( "%s: unable to write end of segment file.\n",
 		 function );
 
 		return( -1 );
@@ -1475,7 +1475,7 @@ ssize_t libewf_segment_file_write_close(
 	if( libewf_segment_file_handle_close(
 	     segment_file_handle ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to close segment file handle.\n",
+		notify_warning_printf( "%s: unable to close segment file handle.\n",
 		 function );
 
 		return( -1 );

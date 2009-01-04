@@ -33,10 +33,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 
 #include "libewf_common.h"
 #include "libewf_hash_sections.h"
-#include "libewf_notify.h"
 
 /* Allocates memory for a new hash sections struct
  * Returns a pointer to the new instance, NULL on error
@@ -52,7 +52,7 @@ libewf_hash_sections_t *libewf_hash_sections_alloc(
 
 	if( hash_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate hash sections.\n",
+		notify_warning_printf( "%s: unable to allocate hash sections.\n",
 		 function );
 
 		return( NULL );
@@ -62,7 +62,7 @@ libewf_hash_sections_t *libewf_hash_sections_alloc(
 	     0,
 	     sizeof( libewf_hash_sections_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear hash sections.\n",
+		notify_warning_printf( "%s: unable to clear hash sections.\n",
 		 function );
 
 		memory_free(
@@ -82,7 +82,7 @@ void libewf_hash_sections_free(
 
 	if( hash_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash sections.\n",
+		notify_warning_printf( "%s: invalid hash sections.\n",
 		 function );
 
 		return;

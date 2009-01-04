@@ -58,6 +58,13 @@ void libewf_notify_printf(
 #define notify_warning_printf \
 	libewf_notify_printf
 
+void libewf_notify_dump_data(
+      void *data,
+      size_t size );
+
+#define notify_dump_data( data, size ) \
+	if( libewf_notify_verbose != 0 ) libewf_notify_dump_data( data, size )
+
 #if defined( __cplusplus )
 }
 #endif

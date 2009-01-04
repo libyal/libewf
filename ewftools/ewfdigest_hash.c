@@ -32,12 +32,12 @@
  */
 
 #include <common.h>
+#include <notify.h>
 #include <types.h>
 
 #include "ewfdigest_hash.h"
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful, 0 if hash was not set, or -1 on error
@@ -55,14 +55,14 @@ int ewfdigest_copy_to_string(
 
 	if( digest_hash == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: invalid digest hash.\n",
+		notify_verbose_printf( "%s: invalid digest hash.\n",
 		 function );
 
 		return( 0 );
 	}
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
@@ -70,7 +70,7 @@ int ewfdigest_copy_to_string(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_digest_hash > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -79,7 +79,7 @@ int ewfdigest_copy_to_string(
 	 */
 	if( size_string < ( ( 2 * size_digest_hash ) + 1 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		notify_warning_printf( "%s: string too small.\n",
 		 function );
 
 		return( -1 );

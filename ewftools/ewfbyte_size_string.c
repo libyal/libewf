@@ -34,6 +34,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <notify.h>
 #include <system_string.h>
 
 #include <errno.h>
@@ -56,7 +57,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfbyte_size_string.h"
 
@@ -150,7 +150,7 @@ int ewfbyte_size_string_create(
 
 	if( byte_size_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid byte size string.\n",
+		notify_warning_printf( "%s: invalid byte size string.\n",
 		 function );
 
 		return( -1 );
@@ -159,7 +159,7 @@ int ewfbyte_size_string_create(
 	 */
 	if( byte_size_string_length < 9 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: byte size string too small.\n",
+		notify_warning_printf( "%s: byte size string too small.\n",
 		 function );
 
 		return( -1 );
@@ -191,7 +191,7 @@ int ewfbyte_size_string_create(
 		}
 		if( factor > 8 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: a size with a factor larger than 8 currently not supported.\n",
+			notify_warning_printf( "%s: a size with a factor larger than 8 currently not supported.\n",
 			 function );
 
 			return( -1 );
@@ -202,7 +202,7 @@ int ewfbyte_size_string_create(
 
 	if( factor_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create factor string.\n",
+		notify_warning_printf( "%s: unable to create factor string.\n",
 		 function );
 
 		return( -1 );
@@ -239,7 +239,7 @@ int ewfbyte_size_string_create(
 	}
 	if( print_count < 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set byte size string.\n",
+		notify_warning_printf( "%s: unable to set byte size string.\n",
 		 function );
 
 		return( -1 );
@@ -264,14 +264,14 @@ int ewfbyte_size_string_convert(
 
 	if( byte_size_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid byte size string.\n",
+		notify_warning_printf( "%s: invalid byte size string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		notify_warning_printf( "%s: invalid size.\n",
 		 function );
 
 		return( -1 );
@@ -328,7 +328,7 @@ int ewfbyte_size_string_convert(
 
 	if( factor < 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid factor.\n",
+		notify_warning_printf( "%s: invalid factor.\n",
 		 function );
 
 		return( -1 );
@@ -350,7 +350,7 @@ int ewfbyte_size_string_convert(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid units.\n",
+		notify_warning_printf( "%s: invalid units.\n",
 		 function );
 
 		return( -1 );
@@ -372,12 +372,12 @@ int ewfbyte_size_string_convert(
 	}
 	else if( remainder >= 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: ignoring byte value remainder.\n",
+		notify_warning_printf( "%s: ignoring byte value remainder.\n",
 		 function );
 	}
 	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
 	{
-		LIBEWF_WARNING_PRINT( "%s: trailing data in byte size string.\n",
+		notify_warning_printf( "%s: trailing data in byte size string.\n",
 		 function );
 	}
 	*size = byte_size;
@@ -440,14 +440,14 @@ int ewfbyte_size_string_convert_char_t(
 
 	if( byte_size_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid byte size string.\n",
+		notify_warning_printf( "%s: invalid byte size string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		notify_warning_printf( "%s: invalid size.\n",
 		 function );
 
 		return( -1 );
@@ -504,7 +504,7 @@ int ewfbyte_size_string_convert_char_t(
 
 	if( factor < 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid factor.\n",
+		notify_warning_printf( "%s: invalid factor.\n",
 		 function );
 
 		return( -1 );
@@ -526,7 +526,7 @@ int ewfbyte_size_string_convert_char_t(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid units.\n",
+		notify_warning_printf( "%s: invalid units.\n",
 		 function );
 
 		return( -1 );
@@ -548,12 +548,12 @@ int ewfbyte_size_string_convert_char_t(
 	}
 	else if( remainder >= 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: ignoring byte value remainder.\n",
+		notify_warning_printf( "%s: ignoring byte value remainder.\n",
 		 function );
 	}
 	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
 	{
-		LIBEWF_WARNING_PRINT( "%s: trailing data in byte size string.\n",
+		notify_warning_printf( "%s: trailing data in byte size string.\n",
 		 function );
 	}
 	*size = byte_size;

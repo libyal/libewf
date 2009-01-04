@@ -33,9 +33,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 
 #include "libewf_common.h"
-#include "libewf_notify.h"
 #include "libewf_section_list.h"
 
 /* Append an entry to the section list
@@ -53,28 +53,28 @@ libewf_section_list_t *libewf_section_list_append(
 
 	if( section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		notify_warning_printf( "%s: invalid section list.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( type == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid type.\n",
+		notify_warning_printf( "%s: invalid type.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( type_length == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid type length value cannot be zero.\n",
+		notify_warning_printf( "%s: invalid type length value cannot be zero.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( type_length >= 16 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid type length value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid type length value exceeds maximum.\n",
 		 function );
 
 		return( NULL );
@@ -84,7 +84,7 @@ libewf_section_list_t *libewf_section_list_append(
 
 	if( section_list_entry == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create section list entry.\n",
+		notify_warning_printf( "%s: unable to create section list entry.\n",
 		 function );
 
 		return( NULL );
@@ -94,7 +94,7 @@ libewf_section_list_t *libewf_section_list_append(
 	     0,
 	     sizeof( libewf_section_list_entry_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear section list entry.\n",
+		notify_warning_printf( "%s: unable to clear section list entry.\n",
 		 function );
 
 		memory_free(
@@ -107,7 +107,7 @@ libewf_section_list_t *libewf_section_list_append(
 	     type,
 	     type_length ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set section list entry type.\n",
+		notify_warning_printf( "%s: unable to set section list entry type.\n",
 		 function );
 
 		memory_free(
@@ -145,7 +145,7 @@ int libewf_section_list_remove_last(
 
 	if( section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		notify_warning_printf( "%s: invalid section list.\n",
 		 function );
 
 		return( -1 );
@@ -154,19 +154,19 @@ int libewf_section_list_remove_last(
 	{
 		if( section_list->first != section_list->last )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid section list - corruption in list.\n",
+			notify_warning_printf( "%s: invalid section list - corruption in list.\n",
 			 function );
 
 			return( -1 );
 		}
-		LIBEWF_VERBOSE_PRINT( "%s: section list is empty.\n",
+		notify_verbose_printf( "%s: section list is empty.\n",
 		 function );
 	}
 	else if( section_list->last->previous == NULL )
 	{
 		if( section_list->first != section_list->last )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid section list - corruption in list.\n",
+			notify_warning_printf( "%s: invalid section list - corruption in list.\n",
 			 function );
 
 			return( -1 );

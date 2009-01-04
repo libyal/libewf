@@ -34,6 +34,7 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include <errno.h>
@@ -49,7 +50,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfglob.h"
 
@@ -89,7 +89,7 @@ ewfglob_t *ewfglob_alloc(
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate glob.\n",
+		notify_warning_printf( "%s: unable to allocate glob.\n",
 		 function );
 
 		return( NULL );
@@ -99,7 +99,7 @@ ewfglob_t *ewfglob_alloc(
 	     0,
 	     sizeof( ewfglob_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
+		notify_warning_printf( "%s: unable to clear glob.\n",
 		 function );
 
 		memory_free(
@@ -127,14 +127,14 @@ ewfglob_t *ewfglob_realloc(
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid glob.\n",
+		notify_warning_printf( "%s: invalid glob.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( glob->amount >= new_amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: new amount less equal than current amount.\n",
+		notify_warning_printf( "%s: new amount less equal than current amount.\n",
 		 function );
 
 		return( NULL );
@@ -145,7 +145,7 @@ ewfglob_t *ewfglob_realloc(
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( NULL );
@@ -163,7 +163,7 @@ ewfglob_t *ewfglob_realloc(
 	}
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate glob results.\n",
+		notify_warning_printf( "%s: unable to reallocate glob results.\n",
 		 function );
 
 		return( NULL );
@@ -175,7 +175,7 @@ ewfglob_t *ewfglob_realloc(
 	     0,
 	     ( new_size - previous_size ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
+		notify_warning_printf( "%s: unable to clear glob.\n",
 		 function );
 
 		return( NULL );
@@ -195,7 +195,7 @@ void ewfglob_free(
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid glob.\n",
+		notify_warning_printf( "%s: invalid glob.\n",
 		 function );
 
 		return;
@@ -243,7 +243,7 @@ int32_t ewfglob_resolve(
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid glob.\n",
+		notify_warning_printf( "%s: invalid glob.\n",
 		 function );
 
 		return( -1 );
@@ -252,7 +252,7 @@ int32_t ewfglob_resolve(
 	{
 		if( patterns[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid pattern.\n",
+			notify_warning_printf( "%s: invalid pattern.\n",
 			 function );
 
 			return( -1 );
@@ -269,7 +269,7 @@ int32_t ewfglob_resolve(
 		     find_extension,
 		     _MAX_EXT ) != 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to split path.\n",
+			notify_warning_printf( "%s: unable to split path.\n",
 			 function );
 
 			return( -1 );
@@ -284,7 +284,7 @@ int32_t ewfglob_resolve(
 
 				if( reallocation == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to reallocate glob.\n",
+					notify_warning_printf( "%s: unable to reallocate glob.\n",
 					 function );
 
 					return( -1 );
@@ -297,7 +297,7 @@ int32_t ewfglob_resolve(
 				     find_data.name,
 				     _SYSTEM_CHARACTER_T_STRING( "" )  ) != 0 )
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to make path.\n",
+					notify_warning_printf( "%s: unable to make path.\n",
 					 function );
 
 					return( -1 );
@@ -311,7 +311,7 @@ int32_t ewfglob_resolve(
 
 				if( globs_found > (int32_t) UINT16_MAX )
 				{
-					LIBEWF_WARNING_PRINT( "%s: too many globs found.\n",
+					notify_warning_printf( "%s: too many globs found.\n",
 					 function );
 
 					return( -1 );
@@ -321,14 +321,14 @@ int32_t ewfglob_resolve(
 
 			if( errno != ENOENT )
 			{
-				LIBEWF_WARNING_PRINT( "%s: error finding next file entry.\n",
+				notify_warning_printf( "%s: error finding next file entry.\n",
 				 function );
 
 				return( -1 );
 			}
 			if( ewfglob_findclose( find_handle ) != 0 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: error closing find handle.\n",
+				notify_warning_printf( "%s: error closing find handle.\n",
 				 function );
 
 				return( -1 );
@@ -336,7 +336,7 @@ int32_t ewfglob_resolve(
 		}
 		else if( errno != ENOENT )
 		{
-			LIBEWF_WARNING_PRINT( "%s: error finding file entry.\n",
+			notify_warning_printf( "%s: error finding file entry.\n",
 			 function );
 
 			return( -1 );

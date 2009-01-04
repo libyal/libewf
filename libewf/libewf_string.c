@@ -34,12 +34,12 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
 
 #include "libewf_common.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_char.h"
@@ -269,14 +269,14 @@ int libewf_string_copy_from_utf16(
 
 	if( utf16_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid UTF16 string.\n",
+		notify_warning_printf( "%s: invalid UTF16 string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
@@ -284,7 +284,7 @@ int libewf_string_copy_from_utf16(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_utf16 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -294,7 +294,7 @@ int libewf_string_copy_from_utf16(
 	 */
 	if( size_string < ( ( size_utf16 - 2 ) / 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		notify_warning_printf( "%s: string too small.\n",
 		 function );
 
 		return( -1 );
@@ -313,7 +313,7 @@ int libewf_string_copy_from_utf16(
 	}
 	else
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: no byte order in UTF16 string.\n",
+		notify_verbose_printf( "%s: no byte order in UTF16 string.\n",
 		 function );
 
 		if( ( utf16_string[ 0 ] == (character_t) '\0' )
@@ -328,7 +328,7 @@ int libewf_string_copy_from_utf16(
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to determine byte order in UTF16 string.\n",
+			notify_warning_printf( "%s: unable to determine byte order in UTF16 string.\n",
 			 function );
 
 			return( -1 );
@@ -341,7 +341,7 @@ int libewf_string_copy_from_utf16(
 	     0,
 	     sizeof( mbstate_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear converion state.\n",
+		notify_warning_printf( "%s: unable to clear converion state.\n",
 		 function );
 
 		return( -1 );
@@ -349,7 +349,7 @@ int libewf_string_copy_from_utf16(
 	if( mbsinit(
 	     &conversion_state ) == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
+		notify_warning_printf( "%s: unable to initialize converion state.\n",
 		 function );
 
 		return( -1 );
@@ -366,7 +366,7 @@ int libewf_string_copy_from_utf16(
 		     2,
 		     &conversion_state ) >= (size_t) -2 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to convert UTF16 character: %02x %02x.\n",
+			notify_warning_printf( "%s: unable to convert UTF16 character: %02x %02x.\n",
 			 function, utf16_string[ utf16_iterator ], utf16_string[ utf16_iterator + 1 ] );
 		}
 #else
@@ -424,14 +424,14 @@ int libewf_string_copy_to_utf16(
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( utf16_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid UTF16 string.\n",
+		notify_warning_printf( "%s: invalid UTF16 string.\n",
 		 function );
 
 		return( -1 );
@@ -439,7 +439,7 @@ int libewf_string_copy_to_utf16(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_utf16 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -450,7 +450,7 @@ int libewf_string_copy_to_utf16(
 	     0,
 	     sizeof( mbstate_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear converion state.\n",
+		notify_warning_printf( "%s: unable to clear converion state.\n",
 		 function );
 
 		return( -1 );
@@ -458,7 +458,7 @@ int libewf_string_copy_to_utf16(
 	if( mbsinit(
 	     &conversion_state ) == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
+		notify_warning_printf( "%s: unable to initialize converion state.\n",
 		 function );
 
 		return( -1 );
@@ -468,7 +468,7 @@ int libewf_string_copy_to_utf16(
 	 */
 	if( size_utf16 < ( ( size_string * 2 ) + 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: UTF16 string too small.\n",
+		notify_warning_printf( "%s: UTF16 string too small.\n",
 		 function );
 
 		return( -1 );
@@ -487,7 +487,7 @@ int libewf_string_copy_to_utf16(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: undefined byte order.\n",
+		notify_warning_printf( "%s: undefined byte order.\n",
 		 function );
 
 		return( -1 );
@@ -502,7 +502,7 @@ int libewf_string_copy_to_utf16(
 		     string[ string_iterator ],
 		     &conversion_state ) >= (size_t) -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to convert character: %04x.\n",
+			notify_warning_printf( "%s: unable to convert character: %04x.\n",
 			 function, string[ string_iterator ] );
 		}
 #else
@@ -540,14 +540,14 @@ int libewf_string_copy_from_ewf_char(
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( ewf_char_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid EWF character string.\n",
+		notify_warning_printf( "%s: invalid EWF character string.\n",
 		 function );
 
 		return( -1 );
@@ -555,14 +555,14 @@ int libewf_string_copy_from_ewf_char(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size_string < size_ewf_char_string )
 	{
-		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		notify_warning_printf( "%s: string too small.\n",
 		 function );
 
 		return( -1 );
@@ -595,14 +595,14 @@ int libewf_string_copy_to_ewf_char(
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( ewf_char_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid EWF character string.\n",
+		notify_warning_printf( "%s: invalid EWF character string.\n",
 		 function );
 
 		return( -1 );
@@ -610,14 +610,14 @@ int libewf_string_copy_to_ewf_char(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size_ewf_char_string < size_string )
 	{
-		LIBEWF_WARNING_PRINT( "%s: EWF character string too small.\n",
+		notify_warning_printf( "%s: EWF character string too small.\n",
 		 function );
 
 		return( -1 );
@@ -656,14 +656,14 @@ int libewf_string_copy_from_header2(
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( header2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+		notify_warning_printf( "%s: invalid header2.\n",
 		 function );
 
 		return( -1 );
@@ -671,14 +671,14 @@ int libewf_string_copy_from_header2(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_header2 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size_string < ( ( size_header2 - 2 ) / 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		notify_warning_printf( "%s: string too small.\n",
 		 function );
 
 		return( -1 );
@@ -689,7 +689,7 @@ int libewf_string_copy_from_header2(
 	     header2,
 	     size_header2 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy header2 to string.\n",
+		notify_warning_printf( "%s: unable to copy header2 to string.\n",
 		 function );
 
 		return( -1 );
@@ -710,14 +710,14 @@ int libewf_string_copy_to_header2(
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( header2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+		notify_warning_printf( "%s: invalid header2.\n",
 		 function );
 
 		return( -1 );
@@ -725,14 +725,14 @@ int libewf_string_copy_to_header2(
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_header2 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size_header2 < ( ( size_string * 2 ) + 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: header2 too small.\n",
+		notify_warning_printf( "%s: header2 too small.\n",
 		 function );
 
 		return( -1 );
@@ -744,7 +744,7 @@ int libewf_string_copy_to_header2(
 	     size_header2,
 	     LIBEWF_STRING_LITTLE_ENDIAN ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy string to header2.\n",
+		notify_warning_printf( "%s: unable to copy string to header2.\n",
 		 function );
 
 		return( -1 );
@@ -768,28 +768,28 @@ int libewf_string_ctime(
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		notify_warning_printf( "%s: invalid time stamp.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( ctime_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid ctime string.\n",
+		notify_warning_printf( "%s: invalid ctime string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( *ctime_string != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: ctime string already created.\n",
+		notify_warning_printf( "%s: ctime string already created.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( ctime_string_length == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid ctime string length.\n",
+		notify_warning_printf( "%s: invalid ctime string length.\n",
 		 function );
 
 		return( -1 );
@@ -812,7 +812,7 @@ int libewf_string_ctime(
 
         if( narrow_ctime_string == NULL )
         {
-                LIBEWF_WARNING_PRINT( "%s: unable to create narrow ctime string.\n",
+                notify_warning_printf( "%s: unable to create narrow ctime string.\n",
                  function );
 
                 return( -1 );
@@ -822,7 +822,7 @@ int libewf_string_ctime(
 
         if( *ctime_string == NULL )
         {
-                LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
+                notify_warning_printf( "%s: unable to create ctime string.\n",
                  function );
 
 		memory_free(
@@ -837,7 +837,7 @@ int libewf_string_ctime(
 	     narrow_ctime_string,
 	     *ctime_string_length ) != 1 )
         {
-                LIBEWF_WARNING_PRINT( "%s: unable to copy narrow ctime string to ctime string.\n",
+                notify_warning_printf( "%s: unable to copy narrow ctime string to ctime string.\n",
                  function );
 
 		memory_free(

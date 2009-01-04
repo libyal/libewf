@@ -65,7 +65,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfbyte_size_string.h"
 #include "ewfcommon.h"

@@ -34,6 +34,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 
 #include <time.h>
 
@@ -42,7 +43,6 @@
 #include "libewf_common.h"
 #include "libewf_header_values.h"
 #include "libewf_internal_handle.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
@@ -64,7 +64,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle.\n",
+		notify_warning_printf( "%s: unable to allocate handle.\n",
 		 function );
 
 		return( NULL );
@@ -98,7 +98,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create segment table.\n",
+		notify_warning_printf( "%s: unable to create segment table.\n",
 		 function );
 
 		memory_free(
@@ -112,7 +112,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create delta segment table.\n",
+		notify_warning_printf( "%s: unable to create delta segment table.\n",
 		 function );
 
 		libewf_segment_table_free(
@@ -126,7 +126,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create offset table.\n",
+		notify_warning_printf( "%s: unable to create offset table.\n",
 		 function );
 
 		libewf_segment_table_free(
@@ -142,7 +142,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->secondary_offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create secondary offset table.\n",
+		notify_warning_printf( "%s: unable to create secondary offset table.\n",
 		 function );
 
 		libewf_offset_table_free(
@@ -161,7 +161,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache.\n",
+		notify_warning_printf( "%s: unable to create chunk cache.\n",
 		 function );
 
 		libewf_offset_table_free(
@@ -181,7 +181,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create media values.\n",
+		notify_warning_printf( "%s: unable to create media values.\n",
 		 function );
 
 		libewf_chunk_cache_free(
@@ -203,7 +203,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->header_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create header sections.\n",
+		notify_warning_printf( "%s: unable to create header sections.\n",
 		 function );
 
 		libewf_media_values_free(
@@ -227,7 +227,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->hash_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create hash sections.\n",
+		notify_warning_printf( "%s: unable to create hash sections.\n",
 		 function );
 
 		libewf_header_sections_free(
@@ -253,7 +253,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->sessions == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create sessions.\n",
+		notify_warning_printf( "%s: unable to create sessions.\n",
 		 function );
 
 		libewf_hash_sections_free(
@@ -281,7 +281,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 	if( internal_handle->acquiry_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry errors.\n",
+		notify_warning_printf( "%s: unable to create acquiry errors.\n",
 		 function );
 
 		libewf_sector_table_free(
@@ -313,7 +313,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		if( internal_handle->read == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create subhandle read.\n",
+			notify_warning_printf( "%s: unable to create subhandle read.\n",
 			 function );
 
 			libewf_sector_table_free(
@@ -348,7 +348,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		if( internal_handle->write == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create subhandle write.\n",
+			notify_warning_printf( "%s: unable to create subhandle write.\n",
 			 function );
 
 			if( internal_handle->read != NULL )
@@ -394,7 +394,7 @@ void libewf_internal_handle_free(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return;
@@ -487,7 +487,7 @@ libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
 
 	if( handle_read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle read.\n",
+		notify_warning_printf( "%s: unable to allocate handle read.\n",
 		 function );
 
 		return( NULL );
@@ -496,7 +496,7 @@ libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
 
 	if( handle_read->crc_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate crc errors.\n",
+		notify_warning_printf( "%s: unable to allocate crc errors.\n",
 		 function );
 
 		memory_free(
@@ -518,7 +518,7 @@ void libewf_internal_handle_read_free(
 
 	if( handle_read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle read.\n",
+		notify_warning_printf( "%s: invalid handle read.\n",
 		 function );
 
 		return;
@@ -544,7 +544,7 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 
 	if( handle_write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle write.\n",
+		notify_warning_printf( "%s: unable to allocate handle write.\n",
 		 function );
 
 		return( NULL );
@@ -582,7 +582,7 @@ void libewf_internal_handle_write_free(
 
 	if( handle_write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle write.\n",
+		notify_warning_printf( "%s: invalid handle write.\n",
 		 function );
 
 		return;
@@ -607,7 +607,7 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
 
 	if( maximum_amount_of_segments == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid maximum amount of segments.\n",
+		notify_warning_printf( "%s: invalid maximum amount of segments.\n",
 		 function );
 
 		return( -1 );
@@ -626,7 +626,7 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported EWF format.\n",
+		notify_warning_printf( "%s: unsupported EWF format.\n",
 		 function );
 
 		return( -1 );
@@ -651,14 +651,14 @@ int libewf_internal_handle_initialize_media_values(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		notify_warning_printf( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -666,7 +666,7 @@ int libewf_internal_handle_initialize_media_values(
 	if( ( sectors_per_chunk == 0 )
 	 || ( sectors_per_chunk > (uint32_t) INT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
+		notify_warning_printf( "%s: invalid sectors per chunk.\n",
 		 function );
 
 		return( -1 );
@@ -674,14 +674,14 @@ int libewf_internal_handle_initialize_media_values(
 	if( ( bytes_per_sector == 0 )
 	 || ( bytes_per_sector > (uint32_t) INT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
+		notify_warning_printf( "%s: invalid bytes per sector.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( media_size > (size64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid media size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -693,7 +693,7 @@ int libewf_internal_handle_initialize_media_values(
 	if( ( chunk_size == 0 )
 	 || ( chunk_size > (size32_t) INT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		notify_warning_printf( "%s: invalid chunk size.\n",
 		 function );
 
 		return( -1 );
@@ -705,7 +705,7 @@ int libewf_internal_handle_initialize_media_values(
 
 	if( media_size > maximum_input_file_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
+		notify_warning_printf( "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
 		 function, maximum_input_file_size, chunk_size );
 
 		return( -1 );
@@ -729,7 +729,7 @@ int libewf_internal_handle_initialize_media_values(
 		}
 		if( amount_of_chunks > (int64_t) UINT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks value exceeds maximum.\n",
+			notify_warning_printf( "%s: invalid amount of chunks value exceeds maximum.\n",
 			 function );
 
 			return( -1 );
@@ -742,7 +742,7 @@ int libewf_internal_handle_initialize_media_values(
 
 		if( amount_of_chunks > (int64_t) UINT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors value exceeds maximum.\n",
+			notify_warning_printf( "%s: invalid amount of sectors value exceeds maximum.\n",
 			 function );
 
 			return( -1 );
@@ -762,7 +762,7 @@ int libewf_internal_handle_initialize_format(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
@@ -804,7 +804,7 @@ int libewf_internal_handle_initialize_format(
 		     internal_handle->ewf_format,
 		     &( internal_handle->write->maximum_amount_of_segments ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to determine the maximum amount of allowed segment files.\n",
+			notify_warning_printf( "%s: unable to determine the maximum amount of allowed segment files.\n",
 			 function );
 
 			return( -1 );
@@ -830,14 +830,14 @@ int libewf_internal_handle_create_header_values(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->header_values != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: header values already created - cleaning up previous header values.\n",
+		notify_warning_printf( "%s: header values already created - cleaning up previous header values.\n",
 		 function );
 
 		libewf_values_table_free(
@@ -848,7 +848,7 @@ int libewf_internal_handle_create_header_values(
 
 	if( internal_handle->header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+		notify_warning_printf( "%s: unable to create header values.\n",
 		 function );
 
 		return( -1 );
@@ -856,7 +856,7 @@ int libewf_internal_handle_create_header_values(
 	if( libewf_header_values_initialize(
 	     internal_handle->header_values ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
+		notify_warning_printf( "%s: unable to initialize the header values.\n",
 		 function );
 
 		return( -1 );
@@ -868,7 +868,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      case_number ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set case number.\n",
+		notify_warning_printf( "%s: unable to set case number.\n",
 		 function );
 
 		return( -1 );
@@ -880,7 +880,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      description ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set description.\n",
+		notify_warning_printf( "%s: unable to set description.\n",
 		 function );
 
 		return( -1 );
@@ -892,7 +892,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      evidence_number ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set evidence number.\n",
+		notify_warning_printf( "%s: unable to set evidence number.\n",
 		 function );
 
 		return( -1 );
@@ -904,7 +904,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      examiner_name ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set examiner name.\n",
+		notify_warning_printf( "%s: unable to set examiner name.\n",
 		 function );
 
 		return( -1 );
@@ -916,7 +916,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      notes ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set notes.\n",
+		notify_warning_printf( "%s: unable to set notes.\n",
 		 function );
 
 		return( -1 );
@@ -928,7 +928,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      acquiry_operating_system ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to acquiry operating system.\n",
+		notify_warning_printf( "%s: unable to acquiry operating system.\n",
 		 function );
 
 		return( -1 );
@@ -940,7 +940,7 @@ int libewf_internal_handle_create_header_values(
 	     string_length(
 	      acquiry_software_version ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to acquiry software version.\n",
+		notify_warning_printf( "%s: unable to acquiry software version.\n",
 		 function );
 
 		return( -1 );
@@ -962,28 +962,28 @@ int libewf_internal_handle_write_initialize(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		notify_warning_printf( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		notify_warning_printf( "%s: invalid handle - missing subhandle write.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write->values_initialized != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be initialized anymore.\n",
+		notify_warning_printf( "%s: write values were initialized and cannot be initialized anymore.\n",
 		 function );
 
 		return( -1 );
@@ -992,7 +992,7 @@ int libewf_internal_handle_write_initialize(
 	 */
 	if( internal_handle->format == LIBEWF_FORMAT_LVF )
 	{
-		LIBEWF_WARNING_PRINT( "%s: writing format LVF currently not supported.\n",
+		notify_warning_printf( "%s: writing format LVF currently not supported.\n",
 		 function );
 
 		return( -1 );
@@ -1011,7 +1011,7 @@ int libewf_internal_handle_write_initialize(
 		 && ( internal_handle->format != LIBEWF_FORMAT_FTK )
 		 && ( internal_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: EWF file format does not allow for streaming write.\n",
+			notify_warning_printf( "%s: EWF file format does not allow for streaming write.\n",
 			 function );
 
 			return( -1 );
@@ -1028,7 +1028,7 @@ int libewf_internal_handle_write_initialize(
 
 		if( required_amount_of_segments > (int64_t) internal_handle->write->maximum_amount_of_segments )
 		{
-			LIBEWF_WARNING_PRINT( "%s: the settings exceed the maximum amount of allowed segment files.\n",
+			notify_warning_printf( "%s: the settings exceed the maximum amount of allowed segment files.\n",
 			 function );
 
 			return( -1 );

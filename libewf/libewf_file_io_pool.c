@@ -33,12 +33,12 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 
 #include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_file_io_pool.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 /* Allocates memory for a file io pool struct
@@ -56,7 +56,7 @@ libewf_file_io_pool_t *libewf_file_io_pool_alloc(
 
 	if( file_io_pool == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate file io pool.\n",
+		notify_warning_printf( "%s: unable to allocate file io pool.\n",
 		 function );
 
 		return( NULL );
@@ -66,7 +66,7 @@ libewf_file_io_pool_t *libewf_file_io_pool_alloc(
 
 	if( file_io_pool->handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate file io handles.\n",
+		notify_warning_printf( "%s: unable to allocate file io handles.\n",
 		 function );
 
 		memory_free(
@@ -100,14 +100,14 @@ int libewf_file_io_pool_realloc(
 
 	if( file_io_pool == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io pool.\n",
+		notify_warning_printf( "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->amount >= amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: new amount must be greater than previous amount.\n",
+		notify_warning_printf( "%s: new amount must be greater than previous amount.\n",
 		 function );
 
 		return( -1 );
@@ -118,7 +118,7 @@ int libewf_file_io_pool_realloc(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file io handles array.\n",
+		notify_warning_printf( "%s: unable to reallocate dynamic file io handles array.\n",
 		 function );
 
 		return( -1 );
@@ -147,7 +147,7 @@ void libewf_file_io_pool_free(
 
 	if( file_io_pool == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io pool.\n",
+		notify_warning_printf( "%s: invalid file io pool.\n",
 		 function );
 
 		return;

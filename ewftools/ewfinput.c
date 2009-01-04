@@ -35,6 +35,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <system_string.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -55,7 +56,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfbyte_size_string.h"
 #include "ewfinput.h"
@@ -116,7 +116,7 @@ uint8_t ewfinput_determine_libewf_format(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( 0 );
@@ -220,7 +220,7 @@ uint8_t ewfinput_determine_libewf_format_char_t(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( 0 );
@@ -324,7 +324,7 @@ uint32_t ewfinput_determine_sectors_per_chunk(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( 0 );
@@ -412,7 +412,7 @@ uint32_t ewfinput_determine_sectors_per_chunk_char_t(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( 0 );
@@ -500,7 +500,7 @@ int8_t ewfinput_determine_compression_level(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( -1 );
@@ -539,7 +539,7 @@ int8_t ewfinput_determine_compression_level_char_t(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( -1 );
@@ -578,7 +578,7 @@ int8_t ewfinput_determine_media_type(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( -1 );
@@ -610,7 +610,7 @@ int8_t ewfinput_determine_volume_type(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( -1 );
@@ -642,7 +642,7 @@ int8_t ewfinput_determine_yes_no(
 
 	if( argument == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
 		return( -1 );
@@ -681,14 +681,14 @@ character_t *ewfinput_get_variable(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
 		return( NULL );
@@ -727,7 +727,7 @@ character_t *ewfinput_get_variable(
 
 			if( user_input == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				notify_warning_printf( "%s: unable to create string.\n",
 				 function );
 
 				return( NULL );
@@ -737,7 +737,7 @@ character_t *ewfinput_get_variable(
 			     user_input_buffer_ptr,
 			     input_length ) == NULL  )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
+				notify_warning_printf( "%s: unable to copy string.\n",
 				 function );
 
 				memory_free(
@@ -755,7 +755,7 @@ character_t *ewfinput_get_variable(
 
 			if( user_input == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				notify_warning_printf( "%s: unable to create string.\n",
 				 function );
 
 				return( NULL );
@@ -801,7 +801,7 @@ system_character_t *ewfinput_get_variable_char_t(
 
 		if( user_input_char_t == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create conversion string.\n",
+			notify_warning_printf( "%s: unable to create conversion string.\n",
 			 function );
 
 			memory_free(
@@ -814,7 +814,7 @@ system_character_t *ewfinput_get_variable_char_t(
 		     user_input_char_t,
 		     ( user_input_length + 1 ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set conversion string.\n",
+			notify_warning_printf( "%s: unable to set conversion string.\n",
 			 function );
 
 			memory_free(
@@ -829,7 +829,7 @@ system_character_t *ewfinput_get_variable_char_t(
 
 		return( user_input_char_t );
 	}
-	LIBEWF_WARNING_PRINT( "%s: character conversion unsupported.\n",
+	notify_warning_printf( "%s: character conversion unsupported.\n",
 	 function );
 
 	return( NULL );
@@ -854,14 +854,14 @@ uint64_t ewfinput_get_size_variable(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
 		return( 0 );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
 		return( 0 );
@@ -931,14 +931,14 @@ uint64_t ewfinput_get_byte_size_variable(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
 		return( 0 );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
 		return( 0 );
@@ -949,7 +949,7 @@ uint64_t ewfinput_get_byte_size_variable(
 	     minimum,
 	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create minimum byte size string.\n",
+		notify_warning_printf( "%s: unable to create minimum byte size string.\n",
 		 function );
 
 		return( 0 );
@@ -960,7 +960,7 @@ uint64_t ewfinput_get_byte_size_variable(
 	     default_value,
 	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create default byte size string.\n",
+		notify_warning_printf( "%s: unable to create default byte size string.\n",
 		 function );
 
 		return( 0 );
@@ -971,7 +971,7 @@ uint64_t ewfinput_get_byte_size_variable(
 	     maximum,
 	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create maximum byte size string.\n",
+		notify_warning_printf( "%s: unable to create maximum byte size string.\n",
 		 function );
 
 		return( 0 );
@@ -1044,21 +1044,21 @@ character_t *ewfinput_get_fixed_value(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( default_value >= amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: default value exceeds amount.\n",
+		notify_warning_printf( "%s: default value exceeds amount.\n",
 		 function );
 
 		return( NULL );
@@ -1144,7 +1144,7 @@ character_t *ewfinput_get_fixed_value(
 
 			if( user_input == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				notify_warning_printf( "%s: unable to create string.\n",
 				 function );
 
 				return( NULL );
@@ -1154,7 +1154,7 @@ character_t *ewfinput_get_fixed_value(
 			     values[ iterator ],
 			     value_length ) == NULL  )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
+				notify_warning_printf( "%s: unable to copy string.\n",
 				 function );
 
 				memory_free(
@@ -1172,7 +1172,7 @@ character_t *ewfinput_get_fixed_value(
 
 			if( user_input == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				notify_warning_printf( "%s: unable to create string.\n",
 				 function );
 
 				return( NULL );

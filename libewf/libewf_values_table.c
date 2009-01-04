@@ -34,13 +34,13 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_values_table.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -60,7 +60,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 	if( values_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate values table.\n",
+		notify_warning_printf( "%s: unable to allocate values table.\n",
 		 function );
 
 		return( NULL );
@@ -69,7 +69,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 	if( values_table_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		memory_free(
@@ -82,7 +82,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 	if( values_table->identifiers == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate identifiers.\n",
+		notify_warning_printf( "%s: unable to allocate identifiers.\n",
 		 function );
 
 		memory_free(
@@ -95,7 +95,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 	     0,
 	     values_table_size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear identifiers.\n",
+		notify_warning_printf( "%s: unable to clear identifiers.\n",
 		 function );
 
 		memory_free(
@@ -110,7 +110,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 	if( values_table->values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate values.\n",
+		notify_warning_printf( "%s: unable to allocate values.\n",
 		 function );
 
 		memory_free(
@@ -125,7 +125,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 	     0,
 	     values_table_size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear values.\n",
+		notify_warning_printf( "%s: unable to clear values.\n",
 		 function );
 
 		memory_free(
@@ -157,7 +157,7 @@ int libewf_values_table_realloc(
 
 	if( values_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid values table.\n",
+		notify_warning_printf( "%s: invalid values table.\n",
 		 function );
 
 		return( -1 );
@@ -165,14 +165,14 @@ int libewf_values_table_realloc(
 	if( ( previous_amount > (uint32_t) INT32_MAX )
 	 || ( new_amount > (uint32_t) INT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid amount value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( previous_amount >= new_amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: new amount smaller than previous amount.\n",
+		notify_warning_printf( "%s: new amount smaller than previous amount.\n",
 		 function );
 
 		return( -1 );
@@ -180,7 +180,7 @@ int libewf_values_table_realloc(
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (ssize_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -191,7 +191,7 @@ int libewf_values_table_realloc(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate identifiers.\n",
+		notify_warning_printf( "%s: unable to reallocate identifiers.\n",
 		 function );
 
 		return( -1 );
@@ -203,7 +203,7 @@ int libewf_values_table_realloc(
              0,
              ( new_size - previous_size ) ) == NULL )
         {
-                LIBEWF_WARNING_PRINT( "%s: unable to clear identifiers.\n",
+                notify_warning_printf( "%s: unable to clear identifiers.\n",
                  function );
 
                 return( -1 );
@@ -214,7 +214,7 @@ int libewf_values_table_realloc(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate values.\n",
+		notify_warning_printf( "%s: unable to reallocate values.\n",
 		 function );
 
 		return( -1 );
@@ -226,7 +226,7 @@ int libewf_values_table_realloc(
              0,
              ( new_size - previous_size ) ) == NULL )
         {
-                LIBEWF_WARNING_PRINT( "%s: unable to clear values.\n",
+                notify_warning_printf( "%s: unable to clear values.\n",
                  function );
 
                 return( -1 );
@@ -246,7 +246,7 @@ void libewf_values_table_free(
 
 	if( values_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid values table.\n",
+		notify_warning_printf( "%s: invalid values table.\n",
 		 function );
 
 		return;
@@ -292,14 +292,14 @@ int32_t libewf_values_table_get_index(
 
 	if( values_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid values table.\n",
+		notify_warning_printf( "%s: invalid values table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		notify_warning_printf( "%s: invalid identifier.\n",
 		 function );
 
 		return( -1 );
@@ -309,14 +309,14 @@ int32_t libewf_values_table_get_index(
 
 	if( identifier_length == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		notify_warning_printf( "%s: invalid identifier.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( values_table->amount > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid values table amount value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid values table amount value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -325,7 +325,7 @@ int32_t libewf_values_table_get_index(
 	{
 		if( values_table->identifiers[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: missing identifier for index: %" PRIi32 ".\n",
+			notify_warning_printf( "%s: missing identifier for index: %" PRIi32 ".\n",
 			 function, iterator );
 
 			continue;
@@ -335,7 +335,7 @@ int32_t libewf_values_table_get_index(
 
 		if( string_length == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to determine length of identifier of index: %" PRIi32 ".\n",
+			notify_warning_printf( "%s: unable to determine length of identifier of index: %" PRIi32 ".\n",
 			 function, iterator );
 
 			continue;
@@ -370,14 +370,14 @@ int libewf_values_table_get_identifier(
 
 	if( values_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid values table.\n",
+		notify_warning_printf( "%s: invalid values table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		notify_warning_printf( "%s: invalid identifier.\n",
 		 function );
 
 		return( -1 );
@@ -388,14 +388,14 @@ int libewf_values_table_get_identifier(
 	}
 	if( index >= values_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
+		notify_warning_printf( "%s: invalid index out of range.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( values_table->identifiers[ index ] == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: missing identifier for index: %" PRIu32 ".\n",
+		notify_warning_printf( "%s: missing identifier for index: %" PRIu32 ".\n",
 		 function, index );
 
 		return( -1 );
@@ -415,7 +415,7 @@ int libewf_values_table_get_identifier(
 
 	if( identifier_length > length )
 	{
-		LIBEWF_WARNING_PRINT( "%s: identifier too small.\n",
+		notify_warning_printf( "%s: identifier too small.\n",
 		 function );
 
 		return( -1 );
@@ -425,7 +425,7 @@ int libewf_values_table_get_identifier(
 	     values_table->identifiers[ index ],
 	     identifier_length ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set identifier.\n",
+		notify_warning_printf( "%s: unable to set identifier.\n",
 		 function );
 
 		return( -1 );
@@ -451,7 +451,7 @@ int libewf_values_table_get_value(
 
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		notify_warning_printf( "%s: invalid value.\n",
 		 function );
 
 		return( -1 );
@@ -462,7 +462,7 @@ int libewf_values_table_get_value(
 
 	if( index <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs ".\n",
+		notify_warning_printf( "%s: unable to find index for: %" PRIs ".\n",
 		 function, identifier );
 
 		return( -1 );
@@ -490,7 +490,7 @@ int libewf_values_table_get_value(
 
 	if( value_length > length )
 	{
-		LIBEWF_WARNING_PRINT( "%s: value too small.\n",
+		notify_warning_printf( "%s: value too small.\n",
 		 function );
 
 		return( -1 );
@@ -500,7 +500,7 @@ int libewf_values_table_get_value(
 	     values_table->values[ index ],
 	     value_length ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set value.\n",
+		notify_warning_printf( "%s: unable to set value.\n",
 		 function );
 
 		return( -1 );
@@ -531,7 +531,7 @@ int libewf_values_table_set_value(
 
 	if( index <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs ".\n",
+		notify_warning_printf( "%s: unable to find index for: %" PRIs ".\n",
 		 function, identifier );
 
 		return( -1 );
@@ -543,7 +543,7 @@ int libewf_values_table_set_value(
 
 		if( string_length == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to determine length of identifier.\n",
+			notify_warning_printf( "%s: unable to determine length of identifier.\n",
 			 function );
 
 			return( -1 );
@@ -553,7 +553,7 @@ int libewf_values_table_set_value(
 		     values_table->amount,
 		     ( index + 1 ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate values table.\n",
+			notify_warning_printf( "%s: unable to reallocate values table.\n",
 			 function );
 
 			return( -1 );
@@ -564,7 +564,7 @@ int libewf_values_table_set_value(
 
 		if( values_table->identifiers[ index ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set identifier.\n",
+			notify_warning_printf( "%s: unable to set identifier.\n",
 			 function );
 
 			memory_free(
@@ -600,7 +600,7 @@ int libewf_values_table_set_value(
 
 	if( values_table->values[ index ] == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set value.\n",
+		notify_warning_printf( "%s: unable to set value.\n",
 		 function );
 
 		memory_free(

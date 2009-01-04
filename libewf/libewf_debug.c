@@ -34,6 +34,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
@@ -42,7 +43,6 @@
 #include "libewf_compression.h"
 #include "libewf_debug.h"
 #include "libewf_endian.h"
-#include "libewf_notify.h"
 #include "libewf_segment_file.h"
 #include "libewf_string.h"
 
@@ -60,7 +60,7 @@ void libewf_debug_dump_data(
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return;
@@ -70,7 +70,7 @@ void libewf_debug_dump_data(
 	                  ( size - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	libewf_dump_data(
+	notify_dump_data(
 	 data,
 	 size );
 
@@ -79,7 +79,7 @@ void libewf_debug_dump_data(
 	     &data[ size - sizeof( ewf_crc_t ) ],
 	     sizeof( ewf_crc_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set CRC.\n",
+		notify_warning_printf( "%s: unable to set CRC.\n",
 		 function );
 	}
 	else
@@ -103,14 +103,14 @@ void libewf_debug_section_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( section == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section.\n",
+		notify_warning_printf( "%s: invalid section.\n",
 		 function );
 
 		return;
@@ -124,7 +124,7 @@ void libewf_debug_section_fprint(
 	     &stored_crc,
 	     section->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
 		 function );
 
 		return;
@@ -133,7 +133,7 @@ void libewf_debug_section_fprint(
 	     &next,
 	     section->next ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert next offset value.\n",
+		notify_warning_printf( "%s: unable to convert next offset value.\n",
 		 function );
 
 		return;
@@ -142,7 +142,7 @@ void libewf_debug_section_fprint(
 	     &size,
 	     section->size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert size value.\n",
+		notify_warning_printf( "%s: unable to convert size value.\n",
 		 function );
 
 		return;
@@ -169,14 +169,14 @@ void libewf_debug_header_string_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header string.\n",
+		notify_warning_printf( "%s: invalid header string.\n",
 		 function );
 
 		return;
@@ -197,7 +197,7 @@ void libewf_debug_header_fprint(
 
 	if( header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header.\n",
+		notify_warning_printf( "%s: invalid header.\n",
 		 function );
 
 		return;
@@ -207,7 +207,7 @@ void libewf_debug_header_fprint(
 
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create header string.\n",
+		notify_warning_printf( "%s: unable to create header string.\n",
 		 function );
 
 		return;
@@ -217,7 +217,7 @@ void libewf_debug_header_fprint(
 	     size,
 	     header, size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy header to header string.\n",
+		notify_warning_printf( "%s: unable to copy header to header string.\n",
 		 function );
 
 		memory_free(
@@ -246,7 +246,7 @@ void libewf_debug_header2_fprint(
 
 	if( header2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+		notify_warning_printf( "%s: invalid header2.\n",
 		 function );
 
 		return;
@@ -257,7 +257,7 @@ void libewf_debug_header2_fprint(
 
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create header string.\n",
+		notify_warning_printf( "%s: unable to create header string.\n",
 		 function );
 
 		return;
@@ -267,7 +267,7 @@ void libewf_debug_header2_fprint(
 	     header_size,
 	     header2, size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy header2 to header string.\n",
+		notify_warning_printf( "%s: unable to copy header2 to header string.\n",
 		 function );
 
 		memory_free(
@@ -293,14 +293,14 @@ void libewf_debug_chunk_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( chunk == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk.\n",
+		notify_warning_printf( "%s: invalid chunk.\n",
 		 function );
 
 		return;

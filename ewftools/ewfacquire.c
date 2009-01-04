@@ -89,7 +89,6 @@ typedef size_t u64;
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfcommon.h"
 #include "ewfgetopt.h"

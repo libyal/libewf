@@ -32,12 +32,12 @@
  */
 
 #include <common.h>
+#include <notify.h>
 #include <types.h>
 
 #include "ewfdigest_context.h"
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 /* Initializes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
@@ -55,7 +55,7 @@ int ewfdigest_context_initialize(
 
 	if( digest_context == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid digest context.\n",
+		notify_warning_printf( "%s: invalid digest context.\n",
 		 function );
 
 		return( -1 );
@@ -63,7 +63,7 @@ int ewfdigest_context_initialize(
 	if( ( type != EWFDIGEST_CONTEXT_TYPE_MD5 )
 	 && ( type != EWFDIGEST_CONTEXT_TYPE_SHA1 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported digest context type.\n",
+		notify_warning_printf( "%s: unsupported digest context type.\n",
 		 function );
 
 		return( -1 );
@@ -84,7 +84,7 @@ int ewfdigest_context_initialize(
 	     digest_type,
 	     NULL ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize context.\n",
+		notify_warning_printf( "%s: unable to initialize context.\n",
 		 function );
 
 		return( 0 );
@@ -109,7 +109,7 @@ int ewfdigest_context_initialize(
 		     PROV_RSA_FULL,
 		     CRYPT_VERIFYCONTEXT ) == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create AES or RSA crypt provider.\n",
+			notify_warning_printf( "%s: unable to create AES or RSA crypt provider.\n",
 			 function );
 
 			return( 0 );
@@ -117,7 +117,7 @@ int ewfdigest_context_initialize(
 	}
 	if( digest_context->crypt_provider == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create crypt provider.\n",
+		notify_warning_printf( "%s: unable to create crypt provider.\n",
 		 function );
 
 		return( 0 );
@@ -137,7 +137,7 @@ int ewfdigest_context_initialize(
 	     0,
 	     &digest_context->hash ) != 1 ) 
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create hash object.\n",
+		notify_warning_printf( "%s: unable to create hash object.\n",
 		 function );
 
 		CryptReleaseContext( digest_context->crypt_provider, 0 );
@@ -160,21 +160,21 @@ int ewfdigest_context_update(
 
 	if( digest_context == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid digest context.\n",
+		notify_warning_printf( "%s: invalid digest context.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -182,7 +182,7 @@ int ewfdigest_context_update(
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 	if( EVP_DigestUpdate( digest_context, (const void *) buffer, (unsigned long) size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to update digest hash.\n",
+		notify_warning_printf( "%s: unable to update digest hash.\n",
 		 function );
 
 		return( 0 );
@@ -190,14 +190,14 @@ int ewfdigest_context_update(
 #elif defined( HAVE_WINCPRYPT_H )
 	if( digest_context->hash == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid digest context - missing hash.\n",
+		notify_warning_printf( "%s: invalid digest context - missing hash.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( CryptHashData( digest_context->hash, (BYTE *) buffer, (DWORD) size, 0 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to update digest context hash.\n",
+		notify_warning_printf( "%s: unable to update digest context hash.\n",
 		 function );
 
 		return( 0 );
@@ -218,21 +218,21 @@ int ewfdigest_context_finalize(
 
 	if( digest_context == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid digest context.\n",
+		notify_warning_printf( "%s: invalid digest context.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( digest_hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid digest hash.\n",
+		notify_warning_printf( "%s: invalid digest hash.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( *size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -243,20 +243,20 @@ int ewfdigest_context_finalize(
 	     (unsigned char *) digest_hash,
 	     (unsigned int *) size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to finalize digest hash.\n",
+		notify_warning_printf( "%s: unable to finalize digest hash.\n",
 		 function );
 
 		return( 0 );
 	}
 	if( EVP_MD_CTX_cleanup( digest_context ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clean up digest context.\n",
+		notify_warning_printf( "%s: unable to clean up digest context.\n",
 		 function );
 	}
 #elif defined( HAVE_WINCPRYPT_H )
 	if( digest_context->hash == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid digest context - missing hash.\n",
+		notify_warning_printf( "%s: invalid digest context - missing hash.\n",
 		 function );
 
 		return( -1 );
@@ -268,7 +268,7 @@ int ewfdigest_context_finalize(
 	     (DWORD *) size,
 	     0 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to finalize digest hash.\n",
+		notify_warning_printf( "%s: unable to finalize digest hash.\n",
 		 function );
 
 		return( 0 );

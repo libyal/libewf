@@ -33,6 +33,7 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #if defined( HAVE_STRING_H )
@@ -42,7 +43,6 @@
 #include <libewf/definitions.h>
 
 #include "libewf_common.h"
-#include "libewf_notify.h"
 
 /* Function to wrap open()
  */
@@ -56,7 +56,7 @@ int libewf_common_open(
 
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		notify_warning_printf( "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
@@ -91,7 +91,7 @@ int libewf_common_open(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: flags not supported.\n",
+		notify_warning_printf( "%s: flags not supported.\n",
 		 function );
 
 		return( -1 );
@@ -112,7 +112,7 @@ int libewf_common_open(
 	if( file_descriptor == -1 )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "%s: error opening file.\n",
+		notify_warning_printf( "%s: error opening file.\n",
 		 function );
 
 		return( -1 );
@@ -136,7 +136,7 @@ int libewf_common_wide_open(
 
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		notify_warning_printf( "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
@@ -171,7 +171,7 @@ int libewf_common_wide_open(
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: flags not supported.\n",
+		notify_warning_printf( "%s: flags not supported.\n",
 		 function );
 
 		return( -1 );
@@ -184,7 +184,7 @@ int libewf_common_wide_open(
 	     _SH_DENYRW,
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: error opening file.\n",
+		notify_warning_printf( "%s: error opening file.\n",
 		 function );
 
 		return( -1 );
@@ -208,14 +208,14 @@ int libewf_common_test_empty_block(
 
 	if( block_buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid block buffer.\n",
+		notify_warning_printf( "%s: invalid block buffer.\n",
 		 function );
 
 		return( 0 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( 0 );
@@ -253,7 +253,7 @@ struct tm *libewf_common_localtime(
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		notify_warning_printf( "%s: invalid time stamp.\n",
 		 function );
 
 		return( NULL );
@@ -263,7 +263,7 @@ struct tm *libewf_common_localtime(
 
 	if( time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
+		notify_warning_printf( "%s: unable to create time elements.\n",
 		 function );
 
 		return( NULL );
@@ -279,7 +279,7 @@ struct tm *libewf_common_localtime(
 	     time_elements ) == NULL )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		notify_warning_printf( "%s: unable to set time elements.\n",
 		 function );
 
 		memory_free(
@@ -294,7 +294,7 @@ struct tm *libewf_common_localtime(
 
 	if( static_time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create static time elements.\n",
+		notify_warning_printf( "%s: unable to create static time elements.\n",
 		 function );
 
 		memory_free(
@@ -307,7 +307,7 @@ struct tm *libewf_common_localtime(
 	     static_time_elements,
 	     sizeof( struct tm ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		notify_warning_printf( "%s: unable to set time elements.\n",
 		 function );
 
 		memory_free(
@@ -350,7 +350,7 @@ char *libewf_common_ctime(
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		notify_warning_printf( "%s: invalid time stamp.\n",
 		 function );
 
 		return( NULL );
@@ -360,7 +360,7 @@ char *libewf_common_ctime(
 
 	if( time_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create time string.\n",
+		notify_warning_printf( "%s: unable to create time string.\n",
 		 function );
 
 		return( NULL );
@@ -378,7 +378,7 @@ char *libewf_common_ctime(
 	     time_string_size ) == NULL )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
+		notify_warning_printf( "%s: unable to set time string.\n",
 		 function );
 
 		memory_free(
@@ -393,7 +393,7 @@ char *libewf_common_ctime(
 
 	if( static_time_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create static time string.\n",
+		notify_warning_printf( "%s: unable to create static time string.\n",
 		 function );
 
 		memory_free(
@@ -406,7 +406,7 @@ char *libewf_common_ctime(
              static_time_string,
              time_string_size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
+		notify_warning_printf( "%s: unable to set time string.\n",
 		 function );
 
 		memory_free(
@@ -441,7 +441,7 @@ wchar_t *libewf_common_wide_ctime(
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		notify_warning_printf( "%s: invalid time stamp.\n",
 		 function );
 
 		return( NULL );
@@ -451,7 +451,7 @@ wchar_t *libewf_common_wide_ctime(
 
 	if( time_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create time string.\n",
+		notify_warning_printf( "%s: unable to create time string.\n",
 		 function );
 
 		return( NULL );
@@ -462,7 +462,7 @@ wchar_t *libewf_common_wide_ctime(
 	     time_string,
 	     time_string_size ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
+		notify_warning_printf( "%s: unable to set time string.\n",
 		 function );
 
 		memory_free(
@@ -491,21 +491,21 @@ int libewf_common_copy_wchar_to_char(
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		notify_warning_printf( "%s: invalid source.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		notify_warning_printf( "%s: invalid destination.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -541,21 +541,21 @@ int libewf_common_copy_char_to_wchar(
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		notify_warning_printf( "%s: invalid source.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		notify_warning_printf( "%s: invalid destination.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );

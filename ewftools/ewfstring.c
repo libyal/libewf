@@ -35,6 +35,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <system_string.h>
 
 #include <errno.h>
@@ -57,7 +58,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfstring.h"
 
@@ -98,7 +98,7 @@ char *ewfstring_strerror(
 
 	if( error_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create error string.\n",
+		notify_warning_printf( "%s: unable to create error string.\n",
 		 function );
 
 		return( NULL );
@@ -110,7 +110,7 @@ char *ewfstring_strerror(
 	     error_string,
 	     error_string_size ) != LIBEWF_COMMON_STRERROR_R_RETURN_ERROR )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
+		notify_warning_printf( "%s: unable to set error string.\n",
 		 function );
 
 		memory_free(
@@ -126,7 +126,7 @@ char *ewfstring_strerror(
 
 	if( static_error_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create static error string.\n",
+		notify_warning_printf( "%s: unable to create static error string.\n",
 		 function );
 
 		memory_free(
@@ -139,7 +139,7 @@ char *ewfstring_strerror(
 	     static_error_string,
 	     error_string_size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
+		notify_warning_printf( "%s: unable to set error string.\n",
 		 function );
 
 		memory_free(
@@ -182,7 +182,7 @@ wchar_t *ewfstring_wide_strerror(
 
 	if( error_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create error string.\n",
+		notify_warning_printf( "%s: unable to create error string.\n",
 		 function );
 
 		return( NULL );
@@ -192,7 +192,7 @@ wchar_t *ewfstring_wide_strerror(
 	     error_string,
 	     error_string_size ) != LIBEWF_COMMON_STRERROR_R_RETURN_ERROR )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
+		notify_warning_printf( "%s: unable to set error string.\n",
 		 function );
 
 		memory_free(
@@ -223,14 +223,14 @@ int ewfstring_copy_system_string_to_character_string(
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		notify_warning_printf( "%s: invalid source.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		notify_warning_printf( "%s: invalid destination.\n",
 		 function );
 
 		return( -1 );
@@ -262,7 +262,7 @@ int ewfstring_copy_system_string_to_character_string(
 #endif
 		else
 		{
-			LIBEWF_WARNING_PRINT( "%s: unsupported conversion.\n",
+			notify_warning_printf( "%s: unsupported conversion.\n",
 			 function );
 
 			return( -1 );
@@ -288,14 +288,14 @@ int ewfstring_copy_character_string_to_system_string(
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		notify_warning_printf( "%s: invalid source.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		notify_warning_printf( "%s: invalid destination.\n",
 		 function );
 
 		return( -1 );
@@ -327,7 +327,7 @@ int ewfstring_copy_character_string_to_system_string(
 #endif
 		else
 		{
-			LIBEWF_WARNING_PRINT( "%s: unsupported conversion.\n",
+			notify_warning_printf( "%s: unsupported conversion.\n",
 			 function );
 
 			return( -1 );

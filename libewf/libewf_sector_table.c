@@ -33,9 +33,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 
 #include "libewf_common.h"
-#include "libewf_notify.h"
 #include "libewf_sector_table.h"
 
 /* Allocates memory for a sector table struct
@@ -52,7 +52,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 	if( sector_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate sector table.\n",
+		notify_warning_printf( "%s: unable to allocate sector table.\n",
 		 function );
 
 		return( NULL );
@@ -66,7 +66,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 		if( sector_table->sector == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic sector array.\n",
+			notify_warning_printf( "%s: unable to allocate dynamic sector array.\n",
 			 function );
 
 			memory_free(
@@ -79,7 +79,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 		     0, 
 		     ( sizeof( libewf_sector_table_entry_t ) * amount ) ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic sector array.\n",
+			notify_warning_printf( "%s: unable to clear dynamic sector array.\n",
 			 function );
 
 			memory_free(
@@ -107,14 +107,14 @@ int libewf_sector_table_realloc(
 
 	if( sector_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector table.\n",
+		notify_warning_printf( "%s: invalid sector table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( sector_table->amount >= amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: new amount must be greater than previous amount.\n",
+		notify_warning_printf( "%s: new amount must be greater than previous amount.\n",
 		 function );
 
 		return( -1 );
@@ -125,7 +125,7 @@ int libewf_sector_table_realloc(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic sector array.\n",
+		notify_warning_printf( "%s: unable to reallocate dynamic sector array.\n",
 		 function );
 
 		return( -1 );
@@ -137,7 +137,7 @@ int libewf_sector_table_realloc(
 	     0, 
 	     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic sector array.\n",
+		notify_warning_printf( "%s: unable to clear dynamic sector array.\n",
 		 function );
 
 		return( 1 );
@@ -156,7 +156,7 @@ void libewf_sector_table_free(
 
 	if( sector_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector table.\n",
+		notify_warning_printf( "%s: invalid sector table.\n",
 		 function );
 
 		return;
@@ -183,7 +183,7 @@ int libewf_sector_table_get_sector(
 
 	if( sector_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector table.\n",
+		notify_warning_printf( "%s: invalid sector table.\n",
 		 function );
 
 		return( -1 );
@@ -194,28 +194,28 @@ int libewf_sector_table_get_sector(
 	}
 	if( sector_table->sector == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector table - missing sectors.\n",
+		notify_warning_printf( "%s: invalid sector table - missing sectors.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( first_sector == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid first sector.\n",
+		notify_warning_printf( "%s: invalid first sector.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( amount_of_sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
+		notify_warning_printf( "%s: invalid amount of sectors.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( index >= sector_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
+		notify_warning_printf( "%s: invalid index out of range.\n",
 		 function );
 
 		return( -1 );
@@ -243,14 +243,14 @@ int libewf_sector_table_add_sector(
 
 	if( sector_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector table.\n",
+		notify_warning_printf( "%s: invalid sector table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( first_sector < 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid first sector value is below zero.\n",
+		notify_warning_printf( "%s: invalid first sector value is below zero.\n",
 		 function );
 
 		return( -1 );
@@ -288,7 +288,7 @@ int libewf_sector_table_add_sector(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create sectors.\n",
+		notify_warning_printf( "%s: unable to create sectors.\n",
 		 function );
 
 		return( -1 );

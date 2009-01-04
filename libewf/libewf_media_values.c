@@ -33,10 +33,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 
 #include "libewf_common.h"
 #include "libewf_media_values.h"
-#include "libewf_notify.h"
 
 #include "ewf_definitions.h"
 
@@ -54,7 +54,7 @@ libewf_media_values_t *libewf_media_values_alloc(
 
 	if( media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate media values.\n",
+		notify_warning_printf( "%s: unable to allocate media values.\n",
 		 function );
 
 		return( NULL );
@@ -64,7 +64,7 @@ libewf_media_values_t *libewf_media_values_alloc(
 	     0,
 	     sizeof( libewf_media_values_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear media values.\n",
+		notify_warning_printf( "%s: unable to clear media values.\n",
 		 function );
 
 		memory_free(

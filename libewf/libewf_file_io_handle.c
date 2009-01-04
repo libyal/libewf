@@ -32,13 +32,13 @@
  */
 
 #include <common.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_file_io_handle.h"
-#include "libewf_notify.h"
 
 /* Opens a file io handle
  * Sets the filename and the file descriptor in the file io handle struct
@@ -52,14 +52,14 @@ int libewf_file_io_handle_open(
 
 	if( file_io_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle.\n",
+		notify_warning_printf( "%s: invalid file io handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid file io handle - missing filename.\n",
 		 function );
 
 		return( -1 );
@@ -70,7 +70,7 @@ int libewf_file_io_handle_open(
 
 	if( file_io_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to open file io handle: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open file io handle: %" PRIs_EWF_filename ".\n",
 		 function, file_io_handle->filename );
 
 		return( -1 );
@@ -94,35 +94,35 @@ ssize_t libewf_file_io_handle_read(
 
 	if( file_io_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle.\n",
+		notify_warning_printf( "%s: invalid file io handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid file io handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid file io handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -138,7 +138,7 @@ ssize_t libewf_file_io_handle_read(
 	}
 	if( read_count != (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read from file io handle: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to read from file io handle: %" PRIs_EWF_filename ".\n",
 		 function, file_io_handle->filename );
 	}
 	return( read_count );
@@ -158,35 +158,35 @@ ssize_t libewf_file_io_handle_write(
 
 	if( file_io_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle.\n",
+		notify_warning_printf( "%s: invalid file io handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid file io handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid file io handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -202,7 +202,7 @@ ssize_t libewf_file_io_handle_write(
 	}
 	if( write_count != (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write to file io handle: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to write to file io handle: %" PRIs_EWF_filename ".\n",
 		 function, file_io_handle->filename );
 	}
 	return( write_count );
@@ -219,35 +219,35 @@ off64_t libewf_file_io_handle_seek_offset(
 
 	if( file_io_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle.\n",
+		notify_warning_printf( "%s: invalid file io handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid file io handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid file io handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset > (off64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid offset value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle->file_offset != offset )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
 		 function, offset, file_io_handle->filename, file_io_handle->file_descriptor );
 
 		if( libewf_common_lseek(
@@ -255,7 +255,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename ".\n",
+			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename ".\n",
 			 function, offset, file_io_handle->filename );
 
 			return( -1 );

@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
@@ -39,7 +40,6 @@
 #include "libewf_common.h"
 #include "libewf_compression.h"
 #include "libewf_endian.h"
-#include "libewf_notify.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_read.h"
@@ -67,21 +67,21 @@ ssize_t libewf_read_process_chunk_data(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data.\n",
+		notify_warning_printf( "%s: invalid chunk data.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_data_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid chunk data size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -96,7 +96,7 @@ ssize_t libewf_read_process_chunk_data(
 			     &chunk_crc,
 			     &chunk_data[ chunk_data_size ] ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+				notify_warning_printf( "%s: unable to convert stored CRC value.\n",
 				 function );
 
 				return( -1 );
@@ -109,7 +109,7 @@ ssize_t libewf_read_process_chunk_data(
 
 		if( chunk_crc != calculated_crc )
 		{
-			LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+			notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
 			 function, chunk_crc, calculated_crc );
 
 			return( -1 );
@@ -120,21 +120,21 @@ ssize_t libewf_read_process_chunk_data(
 	{
 		if( uncompressed_chunk_data == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid uncompressed chunk data.\n",
+			notify_warning_printf( "%s: invalid uncompressed chunk data.\n",
 			 function );
 
 			return( -1 );
 		}
 		if( chunk_data == uncompressed_chunk_data )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid uncompressed chunk data is the same as chunk data.\n",
+			notify_warning_printf( "%s: invalid uncompressed chunk data is the same as chunk data.\n",
 			 function );
 
 			return( -1 );
 		}
 		if( *uncompressed_chunk_data_size > (size_t) SSIZE_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid uncompressed chunk data size value exceeds maximum.\n",
+			notify_warning_printf( "%s: invalid uncompressed chunk data size value exceeds maximum.\n",
 			 function );
 
 			return( -1 );
@@ -145,7 +145,7 @@ ssize_t libewf_read_process_chunk_data(
 		     chunk_data,
 		     chunk_data_size ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to uncompressed chunk data.\n",
+			notify_warning_printf( "%s: unable to uncompressed chunk data.\n",
 			 function );
 
 			return( -1 );
@@ -183,84 +183,84 @@ ssize_t libewf_raw_read_chunk(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		notify_warning_printf( "%s: invalid handle - missing offset table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunnk offsets.\n",
+		notify_warning_printf( "%s: invalid handle - invalid offset table - missing chunnk offsets.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		notify_warning_printf( "%s: invalid handle - missing segment table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->segment_table->segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment file handles.\n",
+		notify_warning_printf( "%s: invalid handle - invalid segment table - missing segment file handles.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		notify_warning_printf( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk buffer.\n",
+		notify_warning_printf( "%s: invalid chunk buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value is zero.\n",
+		notify_warning_printf( "%s: invalid chunk size value is zero.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid chunk size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( is_compressed == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid is compressed.\n",
+		notify_warning_printf( "%s: invalid is compressed.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( chunk_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk crc.\n",
+		notify_warning_printf( "%s: invalid chunk crc.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( read_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid read crc.\n",
+		notify_warning_printf( "%s: invalid read crc.\n",
 		 function );
 
 		return( -1 );
@@ -299,7 +299,7 @@ ssize_t libewf_raw_read_chunk(
 	 */
 	if( chunk_size < chunk_data_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size too small.\n",
+		notify_warning_printf( "%s: invalid chunk size too small.\n",
 		 function );
 
 		return( -1 );
@@ -308,14 +308,14 @@ ssize_t libewf_raw_read_chunk(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file.\n",
+		notify_verbose_printf( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - missing filename.\n",
+		notify_verbose_printf( "%s: invalid segment file - missing filename.\n",
 		 function );
 
 		return( -1 );
@@ -326,7 +326,7 @@ ssize_t libewf_raw_read_chunk(
 	     segment_file_handle,
 	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk.\n",
+		notify_warning_printf( "%s: unable to seek chunk.\n",
 		 function );
 
 		return( -1 );
@@ -340,7 +340,7 @@ ssize_t libewf_raw_read_chunk(
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read chunk.\n",
+		notify_warning_printf( "%s: unable to read chunk.\n",
 		 function );
 
 		return( -1 );
@@ -356,7 +356,7 @@ ssize_t libewf_raw_read_chunk(
 
 		if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
+			notify_warning_printf( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
 			 function, chunk, segment_number, segment_file_handle->filename );
 
 			return( -1 );
@@ -365,7 +365,7 @@ ssize_t libewf_raw_read_chunk(
 		     chunk_crc,
 		     stored_crc_buffer ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
+			notify_warning_printf( "%s: unable to convert CRC value.\n",
 			 function );
 
 			return( -1 );
@@ -380,7 +380,7 @@ ssize_t libewf_raw_read_chunk(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
+	notify_verbose_printf( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
 	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type,
 	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
@@ -413,56 +413,56 @@ ssize_t libewf_read_chunk_data(
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		notify_warning_printf( "%s: invalid handle - missing subhandle read.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		notify_warning_printf( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		notify_warning_printf( "%s: invalid handle - missing offset table.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
+		notify_warning_printf( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		notify_warning_printf( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == internal_handle->chunk_cache->compressed )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache compressed.\n",
+		notify_warning_printf( "%s: invalid buffer - same as chunk cache compressed.\n",
 		 function );
 
 		return( -1 );
@@ -482,14 +482,14 @@ ssize_t libewf_read_chunk_data(
 
 		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu ".\n",
+			notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
 			 function, chunk_data_size );
 
 			if( libewf_chunk_cache_realloc(
 			     internal_handle->chunk_cache,
 			     chunk_data_size ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
+				notify_warning_printf( "%s: unable to reallocate chunk cache.\n",
 				 function );
 
 				return( -1 );
@@ -546,7 +546,7 @@ ssize_t libewf_read_chunk_data(
 
 		if( chunk_read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read chunk.\n",
+			notify_warning_printf( "%s: unable to read chunk.\n",
 			 function );
 
 			return( -1 );
@@ -576,7 +576,7 @@ ssize_t libewf_read_chunk_data(
 				     0,
 				     internal_handle->media_values->chunk_size ) == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
+					notify_warning_printf( "%s: unable to wipe chunk data.\n",
 					 function );
 
 					return( -1 );
@@ -593,7 +593,7 @@ ssize_t libewf_read_chunk_data(
 			}
 			if( libewf_add_crc_error( (LIBEWF_HANDLE *) internal_handle, sector, amount_of_sectors ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set CRC error.\n",
+				notify_warning_printf( "%s: unable to set CRC error.\n",
 				 function );
 
 				return( -1 );
@@ -623,7 +623,7 @@ ssize_t libewf_read_chunk_data(
 	 */
 	if( chunk_data_size < chunk_offset )
 	{
-		LIBEWF_WARNING_PRINT( "%s: chunk offset exceeds amount of bytes available in chunk.\n",
+		notify_warning_printf( "%s: chunk offset exceeds amount of bytes available in chunk.\n",
 		 function );
 
 		return( -1 );
@@ -638,7 +638,7 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( bytes_available > (size_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid available amount of bytes value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid available amount of bytes value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -655,7 +655,7 @@ ssize_t libewf_read_chunk_data(
 		       &chunk_data[ chunk_offset ],
 		       bytes_available ) == NULL ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set chunk data in buffer.\n",
+			notify_warning_printf( "%s: unable to set chunk data in buffer.\n",
 			 function );
 
 			return( -1 );
@@ -685,7 +685,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
@@ -694,7 +694,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		notify_warning_printf( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -702,7 +702,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
+		notify_warning_printf( "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -710,7 +710,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	if( ( uncompressed_buffer == internal_handle->chunk_cache->data )
 	 || ( uncompressed_buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid uncompressed buffer - same as chunk cache.\n",
+		notify_warning_printf( "%s: invalid uncompressed buffer - same as chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -727,7 +727,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( chunk_data_size <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to prepare chunk data.\n",
+		notify_warning_printf( "%s: unable to prepare chunk data.\n",
 		 function );
 
 		return( -1 );
@@ -754,7 +754,7 @@ ssize_t libewf_raw_read_buffer(
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
@@ -763,7 +763,7 @@ ssize_t libewf_raw_read_buffer(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		notify_warning_printf( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -771,7 +771,7 @@ ssize_t libewf_raw_read_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
+		notify_warning_printf( "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -787,7 +787,7 @@ ssize_t libewf_raw_read_buffer(
 
 	if( read_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read chunk data.\n",
+		notify_warning_printf( "%s: unable to read chunk data.\n",
 		 function );
 	}
 	internal_handle->current_chunk += 1;
@@ -811,7 +811,7 @@ ssize_t libewf_read_buffer(
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
@@ -820,21 +820,21 @@ ssize_t libewf_read_buffer(
 
 	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		notify_warning_printf( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		notify_warning_printf( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
@@ -842,19 +842,19 @@ ssize_t libewf_read_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
+		notify_warning_printf( "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: reading size: %" PRIzu ".\n",
+	notify_verbose_printf( "%s: reading size: %" PRIzu ".\n",
 	 function, size );
 
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
@@ -864,14 +864,14 @@ ssize_t libewf_read_buffer(
 
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu ".\n",
+		notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function, chunk_data_size );
 
 		if( libewf_chunk_cache_realloc(
 		     internal_handle->chunk_cache,
 		     chunk_data_size ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
+			notify_warning_printf( "%s: unable to reallocate chunk cache.\n",
 			 function );
 
 			return( -1 );
@@ -888,7 +888,7 @@ ssize_t libewf_read_buffer(
 
 		if( chunk_read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",
+			notify_warning_printf( "%s: unable to read data from chunk.\n",
 			 function );
 
 			return( -1 );
@@ -909,7 +909,7 @@ ssize_t libewf_read_buffer(
 		}
 		else if( internal_handle->current_chunk_offset > internal_handle->media_values->chunk_size )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
+			notify_warning_printf( "%s: invalid current chunk offset.\n",
 			 function );
 
 			return( -1 );
@@ -936,7 +936,7 @@ ssize_t libewf_read_random(
 
 	if( libewf_seek_offset( handle, offset ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to seek offset.\n",
+		notify_warning_printf( "%s: unable to seek offset.\n",
 		 function );
 
 		return( -1 );
@@ -945,7 +945,7 @@ ssize_t libewf_read_random(
 
 	if( read_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read buffer.\n",
+		notify_warning_printf( "%s: unable to read buffer.\n",
 		 function );
 
 		return( -1 );

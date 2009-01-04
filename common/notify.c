@@ -32,6 +32,8 @@
  */
 
 #include "common.h"
+#include "notify.h"
+#include "types.h"
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -62,8 +64,6 @@
 #else
 #error No variable argument support available
 #endif
-
-#include "notify.h"
 
 FILE *libewf_notify_stream = NULL;
 int libewf_notify_verbose  = 0;
@@ -104,3 +104,67 @@ void VARARGS(
 	}
 }
 
+/* Prints a dump of data
+ */
+void libewf_notify_dump_data(
+      void *data,
+      size_t size )
+{
+	size_t iterator = 0;
+
+	if( libewf_notify_stream == NULL )
+	{
+		return;
+	}
+	while( iterator < size )
+	{
+		if( iterator % 16 == 0 )
+		{
+			fprintf( libewf_notify_stream, "%.8" PRIzx ": ",
+			 iterator );
+		}
+		fprintf( libewf_notify_stream, "%.2" PRIx8 "",
+		 ( (unsigned char *) data )[ iterator++ ] );
+
+		if( iterator % 16 == 0 )
+		{
+			fprintf( libewf_notify_stream, "\n" );
+		}
+		else if( iterator % 8 == 0 )
+		{
+			fprintf( libewf_notify_stream, "  " );
+		}
+	}
+	if( iterator % 16 != 0 )
+	{
+		fprintf( libewf_notify_stream, "\n" );
+	}
+	fprintf( libewf_notify_stream, "\n" );
+
+	iterator = 0;
+
+	while( iterator < size )
+	{
+		if( iterator % 32 == 0 )
+		{
+			fprintf( libewf_notify_stream, "%.8" PRIzx ": ",
+			 iterator );
+		}
+		fprintf( libewf_notify_stream, "%c ",
+		 ( (char *) data )[ iterator++ ] );
+
+		if( iterator % 32 == 0 )
+		{
+			fprintf( libewf_notify_stream, "\n" );
+		}
+		else if( iterator % 8 == 0 )
+		{
+			fprintf( libewf_notify_stream, "  " );
+		}
+	}
+	if( iterator % 32 != 0 )
+	{
+		fprintf( libewf_notify_stream, "\n" );
+	}
+	fprintf( libewf_notify_stream, "\n" );
+}

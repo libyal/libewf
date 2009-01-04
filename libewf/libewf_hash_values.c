@@ -34,13 +34,13 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_hash_values.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -55,7 +55,7 @@ int libewf_hash_values_initialize(
 
 	if( hash_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
+		notify_warning_printf( "%s: invalid hash values.\n",
 		 function );
 
 		return( -1 );
@@ -87,7 +87,7 @@ int libewf_hash_values_parse_hash_string_xml(
 
 	if( hash_string_xml == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash string.\n",
+		notify_warning_printf( "%s: invalid hash string.\n",
 		 function );
 
 		return( -1 );
@@ -100,7 +100,7 @@ int libewf_hash_values_parse_hash_string_xml(
 
 	if( lines == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to split lines in hash string.\n",
+		notify_warning_printf( "%s: unable to split lines in hash string.\n",
 		 function );
 
 		return( -1 );
@@ -110,7 +110,7 @@ int libewf_hash_values_parse_hash_string_xml(
 
 	if( *hash_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create hash values.\n",
+		notify_warning_printf( "%s: unable to create hash values.\n",
 		 function );
 
 		libewf_string_split_values_free(
@@ -122,7 +122,7 @@ int libewf_hash_values_parse_hash_string_xml(
 	if( libewf_hash_values_initialize(
 	     *hash_values ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize the hash values.\n",
+		notify_warning_printf( "%s: unable to initialize the hash values.\n",
 		 function );
 
 		libewf_string_split_values_free(
@@ -215,7 +215,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		     &open_tag_end[ 1 ],
 		     string_length ) != 1 )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs ".\n",
+			notify_verbose_printf( "%s: unable to set value with identifier: %" PRIs ".\n",
 			 function, &open_tag_start[ 1 ] );
 		}
 	}
@@ -240,7 +240,7 @@ int libewf_hash_values_parse_xhash(
 
 	if( xhash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid xhash.\n",
+		notify_warning_printf( "%s: invalid xhash.\n",
 		 function );
 
 		return( -1 );
@@ -250,7 +250,7 @@ int libewf_hash_values_parse_xhash(
 
 	if( xml_hash_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create XML hash string.\n",
+		notify_warning_printf( "%s: unable to create XML hash string.\n",
 		 function );
 
 		return( -1 );
@@ -261,7 +261,7 @@ int libewf_hash_values_parse_xhash(
 	     xhash,
 	     size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy xhash to xml hash string.\n",
+		notify_warning_printf( "%s: unable to copy xhash to xml hash string.\n",
 		 function );
 
 		memory_free(
@@ -276,7 +276,7 @@ int libewf_hash_values_parse_xhash(
 
 	if( result != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to parse xml hash string.\n",
+		notify_warning_printf( "%s: unable to parse xml hash string.\n",
 		 function );
 	}
 	memory_free(
@@ -299,7 +299,7 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 	if( hash_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash string.\n",
+		notify_warning_printf( "%s: invalid hash string.\n",
 		 function );
 
 		return( -1 );
@@ -307,28 +307,28 @@ int libewf_hash_values_convert_hash_string_to_hash(
 	if( ( hash_string_length == 0 )
 	 || ( hash_string_length > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash string length.\n",
+		notify_warning_printf( "%s: invalid hash string length.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash.\n",
+		notify_warning_printf( "%s: invalid hash.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( hash_length == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash length.\n",
+		notify_warning_printf( "%s: invalid hash length.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( *hash != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: hash already created .\n",
+		notify_warning_printf( "%s: hash already created .\n",
 		 function );
 
 		return( -1 );
@@ -338,7 +338,7 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 	if( *hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create hash.\n",
+		notify_warning_printf( "%s: unable to create hash.\n",
 		 function );
 
 		*hash_length = 0;
@@ -353,7 +353,7 @@ int libewf_hash_values_convert_hash_string_to_hash(
 	     *hash,
 	     *hash_length ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set hash.\n",
+		notify_warning_printf( "%s: unable to set hash.\n",
 		 function );
 
 		memory_free(
@@ -386,28 +386,28 @@ int libewf_hash_values_generate_hash_string_xml(
 
 	if( hash_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
+		notify_warning_printf( "%s: invalid hash values.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( hash_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash string.\n",
+		notify_warning_printf( "%s: invalid hash string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( *hash_string != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: hash string already created.\n",
+		notify_warning_printf( "%s: hash string already created.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( hash_string_length == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash string length.\n",
+		notify_warning_printf( "%s: invalid hash string length.\n",
 		 function );
 
 		return( -1 );
@@ -427,7 +427,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	{
 		if( hash_values->identifiers[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid hash value - missing identifier.\n",
+			notify_warning_printf( "%s: invalid hash value - missing identifier.\n",
 			 function );
 
 			continue;
@@ -454,7 +454,7 @@ int libewf_hash_values_generate_hash_string_xml(
 
 	if( *hash_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create hash string.\n",
+		notify_warning_printf( "%s: unable to create hash string.\n",
 		 function );
 
 		*hash_string_length = 0;
@@ -471,7 +471,7 @@ int libewf_hash_values_generate_hash_string_xml(
 
 	if( character_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
+		notify_warning_printf( "%s: unable to set hash string.\n",
 		 function );
 
 		memory_free(
@@ -488,7 +488,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	{
 		if( hash_values->identifiers[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid hash value - missing identifier.\n",
+			notify_warning_printf( "%s: invalid hash value - missing identifier.\n",
 			 function );
 
 			continue;
@@ -507,7 +507,7 @@ int libewf_hash_values_generate_hash_string_xml(
 
 			if( character_count <= -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
+				notify_warning_printf( "%s: unable to set hash string.\n",
 				 function );
 
 				memory_free(
@@ -529,7 +529,7 @@ int libewf_hash_values_generate_hash_string_xml(
 
 	if( character_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
+		notify_warning_printf( "%s: unable to set hash string.\n",
 		 function );
 
 		memory_free(
@@ -564,7 +564,7 @@ int libewf_hash_values_generate_xhash_string_ewfx(
 	     &hash_string,
 	     hash_length ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create xhash string.\n",
+		notify_warning_printf( "%s: unable to create xhash string.\n",
 		 function );
 
 		return( -1 );
@@ -577,7 +577,7 @@ int libewf_hash_values_generate_xhash_string_ewfx(
 
 	if( result != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create xhash.\n",
+		notify_warning_printf( "%s: unable to create xhash.\n",
 		 function );
 	}
 	memory_free(

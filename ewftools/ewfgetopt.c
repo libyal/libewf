@@ -33,13 +33,12 @@
  */
 
 #include <common.h>
+#include <notify.h>
 #include <system_string.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
-
-#include "../libewf/libewf_notify.h"
 
 #include "ewfgetopt.h"
 
@@ -122,7 +121,7 @@ system_integer_t ewfgetopt(
 		if( ( *options_string != (system_character_t) ':' )
 		 && ( optopt != (system_integer_t) '?' ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: no such option: %" PRIc_SYSTEM ".\n",
+			notify_warning_printf( "%s: no such option: %" PRIc_SYSTEM ".\n",
 			 function, optopt );
 		}
 		return( (system_integer_t) '?' );
@@ -160,7 +159,7 @@ system_integer_t ewfgetopt(
 			{
 				return( (system_integer_t) ':' );
 			}
-			LIBEWF_WARNING_PRINT( "%s: option: %" PRIc_SYSTEM " requires an argument.\n",
+			notify_warning_printf( "%s: option: %" PRIc_SYSTEM " requires an argument.\n",
 			 function, optopt );
 
 			return( (system_integer_t) '?' );

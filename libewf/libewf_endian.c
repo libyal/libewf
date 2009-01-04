@@ -32,10 +32,10 @@
  */
 
 #include <common.h>
+#include <notify.h>
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
-#include "libewf_notify.h"
 
 /* Converts a byte array into a 16bit little endian value
  * Returns 1 if successful -1 on error
@@ -48,14 +48,14 @@ int libewf_endian_convert_16bit(
 
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		notify_warning_printf( "%s: invalid value.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		notify_warning_printf( "%s: invalid bytes.\n",
 		 function );
 
 		return( -1 );
@@ -78,14 +78,14 @@ int libewf_endian_convert_32bit(
 
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		notify_warning_printf( "%s: invalid value.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		notify_warning_printf( "%s: invalid bytes.\n",
 		 function );
 
 		return( -1 );
@@ -112,14 +112,14 @@ int libewf_endian_convert_64bit(
 
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		notify_warning_printf( "%s: invalid value.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		notify_warning_printf( "%s: invalid bytes.\n",
 		 function );
 
 		return( -1 );
@@ -154,7 +154,7 @@ int libewf_endian_revert_16bit(
 
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		notify_warning_printf( "%s: invalid bytes.\n",
 		 function );
 
 		return( -1 );
@@ -177,7 +177,7 @@ int libewf_endian_revert_32bit(
 
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		notify_warning_printf( "%s: invalid bytes.\n",
 		 function );
 
 		return( -1 );
@@ -204,7 +204,7 @@ int libewf_endian_revert_64bit(
 
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		notify_warning_printf( "%s: invalid bytes.\n",
 		 function );
 
 		return( -1 );

@@ -35,6 +35,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <memory.h>
+#include <notify.h>
 #include <system_string.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -73,7 +74,6 @@
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_hash_values.h"
 #include "../libewf/libewf_header_values.h"
-#include "../libewf/libewf_notify.h"
 
 #include "ewfbyte_size_string.h"
 #include "ewfdigest_context.h"
@@ -105,7 +105,7 @@ struct tm *ewfoutput_gmtime(
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		notify_warning_printf( "%s: invalid time stamp.\n",
 		 function );
 
 		return( NULL );
@@ -115,7 +115,7 @@ struct tm *ewfoutput_gmtime(
 
 	if( time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
+		notify_warning_printf( "%s: unable to create time elements.\n",
 		 function );
 
 		return( NULL );
@@ -127,7 +127,7 @@ struct tm *ewfoutput_gmtime(
 	if( ewfoutput_gmtime_r( timestamp, time_elements ) == NULL )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		notify_warning_printf( "%s: unable to set time elements.\n",
 		 function );
 
 		memory_free(
@@ -141,7 +141,7 @@ struct tm *ewfoutput_gmtime(
 
 	if( static_time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create static time elements.\n",
+		notify_warning_printf( "%s: unable to create static time elements.\n",
 		 function );
 
 		memory_free(
@@ -154,7 +154,7 @@ struct tm *ewfoutput_gmtime(
 	     static_time_elements,
 	     sizeof( struct tm ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		notify_warning_printf( "%s: unable to set time elements.\n",
 		 function );
 
 		memory_free(
@@ -177,14 +177,14 @@ void ewfoutput_version_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( program == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid program name.\n",
+		notify_warning_printf( "%s: invalid program name.\n",
 		 function );
 
 		return;
@@ -212,7 +212,7 @@ void ewfoutput_copyright_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
@@ -254,7 +254,7 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
@@ -496,21 +496,21 @@ void ewfoutput_acquiry_errors_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return;
 	}
 	if( amount_of_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
+		notify_warning_printf( "%s: invalid amount of errors.\n",
 		 function );
 
 		return;
@@ -519,7 +519,7 @@ void ewfoutput_acquiry_errors_fprint(
 	     handle,
 	     amount_of_errors ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
+		notify_warning_printf( "%s: unable to retrieve the amount of acquiry errors.\n",
 		 function );
 
 		return;
@@ -538,7 +538,7 @@ void ewfoutput_acquiry_errors_fprint(
 			     &first_sector,
 			     &amount_of_sectors ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
+				notify_warning_printf( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
 				 function, iterator );
 
 				first_sector      = 0;
@@ -565,21 +565,21 @@ void ewfoutput_crc_errors_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return;
 	}
 	if( amount_of_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
+		notify_warning_printf( "%s: invalid amount of errors.\n",
 		 function );
 
 		return;
@@ -588,7 +588,7 @@ void ewfoutput_crc_errors_fprint(
 	     handle,
 	     amount_of_errors ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of CRC errors.\n",
+		notify_warning_printf( "%s: unable to retrieve the amount of CRC errors.\n",
 		 function );
 
 		return;
@@ -606,7 +606,7 @@ void ewfoutput_crc_errors_fprint(
 			     &first_sector,
 			     &amount_of_sectors ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
+				notify_warning_printf( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
 				 function, iterator );
 
 				first_sector      = 0;
@@ -633,21 +633,21 @@ void ewfoutput_sessions_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return;
 	}
 	if( amount_of_sessions == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sessions.\n",
+		notify_warning_printf( "%s: invalid amount of sessions.\n",
 		 function );
 
 		return;
@@ -656,7 +656,7 @@ void ewfoutput_sessions_fprint(
 	     handle,
 	     amount_of_sessions ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of sessions.\n",
+		notify_warning_printf( "%s: unable to retrieve the amount of sessions.\n",
 		 function );
 
 		return;
@@ -674,7 +674,7 @@ void ewfoutput_sessions_fprint(
 			     &first_sector,
 			     &amount_of_sectors ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
+				notify_warning_printf( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
 				 function, iterator );
 
 				first_sector      = 0;
@@ -704,14 +704,14 @@ void ewfoutput_header_values_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return;
@@ -720,7 +720,7 @@ void ewfoutput_header_values_fprint(
 	     handle,
 	     &amount_of_values ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of header values.\n",
+		notify_warning_printf( "%s: unable to retrieve the amount of header values.\n",
 		 function );
 
 		return;
@@ -882,7 +882,7 @@ void ewfoutput_header_values_fprint(
 			     header_identifier,
 			     header_identifier_length ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
+				notify_warning_printf( "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
 				 function, iterator );
 			}
 			else if( libewf_get_header_value(
@@ -891,7 +891,7 @@ void ewfoutput_header_values_fprint(
 			          header_value,
 			          header_value_length ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the header value for identifier: %" PRIs ".\n",
+				notify_warning_printf( "%s: unable to retrieve the header value for identifier: %" PRIs ".\n",
 				 function, header_identifier );
 			}
 			else
@@ -922,21 +922,21 @@ void ewfoutput_hash_values_fprint(
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		notify_warning_printf( "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
 		return;
 	}
 	if( libewf_get_md5_hash( handle, md5_hash, EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve MD5 hash.\n",
+		notify_warning_printf( "%s: unable to retrieve MD5 hash.\n",
 		 function );
 
 		return;
@@ -965,7 +965,7 @@ void ewfoutput_hash_values_fprint(
 	{
 		if( libewf_get_amount_of_hash_values( handle, &amount_of_values ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to retrieve amount of hash values.\n",
+			notify_warning_printf( "%s: unable to retrieve amount of hash values.\n",
 			 function );
 
 			return;
@@ -980,12 +980,12 @@ void ewfoutput_hash_values_fprint(
 				{
 					if( libewf_get_hash_value_identifier( handle, iterator, hash_identifier, hash_identifier_length ) != 1 )
 					{
-						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
+						notify_warning_printf( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
 						 function, iterator );
 					}
 					else if( libewf_get_hash_value( handle, hash_identifier, hash_value, hash_value_length ) != 1 )
 					{
-						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash value for identifier: %" PRIs ".\n",
+						notify_warning_printf( "%s: unable to retrieve the hash value for identifier: %" PRIs ".\n",
 						 function, hash_identifier );
 					}
 					else

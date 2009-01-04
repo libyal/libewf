@@ -33,11 +33,11 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include "libewf_chunk_cache.h"
 #include "libewf_common.h"
-#include "libewf_notify.h"
 
 /* Allocates memory for the chunk cache cache
  * Returns a pointer to the new instance, NULL on error
@@ -53,7 +53,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate chunk cache.\n",
+		notify_warning_printf( "%s: unable to allocate chunk cache.\n",
 		 function );
 
 		return( NULL );
@@ -62,7 +62,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( NULL );
@@ -72,7 +72,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 	if( chunk_cache->compressed == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache compressed.\n",
+		notify_warning_printf( "%s: unable to create chunk cache compressed.\n",
 		 function );
 
 		memory_free(
@@ -85,7 +85,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 	if( chunk_cache->data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache data.\n",
+		notify_warning_printf( "%s: unable to create chunk cache data.\n",
 		 function );
 
 		memory_free(
@@ -116,7 +116,7 @@ int libewf_chunk_cache_realloc(
 
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
+		notify_warning_printf( "%s: invalid chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -125,14 +125,14 @@ int libewf_chunk_cache_realloc(
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size <= chunk_cache->allocated_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: new size must be greater than previous size.\n",
+		notify_warning_printf( "%s: new size must be greater than previous size.\n",
 		 function );
 
 		return( -1 );
@@ -143,7 +143,7 @@ int libewf_chunk_cache_realloc(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to realloc chunk cache compressed.\n",
+		notify_warning_printf( "%s: unable to realloc chunk cache compressed.\n",
 		 function );
 
 		return( -1 );
@@ -155,7 +155,7 @@ int libewf_chunk_cache_realloc(
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to realloc chunk cache data.\n",
+		notify_warning_printf( "%s: unable to realloc chunk cache data.\n",
 		 function );
 
 		return( -1 );
@@ -179,7 +179,7 @@ void libewf_chunk_cache_free(
 
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
+		notify_warning_printf( "%s: invalid chunk cache.\n",
 		 function );
 
 		return;

@@ -33,10 +33,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 #include <types.h>
 
 #include "libewf_common.h"
-#include "libewf_notify.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_string.h"
 
@@ -54,7 +54,7 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create segment file handle.\n",
+		notify_warning_printf( "%s: unable to create segment file handle.\n",
 		 function );
 
 		return( NULL );
@@ -64,7 +64,7 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
 
 	if( segment_file_handle->section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create section list.\n",
+		notify_warning_printf( "%s: unable to create section list.\n",
 		 function );
 
 		memory_free(
@@ -95,7 +95,7 @@ void libewf_segment_file_handle_free(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return;
@@ -137,21 +137,21 @@ int libewf_segment_file_handle_get_filename(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		notify_warning_printf( "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
@@ -164,7 +164,7 @@ int libewf_segment_file_handle_get_filename(
 
 	if( length_filename < filename_length )
 	{
-		LIBEWF_WARNING_PRINT( "%s: filename too small.\n",
+		notify_warning_printf( "%s: filename too small.\n",
 		 function );
 
 		return( -1 );
@@ -174,7 +174,7 @@ int libewf_segment_file_handle_get_filename(
 	     segment_file_handle->filename,
 	     filename_length ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
+		notify_warning_printf( "%s: unable to set filename.\n",
 		 function );
 
 		return( -1 );
@@ -195,35 +195,35 @@ int libewf_segment_file_handle_set_filename(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		notify_warning_printf( "%s: invalid filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: filename already set: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: filename already set: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
 	}
 	if( length_filename == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length is zero.\n",
+		notify_warning_printf( "%s: invalid filename length is zero.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( length_filename >= (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid filename length value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -235,7 +235,7 @@ int libewf_segment_file_handle_set_filename(
 
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create filename.\n",
+		notify_warning_printf( "%s: unable to create filename.\n",
 		 function );
 
 		return( -1 );
@@ -245,7 +245,7 @@ int libewf_segment_file_handle_set_filename(
 	     filename,
 	     length_filename ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
+		notify_warning_printf( "%s: unable to set filename.\n",
 		 function );
 
 		memory_free(
@@ -275,14 +275,14 @@ int libewf_segment_file_handle_open(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file handle - missing filename.\n",
 		 function );
 
 		return( -1 );
@@ -293,7 +293,7 @@ int libewf_segment_file_handle_open(
 
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
@@ -312,21 +312,21 @@ int libewf_segment_file_handle_reopen(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_close( segment_file_handle->file_descriptor ) != 0 )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: unable to close segment file: %" PRIs_EWF_filename ".\n",
+		notify_verbose_printf( "%s: unable to close segment file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 	}
 	segment_file_handle->file_descriptor = libewf_filename_open(
@@ -335,7 +335,7 @@ int libewf_segment_file_handle_reopen(
 
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
@@ -347,7 +347,7 @@ int libewf_segment_file_handle_reopen(
 	     segment_file_handle->file_offset,
 	     SEEK_CUR ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to seek in file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to seek in file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
@@ -369,35 +369,35 @@ ssize_t libewf_segment_file_handle_read(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid segment file handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -413,7 +413,7 @@ ssize_t libewf_segment_file_handle_read(
 	}
 	if( read_count != (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read from segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to read from segment file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 	}
 	return( read_count );
@@ -433,35 +433,35 @@ ssize_t libewf_segment_file_handle_write(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid segment file handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		notify_warning_printf( "%s: invalid buffer.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -477,7 +477,7 @@ ssize_t libewf_segment_file_handle_write(
 	}
 	if( write_count != (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write to segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to write to segment file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file_handle->filename );
 	}
 	return( write_count );
@@ -494,35 +494,35 @@ off64_t libewf_segment_file_handle_seek_offset(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid segment file handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file handle - missing filename.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset > (off64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid offset value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_offset != offset )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd " in segment file: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in segment file: %" PRIs_EWF_filename " with file descriptor: %d.\n",
 		 function, offset, segment_file_handle->filename, segment_file_handle->file_descriptor );
 
 		if( libewf_common_lseek(
@@ -530,7 +530,7 @@ off64_t libewf_segment_file_handle_seek_offset(
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd " in segment file: %" PRIs_EWF_filename ".\n",
+			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in segment file: %" PRIs_EWF_filename ".\n",
 			 function, offset, segment_file_handle->filename );
 
 			return( -1 );
@@ -550,21 +550,21 @@ int libewf_segment_file_handle_close(
 
 	if( segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle - invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid segment file handle - invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_close( segment_file_handle->file_descriptor ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to close segment file handle.\n",
+		notify_warning_printf( "%s: unable to close segment file handle.\n",
 		 function );
 
 		return( -1 );
