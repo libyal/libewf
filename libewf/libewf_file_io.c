@@ -22,14 +22,15 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include <liberror.h>
 
 #include <errno.h>
 
 #include "libewf_file_io.h"
-#include "libewf_string.h"
 
 /* Function to open a file
  * Returns the file descriptor or -1 on error 

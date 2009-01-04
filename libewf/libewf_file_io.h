@@ -24,7 +24,9 @@
 #define _LIBEWF_FILE_IO_H
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include <liberror.h>
 
@@ -47,8 +49,6 @@
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
-
-#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {

@@ -202,6 +202,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20081005
+* small adjustment file io
+
 Version: 20080928
 * worked on making ewftools code more gereneric
 * worked on making UTF-8 strings for internal use (not for filenames)
