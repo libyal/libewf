@@ -274,9 +274,6 @@ CHAR_T *ewfcommon_get_user_input_variable_char_t( FILE *stream, LIBEWF_CHAR *req
 uint64_t ewfcommon_get_user_input_size_variable( FILE *stream, LIBEWF_CHAR *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value );
 LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *request_string, LIBEWF_CHAR **values, uint8_t amount, uint8_t default_value );
 
-int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_string, size_t size );
-int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size );
-
 struct tm *ewfcommon_gmtime( const time_t *timestamp );
 
 void ewfcommon_version_fprint( FILE *stream, LIBEWF_CHAR *program );

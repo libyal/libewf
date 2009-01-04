@@ -207,6 +207,11 @@ LIBEWF_EXTERN int8_t libewf_get_format( LIBEWF_HANDLE *handle );
  */
 LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 
+/* Returns the MD5 hash
+ * Returns 0 if successful, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
+
 /* Returns the amount of chunks written
  * Returns 1 if successful, -1 on error
  */
@@ -405,9 +410,15 @@ LIBEWF_EXTERN int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t 
  */
 LIBEWF_EXTERN int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector );
 
-/* Returns 1 if the GUID is set, or -1 on error
+/* Sets the GUID
+ * Returns 1 if successful, or -1 on error
  */
 LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+
+/* Sets the MD5 hash
+ * Returns 1 if successful, 0 if value not present, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error

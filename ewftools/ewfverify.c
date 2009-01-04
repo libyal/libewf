@@ -86,6 +86,8 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+
 #if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob                            = NULL;
 	int32_t glob_count                       = 0;
@@ -367,14 +369,36 @@ int main( int argc, char * const argv[] )
 
 	if( calculate_md5 == 1 )
 	{
-		stored_md5_hash_result = libewf_get_hash_value_md5(
+		stored_md5_hash_result = libewf_get_md5_hash(
 					  handle,
-					  stored_md5_hash_string,
-					  LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+					  md5_hash,
+					  EWFDIGEST_HASH_SIZE_MD5 );
 
 		if( stored_md5_hash_result == -1 )
 		{
 			fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+
+			if( libewf_close( handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			libewf_common_free( stored_md5_hash_string );
+			libewf_common_free( calculated_md5_hash_string );
+
+			if( calculate_sha1 == 1 )
+			{
+				libewf_common_free( stored_sha1_hash_string );
+				libewf_common_free( calculated_sha1_hash_string );
+			}
+			return( EXIT_FAILURE );
+		}
+		if( ewfdigest_copy_to_string(
+		     md5_hash,
+		     EWFDIGEST_HASH_SIZE_MD5,
+		     stored_md5_hash_string,
+		     LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
+		{
+			fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
 
 			if( libewf_close( handle ) != 0 )
 			{

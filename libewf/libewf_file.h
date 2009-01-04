@@ -91,6 +91,7 @@ LIBEWF_EXTERN int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN int8_t libewf_get_format( LIBEWF_HANDLE *handle );
 
 LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
 LIBEWF_EXTERN int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks );
 
@@ -101,6 +102,7 @@ LIBEWF_EXTERN int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t 
 LIBEWF_EXTERN int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector );
 
 LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+LIBEWF_EXTERN int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
 LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size );
 LIBEWF_EXTERN int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity );

@@ -1425,6 +1425,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	size_t size                       = 0;
 	uint32_t offset32_value           = 0;
 	uint32_t iterator                 = 0;
+	uint8_t overflow                  = 0;
 	uint8_t write_crc                 = 0;
 
 	if( internal_handle == NULL )
@@ -1537,12 +1538,13 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6
 		 */
-		if( ( offset32_value + offset_table->size[ offset_table_index + iterator ] ) > (uint32_t) INT32_MAX )
+		if( ( overflow == 0 )
+		 && ( ( offset64_value + offset_table->size[ offset_table_index + iterator ] ) > (off64_t) INT32_MAX ) )
 		{
-			base_offset += offset32_value;
+			overflow = 1;
 
-			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround, new base: %" PRIu32 ".\n",
-			 function, base_offset );
+			LIBEWF_VERBOSE_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
+			 function, offset64_value );
 		}
 	}
 	section_write_count = libewf_section_start_write(
@@ -2674,7 +2676,7 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 			return( -1 );
 		}
 	}
-	if( libewf_internal_handle_set_md5_hash( internal_handle, hash->md5_hash ) != 1 )
+	if( libewf_common_memcpy( internal_handle->md5_hash, hash->md5_hash, size ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
 		 function );
@@ -2686,6 +2688,8 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 			return( -1 );
 		}
 	}
+	internal_handle->md5_hash_set = 1;
+
 	libewf_common_free( hash );
 
 	return( (ssize_t) size );

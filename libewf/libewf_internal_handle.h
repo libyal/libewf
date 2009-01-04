@@ -148,7 +148,7 @@ struct libewf_internal_handle
 
 	/* The MD5 hash of the data
 	 */
-	EWF_DIGEST_HASH *md5_hash;
+	EWF_DIGEST_HASH md5_hash[ EWF_DIGEST_HASH_SIZE_MD5 ];
 
 	/* The sectors with acquiry read errors
 	 */
@@ -172,13 +172,13 @@ struct libewf_internal_handle
 	 */
 	uint8_t swap_byte_pairs;
 
-	/* Value to indicate if the MD5 should be calculated internally
-	 */
-	uint8_t calculate_md5;
-
 	/* value to indicate the compression level used
 	 */
 	int8_t compression_level;
+
+	/* value to indicate if the MD5 hash was set
+	 */
+	int8_t md5_hash_set;
 
 	/* value to indicate how much header sections were found
 	 */
@@ -375,8 +375,6 @@ int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size );
 int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xheader, size_t size );
 int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xhash, size_t size );
-
-int libewf_internal_handle_set_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash );
 
 int libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
 int libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );

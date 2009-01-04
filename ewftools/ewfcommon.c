@@ -1075,140 +1075,6 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 	return( user_input );
 }
 
-/* Finalize the MD5 digest context and retrieve the MD5 hash string
- * Returns 1 if successful, or -1 on errror
- */
-int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_string, size_t size )
-{
-	EWFDIGEST_HASH *md5_hash = NULL;
-	static char *function    = "ewfcommon_get_md5_hash";
-	size_t md5_hash_size     = EWFDIGEST_HASH_SIZE_MD5;
-
-	if( md5_context == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid MD5 digest context.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( md5_hash_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid MD5 hash string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size < LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: MD5 hash string too small.\n",
-		 function );
-
-		return( -1 );
-	}
-	md5_hash = (EWFDIGEST_HASH *) libewf_common_alloc( md5_hash_size );
-
-	if( md5_hash == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ewfmd5_finalize( md5_context, md5_hash, &md5_hash_size ) != 1 )
-	 || ( md5_hash_size != EWFDIGEST_HASH_SIZE_MD5 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
-		 function );
-
-		libewf_common_free( md5_hash );
-
-		return( -1 );
-	}
-	if( ewfdigest_copy_to_string(
-	     md5_hash,
-	     EWFDIGEST_HASH_SIZE_MD5,
-	     md5_hash_string,
-	     size) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
-		 function );
-
-		libewf_common_free( md5_hash );
-
-		return( -1 );
-	}
-	libewf_common_free( md5_hash );
-
-	return( 1 );
-}
-
-/* Finalize the SHA1 digest context and retrieve the SHA1 hash string
- * Returns 1 if successful, or -1 on errror
- */
-int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size )
-{
-	EWFDIGEST_HASH *sha1_hash = NULL;
-	static char *function     = "ewfcommon_get_sha1_hash";
-	size_t sha1_hash_size     = EWFDIGEST_HASH_SIZE_SHA1;
-
-	if( sha1_context == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid SHA1 digest context.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sha1_hash_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid SHA1 hash string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size < LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: SHA1 hash string too small.\n",
-		 function );
-
-		return( -1 );
-	}
-	sha1_hash = (EWFDIGEST_HASH *) libewf_common_alloc( sha1_hash_size );
-
-	if( sha1_hash == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create SHA1 hash.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ewfsha1_finalize( sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
-	 || ( sha1_hash_size != EWFDIGEST_HASH_SIZE_SHA1 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
-		 function );
-
-		libewf_common_free( sha1_hash );
-
-		return( -1 );
-	}
-	if( ewfdigest_copy_to_string(
-	     sha1_hash,
-	     EWFDIGEST_HASH_SIZE_SHA1,
-	     sha1_hash_string,
-	     size ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
-		 function );
-
-		libewf_common_free( sha1_hash );
-
-		return( -1 );
-	}
-	libewf_common_free( sha1_hash );
-
-	return( 1 );
-}
-
 #if defined( HAVE_WINDOWS_API )
 #define ewfcommon_gmtime_r( timestamp, time_elements ) \
 	gmtime_s( time_elements, timestamp )
@@ -1762,6 +1628,7 @@ void ewfcommon_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
 	LIBEWF_CHAR hash_value[ 128 ];
+	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	LIBEWF_CHAR *stored_md5_hash_string     = NULL;
@@ -1785,11 +1652,22 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
+	if( libewf_get_md5_hash(
+	     handle,
+	     md5_hash,
+	     EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve MD5 hash.\n",
+		 function );
+
+		return;
+	}
 	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( ( stored_md5_hash_string != NULL )
-	 && ( libewf_get_hash_value_md5(
-	       handle,
+	 && ( ewfdigest_copy_to_string(
+	       md5_hash,
+	       EWFDIGEST_HASH_SIZE_MD5,
 	       stored_md5_hash_string,
 	       LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
 	{
@@ -1819,7 +1697,7 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 				     hash_value,
 				     hash_value_length ) == 1 )
 				{
-					fprintf( stream, "\t%" PRIs_EWF ": %" PRIs_EWF "\n",
+					fprintf( stream, "\t%" PRIs_EWF ":\t%" PRIs_EWF "\n",
 					 internal_handle->hash_values->identifiers[ iterator ],
 					 hash_value );
 				}
@@ -2455,6 +2333,9 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
 
+	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+
 	uint8_t *data              = NULL;
 	static char *function      = "ewfcommon_read_verify";
 	off64_t read_offset        = 0;
@@ -2462,6 +2343,8 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	size32_t chunk_size        = 0;
 	size_t buffer_size         = 0;
 	size_t read_size           = 0;
+	size_t md5_hash_size       = 0;
+	size_t sha1_hash_size      = 0;
 	ssize64_t total_read_count = 0;
 	ssize_t read_count         = 0;
 
@@ -2607,8 +2490,16 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfcommon_get_md5_hash(
-		     &md5_context,
+		if( ewfmd5_finalize( &md5_context, md5_hash, &md5_hash_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ewfdigest_copy_to_string(
+		     md5_hash,
+		     md5_hash_size,
 		     md5_hash_string,
 		     md5_hash_string_length ) != 1 )
 		{
@@ -2620,8 +2511,16 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfcommon_get_sha1_hash(
-		     &sha1_context,
+		if( ewfsha1_finalize( &sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ewfdigest_copy_to_string(
+		     sha1_hash,
+		     sha1_hash_size,
 		     sha1_hash_string,
 		     sha1_hash_string_length ) != 1 )
 		{
@@ -2642,10 +2541,15 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
 
+	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+
 	uint8_t *data               = NULL;
 	static char *function       = "ewfcommon_write_from_file_descriptor";
 	size32_t chunk_size         = 0;
 	size_t buffer_size          = 0;
+	size_t md5_hash_size       = 0;
+	size_t sha1_hash_size      = 0;
 	ssize64_t total_write_count = 0;
 	ssize64_t write_count       = 0;
 	ssize32_t read_count        = 0;
@@ -2948,8 +2852,16 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfcommon_get_md5_hash(
-		     &md5_context,
+		if( ewfmd5_finalize( &md5_context, md5_hash, &md5_hash_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ewfdigest_copy_to_string(
+		     md5_hash,
+		     md5_hash_size,
 		     md5_hash_string,
 		     md5_hash_string_length ) != 1 )
 		{
@@ -2959,6 +2871,18 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			return( -1 );
 		}
 		/* The MD5 hash must be set before write finalized is used
+		 */
+		if( libewf_set_md5_hash(
+		     handle,
+		     md5_hash,
+		     md5_hash_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
+			 function );
+
+			return( -1 );
+		}
+		/* The MD5 hash string must be set before write finalized is used
 		 */
 		if( libewf_set_hash_value_md5(
 		     handle,
@@ -2973,8 +2897,16 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfcommon_get_sha1_hash(
-		     &sha1_context,
+		if( ewfsha1_finalize( &sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ewfdigest_copy_to_string(
+		     sha1_hash,
+		     sha1_hash_size,
 		     sha1_hash_string,
 		     sha1_hash_string_length ) != 1 )
 		{
@@ -2983,7 +2915,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 			return( -1 );
 		}
-		/* The SHA1 hash must be set before write finalized is used
+		/* The SHA1 hash string must be set before write finalized is used
 		 */
 		if( libewf_set_hash_value_sha1(
 		     handle,

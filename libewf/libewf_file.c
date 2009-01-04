@@ -845,30 +845,68 @@ int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->guid == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing GUID.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( guid == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid guid.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid GUID.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size < 16 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: guid too small.\n",
+		LIBEWF_WARNING_PRINT( "%s: GUID too small.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memcpy( guid, internal_handle->guid, 16 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set guid.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Returns the MD5 hash
+ * Returns 1 if successful, 0 if value not present, -1 on error
+ */
+int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_md5_hash";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->md5_hash_set == 0 )
+	{
+		return( 0 );
+	}
+	if( md5_hash == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size < EWF_DIGEST_HASH_SIZE_MD5 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: MD5 hash too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_common_memcpy( md5_hash, internal_handle->md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
 		 function );
 
 		return( -1 );
@@ -1078,7 +1116,8 @@ int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_secto
 	return( 1 );
 }
 
-/* Returns 1 if the GUID is set, or -1 on error
+/* Sets the GUID
+ * Returns 1 if successful, or -1 on error
  */
 int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 {
@@ -1096,14 +1135,14 @@ int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 
 	if( guid == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid guid.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid GUID.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size < 16 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: guid too small.\n",
+		LIBEWF_WARNING_PRINT( "%s: GUID too small.\n",
 		 function );
 
 		return( -1 );
@@ -1111,18 +1150,68 @@ int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 	if( ( internal_handle->write != NULL )
 	 && ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: guid cannot be changed.\n",
+		LIBEWF_WARNING_PRINT( "%s: GUID cannot be changed.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memcpy( internal_handle->guid, guid, 16 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set guid.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
 		 function );
 
 		return( -1 );
 	}
+	return( 1 );
+}
+
+/* Sets the MD5 hash
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_md5_hash";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( md5_hash == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size < EWF_DIGEST_HASH_SIZE_MD5 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: MD5 hash too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->md5_hash_set )
+	{
+		LIBEWF_WARNING_PRINT( "%s: MD5 hash cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_common_memcpy( internal_handle->md5_hash, md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->md5_hash_set = 1;
+
 	return( 1 );
 }
 

@@ -83,14 +83,13 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->xhash_size                = 0;
 	internal_handle->header_values             = NULL;
 	internal_handle->hash_values               = NULL;
-	internal_handle->md5_hash                  = NULL;
 	internal_handle->acquiry_error_sectors     = NULL;
 	internal_handle->acquiry_amount_of_errors  = 0;
 	internal_handle->current_chunk             = 0;
 	internal_handle->current_chunk_offset      = 0;
 	internal_handle->swap_byte_pairs           = 0;
-	internal_handle->calculate_md5             = 1;
 	internal_handle->compression_level         = EWF_COMPRESSION_UNKNOWN;
+	internal_handle->md5_hash_set              = 0;
 	internal_handle->amount_of_header_sections = 0;
 	internal_handle->format                    = LIBEWF_FORMAT_UNKNOWN;
 	internal_handle->ewf_format                = EWF_FORMAT_UNKNOWN;
@@ -248,8 +247,6 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	{
 		libewf_hash_values_free( internal_handle->hash_values );
 	}
-	libewf_common_free( internal_handle->md5_hash );
-
 	if( internal_handle->chunk_cache != NULL )
 	{
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
@@ -602,47 +599,6 @@ int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, E
 	internal_handle->xhash      = xhash;
 	internal_handle->xhash_size = size;
 
-	return( 1 );
-}
-
-/* Sets the MD5 hash value
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_set_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash )
-{
-	static char *function = "libewf_internal_handle_set_md5_hash";
-	size_t size           = EWF_DIGEST_HASH_SIZE_MD5;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->md5_hash == NULL )
-	{
-		internal_handle->md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( size );
-
-		if( internal_handle->md5_hash == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( libewf_common_memcpy( internal_handle->md5_hash, md5_hash, size ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
-		 function );
-
-		libewf_common_free( internal_handle->md5_hash );
-
-		internal_handle->md5_hash = NULL;
-
-		return( -1 );
-	}
 	return( 1 );
 }
 
