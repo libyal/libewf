@@ -57,31 +57,31 @@ typedef wint_t system_integer_t;
 #define _SYSTEM_CHARACTER_T_STRING( string ) \
 	_SYSTEM_CHARACTER_T_STRING_INTERMEDIATE( string )
 
-#define sytem_string_length( string ) \
+#define system_string_length( string ) \
 	wide_string_length( string )
 
-#define sytem_string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	wide_string_compare( string1, string2, size )
 
-#define sytem_string_copy( destination, source, size ) \
+#define system_string_copy( destination, source, size ) \
 	wide_string_copy( destination, source, size )
 
-#define sytem_string_search( string, character, size ) \
+#define system_string_search( string, character, size ) \
 	wide_string_search( string, character, size )
 
-#define sytem_string_search_reverse( string, character, size ) \
+#define system_string_search_reverse( string, character, size ) \
 	wide_string_search_reverse( string, character, size )
 
-#define sytem_string_snprintf( target, size, format, ... ) \
+#define system_string_snprintf( target, size, format, ... ) \
 	wide_string_snprintf( target, size, format, __VA_ARGS__ )
 
-#define sytem_string_get_from_stream( string, size, stream ) \
+#define system_string_get_from_stream( string, size, stream ) \
 	wide_string_get_from_stream( string, size, stream )
 
-#define sytem_string_to_signed_long_long( string, end_of_string, base ) \
+#define system_string_to_signed_long_long( string, end_of_string, base ) \
 	wide_string_to_signed_long_long( string, end_of_string, base )
 
-#define sytem_string_to_unsigned_long_long( string, end_of_string, base ) \
+#define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	wide_string_to_unsigned_long_long( string, end_of_string, base )
 
 #else

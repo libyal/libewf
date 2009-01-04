@@ -153,6 +153,8 @@ Next release(s):
 
 * change libewf_system_string_to_(u)int64 to return 1 or -1
 
+* remove win crypto api from libewf_dll release configuration
+
 CLOSED
 * what about read+write and compression?
   solved by delta files

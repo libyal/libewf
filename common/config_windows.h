@@ -97,6 +97,10 @@
  * make use of the wide character support functions
  */ 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if !defined( HAVE_WCHAR_H )
+#define HAVE_WCHAR_H            1
+#endif
+
 #define HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS	1
 #endif 
     
