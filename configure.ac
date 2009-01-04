@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20071230], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20080103], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20071230])
+AM_INIT_AUTOMAKE([libewf], [20080103])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -232,7 +232,7 @@ AS_IF([test "x$ac_libewf_enable_debug_output" != xno ],
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
-CFLAGS="$CFLAGS -Wall";
+CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile libewf/Makefile ewftools/Makefile manuals/Makefile])

@@ -153,7 +153,10 @@ void libewf_sector_table_free( libewf_sector_table_t *sector_table )
 
 		return;
 	}
-	libewf_common_free( sector_table->error_sector );
+	if( sector_table->error_sector != NULL )
+	{
+		libewf_common_free( sector_table->error_sector );
+	}
 	libewf_common_free( sector_table );
 }
 

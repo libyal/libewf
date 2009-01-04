@@ -159,7 +159,10 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 	}
 	/* The segment file reference is freed in the segment table
 	 */
-	libewf_common_free( offset_table->chunk_offset );
+	if( offset_table->chunk_offset != NULL )
+	{
+		libewf_common_free( offset_table->chunk_offset );
+	}
 	libewf_common_free( offset_table );
 }
 

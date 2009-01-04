@@ -82,7 +82,10 @@ void libewf_hash_sections_free( LIBEWF_HASH_SECTIONS *hash_sections )
 
 		return;
 	}
-	libewf_common_free( hash_sections->xhash );
+	if( hash_sections->xhash != NULL )
+	{
+		libewf_common_free( hash_sections->xhash );
+	}
 	libewf_common_free( hash_sections );
 }
 

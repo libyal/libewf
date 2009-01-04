@@ -245,6 +245,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	buffer = libewf_common_alloc(
+	          alter_size );
+
 	if( buffer == NULL )
 	{
 		fprintf( stderr, "Unable to allocate buffer.\n" );

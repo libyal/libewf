@@ -319,7 +319,7 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	{
 		libewf_offset_table_free( internal_handle->secondary_offset_table );
 	}
-	if( internal_handle->acquiry_errors == NULL )
+	if( internal_handle->acquiry_errors != NULL )
 	{
 		libewf_sector_table_free( internal_handle->acquiry_errors );
 	}
@@ -393,7 +393,10 @@ void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read 
 
 		return;
 	}
-	libewf_sector_table_free( handle_read->crc_errors );
+	if( handle_read->crc_errors != NULL )
+	{
+		libewf_sector_table_free( handle_read->crc_errors );
+	}
 	libewf_common_free( handle_read );
 }
 
@@ -450,7 +453,10 @@ void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_wri
 
 		return;
 	}
-	libewf_common_free( handle_write->data_section );
+	if( handle_write->data_section != NULL )
+	{
+		libewf_common_free( handle_write->data_section );
+	}
 	libewf_common_free( handle_write );
 }
 

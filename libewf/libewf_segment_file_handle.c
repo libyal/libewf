@@ -41,12 +41,13 @@
 /* Allocates memory for a segment file handle struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_SEGMENT_FILE_HANDLE *libewf_segment_file_handle_alloc( void )
+libewf_segment_file_handle_t *libewf_segment_file_handle_alloc( void )
 {
 	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
 	static char *function                           = "libewf_segment_file_handle_alloc";
 
-	segment_file_handle = (LIBEWF_SEGMENT_FILE_HANDLE *) libewf_common_alloc( LIBEWF_SEGMENT_FILE_HANDLE_SIZE );
+	segment_file_handle = (libewf_segment_file_handle_t *) libewf_common_alloc(
+	                                                        sizeof( libewf_segment_file_handle_t ) );
 
 	if( segment_file_handle == NULL )
 	{
@@ -55,7 +56,8 @@ LIBEWF_SEGMENT_FILE_HANDLE *libewf_segment_file_handle_alloc( void )
 
 		return( NULL );
 	}
-	segment_file_handle->section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
+	segment_file_handle->section_list = (libewf_section_list_t *) libewf_common_alloc(
+	                                                               sizeof( libewf_section_list_t ) );
 
 	if( segment_file_handle->section_list == NULL )
 	{
@@ -94,7 +96,8 @@ void libewf_segment_file_handle_free( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 	}
 	if( segment_file_handle->filename != NULL )
 	{
-		libewf_common_free( segment_file_handle->filename );
+		libewf_common_free(
+		 segment_file_handle->filename );
 	}
 	if( segment_file_handle->section_list != NULL )
 	{
@@ -212,7 +215,8 @@ int libewf_segment_file_handle_set_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment
 	}
 	/* One additional byte for the end of string character is needed
 	 */
-	segment_file_handle->filename = (LIBEWF_FILENAME *) libewf_common_alloc( LIBEWF_FILENAME_SIZE * ( length_filename + 1 ) );
+	segment_file_handle->filename = (libewf_filename_t *) libewf_common_alloc(
+	                                                       sizeof( libewf_filename_t ) * ( length_filename + 1 ) );
 
 	if( segment_file_handle->filename == NULL )
 	{
@@ -221,12 +225,16 @@ int libewf_segment_file_handle_set_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment
 
 		return( -1 );
 	}
-	if( libewf_filename_copy( segment_file_handle->filename, filename, length_filename ) == NULL )
+	if( libewf_filename_copy(
+	     segment_file_handle->filename,
+	     filename,
+	     length_filename ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
 		 function );
 
-		libewf_common_free( segment_file_handle->filename );
+		libewf_common_free(
+		 segment_file_handle->filename );
 
 		segment_file_handle->filename = NULL;
 

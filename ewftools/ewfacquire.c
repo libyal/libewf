@@ -416,11 +416,26 @@ int main( int argc, char * const argv[] )
 
 	do
 	{
-		libewf_common_free( case_number );
-		libewf_common_free( description );
-		libewf_common_free( evidence_number );
-		libewf_common_free( examiner_name );
-		libewf_common_free( notes );
+		if( case_number != NULL )
+		{
+			libewf_common_free( case_number );
+		}
+		if( description != NULL )
+		{
+			libewf_common_free( description );
+		}
+		if( evidence_number != NULL )
+		{
+			libewf_common_free( evidence_number );
+		}
+		if( examiner_name != NULL )
+		{
+			libewf_common_free( examiner_name );
+		}
+		if( notes != NULL )
+		{
+			libewf_common_free( notes );
+		}
 
 		/* Request the necessary case data
 		 */

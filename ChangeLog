@@ -155,6 +155,17 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+TODO:
+fix leakage in libewf_segment_file_handle.c
+
+Version: 20080103
+* Used memwatch to analyze allocation issues
+* Fixed memory leakage in values list and in internal handle with
+  sector table
+* Fixed missing libewf_common_alloc in ewfalter
+* Added NULL pointer free protection against non NULL protected
+  libewf_common_free replacements
+
 Version: 20080102
 * Updated package config file
 

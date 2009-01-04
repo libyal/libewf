@@ -221,13 +221,23 @@ void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table )
 
 		return;
 	}
-	if( values_table->values != NULL )
+	for( iterator = 0; iterator < values_table->amount; iterator++ )
 	{
-		for( iterator = 0; iterator < values_table->amount; iterator++ )
+		if( values_table->identifiers[ iterator ] != NULL )
 		{
 			libewf_common_free( values_table->identifiers[ iterator ] );
+		}
+		if( values_table->values[ iterator ] != NULL )
+		{
 			libewf_common_free( values_table->values[ iterator ] );
 		}
+	}
+	if( values_table->identifiers != NULL )
+	{
+		libewf_common_free( values_table->identifiers );
+	}
+	if( values_table->values != NULL )
+	{
 		libewf_common_free( values_table->values );
 	}
 	libewf_common_free( values_table );

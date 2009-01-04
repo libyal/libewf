@@ -86,9 +86,18 @@ void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections )
 
 		return;
 	}
-	libewf_common_free( header_sections->header );
-	libewf_common_free( header_sections->header2 );
-	libewf_common_free( header_sections->xheader );
+	if( header_sections->header != NULL )
+	{
+		libewf_common_free( header_sections->header );
+	}
+	if( header_sections->header2 != NULL )
+	{
+		libewf_common_free( header_sections->header2 );
+	}
+	if( header_sections->xheader != NULL )
+	{
+		libewf_common_free( header_sections->xheader );
+	}
 	libewf_common_free( header_sections );
 }
 
