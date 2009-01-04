@@ -169,6 +169,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080217
+* added corruption detection test in libewf_segment_file_write_chunks_data
+
 Version: 20080214
 * worked on abort
 * worked on low memory usage

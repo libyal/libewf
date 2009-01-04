@@ -991,6 +991,23 @@ ssize_t libewf_segment_file_write_chunks_data(
 	LIBEWF_VERBOSE_PRINT( "%s: writing %s chunk: %" PRIu32 " at offset: %jd with size: %zu, with CRC: %" PRIu32 ".\n",
 	 function, chunk_type, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
 #endif
+#if !defined TEST
+	if( is_compressed == 0 )
+	{
+		uint32_t test_chunk_crc = 0;
+
+		test_chunk_crc = ewf_crc_calculate(
+		                  chunk_data,
+		                  size,
+		                  1 );
+
+		if( test_chunk_crc != *chunk_crc )
+		{
+			LIBEWF_WARNING_PRINT( "%s: corruption in chunk data detected.\n",
+			 function );
+		}
+	}
+#endif
 
 	/* Write the chunk data to the segment file
 	 */
