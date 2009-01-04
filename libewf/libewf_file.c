@@ -511,7 +511,7 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 #endif
 
 /* Closes the EWF handle and frees memory used within the handle
- * Returns 1 if successful, or -1 on error
+ * Returns 0 if successful, or -1 on error
  */
 int8_t libewf_close( LIBEWF_HANDLE *handle )
 {
@@ -545,7 +545,7 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
 	}
 	libewf_internal_handle_free( internal_handle );
 
-	return( 1 );
+	return( 0 );
 }
 
 /* Seeks a certain offset of the media data within the EWF file(s)

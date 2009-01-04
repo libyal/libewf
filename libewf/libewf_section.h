@@ -41,6 +41,7 @@
 #include "libewf_section_list.h"
 
 #include "ewf_char.h"
+#include "ewf_crc.h"
 #include "ewf_digest_hash.h"
 #include "ewf_header.h"
 #include "ewf_header2.h"
@@ -98,6 +99,9 @@ ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, i
 ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
 #define libewf_section_xhash_write( handle, file_descriptor, start_offset, xhash, size, compression_level ) \
 	libewf_section_compressed_string_write( handle, file_descriptor, start_offset, (EWF_CHAR *) "xhash", xhash, size, compression_level )
+
+ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
+ssize_t libewf_section_delta_chunk_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, EWF_CRC *chunk_crc );
 
 int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off_t *section_start_offset );
 

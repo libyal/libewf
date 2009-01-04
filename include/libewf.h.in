@@ -140,7 +140,7 @@ LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, 
 LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
 
 /* Closes the EWF handle and frees memory used within the handle
- * Returns 1 if successful, or -1 on error
+ * Returns 0 if successful, or -1 on error
  */
 LIBEWF_EXTERN int8_t libewf_close( LIBEWF_HANDLE *handle );
 

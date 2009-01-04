@@ -1,5 +1,5 @@
 /*
- * libewf file reading
+ * libewf section
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -615,19 +615,22 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
 {
 	EWF_VOLUME_SMART *volume    = NULL;
+	static char *function       = "libewf_section_volume_s01_write";
 	ssize_t section_write_count = 0;
 	ssize_t volume_write_count  = 0;
-	size_t size               = EWF_VOLUME_SMART_SIZE;
+	size_t size                 = EWF_VOLUME_SMART_SIZE;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -635,7 +638,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( volume == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to create volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create volume.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -651,7 +655,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_chunks, volume->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to revert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -659,7 +664,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_endian_revert_32bit( internal_handle->media->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to revert sectors per chunk value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -667,7 +673,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_endian_revert_32bit( internal_handle->media->bytes_per_sector, volume->bytes_per_sector ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to revert bytes per sector value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -675,13 +682,16 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_sectors, volume->amount_of_sectors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to revert amount of sectors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_section_volume_s01_write: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n", internal_handle->media->amount_of_chunks, internal_handle->media->sectors_per_chunk, internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
+	LIBEWF_VERBOSE_PRINT( "%s: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n",
+	 function, internal_handle->media->amount_of_chunks, internal_handle->media->sectors_per_chunk,
+	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
 
 	if( internal_handle->format == LIBEWF_FORMAT_SMART )
 	{
@@ -695,7 +705,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -707,7 +718,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( volume_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_s01_write: unable to write volume to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write volume to file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -720,25 +732,29 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
 	EWF_VOLUME *volume      = NULL;
+	static char *function   = "libewf_section_volume_e01_read";
 	EWF_CRC calculated_crc  = 0;
 	EWF_CRC stored_crc      = 0;
 	int32_t bytes_per_chunk = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size != EWF_VOLUME_SIZE )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: mismatch in section volume size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: mismatch in section volume size.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -746,13 +762,15 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 	if( volume == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to read volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read volume.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_volume_read( volume, file_descriptor ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to read volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read volume.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -771,7 +789,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -779,7 +798,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to convert stored CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -789,7 +809,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 	if( bytes_per_chunk <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to calculate chunk size - using default.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate chunk size - using default.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -801,7 +822,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( stored_crc != calculated_crc )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -812,7 +834,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( libewf_endian_convert_32bit( &internal_handle->media->amount_of_chunks, volume->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to convert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -820,7 +843,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( libewf_endian_convert_32bit( &internal_handle->media->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to convert sectors per chunk value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -828,7 +852,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( libewf_endian_convert_32bit( &internal_handle->media->bytes_per_sector, volume->bytes_per_sector ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to convert bytes per sector value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -836,7 +861,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( libewf_endian_convert_32bit( &internal_handle->media->amount_of_sectors, volume->amount_of_sectors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to convert amount of sectors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -844,7 +870,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( libewf_endian_convert_32bit( &internal_handle->media->error_granularity, volume->error_granularity ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to convert error granularity value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert error granularity value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -855,12 +882,15 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	internal_handle->media->media_flags = volume->media_flags;
 	internal_handle->compression_level  = (int8_t) volume->compression_level;
 
-	LIBEWF_VERBOSE_PRINT( "libewf_section_volume_e01_read: this volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n", internal_handle->media->amount_of_chunks, bytes_per_chunk, stored_crc, calculated_crc );
-	LIBEWF_VERBOSE_PRINT( "libewf_section_volume_e01_read: This volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n", internal_handle->media->amount_of_sectors, internal_handle->media->bytes_per_sector );
+	LIBEWF_VERBOSE_PRINT( "%s: this volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n",
+	 function, internal_handle->media->amount_of_chunks, bytes_per_chunk, stored_crc, calculated_crc );
+	LIBEWF_VERBOSE_PRINT( "%s: This volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	 function, internal_handle->media->amount_of_sectors, internal_handle->media->bytes_per_sector );
 
 	if( libewf_common_memcpy( internal_handle->guid, volume->guid, 16 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_read: unable to set GUID.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -937,19 +967,22 @@ ssize_t libewf_section_volume_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
 {
 	EWF_VOLUME *volume          = NULL;
+	static char *function       = "libewf_section_volume_e01_write";
 	ssize_t section_write_count = 0;
 	ssize_t volume_write_count  = 0;
 	size_t size                 = EWF_VOLUME_SIZE;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -957,13 +990,15 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( volume == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to create volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create volume.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memset( volume, 0, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_write: unable to clear volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear volume.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -981,7 +1016,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_chunks, volume->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to revert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -989,7 +1025,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_endian_revert_32bit( internal_handle->media->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to revert sectors per chunk value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -997,7 +1034,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_endian_revert_32bit( internal_handle->media->bytes_per_sector, volume->bytes_per_sector ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to revert bytes per sector value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -1005,13 +1043,15 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_sectors, volume->amount_of_sectors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to revert amount of sectors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
+		 function );
 
 		libewf_common_free( volume );
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_section_volume_e01_write: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n", internal_handle->media->amount_of_chunks, internal_handle->media->sectors_per_chunk, internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
+	LIBEWF_VERBOSE_PRINT( "%s: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n",
+	 function, internal_handle->media->amount_of_chunks, internal_handle->media->sectors_per_chunk, internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
 
 	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
@@ -1023,7 +1063,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		if( libewf_common_memcpy( volume->guid, internal_handle->guid, 16 ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to set GUID.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
+			 function );
 
 			libewf_common_free( volume );
 
@@ -1031,7 +1072,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		}
 		if( libewf_endian_revert_32bit( internal_handle->media->error_granularity, volume->error_granularity ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to revert error granularity value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
+			 function );
 
 			libewf_common_free( volume );
 
@@ -1042,7 +1084,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( volume );
 
@@ -1054,7 +1097,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	if( volume_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_e01_write: unable to write volume to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write volume to file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1066,6 +1110,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
  */
 LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance )
 {
+	static char *function   = "libewf_fill_offset_table";
 	uint32_t chunk_size     = 0;
 	uint32_t current_offset = 0;
 	uint32_t next_offset    = 0;
@@ -1075,7 +1120,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: invalid offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -1095,7 +1141,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( offset_table == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: unable to reallocate offset table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
+			 function );
 
 			return( NULL );
 		}
@@ -1104,7 +1151,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	 */
 	if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator ].offset ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: unable to convert raw offset value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -1117,7 +1165,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator + 1 ].offset ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: unable to convert raw offset value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
+			 function );
 
 			return( NULL );
 		}
@@ -1125,7 +1174,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( next_offset < current_offset )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: invalid chunk offset larger than next.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset larger than next.\n",
+			 function );
 
 			return( NULL );
 		}
@@ -1133,13 +1183,15 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( current_offset > (uint32_t) INT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: invalid chunk offset only values below 2^32 are supported.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( chunk_size == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: invalid chunk size - size is zero.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk size - size is zero.\n",
+			 function );
 
 			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
@@ -1148,13 +1200,22 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: invalid chunk size only values below 2^32 are supported.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
+			 function );
 
 			return( NULL );
 		}
-		if( libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, compressed, (off_t) current_offset, (size_t) chunk_size, segment_number ) == -1 )
+		if( libewf_offset_table_set_values(
+		     offset_table,
+		     offset_table->last,
+		     file_descriptor,
+		     compressed,
+		     (off_t) current_offset,
+		     (size_t) chunk_size,
+		     segment_number ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: unable to set value in offset table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
+			 function );
 
 			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
@@ -1165,13 +1226,13 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( compressed == 0 )
 		{
-			LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: uncompressed chunk %" PRIu32 " read with offset %" PRIu32 " and size %" PRIu32 ".\n",
-                                              offset_table->last, current_offset, chunk_size );
+			LIBEWF_VERBOSE_PRINT( "%s: uncompressed chunk %" PRIu32 " read with offset %" PRIu32 " and size %" PRIu32 ".\n",
+			 function, offset_table->last, current_offset, chunk_size );
 		}
 		else
 		{
-			LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: compressed chunk %" PRIu32 " read with offset %" PRIu32 " and size %" PRIu32 ".\n",
-			                      offset_table->last, current_offset, chunk_size );
+			LIBEWF_VERBOSE_PRINT( "%s: compressed chunk %" PRIu32 " read with offset %" PRIu32 " and size %" PRIu32 ".\n",
+			 function, offset_table->last, current_offset, chunk_size );
 		}
 		current_offset = next_offset;
 
@@ -1179,7 +1240,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator ].offset ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: unable to convert raw offset value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -1188,13 +1250,22 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 	if( current_offset > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: invalid chunk offset only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
-	if( libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, compressed, current_offset, 0, segment_number ) == -1 )
+	if( libewf_offset_table_set_values(
+	     offset_table,
+	     offset_table->last,
+	     file_descriptor,
+	     compressed,
+	     current_offset,
+	     0,
+	     segment_number ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_fill_offset_table: unable to set value in offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
+		 function );
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -1203,13 +1274,13 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	if( compressed == 0 )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: uncompressed last chunk %" PRIu32 " read with offset %" PRIu32 ".\n",
-		                      ( offset_table->last + 1 ), current_offset );
+		LIBEWF_VERBOSE_PRINT( "%s: uncompressed last chunk %" PRIu32 " read with offset %" PRIu32 ".\n",
+		 function, ( offset_table->last + 1 ), current_offset );
 	}
 	else
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: compressed last chunk %" PRIu32 " read with offset %" PRIu64 ".\n",
-                                      ( offset_table->last + 1 ), current_offset );
+		LIBEWF_VERBOSE_PRINT( "%s: compressed last chunk %" PRIu32 " read with offset %" PRIu64 ".\n",
+		 function, ( offset_table->last + 1 ), current_offset );
 	}
 	return( offset_table );
 }
@@ -1259,7 +1330,7 @@ int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_S
 
 			if( last_offset > (off_t) INT32_MAX )
 			{
-				LIBEWF_WARNING_PRINT( "%s: invalid last chunk offset only values below 2^32 are supported.\n",
+				LIBEWF_WARNING_PRINT( "%s: invalid last chunk offset value exceeds maximum.\n",
 				 function );
 
 				return( -1 );
@@ -1276,7 +1347,7 @@ int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_S
 			}
 			if( chunk_size > (off_t) INT32_MAX )
 			{
-				LIBEWF_WARNING_PRINT( "%s: invalid chunk size only values below 2^32 are supported.\n",
+				LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
 
 				return( -1 );
@@ -1316,24 +1387,28 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	LIBEWF_OFFSET_TABLE *reallocation = NULL;
 	EWF_TABLE *table                  = NULL;
 	EWF_TABLE_OFFSET *offsets         = NULL;
+	static char *function             = "libewf_offset_table_read";
 	EWF_CRC calculated_crc            = 0;
 	EWF_CRC stored_crc                = 0;
 
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: invalid offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: invalid section list.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( amount_of_chunks == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: invalid amount of chunks.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -1341,13 +1416,15 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 
 	if( table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to allocate table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate table.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( ewf_table_read( table, file_descriptor ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to read table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read table.\n",
+		 function );
 
 		libewf_common_free( table );
 
@@ -1361,7 +1438,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	 */
 	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		libewf_common_free( table );
 
@@ -1369,7 +1447,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	if( libewf_endian_convert_32bit( &stored_crc, table->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to convert stored CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
 
 		libewf_common_free( table );
 
@@ -1377,7 +1456,9 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	if( stored_crc != calculated_crc )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
+
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( table );
@@ -1387,7 +1468,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	if( libewf_endian_convert_32bit( amount_of_chunks, table->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to convert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( table );
 
@@ -1395,13 +1477,15 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	libewf_common_free( table );
 
-	LIBEWF_VERBOSE_PRINT( "libewf_offset_table_read: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n", *amount_of_chunks, stored_crc, calculated_crc );
+	LIBEWF_VERBOSE_PRINT( "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
+	 function, *amount_of_chunks, stored_crc, calculated_crc );
 
 	size -= EWF_TABLE_SIZE;
 
 	if( *amount_of_chunks == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: table contains no offsets.\n" );
+		LIBEWF_WARNING_PRINT( "%s: table contains no offsets.\n",
+		 function );
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -1414,7 +1498,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 		 */
 		if( *amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: table contains more than %d offsets!.\n", EWF_MAXIMUM_OFFSETS_IN_TABLE );
+			LIBEWF_WARNING_PRINT( "%s: table contains more than %d offsets!.\n",
+			 function, EWF_MAXIMUM_OFFSETS_IN_TABLE );
 
 			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
@@ -1425,13 +1510,15 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( offsets == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to allocated table offsets.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocated table offsets.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( ewf_table_offsets_read( offsets, file_descriptor, *amount_of_chunks ) <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to read table offsets.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to read table offsets.\n",
+			 function );
 
 			libewf_common_free( offsets );
 
@@ -1447,7 +1534,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 			 */
 			if( ewf_crc_calculate( &calculated_crc, (uint8_t *) offsets, ( EWF_TABLE_OFFSET_SIZE * *amount_of_chunks ), 1 ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to calculate CRC.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+				 function );
 
 				libewf_common_free( offsets );
 
@@ -1455,7 +1543,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 			}
 			if( ewf_crc_read( &stored_crc, file_descriptor ) != (int32_t) EWF_CRC_SIZE )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to read CRC from file descriptor.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
+				 function );
 
 				libewf_common_free( offsets );
 
@@ -1463,7 +1552,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 			}
 			if( stored_crc != calculated_crc )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_offset_table_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+				LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+				 function, stored_crc, calculated_crc );
 
 				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 				{
@@ -1480,7 +1570,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( reallocation == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to fill offset table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to fill offset table.\n",
+			 function );
 
 			return( NULL );
 		}
@@ -1488,7 +1579,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( libewf_calculate_last_offset( offset_table, section_list, file_descriptor, segment_number, error_tollerance ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to calculate last offset.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to calculate last offset.\n",
+			 function );
 
 			return( NULL );
 		}
@@ -1499,7 +1591,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	{
 		if( libewf_common_lseek( file_descriptor, size, SEEK_CUR ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: unable to align with next section.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
+			 function );
 
 			return( NULL );
 		}
@@ -1512,11 +1605,14 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
  */
 uint8_t libewf_compare_offset_tables( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 )
 {
-	uint64_t iterator = 0;
+	static char *function = "libewf_compare_offset_tables";
+	uint64_t iterator     = 0;
 
-	if( ( offset_table1 == NULL ) || ( offset_table2 == NULL ) )
+	if( ( offset_table1 == NULL )
+	 || ( offset_table2 == NULL ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_compare_offset_tables: invalid offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -1524,7 +1620,8 @@ uint8_t libewf_compare_offset_tables( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF
 	 */
 	if( offset_table1->amount != offset_table2->amount )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_compare_offset_tables: offset tables differ in size.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in size.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -1534,7 +1631,8 @@ uint8_t libewf_compare_offset_tables( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF
 		{
 			if( offset_table1->offset[ iterator ] != offset_table2->offset[ iterator ] )
 			{
-				LIBEWF_VERBOSE_PRINT( "libewf_compare_offset_tables: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n", iterator, offset_table1->offset[ iterator ], offset_table2->offset[ iterator ] );
+				LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n",
+				 function, iterator, offset_table1->offset[ iterator ], offset_table2->offset[ iterator ] );
 
 				return( 0 );
 			}
@@ -2969,6 +3067,96 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	return( read_count );
 }
 
+/* Reads a delta chunk section from file
+ * Returns the amount of bytes read, or -1 on error
+ */
+ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+{
+}
+
+/* Writes a delta chunk section to file
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_section_delta_chunk_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+{
+	EWF_CHAR buffer[ 4 ];
+
+	static char *function       = "libewf_section_delta_chunk_write";
+	ssize_t section_write_count = 0;
+	ssize_t write_count         = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size > (size_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size only value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_endian_revert_32bit( chunk, buffer ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk value.\n" );
+
+		return( -1 );
+	}
+	write_count = libewf_section_start_write(
+	                       internal_handle,
+	                       file_descriptor,
+	                       (EWF_CHAR *) "delta_chunk",
+	                       ( sizeof( uint32_t ) + chunk_size + EWF_CRC_SIZE ),
+	                       start_offset );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_write_count += write_count;
+
+	write_count = ewf_chunk_write( buffer, file_descriptor, sizeof( uint32_t ) );
+
+	if( write_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write chunk value to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_write_count += write_count;
+
+	write_count = ewf_chunk_write( chunk_data, file_descriptor, chunk_size );
+
+	if( write_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write chunk data to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_write_count += write_count;
+
+	write_count = ewf_crc_write( chunk_crc, file_descriptor );
+
+	if( write_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write CRC to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_write_count += write_count;
+
+	return( section_write_count );
+}
+
 /* Reads and processes a section
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
@@ -3011,7 +3199,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 	if( *section_start_offset > (off_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section start offset only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid section start offset value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -3032,7 +3220,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 	if( size > (uint64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid size only value exceeds maximum.\n",
 		 function );
 
 		return( -1 );

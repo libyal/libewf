@@ -228,6 +228,7 @@ void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, siz
 uint8_t libewf_common_test_empty_block( uint8_t *block_buffer, size_t size );
 
 struct tm *libewf_common_gmtime( const time_t *timestamp );
+struct tm *libewf_common_localtime( const time_t *timestamp );
 
 char *libewf_common_ctime( const time_t *timestamp );
 

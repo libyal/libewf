@@ -121,7 +121,8 @@ DELTA FILE
   chunk data and CRC
 
 Version: 20070809
-* change _localtime functions into _gmtime
+* fixed weird progress indiction, changed localtime into gmtime
+* fixed error in libewf_close comment regarding return value
 
 Version: 20070807
 * worked on restructuring to improve internal structure

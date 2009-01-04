@@ -84,6 +84,12 @@
 /* Define to 1 if you have the <linux/fs.h> header file. */
 #define HAVE_LINUX_FS_H 1
 
+/* Define to 1 if you have the `localtime' function. */
+#define HAVE_LOCALTIME 1
+
+/* Define to 1 if you have the `localtime_r' function. */
+#define HAVE_LOCALTIME_R 1
+
 /* Define to 1 if you have the `mbsinit' function. */
 /* #undef HAVE_MBSINIT */
 
