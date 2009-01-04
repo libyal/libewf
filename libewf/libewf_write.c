@@ -1069,9 +1069,9 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		 */
 		write_count = libewf_segment_file_write_start(
 		               internal_handle,
+		               internal_handle->segment_table,
 		               segment_number,
-		               file_descriptor,
-		               internal_handle->segment_table->section_list[ segment_number ] );
+		               LIBEWF_SEGMENT_FILE_TYPE_EWF );
 
 		if( write_count == -1 )
 		{
@@ -1564,18 +1564,35 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		/* Check if a new delta segment file should be created
 		 */
-		if( internal_handle->delta_segment_table->file_descriptor[ segment_number ] != -1 )
+		if( segment_number == 0 )
 		{
 			segment_number++;
 		}
 		/* Check if chunk fits in exisiting delta segment file
 		 */
 		else if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
-		            + chunk_data_size + EWF_CRC_SIZE ) > internal_handle->write->segment_file_size )
+		         + chunk_data_size + EWF_CRC_SIZE ) > internal_handle->write->segment_file_size )
 		{
+			segment_number++;
 		}
+		/* Create a new delta segment file
+		 */
+		if( internal_handle->delta_segment_table->file_descriptor[ segment_number ] != -1 )
+		{
+			if( libewf_segment_file_create(
+			     internal_handle->segment_table,
+			     segment_number,
+			     internal_handle->write->maximum_amount_of_segments,
+			     LIBEWF_SEGMENT_FILE_TYPE_DWF,
+			     internal_handle->ewf_format,
+			     internal_handle->format ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to create delta segment file for segment: %" PRIu16 ".\n",
+				 function, segment_number );
 
-		/* TODO */
+				return( -1 );
+			}
+		}
 	}
 	else
 	{

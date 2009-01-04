@@ -273,8 +273,8 @@ int libewf_segment_file_create_extension( uint16_t segment_number, int16_t maxim
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type: %c.\n",
-		 function, (char) segment_file_type );
+		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1305,13 +1305,14 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, LIBEWF_SECTION_LIST *section_list )
+ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint8_t segment_file_type )
 {
 	EWF_FILE_HEADER file_header;
 
-	static char *function     = "libewf_segment_file_write_start";
-	ssize_t total_write_count = 0;
-	ssize_t write_count       = 0;
+	static char *function         = "libewf_segment_file_write_start";
+	const uint8_t *file_signature = NULL;
+	ssize_t total_write_count     = 0;
+	ssize_t write_count           = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1320,9 +1321,23 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table == NULL )
+	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing section lists.\n",
 		 function );
 
 		return( -1 );
@@ -1334,21 +1349,21 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( segment_number > internal_handle->segment_table->amount )
+	if( segment_number > segment_table->amount )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( file_descriptor <= -1 )
+	if( segment_table->file_descriptor[ segment_number ] <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( section_list == NULL )
+	if( segment_table->section_list[ segment_number ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
 		 function );
@@ -1356,9 +1371,30 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 
-	if( libewf_common_memcpy( file_header.signature, evf_file_signature, 8 ) == NULL )
+	/* Determine the segment file signature
+	 */
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set data.\n",
+		file_signature = evf_file_signature;
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
+	{
+		file_signature = lvf_file_signature;
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	{
+		file_signature = dvf_file_signature;
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_common_memcpy( file_header.signature, file_signature, 8 ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set file signature.\n",
 		 function );
 
 		return( -1 );
@@ -1374,9 +1410,11 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 	file_header.fields_end[ 0 ] = 0;
 	file_header.fields_end[ 1 ] = 0;
 
+	/* Write segment file header
+	 */
 	write_count = ewf_file_header_write(
 	               &file_header,
-	               file_descriptor );
+	               segment_table->file_descriptor[ segment_number ] );
 
 	if( write_count == -1 )
 	{
@@ -1387,97 +1425,100 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	total_write_count += write_count;
 
-	if( segment_number == 1 )
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
 	{
-		/* Write header section(s)
-		 */
-		write_count = libewf_segment_file_write_headers(
-		               internal_handle,
-		               file_descriptor,
-		               section_list,
-		               (off_t) total_write_count );
-
-		if( write_count == -1 )
+		if( segment_number == 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write header sections.\n",
-			 function );
-
-			return( -1 );
-		}
-		total_write_count += write_count;
-
-		if( internal_handle->ewf_format == EWF_FORMAT_S01 )
-		{
-			/* Write volume (SMART) section
+			/* Write header section(s)
 			 */
-			write_count = libewf_section_volume_s01_write(
-			               internal_handle,
-			               file_descriptor,
-			               (off_t) total_write_count );
+			write_count = libewf_segment_file_write_headers(
+				       internal_handle,
+				       segment_table->file_descriptor[ segment_number ],
+				       segment_table->section_list[ segment_number ],
+				       (off_t) total_write_count );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write header sections.\n",
+				 function );
+
+				return( -1 );
+			}
+			total_write_count += write_count;
+
+			if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+			{
+				/* Write volume (SMART) section
+				 */
+				write_count = libewf_section_volume_s01_write(
+					       internal_handle,
+				               segment_table->file_descriptor[ segment_number ],
+					       (off_t) total_write_count );
+			}
+			else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
+			{
+				/* Write volume section
+				 */
+				write_count = libewf_section_volume_e01_write(
+					       internal_handle,
+					       segment_table->file_descriptor[ segment_number ],
+					       (off_t) total_write_count );
+			}
+			else
+			{
+				/* Fail safe
+				 */
+				write_count = -1;
+			}
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write volume section.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( libewf_section_list_append(
+			     segment_table->section_list[ segment_number ],
+			     (EWF_CHAR *) "volume",
+			     (off_t) total_write_count,
+			     (off_t) ( total_write_count + write_count ) ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to append volume section to section list.\n",
+				 function );
+
+				return( -1 );
+			}
+			total_write_count += write_count;
 		}
 		else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
 		{
-			/* Write volume section
+			/* Write data section
 			 */
-			write_count = libewf_section_volume_e01_write(
-			               internal_handle,
-			               file_descriptor,
-			               (off_t) total_write_count );
-		}
-		else
-		{
-			/* Fail safe
-			 */
-			write_count = -1;
-		}
-		if( write_count == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write volume section.\n",
-			 function );
+			write_count = libewf_section_data_write(
+				       internal_handle,
+				       segment_table->file_descriptor[ segment_number ],
+				       (off_t) total_write_count );
 
-			return( -1 );
-		}
-		if( libewf_section_list_append(
-		     section_list,
-		     (EWF_CHAR *) "volume",
-		     (off_t) total_write_count,
-		     (off_t) ( total_write_count + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append volume section to section list.\n",
-			 function );
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write data section.\n",
+				 function );
 
-			return( -1 );
-		}
-		total_write_count += write_count;
-	}
-	else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
-	{
-		/* Write data section
-		 */
-		write_count = libewf_section_data_write(
-		               internal_handle,
-		               file_descriptor,
-		               (off_t) total_write_count );
+				return( -1 );
+			}
+			if( libewf_section_list_append(
+			     segment_table->section_list[ segment_number ],
+			     (EWF_CHAR *) "data",
+			     (off_t) total_write_count,
+			     (off_t) ( total_write_count + write_count ) ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to append data section to section list.\n",
+				 function );
 
-		if( write_count == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write data section.\n",
-			 function );
-
-			return( -1 );
+				return( -1 );
+			}
+			total_write_count += write_count;
 		}
-		if( libewf_section_list_append(
-		     section_list,
-		     (EWF_CHAR *) "data",
-		     (off_t) total_write_count,
-		     (off_t) ( total_write_count + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append data section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		total_write_count += write_count;
 	}
 	return( total_write_count );
 }
@@ -1666,91 +1707,6 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	total_write_count += write_count;
 
 	return( total_write_count );
-}
-
-/* Write the necessary sections at the start of the delta segment file
- * Returns the amount of bytes written, or -1 on error
- */
-ssize_t libewf_segment_delta_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, LIBEWF_SECTION_LIST *section_list )
-{
-	EWF_FILE_HEADER file_header;
-
-	static char *function = "libewf_segment_delta_file_write_start";
-	ssize_t write_count   = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number > internal_handle->delta_segment_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( file_descriptor <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
-		 function );
-
-		return( -1 );
-	}
-
-	if( libewf_common_memcpy( file_header.signature, dvf_file_signature, 8 ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set data.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_16bit( segment_number, file_header.fields_segment ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert segment number.\n",
-		 function );
-
-		return( -1 );
-	}
-	file_header.fields_start    = 1;
-	file_header.fields_end[ 0 ] = 0;
-	file_header.fields_end[ 1 ] = 0;
-
-	write_count = ewf_file_header_write(
-	               &file_header,
-	               file_descriptor );
-
-	if( write_count == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write file header to file.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( write_count );
 }
 
 /* Write the necessary sections before the actual data chunks to file

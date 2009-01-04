@@ -3118,13 +3118,24 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase1( LIBEWF_HEADER_V
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
+	static char *function           = "libewf_header_values_generate_header_string_encase1";
 
-	header_string = libewf_header_values_generate_header_string_type1( header_values, timestamp, compression_level, header_string_head, header_string_tail, header_length );
-	header        = libewf_header_values_convert_header_string_to_header( header_string, *header_length, header_length );
+	header_string = libewf_header_values_generate_header_string_type1(
+	                 header_values,
+	                 timestamp,
+	                 compression_level,
+	                 header_string_head,
+	                 header_string_tail,
+	                 header_length );
+	header        = libewf_header_values_convert_header_string_to_header(
+	                 header_string,
+	                 *header_length,
+	                 header_length );
 
 	if( header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_generate_header_string_encase1: unable to create header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -3140,13 +3151,24 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function           = "libewf_header_values_generate_header_string_ftk";
 
-	header_string = libewf_header_values_generate_header_string_type2( header_values, timestamp, compression_level, header_string_head, header_string_tail, header_length );
-	header        = libewf_header_values_convert_header_string_to_header( header_string, *header_length, header_length );
+	header_string = libewf_header_values_generate_header_string_type2(
+	                 header_values,
+	                 timestamp,
+	                 compression_level,
+	                 header_string_head,
+	                 header_string_tail,
+	                 header_length );
+	header        = libewf_header_values_convert_header_string_to_header(
+	                 header_string,
+	                 *header_length,
+	                 header_length );
 
 	if( header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_generate_header_string_ftk: unable to create header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -3162,13 +3184,24 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase2( LIBEWF_HEADER_V
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
+	static char *function           = "libewf_header_values_generate_header_string_encase2";
 
-	header_string = libewf_header_values_generate_header_string_type2( header_values, timestamp, compression_level, header_string_head, header_string_tail, header_length );
-	header        = libewf_header_values_convert_header_string_to_header( header_string, *header_length, header_length );
+	header_string = libewf_header_values_generate_header_string_type2(
+	                 header_values,
+	                 timestamp,
+	                 compression_level,
+	                 header_string_head,
+	                 header_string_tail,
+	                 header_length );
+	header        = libewf_header_values_convert_header_string_to_header(
+	                 header_string,
+	                 *header_length,
+	                 header_length );
 
 	if( header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_generate_header_string_encase2: unable to create header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -3184,13 +3217,23 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
+	static char *function           = "libewf_header_values_generate_header_string_encase4";
 
-	header_string = libewf_header_values_generate_header_string_type3( header_values, timestamp, header_string_head, header_string_tail, header_length );
-	header        = libewf_header_values_convert_header_string_to_header( header_string, *header_length, header_length );
+	header_string = libewf_header_values_generate_header_string_type3(
+	                 header_values,
+	                 timestamp,
+	                 header_string_head,
+	                 header_string_tail,
+	                 header_length );
+	header        = libewf_header_values_convert_header_string_to_header(
+	                 header_string,
+	                 *header_length,
+	                 header_length );
 
 	if( header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_header_values_generate_header_string_encase4: unable to create header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header.\n",
+		 function );
 
 		return( NULL );
 	}
