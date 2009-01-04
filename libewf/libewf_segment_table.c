@@ -182,6 +182,12 @@ void libewf_segment_table_free(
 	}
 	memory_free(
 	 segment_table->segment_file_handle );
+
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+	}
 	memory_free(
 	 segment_table );
 }

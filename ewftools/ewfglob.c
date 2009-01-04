@@ -35,6 +35,7 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
+#include <system_string.h>
 #include <types.h>
 
 #include <errno.h>
@@ -53,7 +54,7 @@
 
 #if !defined( HAVE_GLOB_H )
 
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 
 #define ewfglob_finddata_t	_wfinddata_t
 #define ewfglob_makepath	_wmakepath_s
@@ -118,10 +119,10 @@ ewfglob_t *ewfglob_realloc(
             ewfglob_t *glob,
             uint16_t new_amount )
 {
-	system_character_t **reallocation = NULL;
-	static char *function             = "ewfglob_realloc";
-	size_t previous_size              = 0;
-	size_t new_size                   = 0;
+	void *reallocation    = NULL;
+	static char *function = "ewfglob_realloc";
+	size_t previous_size  = 0;
+	size_t new_size       = 0;
 
 	if( glob == NULL )
 	{
@@ -150,14 +151,14 @@ ewfglob_t *ewfglob_realloc(
 	}
 	if( glob->amount == 0 )
 	{
-		reallocation = (system_character_t **) memory_allocate(
-		                            new_size );
+		reallocation = memory_allocate(
+		                new_size );
 	}
 	else
 	{
-		reallocation  = (system_character_t **) memory_reallocate(
-		                             glob->results,
-		                             new_size );
+		reallocation = memory_reallocate(
+		                glob->results,
+		                new_size );
 	}
 	if( reallocation == NULL )
 	{
@@ -166,7 +167,7 @@ ewfglob_t *ewfglob_realloc(
 
 		return( NULL );
 	}
-	glob->results = reallocation;
+	glob->results = (system_character_t **) reallocation;
 
 	if( memory_set(
 	     &( glob->results[ glob->amount ] ),
@@ -272,13 +273,17 @@ int32_t ewfglob_resolve(
 
 			return( -1 );
 		}
-		find_handle = ewfglob_findfirst( patterns[ iterator ], &find_data );
+		find_handle = ewfglob_findfirst(
+		               patterns[ iterator ],
+		               &find_data );
 
 		if( find_handle != -1 )
 		{
 			do
 			{
-				reallocation = ewfglob_realloc( glob, ( glob->amount + 1 ) );
+				reallocation = ewfglob_realloc(
+				                glob,
+				                ( glob->amount + 1 ) );
 
 				if( reallocation == NULL )
 				{
@@ -315,7 +320,9 @@ int32_t ewfglob_resolve(
 					return( -1 );
 				}
 			}
-			while( ewfglob_findnext( find_handle, &find_data ) == 0 );
+			while( ewfglob_findnext(
+			        find_handle,
+			        &find_data ) == 0 );
 
 			if( errno != ENOENT )
 			{
@@ -324,7 +331,8 @@ int32_t ewfglob_resolve(
 
 				return( -1 );
 			}
-			if( ewfglob_findclose( find_handle ) != 0 )
+			if( ewfglob_findclose(
+			     find_handle ) != 0 )
 			{
 				notify_warning_printf( "%s: error closing find handle.\n",
 				 function );

@@ -91,6 +91,8 @@
  */
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #define HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS 1
+#define HAVE_WCHAR_H 1
+#define HAVE_WCSLEN 1
 #endif
 
 /* Define a string for the acquiry system value in the header values
