@@ -166,6 +166,62 @@ ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffe
 	return( read_count );
 }
 
+/* Seeks a certain offset within the a segment file
+ * Returns 1 if the seek is successful, or -1 on error
+ */
+off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset, int whence )
+{
+	static char *function = "libewf_segment_file_seek_offset";
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset > (off64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->file_offset != offset )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %jd in segment file: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		 function, offset, segment_file->filename, segment_file->file_descriptor );
+
+		if( libewf_common_lseek(
+		     segment_file->file_descriptor,
+		     offset,
+		     whence ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %jd in segment file: %" PRIs_EWF_filename ".\n",
+			 function, offset, segment_file->filename );
+
+			return( -1 );
+		}
+		segment_file->file_offset = offset;
+	}
+	return( offset );
+}
+
+
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror
  */
@@ -2384,64 +2440,6 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 	return( 1 );
 }
 
-/* Seeks a certain offset within the a segment file
- * Returns 1 if the seek is successful, or -1 on error
- */
-off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset )
-{
-	static char *function = "libewf_segment_file_seek_offset";
-
-	if( segment_file == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file->file_descriptor == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( segment_file->filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	if( offset > (off64_t) INT64_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file->file_offset != offset )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment file: %" PRIs_EWF_filename " for offset: %jd.\n",
-		 function, segment_file->file_descriptor, segment_file->filename, offset );
-
-		if( libewf_common_lseek(
-		     segment_file->file_descriptor,
-		     offset,
-		     SEEK_SET ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
-			 function, offset );
-
-			return( -1 );
-		}
-		segment_file->file_offset = offset;
-	}
-	return( offset );
-}
-
-
 /* Seeks a certain chunk offset within the EWF segment file(s)
  * Returns the segment file offset if seek is successful, or -1 on error
  */
@@ -2520,7 +2518,8 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 		}
 		if( libewf_segment_file_seek_offset(
 		     &( internal_handle->segment_table->segment_file[ segment_number ] ),
-		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
+		     SEEK_SET ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
 			 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
@@ -2540,7 +2539,8 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 		}
 		if( libewf_segment_file_seek_offset(
 		     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
-		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
+		     SEEK_SET ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
 			 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );

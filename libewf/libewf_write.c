@@ -1438,7 +1438,8 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		if( libewf_segment_file_seek_offset(
 		      segment_file,
-		      internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+		      internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
+		      SEEK_SET ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
 			 function );

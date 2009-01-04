@@ -41,6 +41,7 @@
 #include "libewf_header_values.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
+#include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 
 #include "ewf_compress.h"
@@ -1245,13 +1246,6 @@ int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_T
 
 		return( -1 );
 	}
-	if( segment_file->file_descriptor == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( offset_table == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
@@ -1275,8 +1269,8 @@ int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_T
 
 		return( -1 );
 	}
-	read_count = libewf_common_read(
-	              segment_file->file_descriptor,
+	read_count = libewf_segment_file_read(
+	              segment_file,
 	              table,
 	              EWF_TABLE_SIZE );
 	
@@ -1378,8 +1372,8 @@ int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_T
 
 			return( -1 );
 		}
-		read_count = libewf_common_read(
-		              segment_file->file_descriptor,
+		read_count = libewf_segment_file_read(
+		              segment_file,
 		              offsets,
 		              offsets_size );
 	
@@ -1402,8 +1396,8 @@ int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_T
 			 */
 			calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
 
-			read_count = libewf_common_read(
-			              segment_file->file_descriptor,
+			read_count = libewf_segment_file_read(
+			              segment_file,
 			              stored_crc_buffer,
 			              EWF_CRC_SIZE );
 
@@ -1474,8 +1468,8 @@ int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_T
 	if( ( size > 0 )
 	 && ( size <= (size_t) INT32_MAX ) )
 	{
-		if( libewf_common_lseek(
-		     segment_file->file_descriptor,
+		if( libewf_segment_file_seek_offset(
+		     segment_file,
 		     size,
 		     SEEK_CUR ) == -1 )
 		{
