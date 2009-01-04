@@ -155,6 +155,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080102
+* Updated package config file
+
 Version: 20071230
 * adjustments to summary message to configure.ac
 * worked on MacOS-X package
