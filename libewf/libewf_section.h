@@ -70,23 +70,19 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEW
 ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, int8_t compression_level, uint8_t no_section_append );
 ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance );
 
-int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, uint32_t *amount_of_chunks, off64_t section_offset, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
-
-ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size );
+ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE **offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance );
 ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append );
 
-ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size );
-
-ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
+ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
 
 ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t *ewf_format, uint8_t error_tollerance );
 
 ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t size, uint8_t ewf_format, uint8_t error_tollerance );
 
-ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
+ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, uint8_t ewf_format, uint8_t error_tollerance );
 ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t amount_of_chunks, uint32_t sectors_per_chunk, uint32_t bytes_per_sector, uint32_t amount_of_sectors, uint32_t error_granularity, uint8_t media_type, uint8_t media_flags, int8_t compression_level, uint8_t *guid, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append );
 
-ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
+ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ERROR_SECTOR **acquiry_error_sectors, uint32_t *amount_of_acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance );
 ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors );
 
 ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_DIGEST_HASH *md5_hash, uint8_t error_tollerance );
@@ -100,7 +96,7 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHA
 ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_xhash, size_t *cached_xhash_size );
 ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *xhash, size_t xhash_size, int8_t compression_level );
 
-ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint8_t error_tollerance );
+ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint8_t error_tollerance );
 ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc, uint8_t no_section_append );
 
 int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTION *section, off64_t *section_start_offset );

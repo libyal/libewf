@@ -140,11 +140,11 @@ Next release:
   - for some sections not useful
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
-* remove ewf_compress and ewf_string.c
-* libewf_section_list_append add section_type length parameter
 * pass media values struct to section volume/data functions
-* section make sure read count is returned instead of section_size
-* section remove passing of internal handle
+* move libewf_section_read to segment file
+
+* Try to correct the table
+  - add error flag
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -159,6 +159,17 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071123
+* worked on refactoring code
+* moved libewf_offset_table_compare after the full index build
+  in libewf_segment_file_read_open
+* added chunk size to delta chunk for redundancy
+* removed internal handle from most functions in section
+* ewfexport added argument set detection for interactive mode
+* section read count is returned instead of section size when possible
+* fixed win32 support solution file and ewfglob
+* added section type length to section list entry
 
 Version: 20071121
 * worked on refactoring code

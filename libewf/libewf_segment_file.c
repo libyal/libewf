@@ -143,7 +143,7 @@ LIBEWF_SEGMENT_FILE *libewf_segment_file_alloc( void )
  * Sets the filename and the file descriptor in the segment file struct
  * Returns a pointer to the segment file if successful, or NULL on error
  */
-LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, int flags )
+LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, uint8_t flags )
 {
 	LIBEWF_SEGMENT_FILE *segment_file = NULL;
 	static char *function             = "libewf_segment_file_open";
@@ -1630,6 +1630,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		if( libewf_section_list_append(
 		     segment_file->section_list,
 		     (EWF_CHAR *) "sectors",
+		     7,
 		     chunks_section_offset,
 		     ( chunks_section_offset + write_count ) ) == NULL )
 		{
@@ -1839,7 +1840,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		}
 		/* Write the error2 section if required 
 		 */
-		if( ( internal_handle->acquiry_amount_of_errors > 0 )
+		if( ( internal_handle->amount_of_acquiry_errors > 0 )
 		 && ( ( internal_handle->format == LIBEWF_FORMAT_ENCASE3 )
 		  || ( internal_handle->format == LIBEWF_FORMAT_ENCASE4 )
 		  || ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
@@ -1851,7 +1852,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 			write_count = libewf_section_error2_write(
 			               segment_file,
 			               internal_handle->acquiry_error_sectors,
-			               internal_handle->acquiry_amount_of_errors );
+			               internal_handle->amount_of_acquiry_errors );
 
 			if( write_count == -1 )
 			{
@@ -1918,6 +1919,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 			if( libewf_section_list_append(
 			     segment_file->section_list,
 			     (EWF_CHAR *) "xhash",
+			     5,
 			     segment_file->file_offset,
 			     ( segment_file->file_offset + write_count ) ) == NULL )
 			{
@@ -2100,6 +2102,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	uint16_t segment_number   = 0;
 	uint8_t segment_file_type = 0;
 	int file_descriptor       = 0;
+	int result                = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2358,6 +2361,35 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 		 function );
 
 		return( -1 );
+	}
+	/* Only compare the primary and secondary offset table
+	 * if the secondary table was created
+	 */
+	if( internal_handle->secondary_offset_table != NULL )
+	{
+		result = libewf_offset_table_compare(
+			  internal_handle->offset_table,
+			  internal_handle->secondary_offset_table );
+
+		if( result == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to compare primary and secondary offset table.\n",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: primary and secondary offset table differ.\n",
+			 function );
+
+			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+			{
+				return( -1 );
+			}
+			/* TODO Try to correct the table
+			 */
+		}
 	}
 	return( 1 );
 }

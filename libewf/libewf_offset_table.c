@@ -455,18 +455,30 @@ int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFS
 	static char *function = "libewf_offset_table_compare";
 	uint64_t iterator     = 0;
 
-	if( ( offset_table1 == NULL )
-	 || ( offset_table2 == NULL ) )
+	if( offset_table1 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table1.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( offset_table1->chunk_offset == NULL )
-	 || ( offset_table2->chunk_offset == NULL ) )
+	if( offset_table2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table2.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table1->chunk_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table1 - missing chunk offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table2->chunk_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table2 - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
