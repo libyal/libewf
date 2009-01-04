@@ -850,7 +850,7 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEW
 /* Writes an EWF-S01 (SMART) volume section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append )
+ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t no_section_append )
 {
 	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
 	EWF_VOLUME_SMART *volume    = NULL;
@@ -860,23 +860,16 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	ssize_t section_write_count = 0;
 	ssize_t write_count         = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -903,7 +896,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	volume->unknown1[ 0 ] = 1;
 
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->amount_of_chunks,
+	     media_values->amount_of_chunks,
 	     volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
@@ -914,7 +907,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->sectors_per_chunk,
+	     media_values->sectors_per_chunk,
 	     volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
@@ -925,7 +918,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->bytes_per_sector,
+	     media_values->bytes_per_sector,
 	     volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
@@ -936,7 +929,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->amount_of_sectors,
+	     media_values->amount_of_sectors,
 	     volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
@@ -946,7 +939,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->format == LIBEWF_FORMAT_SMART )
+	if( format == LIBEWF_FORMAT_SMART )
 	{
 		volume->signature[ 0 ] = (uint8_t) 'S';
 		volume->signature[ 1 ] = (uint8_t) 'M';
@@ -965,9 +958,11 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n",
-	 function, internal_handle->media_values->amount_of_chunks, internal_handle->media_values->sectors_per_chunk,
-	 internal_handle->media_values->bytes_per_sector, internal_handle->media_values->amount_of_sectors );
+	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
+
+	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file,
@@ -1188,7 +1183,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEW
 /* Writes an EWF-E01 (EnCase) volume section to file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append )
+ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, int8_t compression_level, uint8_t no_section_append )
 {
 	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
 	EWF_VOLUME *volume          = NULL;
@@ -1198,23 +1193,16 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	ssize_t section_write_count = 0;
 	ssize_t write_count         = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -1239,18 +1227,18 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->format == LIBEWF_FORMAT_FTK )
+	if( format == LIBEWF_FORMAT_FTK )
 	{
 		volume->media_type = 0x01;
 	}
 	else
 	{
-		volume->media_type = internal_handle->media_values->media_type;
+		volume->media_type = media_values->media_type;
 	}
-	volume->media_flags = internal_handle->media_values->media_flags;
+	volume->media_flags = media_values->media_flags;
 
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->amount_of_chunks,
+	     media_values->amount_of_chunks,
 	     volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
@@ -1261,7 +1249,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->sectors_per_chunk,
+	     media_values->sectors_per_chunk,
 	     volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
@@ -1272,7 +1260,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->bytes_per_sector,
+	     media_values->bytes_per_sector,
 	     volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
@@ -1283,7 +1271,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit(
-	     internal_handle->media_values->amount_of_sectors,
+	     media_values->amount_of_sectors,
 	     volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
@@ -1293,17 +1281,17 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN5 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_EWFX ) )
+	if( ( format == LIBEWF_FORMAT_ENCASE5 )
+	 || ( format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( format == LIBEWF_FORMAT_LINEN5 )
+	 || ( format == LIBEWF_FORMAT_LINEN6 )
+	 || ( format == LIBEWF_FORMAT_EWFX ) )
 	{
-		volume->compression_level = (uint8_t) internal_handle->compression_level;
+		volume->compression_level = (uint8_t) compression_level;
 
 		if( libewf_common_memcpy(
 		     volume->guid,
-		     internal_handle->media_values->guid,
+		     media_values->guid,
 		     16 ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
@@ -1314,7 +1302,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 			return( -1 );
 		}
 		if( libewf_endian_revert_32bit(
-		     internal_handle->media_values->error_granularity,
+		     media_values->error_granularity,
 		     volume->error_granularity ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
@@ -1336,9 +1324,11 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n",
-	 function, internal_handle->media_values->amount_of_chunks, internal_handle->media_values->sectors_per_chunk,
-	 internal_handle->media_values->bytes_per_sector, internal_handle->media_values->amount_of_sectors );
+	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
+
+	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file,
@@ -1489,8 +1479,8 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 	{
 		media_values->chunk_size = (uint32_t) bytes_per_chunk;
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes each.\n",
-	 function, media_values->amount_of_chunks, media_values->chunk_size );
+	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
+	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
 
 	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
 	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );

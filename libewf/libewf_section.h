@@ -65,9 +65,9 @@ ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *header2, size_t header2_size, int8_t compression_level );
 
 ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t *format, uint8_t error_tollerance );
-ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append );
+ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t no_section_append );
 ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t error_tollerance );
-ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append );
+ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, int8_t compression_level, uint8_t no_section_append );
 ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance );
 
 int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, uint32_t *amount_of_chunks, off64_t section_offset, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance );

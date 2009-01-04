@@ -2514,8 +2514,9 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						/* Write volume (SMART) section
 						 */
 						write_count = libewf_section_volume_s01_write(
-							       internal_handle,
 							       segment_file,
+							       internal_handle->media_values,
+							       internal_handle->format,
 							       1 );
 					}
 					else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
@@ -2523,8 +2524,10 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						/* Write volume section
 						 */
 						write_count = libewf_section_volume_e01_write(
-							       internal_handle,
 							       segment_file,
+							       internal_handle->media_values,
+							       internal_handle->format,
+							       internal_handle->compression_level,
 							       1 );
 					}
 					else
