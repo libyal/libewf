@@ -99,7 +99,7 @@ struct libewf_offset_table
 };
 
 LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
-LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
+int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
 int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off_t offset, size_t size, uint16_t segment_number, uint8_t dirty );
 

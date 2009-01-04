@@ -374,7 +374,8 @@ LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size )
 		libewf_string_snprintf(
 		 size_string,
 		 8,
-		 _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 ) _S_LIBEWF_CHAR( ".%" ) _S_LIBEWF_CHAR( PRIu8 ) _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF ),
+		 _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 ) _S_LIBEWF_CHAR( ".%" )
+		 _S_LIBEWF_CHAR( PRIu8 ) _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF ),
 		 size,
 		 remainder,
 		 units_string );
@@ -389,6 +390,58 @@ LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size )
 		 units_string );
 	}
 	return( size_string );
+}
+
+/* Determines the sectors per chunk value from an argument string
+ * Returns the sectors per chunk value, or 0 on error
+ */
+uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument )
+{
+	if( argument == NULL )
+	{
+		return( 0 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "32768" ), 5 ) == 0 )
+	{
+		return( 32768 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "16384" ), 5 ) == 0 )
+	{
+		return( 16384 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "8192" ), 4 ) == 0 )
+	{
+		return( 8192 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "4096" ), 4 ) == 0 )
+	{
+		return( 4096 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "2048" ), 4 ) == 0 )
+	{
+		return( 2048 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "1024" ), 4 ) == 0 )
+	{
+		return( 1024 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "512" ), 3 ) == 0 )
+	{
+		return( 512 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "256" ), 3 ) == 0 )
+	{
+		return( 256 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "128" ), 3 ) == 0 )
+	{
+		return( 128 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "64" ), 2 ) == 0 )
+	{
+		return( 64 );
+	}
+	return( 0 );
 }
 
 /* Copies the source string (of CHAR_T) into the destination string for a certain length

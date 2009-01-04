@@ -129,7 +129,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported digest type.\n" );
+					fprintf( stderr, "Unsupported digest type.\n" );
 				}
 				break;
 

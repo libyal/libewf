@@ -234,6 +234,7 @@ LIBEWF_CHAR *ewfcommon_determine_operating_system( void );
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format );
 LIBEWF_CHAR *ewfcommon_determine_units_string( int factor );
 LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size );
+uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument );
 
 int8_t ewfcommon_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const CHAR_T *source, size_t length );
 int8_t ewfcommon_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *destination, size_t length );

@@ -78,7 +78,8 @@ void usage( void )
 
 	fprintf( stderr, "\tReads data from stdin\n\n" );
 
-	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
+	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stderr, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
 	fprintf( stderr, "\t-C: specify the case number (default is case_number).\n" );
 	fprintf( stderr, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
@@ -110,7 +111,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
-	CHAR_T *filenames[ 1 ]                  = { "stream" };
+	CHAR_T *filenames[ 1 ]                  = { _S_CHAR_T( "stream" ) };
 
 	LIBEWF_HANDLE *handle                    = NULL;
 	LIBEWF_CHAR *calculated_md5_hash_string  = NULL;
@@ -172,49 +173,13 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'b':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "32768" ), 5 ) == 0 )
+				sectors_per_chunk = ewfcommon_determine_sectors_per_chunk( optarg );
+
+				if( sectors_per_chunk == 0 )
 				{
-					sectors_per_chunk = 32768;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "16384" ), 5 ) == 0 )
-				{
-					sectors_per_chunk = 16384;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "8192" ), 4 ) == 0 )
-				{
-					sectors_per_chunk = 8192;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "4096" ), 4 ) == 0 )
-				{
-					sectors_per_chunk = 4096;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "2048" ), 4 ) == 0 )
-				{
-					sectors_per_chunk = 2048;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "1024" ), 4 ) == 0 )
-				{
-					sectors_per_chunk = 1024;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "512" ), 3 ) == 0 )
-				{
-					sectors_per_chunk = 512;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "256" ), 3 ) == 0 )
-				{
-					sectors_per_chunk = 256;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "128" ), 3 ) == 0 )
-				{
-					sectors_per_chunk = 128;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "64" ), 2 ) == 0 )
-				{
+					fprintf( stderr, "Unsuported amount of sectors per chunk defaulting to 64.\n" );
+
 					sectors_per_chunk = 64;
-				}
-				else
-				{
-					fprintf( stderr, "unsuported amount of sectors per chunk defaulting to 64.\n" );
 				}
 				break;
 
@@ -237,7 +202,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported compression type defaulting to none.\n" );
+					fprintf( stderr, "Unsupported compression type defaulting to none.\n" );
 				}
 				break;
 
@@ -253,7 +218,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported digest type.\n" );
+					fprintf( stderr, "Unsupported digest type.\n" );
 				}
 				break;
 
@@ -311,7 +276,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported EWF file format type defaulting to encase5.\n" );
+					fprintf( stderr, "Unsupported EWF file format type defaulting to encase5.\n" );
 				}
 				break;
 
@@ -331,7 +296,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported media type defaulting to fixed.\n" );
+					fprintf( stderr, "Unsupported media type defaulting to fixed.\n" );
 				}
 				break;
 
@@ -346,7 +311,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported volume type defaulting to logical.\n" );
+					fprintf( stderr, "Unsupported volume type defaulting to logical.\n" );
 				}
 				break;
 

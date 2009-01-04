@@ -159,9 +159,9 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 }
 
 /* Reallocates memory for the dynamic file descriptor, offset and size array
- * Returns a pointer to the instance, NULL on error
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount )
+int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_offset_table_realloc";
@@ -171,7 +171,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: invalid offset_table.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	reallocation = libewf_common_realloc_new_cleared(
 	                offset_table->file_descriptor,
@@ -184,7 +184,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate file descriptors.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->file_descriptor = (int *) reallocation;
 	reallocation                  = libewf_common_realloc_new_cleared(
@@ -198,7 +198,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate compressed flags.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->compressed = (uint8_t *) reallocation;
 	reallocation             = libewf_common_realloc_new_cleared(
@@ -212,7 +212,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate offsets.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->offset = (off_t *) reallocation;
 	reallocation         = libewf_common_realloc_new_cleared(
@@ -226,7 +226,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate sizes.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->size   = (size_t *) reallocation;
 	reallocation         = libewf_common_realloc_new_cleared(
@@ -240,7 +240,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate hashed flags.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->hashed = (uint8_t *) reallocation;
 	reallocation         = libewf_common_realloc_new_cleared(
@@ -254,7 +254,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate segment numbers.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->segment_number = (uint16_t *) reallocation;
 	reallocation                 = libewf_common_realloc_new_cleared(
@@ -268,12 +268,12 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_ta
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dirty flags.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	offset_table->dirty  = (uint8_t *) reallocation;
 	offset_table->amount = amount;
 
-	return( offset_table );
+	return( 1 );
 }
 
 /* Frees memory of a offset table struct including elements
@@ -309,6 +309,48 @@ int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32
 	if( offset_table == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->compressed == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing compressed values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing sizes.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->segment_number == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing segment numbers.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->dirty == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing dirty values.\n",
 		 function );
 
 		return( -1 );

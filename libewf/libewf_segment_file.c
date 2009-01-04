@@ -1747,10 +1747,9 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
  */
 ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount )
 {
-	LIBEWF_OFFSET_TABLE *reallocation = NULL;
-	static char *function             = "libewf_segment_file_write_chunks_section_start";
-	ssize_t write_count               = 0;
-	size_t section_size               = 0;
+	static char *function = "libewf_segment_file_write_chunks_section_start";
+	ssize_t write_count   = 0;
+	size_t section_size   = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1806,18 +1805,15 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 	 */
 	if( internal_handle->offset_table->amount < ( total_chunk_amount + segment_chunk_amount ) )
 	{
-		reallocation = libewf_offset_table_realloc(
-		                internal_handle->offset_table,
-		                ( total_chunk_amount + segment_chunk_amount ) );
-
-		if( reallocation == NULL )
+		if( libewf_offset_table_realloc(
+		     internal_handle->offset_table,
+		     ( total_chunk_amount + segment_chunk_amount ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
 			 function );
 
 			return( -1 );
 		}
-		internal_handle->offset_table = reallocation;
 	}
 	if( ( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
@@ -1874,14 +1870,13 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
  */
 ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc, uint32_t amount_of_chunks )
 {
-	LIBEWF_OFFSET_TABLE *reallocation = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
-	char *chunk_type                  = NULL;
+	char *chunk_type          = NULL;
 #endif
-	static char *function             = "libewf_segment_file_write_chunks_data";
-	ssize_t write_count               = 0;
-	ssize_t total_write_count         = 0;
-	size_t chunk_size                 = size;
+	static char *function     = "libewf_segment_file_write_chunks_data";
+	ssize_t write_count       = 0;
+	ssize_t total_write_count = 0;
+	size_t chunk_size         = size;
 
 	if( internal_handle == NULL )
 	{
@@ -1961,18 +1956,15 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	 */
 	if( internal_handle->offset_table->amount < ( chunk + 1 ) )
 	{
-		reallocation = libewf_offset_table_realloc(
-		                internal_handle->offset_table,
-		                ( chunk + 1 ) );
-
-		if( reallocation == NULL )
+		if( libewf_offset_table_realloc(
+		     internal_handle->offset_table,
+		     ( chunk + 1 ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
 			 function );
 
 			return( -1 );
 		}
-		internal_handle->offset_table = reallocation;
 	}
 	/* Set the values in the offset table
 	 */

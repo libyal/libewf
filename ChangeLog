@@ -1,6 +1,5 @@
 Roadmap:
 * allow MD5 calculation to be disabled
-* read and write mode - currently implemented, still expirimental
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -126,11 +125,20 @@ TODO
 * remove libewf_write_finalize and libewf_write_chunk ?
 * check if chunk_cache_offset is still needed in write_new_chunk
   read is now in write_existing_chunk
+* "Amount of bytes to alter" correct for offset !!! also in ewfacquire?
+* ewfexport to export EWF format to merge delta file(s) and ewf file(s)
 
-DELTA FILE
-* consists of sections "delta_chunk" with chunk number
-  chunk data and CRC
-* read dirty chunk from delta segment file
+Version: 20070819
+* worked on restructuring to improve internal structure
+* worked on improved rewrite using delta segment files
+* change libewf_offset_table_realloc to return integer value
+  because function does not change pointer of offset table itself
+  the same for libewf_fill_offset_table and libewf_offset_table_read
+* completed reading dirty chunks from delta segment files
+* worked on ewfexport exporting ewf formatted data for delta merge
+  ewfexport no longer exports to stdout
+  specify '-t -' to write to stdout
+* fixed spelling error in unsuported => unsupported in ewftools
 
 Version: 20070818
 * worked on restructuring to improve internal structure

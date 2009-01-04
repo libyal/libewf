@@ -343,7 +343,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "unsuported digest type.\n" );
+					fprintf( stderr, "Unsupported digest type.\n" );
 				}
 				break;
 
@@ -499,7 +499,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "ewfacquire: unsuported media type.\n" );
+			fprintf( stderr, "ewfacquire: unsupported media type.\n" );
 
 			return( EXIT_FAILURE );
 		}
@@ -519,7 +519,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "ewfacquire: unsuported volume type.\n" );
+			fprintf( stderr, "ewfacquire: unsupported volume type.\n" );
 
 			return( EXIT_FAILURE );
 		}
@@ -543,7 +543,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "ewfacquire: unsuported compression type.\n" );
+			fprintf( stderr, "ewfacquire: unsupported compression type.\n" );
 
 			return( EXIT_FAILURE );
 		}
@@ -565,7 +565,7 @@ int main( int argc, char * const argv[] )
 			}
 			else
 			{
-				fprintf( stderr, "ewfacquire: unsuported answer.\n" );
+				fprintf( stderr, "ewfacquire: unsupported answer.\n" );
 
 				return( EXIT_FAILURE );
 			}
@@ -626,7 +626,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "ewfacquire: unsuported EWF file format type.\n" );
+			fprintf( stderr, "ewfacquire: unsupported EWF file format type.\n" );
 
 			libewf_common_free( user_input );
 
@@ -680,7 +680,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "ewfacquire: unsuported answer.\n" );
+			fprintf( stderr, "ewfacquire: unsupported answer.\n" );
 
 			return( EXIT_FAILURE );
 		}

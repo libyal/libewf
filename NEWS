@@ -1,26 +1,16 @@
-Source package:
-new source structure
-./libewf   -> library
-./ewftools -> tools
-./include  -> library include files
-./manual   -> man pages
-
-config.h is now include/libewf/libewf_config.h
-
-libtool is now used instead of ranlib
-
 Library:
-wide character support
-streamed write support
-now supports EnCase6, linen5, linen6 and EWFX (expirimental) format
-expirimental read and write support
+* improved internal code structure
+* added raw read and write functions that will allow to read
+  'raw' chunk data
+* improved read and write support uses delta segment files
+  no changes are stored in the EWF files use ewfexport to
+  create a set of changed EWF files for EnCase and FTK
 
 EWF tools:
-ewfinfo now support date format type and ISO8601
-ewfacquire now allows to set media type (fixed or removable)
-added ewfacquirestream
-added SHA1 calculation, however the SHA1 hash is only stored in the EWF-X format
+* ewfexport no longer writes to stdout per default, default is now export.raw
+  specify '-t -' to write to stdout
 
 Platform support:
-compiles under Microsoft Visual Studio 2005 (express)
+* Microsoft Visual Studio 2005 (express) project files have been
+  added to the package
 
