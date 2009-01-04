@@ -639,9 +639,8 @@ int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
+		          &( internal_handle->segment_table->segment_file[ segment_number ] ),
 		          segment_number,
-		          internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
-		          internal_handle->segment_table->segment_file[ segment_number ].section_list,
 		          &last_segment_file );
 
 		if( result == -1 )
@@ -711,9 +710,8 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
 
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
+		          &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
 		          segment_number,
-		          internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor,
-		          internal_handle->delta_segment_table->segment_file[ segment_number ].section_list,
 		          &last_segment_file );
 
 		if( result == -1 )
@@ -747,7 +745,7 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, LIBEWF_SECTION_LIST *section_list, int *last_segment_file )
+int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, int *last_segment_file )
 {
 	EWF_SECTION section;
 
@@ -762,16 +760,9 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 
 		return( -1 );
 	}
-	if( file_descriptor == -1 )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
@@ -793,9 +784,9 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	{
 		result = libewf_section_read(
 		          internal_handle,
-		          file_descriptor,
+		          segment_file->file_descriptor,
 		          &section,
-		          section_list,
+		          segment_file->section_list,
 		          segment_number,
 		          &previous_offset );
 

@@ -68,7 +68,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, LIBEWF_SECTION_LIST *section_list, int *last_segment_file );
+int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, int *last_segment_file );
 
 ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, LIBEWF_SECTION_LIST *section_list, off64_t start_offset );
 ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, LIBEWF_SECTION_LIST *section_list, off64_t start_offset, int last_segment_file );
