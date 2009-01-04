@@ -1,4 +1,4 @@
-.Dd November 11, 2007
+.Dd November 12, 2007
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -52,7 +52,7 @@ shows this help
 swap byte pairs of the media data (from AB to BA)
 (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in kbytes (2^10) (default is 665600)
+the segment file size in kbytes (2^10) (default is 1536000)
 .It Fl t Ar target
 specify the target file to export to, use - for stdout (default is export)
 stdout is only supported for the raw format
@@ -74,7 +74,7 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20071011 (libewf 20071011, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfexport 20071012 (libewf 20071012, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Information for export required, please provide the necessary input
 Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
@@ -82,7 +82,7 @@ Target path and filename with extension or - for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 
-Export started at: Sun Nov 11 19:19:40 2006
+Export started at: Mon Nov 12 19:19:40 2007
 
 This could take a while.
 
@@ -95,7 +95,7 @@ Status: at 100%.
         exported 1.4 MB (1474560 bytes) of total 1.4 MB (1474560 bytes).
         completion in 1 second(s) with 1 MB/s (1474560 bytes/second).
 
-Export completed at: Sun Nov 11 19:19:41 2006
+Export completed at: Mon Nov 12 19:19:41 2007
 
 Written: 1.4 MB (1474560 bytes) in 1 second(s) with 1 MB/s (1474560 bytes/second).
 .Ed

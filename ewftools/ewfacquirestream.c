@@ -97,7 +97,8 @@ void usage( void )
 	fprintf( stdout, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stdout, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n", (uint32_t) ( 650 * 1024 ) );
+	fprintf( stdout, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n",
+	 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 	fprintf( stdout, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
 	fprintf( stdout, "\t-V: print version\n" );
@@ -144,7 +145,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                     = 0;
 	time_t timestamp_start                   = 0;
 	time_t timestamp_end                     = 0;
-	int64_t segment_file_size                = ( 650 * 1024 );
+	int64_t segment_file_size                = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	int64_t write_count                      = 0;
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;

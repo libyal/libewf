@@ -117,6 +117,7 @@ Next release:
 * ewfexport
   - ewfcommon_export_ewf - add raw access write support
   - allow to set sha1 and md5 calculation support
+  - > 2Gb segment file support
 * ewfacquire
   - account for backspace in user input (no issue on Fedora Core 8)
   - ewfinput_get_size_variable uses strtoul, max is ULONG_MAX
@@ -133,6 +134,10 @@ Next release:
 * API function get current chunk size?
 * do not finalize on write error?
 
+* change segment table to table of segment files
+  this reduced the amount of reallocs
+  and what about the offset/chunk table?
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -146,6 +151,10 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071112
+* change default segment file size to 1500 MB (^10)
+  about 1400 MB in (^2), 3x segment files should fit on a DVD
 
 Version: 20071111
 * changed default wipe behavior for ewfacquire(stream)

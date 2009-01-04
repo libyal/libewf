@@ -604,7 +604,7 @@ int main( int argc, char * const argv[] )
 		                     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
 		                     1440,
 		                     ( maximum_segment_file_size / 1024 ),
-		                     ( 650 * 1024 ) );
+		                     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 
 		segment_file_size *= 1024;
 

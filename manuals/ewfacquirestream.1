@@ -1,4 +1,4 @@
-.Dd November 11, 2007
+.Dd November 12, 2007
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -74,7 +74,7 @@ the notes (default is notes)
 swap byte pairs of the media data (from AB to BA)
 (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in kbytes (2^10) (default is 665600)
+the segment file size in kbytes (2^10) (default is 1536000)
 .It Fl t Ar target
 the target file (without extension) to write to (default is stream)
 .It Fl v
@@ -97,7 +97,7 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfacquirestream -C 1 -D Floppy -E 1.1 -e 'John D.' -N 'Just a floppy in my system' -m removable -M physical -t floppy </dev/fd0
-ewfacquirestream 20070512 (libewf 20070512, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfacquirestream 20071112 (libewf 20071112, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Using the following acquiry parameters:
 Image path and filename:        floppy.E01
@@ -113,17 +113,20 @@ Compress empty blocks:          no
 EWF file format:                EnCase 5
 Acquiry start offet:            0
 Amount of bytes to acquire:     0 (until end of input)
-Evidence segment file size:     665600 kbytes
+Evidence segment file size:     1536000 kbytes
 Block size:                     64 sectors
 Error granularity:              64 sectors
 Retries on read error:          2
 Wipe sectors on read error:     no
 
-Acquiry started at: Sat May 12 11:32:41 2007
+Acquiry started at: Mon Nov 12 11:32:41 2007
 
 This could take a while.
 
-Acquiry completed at: Sat May 12 11:32:42 2007
+Status: acquired 1.4 MB (1474560 bytes)
+        in 1 second(s) with 1 MB/s (1474560 bytes/second).
+
+Acquiry completed at: Mon Nov 12 11:32:42 2007
 
 Written: 1.4 MB (1474560 bytes) in 1 second(s) with 1 MB/s (1474560 bytes/second).
 

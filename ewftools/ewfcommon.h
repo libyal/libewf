@@ -48,6 +48,8 @@
 
 #include "../libewf/libewf_char.h"
 
+#define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE	( 1500 * 1024 )
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
