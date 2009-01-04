@@ -139,6 +139,7 @@ Next release:
   set and pass header values reference as parameter
 
 * set crc errors in raw access verify
+* merge alloc an realloc blocks
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

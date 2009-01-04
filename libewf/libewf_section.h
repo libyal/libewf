@@ -73,7 +73,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEW
 ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t no_section_append );
 ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance );
 
-ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE **offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance );
+ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE *offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance );
 ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append );
 
 ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
@@ -107,7 +107,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size );
 #endif
 
-int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
+int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
 
 #if defined( __cplusplus )
 }

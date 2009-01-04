@@ -112,6 +112,33 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
+	internal_handle->offset_table = libewf_offset_table_alloc( 0 );
+
+	if( internal_handle->offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create offset table.\n",
+		 function );
+
+		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_common_free( internal_handle );
+
+		return( NULL );
+	}
+	internal_handle->secondary_offset_table = libewf_offset_table_alloc( 0 );
+
+	if( internal_handle->secondary_offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create secondary offset table.\n",
+		 function );
+
+		libewf_offset_table_free( internal_handle->offset_table );
+		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_common_free( internal_handle );
+
+		return( NULL );
+	}
 	internal_handle->chunk_cache = libewf_chunk_cache_alloc( EWF_MINIMUM_CHUNK_SIZE + EWF_CRC_SIZE );
 
 	if( internal_handle->chunk_cache == NULL )
@@ -119,8 +146,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache.\n",
 		 function );
 
-		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_offset_table_free( internal_handle->secondary_offset_table );
+		libewf_offset_table_free( internal_handle->offset_table );
 		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -133,8 +162,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		 function );
 
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
-		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_offset_table_free( internal_handle->secondary_offset_table );
+		libewf_offset_table_free( internal_handle->offset_table );
 		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -148,8 +179,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		libewf_media_values_free( internal_handle->media_values );
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
-		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_offset_table_free( internal_handle->secondary_offset_table );
+		libewf_offset_table_free( internal_handle->offset_table );
 		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -164,8 +197,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		libewf_header_sections_free( internal_handle->header_sections );
 		libewf_media_values_free( internal_handle->media_values );
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
-		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_offset_table_free( internal_handle->secondary_offset_table );
+		libewf_offset_table_free( internal_handle->offset_table );
 		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -181,8 +216,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		libewf_header_sections_free( internal_handle->header_sections );
 		libewf_media_values_free( internal_handle->media_values );
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
-		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_offset_table_free( internal_handle->secondary_offset_table );
+		libewf_offset_table_free( internal_handle->offset_table );
 		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -201,8 +238,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			libewf_header_sections_free( internal_handle->header_sections );
 			libewf_media_values_free( internal_handle->media_values );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
-			libewf_segment_table_free( internal_handle->segment_table );
+			libewf_offset_table_free( internal_handle->secondary_offset_table );
+			libewf_offset_table_free( internal_handle->offset_table );
 			libewf_segment_table_free( internal_handle->delta_segment_table );
+			libewf_segment_table_free( internal_handle->segment_table );
 			libewf_common_free( internal_handle );
 
 			return( NULL );
@@ -226,8 +265,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			libewf_header_sections_free( internal_handle->header_sections );
 			libewf_media_values_free( internal_handle->media_values );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
-			libewf_segment_table_free( internal_handle->segment_table );
+			libewf_offset_table_free( internal_handle->secondary_offset_table );
+			libewf_offset_table_free( internal_handle->offset_table );
 			libewf_segment_table_free( internal_handle->delta_segment_table );
+			libewf_segment_table_free( internal_handle->segment_table );
 			libewf_common_free( internal_handle );
 
 			return( NULL );
@@ -812,6 +853,13 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		return( -1 );
 	}
+	if( internal_handle->offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->write == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
@@ -1035,21 +1083,16 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 		}
 		internal_handle->media_values->amount_of_sectors = (uint32_t) amount_of_sectors;
 	}
-	/* Allocate the offset table if necessary
+        /* Allocate the necessary amount of chunk offsets
+	 * this reduces the amount of reallocations
 	 */
-	if( internal_handle->offset_table == NULL )
+	if( internal_handle->offset_table->amount < amount_of_chunks )
 	{
-		/* Make sure at least one offset table entry is allocated
-		 */
-		if( amount_of_chunks ==  0 )
+		if( libewf_offset_table_realloc(
+		     internal_handle->offset_table,
+		     (uint32_t) amount_of_chunks ) != 1 )
 		{
-			amount_of_chunks = 1;
-		}
-		internal_handle->offset_table = libewf_offset_table_alloc( (uint32_t) amount_of_chunks );
-
-		if( internal_handle->offset_table == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocate offset table.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
 			 function );
 
 			return( -1 );

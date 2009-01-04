@@ -62,9 +62,6 @@ ssize_t libewf_segment_file_read_file_header( LIBEWF_SEGMENT_FILE *segment_file,
 
 int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format );
 
-int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
 int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, int *last_segment_file );
 
 ssize_t libewf_segment_file_write_headers( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format );
@@ -80,10 +77,12 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_SEGMENT_FILE *segmen
 
 ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc );
 
-ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_HASH_SECTIONS *hash_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format );
+ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format );
 
 int libewf_segment_file_get_filename( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_FILENAME *filename, size_t length_filename );
 int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const LIBEWF_FILENAME *filename, size_t length_filename );
+
+int libewf_segment_table_build( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_TABLE *segment_table );
 
 int libewf_segment_table_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_SEGMENT_TABLE *delta_segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags );
 

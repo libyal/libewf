@@ -877,14 +877,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->chunk_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( ( chunk < internal_handle->offset_table->amount )
+	 && ( internal_handle->offset_table->chunk_offset != NULL )
 	 && ( internal_handle->offset_table->chunk_offset[ chunk ].segment_file != NULL ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk: %" PRIu32 " already exists.\n",
@@ -1170,8 +1164,9 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 			               segment_number,
 			               internal_handle->write->segment_amount_of_chunks,
 			               0,
-			               internal_handle->media_values,
 			               internal_handle->hash_sections,
+			               internal_handle->media_values,
+			               internal_handle->acquiry_errors,
 			               internal_handle->compression_level,
 			               internal_handle->format,
 			               internal_handle->ewf_format );
@@ -1765,13 +1760,6 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->chunk_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( chunk >= internal_handle->offset_table->amount )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk does not exists.\n",
@@ -2037,13 +2025,6 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->chunk_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( data_size > internal_handle->media_values->chunk_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: data size cannot be larger than maximum chunk size.\n",
@@ -2054,6 +2035,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 	/* Check if chunk has already been created within a segment file
 	 */
 	if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
+	 && ( internal_handle->offset_table->chunk_offset != NULL )
 	 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].segment_file != NULL ) )
 	{
 		write_count = libewf_raw_write_chunk_existing(
@@ -2136,13 +2118,6 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->chunk_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( buffer == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
@@ -2195,6 +2170,7 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 		/* Check if chunk has already been created within a segment file
 		 */
 		if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
+		 && ( internal_handle->offset_table->chunk_offset != NULL )
 		 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].segment_file != NULL ) )
 		{
 			write_count = libewf_write_chunk_data_existing(
@@ -2435,8 +2411,9 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		               segment_number,
 		               internal_handle->write->segment_amount_of_chunks,
 		               1,
-		               internal_handle->media_values,
 		               internal_handle->hash_sections,
+		               internal_handle->media_values,
+		               internal_handle->acquiry_errors,
 		               internal_handle->compression_level,
 		               internal_handle->format,
 		               internal_handle->ewf_format );

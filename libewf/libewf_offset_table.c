@@ -50,7 +50,6 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 {
 	LIBEWF_OFFSET_TABLE *offset_table = NULL;
 	static char *function             = "libewf_offset_table_alloc";
-	uint32_t iterator                 = 0;
 
 	offset_table = (LIBEWF_OFFSET_TABLE *) libewf_common_alloc( LIBEWF_OFFSET_TABLE_SIZE );
 
@@ -61,24 +60,34 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) libewf_common_alloc( ( amount * LIBEWF_CHUNK_OFFSET_SIZE ) );
+	offset_table->chunk_offset = NULL;
 
-	if( offset_table->chunk_offset == NULL )
+	if( amount > 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate chunk offsets.\n",
-		 function );
+		offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) libewf_common_alloc( LIBEWF_CHUNK_OFFSET_SIZE * amount );
 
-		libewf_common_free( offset_table );
+		if( offset_table->chunk_offset == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate chunk offsets.\n",
+			 function );
 
-		return( NULL );
-	}
-	for( iterator = 0; iterator < amount; iterator++ )
-	{
-		offset_table->chunk_offset[ iterator ].segment_file = NULL;
-		offset_table->chunk_offset[ iterator ].file_offset  = 0;
-		offset_table->chunk_offset[ iterator ].size         = 0;
-		offset_table->chunk_offset[ iterator ].compressed   = 0;
-		offset_table->chunk_offset[ iterator ].dirty        = 0;
+			libewf_common_free( offset_table );
+
+			return( NULL );
+		}
+		if( libewf_common_memset(
+		     offset_table->chunk_offset,
+		     0,
+		     ( LIBEWF_CHUNK_OFFSET_SIZE * amount ) ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to clear chunk offsets.\n",
+			 function );
+
+			libewf_common_free( offset_table->chunk_offset );
+			libewf_common_free( offset_table );
+
+			return( NULL );
+		}
 	}
 	offset_table->amount = amount;
         offset_table->last   = 0;

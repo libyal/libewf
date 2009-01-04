@@ -233,13 +233,9 @@ int libewf_sector_table_add_error_sector( LIBEWF_SECTOR_TABLE *sector_table, off
 
 		return( -1 );
 	}
-	if( sector_table->error_sector == NULL )
+	if( sector_table->error_sector != NULL )
 	{
-		error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
-	}
-	else
-	{
-		/* Check if CRC error is already in list
+		/* Check if the error sector is already in the table
 		 */
 		for( iterator = 0; iterator < sector_table->amount; iterator++ )
 		{
@@ -249,6 +245,8 @@ int libewf_sector_table_add_error_sector( LIBEWF_SECTOR_TABLE *sector_table, off
 			if( ( sector >= sector_table->error_sector[ iterator ].sector )
 			 && ( sector <= last_range_sector ) )
 			{
+				/* Merge current error sector with existing
+				 */
 				last_sector = sector + amount_of_sectors;
 
 				if( last_sector > last_range_sector )
@@ -258,10 +256,13 @@ int libewf_sector_table_add_error_sector( LIBEWF_SECTOR_TABLE *sector_table, off
 				return( 1 );
 			}
 		}
-		error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
-		                sector_table->error_sector,
-		                ( LIBEWF_ERROR_SECTOR_SIZE * ( sector_table->amount + 1 ) ) );
 	}
+	/* Create a new error sector
+	 */
+	error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
+	                sector_table->error_sector,
+	                ( LIBEWF_ERROR_SECTOR_SIZE * ( sector_table->amount + 1 ) ) );
+
 	if( error_sector == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create error sectors.\n",
