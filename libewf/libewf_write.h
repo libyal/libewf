@@ -77,15 +77,18 @@ ssize_t libewf_write_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_
 
 ssize_t libewf_write_segment_file_start( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, LIBEWF_SECTION_LIST *section_list );
 ssize_t libewf_write_segment_file_chunks_section_start( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, uint32_t total_chunk_amount, uint32_t segment_chunk_amount );
-ssize_t libewf_write_segment_file_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, EWF_CHUNK *chunk_data, off_t start_offset, size_t size, uint32_t chunk );
+ssize_t libewf_write_segment_file_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc );
 ssize_t libewf_write_segment_file_chunks_section_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, LIBEWF_SECTION_LIST *section_list, off_t chunks_section_offset, size_t chunks_section_size );
 ssize_t libewf_write_segment_file_end( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SECTION_LIST *section_list, int file_descriptor, off_t start_offset, uint8_t last_segment_file );
+
+ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, EWF_CHUNK **chunk_data, size_t size, EWF_CRC *chunk_crc, int8_t *is_compressed, int8_t *write_crc );
 
 ssize_t libewf_write_segment_file_open( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number );
 ssize_t libewf_write_segment_file_close( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint8_t last_segment_file );
 
 ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, uint8_t force_write );
 
+LIBEWF_EXTERN ssize_t libewf_write_buffer_raw( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 LIBEWF_EXTERN ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset );
 

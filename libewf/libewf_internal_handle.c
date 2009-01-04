@@ -54,18 +54,14 @@
 LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, uint8_t flags )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_internal_handle_alloc";
 
-	if( ( flags != LIBEWF_OPEN_READ ) && ( flags != LIBEWF_OPEN_WRITE ) && ( flags != LIBEWF_OPEN_READ_WRITE ) )
-	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: invalid flags.\n" );
-
-		return( NULL );
-	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_SIZE );
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to allocate handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -99,12 +95,18 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 	internal_handle->ewf_format                = EWF_FORMAT_UNKNOWN;
 	internal_handle->index_build               = 0;
 	internal_handle->error_tollerance          = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
+	internal_handle->raw_access                = 0;
 
+	if( ( flags & LIBEWF_FLAG_RAW ) == LIBEWF_FLAG_RAW )
+	{
+		internal_handle->raw_access = 1;
+	}
 	internal_handle->segment_table = libewf_segment_table_alloc( segment_amount );
 
 	if( internal_handle->segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create segment table.\n",
+		 function );
 
 		libewf_common_free( internal_handle );
 
@@ -114,7 +116,8 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache.\n",
+		 function );
 
 		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_common_free( internal_handle );
@@ -125,7 +128,8 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create media subhandle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create media subhandle.\n",
+		 function );
 
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
 		libewf_segment_table_free( internal_handle->segment_table );
@@ -133,14 +137,14 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 
 		return( NULL );
 	}
-	if( ( flags == LIBEWF_OPEN_READ )
-	 || ( flags == LIBEWF_OPEN_READ_WRITE ) )
+	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		internal_handle->read = libewf_internal_handle_read_alloc();
 
 		if( internal_handle->read == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create read subhandle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create read subhandle.\n",
+			 function );
 
 			libewf_internal_handle_media_free( internal_handle->media );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
@@ -150,14 +154,14 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 			return( NULL );
 		}
 	}
-	if( ( flags == LIBEWF_OPEN_WRITE )
-	 || ( flags == LIBEWF_OPEN_READ_WRITE ) )
+	if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
 		internal_handle->write = libewf_internal_handle_write_alloc();
 
 		if( internal_handle->write == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create write subhandle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create write subhandle.\n",
+			 function );
 
 			if( internal_handle->read != NULL )
 			{
@@ -178,9 +182,12 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
  */
 void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_free";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_free: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return;
 	}
@@ -234,12 +241,14 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 LIBEWF_INTERNAL_HANDLE_MEDIA *libewf_internal_handle_media_alloc( void )
 {
 	LIBEWF_INTERNAL_HANDLE_MEDIA *handle_media = NULL;
+	static char *function                      = "libewf_internal_handle_media_alloc";
 
 	handle_media = (LIBEWF_INTERNAL_HANDLE_MEDIA *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_MEDIA_SIZE );
 
 	if( handle_media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_media_alloc: unable to allocate handle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle media.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -262,12 +271,14 @@ LIBEWF_INTERNAL_HANDLE_MEDIA *libewf_internal_handle_media_alloc( void )
 LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void )
 {
 	LIBEWF_INTERNAL_HANDLE_READ *handle_read = NULL;
+	static char *function                    = "libewf_internal_handle_read_alloc";
 
 	handle_read = (LIBEWF_INTERNAL_HANDLE_READ *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_READ_SIZE );
 
 	if( handle_read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_read_alloc: unable to allocate handle read.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle read.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -282,9 +293,12 @@ LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void )
  */
 void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read )
 {
+	static char *function = "libewf_internal_handle_read_free";
+
 	if( handle_read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_read_free: invalid handle read.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle read.\n",
+		 function );
 
 		return;
 	}
@@ -298,12 +312,14 @@ void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read 
 LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 {
 	LIBEWF_INTERNAL_HANDLE_WRITE *handle_write = NULL;
+	static char *function                      = "libewf_internal_handle_write_alloc";
 
 	handle_write = (LIBEWF_INTERNAL_HANDLE_WRITE *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_WRITE_SIZE );
 
 	if( handle_write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_handle_write_alloc: unable to allocate handle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle write.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -1329,7 +1345,9 @@ int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *
 				return( 1 );
 			}
 		}
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc( internal_handle->acquiry_error_sectors, ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->acquiry_amount_of_errors + 1 ) ) );
+		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
+		                         internal_handle->acquiry_error_sectors,
+		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->acquiry_amount_of_errors + 1 ) ) );
 	}
 	if( acquiry_error_sectors == NULL )
 	{
@@ -1353,24 +1371,28 @@ int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *
 int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk ) 
 {
 	LIBEWF_ERROR_SECTOR *crc_error_sectors = NULL;
+	static char *function                  = "libewf_internal_handle_add_crc_error_chunk";
 	uint64_t sector                        = 0;
 	uint32_t iterator                      = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_crc_error_chunk: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_crc_error_chunk: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_crc_error_chunk: invalid handle - missing subhandle read.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1391,11 +1413,14 @@ int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *inter
 				return( 1 );
 			}
 		}
-		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc( internal_handle->read->crc_error_sectors, ( internal_handle->read->crc_amount_of_errors + 1 ) );
+		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
+		                     internal_handle->read->crc_error_sectors,
+		                     ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->read->crc_amount_of_errors + 1 ) ) );
 	}
 	if( crc_error_sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_crc_error_chunk: unable to create CRC error sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create CRC error sectors.\n",
+		 function );
 
 		return( -1 );
 	}

@@ -101,8 +101,14 @@ Next release:
 
 * refactor function names into static char *
 
+Version: 20070715
+* worked on libtool DLL support
+* worked on allowing to write raw buffers as chunks
+* fixed reallocation bug in libewf_internal_handle_add_crc_error_chunk
+
 Version: 20070714
 * worked on libtool DLL support
+* worked on allowing to write raw buffers as chunks
 
 Version: 20070713
 * worked on libtool DLL support

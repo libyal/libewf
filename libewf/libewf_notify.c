@@ -57,7 +57,7 @@ void libewf_notify_set_values( FILE *stream, uint8_t verbose )
  */
 void VARARGS( libewf_verbose_print, char *, format )
 {
-#ifdef HAVE_VERBOSE_OUTPUT
+#if defined( HAVE_VERBOSE_OUTPUT )
 	va_list argument_list;
 
 	if( ( libewf_notify_stream != NULL ) && ( libewf_notify_verbose != 0 ) )

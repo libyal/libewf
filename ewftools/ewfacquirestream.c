@@ -523,7 +523,26 @@ int main( int argc, char * const argv[] )
 
 	fprintf( stdout, "Using the following acquiry parameters:\n" );
 
-	ewfcommon_acquiry_paramters_fprint( stdout, filenames[ 0 ], case_number, description, evidence_number, examiner_name, notes, media_type, volume_type, compression_level, compress_empty_block, libewf_format, acquiry_offset, acquiry_size, (uint32_t) segment_file_size, sectors_per_chunk, sector_error_granularity, read_error_retry, wipe_block_on_read_error );
+	ewfcommon_acquiry_parameters_fprint(
+	 stdout,
+	 filenames[ 0 ],
+	 case_number,
+	 description,
+	 evidence_number,
+	 examiner_name,
+	 notes,
+	 media_type,
+	 volume_type,
+	 compression_level,
+	 compress_empty_block,
+	 libewf_format,
+	 acquiry_offset,
+	 acquiry_size,
+	 (uint32_t) segment_file_size,
+	 sectors_per_chunk,
+	 sector_error_granularity,
+	 read_error_retry,
+	 wipe_block_on_read_error );
 
 	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
 

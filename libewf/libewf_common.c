@@ -175,6 +175,10 @@ int libewf_common_open( const char *filename, uint8_t flags )
 
 		return( -1 );
 	}
+	/* Ignore flags other than the read and write flags
+	 */
+	flags &= ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE );
+
 	if( flags == LIBEWF_OPEN_READ )
 	{
 #if defined( HAVE_WINDOWS_API )
@@ -235,6 +239,10 @@ int libewf_common_wide_open( const wchar_t *filename, uint8_t flags )
 
 		return( -1 );
 	}
+	/* Ignore flags other than the read and write flags
+	 */
+	flags &= ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE );
+
 	if( flags == LIBEWF_OPEN_READ )
 	{
 #if defined( HAVE_WINDOWS_API )

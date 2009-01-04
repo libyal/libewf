@@ -32,6 +32,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define TEST_RAW_WRITE
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -122,13 +124,37 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 
 	fprintf( stdout, "The following acquiry parameters were provided:\n" );
 
-	ewfcommon_acquiry_paramters_fprint( stdout, filename, case_number, description, evidence_number, examiner_name, notes, media_type, volume_type, compression_level, compress_empty_block, libewf_format, acquiry_offset, acquiry_size, segment_file_size, sectors_per_chunk, sector_error_granularity, read_error_retry, wipe_block_on_read_error );
+	ewfcommon_acquiry_parameters_fprint(
+	 stdout,
+	 filename,
+	 case_number,
+	 description,
+	 evidence_number,
+	 examiner_name,
+	 notes,
+	 media_type,
+	 volume_type,
+	 compression_level,
+	 compress_empty_block,
+	 libewf_format,
+	 acquiry_offset,
+	 acquiry_size,
+	 segment_file_size,
+	 sectors_per_chunk,
+	 sector_error_granularity,
+	 read_error_retry,
+	 wipe_block_on_read_error );
 
 	/* Ask for confirmation
 	 */
 	while( input_confirmed == -1 )
 	{
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Continue acquiry with these values" ), yes_no, 2, 0 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "Continue acquiry with these values" ),
+		              yes_no,
+		              2,
+		              0 );
 	
 		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
 		{
@@ -672,13 +698,35 @@ int main( int argc, char * const argv[] )
 	}
 	/* Check if user is content with values
 	 */
-	while( confirm_input( filename, case_number, description, evidence_number, examiner_name, notes, media_type, volume_type, compression_level, compress_empty_block, libewf_format, acquiry_offset, acquiry_size, (uint32_t) segment_file_size, sectors_per_chunk, sector_error_granularity, read_error_retry, wipe_block_on_read_error ) == 0 );
+	while( confirm_input(
+	        filename,
+	        case_number,
+	        description,
+	        evidence_number,
+	        examiner_name,
+	        notes,
+	        media_type,
+	        volume_type,
+	        compression_level,
+	        compress_empty_block,
+	        libewf_format,
+	        acquiry_offset,
+	        acquiry_size,
+	        (uint32_t) segment_file_size,
+	        sectors_per_chunk,
+	        sector_error_granularity,
+	        read_error_retry,
+	        wipe_block_on_read_error ) == 0 );
 
 	/* Done asking user input set up the libewf handle
 	 */
 	filenames[ 0 ] = filename;
 
+#if defined( TEST_RAW_WRITE )
 	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
+#else
+	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_RAW_WRITE );
+#endif
 
 	if( handle == NULL )
 	{
@@ -1047,7 +1095,17 @@ int main( int argc, char * const argv[] )
 	}
 	fprintf( stderr, "This could take a while.\n\n" );
 
-	count = ewfcommon_write_from_file_descriptor( handle, file_descriptor, acquiry_size, acquiry_offset, read_error_retry, sector_error_granularity, wipe_block_on_read_error, seek_on_error, calculate_sha1, callback );
+	count = ewfcommon_write_from_file_descriptor(
+	         handle,
+	         file_descriptor,
+	         acquiry_size,
+	         acquiry_offset,
+	         read_error_retry,
+	         sector_error_granularity,
+	         wipe_block_on_read_error,
+	         seek_on_error,
+	         calculate_sha1,
+	         callback );
 
 	/* Done acquiring data
 	 */

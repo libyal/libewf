@@ -90,12 +90,14 @@ int8_t libewf_check_file_signature( const wchar_t *filename )
 	uint8_t signature[ 8 ];
 
 	wchar_t *error_string = NULL;
+	static char *function = "libewf_check_file_signature";
 	ssize_t count         = 0;
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_check_file_signature: invalid filename.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -107,11 +109,13 @@ int8_t libewf_check_file_signature( const wchar_t *filename )
 
 		if( error_string == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to open file: %ls.\n", filename );
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+			 function, filename );
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to open file: %ls with error: %ls.\n", filename, error_string );
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
+			 function, filename, error_string );
 
 			libewf_common_free( error_string );
 		}
@@ -125,11 +129,13 @@ int8_t libewf_check_file_signature( const wchar_t *filename )
 
 		if( error_string == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to close file: %ls.\n", filename );
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls.\n",
+			 function, filename );
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to close file: %ls with error: %ls.\n", filename, error_string );
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls with error: %ls.\n",
+			 function, filename, error_string );
 
 			libewf_common_free( error_string );
 		}
@@ -137,13 +143,15 @@ int8_t libewf_check_file_signature( const wchar_t *filename )
 	}
 	if( count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_check_file_signature: error reading signature from file: %ls.\n", filename );
+		LIBEWF_WARNING_PRINT( "%s: error reading signature from file: %ls.\n",
+		 function, filename );
 
 		return( -1 );
 	}
 	else if( count != 8 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to read signature from file: %ls.\n", filename );
+		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
+		 function, filename );
 
 		return( -1 );
 	}
@@ -158,13 +166,15 @@ int8_t libewf_check_file_signature( const char *filename )
 {
 	uint8_t signature[ 8 ];
 
-	char *error_string  = NULL;
-	ssize_t count       = 0;
-	int file_descriptor = 0;
+	char *error_string    = NULL;
+	static char *function = "libewf_check_file_signature";
+	ssize_t count         = 0;
+	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_check_file_signature: invalid filename.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -176,11 +186,13 @@ int8_t libewf_check_file_signature( const char *filename )
 
 		if( error_string == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to open file: %s.\n", filename );
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+			 function, filename );
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to open file: %s with error: %s.\n", filename, error_string );
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
+			 function, filename, error_string );
 
 			libewf_common_free( error_string );
 		}
@@ -194,11 +206,13 @@ int8_t libewf_check_file_signature( const char *filename )
 
 		if( error_string == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to close file: %s.\n", filename );
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s.\n",
+			 function, filename );
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to close file: %s with error: %s.\n", filename, error_string );
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s with error: %s.\n",
+			 function, filename, error_string );
 
 			libewf_common_free( error_string );
 		}
@@ -206,13 +220,15 @@ int8_t libewf_check_file_signature( const char *filename )
 	}
 	if( count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_check_file_signature: error reading signature from file: %s.\n", filename );
+		LIBEWF_WARNING_PRINT( "%s: error reading signature from file: %s.\n",
+		 function, filename );
 
 		return( -1 );
 	}
 	else if( count != 8 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_check_file_signature: unable to read signature from file: %s.\n", filename );
+		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %s.\n",
+		 function, filename );
 
 		return( -1 );
 	}
@@ -233,11 +249,12 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	wchar_t *error_string                   = NULL;
+	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
 	uint16_t fields_segment                 = 0;
 	int file_descriptor                     = 0;
 
-	if( ( flags == LIBEWF_OPEN_READ ) || ( flags == LIBEWF_OPEN_READ_WRITE ) )
+	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		/* 1 additional entry required because
 		 * entry [ 0 ] is not used for reading
@@ -246,13 +263,15 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 		if( handle == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to create handle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( internal_handle->segment_table == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: invalid handle - missing segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( handle );
 
@@ -268,11 +287,13 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 				if( error_string == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "libewf_open: unable to open file: %s.\n", filenames[ iterator ] );
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+					 function, filenames[ iterator ] );
 				}
 				else
 				{
-					LIBEWF_WARNING_PRINT( "libewf_open: unable to open file: %s with error: %s.\n", filenames[ iterator ], error_string );
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
+					 function, filenames[ iterator ], error_string );
 
 					libewf_common_free( error_string );
 				}
@@ -282,7 +303,8 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 			}
 			if( ewf_file_header_read( &file_header, file_descriptor ) <= -1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: invalid file header in: %s.\n", filenames[ iterator ] );
+				LIBEWF_WARNING_PRINT( "%s: invalid file header in: %s.\n",
+				 function, filenames[ iterator ] );
 
 				libewf_internal_handle_free( handle );
 
@@ -290,7 +312,8 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 			}
 			if( ewf_file_header_check_signature( file_header.signature ) == 0 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: file signature does not match.\n" );
+				LIBEWF_WARNING_PRINT( "%s: file signature does not match.\n",
+				 function );
 
 				libewf_internal_handle_free( handle );
 
@@ -298,26 +321,36 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 			}
 			if( libewf_endian_convert_16bit( &fields_segment, file_header.fields_segment ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: unable to convert fields segment value.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to convert fields segment value.\n",
+				 function );
 
 				libewf_internal_handle_free( handle );
 
 				return( NULL );
 			}
-			LIBEWF_VERBOSE_PRINT( "libewf_open: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-				filenames[ iterator ], file_descriptor, fields_segment );
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, fields_segment );
 
-			if( libewf_segment_table_set_wide_filename( internal_handle->segment_table, fields_segment, filenames[ iterator ], libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+			if( libewf_segment_table_set_wide_filename(
+			     internal_handle->segment_table,
+			     fields_segment,
+			     filenames[ iterator ],
+			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: unable to set filename in segment table.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+				 function );
 
 				libewf_internal_handle_free( handle );
 
 				return( NULL );
 			}
-			if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, fields_segment, file_descriptor ) != 1 )
+			if( libewf_segment_table_set_file_descriptor(
+			     internal_handle->segment_table,
+			     fields_segment,
+			     file_descriptor ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: unable to set file descriptor in segment table.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
+				 function );
 
 				libewf_internal_handle_free( handle );
 
@@ -326,14 +359,15 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 		}
 		if( libewf_read_build_index( handle ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to create index.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create index.\n",
+			 function );
 
 			libewf_internal_handle_free( handle );
 
 			return( NULL );
 		}
 	}
-	else if( flags == LIBEWF_OPEN_WRITE )
+	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
 		/* Allocate 2 entries
 		 * entry [ 0 ] is used for the base filename
@@ -342,21 +376,28 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 		if( handle == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to create handle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( internal_handle->segment_table == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: invalid handle - missing segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( handle );
 
 			return( NULL );
 		}
-		if( libewf_segment_table_set_wide_filename( internal_handle->segment_table, 0, filenames[ iterator ], libewf_common_wide_string_length( filenames[ iterator ] ) ) != 1 )
+		if( libewf_segment_table_set_wide_filename(
+		     internal_handle->segment_table,
+		     0,
+		     filenames[ iterator ],
+		     libewf_common_wide_string_length( filenames[ iterator ] ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to set filename in segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( handle );
 
@@ -364,7 +405,8 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 		}
 		if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, 0, -1 ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to set file descriptor in segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( handle );
 
@@ -373,11 +415,13 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_open: unsupported flags.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
+		 function );
 
 		return( NULL );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_open: open successful.\n" );
+	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
+	 function );
 
 	return( (LIBEWF_HANDLE *) handle );
 }
@@ -394,11 +438,12 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	char *error_string                      = NULL;
+	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
 	uint16_t fields_segment                 = 0;
 	int file_descriptor                     = 0;
 
-	if( ( flags == LIBEWF_OPEN_READ ) || ( flags == LIBEWF_OPEN_READ_WRITE ) )
+	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		/* 1 additional entry required because
 		 * entry [ 0 ] is not used for reading
@@ -407,13 +452,15 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 		if( internal_handle == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to create handle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( internal_handle->segment_table == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: invalid handle - missing segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
@@ -429,11 +476,13 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 				if( error_string == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "libewf_open: unable to open file: %s.\n", filenames[ iterator ] );
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+					 function, filenames[ iterator ] );
 				}
 				else
 				{
-					LIBEWF_WARNING_PRINT( "libewf_open: unable to open file: %s with error: %s.\n", filenames[ iterator ], error_string );
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
+					 function, filenames[ iterator ], error_string );
 
 					libewf_common_free( error_string );
 				}
@@ -443,7 +492,8 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 			}
 			if( ewf_file_header_read( &file_header, file_descriptor ) <= -1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: invalid file header in: %s.\n", filenames[ iterator ] );
+				LIBEWF_WARNING_PRINT( "%s: invalid file header in: %s.\n",
+				 function, filenames[ iterator ] );
 
 				libewf_internal_handle_free( internal_handle );
 
@@ -451,7 +501,8 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 			}
 			if( ewf_file_header_check_signature( file_header.signature ) == 0 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: file signature does not match.\n" );
+				LIBEWF_WARNING_PRINT( "%s: file signature does not match.\n",
+				 function );
 
 				libewf_internal_handle_free( internal_handle );
 
@@ -459,18 +510,24 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 			}
 			if( libewf_endian_convert_16bit( &fields_segment, file_header.fields_segment ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: unable to convert fields segment value.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to convert fields segment value.\n",
+				 function );
 
 				libewf_internal_handle_free( internal_handle );
 
 				return( NULL );
 			}
-			LIBEWF_VERBOSE_PRINT( "libewf_open: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-				filenames[ iterator ], file_descriptor, fields_segment );
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, fields_segment );
 
-			if( libewf_segment_table_set_filename( internal_handle->segment_table, fields_segment, filenames[ iterator ], libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+			if( libewf_segment_table_set_filename(
+			     internal_handle->segment_table,
+			     fields_segment,
+			     filenames[ iterator ],
+			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: unable to set filename in segment table.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+				 function );
 
 				libewf_internal_handle_free( internal_handle );
 
@@ -478,7 +535,8 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 			}
 			if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, fields_segment, file_descriptor ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_open: unable to set file descriptor in segment table.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
+				 function );
 
 				libewf_internal_handle_free( internal_handle );
 
@@ -487,14 +545,15 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 		}
 		if( libewf_read_build_index( internal_handle ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to create index.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create index.\n",
+			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
 			return( NULL );
 		}
 	}
-	else if( flags == LIBEWF_OPEN_WRITE )
+	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
 		/* Allocate 2 entries
 		 * entry [ 0 ] is used for the base filename
@@ -503,21 +562,28 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 		if( internal_handle == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to create handle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( internal_handle->segment_table == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: invalid handle - missing segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
 			return( NULL );
 		}
-		if( libewf_segment_table_set_filename( internal_handle->segment_table, 0, filenames[ iterator ], libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+		if( libewf_segment_table_set_filename(
+		     internal_handle->segment_table,
+		     0,
+		     filenames[ iterator ],
+		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to set filename in segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
@@ -525,7 +591,8 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 		}
 		if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, 0, -1 ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_open: unable to set file descriptor in segment table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
+			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
@@ -534,11 +601,13 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_open: unsupported flags.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
+		 function );
 
 		return( NULL );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_open: open successful.\n" );
+	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
+	 function );
 
 	return( (LIBEWF_HANDLE *) internal_handle );
 }
@@ -555,12 +624,14 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
 #else
 	char *filename                          = NULL;
 #endif
+	static char *function                   = "libewf_close";
 	uint16_t iterator                       = 0;
 	int8_t result                           = 0;
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_close: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -568,7 +639,8 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
 /*
 	if( ( internal_handle->write != NULL ) && ( internal_handle->write->write_finalized == 0 ) )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_close: write has not been finalized.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: write has not been finalized.\n",
+		 function );
 
 		libewf_write_finalize( handle );
 	}
@@ -587,17 +659,17 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
 
 				if( filename == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "libewf_close: unable to close segment file: %" PRIu32 ".\n",
-						iterator );
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu32 ".\n",
+					 function, iterator );
 				}
 				else
 				{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "libewf_close: unable to close segment file: %" PRIu32 " (%ls).\n",
-						iterator, filename );
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu32 " (%ls).\n",
+					 function, iterator, filename );
 #else
-					LIBEWF_WARNING_PRINT( "libewf_close: unable to close segment file: %" PRIu32 " (%s).\n",
-						iterator, filename );
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu32 " (%s).\n",
+					 function, iterator, filename );
 #endif
 				}
 				result = -1;
@@ -614,43 +686,50 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
  */
 off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk )
 {
+	static char *function   = "libewf_seek_chunk";
 	off_t offset            = 0;
 	uint16_t segment_number = 0;
 	int file_descriptor     = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: invalid handle - missing segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: invalid handle - missing offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: invalid handle - missing chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->index_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: index was not build.\n" );
+		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( chunk >= internal_handle->offset_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: chunk: %" PRIu32 " not in offset table.\n", chunk );
+		LIBEWF_WARNING_PRINT( "%s: chunk: %" PRIu32 " not in offset table.\n",
+		 function, chunk );
 
 		return( -1 );
 	}
@@ -658,12 +737,13 @@ off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk
 	offset          = internal_handle->offset_table->offset[ chunk ];
 	segment_number  = internal_handle->offset_table->segment_number[ chunk ];
 
-	LIBEWF_VERBOSE_PRINT( "libewf_seek_chunk: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
-	                      file_descriptor, segment_number, offset );
+	LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
+	 function, file_descriptor, segment_number, offset );
 
 	if( offset > (off_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_chunk: invalid chunk offset only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -671,7 +751,8 @@ off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk
 	{
 		if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_seek_chunk: cannot find offset: %jd.\n", offset );
+			LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
+			 function, offset );
 
 			return( -1 );
 		}
@@ -689,12 +770,14 @@ off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk
 off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_seek_offset";
 	uint32_t chunk                          = 0;
 	uint32_t chunk_offset                   = 0;
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -702,37 +785,43 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: invalid handle - missing offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: invalid handle - missing chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->index_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: index was not build.\n" );
+		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( offset <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: invalid offset value cannot be negative.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset value cannot be negative.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( offset >= (off_t) internal_handle->media->media_size )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: attempting to read past the end of the file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: attempting to read past the end of the file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -742,7 +831,8 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 
 	if( libewf_seek_chunk( internal_handle, chunk ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_seek_offset: unable to seek chunk offset.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -949,13 +1039,15 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	uint8_t *data                           = NULL;
+	static char *function                   = "libewf_calculate_md5_hash";
 	off_t offset                            = 0;
 	ssize_t count                           = 0;
 	uint32_t iterator                       = 0;
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%S: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -963,25 +1055,29 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( string == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_calculate_md5_hash: invalid string.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( length < LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_calculate_md5_hash: string too small.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: string too small.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->index_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: index was not build.\n" );
+		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -991,7 +1087,8 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 
 		if( data == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: unable to allocate data.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -1002,7 +1099,8 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 
 			if( count == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: unable to read chunk.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to read chunk.\n",
+				 function );
 
 				libewf_common_free( data );
 
@@ -1010,7 +1108,8 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 			}
 			if( count > (ssize_t) INT32_MAX )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: invalid count - only values below 2^32 supported.\n" );
+				LIBEWF_WARNING_PRINT( "%s: invalid count - only values below 2^32 supported.\n",
+				 function );
 
 				libewf_common_free( data );
 
@@ -1021,11 +1120,13 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 	}
 	else
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_calculate_md5_hash: MD5 hash already calculated.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: MD5 hash already calculated.\n",
+		 function );
 	}
 	if( libewf_string_copy_from_digest_hash( string, length, internal_handle->calculated_md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_calculate_md5_hash: unable to set MD5 hash string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1038,11 +1139,13 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_stored_md5_hash";
 	int8_t result                           = 0;
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_get_stored_md5_hash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1050,7 +1153,8 @@ int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, s
 
 	if( internal_handle->stored_md5_hash == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_get_stored_md5_hash: MD5 hash was not set.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: MD5 hash was not set.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -1058,7 +1162,8 @@ int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, s
 
 	if( result == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_get_stored_md5_hash: unable to create MD5 hash string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash string.\n",
+		 function );
 	}
 	return( result );
 }
@@ -1069,11 +1174,13 @@ int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, s
 int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_calculated_md5_hash";
 	int8_t result                           = 0;
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_get_calculated_md5_hash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1083,7 +1190,8 @@ int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *strin
 
 	if( result == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_get_calculated_md5_hash: unable to create MD5 hash string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash string.\n",
+		 function );
 	}
 	return( result );
 }
@@ -1096,10 +1204,12 @@ int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 {
 	LIBEWF_HEADER_VALUES *header_values     = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_parse_header_values";
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_parse_header_values: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1119,13 +1229,15 @@ int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 	}
 	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_parse_header_values: unable to parse header(s) for values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to parse header(s) for values.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->header_values != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_parse_header_values: header values already set in handle - cleaning up previous ones.\n" );
+		LIBEWF_WARNING_PRINT( "%s: header values already set in handle - cleaning up previous ones.\n",
+		 function );
 
 		libewf_header_values_free( internal_handle->header_values );
 	}
@@ -1150,10 +1262,12 @@ int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_HASH_VALUES *hash_values         = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_parse_hash_values";
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_parse_hash_values: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1165,13 +1279,15 @@ int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 	}
 	if( hash_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_parse_hash_values: unable to parse xhash for values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to parse xhash for values.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->hash_values != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_parse_hash_values: hash values already set in handle - cleaning up previous ones.\n" );
+		LIBEWF_WARNING_PRINT( "%s: hash values already set in handle - cleaning up previous ones.\n",
+		 function );
 
 		libewf_hash_values_free( internal_handle->hash_values );
 	}
