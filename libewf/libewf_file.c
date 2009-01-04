@@ -2203,6 +2203,9 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
+fprintf( stderr, "Cp2: %" PRIu32 ", %" PRIu64 ", %" PRIu32 "\n",
+ internal_handle->read->crc_amount_of_errors, sector, amount_of_sectors );
+
 	if( internal_handle->media == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",

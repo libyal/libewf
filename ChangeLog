@@ -162,6 +162,7 @@ Version: 20071028
 * worked on read wipe chunk on error
 * fixed miscalculation for CRC error in last chunk in read
 * added function to API to add CRC errors
+* fixed wrong function calls in ewfoutput_crc_errors_fprint
 
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions

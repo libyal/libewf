@@ -747,7 +747,9 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		              (size_t) raw_read_count,
 		              data,
 		              &uncompressed_size,
-		              is_compressed );
+		              is_compressed,
+		              chunk_crc,
+		              read_crc );
 
 		if( read_count <= -1 )
 		{

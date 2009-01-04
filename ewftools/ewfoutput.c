@@ -572,7 +572,7 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	if( libewf_get_amount_of_acquiry_errors( handle, &amount_of_errors ) == -1 )
+	if( libewf_get_amount_of_crc_errors( handle, &amount_of_errors ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
 		 function );
@@ -586,7 +586,7 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
-			if( libewf_get_acquiry_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
+			if( libewf_get_crc_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
 				 function, iterator );

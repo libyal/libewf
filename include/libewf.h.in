@@ -97,7 +97,7 @@ LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset 
  * The buffer size cannot be larger than the chunk size
  * Returns the resulting chunk size, or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed );
+LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, uint32_t chunk_crc, int8_t read_crc );
 
 /* Reads 'raw' data from the curent offset into a buffer
  * size contains the size of the buffer
@@ -732,7 +732,7 @@ LIBEWF_EXTERN int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t secto
 /* Add a CRC error
  * Returns 1 if successful, or -1 on error
  */
-LIBEWF_EXTERN int libewf_add_chunk_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
+LIBEWF_EXTERN int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
 
 /* Copies the header values from the source to the destination handle
  * Returns 1 if successful, or -1 on error
