@@ -47,12 +47,21 @@
  */
 ssize_t ewf_table_read( EWF_TABLE *table, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_TABLE_SIZE;
+	static char *function = "ewf_table_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_TABLE_SIZE;
 
 	if( table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_read: invalid table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -60,7 +69,8 @@ ssize_t ewf_table_read( EWF_TABLE *table, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_read: unable to read table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read table.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -72,12 +82,21 @@ ssize_t ewf_table_read( EWF_TABLE *table, int file_descriptor )
  */
 ssize_t ewf_table_offsets_read( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_TABLE_OFFSET_SIZE * amount;
+	static char *function = "ewf_table_offsets_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_TABLE_OFFSET_SIZE * amount;
 
 	if( offsets == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_offsets_read: invalid table offsets.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid table offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -85,7 +104,8 @@ ssize_t ewf_table_offsets_read( EWF_TABLE_OFFSET *offsets, int file_descriptor, 
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_offsets_read: unable to read offsets.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read offsets.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -97,25 +117,36 @@ ssize_t ewf_table_offsets_read( EWF_TABLE_OFFSET *offsets, int file_descriptor, 
  */
 ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
 {
-	EWF_CRC crc   = 0;
-	ssize_t count = 0;
-	size_t size   = EWF_TABLE_SIZE;
+	static char *function = "ewf_table_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	size_t size           = EWF_TABLE_SIZE;
 
 	if( table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_write: invalid table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) table, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( crc, table->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -123,7 +154,8 @@ ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_write: error writing table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error writing table.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -135,14 +167,23 @@ ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
  */
 ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount, uint8_t write_crc )
 {
-	EWF_CRC crc       = 0;
-	ssize_t count     = 0;
-	ssize_t crc_count = 0;
-	size_t size       = EWF_TABLE_OFFSET_SIZE * amount;
+	static char *function = "ewf_table_offsets_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	ssize_t crc_count     = 0;
+	size_t size           = EWF_TABLE_OFFSET_SIZE * amount;
 
 	if( offsets == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_offsets_write: invalid offsets.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -150,7 +191,8 @@ ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor,
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_table_offsets_write: unable to write table offsets.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write table offsets.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -158,7 +200,8 @@ ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor,
 	{
 		if( ewf_crc_calculate( &crc, (uint8_t *) offsets, size, 1 ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewf_table_offsets_write: unable to calculate CRC.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -166,7 +209,8 @@ ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor,
 
 		if( crc_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewf_table_offsets_write: unable to write CRC.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to write CRC.\n",
+			 function );
 
 			return( -1 );
 		}

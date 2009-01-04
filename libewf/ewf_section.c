@@ -48,12 +48,21 @@
  */
 ssize_t ewf_section_read( EWF_SECTION *section, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_SECTION_SIZE;
+	static char *function = "ewf_section_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_SECTION_SIZE;
 
 	if( section == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_section_read: invalid section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid section.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -61,7 +70,8 @@ ssize_t ewf_section_read( EWF_SECTION *section, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_section_read: unable to read section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read section.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -73,25 +83,36 @@ ssize_t ewf_section_read( EWF_SECTION *section, int file_descriptor )
  */
 ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 {
-	EWF_CRC crc   = 0;
-	ssize_t count = 0;
-	size_t size   = EWF_SECTION_SIZE;
+	static char *function = "ewf_section_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	size_t size           = EWF_SECTION_SIZE;
 
 	if( section == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_section_write: invalid section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid section.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) section, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_section_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( crc, section->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_section_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -99,7 +120,8 @@ ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_section_write: unable to write section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -109,12 +131,12 @@ ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 /* Test if section is of a certain type
  * Returns 1 if successful, 0 otherwise
  */
-uint8_t ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type )
+int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type )
 {
-	/* Make sure to include \0 byte in the size
+	/* Make sure to include \0 byte in the size for memcmp
 	 */
 	size_t size = ewf_string_length( type ) + 1;
 
-	return( (uint8_t)( ewf_string_compare( section->type, type, size ) == 0 ) );
+	return( (int) ( ewf_string_compare( section->type, type, size ) == 0 ) );
 }
 

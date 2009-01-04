@@ -1,4 +1,4 @@
-.Dd Juny 21, 2007
+.Dd July 22, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -27,7 +27,7 @@
 .Ft ssize_t
 .Fn libewf_raw_write_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
 .Ft ssize_t
-.Fn libewf_raw_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t uncompressed_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
+.Fn libewf_raw_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
 .Ft ssize_t
 .Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
 .Ft int8_t

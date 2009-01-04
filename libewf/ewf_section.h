@@ -78,7 +78,7 @@ struct ewf_section
 ssize_t ewf_section_read( EWF_SECTION *section, int file_descriptor );
 ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor );
 
-uint8_t ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );
+int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );
 
 #define ewf_section_is_type_header( section ) \
 	ewf_section_is_type( section, (EWF_CHAR *) "header" )

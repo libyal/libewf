@@ -46,12 +46,21 @@
  */
 ssize_t ewf_ltree_read( EWF_LTREE *ltree, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_LTREE_SIZE;
+	static char *function = "ewf_ltree_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_LTREE_SIZE;
 
 	if( ltree == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_ltree_read: invalid ltree.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid ltree.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -59,7 +68,8 @@ ssize_t ewf_ltree_read( EWF_LTREE *ltree, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_ltree_read: unable to read ltree.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read ltree.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -71,12 +81,21 @@ ssize_t ewf_ltree_read( EWF_LTREE *ltree, int file_descriptor )
  */
 ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_LTREE_SIZE;
+	static char *function = "ewf_ltree_write";
+	ssize_t count         = 0;
+	size_t size           = EWF_LTREE_SIZE;
 
 	if( ltree == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_ltree_write: invalid ltree.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: invalid ltree.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}

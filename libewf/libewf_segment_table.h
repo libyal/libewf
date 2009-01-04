@@ -95,8 +95,6 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
 void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
 
-uint8_t libewf_segment_table_values_is_set( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment );
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment );
 #else

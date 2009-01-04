@@ -156,7 +156,7 @@ struct ewf_volume
 
 ssize_t ewf_volume_read( EWF_VOLUME *volume, int file_descriptor );
 ssize_t ewf_volume_write( EWF_VOLUME *volume, int file_descriptor );
-int32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume );
+ssize32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume );
 
 #ifdef __cplusplus
 }

@@ -50,12 +50,21 @@ ssize_t ewf_crc_read( EWF_CRC *crc, int file_descriptor )
 {
 	uint8_t buffer[ 4 ];
 
-	ssize_t count = 0;
-	size_t size   = EWF_CRC_SIZE;
+	static char *function = "ewf_crc_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_CRC_SIZE;
 
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_read: invalid CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid CRC.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -63,13 +72,15 @@ ssize_t ewf_crc_read( EWF_CRC *crc, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_read: unable to read CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_convert_32bit( crc, buffer ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_read: unable to convert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -83,18 +94,28 @@ ssize_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
 {
 	uint8_t buffer[ 4 ];
 
-	ssize_t count = 0;
-	size_t size   = EWF_CRC_SIZE;
+	static char *function = "ewf_crc_write";
+	ssize_t count         = 0;
+	size_t size           = EWF_CRC_SIZE;
 
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_write: invalid CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid CRC.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( *crc, buffer ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -102,7 +123,8 @@ ssize_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_write: error writing CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error writing CRC.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -115,23 +137,28 @@ ssize_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
  *
  * The original algorithm was taken from the ASR data web site
  */
-int8_t ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key )
+int ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key )
 {
+	static char *function = "ewf_crc_calculate";
+
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_calculate: invalid CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_calculate: invalid buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_calculate: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}

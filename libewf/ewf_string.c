@@ -217,6 +217,13 @@ ssize_t ewf_string_read_to_buffer( EWF_CHAR *string, int file_descriptor, size_t
 
 		return( -1 );
 	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
 	size *= EWF_CHAR_SIZE;
 
 	if( size > (size_t) SSIZE_MAX )
@@ -249,6 +256,13 @@ ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, siz
 	if( string == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );

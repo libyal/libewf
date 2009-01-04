@@ -50,7 +50,7 @@ typedef uint32_t ewf_crc_t;
 
 ssize_t ewf_crc_read( EWF_CRC *crc, int file_descriptor );
 ssize_t ewf_crc_write( EWF_CRC *crc, int file_descriptor );
-int8_t ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key );
+int ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key );
 
 #ifdef __cplusplus
 }

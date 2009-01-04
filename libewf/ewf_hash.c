@@ -45,12 +45,21 @@
  */
 ssize_t ewf_hash_read( EWF_HASH *hash, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_HASH_SIZE;
+	static char *function = "ewf_hash_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_HASH_SIZE;
 
 	if( hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_hash_read: unable to create hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -58,7 +67,8 @@ ssize_t ewf_hash_read( EWF_HASH *hash, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_hash_read: unable to read hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read hash.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -70,25 +80,36 @@ ssize_t ewf_hash_read( EWF_HASH *hash, int file_descriptor )
  */
 ssize_t ewf_hash_write( EWF_HASH *hash, int file_descriptor )
 {
-	EWF_CRC crc   = 0;
-	ssize_t count = 0;
-	size_t size   = EWF_HASH_SIZE;
+	static char *function = "ewf_hash_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	size_t size           = EWF_HASH_SIZE;
 
 	if( hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_hash_write: invalid hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) hash, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_hash_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( crc, hash->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_hash_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -96,7 +117,8 @@ ssize_t ewf_hash_write( EWF_HASH *hash, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_hash_write: unable to write hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write hash.\n",
+		 function );
 
 		return( -1 );
 	}

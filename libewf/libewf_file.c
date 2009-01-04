@@ -48,6 +48,7 @@
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
 #include "libewf_section_list.h"
+#include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_string.h"
 #include "libewf_write.h"
@@ -75,12 +76,10 @@ const LIBEWF_CHAR *libewf_get_version( void )
  */
 int libewf_check_file_signature( const wchar_t *filename )
 {
-	uint8_t signature[ 8 ];
-
 	wchar_t *error_string = NULL;
 	static char *function = "libewf_check_file_signature";
-	ssize_t count         = 0;
 	int file_descriptor   = 0;
+	int result            = 0;
 
 	if( filename == NULL )
 	{
@@ -109,7 +108,7 @@ int libewf_check_file_signature( const wchar_t *filename )
 		}
 		return( -1 );
 	}
-	count = libewf_common_read( file_descriptor, signature, 8 );
+	result = libewf_segment_file_check_file_signature( file_descriptor );
 
 	if( libewf_common_close( file_descriptor ) != 0 )
 	{
@@ -129,21 +128,14 @@ int libewf_check_file_signature( const wchar_t *filename )
 		}
 		return( -1 );
 	}
-	if( count <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: error reading signature from file: %ls.\n",
-		 function, filename );
-
-		return( -1 );
-	}
-	else if( count != 8 )
+	if( result <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
 		 function, filename );
 
 		return( -1 );
 	}
-	return( ewf_file_header_check_signature( signature ) );
+	return( result );
 }
 #else
 
@@ -152,12 +144,10 @@ int libewf_check_file_signature( const wchar_t *filename )
  */
 int libewf_check_file_signature( const char *filename )
 {
-	uint8_t signature[ 8 ];
-
 	char *error_string    = NULL;
 	static char *function = "libewf_check_file_signature";
-	ssize_t count         = 0;
 	int file_descriptor   = 0;
+	int result            = 0;
 
 	if( filename == NULL )
 	{
@@ -186,7 +176,7 @@ int libewf_check_file_signature( const char *filename )
 		}
 		return( -1 );
 	}
-	count = libewf_common_read( file_descriptor, signature, 8 );
+	result = libewf_segment_file_check_file_signature( file_descriptor );
 
 	if( libewf_common_close( file_descriptor ) != 0 )
 	{
@@ -206,21 +196,14 @@ int libewf_check_file_signature( const char *filename )
 		}
 		return( -1 );
 	}
-	if( count <= -1 )
+	if( result <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: error reading signature from file: %s.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
 		 function, filename );
 
 		return( -1 );
 	}
-	else if( count != 8 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %s.\n",
-		 function, filename );
-
-		return( -1 );
-	}
-	return( ewf_file_header_check_signature( signature ) );
+	return( result );
 }
 #endif
 
@@ -239,7 +222,7 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 	wchar_t *error_string                   = NULL;
 	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
-	uint16_t fields_segment                 = 0;
+	uint16_t segment_number                 = 0;
 	int file_descriptor                     = 0;
 
 	if( file_amount < 1 )
@@ -282,12 +265,12 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 				if( error_string == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
 					 function, filenames[ iterator ] );
 				}
 				else
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %s.\n",
 					 function, filenames[ iterator ], error_string );
 
 					libewf_common_free( error_string );
@@ -296,39 +279,21 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 				return( NULL );
 			}
-			if( ewf_file_header_read( &file_header, file_descriptor ) <= -1 )
+			if( libewf_segment_file_read_file_header( file_descriptor, &segment_number ) <= -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: invalid file header in: %s.\n",
+				LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %ls.\n",
 				 function, filenames[ iterator ] );
 
-				libewf_internal_handle_free( handle );
+				libewf_internal_handle_free( internal_handle );
 
 				return( NULL );
 			}
-			if( ewf_file_header_check_signature( file_header.signature ) == 0 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: file signature does not match.\n",
-				 function );
-
-				libewf_internal_handle_free( handle );
-
-				return( NULL );
-			}
-			if( libewf_endian_convert_16bit( &fields_segment, file_header.fields_segment ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to convert fields segment value.\n",
-				 function );
-
-				libewf_internal_handle_free( handle );
-
-				return( NULL );
-			}
-			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, filenames[ iterator ], file_descriptor, fields_segment );
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
 
 			if( libewf_segment_table_set_wide_filename(
 			     internal_handle->segment_table,
-			     fields_segment,
+			     segment_number,
 			     filenames[ iterator ],
 			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 			{
@@ -341,7 +306,7 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 			}
 			if( libewf_segment_table_set_file_descriptor(
 			     internal_handle->segment_table,
-			     fields_segment,
+			     segment_number,
 			     file_descriptor ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
@@ -429,13 +394,11 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
  */
 LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags )
 {
-	EWF_FILE_HEADER file_header;
-
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	char *error_string                      = NULL;
 	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
-	uint16_t fields_segment                 = 0;
+	uint16_t segment_number                 = 0;
 	int file_descriptor                     = 0;
 
 	if( file_amount < 1 )
@@ -492,39 +455,21 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 				return( NULL );
 			}
-			if( ewf_file_header_read( &file_header, file_descriptor ) <= -1 )
+			if( libewf_segment_file_read_file_header( file_descriptor, &segment_number ) <= -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: invalid file header in: %s.\n",
+				LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %s.\n",
 				 function, filenames[ iterator ] );
 
 				libewf_internal_handle_free( internal_handle );
 
 				return( NULL );
 			}
-			if( ewf_file_header_check_signature( file_header.signature ) == 0 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: file signature does not match.\n",
-				 function );
-
-				libewf_internal_handle_free( internal_handle );
-
-				return( NULL );
-			}
-			if( libewf_endian_convert_16bit( &fields_segment, file_header.fields_segment ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to convert fields segment value.\n",
-				 function );
-
-				libewf_internal_handle_free( internal_handle );
-
-				return( NULL );
-			}
 			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, filenames[ iterator ], file_descriptor, fields_segment );
+			 function, filenames[ iterator ], file_descriptor, segment_number );
 
 			if( libewf_segment_table_set_filename(
 			     internal_handle->segment_table,
-			     fields_segment,
+			     segment_number,
 			     filenames[ iterator ],
 			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 			{
@@ -535,7 +480,7 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 				return( NULL );
 			}
-			if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, fields_segment, file_descriptor ) != 1 )
+			if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, segment_number, file_descriptor ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
 				 function );
@@ -1211,7 +1156,7 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
 		 function );
 	}
-	return( result );
+	return( (int8_t) result );
 }
 
 /* Creates a printable string of the stored md5 hash

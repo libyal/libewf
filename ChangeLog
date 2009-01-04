@@ -104,6 +104,7 @@ Next release:
 * add maximum check to set functions in internal handle
 * rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle
+* move any access to segment table in file, write and read to segment_file
 
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?

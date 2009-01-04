@@ -46,12 +46,21 @@
  */
 ssize_t ewf_data_read( EWF_DATA *data, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_DATA_SIZE;
+	static char *function = "ewf_data_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_DATA_SIZE;
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_data_read: invalid data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -59,7 +68,8 @@ ssize_t ewf_data_read( EWF_DATA *data, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_data_read: unable to read data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read data.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -71,25 +81,36 @@ ssize_t ewf_data_read( EWF_DATA *data, int file_descriptor )
  */
 ssize_t ewf_data_write( EWF_DATA *data, int file_descriptor )
 {
-	EWF_CRC crc   = 0;
-	ssize_t count = 0;
-	size_t size   = EWF_DATA_SIZE;
+	static char *function = "ewf_data_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	size_t size           = EWF_DATA_SIZE;
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_data_write: invalid data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) data, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_data_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( crc, data->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_data_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -97,7 +118,8 @@ ssize_t ewf_data_write( EWF_DATA *data, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_data_write: unable to write data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write data.\n",
+		 function );
 
 		return( -1 );
 	}

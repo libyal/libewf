@@ -2356,16 +2356,22 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			return( -1 );
 		}
 #endif
+
 		if( calculate_sha1 == 1 )
 		{
+/* MSVS C++ does not allow pre compiler macro in macro defintions
+ */
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			ewfsha1_update(
 			 &sha1_context,
-#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			 data,
-#else
-			 ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data,
-#endif
 			 read_count );
+#else
+			ewfsha1_update(
+			 &sha1_context,
+			 ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data,
+			 read_count );
+#endif
 		}
 		if( ( write_size != 0 )
 		 && ( ( total_write_count + read_count ) == (int64_t) write_size ) )
@@ -2453,20 +2459,6 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 		               is_compressed,
 		               chunk_crc,
 		               write_crc );
-
-		if( write_count != raw_write_count )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
-			 function );
-
-#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( compressed_data );
-#endif
-#endif
-			return( -1 );
-		}
 #else
 		write_count = libewf_write_buffer(
 		               handle,
@@ -2477,6 +2469,7 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 #endif
 		               read_count );
 
+#endif
 		if( write_count != read_count )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
@@ -2490,7 +2483,6 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 #endif
 			return( -1 );
 		}
-#endif
 		total_write_count += read_count;
 
 		/* Callback for status update

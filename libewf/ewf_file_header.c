@@ -44,11 +44,14 @@ const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF,
 /* Validates the EWF file signature (EWF-E01, EWF-S01, EWF-L01)
  * Returns 1 if the signature matches, 0 otherwise
  */
-uint8_t ewf_file_header_check_signature( uint8_t *signature )
+int ewf_file_header_check_signature( uint8_t *signature )
 {
+	static char *function = "ewf_file_header_check_signature";
+
 	if( signature == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_file_header_check_signature: invalid signature.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid signature.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -70,12 +73,21 @@ uint8_t ewf_file_header_check_signature( uint8_t *signature )
  */
 ssize_t ewf_file_header_read( EWF_FILE_HEADER *file_header, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_FILE_HEADER_SIZE;
+	static char *function = "ewf_file_header_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_FILE_HEADER_SIZE;
 
 	if( file_header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_file_header_read: invalid file header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid file header.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -83,7 +95,8 @@ ssize_t ewf_file_header_read( EWF_FILE_HEADER *file_header, int file_descriptor 
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_file_header_read: unable to read file header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read file header.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -95,12 +108,21 @@ ssize_t ewf_file_header_read( EWF_FILE_HEADER *file_header, int file_descriptor 
  */
 ssize_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_FILE_HEADER_SIZE;
+	static char *function = "ewf_file_header_write";
+	ssize_t count         = 0;
+	size_t size           = EWF_FILE_HEADER_SIZE;
 
 	if( file_header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_file_header_write: invalid file header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid file header.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -108,7 +130,8 @@ ssize_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_file_header_write: error writing file header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error writing file header.\n",
+		 function );
 
 		return( -1 );
 	}

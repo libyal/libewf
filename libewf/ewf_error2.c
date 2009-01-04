@@ -45,12 +45,21 @@
  */
 ssize_t ewf_error2_read( EWF_ERROR2 *error2, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_ERROR2_SIZE;
+	static char *function = "ewf_error2_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_ERROR2_SIZE;
 
 	if( error2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_read: invalid error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid error2.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -58,7 +67,8 @@ ssize_t ewf_error2_read( EWF_ERROR2 *error2, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_read: unable to read error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read error2.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -70,18 +80,28 @@ ssize_t ewf_error2_read( EWF_ERROR2 *error2, int file_descriptor )
  */
 ssize_t ewf_error2_sectors_read( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_ERROR2_SECTOR_SIZE * amount;
+	static char *function = "ewf_error2_sectors_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_ERROR2_SECTOR_SIZE * amount;
 
 	if( sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_read: invalid error2 sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid error2 sectors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_read: invalid amount exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -89,7 +109,8 @@ ssize_t ewf_error2_sectors_read( EWF_ERROR2_SECTOR *sectors, int file_descriptor
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_read: unable to read error2 sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read error2 sectors.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -101,25 +122,36 @@ ssize_t ewf_error2_sectors_read( EWF_ERROR2_SECTOR *sectors, int file_descriptor
  */
 ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 {
-	EWF_CRC crc   = 0;
-	ssize_t count = 0;
-	size_t size   = EWF_ERROR2_SIZE;
+	static char *function = "ewf_error2_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	size_t size           = EWF_ERROR2_SIZE;
 
 	if( error2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_write: invalid error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid error2.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) error2, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( crc, error2->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -127,7 +159,8 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_write: unable to write error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write error2.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -139,20 +172,30 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
  */
 ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount )
 {
-	EWF_CRC crc       = 0;
-	ssize_t count     = 0;
-	ssize_t crc_count = 0;
-	size_t size       = EWF_ERROR2_SECTOR_SIZE * amount;
+	static char *function = "ewf_error2_sectors_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	ssize_t crc_count     = 0;
+	size_t size           = EWF_ERROR2_SECTOR_SIZE * amount;
 
 	if( sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: invalid sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: invalid amount exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -160,13 +203,15 @@ ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descripto
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: unable write error2 sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable write error2 sectors.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) sectors, size, 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -174,7 +219,8 @@ ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descripto
 
 	if( crc_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: unable to write CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write CRC.\n",
+		 function );
 
 		return( -1 );
 	}

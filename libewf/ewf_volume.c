@@ -46,12 +46,21 @@
  */
 ssize_t ewf_volume_read( EWF_VOLUME *volume, int file_descriptor )
 {
-	ssize_t count = 0;
-	size_t size   = EWF_VOLUME_SIZE;
+	static char *function = "ewf_volume_read";
+	ssize_t count         = 0;
+	size_t size           = EWF_VOLUME_SIZE;
 
 	if( volume == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_read: invalid volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid volume.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -59,7 +68,8 @@ ssize_t ewf_volume_read( EWF_VOLUME *volume, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_read: unable to read volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read volume.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -71,25 +81,36 @@ ssize_t ewf_volume_read( EWF_VOLUME *volume, int file_descriptor )
  */
 ssize_t ewf_volume_write( EWF_VOLUME *volume, int file_descriptor )
 {
-	EWF_CRC crc   = 0;
-	ssize_t count = 0;
-	size_t size   = EWF_VOLUME_SIZE;
+	static char *function = "ewf_volume_write";
+	EWF_CRC crc           = 0;
+	ssize_t count         = 0;
+	size_t size           = EWF_VOLUME_SIZE;
 
 	if( volume == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_write: invalid volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid volume.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_crc_calculate( &crc, (uint8_t *) volume, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_revert_32bit( crc, volume->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_write: unable to revert CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -97,7 +118,8 @@ ssize_t ewf_volume_write( EWF_VOLUME *volume, int file_descriptor )
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_write: unable to write volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write volume.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -107,50 +129,57 @@ ssize_t ewf_volume_write( EWF_VOLUME *volume, int file_descriptor )
 /* Calculates the chunck size = sectors per chunk * bytes per sector
  * Returns the amount of bytes per sector, or -1 on error
  */
-int32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume )
+ssize32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume )
 {
+	static char *function      = "ewf_volume_calculate_chunk_size";
 	uint32_t sectors_per_chunk = 0;
 	uint32_t bytes_per_sector  = 0;
-	uint64_t chunk_size        = 0;
+	size64_t chunk_size        = 0;
 
 	if( volume == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_calculate_chunk_size: invalid volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid volume.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_convert_32bit( &sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_calculate_chunk_size: unable to convert sectors per chunk value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_endian_convert_32bit( &bytes_per_sector, volume->bytes_per_sector ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_calculate_chunk_size: unable to conver bytes per sector value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to conver bytes per sector value.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_calculate_chunk_size: invalid sectors per chunk only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_calculate_chunk_size: invalid bytes per sector only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
-	chunk_size = (uint64_t) sectors_per_chunk * (uint64_t) bytes_per_sector;
+	chunk_size = (size64_t) sectors_per_chunk * (size64_t) bytes_per_sector;
 
-	if( chunk_size > (uint64_t) INT32_MAX )
+	if( chunk_size > (size64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_volume_calculate_chunk_size: invalid chunk size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
-	return( (int32_t) chunk_size );
+	return( (ssize32_t) chunk_size );
 }
 
