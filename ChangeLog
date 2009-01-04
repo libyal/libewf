@@ -101,8 +101,6 @@ Next release:
   - add raw date format to allow to print raw date string
 * change string duplicate function to macro?
 * check if successive headers match first header ?
-* have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
-* do not create human readable byte string if size <= 1024
 
 * add maximum check to set functions in internal handle
 * move any access to segment table in file, write and read to segment_file
@@ -120,9 +118,6 @@ TODO
 * rewrite ewfglob marcros to function macros (including arguments)
 * what about header values parsing with preservation of timestamps?
 
-* change int8_t return values into int return values
-* change libewf_get and libewf_set functions for api consistency
-  move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
   - change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
@@ -130,8 +125,9 @@ TODO
   because the MSB is normally used to mark if the chunk is compressed
 
 * ewfexport: non interactive mode?
+* ewfacquire: account for backspace in user input
 
-* what about setting errno for api set and get function i.e. for size too small
+* what about setting errno for API set and get function i.e. for size too small
 
 * move wipe on error to ewftools, like in ewfacquire?
   WIPE_ON_ERROR
@@ -173,14 +169,21 @@ From ewftools
 Add:
   libewf_values_table.c and .h
 
+WORKING
+* have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
+
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions
 * Cleanup of set/get functions in internal handle
 * Added libewf_get_amount_of_acquiry_errors
-* Wrote api functions to rid ewfcommon of internal_handle for acquiry and
+* Wrote API functions to rid ewfcommon of internal_handle for acquiry and
   CRC errors, header and hash values
 * Moved duplicate code for handling header and hash values into libewf_values_table
 * Removed internal_handle from ewftools
+* ewftools no longer create human readable byte string if size <= 1024
+* changed int8_t return values into int return values
+* changed libewf_get and libewf_set functions for API consistency
+* moved several get and set functions from internal handle to file
 
 Version: 20071016
 * Worked on cleaning up ewf struct read and write functions
@@ -277,7 +280,7 @@ Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy
   using memcpy instead
 * changed some int8_t return values into int return values
-* worked on changing libewf_get functions for api consistency
+* worked on changing libewf_get functions for API consistency
 * removed unused macros from internal handle
 * replaced libewf_set_media_values by libewf_set_sectors_per_chunk
   and libewf_set_bytes_per_sector
@@ -531,7 +534,7 @@ Version: 20070127
   - moved copy from and to char_t functions out of the library into ewfcommon
   - CHAR_T now removed from library
 * implemented internal_handle to hide handle representation from outside code
-  - added serveral api functions
+  - added serveral API functions
 * renamed handle where used as internal handle to internal_handle
 
 Version: 20070125
@@ -681,7 +684,7 @@ Version: 20061227
 * moved libewf header files to include/libewf - should fix missing header problem
 * worked on read and write mode
   - added seek_offset
-  - added read_buffer - added it to api and libewf man page
+  - added read_buffer - added it to API and libewf man page
   - added ewfalter (expirimental)
   - rewrote read_chunk not to do its own offset checking
   - added write_random
@@ -961,7 +964,7 @@ Version: 20061112
 Version: 20061111
 * ewfexport: added time estimate
 * moved byte print function to ewfcommon
-* added api functions to retrieve header values
+* added API functions to retrieve header values
 * string: add string copy
 * string: add string copy to char/w_char types
 
@@ -1010,7 +1013,7 @@ Version: 20061025
 * made one type (error sector) for crc and acquiry read error sectors
 * Worked on Win32 native port
   - fix for file open - not using the right parameters for Windows
-  - fix for crypto api calls for md5 context
+  - fix for crypto API calls for md5 context
   - rewrote some API functions to pass buffers from the application to the library
     so allocation and de-allocation is handled within the same program space
 

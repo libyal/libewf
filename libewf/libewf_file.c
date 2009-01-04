@@ -700,9 +700,10 @@ int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size )
 	return( 1 );
 }
 
-/* Returns the media type value, or -1 on error
+/* Retrieves the media type value
+ * Returns 1 if successful, or -1 on error
  */
-int8_t libewf_get_media_type( LIBEWF_HANDLE *handle )
+int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_media_type";
@@ -730,12 +731,22 @@ int8_t libewf_get_media_type( LIBEWF_HANDLE *handle )
 
 		return( -1 );
 	}
-	return( (int8_t) internal_handle->media->media_type );
+	if( media_type == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media type.\n",
+		 function );
+
+		return( -1 );
+	}
+	*media_type = internal_handle->media->media_type;
+
+	return( 1 );
 }
 
-/* Returns the media flags value, or -1 on error
+/* Retrieves the media flags
+ * Returns 1 if successful, or -1 on error
  */
-int8_t libewf_get_media_flags( LIBEWF_HANDLE *handle )
+int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_media_flags";
@@ -763,12 +774,22 @@ int8_t libewf_get_media_flags( LIBEWF_HANDLE *handle )
 
 		return( -1 );
 	}
-	return( (int8_t) internal_handle->media->media_flags );
+	if( media_flags == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media flags.\n",
+		 function );
+
+		return( -1 );
+	}
+	*media_flags = internal_handle->media->media_flags;
+
+	return( 1 );
 }
 
-/* Returns the volume type value, or -1 on error
+/* Retrieves the volume type value
+ * Returns 1 if successful, or -1 on error
  */
-int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle )
+int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_volume_type";
@@ -789,16 +810,28 @@ int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle )
 
 		return( -1 );
 	}
+	if( volume_type == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid volume type.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( ( internal_handle->media->media_flags & 0x02 ) == 0 )
 	{
-		return( (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL );
+		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL;
 	}
-	return( (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL );
+	else
+	{
+		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL;
+	}
+	return( 1 );
 }
 
-/* Returns the format value, or -1 on error
+/* Retrieves the format type value
+ * Returns 1 if successful, or -1 on error
  */
-int8_t libewf_get_format( LIBEWF_HANDLE *handle )
+int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_volume_type";
@@ -826,7 +859,16 @@ int8_t libewf_get_format( LIBEWF_HANDLE *handle )
 
 		return( -1 );
 	}
-	return( (int8_t) internal_handle->format );
+	if( format == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid format.\n",
+		 function );
+
+		return( -1 );
+	}
+	*format = internal_handle->format;
+
+	return( 1 );
 }
 
 /* Retrieves the GUID

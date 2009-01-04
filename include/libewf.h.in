@@ -190,29 +190,33 @@ LIBEWF_EXTERN int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *c
  */
 LIBEWF_EXTERN int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size );
 
-/* Returns the media type value, or -1 on error
+/* Retrieves the media type value
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_get_media_type( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type );
 
-/* Returns the media flags value, or -1 on error
+/* Retrieves the media flags
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_get_media_flags( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags );
 
-/* Returns the volume type value, or -1 on error
+/* Retrieves the volume type value
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type );
 
-/* Returns the format value, or -1 on error
+/* Retrieves the format type value
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_get_format( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format );
 
 /* Retrieves the GUID
- * Returns 0 if successful, or -1 on error
+ * Returns 1 if successful, or -1 on error
  */
 LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 
 /* Retrieves the MD5 hash
- * Returns 0 if successful, or -1 on error
+ * Returns 1 if successful, or -1 on error
  */
 LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 

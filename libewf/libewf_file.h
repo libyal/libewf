@@ -85,10 +85,10 @@ LIBEWF_EXTERN int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t 
 LIBEWF_EXTERN int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_level );
 LIBEWF_EXTERN int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size );
 
-LIBEWF_EXTERN int8_t libewf_get_media_type( LIBEWF_HANDLE *handle );
-LIBEWF_EXTERN int8_t libewf_get_media_flags( LIBEWF_HANDLE *handle );
-LIBEWF_EXTERN int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle );
-LIBEWF_EXTERN int8_t libewf_get_format( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type );
+LIBEWF_EXTERN int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags );
+LIBEWF_EXTERN int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type );
+LIBEWF_EXTERN int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format );
 
 LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );

@@ -886,9 +886,12 @@ void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t sec
 	}
 	if( seconds > 0 )
 	{
-		bytes_per_second        = bytes / seconds;
-		bytes_per_second_string = ewfoutput_determine_human_readable_size_string( bytes_per_second );
+		bytes_per_second = bytes / seconds;
 
+		if( bytes_per_second <= 1024 )
+		{
+			bytes_per_second_string = ewfoutput_determine_human_readable_size_string( bytes_per_second );
+		}
 		fprintf( stream, " with" );
 
 		if( bytes_per_second_string != NULL )
@@ -917,8 +920,10 @@ void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes )
 	{
 		return;
 	}
-	bytes_string = ewfoutput_determine_human_readable_size_string( bytes );
-
+	if( bytes <= 1024 )
+	{
+		bytes_string = ewfoutput_determine_human_readable_size_string( bytes );
+	}
 	if( bytes_string != NULL )
 	{
 		fprintf( stream, " %" PRIs_EWF " (%" PRIi64 " bytes)", bytes_string, bytes );

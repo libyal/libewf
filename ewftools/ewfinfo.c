@@ -266,9 +266,11 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to parse header values.\n" );
 	}
-	format = libewf_get_format( handle );
-
-	if( verbose == 1 )
+	if( libewf_get_format( handle, &format ) != 1 )
+	{
+		fprintf( stderr, "Unable to determine format.\n" );
+	}
+	else if( verbose == 1 )
 	{
 		switch( format )
 		{
@@ -343,11 +345,11 @@ int main( int argc, char * const argv[] )
 		if( ( format != LIBEWF_FORMAT_EWF )
 		 && ( format != LIBEWF_FORMAT_SMART ) )
 		{
-			media_type  = libewf_get_media_type( handle );
-			media_flags = libewf_get_media_flags( handle );
-			volume_type = libewf_get_volume_type( handle );
-
-			if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
+			if( libewf_get_media_type( handle, &media_type ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine media type.\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
 			{
 				fprintf( stdout, "\tMedia type:\t\tremovable disk\n" );
 			}
@@ -359,11 +361,19 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n", media_type );
 			}
-			if( verbose == 1 )
+			if( libewf_get_media_flags( handle, &media_flags ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine media flags.\n" );
+			}
+			else if( verbose == 1 )
 			{
 				fprintf( stdout, "\tMedia flags:\t\t0x%" PRIx8 "\n", media_flags );
 			}
-			if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
+			if( libewf_get_volume_type( handle, &volume_type ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine volume type.\n" );
+			}
+			else if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
 			{
 				fprintf( stdout, "\tMedia is physical:\tno\n" );
 			}
