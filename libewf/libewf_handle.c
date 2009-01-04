@@ -1164,8 +1164,9 @@ int libewf_internal_handle_set_format(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format.\n",
-		 function );
+		 "%s: unsupported format: %d.\n",
+		 function,
+	         format );
 
 		return( -1 );
 	}

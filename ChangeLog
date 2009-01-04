@@ -126,6 +126,8 @@ check for funtion,[ ]
 check error tollerance
 check TODO
 
+* add daylight savings correction to ewfx date/time string?
+
 * use internal format of date/time string convert them in interface
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
@@ -203,6 +205,8 @@ Version: 20080912
 * worked on improved error handling
 * removed error tollerance setting the code will be error tollerant if it is
   able to compensate or certain a value is valid
+* fixed issue regarding write finalize did not set data sections correctly
+  for streamed writes due to data section cache
 
 Version: 20080911
 * worked on improved error handling

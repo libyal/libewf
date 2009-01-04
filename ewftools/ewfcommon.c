@@ -1745,7 +1745,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	raw_write_data        = (uint8_t *) memory_allocate(
 	                                    sizeof( uint8_t ) * raw_write_buffer_size );
 
-	if( raw_write_buffer == NULL )
+	if( raw_write_data == NULL )
 	{
 		notify_warning_printf( "%s: unable to create raw write data.\n",
 		 function );
@@ -1836,7 +1836,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		write_count = ewfcommon_raw_write_ewf(
 		               handle,
 		               raw_write_data,
-		               raw_write_data,
+		               raw_write_buffer_size,
 		               data_buffer,
 		               data_buffer_size,
 		               read_count );

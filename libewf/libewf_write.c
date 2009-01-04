@@ -3719,6 +3719,13 @@ ssize_t libewf_write_finalize(
 		                                                 / internal_handle->media_values->bytes_per_sector );
 		internal_handle->media_values->media_size        = (size32_t) internal_handle->write->input_write_count;
 
+		/* Make sure to flush the data section write cache
+		 */
+		memory_free(
+		 internal_handle->write->data_section );
+
+		internal_handle->write->data_section = NULL;
+
 		/* Correct the segment files
 		 */
 		for( segment_table_iterator = 1; segment_table_iterator < internal_handle->segment_table->amount; segment_table_iterator++ )

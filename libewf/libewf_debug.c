@@ -250,7 +250,7 @@ int libewf_debug_byte_stream_print(
 		return( -1 );
 	}
 	notify_printf(
-	 "%" PRIs_LIBEWF ":\n",
+	 "%" PRIs_LIBEWF ":\n"
 	 "%" PRIs_LIBEWF "",
 	 header,
 	 string );
@@ -345,7 +345,7 @@ int libewf_debug_utf8_stream_print(
 		return( -1 );
 	}
 	notify_printf(
-	 "%" PRIs_LIBEWF ":",
+	 "%" PRIs_LIBEWF ":\n"
 	 "%" PRIs_LIBEWF "",
 	 header,
 	 string );
@@ -442,7 +442,7 @@ int libewf_debug_utf16_stream_print(
 		return( -1 );
 	}
 	notify_printf(
-	 "%" PRIs_LIBEWF ":",
+	 "%" PRIs_LIBEWF ":\n"
 	 "%" PRIs_LIBEWF "",
 	 header,
 	 string );

@@ -1188,9 +1188,9 @@ int ewfinput_get_string_variable_system_character(
      system_character_t *string_variable,
      size_t string_variable_size )
 {
-	system_character_t *result_string = NULL;
-	static char *function             = "ewfinput_get_string_variable_system_character";
-	int result                        = 0;
+	character_t *result_string = NULL;
+	static char *function      = "ewfinput_get_string_variable_system_character";
+	int result                 = 0;
 
 	if( sizeof( system_character_t ) != sizeof( character_t ) )
 	{
@@ -1207,7 +1207,7 @@ int ewfinput_get_string_variable_system_character(
 	}
 	else
 	{
-		result_string = string_variable;
+		result_string = (character_t *) string_variable;
 	}
 	result = ewfinput_get_string_variable(
 	          stream,

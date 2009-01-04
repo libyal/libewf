@@ -204,6 +204,8 @@ int libewf_string_split(
 	split_value_start     = string;
 	split_value_end       = string;
 
+	/* Empty values are stored as strings only containing the end of character
+	 */
 	for( split_value_iterator = 0; split_value_iterator < *amount_of_split_values; split_value_iterator++ )
 	{
 		if( split_value_end != string )
@@ -225,7 +227,7 @@ int libewf_string_split(
 		{
 			split_value_size = (ssize_t) ( split_value_end - split_value_start );
 		}
-		if( split_value_size > 0 )
+		if( split_value_size >= 0 )
 		{
 			/* Add 1 additional byte required for the end of string character
 			 */
@@ -324,9 +326,10 @@ int libewf_string_split_values_free(
 		else
 		{
 			notify_verbose_printf(
-			 "%s: empty split value: %" PRIzd ".\n",
+			 "%s: empty split value: %" PRIzd " out of: %" PRIzd ".\n",
 			 function,
-			 split_value_iterator );
+			 split_value_iterator,
+			 amount_of_split_values );
 		}
 #endif
 	}

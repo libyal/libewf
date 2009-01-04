@@ -596,10 +596,11 @@ libewf_handle_t *libewf_open(
 	}
 	/* Make sure format specific values are set
 	 */
-	if( libewf_internal_handle_set_format(
-	     internal_handle,
-	     internal_handle->format,
-	     &error ) != 1 )
+	if( ( internal_handle->format != 0 )
+	 && ( libewf_internal_handle_set_format(
+	       internal_handle,
+	       internal_handle->format,
+	       &error ) != 1 ) )
 	{
 		libewf_error_set(
 		 &error,

@@ -4009,8 +4009,10 @@ ssize_t libewf_section_data_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_INPUT,
 		 LIBEWF_INPUT_ERROR_VALUE_MISMATCH,
-		 "%s: amount of chunks does not match in data section.\n",
-		 function );
+		 "%s: amount of chunks: %" PRIu32 " does not match amount in data section: %" PRIu32 ".\n",
+		 function,
+		 media_values->amount_of_chunks,
+		 amount_of_chunks );
 
 		memory_free(
 		 data );

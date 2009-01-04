@@ -596,8 +596,8 @@ int main( int argc, char * const argv[] )
 		if( string_length > 0 )
 		{
 			string_length  += 1;
-			target_filename = (character_t *) memory_allocate(
-			                                   sizeof( character_t ) * string_length );
+			target_filename = (system_character_t *) memory_allocate(
+			                                          sizeof( system_character_t ) * string_length );
 
 			if( target_filename == NULL )
 			{
@@ -605,10 +605,10 @@ int main( int argc, char * const argv[] )
 
 				error_abort = 1;
 			}
-			else if( ewfstring_copy_system_string_to_character_string(
+			else if( system_string_copy(
 				  target_filename,
 				  option_target_filename,
-				  string_length ) != 1 )
+				  string_length ) == NULL )
 			{
 				fprintf( stderr, "Unable to set target filename string.\n" );
 
@@ -631,9 +631,9 @@ int main( int argc, char * const argv[] )
 		 */
 		else if( interactive_mode == 0 )
 		{
-			if( string_copy(
+			if( system_string_copy(
 			     target_filename,
-			     _CHARACTER_T_STRING( "export" ),
+			     _SYSTEM_CHARACTER_T_STRING( "export" ),
 			     7 ) == NULL )
 			{
 				fprintf( stderr, "Unable to set target filename string.\n" );

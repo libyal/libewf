@@ -165,7 +165,8 @@ void libewf_error_add_message(
 		{
 			message_size += 64;
 		}
-		if( (size_t) print_count > message_size )
+		if( ( (size_t) print_count > message_size )
+		 || ( ( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ][ print_count ] != 0 ) )
 		{
 			message_size = (size_t) ( print_count + 1 );
 			print_count  = -1;

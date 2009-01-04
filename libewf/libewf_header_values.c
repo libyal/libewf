@@ -433,40 +433,40 @@ int libewf_header_values_date_string_copy_from_timestamp(
 		switch( time_elements->tm_mon )
 		{
 			case 0:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Jan" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Jan" );
 				break;
 			case 1:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Feb" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Feb" );
 				break;
 			case 2:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Mar" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Mar" );
 				break;
 			case 3:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Apr" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Apr" );
 				break;
 			case 4:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "May" );
+				month = _LIBEWF_CHARACTER_T_STRING( "May" );
 				break;
 			case 5:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Jun" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Jun" );
 				break;
 			case 6:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Jul" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Jul" );
 				break;
 			case 7:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Aug" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Aug" );
 				break;
 			case 8:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Sep" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Sep" );
 				break;
 			case 9:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Oct" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Oct" );
 				break;
 			case 10:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Nov" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Nov" );
 				break;
 			case 11:
-				day_of_week = _LIBEWF_CHARACTER_T_STRING( "Dec" );
+				month = _LIBEWF_CHARACTER_T_STRING( "Dec" );
 				break;
 
 			default:
@@ -486,15 +486,15 @@ int libewf_header_values_date_string_copy_from_timestamp(
 			       date_string,
 			       date_string_size,
 			       _LIBEWF_CHARACTER_T_STRING( "%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
-			       _LIBEWF_CHARACTER_T_STRING( "%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
-			       _LIBEWF_CHARACTER_T_STRING( "%2d %02d:%02d:%02d %04d" ),
+			       _LIBEWF_CHARACTER_T_STRING( " %" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
+			       _LIBEWF_CHARACTER_T_STRING( " %2d %02d:%02d:%02d %04d" ),
 			       day_of_week,
 			       month,
 			       time_elements->tm_mday,
-			       ( time_elements->tm_year + 1900 ),
 			       time_elements->tm_hour,
 			       time_elements->tm_min,
-			       time_elements->tm_sec );
+			       time_elements->tm_sec,
+			       time_elements->tm_year + 1900 );
 	}
 	else if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	{
@@ -504,7 +504,7 @@ int libewf_header_values_date_string_copy_from_timestamp(
 			       _LIBEWF_CHARACTER_T_STRING( "%02d/%02d/%04d %02d:%02d:%02d" ),
 			       ( time_elements->tm_mon + 1 ),
 			       time_elements->tm_mday,
-			       ( time_elements->tm_year + 1900 ),
+			       time_elements->tm_year + 1900,
 			       time_elements->tm_hour,
 			       time_elements->tm_min,
 			       time_elements->tm_sec );
@@ -517,7 +517,7 @@ int libewf_header_values_date_string_copy_from_timestamp(
 			       _LIBEWF_CHARACTER_T_STRING( "%02d/%02d/%04d %02d:%02d:%02d" ),
 			       time_elements->tm_mday,
 			       ( time_elements->tm_mon + 1 ),
-			       ( time_elements->tm_year + 1900 ),
+			       time_elements->tm_year + 1900,
 			       time_elements->tm_hour,
 			       time_elements->tm_min,
 			       time_elements->tm_sec );
@@ -528,7 +528,7 @@ int libewf_header_values_date_string_copy_from_timestamp(
 			       date_string,
 			       date_string_size,
 			       _LIBEWF_CHARACTER_T_STRING( "%04d-%02d-%02dT%02d:%02d:%02d" ),
-			       ( time_elements->tm_year + 1900 ),
+			       time_elements->tm_year + 1900,
 			       ( time_elements->tm_mon + 1 ),
 			       time_elements->tm_mday,
 			       time_elements->tm_hour,
@@ -883,8 +883,8 @@ int libewf_generate_date_header_value(
 	               *date_string,
 	               *date_string_size,
 	               _LIBEWF_CHARACTER_T_STRING( "%4d %d %d %d %d %d" ),
-	               ( time_elements->tm_year + 1900 ),
-	               ( time_elements->tm_mon + 1 ),
+	               time_elements->tm_year + 1900,
+	               time_elements->tm_mon + 1,
 	               time_elements->tm_mday,
 	               time_elements->tm_hour,
 	               time_elements->tm_min,
@@ -2692,8 +2692,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -2701,8 +2699,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -2710,8 +2706,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -2719,8 +2713,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -2728,8 +2720,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -2737,8 +2727,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -2773,8 +2761,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -2809,8 +2795,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -2824,8 +2808,6 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ];
 
 		compression_type = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ];
@@ -3086,8 +3068,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -3095,8 +3075,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -3104,8 +3082,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -3113,8 +3089,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -3122,8 +3096,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -3131,8 +3103,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -3167,8 +3137,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -3203,8 +3171,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
 
 		acquiry_operating_system = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
@@ -3212,8 +3178,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
 
 		acquiry_software_version = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
@@ -3221,8 +3185,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -3236,8 +3198,6 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ];
 
 		compression_type = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_COMPRESSION_TYPE ];
@@ -3485,8 +3445,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -3494,8 +3452,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -3503,8 +3459,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -3512,8 +3466,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -3521,8 +3473,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -3530,8 +3480,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -3566,8 +3514,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -3602,8 +3548,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
 
 		acquiry_operating_system = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
@@ -3611,8 +3555,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
 
 		acquiry_software_version = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
@@ -3620,8 +3562,6 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -3857,8 +3797,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -3866,8 +3804,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -3875,8 +3811,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -3884,8 +3818,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -3893,8 +3825,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -3902,8 +3832,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -3938,8 +3866,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -3974,8 +3900,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
 
 		acquiry_operating_system = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
@@ -3983,8 +3907,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
 
 		acquiry_software_version = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
@@ -3992,8 +3914,6 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -4232,8 +4152,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -4241,8 +4159,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -4250,8 +4166,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -4259,8 +4173,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -4268,8 +4180,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -4277,8 +4187,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -4313,8 +4221,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -4349,8 +4255,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
 
 		acquiry_operating_system = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
@@ -4358,8 +4262,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
 
 		acquiry_software_version = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
@@ -4367,8 +4269,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -4376,8 +4276,6 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ];
 
 		unknown_dc = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ];
@@ -4621,8 +4519,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -4630,8 +4526,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -4639,8 +4533,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -4648,8 +4540,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -4657,8 +4547,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -4666,8 +4554,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -4702,8 +4588,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -4738,8 +4622,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
 
 		acquiry_operating_system = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
@@ -4747,8 +4629,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
 
 		acquiry_software_version = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
@@ -4756,8 +4636,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -4765,8 +4643,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_MODEL ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_MODEL ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_MODEL ];
 
 		model = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_MODEL ];
@@ -4774,8 +4650,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER ];
 
 		serial_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER ];
@@ -4783,8 +4657,6 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ];
 
 		unknown_dc = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC ];
@@ -5027,8 +4899,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
 
 		case_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_CASE_NUMBER ];
@@ -5036,8 +4906,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
 
 		description = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_DESCRIPTION ];
@@ -5045,8 +4913,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
 
 		examiner_name = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EXAMINER_NAME ];
@@ -5054,8 +4920,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
 
 		evidence_number = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_EVIDENCE_NUMBER ];
@@ -5063,8 +4927,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
 
 		notes =  header_values->value[ LIBEWF_HEADER_VALUES_INDEX_NOTES ];
@@ -5072,8 +4934,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
 
 		acquiry_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ];
@@ -5108,8 +4968,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
 
 		system_date = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ];
@@ -5144,8 +5002,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
 
 		acquiry_operating_system = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ];
@@ -5153,8 +5009,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
 
 		acquiry_software_version = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ];
@@ -5162,8 +5016,6 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
 	 && ( header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] > 0 ) )
 	{
-		/* Do not include end of string character
-		 */
 		*header_string_size += header_values->value_length[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
 
 		password_hash = header_values->value[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ];
@@ -5173,7 +5025,7 @@ int libewf_header_values_generate_header_string_type7(
 
 	/* allow for 9x \t and 1x \0
 	 */
-	*header_string_size += 11;
+	*header_string_size += 10;
 
 	*header_string = (libewf_character_t *) memory_allocate(
 	                                         sizeof( libewf_character_t ) * *header_string_size );
@@ -6320,40 +6172,40 @@ int libewf_generate_date_xheader_value(
 	switch( time_elements->tm_mon )
 	{
 		case 0:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Jan" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Jan" );
 			break;
 		case 1:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Feb" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Feb" );
 			break;
 		case 2:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Mar" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Mar" );
 			break;
 		case 3:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Apr" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Apr" );
 			break;
 		case 4:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "May" );
+			month = _LIBEWF_CHARACTER_T_STRING( "May" );
 			break;
 		case 5:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Jun" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Jun" );
 			break;
 		case 6:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Jul" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Jul" );
 			break;
 		case 7:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Aug" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Aug" );
 			break;
 		case 8:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Sep" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Sep" );
 			break;
 		case 9:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Oct" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Oct" );
 			break;
 		case 10:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Nov" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Nov" );
 			break;
 		case 11:
-			day_of_week = _LIBEWF_CHARACTER_T_STRING( "Dec" );
+			month = _LIBEWF_CHARACTER_T_STRING( "Dec" );
 			break;
 
 		default:
@@ -6391,15 +6243,15 @@ int libewf_generate_date_xheader_value(
 		       *date_string,
 		       *date_string_size,
 		       _LIBEWF_CHARACTER_T_STRING( "%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
-		       _LIBEWF_CHARACTER_T_STRING( "%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
-		       _LIBEWF_CHARACTER_T_STRING( "%2d %02d:%02d:%02d %04d %s" ),
+		       _LIBEWF_CHARACTER_T_STRING( " %" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
+		       _LIBEWF_CHARACTER_T_STRING( " %2d %02d:%02d:%02d %04d %s" ),
 		       day_of_week,
 		       month,
 		       time_elements->tm_mday,
-		       ( time_elements->tm_year + 1900 ),
 		       time_elements->tm_hour,
 		       time_elements->tm_min,
 		       time_elements->tm_sec,
+		       time_elements->tm_year + 1900,
 	               tzname[ 0 ] );
 
 	memory_free(
