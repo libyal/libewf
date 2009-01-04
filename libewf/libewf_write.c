@@ -1935,6 +1935,7 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
  * intended for raw write
  * The buffer size cannot be larger than the chunk size
  * The function sets the chunk crc, is compressed and write crc values
+ * Will initialize write if necessary
  * Returns the resulting chunk size, or -1 on error
  */
 ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc )
@@ -1975,6 +1976,23 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
 
 		return( -1 );
 	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized == 0 )
+	{
+		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
 	chunk_data_size = libewf_write_process_chunk_data(
 	                   internal_handle,
 	                   (EWF_CHAR *) buffer,
@@ -1999,6 +2017,7 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
+ * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc )
@@ -2105,18 +2124,19 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 	}
 	if( write_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write chunk data.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to write raw chunk data.\n",
 		 function );
 
 		return( -1 );
 	}
 	internal_handle->current_chunk += 1;
 
-	return( write_count );
+	return( data_size );
 }
 
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
@@ -2282,6 +2302,7 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
+ * Will initialize write if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset )

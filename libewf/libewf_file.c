@@ -531,6 +531,7 @@ int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sec
 }
 
 /* Retrieves the chunk size from the media information
+ * Will initialize write if necessary
  * Returns 1 if successful, or -1 on error
  */
 int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
@@ -567,6 +568,17 @@ int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 		 function );
 
 		return( -1 );
+	}
+	if( ( internal_handle->write != NULL )
+	 && ( internal_handle->write->values_initialized == 0 ) )
+	{
+		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	*chunk_size = internal_handle->media->chunk_size;
 

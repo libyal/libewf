@@ -1072,8 +1072,13 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		LIBEWF_WARNING_PRINT( "%s: ignoring write offset in a stream mode.\n",
 		 function );
 	}
+#if defined( HAVE_RAW_ACCESS )
+	buffer_size = chunk_size;
+#else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
-	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
+#endif
+fprintf( stderr, "X: %" PRIu32 "\n", buffer_size );
+	data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
 	if( data == NULL )
 	{
@@ -1083,7 +1088,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		return( -1 );
 	}
 #if defined( HAVE_RAW_ACCESS )
-	compressed_data = (uint8_t *) libewf_common_alloc( 2 * buffer_size * sizeof( uint8_t ) );
+	compressed_data = (uint8_t *) libewf_common_alloc( ( buffer_size + 16 ) * sizeof( uint8_t ) );
 
 	if( compressed_data == NULL )
 	{
@@ -1200,7 +1205,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			 read_count );
 		}
 #if defined( HAVE_RAW_ACCESS )
-		compressed_size = 2 * buffer_size;
+		compressed_size = buffer_size + 16;
 
 		raw_write_count = libewf_raw_write_prepare_buffer(
 		                   handle,
