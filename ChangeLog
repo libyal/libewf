@@ -157,6 +157,7 @@ WORKING
 * check unused parameters gcc -Wextra
 * API function get current chunk size?
 * refactor read and write
+  remove while loop from raw access in libewf_write_chunk_data
 * do not finalize on write error?
 * ewfcommon - size write buffer to chunk size for raw write
 
