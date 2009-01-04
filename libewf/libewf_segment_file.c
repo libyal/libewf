@@ -1928,9 +1928,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			write_count = libewf_section_xhash_write(
-			               internal_handle,
-			               segment_file->file_descriptor,
-			               segment_file->file_offset,
+			               segment_file,
 			               internal_handle->xhash,
 			               internal_handle->xhash_size,
 			               EWF_COMPRESSION_DEFAULT );
