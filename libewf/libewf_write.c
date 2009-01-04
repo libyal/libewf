@@ -1349,8 +1349,8 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	ssize_t read_count      = 0;
 	ssize_t write_count     = 0;
 	uint16_t segment_number = 0;
-	int file_descriptor     = -1;
 	int result              = 0;
+	int8_t read_crc         = 1;
 
 	if( internal_handle == NULL )
 	{
@@ -1458,7 +1458,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-
 	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %zu with data of size: %zd.\n",
 	 function, size, data_size );
 
@@ -1479,9 +1478,25 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	/* TODO what about raw access?
-	 * TODO what about chunk data in chunk cache?
-	 */
+	if( raw_access != 0 )
+	{
+		/* TODO what about raw access? */
+
+		LIBEWF_WARNING_PRINT( "%s: unable to handle raw access.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( is_compressed != 0 )
+	{
+		/* TODO handle compressed chunk data */
+
+		LIBEWF_WARNING_PRINT( "%s: unable to handle compressed chunk data.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO what about chunk data in chunk cache?  */
 
 	/* Check if the data in the buffer aligns with a chunk
 	 */
@@ -1501,7 +1516,10 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		              chunk,
 		              0,
 		              internal_handle->chunk_cache->data,
-		              internal_handle->chunk_cache->allocated_size );
+		              internal_handle->chunk_cache->allocated_size,
+		              &is_compressed,
+		              &chunk_crc,
+		              &read_crc );
 
 		if( read_count <= -1 )
 		{
@@ -1733,6 +1751,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		internal_handle->offset_table->file_descriptor[ chunk ] = internal_handle->delta_segment_table->file_descriptor[ segment_number ];
 		internal_handle->offset_table->segment_number[ chunk ]  = segment_number;
+		internal_handle->offset_table->compressed[ chunk ]      = 0;
 		internal_handle->offset_table->dirty[ chunk ]           = 1;
 	}
 	/* Report the amount of data written
