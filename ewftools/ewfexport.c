@@ -117,11 +117,11 @@ int main( int argc, char * const argv[] )
 #endif
 	void *callback               = &ewfcommon_process_status_fprint;
 	INT_T option                 = 0;
+	size64_t media_size          = 0;
 	size_t string_length         = 0;
 	time_t timestamp_start       = 0;
 	time_t timestamp_end         = 0;
 	int64_t count                = 0;
-	uint64_t size                = 0;
 	uint64_t export_offset       = 0;
 	uint64_t export_size         = 0;
 	uint64_t sectors_per_chunk   = 64;
@@ -355,11 +355,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	size = libewf_get_media_size( handle );
-
-	if( size == 0 )
+	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
-		fprintf( stderr, "Error exporting data from EWF file(s) - media size is 0.\n" );
+		fprintf( stderr, "Unable to determine media size.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{
@@ -371,7 +369,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( export_size == 0 )
 	{
-		export_size = size - export_offset;
+		export_size = media_size - export_offset;
 	}
 	/* Request the necessary case data
 	 */
@@ -549,14 +547,14 @@ int main( int argc, char * const argv[] )
 		                 stderr,
 		                 _S_LIBEWF_CHAR( "Start export at offset" ),
 		                 0,
-		                 size,
+		                 media_size,
 		                 export_offset );
 
 		export_size = ewfcommon_get_user_input_size_variable(
 		               stderr,
 		               _S_LIBEWF_CHAR( "Amount of bytes to export" ),
 		               0,
-		               ( size - export_offset ),
+		               ( media_size - export_offset ),
 		               export_size );
 	}
 	if( target_filename == NULL )

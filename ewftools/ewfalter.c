@@ -93,8 +93,8 @@ int main( int argc, char * const argv[] )
 	LIBEWF_HANDLE *handle      = NULL;
 	uint8_t *buffer            = NULL;
 	INT_T option               = 0;
+	size64_t media_size        = 0;
 	int64_t count              = 0;
-	uint64_t size              = 0;
 	uint64_t alter_offset      = 0;
 	uint64_t alter_size        = 0;
 	uint8_t swap_byte_pairs    = 0;
@@ -216,11 +216,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	size = libewf_get_media_size( handle );
-
-	if( size == 0 )
+	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
-		fprintf( stderr, "Error altering data from EWF file(s) - media size is 0.\n" );
+		fprintf( stderr, "Unable to determine media size.\n" );
 
 		return( EXIT_FAILURE );
 	}
@@ -232,15 +230,15 @@ int main( int argc, char * const argv[] )
 	                stderr,
 	                _S_LIBEWF_CHAR( "Start altering at offset" ),
 	                0,
-	                size,
+	                media_size,
 	                0 );
 
 	alter_size = ewfcommon_get_user_input_size_variable(
 	              stderr,
 	              _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
 	              0,
-	              ( size - alter_offset ),
-	              ( size - alter_offset ) );
+	              ( media_size - alter_offset ),
+	              ( media_size - alter_offset ) );
 
 	buffer = libewf_common_alloc( alter_size * sizeof( uint8_t ) );
 

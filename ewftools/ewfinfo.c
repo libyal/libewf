@@ -98,6 +98,7 @@ int main( int argc, char * const argv[] )
 #endif
 	LIBEWF_HANDLE *handle      = NULL;
 	INT_T option               = 0;
+	size64_t media_size        = 0;
 	uint32_t bytes_per_sector  = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t error_granularity = 0;
@@ -376,7 +377,6 @@ int main( int argc, char * const argv[] )
 				fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n", volume_type );
 			}
 		}
-
 		if( libewf_get_amount_of_sectors( handle, &amount_of_sectors ) == 1 )
 		{
 			fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n", amount_of_sectors );
@@ -393,8 +393,14 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to determine bytes per sector.\n" );
 		}
-		fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n", libewf_get_media_size( handle ) );
-
+		if( libewf_get_media_size( handle, &media_size ) == 1 )
+		{
+			fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n", media_size );
+		}
+		else
+		{
+			fprintf( stderr, "Unable to determine media size.\n" );
+		}
 		if( ( format == LIBEWF_FORMAT_ENCASE5 )
 		 || ( format == LIBEWF_FORMAT_ENCASE6 )
 		 || ( format == LIBEWF_FORMAT_LINEN5 )
@@ -409,23 +415,28 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to determine error granularity.\n" );
 			}
-			compression_level = libewf_get_compression_level( handle );
-
-			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			if( libewf_get_compression_level( handle, &compression_level ) == 1 )
 			{
-				fprintf( stdout, "\tCompression type:\tno compression\n" );
-			}
-			else if( compression_level == LIBEWF_COMPRESSION_FAST )
-			{
-				fprintf( stdout, "\tCompression type:\tgood (fast) compression\n" );
-			}
-			else if( compression_level == LIBEWF_COMPRESSION_BEST )
-			{
-				fprintf( stdout, "\tCompression type:\tbest compression\n" );
+				if( compression_level == LIBEWF_COMPRESSION_NONE )
+				{
+					fprintf( stdout, "\tCompression type:\tno compression\n" );
+				}
+				else if( compression_level == LIBEWF_COMPRESSION_FAST )
+				{
+					fprintf( stdout, "\tCompression type:\tgood (fast) compression\n" );
+				}
+				else if( compression_level == LIBEWF_COMPRESSION_BEST )
+				{
+					fprintf( stdout, "\tCompression type:\tbest compression\n" );
+				}
+				else
+				{
+					fprintf( stdout, "\tCompression type:\tunknown compression\n" );
+				}
 			}
 			else
 			{
-				fprintf( stdout, "\tCompression type:\tunknown compression\n" );
+				fprintf( stderr, "Unable to determine compression level.\n" );
 			}
 			if( libewf_get_guid( handle, guid, 16 ) == 1 )
 			{

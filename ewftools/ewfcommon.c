@@ -2395,10 +2395,10 @@ ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*
 	uint8_t *data                 = NULL;
 	static char *function         = "ewfcommon_read";
 	off64_t read_offset           = 0;
+	size64_t media_size           = 0;
 	size32_t chunk_size           = 0;
 	size_t buffer_size            = 0;
 	size_t read_size              = 0;
-	ssize64_t media_size          = 0;
 	ssize64_t total_read_count    = 0;
 	ssize_t read_count            = 0;
 
@@ -2409,9 +2409,7 @@ ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*
 
 		return( -1 );
 	}
-	media_size = libewf_get_media_size( handle );
-
-	if( media_size <= 0 )
+	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
@@ -2459,11 +2457,11 @@ ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*
 			return( -1 );
 		}
 	}
-	while( total_read_count < media_size )
+	while( total_read_count < (ssize64_t) media_size )
 	{
 		read_size = buffer_size;
 
-		if( ( media_size - total_read_count ) < (ssize64_t) read_size )
+		if( ( media_size - total_read_count ) < read_size )
 		{
 			read_size = (size_t) ( media_size - total_read_count );
 		}
@@ -2505,7 +2503,7 @@ ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*
 
 		if( callback != NULL )
 		{
-			callback( (size64_t) total_read_count, (size64_t) media_size );
+			callback( (size64_t) total_read_count, media_size );
 		}
   	}
 	libewf_common_free( data );
@@ -2956,10 +2954,10 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 {
 	uint8_t *data              = NULL;
 	static char *function      = "ewfcommon_export_raw";
+	size64_t media_size        = 0;
 	size32_t chunk_size        = 0;
 	size_t size                = 0;
 	size_t buffer_size         = 0;
-	ssize64_t media_size       = 0;
 	ssize64_t total_read_count = 0;
 	ssize_t read_count         = 0;
 	ssize_t write_count        = 0;
@@ -2996,9 +2994,7 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 			return( -1 );
 		}
 	}
-	media_size = libewf_get_media_size( handle );
-
-	if( media_size <= 0 )
+	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
@@ -3020,7 +3016,7 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 		return( -1 );
 	}
 	if( ( read_size == 0 )
-	 || ( read_size > (size64_t) media_size )
+	 || ( read_size > media_size )
 	 || ( read_size > (ssize64_t) INT64_MAX ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
@@ -3035,14 +3031,14 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 
 		return( -1 );
 	}
-	if( ( read_size + read_offset ) > (size64_t) media_size )
+	if( ( read_size + read_offset ) > media_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to export beyond size of media.\n",
 		 function );
 
 		return( -1 );
 	}
-	read_all    = (uint8_t) ( ( read_size == (size64_t) media_size ) && ( read_offset == 0 ) );
+	read_all    = (uint8_t) ( ( read_size == media_size ) && ( read_offset == 0 ) );
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -3057,7 +3053,7 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 	{
 		size = buffer_size;
 
-		if( ( media_size - total_read_count ) < (ssize64_t) size )
+		if( ( media_size - total_read_count ) < size )
 		{
 			size = (size_t) ( media_size - total_read_count );
 		}
@@ -3124,10 +3120,10 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 	uint8_t *data              = NULL;
 	static char *function      = "ewfcommon_export_ewf";
+	size64_t media_size        = 0;
 	size32_t chunk_size        = 0;
 	size_t size                = 0;
 	size_t buffer_size         = 0;
-	ssize64_t media_size       = 0;
 	ssize64_t total_read_count = 0;
 	size_t header_value_length = 128;
 	ssize_t read_count         = 0;
@@ -3148,9 +3144,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	media_size = libewf_get_media_size( handle );
-
-	if( media_size <= 0 )
+	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
@@ -3172,7 +3166,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		return( -1 );
 	}
 	if( ( read_size == 0 )
-	 || ( read_size > (size64_t) media_size )
+	 || ( read_size > media_size )
 	 || ( read_size > (ssize64_t) INT64_MAX ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
@@ -3187,7 +3181,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	if( ( read_size + read_offset ) > (size64_t) media_size )
+	if( ( read_size + read_offset ) > media_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to export beyond size of media.\n",
 		 function );
@@ -3215,7 +3209,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	read_all    = (uint8_t) ( ( read_size == (size64_t) media_size ) && ( read_offset == 0 ) );
+	read_all    = (uint8_t) ( ( read_size == media_size ) && ( read_offset == 0 ) );
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -3230,7 +3224,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	{
 		size = buffer_size;
 
-		if( ( media_size - total_read_count ) < (ssize64_t) size )
+		if( ( media_size - total_read_count ) < size )
 		{
 			size = (size_t) ( media_size - total_read_count );
 		}

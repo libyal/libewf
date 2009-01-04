@@ -176,13 +176,15 @@ LIBEWF_EXTERN int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_
  */
 LIBEWF_EXTERN int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity );
 
-/* Returns the compression level value, or -1 on error
+/* Returns the compression level value
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_get_compression_level( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_level );
 
-/* Returns the size of the contained media data, 0 if not set, -1 on error
+/* Returns the size of the contained media data
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN ssize64_t libewf_get_media_size( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size );
 
 /* Returns the media type value, or -1 on error
  */

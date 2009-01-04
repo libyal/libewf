@@ -48,10 +48,10 @@
 .Fn libewf_get_chunk_size "LIBEWF_HANDLE *handle, size32_t *chunk_size"
 .Ft int
 .Fn libewf_get_error_granularity "LIBEWF_HANDLE *handle, uint32_t *error_granularity"
-.Ft int8_t
-.Fn libewf_get_compression_level "LIBEWF_HANDLE *handle"
-.Ft ssize64_t
-.Fn libewf_get_media_size "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_get_compression_level "LIBEWF_HANDLE *handle, int8_t compression_level"
+.Ft int
+.Fn libewf_get_media_size "LIBEWF_HANDLE *handle, size64_t *media_size"
 .Ft int8_t
 .Fn libewf_get_media_type "LIBEWF_HANDLE *handle"
 .Ft int8_t

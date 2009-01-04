@@ -583,20 +583,88 @@ int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granula
 	return( 1 );
 }
 
-/* Returns the compression level value, or -1 on error
+/* Returns the compression level value
+ * Returns 1 if successful, -1 on error
  */
-int8_t libewf_get_compression_level( LIBEWF_HANDLE *handle )
+int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_level )
 {
-	return( libewf_internal_handle_get_compression_level(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_compression_level";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( compression_level == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid compression level.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->compression_level <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid compression level only positive values are supported.\n",
+		 function );
+
+		return( -1 );
+	}
+	*compression_level = internal_handle->compression_level;
+
+	return( 1 );
 }
 
-/* Returns the size of the contained media data, 0 if not set, -1 on error
+/* Returns the size of the contained media data
+ * Returns 1 if successful, -1 on error
  */
-ssize64_t libewf_get_media_size( LIBEWF_HANDLE *handle )
+int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size )
 {
-	return( libewf_internal_handle_get_media_size(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_media_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media->media_size == 0 )
+	{
+		internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
+		                                   * (size64_t) internal_handle->media->bytes_per_sector;
+	}
+	if( internal_handle->media->media_size > (size64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	*media_size = internal_handle->media->media_size;
+
+	return( 1 );
 }
 
 /* Returns the media type value, or -1 on error
