@@ -590,7 +590,7 @@ ssize_t libewf_section_header_read(
 
 	if( *cached_header == NULL )
 	{
-		*cached_header = header;
+		*cached_header      = header;
 		*cached_header_size = header_size;
 	}
 	else
@@ -823,9 +823,14 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  volume,
+	                  ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &stored_crc,
+	     volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
@@ -956,7 +961,10 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memset( volume, 0, sizeof( ewf_volume_smart_t ) ) == NULL )
+	if( libewf_common_memset(
+	     volume,
+	     0,
+	     sizeof( ewf_volume_smart_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear volume.\n" );
 
@@ -1018,9 +1026,14 @@ ssize_t libewf_section_volume_s01_write(
 		volume->signature[ 3 ] = (uint8_t) 'R';
 		volume->signature[ 4 ] = (uint8_t) 'T';
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  volume,
+	                  ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_revert_32bit( calculated_crc, volume->crc ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     calculated_crc,
+	     volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 		 function );
@@ -1144,9 +1157,14 @@ ssize_t libewf_section_volume_e01_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  volume,
+	                  ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &stored_crc,
+	     volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
@@ -1302,7 +1320,10 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memset( volume, 0, sizeof( ewf_volume_t ) ) == NULL )
+	if( libewf_common_memset(
+	     volume,
+	     0,
+	     sizeof( ewf_volume_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear volume.\n",
 		 function );
@@ -1397,9 +1418,14 @@ ssize_t libewf_section_volume_e01_write(
 			return( -1 );
 		}
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  volume,
+	                  ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_revert_32bit( calculated_crc, volume->crc ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     calculated_crc,
+	     volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 		 function );

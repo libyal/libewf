@@ -1,5 +1,5 @@
 Roadmap:
-* add read/write support for session section - partial read support
+* add read/write support for CD/DVD session section - partial read support
 * create iso2ewf tool?
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
@@ -116,16 +116,12 @@ Next release:
   - allow to set maximum delta file size default 4 GiB?
 
 * work on TODO in write
-* API function get current chunk size? for raw read?
 * do not finalize on write error?
 
 * offset table dirty still needed?
   only needed for write
   need to determine if a chunks is stored in a delta segment file
   what about adding the segment file type to the segment file struct?
-
-* refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
-  function
 
 * Try to correct the table
   - add error flag
@@ -155,6 +151,10 @@ TODO
 * check >16375 chunks offset table in encase 4 and earlier formats?
 * refactor libewf_write_process_chunk_data not to use internal handle
 
+* refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
+  function
+  - functions basically use libewf_section_compressed_string_read
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -169,15 +169,20 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080219
+* removed corruption detection test in libewf_segment_file_write_chunks_data
+  no longer needed
+* code cleanup
+
 Version: 20080217
 * added corruption detection test in libewf_segment_file_write_chunks_data
+  needed for test
 
 Version: 20080214
 * worked on abort
 * worked on low memory usage
 * code cleanup
-* rmoved libewf_filename_get and libewf_filename_set
-
+* removed libewf_filename_get and libewf_filename_set
 
 Version: 20080212
 * fixed ewfverify the EWF file can be verified without the integrity hash
