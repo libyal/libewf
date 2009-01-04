@@ -27,23 +27,24 @@ pwhash the password hash should be empty for no password
 
 Header2 found in EnCase5
 
-3                                                                                                                                                     \n
-main                                                                                                                                                  \n
-a                  \t c           \t n               \t e             \t t     \t av      \t ov       \t m             \t u           \t p      \t dc \n
-unique description \t case number \t evidence number \t examiner name \t notes \t version \t platform \t acquired date \t system date \t pwhash \t ?  \n
-                                                                                                                                                      \n
-srce                                                                                                                                                  \n
-0       1                                                                                                                                             \n
-p       n       id      ev      tb      lo      po      ah      gu      aq                                                                            \n
-0       0                                                                                                                                             \n
-                                        -1      -1                                                                                                    \n
-                                                                                                                                                      \n
-sub                                                                                                                                                   \n
-0       1                                                                                                                                             \n
-p       n       id      nu      co      gu                                                                                                            \n
-0       0                                                                                                                                             \n
-                                1                                                                                                                     \n
-                                                                                                                                                      \n
+3                                                                                                                           \n
+main                                                                                                                        \n
+a           \t c    \t n        \t e        \t t     \t av      \t ov       \t m             \t u           \t p      \t dc \n
+description \t case \t evidence \t examiner \t notes \t version \t platform \t acquired date \t system date \t pwhash \t ?  \n
+                                                                                                                            \n
+srce                                                                                                                        \n
+0 \t 1                                                                                                                      \n
+p \t n \t id \t ev \t tb \t lo \t po \t ah \t gu \t aq                                                                      \n
+0 \t 0                                                                                                                      \n
+  \t   \t    \t    \t    \t -1 \t -1 \t    \t    \t                                                                         \n
+                                                                                                                            \n
+sub                                                                                                                         \n
+0 \t 1                                                                                                                      \n
+p \t n \t id \t nu \t co \t gu                                                                                              \n
+0 \t 0                                                                                                                      \n
+  \t   \t    \t    \t 1  \t                                                                                                 \n
+                                                                                                                            \n
+
 unique description, case number, evidence number, examiner name, and notes are free form strings (except for \t and \n)
 
 acquired date, and system date are in the form unix time stamp "1142163845", which is March 12 2006, 11:44:05
@@ -59,23 +60,24 @@ TODO the remaining values are currently unknown
 
 Header2 found in EnCase6
 
-3                                                                                                                                                                               \n
-main                                                                                                                                                                            \n
-a                  \t c           \t n               \t e             \t t     \t md    \t sn            \t av      \t ov       \t m             \t u           \t p      \t dc \n
-unique description \t case number \t evidence number \t examiner name \t notes \t model \t serial number \t version \t platform \t acquired date \t system date \t pwhash \t ?  \n
-                                                                                                                                                                                \n
-srce                                                                                                                                                                            \n
-0       1                                                                                                                                                                       \n
-p       n       id      ev      tb      lo      po      ah      gu      aq                                                                                                      \n
-0       0                                                                                                                                                                       \n
-                                        -1      -1                                                                                                                              \n
-                                                                                                                                                                                \n
-sub                                                                                                                                                                             \n
-0       1                                                                                                                                                                       \n
-p       n       id      nu      co      gu                                                                                                                                      \n
-0       0                                                                                                                                                                       \n
-                                1                                                                                                                                               \n
-                                                                                                                                                                                \n
+3                                                                                                                                                     \n
+main                                                                                                                                                  \n
+a           \t c    \t n        \t e        \t t     \t md    \t sn            \t av      \t ov       \t m             \t u           \t p      \t dc \n
+description \t case \t evidence \t examiner \t notes \t model \t serial number \t version \t platform \t acquired date \t system date \t pwhash \t ?  \n
+                                                                                                                                                      \n
+srce                                                                                                                                                  \n
+0 \t 1                                                                                                                                                \n
+p \t n \t id \t ev \t tb \t lo \t po \t ah \t gu \t aq                                                                                                \n
+0 \t 0                                                                                                                                                \n
+  \t   \t    \t    \t    \t -1 \t -1 \t    \t    \t                                                                                                   \n
+                                                                                                                                                      \n
+sub                                                                                                                                                   \n
+0 \t 1                                                                                                                                                \n
+p \t n \t id \t nu \t co \t gu                                                                                                                        \n
+0 \t 0                                                                                                                                                \n
+  \t   \t    \t    \t 1  \t                                                                                                                           \n
+                                                                                                                                                      \n
+
 unique description, case number, evidence number, examiner name, notes, model, and serial number are free form strings (except for \t and \n)
 
 acquired date, and system date are in the form unix time stamp "1142163845", which is March 12 2006, 11:44:05
@@ -87,4 +89,41 @@ platform is the operating system used to acquire the image
 pwhash the password hash should be empty for no password
 
 TODO the remaining values are currently unknown
+
+
+Header2 found in winen EnCase6.11
+
+3                                                                                                                                                                   \n
+main                                                                                                                                                                \n
+a           \t c    \t n        \t e        \t t     \t md    \t sn            \t av      \t ov       \t m             \t u           \t p      \t pid \t dc \t ext \n
+description \t case \t evidence \t examiner \t notes \t model \t serial number \t version \t platform \t acquired date \t system date \t pwhash \t ?   \t ?  \t ?   \n
+                                                                                                                                                                    \n
+srce                                                                                                                                                                \n
+0 \t 1                                                                                                                                                              \n
+p \t n \t id \t ev \t tb \t lo \t po \t ah \t gu \t aq                                                                                                              \n
+0 \t 0                                                                                                                                                              \n
+  \t   \t    \t    \t    \t -1 \t -1 \t    \t    \t                                                                                                                 \n
+                                                                                                                                                                    \n
+sub                                                                                                                                                                 \n
+0 \t 1                                                                                                                                                              \n
+p \t n \t id \t nu \t co \t gu                                                                                                                                      \n
+0 \t 0                                                                                                                                                              \n
+  \t   \t    \t    \t 1  \t                                                                                                                                         \n
+                                                                                                                                                                    \n
+
+unique description, case number, evidence number, examiner name, notes, model, and serial number are free form strings (except for \t and \n)
+
+acquired date, and system date are in the form unix time stamp "1142163845", which is March 12 2006, 11:44:05
+
+version is the EnCase version used to acquire the image
+
+platform is the operating system used to acquire the image
+
+pwhash the password hash should be empty for no password
+
+TODO the remaining values are currently unknown
+
+ext is a numeric value
+
+
 

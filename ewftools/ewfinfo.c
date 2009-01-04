@@ -437,7 +437,11 @@ int main( int argc, char * const argv[] )
 			}
 			else if( media_type == LIBEWF_MEDIA_TYPE_CD )
 			{
-				fprintf( stdout, "\tMedia type:\t\tCD/DVD\n" );
+				fprintf( stdout, "\tMedia type:\t\tCD/DVD/BD\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_RAM )
+			{
+				fprintf( stdout, "\tMedia type:\t\tRAM\n" );
 			}
 			else
 			{
