@@ -144,6 +144,7 @@ TODO
 * remove files from MSVC++ project
   ewf_crc.c
   ewf_data.c
+  ewf_file_header.c
   ewf_hash.c
   ewf_section.c
   ewf_session.c

@@ -48,6 +48,10 @@
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
 
+const uint8_t dvf_file_signature[] = { 0x64, 0x76, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+const uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
  */
@@ -83,15 +87,15 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( ewf_file_header_check_signature( signature ) == 1 )
+	if( libewf_common_memcmp( evf_file_signature, signature, sizeof( evf_file_signature ) ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( lwf_file_header_check_signature( signature ) == 1 )
+	else if( libewf_common_memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( dwf_file_header_check_signature( signature ) == 1 )
+	else if( libewf_common_memcmp( dvf_file_signature, signature, sizeof( dvf_file_signature ) ) == 0 )
 	{
 		return( 1 );
 	}
@@ -140,15 +144,15 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( ewf_file_header_check_signature( file_header.signature ) == 1 )
+	if( libewf_common_memcmp( evf_file_signature, file_header.signature, sizeof( evf_file_signature ) ) == 0 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 	}
-	else if( lwf_file_header_check_signature( file_header.signature ) == 1 )
+	else if( libewf_common_memcmp( lvf_file_signature, file_header.signature, sizeof( lvf_file_signature ) ) == 0 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
 	}
-	else if( dwf_file_header_check_signature( file_header.signature ) == 1 )
+	else if( libewf_common_memcmp( dvf_file_signature, file_header.signature, sizeof( dvf_file_signature ) ) == 0 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_DWF;
 	}
