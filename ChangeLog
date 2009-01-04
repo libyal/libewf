@@ -159,6 +159,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080430
+* Minor changes
+
 Version: 20080426
 * Minor changes
 
