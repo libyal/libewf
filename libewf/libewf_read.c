@@ -55,7 +55,6 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 {
 	static char *function  = "libewf_read_process_chunk_data";
 	EWF_CRC calculated_crc = 0;
-	size_t buffer_size     = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -80,11 +79,10 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( is_compressed == 0 )
 	{
-		buffer_size    = chunk_data_size;
-		calculated_crc = ewf_crc_calculate( chunk_data, buffer_size, 1 );
-
 		if( read_crc == 0 )
 		{
+			chunk_data_size -= EWF_CRC_SIZE;
+
 			if( libewf_endian_convert_32bit( &chunk_crc, &chunk_data[ chunk_data_size ] ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -92,7 +90,10 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 				return( -1 );
 			}
+			*uncompressed_chunk_data_size = chunk_data_size;
 		}
+		calculated_crc = ewf_crc_calculate( chunk_data, chunk_data_size, 1 );
+
 		if( chunk_crc != calculated_crc )
 		{
 			LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -131,9 +132,8 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 			return( -1 );
 		}
-		buffer_size = *uncompressed_chunk_data_size;
 	}
-	return( (ssize_t) buffer_size );
+	return( (ssize_t) *uncompressed_chunk_data_size );
 }
 
 /* Reads a certain chunk of data from the segment file(s) to a buffer
@@ -354,11 +354,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 				return( -1 );
 			}
 		}
-		else
-		{
-			/* TODO return value */
-			chunk_read_count -= EWF_CRC_SIZE;
-		}
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( *is_compressed == 0 )
@@ -541,7 +536,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 			return( -1 );
 		}
 
-		if( internal_handle->offset_table->compressed[ chunk ] == 1 )
+		if( is_compressed != 0 )
 		{
 			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
 		}
@@ -551,7 +546,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 		     chunk_read_count,
 		     chunk_data,
 		     &chunk_data_size,
-		     internal_handle->offset_table->compressed[ chunk ],
+		     is_compressed,
 		     chunk_crc,
 		     read_crc ) == -1 )
 		{
@@ -630,8 +625,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 	}
 	/* If the data was read into the chunk cache copy it to the buffer
 	 */
-	if( ( chunk_data == internal_handle->chunk_cache->compressed )
-	 || ( chunk_data == internal_handle->chunk_cache->data ) )
+	if( chunk_data == internal_handle->chunk_cache->data )
 	{
 		/* Copy the relevant data to buffer
 		 */

@@ -1848,15 +1848,6 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 
 		return( -1 );
 	}
-	if( is_compressed != 0 )
-	{
-		/* TODO handle compressed chunk data */
-
-		LIBEWF_WARNING_PRINT( "%s: unable to handle compressed chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* TODO what about chunk data in chunk cache?  */
 
 	/* Check if the data in the buffer aligns with a chunk
@@ -2132,7 +2123,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 	}
 	internal_handle->current_chunk += 1;
 
-	return( data_size );
+	return( size );
 }
 
 /* Writes data in EWF format from a buffer at the current offset

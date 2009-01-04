@@ -152,15 +152,13 @@ CLOSED
   not needed
 
 WORKING
-* make buffer passthrough default behavior
+* make buffer passthrough default behavior?
 * work on TODO in write
 * check unused parameters gcc -Wextra
 * API function get current chunk size?
-* refactor read and write
 * do not finalize on write error?
 * ewfcommon - size write buffer to chunk size for raw write
 * ewfexport - add raw access support
-* check return values of raw and non raw functions
 
 Version: 20071104
 * refactored write functions

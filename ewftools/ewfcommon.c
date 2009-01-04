@@ -1244,12 +1244,22 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		               is_compressed,
 		               chunk_crc,
 		               write_crc );
+
+		if( write_count != raw_write_count )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
+			 function );
+
+			libewf_common_free( data );
+			libewf_common_free( compressed_data );
+
+			return( -1 );
+		}
 #else
 		write_count = libewf_write_buffer(
 		               handle,
 		               (void *) data,
 		               read_count );
-#endif
 
 		if( write_count != read_count )
 		{
@@ -1257,12 +1267,10 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			 function );
 
 			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( compressed_data );
-#endif
 
 			return( -1 );
 		}
+#endif
 		total_write_count += read_count;
 
 		/* Callback for status update
