@@ -553,9 +553,113 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 	return( (int32_t) buffer_offset );
 }
 
-/* Writes the data an EWF file
+/* Reads the data from an EWF file
  * using the raw access functions
- * Returns the amount of bytes written, or -1 on error
+ * buffer will be set to the buffer containing the uncompressed data
+ * Returns the amount of bytes read, 0 if no more data can be read, or -1 on error
+ */
+ssize_t ewfcommon_raw_read_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t **buffer, size_t buffer_size, size_t read_size )
+{
+	static char *function    = "ewfcommon_raw_read_ewf";
+	uint8_t *raw_read_buffer = NULL;
+	ssize_t raw_read_count   = 0;
+	ssize_t read_count       = 0;
+	uint32_t chunk_crc       = 0;
+	int8_t is_compressed     = 0;
+	int8_t read_crc          = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( raw_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid raw buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer pointer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( read_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid read size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( read_size > buffer_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid read size value exceeds buffer size.\n",
+		 function );
+
+		return( -1 );
+	}
+	raw_read_count = libewf_raw_read_buffer(
+			  handle,
+			  (void *) raw_buffer,
+			  raw_buffer_size,
+			  &is_compressed,
+			  &chunk_crc,
+			  &read_crc );
+
+	if( raw_read_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
+		 function );
+
+		return( -1 );
+	}
+	buffer_size = read_size;
+	read_count  = libewf_raw_read_prepare_buffer(
+		       handle,
+		       (void *) raw_read_buffer,
+		       (size_t) raw_read_count,
+		       (void *) *buffer,
+		       &buffer_size,
+		       is_compressed,
+		       chunk_crc,
+		       read_crc );
+
+	if( read_count <= -1 )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: unable to prepare buffer after raw read.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( is_compressed == 0 )
+	{
+		*buffer = raw_read_buffer;
+	}
+	if( read_size != buffer_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: mismatch in read and uncompressed buffer size.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( read_size );
+}
+
+/* Writes the data to an EWF file
+ * using the raw access functions
+ * Returns the amount of bytes written, 0 if no more data can be written, or -1 on error
  */
 ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t *buffer, size_t buffer_size, size_t write_size )
 {
@@ -614,7 +718,7 @@ ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, siz
 
 	if( raw_write_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer for raw write.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer before raw write.\n",
 		 function );
 
 		return( -1 );
