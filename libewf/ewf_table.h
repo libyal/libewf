@@ -80,9 +80,7 @@ struct ewf_table
 	uint8_t crc[ 4 ];
 
 	/* The offset array
-	 * consits of 4 bytes per offset
-	 * as long as necessary
-	 * can contain 16375 entries per table
+	 * consists of mulitple 4 byte offsets
 	 */
 
 	/* The last offset is followed by a 4 byte CRC

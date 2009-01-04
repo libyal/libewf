@@ -154,9 +154,6 @@ struct ewf_data
 	uint8_t crc[ 4 ];
 };
 
-ssize_t ewf_data_read( EWF_DATA *data, int file_descriptor );
-ssize_t ewf_data_write( EWF_DATA *data, int file_descriptor );
-
 #if defined( __cplusplus )
 }
 #endif

@@ -141,6 +141,8 @@ TODO
   WIPE_ON_ERROR
 * what about the crc errors in read_raw?
 
+* remove ewf_data.c from MSVC++ project
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions

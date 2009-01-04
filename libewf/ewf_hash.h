@@ -63,9 +63,6 @@ struct ewf_hash
 	uint8_t crc[ 4 ];
 };
 
-ssize_t ewf_hash_read( EWF_HASH *hash, int file_descriptor );
-ssize_t ewf_hash_write( EWF_HASH *hash, int file_descriptor );
-
 #if defined( __cplusplus )
 }
 #endif
