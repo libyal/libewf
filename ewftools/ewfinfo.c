@@ -117,10 +117,10 @@ int main( int argc, char * const argv[] )
 	uint32_t amount_of_acquiry_errors = 0;
 	uint32_t amount_of_sessions       = 0;
 	int8_t compression_level          = 0;
-	int8_t media_type                 = 0;
-	int8_t media_flags                = 0;
-	int8_t volume_type                = 0;
 	uint8_t compress_empty_block      = 0;
+	uint8_t media_type                = 0;
+	uint8_t media_flags               = 0;
+	uint8_t volume_type               = 0;
 	uint8_t format                    = 0;
 	uint8_t verbose                   = 0;
 	uint8_t date_format               = LIBEWF_DATE_FORMAT_CTIME;

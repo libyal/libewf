@@ -159,6 +159,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080505
+* Consistency update in API for get and set media and volume type functions
+
 Version: 20080501
 * Fixed the package config file (.pc) (Nicolas (kwizart))
 * Fixed the debian package files (Guy Voncke)n

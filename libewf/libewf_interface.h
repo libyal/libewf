@@ -93,15 +93,15 @@ LIBEWF_EXTERN int libewf_get_media_size(
 
 LIBEWF_EXTERN int libewf_get_media_type(
                    libewf_handle_t *handle,
-                   int8_t *media_type );
+                   uint8_t *media_type );
 
 LIBEWF_EXTERN int libewf_get_media_flags(
                    libewf_handle_t *handle,
-                   int8_t *media_flags );
+                   uint8_t *media_flags );
 
 LIBEWF_EXTERN int libewf_get_volume_type(
                    libewf_handle_t *handle,
-                   int8_t *volume_type );
+                   uint8_t *volume_type );
 
 LIBEWF_EXTERN int libewf_get_format(
                    libewf_handle_t *handle,

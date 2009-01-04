@@ -391,7 +391,7 @@ int libewf_get_media_size(
  */
 int libewf_get_media_type(
      libewf_handle_t *handle,
-     int8_t *media_type )
+     uint8_t *media_type )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_type";
@@ -436,7 +436,7 @@ int libewf_get_media_type(
  */
 int libewf_get_media_flags(
      libewf_handle_t *handle,
-     int8_t *media_flags )
+     uint8_t *media_flags )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_flags";
@@ -481,7 +481,7 @@ int libewf_get_media_flags(
  */
 int libewf_get_volume_type(
      libewf_handle_t *handle,
-     int8_t *volume_type )
+     uint8_t *volume_type )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
