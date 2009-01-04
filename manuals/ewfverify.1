@@ -1,4 +1,4 @@
-.Dd May 12, 2007
+.Dd September 8, 2007
 .Dt ewfverify
 .Os libewf
 .Sh NAME
@@ -7,7 +7,7 @@
 .Sh SYNOPSIS
 .Nm ewfverify
 .Op Fl d Ar digest_type
-.Op Fl hqvV
+.Op Fl hqsvV
 .Va Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfverify
@@ -38,6 +38,9 @@ calculate additional digest (hash) types besides md5, options: sha1
 shows this help
 .It Fl q
 quiet shows no status information
+.It Fl s
+swap byte pairs of the media data (from AB to BA)
+(use this for big to little endian conversion and vice versa)
 .It Fl v
 verbose output to stderr
 .It Fl V

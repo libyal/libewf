@@ -84,7 +84,7 @@ struct libewf_header_values
 };
 
 LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void );
-LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount );
+int libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount );
 void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values );
 
 int libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index );

@@ -79,7 +79,7 @@ struct libewf_chunk_cache
 };
 
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size );
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size );
+int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size );
 void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache );
 
 #if defined( __cplusplus )

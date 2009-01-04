@@ -95,9 +95,9 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 }
 
 /* Reallocates and wipes memory for the chunk cache cache
- * Returns a pointer to the instance, NULL on error
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
+int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 {
 	EWF_CHUNK *reallocation = NULL;
 	static char *function   = "libewf_chunk_cache_realloc";
@@ -107,7 +107,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	size *= EWF_CHUNK_SIZE;
 
@@ -116,14 +116,14 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( size <= chunk_cache->allocated_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: new size must be greater than previous size.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	reallocation = (EWF_CHAR *) libewf_common_realloc( (void *) chunk_cache->compressed, size );
 
@@ -132,7 +132,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 		LIBEWF_WARNING_PRINT( "%s: unable to realloc chunk cache compressed.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	chunk_cache->compressed = reallocation;
 	reallocation            = (EWF_CHAR *) libewf_common_realloc( (void *) chunk_cache->data, size );
@@ -142,7 +142,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 		LIBEWF_WARNING_PRINT( "%s: unable to realloc chunk cache data.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	chunk_cache->data           = reallocation;
 	chunk_cache->allocated_size = size;
@@ -151,7 +151,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 	chunk_cache->offset         = 0;
 	chunk_cache->cached         = 0;
 
-	return( chunk_cache );
+	return( 1 );
 }
 
 /* Frees memory of a chunk cache struct including elements

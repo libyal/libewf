@@ -277,7 +277,7 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
 	if( internal_handle->write->chunks_per_segment > (int64_t) INT64_MAX )
 	{
@@ -749,7 +749,7 @@ ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 		{
 			chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
 
-			if( libewf_internal_handle_chunk_cache_realloc( internal_handle, *compressed_chunk_data_size ) == NULL )
+			if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, *compressed_chunk_data_size ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 				 function );
@@ -836,7 +836,6 @@ ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 /* Writes a new chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
@@ -851,7 +850,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	size_t chunk_cache_offset         = 0;
 	size_t compressed_chunk_data_size = 0;
 	uint16_t segment_number           = 0;
-	uint8_t last_segment_file         = 0;
 	int chunk_cache_data_used         = 0;
 	int result                        = 0;
 
@@ -1178,31 +1176,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	{
 		if( raw_access == 0 )
 		{
-			/* Swap bytes if necessary
-			 */
-			if( ( internal_handle->swap_byte_pairs != 0 )
-			 && ( libewf_endian_swap_byte_pairs( chunk_data, write_size ) != 1 ) )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
-				 function );
-
-				return( -1 );
-			}
-			/* Check if the MD5 of the chunk needs to be calculated
-			 */
-			if( internal_handle->calculate_md5 != 0 )
-			{
-				if( libewf_md5_update( &internal_handle->md5_context, chunk_data, write_size ) != 1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
-					 function );
-
-					if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-					{
-						return( -1 );
-					}
-				}
-			}
 			chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
 
 			/* The compressed data size contains the maximum allowed buffer size
@@ -1327,37 +1300,32 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	}
 	else if( result == 1 )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: closing segment file with segment number: %" PRIu16 ".\n",
-		 function, segment_number );
-
 		/* Check if this is the last segment file
 		 */
-		if( ( internal_handle->write->input_write_size != 0 )
-		 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->write->input_write_size ) )
+		if( ( internal_handle->write->input_write_size == 0 )
+		 || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->write->input_write_size ) )
 		{
-			last_segment_file = 1;
-		}
-		/* Finish and close the segment file
-		 */
-		write_count = libewf_segment_file_write_close(
-		               internal_handle,
-		               segment_number,
-		               internal_handle->write->segment_amount_of_chunks,
-		               last_segment_file );
+			LIBEWF_VERBOSE_PRINT( "%s: closing segment file with segment number: %" PRIu16 ".\n",
+			 function, segment_number );
 
-		if( write_count == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
-			 function );
+			/* Finish and close the segment file
+			 */
+			write_count = libewf_segment_file_write_close(
+			               internal_handle,
+			               segment_number,
+			               internal_handle->write->segment_amount_of_chunks,
+			               0 );
 
-			return( -1 );
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->write->write_count           += write_count;
+			internal_handle->write->chunks_section_offset  = 0;
 		}
-		if( last_segment_file == 1 )
-		{
-			internal_handle->write->write_finalized = 1;
-		}
-		internal_handle->write->write_count           += write_count;
-		internal_handle->write->chunks_section_offset  = 0;
 	}
 	/* Report the amount of chunk data written
 	 */
@@ -1366,7 +1334,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 /* Writes an existing chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
@@ -1508,7 +1475,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	}
 	else
 	{
-
 		/* Read the chunk data into the chunk cache
 		 */
 		read_count = libewf_read_chunk(
@@ -1547,16 +1513,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		chunk_data_size = (size_t) read_count;
 	}
 
-	/* Swap bytes if necessary
-	 */
-	if( ( internal_handle->swap_byte_pairs == 1 )
-	 && ( libewf_endian_swap_byte_pairs( (uint8_t *) chunk_data, chunk_data_size ) != 1 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* Calculate the new CRC
 	 */
 	if( ewf_crc_calculate( &chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
@@ -1583,9 +1539,27 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		/* Check if chunk fits in exisiting delta segment file
 		 */
 		else if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
-		    + chunk_data_size + EWF_CRC_SIZE ) > (off64_t) internal_handle->write->segment_file_size )
+		    + (off64_t) chunk_data_size + (off64_t) EWF_CRC_SIZE ) > (off64_t) internal_handle->write->segment_file_size )
 		{
 			result = 0;
+
+			/* Make sure to write a next section in the the previous delta segment file
+			 */
+			write_count = libewf_segment_file_write_last_section(
+				       internal_handle,
+				       internal_handle->delta_segment_table->file_descriptor[ segment_number ],
+				       internal_handle->delta_segment_table->section_list[ segment_number ],
+				       internal_handle->delta_segment_table->file_offset[ segment_number ],
+				       0 );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
 		}
 		/* Check if a delta segment already exists
 		 */
@@ -1603,9 +1577,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		}
 		else if( result == 0 )
 		{
-			/* TODO make sure to write a next section in the the previous delta segment file
-			 */
-
 			segment_number++;
 
 			/* Create a new delta segment file
@@ -1710,7 +1681,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 /* Writes a chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
@@ -1800,7 +1770,6 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_
 
 /* Writes chunk data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
@@ -1873,7 +1842,7 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
 		 function, chunk_data_size );
 
-		if( libewf_internal_handle_chunk_cache_realloc( internal_handle, chunk_data_size ) == NULL )
+		if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );
@@ -2057,7 +2026,6 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
@@ -2085,7 +2053,6 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
- * This function swaps byte pairs
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset )
@@ -2189,7 +2156,9 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	 */
 	if( ( internal_handle->current_chunk_offset != 0 )
 	 && ( internal_handle->chunk_cache->amount != 0 )
-	 && ( internal_handle->chunk_cache->offset != 0 ) )
+	 && ( internal_handle->chunk_cache->offset != 0 )
+	 && ( ( internal_handle->write->input_write_size == 0 )
+	  || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->write->input_write_size ) ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: writing chunk remainder at offset: %" PRIu32 " with size: %" PRIu32 "\n",
 		 function, internal_handle->current_chunk_offset, internal_handle->chunk_cache->amount );
@@ -2248,7 +2217,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 		/* Close the segment file
 		 */
-		LIBEWF_VERBOSE_PRINT( "%s: closing segment file.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: closing last segment file.\n",
 		 function );
 
 		write_count = libewf_segment_file_write_close(
@@ -2267,157 +2236,164 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		write_count_finalize                += write_count;
 		internal_handle->write->write_count += write_count;
 	}
-	/* Calculate the media values
+	/* Correct the media values if streamed write was used
 	 */
-	internal_handle->media->amount_of_chunks  = internal_handle->write->amount_of_chunks;
-	internal_handle->media->amount_of_sectors = (uint32_t) ( internal_handle->write->input_write_count
-	                                          / internal_handle->media->bytes_per_sector );
-
-	/* Correct the segment files
-	 */
-	for( segment_table_iterator = 1; segment_table_iterator < internal_handle->segment_table->amount; segment_table_iterator++ )
+	if( internal_handle->write->input_write_size == 0 )
 	{
-		if( internal_handle->segment_table->section_list[ segment_table_iterator ] == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: missing section list.\n",
-			 function );
+		/* Calculate the media values
+		 */
+		internal_handle->media->amount_of_chunks  = internal_handle->write->amount_of_chunks;
+		internal_handle->media->amount_of_sectors = (uint32_t) ( internal_handle->write->input_write_count
+							  / internal_handle->media->bytes_per_sector );
 
-			return( -1 );
-		}
-		if( internal_handle->segment_table->section_list[ segment_table_iterator ]->first == NULL )
+		/* Correct the segment files
+		 */
+		for( segment_table_iterator = 1; segment_table_iterator < internal_handle->segment_table->amount; segment_table_iterator++ )
 		{
-			LIBEWF_WARNING_PRINT( "%s: missing section list entries.\n",
-			 function );
-
-			return( -1 );
-		}
-		file_descriptor = internal_handle->segment_table->file_descriptor[ segment_table_iterator ];
-
-		if( file_descriptor == -1 )
-		{
-			if( internal_handle->segment_table->filename[ segment_table_iterator ] == NULL )
+			if( internal_handle->segment_table->section_list[ segment_table_iterator ] == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: invalid filename for segment file: %" PRIu32 ".\n",
-				 function, segment_table_iterator );
+				LIBEWF_WARNING_PRINT( "%s: missing section list.\n",
+				 function );
 
 				return( -1 );
 			}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			file_descriptor = libewf_common_wide_open(
-			                   internal_handle->segment_table->filename[ segment_table_iterator ],
-			                   LIBEWF_OPEN_READ_WRITE );
-#else
-			file_descriptor = libewf_common_open(
-			                   internal_handle->segment_table->filename[ segment_table_iterator ],
-			                   LIBEWF_OPEN_READ_WRITE );
-#endif
+			if( internal_handle->segment_table->section_list[ segment_table_iterator ]->first == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: missing section list entries.\n",
+				 function );
+
+				return( -1 );
+			}
+			file_descriptor = internal_handle->segment_table->file_descriptor[ segment_table_iterator ];
 
 			if( file_descriptor == -1 )
 			{
+				if( internal_handle->segment_table->filename[ segment_table_iterator ] == NULL )
+				{
+					LIBEWF_WARNING_PRINT( "%s: invalid filename for segment file: %" PRIu32 ".\n",
+					 function, segment_table_iterator );
+
+					return( -1 );
+				}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+				file_descriptor = libewf_common_wide_open(
+						   internal_handle->segment_table->filename[ segment_table_iterator ],
+						   LIBEWF_OPEN_READ_WRITE );
+#else
+				file_descriptor = libewf_common_open(
+						   internal_handle->segment_table->filename[ segment_table_iterator ],
+						   LIBEWF_OPEN_READ_WRITE );
+#endif
+
+				if( file_descriptor == -1 )
+				{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+					 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
+#else
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+					 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
+#endif
+					return( -1 );
+				}
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %ls.\n",
 				 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
 #else
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %s.\n",
 				 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
 #endif
+			}
+			list_entry_iterator = internal_handle->segment_table->section_list[ segment_table_iterator ]->first;
+
+			while( list_entry_iterator != NULL )
+			{
+				if( libewf_common_memcmp( list_entry_iterator->type, "volume", 6 ) == 0 )
+				{
+					LIBEWF_VERBOSE_PRINT( "%s: correcting volume section.\n",
+					 function );
+
+					if( libewf_common_lseek( file_descriptor, list_entry_iterator->start_offset, SEEK_SET ) == -1 )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to find offset to correct volume section.\n",
+						 function );
+
+						return( -1 );
+					}
+					if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+					{
+						/* Write volume (SMART) section
+						 */
+						write_count = libewf_section_volume_s01_write(
+							       internal_handle,
+							       file_descriptor,
+							       list_entry_iterator->start_offset );
+					}
+					else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
+					{
+						/* Write volume section
+						 */
+						write_count = libewf_section_volume_e01_write(
+							       internal_handle,
+							       file_descriptor,
+							       list_entry_iterator->start_offset );
+					}
+					else
+					{
+						write_count = -1;
+					}
+					if( write_count == -1 )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to correct volume section.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
+				else if( libewf_common_memcmp( list_entry_iterator->type, "data", 4 ) == 0 )
+				{
+					LIBEWF_VERBOSE_PRINT( "%s: correcting data section.\n",
+					 function );
+
+					if( libewf_common_lseek(
+					     file_descriptor,
+					     list_entry_iterator->start_offset,
+					     SEEK_SET ) == -1 )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to find offset to data volume section.\n",
+						 function );
+
+						return( -1 );
+					}
+					/* Write data section
+					 */
+					write_count = libewf_section_data_write(
+						       internal_handle,
+						       file_descriptor,
+						       list_entry_iterator->start_offset );
+
+					if( write_count == -1 )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to correct data section.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
+				list_entry_iterator = list_entry_iterator->next;
+			}
+			if( libewf_common_close( file_descriptor ) != 0 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
+				 function );
+
 				return( -1 );
 			}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %ls.\n",
-			 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
-#else
-			LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %s.\n",
-			 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
-#endif
+			internal_handle->segment_table->file_descriptor[ segment_table_iterator ] = -1;
 		}
-		list_entry_iterator = internal_handle->segment_table->section_list[ segment_table_iterator ]->first;
-
-		while( list_entry_iterator != NULL )
-		{
-			if( libewf_common_memcmp( list_entry_iterator->type, "volume", 6 ) == 0 )
-			{
-				LIBEWF_VERBOSE_PRINT( "%s: correcting volume section.\n",
-				 function );
-
-				if( libewf_common_lseek( file_descriptor, list_entry_iterator->start_offset, SEEK_SET ) == -1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to find offset to correct volume section.\n",
-					 function );
-
-					return( -1 );
-				}
-				if( internal_handle->ewf_format == EWF_FORMAT_S01 )
-				{
-					/* Write volume (SMART) section
-					 */
-					write_count = libewf_section_volume_s01_write(
-					               internal_handle,
-					               file_descriptor,
-					               list_entry_iterator->start_offset );
-				}
-				else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
-				{
-					/* Write volume section
-					 */
-					write_count = libewf_section_volume_e01_write(
-					               internal_handle,
-					               file_descriptor,
-					               list_entry_iterator->start_offset );
-				}
-				else
-				{
-					write_count = -1;
-				}
-				if( write_count == -1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to correct volume section.\n",
-					 function );
-
-					return( -1 );
-				}
-			}
-			else if( libewf_common_memcmp( list_entry_iterator->type, "data", 4 ) == 0 )
-			{
-				LIBEWF_VERBOSE_PRINT( "%s: correcting data section.\n",
-				 function );
-
-				if( libewf_common_lseek(
-				     file_descriptor,
-				     list_entry_iterator->start_offset,
-				     SEEK_SET ) == -1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to find offset to data volume section.\n",
-					 function );
-
-					return( -1 );
-				}
-				/* Write data section
-				 */
-				write_count = libewf_section_data_write(
-				               internal_handle,
-				               file_descriptor,
-				               list_entry_iterator->start_offset );
-
-				if( write_count == -1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to correct data section.\n",
-					 function );
-
-					return( -1 );
-				}
-			}
-			list_entry_iterator = list_entry_iterator->next;
-		}
-		if( libewf_common_close( file_descriptor ) != 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->segment_table->file_descriptor[ segment_table_iterator ] = -1;
 	}
+	internal_handle->write->write_finalized = 1;
+
 	return( write_count_finalize );
 }
 

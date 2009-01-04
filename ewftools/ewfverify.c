@@ -69,11 +69,13 @@
  */
 void usage( void )
 {
-	fprintf( stdout, "Usage: ewfverify [ -d digest_type ] [ -hqvV ] ewf_files\n\n" );
+	fprintf( stdout, "Usage: ewfverify [ -d digest_type ] [ -hqsvV ] ewf_files\n\n" );
 
 	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stdout, "\t-h: shows this help\n" );
 	fprintf( stdout, "\t-q: quiet shows no status information\n" );
+	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
 	fprintf( stdout, "\t-V: print version\n" );
 }
@@ -86,6 +88,8 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+
 #if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob                            = NULL;
 	int32_t glob_count                       = 0;
@@ -110,6 +114,7 @@ int main( int argc, char * const argv[] )
 	int8_t stored_sha1_hash_result           = 0;
 	uint8_t calculate_md5                    = 1;
 	uint8_t calculate_sha1                   = 0;
+	uint8_t swap_byte_pairs                  = 0;
 	uint8_t verbose                          = 0;
 	int match_md5_hash                       = 0;
 	int match_sha1_hash                      = 0;
@@ -118,7 +123,7 @@ int main( int argc, char * const argv[] )
 
 	ewfcommon_version_fprint( stdout, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hqvV" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hsqvV" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -151,6 +156,10 @@ int main( int argc, char * const argv[] )
 
 				break;
 
+			case (INT_T) 's':
+				swap_byte_pairs = 1;
+
+				break;
 			case (INT_T) 'v':
 				verbose = 1;
 
@@ -222,23 +231,26 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
-
-	if( stored_md5_hash_string == NULL )
+	if( calculate_md5 == 1 )
 	{
-		fprintf( stderr, "Unable to create stored MD5 hash string.\n" );
+		stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
-		return( EXIT_FAILURE );
-	}
-	calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+		if( stored_md5_hash_string == NULL )
+		{
+			fprintf( stderr, "Unable to create stored MD5 hash string.\n" );
 
-	if( calculated_md5_hash_string == NULL )
-	{
-		fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
+			return( EXIT_FAILURE );
+		}
+		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
-		libewf_common_free( stored_md5_hash_string );
+		if( calculated_md5_hash_string == NULL )
+		{
+			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
 
-		return( EXIT_FAILURE );
+			libewf_common_free( stored_md5_hash_string );
+
+			return( EXIT_FAILURE );
+		}
 	}
 	if( calculate_sha1 == 1 )
 	{
@@ -248,9 +260,11 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create stored SHA1 hash string.\n" );
 
-			libewf_common_free( stored_md5_hash_string );
-			libewf_common_free( calculated_md5_hash_string );
-
+			if( calculate_md5 == 1 )
+			{
+				libewf_common_free( stored_md5_hash_string );
+				libewf_common_free( calculated_md5_hash_string );
+			}
 			return( EXIT_FAILURE );
 		}
 		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
@@ -259,8 +273,11 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
 
-			libewf_common_free( stored_md5_hash_string );
-			libewf_common_free( calculated_md5_hash_string );
+			if( calculate_md5 == 1 )
+			{
+				libewf_common_free( stored_md5_hash_string );
+				libewf_common_free( calculated_md5_hash_string );
+			}
 			libewf_common_free( stored_sha1_hash_string );
 
 			return( EXIT_FAILURE );
@@ -305,6 +322,7 @@ int main( int argc, char * const argv[] )
 	         calculate_sha1,
 	         calculated_sha1_hash_string,
 	         LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
+	         swap_byte_pairs,
 	         callback );
 
 	timestamp_end = time( NULL );
@@ -326,9 +344,11 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
-		libewf_common_free( stored_md5_hash_string );
-		libewf_common_free( calculated_md5_hash_string );
-
+		if( calculate_md5 == 1 )
+		{
+			libewf_common_free( stored_md5_hash_string );
+			libewf_common_free( calculated_md5_hash_string );
+		}
 		if( calculate_sha1 == 1 )
 		{
 			libewf_common_free( stored_sha1_hash_string );
@@ -355,28 +375,53 @@ int main( int argc, char * const argv[] )
 
 	fprintf( stdout, "\n" );
 
-	stored_md5_hash_result = libewf_get_stored_md5_hash(
-	                          handle,
-	                          stored_md5_hash_string,
-	                          LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
-
-	if( stored_md5_hash_result == -1 )
+	if( calculate_md5 == 1 )
 	{
-		fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+		stored_md5_hash_result = libewf_get_md5_hash(
+					  handle,
+					  md5_hash,
+					  EWFDIGEST_HASH_SIZE_MD5 );
 
-		if( libewf_close( handle ) != 0 )
+		if( stored_md5_hash_result == -1 )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		libewf_common_free( stored_md5_hash_string );
-		libewf_common_free( calculated_md5_hash_string );
+			fprintf( stderr, "Unable to get stored MD5 hash.\n" );
 
-		if( calculate_sha1 == 1 )
-		{
-			libewf_common_free( stored_sha1_hash_string );
-			libewf_common_free( calculated_sha1_hash_string );
+			if( libewf_close( handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			libewf_common_free( stored_md5_hash_string );
+			libewf_common_free( calculated_md5_hash_string );
+
+			if( calculate_sha1 == 1 )
+			{
+				libewf_common_free( stored_sha1_hash_string );
+				libewf_common_free( calculated_sha1_hash_string );
+			}
+			return( EXIT_FAILURE );
 		}
-		return( EXIT_FAILURE );
+		if( ewfdigest_copy_to_string(
+		     md5_hash,
+		     EWFDIGEST_HASH_SIZE_MD5,
+		     stored_md5_hash_string,
+		     LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
+		{
+			fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
+
+			if( libewf_close( handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			libewf_common_free( stored_md5_hash_string );
+			libewf_common_free( calculated_md5_hash_string );
+
+			if( calculate_sha1 == 1 )
+			{
+				libewf_common_free( stored_sha1_hash_string );
+				libewf_common_free( calculated_sha1_hash_string );
+			}
+			return( EXIT_FAILURE );
+		}
 	}
 	if( calculate_sha1 == 1 )
 	{
@@ -394,8 +439,11 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			libewf_common_free( stored_md5_hash_string );
-			libewf_common_free( calculated_md5_hash_string );
+			if( calculate_md5 == 1 )
+			{
+				libewf_common_free( stored_md5_hash_string );
+				libewf_common_free( calculated_md5_hash_string );
+			}
 			libewf_common_free( stored_sha1_hash_string );
 			libewf_common_free( calculated_sha1_hash_string );
 
@@ -408,9 +456,11 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
-		libewf_common_free( stored_md5_hash_string );
-		libewf_common_free( calculated_md5_hash_string );
-
+		if( calculate_md5 == 1 )
+		{
+			libewf_common_free( stored_md5_hash_string );
+			libewf_common_free( calculated_md5_hash_string );
+		}
 		if( calculate_sha1 == 1 )
 		{
 			libewf_common_free( stored_sha1_hash_string );
@@ -418,24 +468,26 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( stored_md5_hash_result == 0 )
+	if( calculate_md5 == 1 )
 	{
-		fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
+		if( stored_md5_hash_result == 0 )
+		{
+			fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
+		}
+		else
+		{
+			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_EWF "\n", stored_md5_hash_string );
+		}
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
+
+		match_md5_hash = ( libewf_string_compare(
+		                    stored_md5_hash_string,
+		                    calculated_md5_hash_string,
+		                    LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
+
+		libewf_common_free( stored_md5_hash_string );
+		libewf_common_free( calculated_md5_hash_string );
 	}
-	else
-	{
-		fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_EWF "\n", stored_md5_hash_string );
-	}
-	fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
-
-	match_md5_hash = ( libewf_string_compare(
-	                    stored_md5_hash_string,
-	                    calculated_md5_hash_string,
-	                    LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
-
-	libewf_common_free( stored_md5_hash_string );
-	libewf_common_free( calculated_md5_hash_string );
-
 	if( calculate_sha1 == 1 )
 	{
 		if( stored_sha1_hash_result == 0 )

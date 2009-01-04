@@ -50,8 +50,6 @@ int8_t libewf_endian_revert_16bit( uint16_t value, uint8_t *bytes );
 int8_t libewf_endian_revert_32bit( uint32_t value, uint8_t *bytes );
 int8_t libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes );
 
-int8_t libewf_endian_swap_byte_pairs( uint8_t *buffer, size_t size );
-
 #if defined( __cplusplus )
 }
 #endif

@@ -1425,6 +1425,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	size_t size                       = 0;
 	uint32_t offset32_value           = 0;
 	uint32_t iterator                 = 0;
+	uint8_t overflow                  = 0;
 	uint8_t write_crc                 = 0;
 
 	if( internal_handle == NULL )
@@ -1507,8 +1508,9 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		offset64_value = offset_table->offset[ offset_table_index + iterator ]
 		               - base_offset;
 
-		if( ( offset64_value < 0 )
-		 || ( offset64_value > (off64_t) INT32_MAX ) )
+		if( ( overflow == 0 )
+		 && ( ( offset64_value < 0 )
+		  || ( offset64_value > (off64_t) INT32_MAX ) ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value.\n",
 			 function );
@@ -1522,7 +1524,20 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		if( offset_table->compressed[ offset_table_index + iterator ] != 0 )
 		{
-			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+			if( overflow == 0 )
+			{
+				offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write compressed chunks after chunk overflow.\n",
+				 function );
+
+				libewf_common_free( table );
+				libewf_common_free( offsets );
+
+				return( -1 );
+			}
 		}
 		if( libewf_endian_revert_32bit( offset32_value, (uint8_t *) offsets[ iterator ].offset ) != 1 )
 		{
@@ -1537,12 +1552,27 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6
 		 */
-		if( ( offset32_value + offset_table->size[ offset_table_index + iterator ] ) > (uint32_t) INT32_MAX )
+		if( ( overflow == 0 )
+		 && ( ( offset64_value + offset_table->size[ offset_table_index + iterator ] ) > (off64_t) INT32_MAX ) )
 		{
-			base_offset += offset32_value;
+			if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+			 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
+				 function, offset64_value );
 
-			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround, new base: %" PRIu32 ".\n",
-			 function, base_offset );
+				overflow = 1;
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
+				 function, offset64_value );
+
+				libewf_common_free( table );
+				libewf_common_free( offsets );
+
+				return( -1 );
+			}
 		}
 	}
 	section_write_count = libewf_section_start_write(
@@ -2674,7 +2704,7 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 			return( -1 );
 		}
 	}
-	if( libewf_internal_handle_set_stored_md5_hash( internal_handle, hash->md5_hash ) != 1 )
+	if( libewf_common_memcpy( internal_handle->md5_hash, hash->md5_hash, size ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
 		 function );
@@ -2686,6 +2716,8 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 			return( -1 );
 		}
 	}
+	internal_handle->md5_hash_set = 1;
+
 	libewf_common_free( hash );
 
 	return( (ssize_t) size );
@@ -3282,7 +3314,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		/* Determine the size of the largest segment file for read and write mode only
 		 */
 		if( ( internal_handle->write != NULL )
-		 && ( (off64_t) internal_handle->write->segment_file_size < ( *section_start_offset + EWF_SECTION_SIZE ) ) )
+		 && ( (off64_t) internal_handle->write->segment_file_size < ( *section_start_offset + (off64_t) EWF_SECTION_SIZE ) ) )
 		{
 			internal_handle->write->segment_file_size = (size64_t) ( *section_start_offset + EWF_SECTION_SIZE );
 		}

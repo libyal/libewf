@@ -77,8 +77,6 @@ LIBEWF_EXTERN int libewf_close( LIBEWF_HANDLE *handle );
 
 LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
 
-LIBEWF_EXTERN int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size );
-
 LIBEWF_EXTERN int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk );
 LIBEWF_EXTERN int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector );
 LIBEWF_EXTERN int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors );
@@ -93,6 +91,7 @@ LIBEWF_EXTERN int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN int8_t libewf_get_format( LIBEWF_HANDLE *handle );
 
 LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
 LIBEWF_EXTERN int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks );
 
@@ -102,11 +101,8 @@ LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *ide
 LIBEWF_EXTERN int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk );
 LIBEWF_EXTERN int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector );
 
-/* TODO remove libewf_set_media_values()
- */
-LIBEWF_EXTERN int libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
-
 LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+LIBEWF_EXTERN int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
 LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size );
 LIBEWF_EXTERN int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity );
@@ -117,11 +113,6 @@ LIBEWF_EXTERN int libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t i
 
 LIBEWF_EXTERN int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 LIBEWF_EXTERN int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-
-LIBEWF_EXTERN int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs );
-
-LIBEWF_EXTERN int libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );
-LIBEWF_EXTERN int libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );
 
 LIBEWF_EXTERN int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format );
 LIBEWF_EXTERN int libewf_parse_hash_values( LIBEWF_HANDLE *handle );

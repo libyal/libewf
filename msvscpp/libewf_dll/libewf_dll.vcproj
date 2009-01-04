@@ -59,7 +59,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				UseLibraryDependencyInputs="true"
-				AdditionalDependencies="advapi32.lib zdll.lib"
+				AdditionalDependencies="zdll.lib"
 				OutputFile="$(OutDir)\libewf.dll"
 				Version=""
 				LinkIncremental="0"
@@ -203,6 +203,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\ewf_session.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\ewf_string.c"
 				>
 			</File>
@@ -232,10 +236,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_debug.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_digest_context.c"
 				>
 			</File>
 			<File
@@ -397,10 +397,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_digest_context.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_endian.h"
 				>
 			</File>
@@ -426,10 +422,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_internal_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_md5.h"
 				>
 			</File>
 			<File

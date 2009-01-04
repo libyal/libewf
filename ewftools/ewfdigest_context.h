@@ -45,7 +45,7 @@
 #error Unsupported cryptographic library.
 #endif
 
-#include "ewf_digest_hash.h"
+#include "ewfdigest_hash.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -78,7 +78,7 @@ struct ewfdigest_context
 
 int ewfdigest_context_initialize( EWFDIGEST_CONTEXT *digest_context, uint8_t type );
 int ewfdigest_context_update( EWFDIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size );
-int ewfdigest_context_finalize( EWFDIGEST_CONTEXT *digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size );
+int ewfdigest_context_finalize( EWFDIGEST_CONTEXT *digest_context, EWFDIGEST_HASH *digest_hash, size_t *size );
 
 #if defined( __cplusplus )
 }
