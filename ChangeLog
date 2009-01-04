@@ -1,8 +1,6 @@
 Roadmap:
 * create iso2ewf tool?
 * resume write i.e. system failure (check to which part EWF files ok)
-  - requires (some form of) read and write mode
-  - error resistency
 * lvf support
 * library/tools enhancements (getoptlong)
 * internationalisation (gettext)
@@ -21,11 +19,8 @@ Further analysis of the EWF format:
 To do/think about:
 * all: add LVF support - ltree section
 * all: check for race conditions especially on change of data elements
-* all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
-  - can the values in data be used to correct a corrupted volume ?
 * all: allow for multiple language support - what about gettext?
 * libewf_string: enhance UTF16 conversion code
-* read: correct for errors in the table or table2 section for EWF-E01
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
   - use io pooling
@@ -45,9 +40,6 @@ To do/think about:
   - make a generic media access solution also useable for revit?
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
-* ewfdebug: create a tool to analyse a single segment file
-* ewfrecover: create a tool recover ewf files
-* ewfverify: detect and show which files are corrupted
 * ewfverify: verify against all available hashes that can be verified
 * windows port: for ewftools integrate certain functions in the library
 * windows port: build globbing support - basic support in there
@@ -57,6 +49,17 @@ To do/think about:
 
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   - header2 and ltree only affected sections
+
+Recovery and analysis:
+* resume write i.e. system failure (check to which part EWF files ok)
+  - requires (some form of) read and write mode
+  - error resistency
+* all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
+  - can the values in data be used to correct a corrupted volume ?
+* read: correct for errors in the table or table2 section for EWF-E01
+* ewfdebug: create a tool to analyse a single segment file
+* ewfrecover: create a tool recover ewf files
+* ewfverify: detect and show which files are corrupted
 
 Additional (integrity) checks:
 * check if successive headers match first header ?
@@ -125,13 +128,12 @@ Next release(s):
 
 * implement io pooling?
 
-* all: implement signal handling - cancelation option in library?
-  - mainly for read/writes of large buffers
-
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing
 
 * refactor time/date string functions to only set the string not allocate it?
+
+* use libewf_glob instead of ewfglob ?
 
 Next stable:
 * full platform test
@@ -141,6 +143,10 @@ Next stable:
 
 * test abort
 * test session section R/W functionality
+
+* implement signal handling in ewfacquire, ewfacquirestream, ewfinfo,
+  ewfexport, ewfalter
+* fix signal handling for WIN32
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -168,6 +174,7 @@ CLOSED
 Version: 20080303
 * added byte size string to ewfinfo
 * updated manuals of ewfinfo
+* worked on signal handling
 
 Version: 20080302
 * Code clean up

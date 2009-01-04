@@ -105,7 +105,6 @@ int main( int argc, char * const argv[] )
 	EWFGLOB *glob                              = NULL;
 	int32_t glob_count                         = 0;
 #endif
-	LIBEWF_HANDLE *handle                      = NULL;
 	libewf_char_t *stored_md5_hash_string      = NULL;
 	libewf_char_t *calculated_md5_hash_string  = NULL;
 	libewf_char_t *stored_sha1_hash_string     = NULL;
@@ -136,8 +135,6 @@ int main( int argc, char * const argv[] )
 	int match_md5_hash                         = 0;
 	int match_sha1_hash                        = 0;
 	int result                                 = 0;
-
-	ewfsignal_initialize();
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -220,6 +217,11 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( ewfsignal_attach(
+	     ewfcommon_signal_handler ) != 1 )
+	{
+		fprintf( stderr, "Unable to attach signal handler.\n" );
+	}
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
@@ -247,21 +249,21 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	handle = libewf_open(
-	          glob->results,
-	          glob->amount,
-	          LIBEWF_OPEN_READ );
+	ewfcommon_libewf_handle = libewf_open(
+	                           glob->results,
+	                           glob->amount,
+	                           LIBEWF_OPEN_READ );
 
 	ewfglob_free(
 	 glob );
 #else
-	handle = libewf_open(
-	          &argv[ optind ],
-	          ( argc - optind ),
-	          LIBEWF_OPEN_READ );
+	ewfcommon_libewf_handle = libewf_open(
+	                           &argv[ optind ],
+	                           ( argc - optind ),
+	                           LIBEWF_OPEN_READ );
 #endif
 
-	if( handle == NULL )
+	if( ewfcommon_libewf_handle == NULL )
 	{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
@@ -378,13 +380,13 @@ int main( int argc, char * const argv[] )
 	if( calculate_sha1 == 1 )
 	{
 		if( libewf_parse_hash_values(
-		     handle ) != 1 )
+		     ewfcommon_libewf_handle ) != 1 )
 		{
 			fprintf( stderr, "Unable to get parse hash values.\n" );
 		}
 	}
 	count = ewfcommon_read_verify(
-	         handle,
+	         ewfcommon_libewf_handle,
 	         calculate_md5,
 	         calculated_md5_hash_string,
 	         EWFSTRING_DIGEST_HASH_LENGTH_MD5,
@@ -395,138 +397,28 @@ int main( int argc, char * const argv[] )
 	         wipe_chunk_on_error,
 	         callback );
 
-	timestamp_end = time( NULL );
-	time_string   = libewf_common_ctime(
-	                 &timestamp_end );
-
-	if( count <= -1 )
+	if( ewfcommon_abort == 0 )
 	{
-		if( time_string != NULL )
-		{
-			fprintf( stdout, "Verify failed at: %" PRIs "\n",
-			 time_string );
+		timestamp_end = time( NULL );
+		time_string   = libewf_common_ctime(
+				 &timestamp_end );
 
-			libewf_common_free(
-			 time_string );
-		}
-		else
+		if( count <= -1 )
 		{
-			fprintf( stdout, "Verify failed.\n" );
-		}
-		if( libewf_close(
-		     handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		if( calculate_md5 == 1 )
-		{
-			libewf_common_free(
-			 stored_md5_hash_string );
-			libewf_common_free(
-			 calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			libewf_common_free(
-			 stored_sha1_hash_string );
-			libewf_common_free(
-			 calculated_sha1_hash_string );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( time_string != NULL )
-	{
-		fprintf( stdout, "Verify completed at: %" PRIs "\n",
-		 time_string );
+			if( time_string != NULL )
+			{
+				fprintf( stdout, "Verify failed at: %" PRIs "\n",
+				 time_string );
 
-		libewf_common_free(
-		 time_string );
-	}
-	else
-	{
-		fprintf( stdout, "Verify completed.\n" );
-	}
-	ewfoutput_process_summary_fprint(
-	 stdout,
-	 _S_LIBEWF_CHAR( "Read" ),
-	 count,
-	 timestamp_start,
-	 timestamp_end );
-
-	fprintf( stdout, "\n" );
-
-	if( calculate_md5 == 1 )
-	{
-		stored_md5_hash_result = libewf_get_md5_hash(
-					  handle,
-					  md5_hash,
-					  EWFDIGEST_HASH_SIZE_MD5 );
-
-		if( stored_md5_hash_result == -1 )
-		{
-			fprintf( stderr, "Unable to get stored MD5 hash.\n" );
-
+				libewf_common_free(
+				 time_string );
+			}
+			else
+			{
+				fprintf( stdout, "Verify failed.\n" );
+			}
 			if( libewf_close(
-			     handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			libewf_common_free(
-			 stored_md5_hash_string );
-			libewf_common_free(
-			 calculated_md5_hash_string );
-
-			if( calculate_sha1 == 1 )
-			{
-				libewf_common_free(
-				 stored_sha1_hash_string );
-				libewf_common_free(
-				 calculated_sha1_hash_string );
-			}
-			return( EXIT_FAILURE );
-		}
-		if( ewfdigest_copy_to_string(
-		     md5_hash,
-		     EWFDIGEST_HASH_SIZE_MD5,
-		     stored_md5_hash_string,
-		     EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
-		{
-			fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
-
-			if( libewf_close(
-			     handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			libewf_common_free(
-			 stored_md5_hash_string );
-			libewf_common_free(
-			 calculated_md5_hash_string );
-
-			if( calculate_sha1 == 1 )
-			{
-				libewf_common_free(
-				 stored_sha1_hash_string );
-				libewf_common_free(
-				 calculated_sha1_hash_string );
-			}
-			return( EXIT_FAILURE );
-		}
-	}
-	if( calculate_sha1 == 1 )
-	{
-		stored_sha1_hash_result = libewf_get_hash_value(
-		                           handle,
-		                           _S_LIBEWF_CHAR( "SHA1" ),
-		                           stored_sha1_hash_string,
-		                           EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
-
-		if( stored_sha1_hash_result == -1 )
-		{
-			fprintf( stderr, "Unable to get stored SHA1 hash.\n" );
-
-			if( libewf_close(
-			     handle ) != 0 )
+			     ewfcommon_libewf_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
@@ -537,40 +429,153 @@ int main( int argc, char * const argv[] )
 				libewf_common_free(
 				 calculated_md5_hash_string );
 			}
-			libewf_common_free(
-			 stored_sha1_hash_string );
-			libewf_common_free(
-			 calculated_sha1_hash_string );
-
+			if( calculate_sha1 == 1 )
+			{
+				libewf_common_free(
+				 stored_sha1_hash_string );
+				libewf_common_free(
+				 calculated_sha1_hash_string );
+			}
 			return( EXIT_FAILURE );
 		}
-	}
-	if( log_filename != NULL )
-	{
-		log_file_stream = fopen(
-		                   log_filename,
-		                   "w" );
-
-		if( log_file_stream == NULL )
+		if( time_string != NULL )
 		{
-			fprintf( stderr, "Unable to open log file: %s.\n",
-			 log_filename );
+			fprintf( stdout, "Verify completed at: %" PRIs "\n",
+			 time_string );
+
+			libewf_common_free(
+			 time_string );
+		}
+		else
+		{
+			fprintf( stdout, "Verify completed.\n" );
+		}
+		ewfoutput_process_summary_fprint(
+		 stdout,
+		 _S_LIBEWF_CHAR( "Read" ),
+		 count,
+		 timestamp_start,
+		 timestamp_end );
+
+		fprintf( stdout, "\n" );
+
+		if( calculate_md5 == 1 )
+		{
+			stored_md5_hash_result = libewf_get_md5_hash(
+						  ewfcommon_libewf_handle,
+						  md5_hash,
+						  EWFDIGEST_HASH_SIZE_MD5 );
+
+			if( stored_md5_hash_result == -1 )
+			{
+				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				libewf_common_free(
+				 stored_md5_hash_string );
+				libewf_common_free(
+				 calculated_md5_hash_string );
+
+				if( calculate_sha1 == 1 )
+				{
+					libewf_common_free(
+					 stored_sha1_hash_string );
+					libewf_common_free(
+					 calculated_sha1_hash_string );
+				}
+				return( EXIT_FAILURE );
+			}
+			if( ewfdigest_copy_to_string(
+			     md5_hash,
+			     EWFDIGEST_HASH_SIZE_MD5,
+			     stored_md5_hash_string,
+			     EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
+			{
+				fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				libewf_common_free(
+				 stored_md5_hash_string );
+				libewf_common_free(
+				 calculated_md5_hash_string );
+
+				if( calculate_sha1 == 1 )
+				{
+					libewf_common_free(
+					 stored_sha1_hash_string );
+					libewf_common_free(
+					 calculated_sha1_hash_string );
+				}
+				return( EXIT_FAILURE );
+			}
+		}
+		if( calculate_sha1 == 1 )
+		{
+			stored_sha1_hash_result = libewf_get_hash_value(
+						   ewfcommon_libewf_handle,
+						   _S_LIBEWF_CHAR( "SHA1" ),
+						   stored_sha1_hash_string,
+						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+
+			if( stored_sha1_hash_result == -1 )
+			{
+				fprintf( stderr, "Unable to get stored SHA1 hash.\n" );
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				if( calculate_md5 == 1 )
+				{
+					libewf_common_free(
+					 stored_md5_hash_string );
+					libewf_common_free(
+					 calculated_md5_hash_string );
+				}
+				libewf_common_free(
+				 stored_sha1_hash_string );
+				libewf_common_free(
+				 calculated_sha1_hash_string );
+
+				return( EXIT_FAILURE );
+			}
+		}
+		if( log_filename != NULL )
+		{
+			log_file_stream = fopen(
+					   log_filename,
+					   "w" );
+
+			if( log_file_stream == NULL )
+			{
+				fprintf( stderr, "Unable to open log file: %s.\n",
+				 log_filename );
+			}
+		}
+		ewfoutput_crc_errors_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle,
+		 &amount_of_crc_errors );
+
+		if( log_file_stream != NULL )
+		{
+			ewfoutput_crc_errors_fprint(
+			 log_file_stream,
+			 ewfcommon_libewf_handle,
+			 &amount_of_crc_errors );
 		}
 	}
-	ewfoutput_crc_errors_fprint(
-	 stdout,
-	 handle,
-	 &amount_of_crc_errors );
-
-	if( log_file_stream != NULL )
-	{
-		ewfoutput_crc_errors_fprint(
-		 log_file_stream,
-		 handle,
-		 &amount_of_crc_errors );
-	}
 	if( libewf_close(
-	     handle ) != 0 )
+	     ewfcommon_libewf_handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
@@ -590,6 +595,17 @@ int main( int argc, char * const argv[] )
 		}
 		fclose(
 		 log_file_stream );
+
+		return( EXIT_FAILURE );
+	}
+	if( ewfsignal_detach() != 1 )
+	{
+		fprintf( stderr, "Unable to detach signal handler.\n" );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
+		 program );
 
 		return( EXIT_FAILURE );
 	}
@@ -692,13 +708,15 @@ int main( int argc, char * const argv[] )
 	  || ( stored_sha1_hash_result == 0 )
 	  || match_sha1_hash ) )
 	{
-		fprintf( stdout, "\n%" PRIs_EWF ": SUCCESS\n", program );
+		fprintf( stdout, "\n%" PRIs_EWF ": SUCCESS\n",
+		 program );
 
 		result = EXIT_SUCCESS;
 	}
 	else
 	{
-		fprintf( stdout, "\n%" PRIs_EWF ": FAILURE\n", program );
+		fprintf( stdout, "\n%" PRIs_EWF ": FAILURE\n",
+		 program );
 
 		result = EXIT_FAILURE;
 	}

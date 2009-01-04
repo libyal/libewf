@@ -45,13 +45,54 @@
 
 #include <signal.h>
 
-/* Signal handler for Ctrl+C or Ctrl+Break signals
+/* Attaches a signal handler for SIGINT
+ * Returns 1 if successful or -1 on error
  */
-void ewfsignal_signal_handler( int signal )
+int ewfsignal_attach(
+     void (*signal_handler)( ewfsignal_t ) )
 {
-	signal = 0;
+	static char *function = "ewfsignal_attach";
+
+	if( signal_handler == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( signal(
+	     SIGINT,
+	     signal_handler ) == SIG_ERR )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to attach signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
+/* Detaches a signal handler for SIGINT
+ * Returns 1 if successful or -1 on error
+ */
+int ewfsignal_detach(
+     void )
+{
+	static char *function = "ewfsignal_detach";
+
+	if( signal(
+	     SIGINT,
+	     SIG_DFL ) == SIG_ERR )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to detach signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* TODO remove function */
 void ewfsignal_initialize( void )
 {
 }

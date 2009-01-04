@@ -44,6 +44,7 @@
 
 #include "ewfdigest_context.h"
 #include "ewfmd5.h"
+#include "ewfsignal.h"
 #include "ewfsha1.h"
 #include "ewfstring.h"
 
@@ -57,6 +58,12 @@
 #if defined( __cplusplus )
 extern "C" {
 #endif
+
+extern int ewfcommon_abort;
+extern LIBEWF_HANDLE *ewfcommon_libewf_handle;
+
+void ewfcommon_signal_handler(
+      ewfsignal_t signal );
 
 int ewfcommon_swap_byte_pairs(
      uint8_t *buffer,

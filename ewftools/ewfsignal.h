@@ -45,7 +45,14 @@ extern "C" {
 #endif
 
 #if defined( HAVE_SIGNAL_H )
-void ewfsignal_handler( int signal );
+typedef int ewfsignal_t;
+
+int ewfsignal_attach(
+     void (*signal_hanlder)( ewfsignal_t ) );
+
+int ewfsignal_detach(
+     void );
+
 void ewfsignal_initialize( void );
 
 #elif defined( HAVE_WINDOWS_API )
