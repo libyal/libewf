@@ -1,4 +1,4 @@
-.Dd July 17, 2007
+.Dd November 11, 2007
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -19,7 +19,7 @@
 .Op Fl N Ar notes
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
-.Op Fl -hsvV
+.Op Fl -hsvVw
 .Sh DESCRIPTION
 .Nm ewfacquirestream
 is a utility to acquire media data from stdin
@@ -81,6 +81,8 @@ the target file (without extension) to write to (default is stream)
 verbose output to stderr
 .It Fl V
 print version
+.It Fl w
+wipe sectors on read error (mimic EnCase like behavior)
 .El
 .Pp
 .Nm ewfacquirestream

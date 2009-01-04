@@ -116,7 +116,7 @@ void usage( void )
  * and asks the user for confirmation
  * Return 1 if confirmed by user, 0 otherwise
  */
-int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
+int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_chunk_on_error )
 {
 	LIBEWF_CHAR *user_input = NULL;
 	int input_confirmed     = -1;
@@ -142,7 +142,7 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 	 sectors_per_chunk,
 	 sector_error_granularity,
 	 read_error_retry,
-	 wipe_block_on_read_error );
+	 wipe_chunk_on_error );
 
 	/* Ask for confirmation
 	 */
@@ -276,7 +276,7 @@ int main( int argc, char * const argv[] )
 	int8_t compress_empty_block              = 0;
 	int8_t media_type                        = LIBEWF_MEDIA_TYPE_FIXED;
 	int8_t volume_type                       = LIBEWF_VOLUME_TYPE_LOGICAL;
-	int8_t wipe_block_on_read_error          = 0;
+	int8_t wipe_chunk_on_error               = 0;
 	uint8_t libewf_format                    = LIBEWF_FORMAT_UNKNOWN;
 	uint8_t read_error_retry                 = 2;
 	uint8_t swap_byte_pairs                  = 0;
@@ -653,13 +653,13 @@ int main( int argc, char * const argv[] )
 		              _S_LIBEWF_CHAR( "Wipe sectors on read error (mimic EnCase like behavior)" ),
 		              ewfinput_yes_no,
 		              2,
-		              0 );
+		              1 );
 
-		wipe_block_on_read_error = ewfinput_determine_yes_no( user_input );
+		wipe_chunk_on_error = ewfinput_determine_yes_no( user_input );
 
 		libewf_common_free( user_input );
 
-		if( wipe_block_on_read_error <= -1 )
+		if( wipe_chunk_on_error <= -1 )
 		{
 			fprintf( stderr, "Unsupported answer.\n" );
 
@@ -687,7 +687,7 @@ int main( int argc, char * const argv[] )
 	        (uint32_t) sectors_per_chunk,
 	        (uint32_t) sector_error_granularity,
 	        read_error_retry,
-	        (uint8_t) wipe_block_on_read_error ) == 0 );
+	        (uint8_t) wipe_chunk_on_error ) == 0 );
 
 	/* Done asking user input set up the libewf handle
 	 */
@@ -1129,7 +1129,7 @@ int main( int argc, char * const argv[] )
 	               acquiry_offset,
 	               read_error_retry,
 	               (uint32_t) sector_error_granularity,
-	               (uint8_t) wipe_block_on_read_error,
+	               (uint8_t) wipe_chunk_on_error,
 	               seek_on_error,
 	               calculate_md5,
 	               calculated_md5_hash_string,

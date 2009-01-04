@@ -71,7 +71,7 @@
 void usage( void )
 {
 	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -f format ] [ -o offset ]\n" );
-	fprintf( stderr, "                 [ -S segment_file_size ] [ -t target_file ] [ -hsquvVw ] ewf_files\n\n" );
+	fprintf( stderr, "                 [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
 
 	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
 	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );

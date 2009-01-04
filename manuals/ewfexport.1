@@ -1,4 +1,4 @@
-.Dd November 4, 2007
+.Dd November 11, 2007
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -6,8 +6,14 @@
 .Nd exports media data stored in EWF files
 .Sh SYNOPSIS
 .Nm ewfexport
-.Op Fl t Ar target_file
-.Op Fl hsqvVw
+.Op Fl b Ar amount_of_sectors
+.Op Fl B Ar amount_of_bytes
+.Op Fl c Ar compression_type
+.Op Fl f Ar format
+.Op Fl o Ar offset
+.Op Fl S Ar segment_file_size
+.Op Fl t Ar target
+.Op Fl hsquvVw
 .Va Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfexport
@@ -32,15 +38,26 @@ are the EWF file(s) to read the meta data from.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl b Ar amount_of_sectors
+the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
+.It Fl B Ar amount_of_bytes
+the amount of bytes to export
+.It Fl c Ar compression_type
+the compression type, options: none (is default), empty_block, fast, best
+.It Fl f Ar format
+the file format to write to, options: raw (is default), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
 .It Fl h
 shows this help
-.It Fl q
-quiet shows no status information
 .It Fl s
 swap byte pairs of the media data (from AB to BA)
 (use this for big to little endian conversion and vice versa)
-.It Fl t Ar target_file
-target file to export to (default is stdout)
+.It Fl S Ar segment_file_size
+the segment file size in kbytes (2^10) (default is 665600)
+.It Fl t Ar target
+specify the target file to export to, use - for stdout (default is export)
+stdout is only supported for the raw format
+.It Fl u
+unattended mode (disables user interaction)
 .It Fl v
 verbose output to stderr
 .It Fl V
@@ -56,14 +73,16 @@ None
 .Nm ewfexport
 will ask the information it needs.
 .Bd -literal
-# ewfexport -t floppy.raw floppy.E01
-ewfexport 20070512 (libewf 20070512, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+# ewfexport floppy.E01
+ewfexport 20071011 (libewf 20071011, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Information for export required, please provide the necessary input
+Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
+Target path and filename with extension or - for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 
-Export started at: Sat May 12 19:19:40 2006
+Export started at: Sun Nov 11 19:19:40 2006
 
 This could take a while.
 
@@ -76,7 +95,7 @@ Status: at 100%.
         exported 1.4 MB (1474560 bytes) of total 1.4 MB (1474560 bytes).
         completion in 1 second(s) with 1 MB/s (1474560 bytes/second).
 
-Export completed at: Sat May 12 19:19:41 2006
+Export completed at: Sun Nov 11 19:19:41 2006
 
 Written: 1.4 MB (1474560 bytes) in 1 second(s) with 1 MB/s (1474560 bytes/second).
 .Ed

@@ -77,7 +77,7 @@ void usage( void )
 {
 	fprintf( stdout, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
 	fprintf( stdout, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -m media_type ] [ -M volume_type ] [ -N notes ]\n" );
-	fprintf( stdout, "                        [ -S segment_file_size ] [ -t target ] [ -hsvV ]\n\n" );
+	fprintf( stdout, "                        [ -S segment_file_size ] [ -t target ] [ -hsvVw ]\n\n" );
 
 	fprintf( stdout, "\tReads data from stdin\n\n" );
 
@@ -101,6 +101,7 @@ void usage( void )
 	fprintf( stdout, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
 	fprintf( stdout, "\t-V: print version\n" );
+	fprintf( stdout, "\t-w: wipe sectors on read error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -154,7 +155,7 @@ int main( int argc, char * const argv[] )
 	uint8_t volume_type                      = LIBEWF_VOLUME_TYPE_PHYSICAL;
 	uint8_t compress_empty_block             = 0;
 	uint8_t libewf_format                    = LIBEWF_FORMAT_ENCASE5;
-	uint8_t wipe_block_on_read_error         = 0;
+	uint8_t wipe_chunk_on_error              = 0;
 	uint8_t read_error_retry                 = 2;
 	uint8_t swap_byte_pairs                  = 0;
 	uint8_t seek_on_error                    = 0;
@@ -166,7 +167,7 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_version_fprint( stdout, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:c:C:d:D:e:E:f:hm:M:N:sS:t:vV" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:c:C:d:D:e:E:f:hm:M:N:sS:t:vVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -321,6 +322,11 @@ int main( int argc, char * const argv[] )
 				ewfoutput_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (INT_T) 'w':
+				wipe_chunk_on_error = 1;
+
+				break;
 		}
 	}
 	libewf_set_notify_values( stderr, verbose );
@@ -478,7 +484,7 @@ int main( int argc, char * const argv[] )
 	 (uint32_t) sectors_per_chunk,
 	 sector_error_granularity,
 	 read_error_retry,
-	 wipe_block_on_read_error );
+	 wipe_chunk_on_error );
 
 	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
 
@@ -783,7 +789,7 @@ int main( int argc, char * const argv[] )
 	               acquiry_offset,
 	               read_error_retry,
 	               sector_error_granularity,
-	               wipe_block_on_read_error,
+	               wipe_chunk_on_error,
 	               seek_on_error,
 	               calculate_md5,
 	               calculated_md5_hash_string,

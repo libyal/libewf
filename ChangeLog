@@ -112,7 +112,6 @@ Next release:
 * full platform test
 
 * add maximum check to set functions in file/internal handle
-* move open segment files in file to segment file to read segment table function
 
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
@@ -138,9 +137,6 @@ Next release:
 * API function get current chunk size?
 * do not finalize on write error?
 
-* change default wipe behavior for ewfacquire(stream)
-  - test behavior first
-
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -154,6 +150,10 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071111
+* changed default wipe behavior for ewfacquire(stream)
+  default behavior is that only remainder of the chunk is wiped instead of the entire chunk
 
 Version: 20071110
 * updated MSVSC++ project files

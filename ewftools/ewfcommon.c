@@ -193,7 +193,7 @@ int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format )
 /* Reads data from a file descriptor into the chunk cache
  * Returns the amount of bytes read, 0 if at end of input, or -1 on error
  */
-ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint8_t *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
+ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint8_t *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_chunk_on_error, uint8_t seek_on_error )
 {
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	CHAR_T *error_string              = NULL;
@@ -449,7 +449,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 				error_granularity_offset = ( read_error_offset / byte_error_granularity ) * byte_error_granularity;
 				error_skip_bytes         = ( error_granularity_offset + byte_error_granularity ) - read_error_offset;
 
-				if( wipe_block_on_read_error == 1 )
+				if( wipe_chunk_on_error == 1 )
 				{
 					LIBEWF_VERBOSE_PRINT( "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
 					 function, byte_error_granularity, error_granularity_offset );
@@ -1102,7 +1102,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 /* Writes data in EWF format from a file descriptor
  * Returns the amount of bytes written, or -1 on error
  */
-ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_chunk_on_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1286,7 +1286,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		              write_size,
 		              read_error_retry,
 		              sector_error_granularity,
-		              wipe_block_on_read_error,
+		              wipe_chunk_on_error,
 		              seek_on_error );
 
 		if( read_count <= -1 )
