@@ -158,8 +158,7 @@ Next stable:
   what about adding the segment file type to the segment file struct?
   - reduces memory usage
 
-* Patches by David Loveall
-* ewfacquire(stream), ewfexport, ewfverify log hashes to file -l option
+* ewfexport, ewfverify log hashes to file -l option
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -174,6 +173,11 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20080223
+* worked on logging of digest hashes to log file
+* refactored ewfacquire and ewfacquirestream
+* updated manuals
 
 Version: 20080221
 * fixed logical error in libewf_write_test_chunks_section_full

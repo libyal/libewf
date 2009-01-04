@@ -69,6 +69,24 @@ int8_t ewfcommon_determine_guid(
         uint8_t *guid,
         uint8_t libewf_format );
 
+int ewfcommon_initialize_write(
+     LIBEWF_HANDLE *handle,
+     libewf_char_t *case_number,
+     libewf_char_t *description,
+     libewf_char_t *evidence_number,
+     libewf_char_t *examiner_name,
+     libewf_char_t *notes,
+     libewf_char_t *acquiry_operating_system,
+     libewf_char_t *acquiry_software,
+     libewf_char_t *acquiry_software_version,
+     uint8_t media_type,
+     uint8_t volume_type,
+     int8_t compression_level,
+     uint8_t compress_empty_block,
+     uint8_t libewf_format,
+     size64_t segment_file_size,
+     uint32_t sector_error_granularity );
+
 ssize32_t ewfcommon_read_input(
            LIBEWF_HANDLE *handle,
            int file_descriptor,

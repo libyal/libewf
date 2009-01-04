@@ -90,7 +90,9 @@
 /* Swaps the byte order of byte pairs within a buffer of a certain size
  * Returns 1 if successful, -1 on error
  */
-int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size )
+int ewfcommon_swap_byte_pairs(
+     uint8_t *buffer,
+     size_t size )
 {
 	static char *function = "ewfcommon_swap_byte_pairs";
 	uint8_t byte          = 0;
@@ -121,7 +123,8 @@ int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size )
 
 /* Determines the current platform, or NULL on error
  */
-libewf_char_t *ewfcommon_determine_operating_system( void )
+libewf_char_t *ewfcommon_determine_operating_system(
+                void )
 {
 	libewf_char_t *string  = NULL;
 	char *operating_system = NULL;
@@ -132,7 +135,8 @@ libewf_char_t *ewfcommon_determine_operating_system( void )
 
 	/* Determine the operating system
 	 */
-	if( uname( &utsname_buffer ) == 0 )
+	if( uname(
+	     &utsname_buffer ) == 0 )
 	{
 		operating_system = utsname_buffer.sysname;
 	}
@@ -143,14 +147,20 @@ libewf_char_t *ewfcommon_determine_operating_system( void )
 #else
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
-	length = (uint32_t) strlen( operating_system ) + 1;
+	length = (uint32_t) strlen(
+	                     operating_system ) + 1;
+
 	string = (libewf_char_t *) libewf_common_alloc(
 	                            sizeof( libewf_char_t ) * length );
 
 	if( ( string != NULL )
-	 && ( ewfstring_copy_libewf_char_from_char_t( string, operating_system, length ) != 1 ) )
+	 && ( ewfstring_copy_libewf_char_from_char_t(
+	       string,
+	       operating_system,
+	       length ) != 1 ) )
 	{
-		libewf_common_free( string );
+		libewf_common_free(
+	         string );
 	
 		return( NULL );
 	}
@@ -160,7 +170,9 @@ libewf_char_t *ewfcommon_determine_operating_system( void )
 /* Determines the GUID
  * Returns 1 if successful, or -1 on error
  */
-int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format )
+int8_t ewfcommon_determine_guid(
+        uint8_t *guid,
+        uint8_t libewf_format )
 {
 	static char *function = "ewfcommon_determine_guid";
 
@@ -177,16 +189,280 @@ int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format )
 	 || ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( libewf_format == LIBEWF_FORMAT_EWFX ) )
 	{
-		uuid_generate_random( guid );
+		uuid_generate_random(
+		 guid );
 	}
 #endif
 #if defined( HAVE_UUID_GENERATE_TIME )
 	if( ( libewf_format == LIBEWF_FORMAT_LINEN5 )
 	 || ( libewf_format == LIBEWF_FORMAT_LINEN6 ) )
 	{
-		uuid_generate_time( guid );
+		uuid_generate_time(
+		 guid );
 	}
 #endif
+#endif
+	return( 1 );
+}
+
+/* Initialize the libewf handle for writing
+ * Returns 1 if successful, or -1 on error
+ */
+int ewfcommon_initialize_write(
+     LIBEWF_HANDLE *handle,
+     libewf_char_t *case_number,
+     libewf_char_t *description,
+     libewf_char_t *evidence_number,
+     libewf_char_t *examiner_name,
+     libewf_char_t *notes,
+     libewf_char_t *acquiry_operating_system,
+     libewf_char_t *acquiry_software,
+     libewf_char_t *acquiry_software_version,
+     uint8_t media_type,
+     uint8_t volume_type,
+     int8_t compression_level,
+     uint8_t compress_empty_block,
+     uint8_t libewf_format,
+     size64_t segment_file_size,
+     uint32_t sector_error_granularity )
+{
+#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
+	uint8_t guid[ 16 ];
+#endif
+	static char *function = "ewfcommon_ewfcommon_initialize_write";
+	size_t string_length  = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Set case number
+	 */
+	if( case_number == NULL )
+	{
+		string_length = 0;
+	}
+	else
+	{
+		string_length = libewf_string_length(
+		                 case_number );
+	}
+	if( libewf_set_header_value_case_number(
+	     handle,
+	     case_number,
+	     string_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value case number in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Set description
+	 */
+	if( description == NULL )
+	{
+		string_length = 0;
+	}
+	else
+	{
+		string_length = libewf_string_length(
+		                 description );
+	}
+	if( libewf_set_header_value_description(
+	     handle,
+	     description,
+	     string_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value description in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Set evidence number
+	 */
+	if( evidence_number == NULL )
+	{
+		string_length = 0;
+	}
+	else
+	{
+		string_length = libewf_string_length(
+		                 evidence_number );
+	}
+	if( libewf_set_header_value_evidence_number(
+	     handle,
+	     evidence_number,
+	     string_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value evidence number in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Set examiner name
+	 */
+	if( examiner_name == NULL )
+	{
+		string_length = 0;
+	}
+	else
+	{
+		string_length = libewf_string_length(
+		                 examiner_name );
+	}
+	if( libewf_set_header_value_examiner_name(
+	     handle,
+	     examiner_name,
+	     string_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value examiner name in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Set notes
+	 */
+	if( notes == NULL )
+	{
+		string_length = 0;
+	}
+	else
+	{
+		string_length = libewf_string_length(
+		                 notes );
+	}
+	if( libewf_set_header_value_notes(
+	     handle,
+	     notes,
+	     string_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value notes in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Password is not used within libewf
+	 */
+
+	/* Acquiry date, system date and compression type will be generated automatically when set to NULL
+	 */
+
+	if( ( acquiry_operating_system != NULL )
+	 && ( libewf_set_header_value_acquiry_operating_system(
+	       handle,
+	       acquiry_operating_system,
+	       libewf_string_length(
+	        acquiry_operating_system ) ) != 1 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value acquiry operating system in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_header_value(
+	     handle,
+	     _S_LIBEWF_CHAR( "acquiry_software" ),
+	     acquiry_software,
+	     10 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value acquiry software in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_header_value_acquiry_software_version(
+	     handle,
+	     acquiry_software_version,
+	     libewf_string_length(
+	      acquiry_software_version ) ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value acquiry software version number in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Format needs to be set before segment file size
+	 */
+	if( libewf_set_format(
+	     handle,
+	     libewf_format ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set format in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_segment_file_size(
+	     handle,
+	     segment_file_size ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set segment file size in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_error_granularity(
+	     handle,
+	     sector_error_granularity ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set error granularity in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_media_type(
+	     handle,
+	     media_type ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set media type in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_volume_type(
+	     handle,
+	     volume_type ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set volume type in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_compression_values(
+	     handle,
+	     compression_level,
+	     compress_empty_block ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set compression values in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined(HAVE_UUID_UUID_H) && defined(HAVE_LIBUUID)
+	/* Add a system GUID if necessary
+	 */
+	if( ewfcommon_determine_guid(
+	     guid,
+	     libewf_format ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create GUID.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_guid(
+	     handle,
+	     guid,
+	     16 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set GUID in handle.\n",
+		 function );
+
+		return( -1 );
+	}
 #endif
 	return( 1 );
 }
@@ -194,7 +470,19 @@ int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format )
 /* Reads data from a file descriptor into the chunk cache
  * Returns the amount of bytes read, 0 if at end of input, or -1 on error
  */
-ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint8_t *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_chunk_on_error, uint8_t seek_on_error )
+ssize32_t ewfcommon_read_input(
+           LIBEWF_HANDLE *handle,
+           int file_descriptor,
+           uint8_t *buffer,
+           size_t buffer_size,
+           size32_t chunk_size,
+           uint32_t bytes_per_sector,
+           ssize64_t total_read_count,
+           size64_t total_input_size,
+           uint8_t read_error_retry,
+           uint32_t sector_error_granularity,
+           uint8_t wipe_chunk_on_error,
+           uint8_t seek_on_error )
 {
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	CHAR_T *error_string              = NULL;
@@ -260,7 +548,9 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 
 		return( -1 );
 	}
-	if( libewf_get_write_amount_of_chunks( handle, &chunk_amount ) != 1 )
+	if( libewf_get_write_amount_of_chunks(
+	     handle,
+	      &chunk_amount ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine amount of chunks written.\n",
 		 function );

@@ -49,6 +49,8 @@
 #include <stdlib.h>
 #endif
 
+#include <stdio.h>
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
@@ -71,42 +73,48 @@
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
-/* Prints the executable usage information
+/* Prints the executable usage information to the stream
  */
-void usage( void )
+void usage_fprint(
+      FILE *stream )
 {
-	fprintf( stdout, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
-	fprintf( stdout, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -m media_type ] [ -M volume_type ] [ -N notes ]\n" );
-	fprintf( stdout, "                        [ -S segment_file_size ] [ -t target ] [ -hsvVw ]\n\n" );
+	if( stream == NULL )
+	{
+		return;
+	}
+	fprintf( stream, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
+	fprintf( stream, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -l filename ] [ -m media_type ] [ -M volume_type ]\n" );
+	fprintf( stream, "                        [ -N notes ] [ -S segment_file_size ] [ -t target ] [ -hsvVw ]\n\n" );
 
-	fprintf( stdout, "\tReads data from stdin\n\n" );
+	fprintf( stream, "\tReads data from stdin\n\n" );
 
-	fprintf( stdout, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
-	fprintf( stdout, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stdout, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
-	fprintf( stdout, "\t-C: specify the case number (default is case_number).\n" );
-	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stdout, "\t-D: specify the description (default is description).\n" );
-	fprintf( stdout, "\t-e: specify the examiner name (default is examiner_name).\n" );
-	fprintf( stdout, "\t-E: specify the evidence number (default is evidence_number).\n" );
-	fprintf( stdout, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
-	fprintf( stdout, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
-	fprintf( stdout, "\t-h: shows this help\n" );
-	fprintf( stdout, "\t-m: specify the media type, options: fixed (is default), removable\n" );
-	fprintf( stdout, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
-	fprintf( stdout, "\t-N: specify the notes (default is notes).\n" );
-	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stdout, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
+	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
+	fprintf( stream, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stream, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
+	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stream, "\t-D: specify the description (default is description).\n" );
+	fprintf( stream, "\t-e: specify the examiner name (default is examiner_name).\n" );
+	fprintf( stream, "\t-E: specify the evidence number (default is evidence_number).\n" );
+	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
+	fprintf( stream, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
+	fprintf( stream, "\t-h: shows this help\n" );
+	fprintf( stream, "\t-l: logs the digest (hash) to the filename\n" );
+	fprintf( stream, "\t-m: specify the media type, options: fixed (is default), removable\n" );
+	fprintf( stream, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
+	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
+	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stream, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
 	 (uint32_t) ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
-	fprintf( stdout, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
+	fprintf( stream, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
 	 (uint32_t) ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
 	 (uint64_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT / 1024 ),
 	 (uint32_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT / 1024 ) );
-	fprintf( stdout, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
-	fprintf( stdout, "\t-v: verbose output to stderr\n" );
-	fprintf( stdout, "\t-V: print version\n" );
-	fprintf( stdout, "\t-w: wipe sectors on read error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
+	fprintf( stream, "\t-v: verbose output to stderr\n" );
+	fprintf( stream, "\t-V: print version\n" );
+	fprintf( stream, "\t-w: wipe sectors on read error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -117,9 +125,6 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
-	uint8_t guid[ 16 ];
-#endif
 	CHAR_T *filenames[ 1 ]                     = { _S_CHAR_T( "stream" ) };
 
 	LIBEWF_HANDLE *handle                      = NULL;
@@ -133,6 +138,8 @@ int main( int argc, char * const argv[] )
 	libewf_char_t *acquiry_operating_system    = NULL;
 	libewf_char_t *acquiry_software_version    = NULL;
 	libewf_char_t *program                     = _S_LIBEWF_CHAR( "ewfacquirestream" );
+
+	CHAR_T *log_filename                       = NULL;
 	CHAR_T *option_case_number                 = NULL;
 	CHAR_T *option_description                 = NULL;
 	CHAR_T *option_examiner_name               = NULL;
@@ -143,6 +150,8 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string                       = NULL;
 #endif
+
+	FILE *log_file_stream                      = NULL;
 	void *callback                             = &ewfoutput_stream_process_status_fprint;
 
 	INT_T option                               = 0;
@@ -168,25 +177,34 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                      = 1;
 	uint8_t calculate_sha1                     = 0;
 	uint8_t verbose                            = 0;
+	int error_abort                            = 0;
 
 	ewfsignal_initialize();
 
-	ewfoutput_version_fprint( stdout, program );
+	ewfoutput_version_fprint(
+	 stdout,
+	 program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:c:C:d:D:e:E:f:hm:M:N:sS:t:vVw" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt(
+	                   argc,
+	                   argv,
+	                   _S_CHAR_T( "b:c:C:d:D:e:E:f:hl:m:M:N:sS:t:vVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
 			case (INT_T) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs "\n", argv[ optind ] );
+				fprintf( stderr, "Invalid argument: %" PRIs "\n",
+				 argv[ optind ] );
 
-				usage();
+				usage_fprint(
+				 stdout );
 
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t( optarg );
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t(
+				                     optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
@@ -197,13 +215,17 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'c':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "empty_block" ), 11 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "empty_block" ),
+				     11 ) == 0 )
 				{
 					compress_empty_block = 1;
 				}
 				else
 				{
-					compression_level = ewfinput_determine_compression_level_char_t( optarg );
+					compression_level = ewfinput_determine_compression_level_char_t(
+					                     optarg );
 				
 					if( compression_level <= -1 )
 					{
@@ -220,7 +242,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'd':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "sha1" ), 4 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "sha1" ),
+				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
 				}
@@ -246,7 +271,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'f':
-				libewf_format = ewfinput_determine_libewf_format_char_t( optarg );
+				libewf_format = ewfinput_determine_libewf_format_char_t(
+				                 optarg );
 
 				if( ( libewf_format == 0 )
 				 || ( libewf_format == LIBEWF_FORMAT_EWF )
@@ -259,16 +285,28 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'h':
-				usage();
+				usage_fprint(
+				 stdout );
 
 				return( EXIT_SUCCESS );
 
+			case (INT_T) 'l':
+				log_filename = optarg;
+
+				break;
+
 			case (INT_T) 'm':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "fixed" ), 5 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "fixed" ),
+				     5 ) == 0 )
 				{
 					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "removable" ), 9 ) == 0 )
+				else if( CHAR_T_COMPARE(
+				          optarg,
+				          _S_CHAR_T( "removable" ),
+				          9 ) == 0 )
 				{
 					media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
 				}
@@ -279,11 +317,17 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'M':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "logical" ), 7 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "logical" ),
+				     7 ) == 0 )
 				{
 					volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "physical" ), 8 ) == 0 )
+				else if( CHAR_T_COMPARE(
+				          optarg,
+				          _S_CHAR_T( "physical" ),
+				          8 ) == 0 )
 				{
 					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
 				}
@@ -308,9 +352,16 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'S':
-				string_length      = CHAR_T_LENGTH( optarg );
-				end_of_string      = &optarg[ string_length - 1 ];
-				segment_file_size  = (uint64_t) CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+				string_length = CHAR_T_LENGTH(
+				                 optarg );
+
+				end_of_string = &optarg[ string_length - 1 ];
+
+				segment_file_size  = (uint64_t) CHAR_T_TOLONG(
+				                                 optarg,
+				                                 &end_of_string,
+				                                 0 );
+
 				segment_file_size *= 1024;
 
 				if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
@@ -337,7 +388,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfoutput_copyright_fprint( stdout );
+				ewfoutput_copyright_fprint(
+				 stdout );
 
 				return( EXIT_SUCCESS );
 
@@ -347,11 +399,14 @@ int main( int argc, char * const argv[] )
 				break;
 		}
 	}
-	libewf_set_notify_values( stderr, verbose );
+	libewf_set_notify_values(
+	 stderr,
+	 verbose );
 
 	if( option_case_number != NULL )
 	{
-		string_length = CHAR_T_LENGTH( option_case_number );
+		string_length = CHAR_T_LENGTH(
+		                 option_case_number );
 
 		if( string_length > 0 )
 		{
@@ -363,19 +418,24 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to create case number string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
-			if( ewfstring_copy_libewf_char_from_char_t( case_number, option_case_number, string_length ) != 1 )
+			else if( ewfstring_copy_libewf_char_from_char_t(
+			          case_number,
+			          option_case_number,
+			          string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set case number string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
 		}
 	}
-	if( option_description != NULL )
+	if( ( error_abort == 0 )
+	 && ( option_description != NULL ) )
 	{
-		string_length = CHAR_T_LENGTH( option_description );
+		string_length = CHAR_T_LENGTH(
+		                 option_description );
 
 		if( string_length > 0 )
 		{
@@ -387,19 +447,24 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to create description string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
-			if( ewfstring_copy_libewf_char_from_char_t( description, option_description, string_length ) != 1 )
+			else if( ewfstring_copy_libewf_char_from_char_t(
+			          description,
+			          option_description,
+			          string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set description string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
 		}
 	}
-	if( option_examiner_name != NULL )
+	if( ( error_abort == 0 )
+	 && ( option_examiner_name != NULL ) )
 	{
-		string_length = CHAR_T_LENGTH( option_examiner_name );
+		string_length = CHAR_T_LENGTH(
+		                 option_examiner_name );
 
 		if( string_length > 0 )
 		{
@@ -411,19 +476,24 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to create examiner name string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
-			if( ewfstring_copy_libewf_char_from_char_t( examiner_name, option_examiner_name, string_length ) != 1 )
+			else if( ewfstring_copy_libewf_char_from_char_t(
+			          examiner_name,
+			          option_examiner_name,
+			          string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set examiner name string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
 		}
 	}
-	if( option_evidence_number != NULL )
+	if( ( error_abort == 0 )
+	 && ( option_evidence_number != NULL ) )
 	{
-		string_length = CHAR_T_LENGTH( option_evidence_number );
+		string_length = CHAR_T_LENGTH(
+		                 option_evidence_number );
 
 		if( string_length > 0 )
 		{
@@ -435,19 +505,24 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to create evidence number string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
-			if( ewfstring_copy_libewf_char_from_char_t( evidence_number, option_evidence_number, string_length ) != 1 )
+			else if( ewfstring_copy_libewf_char_from_char_t(
+			          evidence_number,
+			          option_evidence_number,
+			          string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set evidence number string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
 		}
 	}
-	if( option_notes != NULL )
+	if( ( error_abort == 0 )
+	 && ( option_notes != NULL ) )
 	{
-		string_length = CHAR_T_LENGTH( option_notes );
+		string_length = CHAR_T_LENGTH(
+		                 option_notes );
 
 		if( string_length > 0 )
 		{
@@ -459,15 +534,47 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to create notes string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
-			if( ewfstring_copy_libewf_char_from_char_t( notes, option_notes, string_length ) != 1 )
+			else if( ewfstring_copy_libewf_char_from_char_t(
+			          notes,
+			          option_notes,
+			          string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set notes string.\n" );
 
-				return( EXIT_FAILURE );
+				error_abort = 1;
 			}
 		}
+	}
+	if( error_abort != 0 )
+	{
+		if( case_number != NULL )
+		{
+			libewf_common_free(
+			 case_number );
+		}
+		if( description != NULL )
+		{
+			libewf_common_free(
+			 description );
+		}
+		if( examiner_name != NULL )
+		{
+			libewf_common_free(
+			 examiner_name );
+		}
+		if( evidence_number != NULL )
+		{
+			libewf_common_free(
+			 evidence_number );
+		}
+		if( notes != NULL )
+		{
+			libewf_common_free(
+			 notes );
+		}
+		return( EXIT_FAILURE );
 	}
 	acquiry_operating_system = ewfcommon_determine_operating_system();
 	acquiry_software_version = LIBEWF_VERSION;
@@ -519,261 +626,69 @@ int main( int argc, char * const argv[] )
 		fprintf( stderr, "Unable to create EWF file(s).\n" );
 #endif
 
-		return( EXIT_FAILURE );
+		error_abort = 1;
 	}
-	if( case_number == NULL )
+	else if( ewfcommon_initialize_write(
+	          handle,
+	          case_number,
+	          description,
+	          evidence_number,
+	          examiner_name,
+	          notes,
+	          acquiry_operating_system,
+	          program,
+	          acquiry_software_version,
+	          (uint8_t) media_type,
+	          (uint8_t) volume_type,
+	          compression_level,
+	          (uint8_t) compress_empty_block,
+	          libewf_format,
+	          (size64_t) segment_file_size,
+	          (uint32_t) sector_error_granularity ) != 1 )
 	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = libewf_string_length( case_number );
-	}
-	if( libewf_set_header_value_case_number(
-	     handle,
-	     case_number,
-	     string_length ) != 1 )
-	{
-		fprintf( stderr, "Unable to set header value case number in handle.\n" );
+		fprintf( stderr, "Unable to initialize settings for EWF file(s).\n" );
 
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
+		error_abort = 1;
 	}
-	libewf_common_free( case_number );
-
-	if( description == NULL )
+	if( case_number != NULL )
 	{
-		string_length = 0;
+		libewf_common_free(
+		 case_number );
 	}
-	else
+	if( description != NULL )
 	{
-		string_length = libewf_string_length( description );
+		libewf_common_free(
+		 description );
 	}
-	if( libewf_set_header_value_description(
-	     handle,
-	     description,
-	     string_length ) != 1 )
+	if( evidence_number != NULL )
 	{
-		fprintf( stderr, "Unable to set header value description in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
+		libewf_common_free(
+		 evidence_number );
 	}
-	libewf_common_free( description );
-
-	if( examiner_name == NULL )
+	if( examiner_name != NULL )
 	{
-		string_length = 0;
+		libewf_common_free(
+		 examiner_name );
 	}
-	else
+	if( notes != NULL )
 	{
-		string_length = libewf_string_length( examiner_name );
+		libewf_common_free(
+		 notes );
 	}
-	if( libewf_set_header_value_examiner_name(
-	     handle,
-	     examiner_name,
-	     string_length ) != 1 )
-	{
-		fprintf( stderr, "Unable to set header value examiner name in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	libewf_common_free( examiner_name );
-
-	if( evidence_number == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = libewf_string_length( evidence_number );
-	}
-	if( libewf_set_header_value_evidence_number(
-	     handle,
-	     evidence_number,
-	     string_length ) != 1 )
-	{
-		fprintf( stderr, "Unable to set header value evidence number in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	libewf_common_free( evidence_number );
-
-	if( notes == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = libewf_string_length( notes );
-	}
-	if( libewf_set_header_value_notes(
-	     handle,
-	     notes,
-	     string_length ) != 1 )
-	{
-		fprintf( stderr, "Unable to set header value notes in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	libewf_common_free( notes );
-
-	/* Acquiry date, system date and compression type will be generated automatically when set to NULL
-	 */
 	if( acquiry_operating_system != NULL )
 	{
-		if( libewf_set_header_value_acquiry_operating_system(
-		     handle,
-		     acquiry_operating_system,
-		     libewf_string_length( acquiry_operating_system ) ) != 1 )
-		{
-			fprintf( stderr, "Unable to set header value acquiry operating system in handle.\n" );
-
-			if( libewf_close( handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		libewf_common_free( acquiry_operating_system );
+		libewf_common_free(
+		 acquiry_operating_system );
 	}
-	if( libewf_set_header_value(
-	     handle,
-	     _S_LIBEWF_CHAR( "acquiry_software" ),
-	     program,
-	     16 ) != 1 )
+	if( error_abort != 0 )
 	{
-		fprintf( stderr, "Unable to set header value acquiry software in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_header_value_acquiry_software_version(
-	     handle,
-	     acquiry_software_version,
-	     libewf_string_length( acquiry_software_version ) ) != 1 )
-	{
-		fprintf( stderr, "Unable to set header value acquiry software version number in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	/* Format needs to be set before segment file size
-	 */
-	if( libewf_set_format(
-	     handle,
-	     libewf_format ) != 1 )
-	{
-		fprintf( stderr, "Unable to set format in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_set_segment_file_size(
-	     handle,
-	     (size64_t) segment_file_size ) != 1 )
-	{
-		fprintf( stderr, "Unable to set segment file size in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_set_media_type(
-	     handle,
-	     media_type ) != 1 )
-	{
-		fprintf( stderr, "Unable to set media type in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_set_volume_type(
-	     handle,
-	     volume_type ) != 1 )
-	{
-		fprintf( stderr, "Unable to set volume type in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_set_compression_values(
-	     handle,
-	     compression_level,
-	     compress_empty_block ) != 1 )
-	{
-		fprintf( stderr, "Unable to set compression values in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-#if defined(HAVE_UUID_UUID_H) && defined(HAVE_LIBUUID)
-	/* Add a system GUID if necessary
-	 */
-	if( ewfcommon_determine_guid(
-	     guid,
-	     libewf_format ) != 1 )
-	{
-		fprintf( stderr, "Unable to create GUID.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_set_guid(
-	     handle,
-	     guid,
-	     16 ) != 1 )
-	{
-		fprintf( stderr, "Unable to set GUID in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-#endif
 	if( calculate_md5 == 1 )
 	{
 		calculated_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
@@ -783,7 +698,8 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
 
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
@@ -799,9 +715,11 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
 
-			libewf_common_free( calculated_md5_hash_string );
+			libewf_common_free(
+			 calculated_md5_hash_string );
 
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
@@ -811,13 +729,16 @@ int main( int argc, char * const argv[] )
 	/* Start acquiring data
 	 */
 	timestamp_start = time( NULL );
-	time_string     = libewf_common_ctime( &timestamp_start );
+	time_string     = libewf_common_ctime(
+	                   &timestamp_start );
 
 	if( time_string != NULL )
 	{
-		fprintf( stdout, "Acquiry started at: %" PRIs "\n", time_string );
+		fprintf( stdout, "Acquiry started at: %" PRIs "\n",
+		 time_string );
 
-		libewf_common_free( time_string );
+		libewf_common_free(
+		 time_string );
 	}
 	else
 	{
@@ -825,7 +746,10 @@ int main( int argc, char * const argv[] )
 	}
 	if( callback != NULL )
 	{
-		ewfoutput_process_status_initialize( stdout, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
+		ewfoutput_process_status_initialize(
+		 stdout,
+		 _S_LIBEWF_CHAR( "acquired" ),
+		 timestamp_start );
 	}
 	fprintf( stdout, "This could take a while.\n\n" );
 
@@ -852,15 +776,18 @@ int main( int argc, char * const argv[] )
 	/* Done acquiring data
 	 */
 	timestamp_end = time( NULL );
-	time_string   = libewf_common_ctime( &timestamp_end );
+	time_string   = libewf_common_ctime(
+	                 &timestamp_end );
 
 	if( write_count <= -1 )
 	{
 		if( time_string != NULL )
 		{
-			fprintf( stdout, "Acquiry failed at: %" PRIs "\n", time_string );
+			fprintf( stdout, "Acquiry failed at: %" PRIs "\n",
+			 time_string );
 
-			libewf_common_free( time_string );
+			libewf_common_free(
+			 time_string );
 		}
 		else
 		{
@@ -872,19 +799,23 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free( calculated_md5_hash_string );
+			libewf_common_free(
+			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free( calculated_sha1_hash_string );
+			libewf_common_free(
+			 calculated_sha1_hash_string );
 		}
 		return( EXIT_FAILURE );
 	}
 	if( time_string != NULL )
 	{
-		fprintf( stdout, "Acquiry completed at: %" PRIs "\n", time_string );
+		fprintf( stdout, "Acquiry completed at: %" PRIs "\n",
+		 time_string );
 
-		libewf_common_free( time_string );
+		libewf_common_free(
+		 time_string );
 	}
 	else
 	{
@@ -910,27 +841,62 @@ int main( int argc, char * const argv[] )
 
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free( calculated_md5_hash_string );
+			libewf_common_free(
+			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free( calculated_sha1_hash_string );
+			libewf_common_free(
+			 calculated_sha1_hash_string );
 		}
 		return( EXIT_FAILURE );
 	}
+	if( log_filename != NULL )
+	{
+		log_file_stream = fopen(
+		                   log_filename,
+		                   "w" );
+
+		if( log_file_stream == NULL )
+		{
+			fprintf( stderr, "Unable to open log file: %s.\n",
+			 log_filename );
+		}
+	}
 	if( calculate_md5 == 1 )
 	{
-		fprintf( stdout, "MD5 hash calculated over data: %" PRIs_EWF "\n",
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
 		 calculated_md5_hash_string );
 
-		libewf_common_free( calculated_md5_hash_string );
+		if( log_file_stream != NULL )
+		{
+			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
+			 calculated_md5_hash_string );
+		}
+		libewf_common_free(
+		 calculated_md5_hash_string );
 	}
 	if( calculate_sha1 == 1 )
 	{
 		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
 		 calculated_sha1_hash_string );
 
-		libewf_common_free( calculated_sha1_hash_string );
+		if( log_file_stream != NULL )
+		{
+			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
+			 calculated_sha1_hash_string );
+		}
+		libewf_common_free(
+		 calculated_sha1_hash_string );
+	}
+	if( log_file_stream != NULL )
+	{
+		if( fclose(
+		     log_file_stream ) != 0 )
+		{
+			fprintf( stderr, "Unable to close log file: %s.\n",
+			 log_filename );
+		}
 	}
 	return( EXIT_SUCCESS );
 }
