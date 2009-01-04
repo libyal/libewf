@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_IMPORT"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_IMPORT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -49,6 +49,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -61,9 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib libewf.lib"
+				AdditionalDependencies="advapi32.lib libuca.lib libewf.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\debug"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -119,12 +120,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_IMPORT"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -137,9 +139,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib libewf.lib"
+				AdditionalDependencies="advapi32.lib libuca.lib libewf.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\release"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -217,11 +219,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfguid.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfinfo.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfprocess_status.c"
 				>
 			</File>
 			<File
@@ -303,11 +313,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfguid.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfmd5.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfprocess_status.h"
 				>
 			</File>
 			<File

@@ -151,10 +151,6 @@ Next release(s):
 
 * change libewf_system_string_to_(u)int64 to return 1 or -1
 
-WIN32
-* remove win crypto api from libewf_dll release configuration
-* update MSVSCPP files
-
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -178,6 +174,8 @@ Version: 20080904
 * change empty_block to empty-block the former remains to work
 * fixed error in UTF-8 handling (libuca)
 * updated MacOS-X package changed project website
+* updated MSVSCPP project files
+* fixed multiple ewfglob issues
 
 Version: 20080903
 * worked on integrating libuca and replacing string conversion routines

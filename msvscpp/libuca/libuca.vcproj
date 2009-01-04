@@ -2,10 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="ewfverify"
-	ProjectGUID="{E47BC48E-4CDC-49CC-B82E-4468DE2540DE}"
-	RootNamespace="ewfverify"
-	Keyword="Win32Proj"
+	Name="libuca"
+	ProjectGUID="{BC27FF34-C859-4A1A-95D6-FC89952E1910}"
+	RootNamespace="libuca"
 	>
 	<Platforms>
 		<Platform
@@ -19,8 +18,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
+			ConfigurationType="4"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -40,15 +38,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_IMPORT"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				AdditionalIncludeDirectories="..\..\include;..\..\common"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA"
+				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
 				CompileAs="1"
 			/>
 			<Tool
@@ -61,19 +56,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib libuca.lib libewf.lib"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\libuca.lib"
+				ModuleDefinitionFile=""
+				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -85,12 +74,6 @@
 				Name="VCFxCopTool"
 			/>
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -98,9 +81,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			WholeProgramOptimization="1"
+			ConfigurationType="4"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -119,13 +100,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA"
 				RuntimeLibrary="2"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
 				CompileAs="1"
 			/>
 			<Tool
@@ -138,21 +115,13 @@
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib libuca.lib libewf.lib"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)\libuca.lib"
+				ModuleDefinitionFile=""
+				IgnoreAllDefaultLibraries="false"
 			/>
 			<Tool
 				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -162,12 +131,6 @@
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -183,75 +146,75 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\common\character_string.c"
+				RelativePath="..\..\libuca\libuca_byte_stream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\date_time.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1250.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\error_string.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1251.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfbyte_size_string.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1252.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1253.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfdigest_context.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1254.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfdigest_hash.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1255.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfgetopt.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1256.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfglob.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1257.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.c"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1258.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfprocess_status.c"
+				RelativePath="..\..\libuca\libuca_support.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.c"
+				RelativePath="..\..\libuca\libuca_unicode_character.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfstring.c"
+				RelativePath="..\..\libuca\libuca_utf16_stream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfverify.c"
+				RelativePath="..\..\libuca\libuca_utf16_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\file_io.c"
+				RelativePath="..\..\libuca\libuca_utf32_stream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\notify.c"
+				RelativePath="..\..\libuca\libuca_utf32_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\string_conversion.c"
+				RelativePath="..\..\libuca\libuca_utf8_stream.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\system_string.c"
+				RelativePath="..\..\libuca\libuca_utf8_string.c"
 				>
 			</File>
 		</Filter>
@@ -261,103 +224,95 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\common\character_string.h"
+				RelativePath="..\..\libuca\libuca_byte_stream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\common.h"
+				RelativePath="..\..\libuca\libuca_codepage_ascii.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\config.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1250.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\config_windows.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1251.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\date_time.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1252.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\error_string.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1253.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfbyte_size_string.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1254.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1255.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfdigest_context.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1256.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfdigest_hash.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1257.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfgetopt.h"
+				RelativePath="..\..\libuca\libuca_codepage_windows_1258.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfglob.h"
+				RelativePath="..\..\libuca\libuca_definitions.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfmd5.h"
+				RelativePath="..\..\libuca\libuca_extern.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.h"
+				RelativePath="..\..\libuca\libuca_inline.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfprocess_status.h"
+				RelativePath="..\..\libuca\libuca_support.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsha1.h"
+				RelativePath="..\..\libuca\libuca_unicode_character.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfsignal.h"
+				RelativePath="..\..\libuca\libuca_utf16_stream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfstring.h"
+				RelativePath="..\..\libuca\libuca_utf16_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\file_io.h"
+				RelativePath="..\..\libuca\libuca_utf32_stream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\libewf.h"
+				RelativePath="..\..\libuca\libuca_utf32_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\memory.h"
+				RelativePath="..\..\libuca\libuca_utf8_stream.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\notify.h"
+				RelativePath="..\..\libuca\libuca_utf8_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\string_conversion.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\system_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\types.h"
+				RelativePath="..\..\include\libewf\types.h"
 				>
 			</File>
 		</Filter>

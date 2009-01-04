@@ -462,7 +462,7 @@ int ewfinput_determine_sectors_per_chunk(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_sectors_per_chunk_system_character(
-     const character_t *argument,
+     const system_character_t *argument,
      uint32_t *sectors_per_chunk )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk_system_character";
@@ -649,7 +649,7 @@ int ewfinput_determine_compression_level(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_compression_level_system_character(
-     const character_t *argument,
+     const system_character_t *argument,
      int8_t *compression_level,
      uint8_t *compress_empty_block )
 {

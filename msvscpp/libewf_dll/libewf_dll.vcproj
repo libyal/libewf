@@ -39,12 +39,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common;..\..\libewf"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_EXPORT"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_EXPORT"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
 				WarningLevel="4"
 				WarnAsError="false"
 				Detect64BitPortabilityProblems="true"
+				CompileAs="1"
 				ForcedIncludeFiles=""
 			/>
 			<Tool
@@ -59,14 +60,15 @@
 			<Tool
 				Name="VCLinkerTool"
 				UseLibraryDependencyInputs="true"
-				AdditionalDependencies="zdll.lib"
+				AdditionalDependencies="libuca.lib zdll.lib"
 				OutputFile="$(OutDir)\libewf.dll"
 				Version=""
 				LinkIncremental="0"
-				AdditionalLibraryDirectories="..\zlib\lib"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;..\zlib\lib"
+				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(OutDir)/libewf.lib"
+				ImportLibrary="$(OutDir)\libewf.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -118,8 +120,9 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common;..\..\libewf"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_EXPORT"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
+				CompileAs="1"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -132,9 +135,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib zdll.lib"
+				AdditionalDependencies="libuca.lib zdll.lib"
 				OutputFile="$(OutDir)\libewf.dll"
-				AdditionalLibraryDirectories="..\zlib\lib"
+				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;..\zlib\lib"
+				ImportLibrary="$(OutDir)\libewf.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -325,10 +329,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\ewf_char.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\ewf_crc.h"
 				>
 			</File>
@@ -366,10 +366,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\ewf_session.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_string.h"
 				>
 			</File>
 			<File

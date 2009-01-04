@@ -38,6 +38,14 @@
 #include <unistd.h>
 #endif
 
+#if defined( HAVE_FCNLTL_H )
+#include <fcntl.h>
+#endif
+
+#if defined( HAVE_IO_H )
+#include <io.h>
+#endif
+
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif

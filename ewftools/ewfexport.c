@@ -33,6 +33,14 @@
 #include <unistd.h>
 #endif
 
+#if defined( HAVE_FCNLTL_H )
+#include <fcntl.h>
+#endif
+
+#if defined( HAVE_IO_H )
+#include <io.h>
+#endif
+
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -426,6 +434,8 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to attach signal handler.\n" );
 	}
+	amount_of_filenames = argc - optind;
+
 #if !defined( HAVE_GLOB_H )
 	if( ewfglob_initialize(
 	     &glob ) != 1 )
@@ -451,10 +461,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	argv_filenames = glob->results;
+	argv_filenames = glob->result;
 #else
-	amount_of_filenames = argc - optind;
-	argv_filenames      = &argv[ optind ];
+	argv_filenames = &argv[ optind ];
 #endif
 
 	if( amount_of_filenames == 1 )
