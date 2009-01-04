@@ -1,15 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070707], [forensics@hoffmannbv.nl])
-AM_INIT_AUTOMAKE([libewf], [20070707])
+AC_INIT([libewf], [20070708], [forensics@hoffmannbv.nl])
+AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-dnl Function to test if the current directory contains spaces
-AC_DEFUN([LIBEWF_TEST_PWD],
-	[ac_libewf_pwd=`pwd`;
-	 ac_libewf_test_pwd=`pwd | grep ' '`;
-	 AS_IF([test "x$ac_libewf_test_pwd" != x],
-		[AC_MSG_FAILURE([cannot handle space(s) in current directory: $ac_libewf_pwd])])
-])
+AM_INIT_AUTOMAKE([libewf], [20070708])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -81,9 +75,6 @@ AC_DEFINE_UNQUOTED( LIBEWF_OPERATING_SYSTEM, "$ac_libewf_operating_system", [Def
 dnl Check for host type
 AC_CANONICAL_HOST
 
-dnl Check if current directory does not contain spaces
-LIBEWF_TEST_PWD
-
 dnl Check for large file support
 AC_SYS_LARGEFILE
 
@@ -93,6 +84,9 @@ LIBEWF_TEST_ENABLE([buffer-passthrough], [buffer_passthrough], [minimize the usa
 LIBEWF_TEST_ENABLE([chunk-cache-passthrough], [chunk_cache_passthrough], [use the chunk cache as data buffer in the ewf tools], [no])
 LIBEWF_TEST_ENABLE([verbose-output], [verbose_output], [enable verbose output], [no])
 LIBEWF_TEST_ENABLE([debug-output], [debug_output], [enable debug output], [no])
+
+dnl Check for libtool DLL support
+AC_LIBTOOL_WIN32_DLL
 
 dnl Checks for programs
 AC_PROG_CC
