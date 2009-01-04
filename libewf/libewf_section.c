@@ -1150,18 +1150,21 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance )
 {
 	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
+	static char *function                         = "libewf_calculate_last_offset";
 	off_t last_offset                             = 0;
-	size_t chunk_size                             = 0;
+	off_t chunk_size                              = 0;
 
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_calculate_last_offset: invalid offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_calculate_last_offset: invalid section list.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1176,7 +1179,8 @@ int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_S
 	while( section_list_entry != NULL )
 	{
 #ifdef HAVE_DEBUG_OUTPUT
-		LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: start offset: %jd last offset: %jd.\n", section_list_entry->start_offset, last_offset );
+		LIBEWF_VERBOSE_PRINT( "%s: start offset: %jd last offset: %jd.\n",
+		 function, section_list_entry->start_offset, last_offset );
 #endif
 
 		if( ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
@@ -1185,35 +1189,47 @@ int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_S
 
 			if( last_offset > (off_t) INT32_MAX )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_calculate_last_offset: invalid last chunk offset only values below 2^32 are supported.\n" );
+				LIBEWF_WARNING_PRINT( "%s: invalid last chunk offset only values below 2^32 are supported.\n",
+				 function );
 
 				return( -1 );
 			}
 			if( chunk_size == 0 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_calculate_last_offset: invalid chunk size - size is zero.\n" );
+				LIBEWF_WARNING_PRINT( "%s: invalid chunk size - size is zero.\n",
+				 function );
 
 				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 				{
 					return( -1 );
 				}
 			}
-			if( chunk_size > (size_t) INT32_MAX )
+			if( chunk_size > (off_t) INT32_MAX )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_calculate_last_offset: invalid chunk size only values below 2^32 are supported.\n" );
+				LIBEWF_WARNING_PRINT( "%s: invalid chunk size only values below 2^32 are supported.\n",
+				 function );
 
 				return( -1 );
 			}
-			if( libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, offset_table->compressed[ offset_table->last ], last_offset, chunk_size, segment_number ) == -1 )
+			if( libewf_offset_table_set_values(
+			     offset_table,
+			     offset_table->last,
+			     file_descriptor,
+			     offset_table->compressed[ offset_table->last ],
+			     last_offset,
+			     (size_t) chunk_size,
+			     segment_number ) == -1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_calculate_last_offset: unable to set value in offset table.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
+				 function );
 
 				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 				{
 					return( -1 );
 				}
 			}
-			LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: last chunk %" PRIu32 " calculated with offset: %jd and size %zu.\n", ( offset_table->last + 1 ), last_offset, chunk_size );
+			LIBEWF_VERBOSE_PRINT( "%s: last chunk %" PRIu32 " calculated with offset: %jd and size %zu.\n",
+			 function, ( offset_table->last + 1 ), last_offset, (size_t) chunk_size );
 
 			break;
 		}
@@ -1522,6 +1538,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 {
 	EWF_TABLE *table                  = NULL;
 	EWF_TABLE_OFFSET *offsets         = NULL;
+	static char *function             = "libewf_section_table_write";
 	ssize_t section_write_count       = 0;
 	ssize_t table_write_count         = 0;
 	ssize_t table_offsets_write_count = 0;
@@ -1532,13 +1549,15 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: invalid offset table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1553,13 +1572,15 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to create table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memset( table, 0, EWF_TABLE_SIZE ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to clear table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear table.\n",
+		 function );
 
 		libewf_common_free( table );
 
@@ -1569,7 +1590,8 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( offsets == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to create offsets.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create offsets.\n",
+		 function );
 
 		libewf_common_free( table );
 
@@ -1577,7 +1599,8 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( libewf_endian_revert_32bit( amount_of_offsets, table->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to revert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( table );
 		libewf_common_free( offsets );
@@ -1586,7 +1609,18 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	for( iterator = 0; iterator < amount_of_offsets; iterator++ )
 	{
-		offset_value = offset_table->offset[ offset_table_index + iterator ];
+		if( offset_table->offset[ offset_table_index + iterator ] > (off_t) INT32_MAX )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset only values below 2^32 are supported..\n",
+			 function );
+
+			libewf_common_free( table );
+			libewf_common_free( offsets );
+
+			return( -1 );
+		}
+
+		offset_value = (uint32_t) offset_table->offset[ offset_table_index + iterator ];
 
 		if( offset_table->compressed[ offset_table_index + iterator ] != 0 )
 		{
@@ -1594,7 +1628,8 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		}
 		if( libewf_endian_revert_32bit( offset_value, (uint8_t *) offsets[ iterator ].offset ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to revert start offset.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to revert start offset.\n",
+			 function );
 
 			libewf_common_free( table );
 			libewf_common_free( offsets );
@@ -1606,7 +1641,8 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( table );
 		libewf_common_free( offsets );
@@ -1621,13 +1657,15 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( table_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to write table to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write table to file.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( table_offsets_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_table_write: unable to write table offsets to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write table offsets to file.\n",
+		 function );
 
 		return( -1 );
 	}

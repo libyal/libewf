@@ -89,7 +89,7 @@ void usage( void )
 	fprintf( stderr, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
 	fprintf( stderr, "\t-h: shows this help\n" );
 	fprintf( stderr, "\t-m: specify the media type, options: fixed (is default), removable\n" );
-	fprintf( stderr, "\t-M: specify the volume type, options: logical (is default), physical\n" );
+	fprintf( stderr, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
 	fprintf( stderr, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
@@ -145,7 +145,7 @@ int main( int argc, char * const argv[] )
 	int8_t result_md5_hash                   = 0;
 	int8_t result_sha1_hash                  = 0;
 	uint8_t media_type                       = LIBEWF_MEDIA_TYPE_FIXED;
-	uint8_t volume_type                      = LIBEWF_VOLUME_TYPE_LOGICAL;
+	uint8_t volume_type                      = LIBEWF_VOLUME_TYPE_PHYSICAL;
 	uint8_t compress_empty_block             = 0;
 	uint8_t libewf_format                    = LIBEWF_FORMAT_ENCASE5;
 	uint8_t wipe_block_on_read_error         = 0;

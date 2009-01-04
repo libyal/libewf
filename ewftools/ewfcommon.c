@@ -1866,9 +1866,9 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 			size = (size_t) ( media_size - total_read_count );
 		}
 #if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-		read_count = libewf_read_random( handle, data, size, read_offset );
+		read_count = libewf_read_random( handle, (void *) data, size, read_offset );
 #else
-		read_count = libewf_read_random( handle, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, read_offset );
+		read_count = libewf_read_random( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, read_offset );
 #endif
 
 		if( read_count <= -1 )
@@ -2030,9 +2030,9 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 			size = (size_t) ( media_size - total_read_count );
 		}
 #if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-		read_count = libewf_read_random( handle, data, size, (off_t) read_offset );
+		read_count = libewf_read_random( handle, (void *) data, size, (off_t) read_offset );
 #else
-		read_count = libewf_read_random( handle, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, (off_t) read_offset );
+		read_count = libewf_read_random( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, (off_t) read_offset );
 #endif
 
 		if( read_count <= -1 )
@@ -2333,9 +2333,9 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			}
 		}
 #if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-		write_count = libewf_write_buffer( handle, data, read_count );
+		write_count = libewf_write_buffer( handle, (void *) data, read_count );
 #else
-		write_count = libewf_write_buffer( handle, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, read_count );
+		write_count = libewf_write_buffer( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, read_count );
 #endif
 
 		if( write_count != read_count )

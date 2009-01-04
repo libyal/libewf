@@ -88,6 +88,11 @@
 #define HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS 1
 #endif
 
+/* Make sure <sys/types.h> does not define
+ * _off_t and off_t
+ */
+#define _OFF_T_DEFINED
+
 /* Define a string for the acquiry system value in the header values
  */
 #ifdef LIBEWF_OPERATING_SYSTEM

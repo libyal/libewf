@@ -66,6 +66,11 @@ typedef __int64			int64_t;
 typedef unsigned __int64	uint64_t;
 typedef int			ssize_t;
 
+/* Make sure Windows use 64 bit off_t values
+ */
+typedef __int64			_off_t;
+typedef __int64			off_t;
+
 #ifdef __cplusplus
 }
 #endif

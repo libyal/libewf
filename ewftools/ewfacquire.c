@@ -32,7 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
 #define TEST_RAW_WRITE
+*/
 
 #include "../libewf/libewf_includes.h"
 

@@ -37,29 +37,24 @@
 /* The libewf version
  */
 #if 0
-#define LIBEWF_VERSION				L"20070716"
+#define LIBEWF_VERSION				L"20070717"
 #else
-#define LIBEWF_VERSION				"20070716"
+#define LIBEWF_VERSION				"20070717"
 #endif
 
 /* The libewf file access
  * bit 1	set to 1 for read access
  * bit 2	set to 1 for write access
- * bit 3	set to 1 for raw access
- * bit 4-8	not used
+ * bit 3-8	not used
  */
 #define LIBEWF_FLAG_READ			(uint8_t) 0x01
 #define LIBEWF_FLAG_WRITE			(uint8_t) 0x02
-#define LIBEWF_FLAG_RAW				(uint8_t) 0x04
 
 /* The libewf file access macros
  */
 #define LIBEWF_OPEN_READ			( LIBEWF_FLAG_READ )
 #define LIBEWF_OPEN_WRITE			( LIBEWF_FLAG_WRITE )
 #define LIBEWF_OPEN_READ_WRITE			( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE )
-#define LIBEWF_OPEN_RAW_READ			( LIBEWF_FLAG_READ | LIBEWF_FLAG_RAW )
-#define LIBEWF_OPEN_RAW_WRITE			( LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RAW )
-#define LIBEWF_OPEN_RAW_READ_WRITE		( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE | LIBEWF_FLAG_RAW )
 
 /* The levels are ordered from zero tollerance to full tollerance of non fatal errors
  * fatal error cannot be tollerated

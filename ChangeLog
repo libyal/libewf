@@ -101,11 +101,15 @@ Next release:
 
 * refactor function names into static char *
 
-Version: 20070717
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
   write raw only checks for the raw access mode like prepare function
 * remove raw access value in handle and RAW flag
+
+Version: 20070717
+* worked on allowing to write raw buffers as chunks
+* refactored function names into static char *
+* ewfacquire stream made physical default instead of logical just like in ewfacquire
 
 Version: 20070716
 * worked on allowing to write raw buffers as chunks

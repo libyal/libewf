@@ -200,10 +200,6 @@ struct libewf_internal_handle
 	 */
 	uint8_t error_tollerance;
 
-	/* raw access mode
-	 */
-	uint8_t raw_access;
-
 	/* The GUID of the acquiry system
 	 */
 	uint8_t guid[ 16 ];
