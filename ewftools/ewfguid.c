@@ -33,7 +33,7 @@
 int ewfguid_to_string(
      ewfguid_t *guid,
      character_t *string,
-     size_t length )
+     size_t string_size )
 {
 	static char *function = "ewfguid_to_string";
 	ssize_t print_count   = 0;
@@ -52,16 +52,16 @@ int ewfguid_to_string(
 
 		return( -1 );
 	}
-	if( length < 37 )
+	if( string_size < 37 )
 	{
 		notify_warning_printf( "%s: string too small.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( length > (size_t) SSIZE_MAX )
+	if( string_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid length value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid string size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -70,12 +70,24 @@ int ewfguid_to_string(
 	 */
 	print_count = string_snprintf(
 	               string,
-	               length,
-	               "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8
-	               "-%.2" PRIx8 "%.2" PRIx8
-	               "-%.2" PRIx8 "%.2" PRIx8
-	               "-%.2" PRIx8 "%.2" PRIx8
-	               "-%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
+	               string_size,
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "\n" ),
 	               guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ],
 	               guid[ 4 ], guid[ 5 ],
 	               guid[ 6 ], guid[ 7 ],
@@ -89,7 +101,7 @@ int ewfguid_to_string(
 
 		return( -1 );
 	}
-	string[ 36 ] = (character_t) '\0';
+	string[ 36 ] = 0;
 
 	return( 1 );
 }

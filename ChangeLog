@@ -113,14 +113,8 @@ Code clean up
 
 Next release(s):
 
-* fix ewfinfo
-
 * implement libuca
-  - replace string_copy_from_char
-  - xhash and xheader should be stored in UTF-8
   - handle codepage
-
-* check if libewf_string_split is resistant to empty strings
 
 * rename length into size, make sure string size contains end of string
   character
@@ -182,6 +176,8 @@ CLOSED
 
 Version: 20080903
 * worked on integrating libuca and replacing string conversion routines
+* fixed missing split lines issue in libewf_header_values_parse_header_string
+* fixed underflow issue in libewf_string_split
 
 Version: 20080902
 * refactored process status

@@ -437,8 +437,8 @@ int libewf_hash_values_generate_hash_string_xml(
 	*hash_string_size += 1 + string_length(
 	                          xml_open_tag_xhash );
 
-	*hash_string_size = 1 + string_length(
-	                         xml_close_tag_xhash );
+	*hash_string_size += 1 + string_length(
+	                          xml_close_tag_xhash );
 
 	for( iterator = 0; iterator < hash_values->amount; iterator++ )
 	{

@@ -43,8 +43,8 @@ int libewf_string_split(
 	character_t *string_end        = NULL;
 	static char *function          = "libewf_string_split";
 	size_t remaining_string_size   = 0;
-	size_t split_value_size        = 0;
 	size_t split_value_iterator    = 0;
+	ssize_t split_value_size       = 0;
 
 	if( string == NULL )
 	{
@@ -81,17 +81,28 @@ int libewf_string_split(
 
 		return( -1 );
 	}
-	/* Ignore the end of string character
+	/* Include the last character if not the end of string character
 	 */
-	if( string[ string_size - 1 ] == 0 )
+	if( string[ string_size - 1 ] != 0 )
 	{
-		string_size -= 1;
+		string_size += 1;
+	}
+	/* Do not bother with empty strings
+	 */
+	if( ( string_size == 0 )
+	 || ( string[ 0 ] == 0 ) )
+	{
+		*split_values           = NULL;
+		*amount_of_split_values = 0;
+
+		return( 1 );
 	}
 	/* Determine the amount of split values
 	 */
 	remaining_string_size = string_size;
 	split_value_start     = string;
 	split_value_end       = string;
+	string_end            = &string[ string_size - 1 ];
 
 	do
 	{
@@ -100,6 +111,10 @@ int libewf_string_split(
 		                   delimiter,
 		                   remaining_string_size );
 
+		if( split_value_end > string_end )
+		{
+			break;
+		}
 		split_value_iterator++;
 
 		if( split_value_end == NULL )
@@ -123,6 +138,12 @@ int libewf_string_split(
 
 	*amount_of_split_values = split_value_iterator;
 
+	if( *amount_of_split_values == 0 )
+	{
+		*split_values = NULL;
+
+		return( 1 );
+	}
 	*split_values = (character_t **) memory_allocate(
 	                                  ( sizeof( character_t * ) * *amount_of_split_values ) );
 
@@ -153,7 +174,6 @@ int libewf_string_split(
 	remaining_string_size = string_size;
 	split_value_start     = string;
 	split_value_end       = string;
-	string_end            = &string[ string_size - 1 ];
 
 	for( split_value_iterator = 0; split_value_iterator < *amount_of_split_values; split_value_iterator++ )
 	{
@@ -170,50 +190,52 @@ int libewf_string_split(
 		 */
 		if( split_value_end == NULL )
 		{
-			split_value_size = (size_t) ( string_end - split_value_start );
+			split_value_size = (ssize_t) ( string_end - split_value_start );
 		}
 		else
 		{
-			split_value_size = (size_t) ( split_value_end - split_value_start );
+			split_value_size = (ssize_t) ( split_value_end - split_value_start );
 		}
-		/* Add 1 additional byte required for the end of string character
-		 */
-		split_value_size += 1;
-
-		( *split_values )[ split_value_iterator ] = (character_t *) memory_allocate(
-                                                                             sizeof( character_t ) * split_value_size );
-
-		if( ( *split_values )[ split_value_iterator ] == NULL )
+		if( split_value_size > 0 )
 		{
-			notify_warning_printf( "%s: unable to create split value: %" PRIzd ".\n",
-			 function, split_value_iterator );
+			/* Add 1 additional byte required for the end of string character
+			 */
+			split_value_size += 1;
 
-			libewf_string_split_values_free(
-			 *split_values,
-			 ( split_value_iterator - 1 ) );
+			( *split_values )[ split_value_iterator ] = (character_t *) memory_allocate(
+										     sizeof( character_t ) * split_value_size );
 
-			*split_values = NULL;
+			if( ( *split_values )[ split_value_iterator ] == NULL )
+			{
+				notify_warning_printf( "%s: unable to create split value: %" PRIzd ".\n",
+				 function, split_value_iterator );
 
-			return( -1 );
+				libewf_string_split_values_free(
+				 *split_values,
+				 ( split_value_iterator - 1 ) );
+
+				*split_values = NULL;
+
+				return( -1 );
+			}
+			if( string_copy(
+			     ( *split_values )[ split_value_iterator ],
+			     split_value_start,
+			     split_value_size ) == NULL )
+			{
+				notify_warning_printf( "%s: unable to set split value: %" PRIzd ".\n",
+				 function, split_value_iterator );
+
+				libewf_string_split_values_free(
+				 *split_values,
+				 split_value_iterator );
+
+				*split_values = NULL;
+
+				return( -1 );
+			}
+			( *split_values )[ split_value_iterator ][ split_value_size - 1 ] = 0;
 		}
-		if( string_copy(
-		     ( *split_values )[ split_value_iterator ],
-		     split_value_start,
-		     split_value_size ) == NULL )
-		{
-			notify_warning_printf( "%s: unable to set split value: %" PRIzd ".\n",
-			 function, split_value_iterator );
-
-			libewf_string_split_values_free(
-			 *split_values,
-			 split_value_iterator );
-
-			*split_values = NULL;
-
-			return( -1 );
-		}
-		( *split_values )[ split_value_iterator ][ split_value_size - 1 ] = (character_t) '\0';
-
 		/* Include delimiter character
 		 */
 		remaining_string_size -= (size_t) ( split_value_end - split_value_start ) + 1;

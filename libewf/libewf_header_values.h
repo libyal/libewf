@@ -136,7 +136,7 @@ int libewf_header_values_generate_header_string_type1(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_string_type2(
      libewf_values_table_t *header_values,
@@ -145,7 +145,7 @@ int libewf_header_values_generate_header_string_type2(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_string_type3(
      libewf_values_table_t *header_values,
@@ -153,7 +153,7 @@ int libewf_header_values_generate_header_string_type3(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_string_type4(
      libewf_values_table_t *header_values,
@@ -161,7 +161,7 @@ int libewf_header_values_generate_header_string_type4(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_string_type5(
      libewf_values_table_t *header_values,
@@ -169,7 +169,7 @@ int libewf_header_values_generate_header_string_type5(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_string_type6(
      libewf_values_table_t *header_values,
@@ -177,7 +177,7 @@ int libewf_header_values_generate_header_string_type6(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_string_type7(
      libewf_values_table_t *header_values,
@@ -185,53 +185,53 @@ int libewf_header_values_generate_header_string_type7(
      character_t *header_string_head,
      character_t *header_string_tail,
      character_t **header_string,
-     size_t *header_string_length );
+     size_t *header_string_size );
 
 int libewf_header_values_generate_header_ewf(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header_encase1(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header_ftk(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header_encase2(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header_encase4(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header_linen5(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header_linen6(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_length );
+     size_t *header_size );
 
 int libewf_header_values_generate_header2_encase4(
      libewf_values_table_t *header_values,

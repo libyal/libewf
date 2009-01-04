@@ -63,8 +63,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/ewf_digest_hash.h"
-
 #include "ewfcommon.h"
 #include "ewfprocess_status.h"
 #include "ewfstring.h"
