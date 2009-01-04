@@ -241,6 +241,12 @@ void ewfoutput_acquiry_parameters_fprint(
 	{
 		fprintf( stream, "removable\n" );
 	}
+#if defined( LIBEWF_CD_SUPPORT )
+	else if( media_type == LIBEWF_MEDIA_TYPE_CD )
+	{
+		fprintf( stream, "cd/dvd\n" );
+	}
+#endif
 	fprintf( stream, "Volume type:\t\t\t" );
 
 	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )

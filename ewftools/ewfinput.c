@@ -81,9 +81,16 @@ character_t *ewfinput_format_types[ 12 ] = \
    _CHARACTER_T_STRING( "linen6" ),
    _CHARACTER_T_STRING( "ewfx" ) };
 
+#if defined( LIBEWF_CD_SUPPORT )
+character_t *ewfinput_media_types[ 3 ] = \
+ { _CHARACTER_T_STRING( "fixed" ),
+   _CHARACTER_T_STRING( "removable" ),
+   _CHARACTER_T_STRING( "cd" ) };
+#else
 character_t *ewfinput_media_types[ 2 ] = \
  { _CHARACTER_T_STRING( "fixed" ),
    _CHARACTER_T_STRING( "removable" ) };
+#endif
 
 character_t *ewfinput_volume_types[ 2 ] = \
  { _CHARACTER_T_STRING( "logical" ),
@@ -596,6 +603,15 @@ int8_t ewfinput_determine_media_type(
 	{
 		return( LIBEWF_MEDIA_TYPE_REMOVABLE );
 	}
+#if defined( LIBEWF_CD_SUPPORT )
+	else if( string_compare(
+	          argument,
+	          _CHARACTER_T_STRING( "cd" ),
+	          2 ) == 0 )
+	{
+		return( LIBEWF_MEDIA_TYPE_CD );
+	}
+#endif
 	return( -1 );
 }
 

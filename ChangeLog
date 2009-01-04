@@ -134,7 +134,7 @@ Next release(s):
   - allow to set maximum delta file size default 4 GiB?
 
 Next stable:
-* full platform test
+* Check EnCase 6.8 offset table overflow behavior
 
 CLOSED
 * what about read+write and compression?
@@ -152,6 +152,15 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080317
+* fixed typo in configure.ac
+* libewf EnCase 6 >2GB segment files not compatible with EnCase 6.8
+  offset table overflow is no longer written by libewf
+* added LIBEWF_CD_SUPPORT for testing purposes
+  - no way to detect amount of sessions yet, will default to 1 section with
+  start sector 1
+* changed trailing bytes warning into verbose print
 
 Version: 20080315
 * corrected dist clean in Makefile.am

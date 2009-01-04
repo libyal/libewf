@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080315],
+ [20080317],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080315])
+ [20080317])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -33,7 +33,7 @@ AC_DEFUN([LIBEWF_PRINTF_JD],
 	 CFLAGS="$CFLAGS -Wall -Werror"
 	 AC_LANG_PUSH(C)
 	 AC_MSG_CHECKING(
-	  [if printf support the conversion specifier "%jd"])
+	  [if printf supports the conversion specifier "%jd"])
 	 AC_LINK_IFELSE(
 		AC_LANG_PROGRAM(
 		 [[#include <stdio.h>]],
@@ -56,7 +56,7 @@ AC_DEFUN([LIBEWF_PRINTF_ZD],
 	 CFLAGS="$CFLAGS -Wall -Werror"
 	 AC_LANG_PUSH(C)
 	 AC_MSG_CHECKING(
-	  [if printf support the conversion specifier "%zd"])
+	  [if printf supports the conversion specifier "%zd"])
 	 AC_LINK_IFELSE(
 		AC_LANG_PROGRAM(
 		 [[#include <stdio.h>]],

@@ -1938,6 +1938,18 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 			return( -1 );
 		}
 	}
+#if defined( LIBEWF_CD_SUPPORT )
+	if( libewf_add_session(
+	     handle,
+	     1,
+	     write_size ) != 1 )
+	{
+		notify_warning_printf( "%s: unable add session.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	write_count = libewf_write_finalize(
 	               handle );
 

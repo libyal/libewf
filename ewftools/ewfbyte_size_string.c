@@ -357,8 +357,10 @@ int ewfbyte_size_string_convert(
 	}
 	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
 	{
-		notify_warning_printf( "%s: trailing data in byte size string.\n",
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf( "%s: trailing data in byte size string.\n",
 		 function );
+#endif
 	}
 	*size = byte_size;
 
