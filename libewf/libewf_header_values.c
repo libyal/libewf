@@ -1545,7 +1545,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_HEADER_VA
 
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls" ),
 		header_string_head, case_number, evidence_number, description, examiner_name,
@@ -1775,7 +1775,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_HEADER_VA
 
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls" ),
 		header_string_head, case_number, evidence_number, description, examiner_name,
@@ -1979,7 +1979,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_HEADER_VA
 
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls" ),
 		header_string_head, case_number, evidence_number, description, examiner_name,
@@ -2178,7 +2178,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_HEADER_VA
 
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls" ),
 		header_string_head, description, case_number, evidence_number, examiner_name,
@@ -2385,7 +2385,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_HEADER_VA
 		}
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls%ls%ls" ),
 		header_string_head, description, case_number, evidence_number, examiner_name,
@@ -2604,7 +2604,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_HEADER_VA
 		}
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls%ls%ls" ),
 		header_string_head, description, case_number, evidence_number, examiner_name,
@@ -2806,7 +2806,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_HEADER_VA
 		}
 		return( NULL );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_snprintf( header_string, *string_length,
 		_S_LIBEWF_CHAR( "%ls%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls\t%ls%ls%ls%ls" ),
 		header_string_head, description, case_number, evidence_number, examiner_name,

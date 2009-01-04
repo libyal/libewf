@@ -32,10 +32,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
-#define TEST_RAW_WRITE
-*/
-
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -181,13 +177,11 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
  */
 uint64_t determine_device_size( int file_descriptor )
 {
-#ifndef DIOCGMEDIASIZE
-#ifdef DIOCGDINFO
+#if !defined( DIOCGMEDIASIZE ) && defined( DIOCGDINFO )
 	struct disklabel disk_label;
 #endif
-#endif
 	uint64_t input_size  = 0;
-#ifdef DKIOCGETBLOCKCOUNT
+#if defined( DKIOCGETBLOCKCOUNT )
 	uint64_t block_count = 0;
 	uint32_t block_size  = 0;
 #endif
@@ -195,26 +189,23 @@ uint64_t determine_device_size( int file_descriptor )
 	{
 		return( 0 );
 	}
-#ifdef BLKGETSIZE64
+#if defined( BLKGETSIZE64 )
 	if( ioctl( file_descriptor, BLKGETSIZE64, &input_size ) == -1 )
 	{
 		return( 0 );
 	}
-#else
-#ifdef DIOCGMEDIASIZE
+#elif defined( DIOCGMEDIASIZE )
 	if( ioctl( file_descriptor, DIOCGMEDIASIZE, &input_size ) == -1 )
 	{
 		return( 0 );
 	}
-#else
-#ifdef DIOCGDINFO
+#elif defined( DIOCGDINFO )
 	if( ioctl( file_descriptor, DIOCGDINFO, &disk_label ) == -1 )
 	{
 		return( 0 );
 	}
 	input_size = disk_label.d_secperunit * disk_label.d_secsize;
-#else
-#ifdef DKIOCGETBLOCKCOUNT
+#elif defined( DKIOCGETBLOCKCOUNT )
 	if( ioctl( file_descriptor, DKIOCGETBLOCKSIZE, &block_size ) == -1 )
 	{
 		return( 0 );
@@ -223,19 +214,16 @@ uint64_t determine_device_size( int file_descriptor )
 	{
 		return( 0 );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	fprintf( stderr, "block size: %" PRIu32 " block count: %" PRIu64 " ", block_size, block_count );
 #endif
+
 	input_size = block_count * block_size;
 #else
 	input_size = 0;
+#endif
 
-#endif /* DKIOCGETBLOCKCOUNT */
-#endif /* DIOCGDINFO */
-#endif /* DIOCGMEDIASIZE */
-#endif /* BLKGETSIZE64 */
-
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	fprintf( stderr, "device size: %" PRIu64 "\n", input_size );
 #endif
 	return( input_size );
@@ -243,7 +231,7 @@ uint64_t determine_device_size( int file_descriptor )
 
 /* The main program
  */
-#ifdef HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
@@ -724,11 +712,7 @@ int main( int argc, char * const argv[] )
 	 */
 	filenames[ 0 ] = filename;
 
-#if defined( TEST_RAW_WRITE )
-	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_RAW_WRITE );
-#else
 	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
-#endif
 
 	if( handle == NULL )
 	{

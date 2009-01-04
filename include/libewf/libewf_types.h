@@ -65,7 +65,6 @@ typedef unsigned __int32	uint32_t;
 typedef __int64			int64_t;
 typedef unsigned __int64	uint64_t;
 typedef int			ssize_t;
-typedef unsigned __int32	size64_t;
 typedef unsigned __int64	size64_t;
 typedef __int64			ssize64_t;
 typedef __int64			off64_t;
@@ -116,6 +115,10 @@ extern "C" {
 
 #if ! 0 || ! HAVE_SIZE32_T
 typedef uint32_t size32_t;
+#endif
+
+#if ! 0 || ! HAVE_SSIZE32_T
+typedef int32_t ssize32_t;
 #endif
 
 #if ! 0 || ! HAVE_SIZE64_T

@@ -34,11 +34,11 @@
 
 #include "libewf_includes.h"
 
-#ifdef HAVE_WINDOWS_API
+#if defined( HAVE_WINDOWS_API )
 
 #include <windows.h>
 
-#ifdef _MANAGED
+#if defined( _MANAGED )
 #pragma managed(push, off)
 #endif
 

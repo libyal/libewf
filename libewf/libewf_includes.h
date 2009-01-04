@@ -50,19 +50,19 @@
 
 /* Fix for systems without PRI definitions
  */
-#ifndef PRIi8
+#if !defined( PRIi8 )
 	#define PRIi8 "i"
 #endif
 
-#ifndef PRIi16
+#if !defined( PRIi16 )
 	#define PRIi16 "i"
 #endif
 
-#ifndef PRIi32
+#if !defined( PRIi32 )
 	#define PRIi32 "i"
 #endif
 
-#ifndef PRIi64
+#if !defined( PRIi64 )
 #if __WORDSIZE == 64
 	#define PRIi64 "li"
 #else
@@ -70,19 +70,19 @@
 #endif
 #endif
 
-#ifndef PRIu8
+#if !defined( PRIu8 )
 	#define PRIu8 "u"
 #endif
 
-#ifndef PRIu16
+#if !defined( PRIu16 )
 	#define PRIu16 "u"
 #endif
 
-#ifndef PRIu32
+#if !defined( PRIu32 )
 	#define PRIu32 "u"
 #endif
 
-#ifndef PRIu64
+#if !defined( PRIu64 )
 #if __WORDSIZE == 64
 	#define PRIu64 "lu"
 #else
@@ -90,19 +90,19 @@
 #endif
 #endif
 
-#ifndef PRIx8
+#if !defined( PRIx8 )
 	#define PRIx8 "x"
 #endif
 
-#ifndef PRIx16
+#if !defined( PRIx16 )
 	#define PRIx16 "x"
 #endif
 
-#ifndef PRIx32
+#if !defined( PRIx32 )
 	#define PRIx32 "x"
 #endif
 
-#ifndef PRIx64
+#if !defined( PRIx64 )
 #if __WORDSIZE == 64
 	#define PRIx64 "lx"
 #else
@@ -112,27 +112,27 @@
 
 /* Fix for systems without (U)INTx_MAX definitions
  */
-#ifndef INT8_MAX
+#if !defined( INT8_MAX )
 	#define INT8_MAX (127)
 #endif
 
-#ifndef UINT16_MAX
+#if !defined( UINT16_MAX )
 	#define UINT16_MAX (65535)
 #endif
 
-#ifndef UINT32_MAX
+#if !defined( UINT32_MAX )
 	#define UINT32_MAX (4294967295U)
 #endif
 
-#ifndef INT32_MAX
+#if !defined( INT32_MAX )
 	#define INT32_MAX (2147483647)
 #endif
 
-#ifndef INT64_MAX
+#if !defined( INT64_MAX )
 	#define INT64_MAX (9223372036854775807LL)
 #endif
 
-#ifndef SSIZE_MAX
+#if !defined( SSIZE_MAX )
 #if defined( HAVE_WINDOWS_API )
 	#define SSIZE_MAX INT32_MAX
 #elif __WORDSIZE == 64

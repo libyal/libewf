@@ -80,6 +80,11 @@ LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t fil
  */
 LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
 
+/* Updates the internal MD5 for raw access mode
+ * Returns 1 if successful, -1 on error
+ */
+LIBEWF_EXTERN int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size );
+
 /* Reads data from the curent offset into a buffer
  * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of bytes read, or -1 on error
@@ -117,12 +122,12 @@ LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
  * The function sets the chunk crc, is compressed and write crc values
  * Returns the resulting chunk size, or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_write_raw_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc );
+LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc );
 
 /* Writes data in EWF format from a buffer, the necessary settings of the write values must have been made
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_write_raw_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc );
+LIBEWF_EXTERN ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t uncompressed_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc );
 
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 1 if successful, or -1 on error

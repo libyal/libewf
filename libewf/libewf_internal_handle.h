@@ -356,6 +356,8 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void );
 
 LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTERNAL_HANDLE *internal_handle, size_t size );
 
+int libewf_internal_handle_raw_update_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, void *buffer, size_t size );
+
 int8_t libewf_internal_handle_is_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_is_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_is_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle );

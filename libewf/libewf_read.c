@@ -49,7 +49,7 @@
 /* Builds the index (section list and offset table) from the input files
  * Returns 1 if successful, or -1 on error
  */
-int8_t libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
 	EWF_SECTION *last_section = NULL;
 	uint16_t segment_number   = 0;
@@ -301,7 +301,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chu
 		}
 		chunk_data = internal_handle->chunk_cache->data;
 
-#ifdef HAVE_BUFFER_PASSTHROUGH
+#if defined( HAVE_BUFFER_PASSTHROUGH )
 		/* Determine if the chunk data should be put directly in the buffer
 		 */
 		if( ( buffer != internal_handle->chunk_cache->data ) && ( chunk_offset == 0 ) && ( size >= (uint64_t) internal_handle->media->chunk_size ) )
@@ -415,7 +415,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chu
 			{
 				LIBEWF_WARNING_PRINT( "libewf_read_chunk: CRC does not match for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", ( chunk + 1 ), stored_crc, calculated_crc );
 
-#ifdef WIPEONERROR
+#if defined( WIPE_ON_ERROR )
 				/* The chunk data is wiped
 				 */
 				if( libewf_common_memset( chunk_read, 0, internal_handle->media->chunk_size ) == NULL )
@@ -450,7 +450,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chu
 			{
 				LIBEWF_WARNING_PRINT( "libewf_read_chunk: unable to uncompress chunk.\n" );
 
-#ifdef WIPEONERROR
+#if defined( WIPE_ON_ERROR )
 				/* The chunk data is wiped
 				 */
 				if( libewf_common_memset( chunk_data, 0, internal_handle->media->chunk_size ) == NULL )

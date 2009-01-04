@@ -91,7 +91,7 @@ EWF_SECTION *libewf_section_start_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	LIBEWF_VERBOSE_EXEC( libewf_debug_section_fprint( stderr, section ); );
 
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( section->padding, 40 ); );
 #endif
 
@@ -447,7 +447,7 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 		return( -1 );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume_smart->unknown1, 4 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume_smart->unknown2, 20 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume_smart->unknown3, 45 ); );
@@ -693,7 +693,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 		return( -1 );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown1, 3 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown2, 16 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown3, 3 ); );
@@ -1178,7 +1178,7 @@ int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_S
 
 	while( section_list_entry != NULL )
 	{
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 		LIBEWF_VERBOSE_PRINT( "%s: start offset: %jd last offset: %jd.\n",
 		 function, section_list_entry->start_offset, last_offset );
 #endif
@@ -1283,7 +1283,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 
 		return( NULL );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding, 16 ); );
 #endif
 
@@ -1881,7 +1881,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 		return( -1 );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown1, 3 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown2, 16 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown3, 3 ); );
@@ -2225,7 +2225,7 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( error2->unknown, 200 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, ( EWF_ERROR2_SECTOR_SIZE * amount_of_errors ) ); );
 #endif
@@ -2513,7 +2513,7 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 		return( -1 );
 	}
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( hash->unknown1, 16 ); );
 #endif
 
@@ -3028,7 +3028,7 @@ EWF_SECTION *libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	{
 		LIBEWF_WARNING_PRINT( "libewf_section_read: unsupported section type: %s.\n", (char *) section->type );
 
-#ifdef HAVE_DEBUG_OUTPUT
+#if defined( HAVE_DEBUG_OUTPUT )
 		LIBEWF_VERBOSE_EXEC( libewf_debug_read_section( internal_handle, file_descriptor, (size_t) size ); );
 #else
 		/* Skip the data within the section

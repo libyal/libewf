@@ -847,6 +847,17 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 	return( offset );
 }
 
+/* Updates the internal MD5 for raw access mode
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size )
+{
+	return( libewf_internal_handle_raw_update_md5(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         buffer,
+	         size ) );
+}
+
 /* Returns the amount of bytes per sector from the media information, 0 if not set, -1 on error
  */
 int32_t libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle )
@@ -1097,6 +1108,7 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 	off_t offset                            = 0;
 	ssize_t count                           = 0;
 	uint32_t iterator                       = 0;
+	int result                              = 0;
 
 	if( handle == NULL )
 	{
@@ -1188,18 +1200,18 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 		LIBEWF_VERBOSE_PRINT( "%s: MD5 hash already calculated.\n",
 		 function );
 	}
-	if( libewf_string_copy_from_digest_hash(
-	     string,
-	     length,
-	     internal_handle->calculated_md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+	result = libewf_string_copy_from_digest_hash(
+	          string,
+	          length,
+	          internal_handle->calculated_md5_hash,
+	          EWF_DIGEST_HASH_SIZE_MD5 );
+
+	if( result != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
 		 function );
-
-		return( -1 );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Creates a printable string of the stored md5 hash
@@ -1259,10 +1271,17 @@ int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *strin
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
+	if( internal_handle->calculated_md5_hash == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: MD5 hash was not set.\n",
+		 function );
+
+		return( 0 );
+	}
 	result = libewf_string_copy_from_digest_hash(
 	          string,
 	          length,
-	          internal_handle->calculated_md5_hash,
+	          ( (LIBEWF_INTERNAL_HANDLE *) handle )->calculated_md5_hash,
 	          EWF_DIGEST_HASH_SIZE_MD5 );
 
 	if( result == -1 )

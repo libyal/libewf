@@ -37,15 +37,15 @@
 #include <errno.h>
 #include <stdio.h>
 
-#ifdef HAVE_SYS_IOCTL_H
+#if defined( HAVE_SYS_IOCTL_H )
 #include <sys/ioctl.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
+#if defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
+#if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
@@ -101,13 +101,13 @@ void usage( void )
 
 /* The main program
  */
-#ifdef HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-#if defined(HAVE_UUID_UUID_H) && defined(HAVE_LIBUUID)
+#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
 	CHAR_T *filenames[ 1 ]                  = { "stream" };

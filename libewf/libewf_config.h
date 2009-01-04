@@ -10,7 +10,7 @@
 /* Defines if buffer passthrough should be used */
 /* #undef HAVE_BUFFER_PASSTHROUGH */
 
-/* Defines if chunk cache passthrough should be used */
+/* Defines if chunk cache passthrough should be used in the ewf tools */
 /* #undef HAVE_CHUNK_CACHE_PASSTHROUGH */
 
 /* Defines if compressBound funtion is present in zlib. */
@@ -119,6 +119,10 @@
 
 /* Define to 1 if you have the <openssl/sha.h> header file. */
 /* #undef HAVE_OPENSSL_SHA_H */
+
+/* Defines if libewf's read and write raw functionality should be used in the
+   ewf tools */
+#define HAVE_RAW_ACCESS 1
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
@@ -229,7 +233,7 @@
 /* #undef HAVE_VARARGS_H */
 
 /* Defines if verbose output should be used */
-/* #undef HAVE_VERBOSE_OUTPUT */
+#define HAVE_VERBOSE_OUTPUT 1
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1

@@ -170,6 +170,15 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 			return( NULL );
 		}
 	}
+	/* Initialize the MD5 context
+	 */
+	if( libewf_md5_initialize( &internal_handle->md5_context ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 context.\n",
+		 function );
+
+		return( NULL );
+	}
 	return( internal_handle );
 }
 
@@ -374,6 +383,37 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTER
 	internal_handle->chunk_cache = chunk_cache;
 
 	return( internal_handle );
+}
+
+/* Updates the internal MD5 for raw access mode
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_internal_handle_raw_update_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, void *buffer, size_t size )
+{
+	static char *function = "libewf_internal_handle_raw_update_md5";
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+        if( libewf_md5_update( &internal_handle->md5_context, buffer, size ) != 1 )
+        {
+                LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
+                 function );
+
+                return( -1 );
+        }
+	return( 1 );
 }
 
 /* Check if the header value is set
@@ -1937,15 +1977,19 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
  */
 int8_t libewf_internal_handle_read_is_initialized( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_read_is_initialized";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_read_is_initialized: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_read_is_initialized: invalid handle - missing subhandle read.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1957,23 +2001,19 @@ int8_t libewf_internal_handle_read_is_initialized( LIBEWF_INTERNAL_HANDLE *inter
  */
 int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_read_initialize";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_read_initialize: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_read_initialize: invalid handle - missing subhandle read.\n" );
-
-		return( -1 );
-	}
-	/* Initialize the MD5 context
-	 */
-	if( libewf_md5_initialize( &internal_handle->md5_context ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_read_initialize: unable to initialize MD5 context.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1985,15 +2025,19 @@ int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_
  */
 int8_t libewf_internal_handle_write_is_initialized( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_write_is_initialized";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_is_initialized: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_is_initialized: invalid handle - missing subhandle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2005,6 +2049,7 @@ int8_t libewf_internal_handle_write_is_initialized( LIBEWF_INTERNAL_HANDLE *inte
  */
 int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function               = "libewf_internal_handle_write_initialize";
 	int64_t required_amount_of_segments = 0;
 	int64_t amount_of_chunks            = 0;
 	int64_t amount_of_sectors           = 0;
@@ -2012,37 +2057,43 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid handle - missing chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid handle - missing subhandle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write->values_initialized != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: write values were initialized and cannot be initialized anymore.\n" );
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be initialized anymore.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->chunk_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: the media chunk size cannot be zero - using default media values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: the media chunk size cannot be zero - using default media values.\n",
+		 function );
 
 		internal_handle->media->sectors_per_chunk = 64;
 		internal_handle->media->bytes_per_sector  = 512;
@@ -2050,32 +2101,37 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	if( internal_handle->media->chunk_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid media chunk size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid media chunk size only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid bytes per sector only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write->segment_file_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: the segment file size cannot be zero - using default value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: the segment file size cannot be zero - using default value.\n",
+		 function );
 
 		internal_handle->write->segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	}
 	if( internal_handle->write->segment_file_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid segment file size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ( internal_handle->compression_level != EWF_COMPRESSION_NONE ) && ( internal_handle->compression_level != EWF_COMPRESSION_FAST )
 	 && ( internal_handle->compression_level != EWF_COMPRESSION_BEST ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unsupported compression level - using default.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported compression level - using default.\n",
+		 function );
 
 		internal_handle->compression_level           = EWF_COMPRESSION_NONE;
 		internal_handle->write->compress_empty_block = 1;
@@ -2086,13 +2142,15 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 	if( internal_handle->write->input_write_size > maximum_input_file_size )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: input write size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n", maximum_input_file_size, internal_handle->media->chunk_size );
+		LIBEWF_WARNING_PRINT( "%s: input write size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
+		 function, maximum_input_file_size, internal_handle->media->chunk_size );
 
 		return( -1 );
 	}
 	if( internal_handle->write->input_write_size > (uint64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: invalid input write size only values below 2^64 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid input write size only values below 2^64 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2100,7 +2158,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	 */
 	if( internal_handle->format == LIBEWF_FORMAT_LVF )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: writing format LVF currently not supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: writing format LVF currently not supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2118,7 +2177,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	 && ( internal_handle->format != LIBEWF_FORMAT_EWF )
 	 && ( internal_handle->format != LIBEWF_FORMAT_EWFX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unsupported format - using default.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported format - using default.\n",
+		 function );
 
 		internal_handle->format = LIBEWF_FORMAT_ENCASE5;
 	}
@@ -2147,7 +2207,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 	if( internal_handle->write->maximum_amount_of_segments == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unable to determine the maximum amount of allowed segment files.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine the maximum amount of allowed segment files.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2165,7 +2226,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 		 && ( internal_handle->format != LIBEWF_FORMAT_FTK )
 		 && ( internal_handle->format != LIBEWF_FORMAT_EWFX ) )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: EWF file format does not allow for streaming write.\n" );
+			LIBEWF_WARNING_PRINT( "%s: EWF file format does not allow for streaming write.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -2180,7 +2242,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 		if( required_amount_of_segments > (int64_t) internal_handle->write->maximum_amount_of_segments )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: the settings exceed the maximum amount of allowed segment files.\n" );
+			LIBEWF_WARNING_PRINT( "%s: the settings exceed the maximum amount of allowed segment files.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -2194,7 +2257,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 		}
 		if( amount_of_chunks > (int64_t) UINT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: the settings exceed the maximum amount of allowed chunks.\n" );
+			LIBEWF_WARNING_PRINT( "%s: the settings exceed the maximum amount of allowed chunks.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -2206,7 +2270,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 		if( amount_of_chunks > (int64_t) UINT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: the settings exceed the maximum amount of allowed sectors.\n" );
+			LIBEWF_WARNING_PRINT( "%s: the settings exceed the maximum amount of allowed sectors.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -2226,7 +2291,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 		if( internal_handle->offset_table == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unable to allocate offset table.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate offset table.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -2237,37 +2303,35 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	{
 		if( libewf_internal_handle_chunk_cache_realloc( internal_handle, ( internal_handle->media->chunk_size + EWF_CRC_SIZE ) ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unable to reallocate chunk cache.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
+			 function );
 
 			return( -1 );
 		}
 	}
-	/* Initialize the MD5 context
-	 */
-	if( libewf_md5_initialize( &internal_handle->md5_context ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unable to initialize MD5 context.\n" );
-
-		return( -1 );
-	}
 	/* Create the headers if required
 	 */
-	if( ( internal_handle->header == NULL ) && ( internal_handle->header2 == NULL ) && ( internal_handle->xheader == NULL ) )
+	if( ( internal_handle->header == NULL )
+	 && ( internal_handle->header2 == NULL )
+	 && ( internal_handle->xheader == NULL ) )
 	{
 		if( internal_handle->header_values == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: empty header values - using default.\n" );
+			LIBEWF_WARNING_PRINT( "%s: empty header values - using default.\n",
+			 function );
 
 			if( libewf_internal_handle_create_header_values( internal_handle ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unable to create header values.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+				 function );
 
 				return( -1 );
 			}
 		}
 		if( libewf_internal_handle_create_headers( internal_handle, internal_handle->header_values ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_write_initialize: unable to create header(s).\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header(s).\n",
+			 function );
 
 			return( -1 );
 		}

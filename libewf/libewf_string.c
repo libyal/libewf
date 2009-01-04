@@ -89,18 +89,21 @@ LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 	return( duplicate );
 }
 
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#ifdef HAVE_WCSTOL
-#define libewf_string_to_signed_long( string, end_of_string, base )	(int64_t) wcstol( string, end_of_string, base )
+#if defined( HAVE_WCSTOL )
+#define libewf_string_to_signed_long( string, end_of_string, base ) \
+	(int64_t) wcstol( string, end_of_string, base )
 #endif
 
 #else
 
-#ifdef HAVE_STRTOL
-#define libewf_string_to_signed_long( string, end_of_string, base )	(int64_t) strtol( string, end_of_string, base )
-#elif defined(HAVE_ATOL)
-#define libewf_string_to_signed_long( string, end_of_string, base )	(int64_t) atol( string )
+#if defined( HAVE_STRTOL )
+#define libewf_string_to_signed_long( string, end_of_string, base ) \
+	(int64_t) strtol( string, end_of_string, base )
+#elif defined( HAVE_ATOL )
+#define libewf_string_to_signed_long( string, end_of_string, base ) \
+	(int64_t) atol( string )
 #endif
 
 #endif
@@ -154,18 +157,21 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 }
 
 
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#ifdef HAVE_WCSTOUL
-#define libewf_string_to_unsigned_long( string, end_of_string, base )	(uint64_t) wcstoul( string, end_of_string, base )
+#if defined( HAVE_WCSTOUL )
+#define libewf_string_to_unsigned_long( string, end_of_string, base ) \
+	(uint64_t) wcstoul( string, end_of_string, base )
 #endif
 
 #else
 
-#ifdef HAVE_STRTOUL
-#define libewf_string_to_unsigned_long( string, end_of_string, base )	(uint64_t) strtoul( string, end_of_string, base )
-#elif defined(HAVE_ATOL)
-#define libewf_string_to_unsigned_long( string, end_of_string, base )	(uint64_t) atol( string )
+#if defined( HAVE_STRTOUL )
+#define libewf_string_to_unsigned_long( string, end_of_string, base ) \
+	(uint64_t) strtoul( string, end_of_string, base )
+#elif defined( HAVE_ATOL )
+#define libewf_string_to_unsigned_long( string, end_of_string, base ) \
+	(uint64_t) atol( string )
 #endif
 
 #endif
@@ -592,7 +598,7 @@ int8_t libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string
 	}
 	for( iterator = 0; iterator < size_ewf_char_string; iterator++ )
 	{
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		string[ iterator ] = btowc( (int) ewf_char_string[ iterator ] );
 #else
 		string[ iterator ] = (char) ewf_char_string[ iterator ];
@@ -636,7 +642,7 @@ int8_t libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, 
 	}
 	for( iterator = 0; iterator < size_string; iterator++ )
 	{
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		ewf_char_string[ iterator ] = (EWF_HEADER) wctob( string[ iterator ] );
 
 		/* If character is out of the basic ASCII range use '_' as a place holder
@@ -659,19 +665,22 @@ int8_t libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, 
  */
 int8_t libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_string, EWF_DIGEST_HASH *digest_hash, size_t size_digest_hash )
 {
+	static char *function       = "libewf_string_copy_from_digest_hash";
 	size_t string_iterator      = 0;
 	size_t digest_hash_iterator = 0;
 	uint8_t digest_digit        = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_digest_hash: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ( size_string > (size_t) SSIZE_MAX ) || ( size_digest_hash > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_digest_hash: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -679,13 +688,15 @@ int8_t libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_str
 	 */
 	if( size_string < ( ( 2 * size_digest_hash ) + 1 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_digest_hash: string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( digest_hash == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_string_copy_from_digest_hash: invalid digest hash.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: invalid digest hash.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -722,7 +733,7 @@ int8_t libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_str
  */
 int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
 {
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
 
 	char *header2_pointer = NULL;
@@ -752,7 +763,7 @@ int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string,
 
 		return( -1 );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_common_memset( &conversion_state, 0, sizeof( mbstate_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: unable to clear converion state.\n" );
@@ -790,7 +801,7 @@ int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string,
  */
 int8_t libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
 {
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
 #endif
 
@@ -818,7 +829,7 @@ int8_t libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, E
 
 		return( -1 );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_common_memset( &conversion_state, 0, sizeof( mbstate_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: unable to clear converion state.\n" );
@@ -840,7 +851,7 @@ int8_t libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, E
 
 		return( -1 );
 	}
-#ifdef HAVE_WIDE_CHARACTER_TYPE
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( header2[ 4 ] == (EWF_HEADER2) '\0' )
 	{
 		header2[ 0 ] = (EWF_HEADER2) 0xfe;

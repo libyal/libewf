@@ -102,11 +102,13 @@ Next release:
 * refactor function names into static char *
 * refactor some int64 to size64_t and off_t into off64_t
 * add maximum check to set functions in internal handle
+* rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
 
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
   write raw only checks for the raw access mode like prepare function
 * remove raw access value in handle and RAW flag
+* ewfacquire check if last segment file is closed before telling acquiry was completed
 
 Version: 20070721
 * worked on allowing to write raw buffers as chunks

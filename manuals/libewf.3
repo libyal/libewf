@@ -1,4 +1,4 @@
-.Dd Juny 16, 2007
+.Dd Juny 21, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -22,10 +22,12 @@
 .Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
 .Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
+.Ft int
+.Fn libewf_raw_update_md5 "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
-.Fn libewf_write_raw_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
+.Fn libewf_raw_write_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
 .Ft ssize_t
-.Fn libewf_write_raw_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
+.Fn libewf_raw_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t uncompressed_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
 .Ft ssize_t
 .Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
 .Ft int8_t
@@ -242,8 +244,18 @@ Note that certain information like the calculated MD5 has is not available if
 has not been issued.
 .Pp
 The
-.Fn libewf_write_raw_prepare_buffer ,
-.Fn libewf_write_raw_buffer
+.Fn libewf_raw_update_md5
+function can be used to update the internal MD5 for media data
+when reading from or writing to 'raw' chunks to a set of EWF files.
+.Pp
+The
+.Fn libewf_raw_read_prepare_buffer ,
+.Fn libewf_raw_read_buffer
+functions can be used to read 'raw' chunks to a set of EWF files.
+.Pp
+The
+.Fn libewf_raw_write_prepare_buffer ,
+.Fn libewf_raw_write_buffer
 functions can be used to write 'raw' chunks to a set of EWF files.
 .Pp
 The

@@ -84,11 +84,11 @@
 
 /* EWFCOMMON_BUFFER_SIZE definition is intended for testing purposes
  */
-#if ! defined( EWFCOMMON_BUFFER_SIZE )
+#if !defined( EWFCOMMON_BUFFER_SIZE )
 #define EWFCOMMON_BUFFER_SIZE	chunk_size
 #endif
 
-#if ! defined( LIBEWF_OPERATING_SYSTEM )
+#if !defined( LIBEWF_OPERATING_SYSTEM )
 #define LIBEWF_OPERATING_SYSTEM "Unknown"
 #endif
 
@@ -1815,7 +1815,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 	EWFSHA1_CONTEXT sha1_context;
 
 	LIBEWF_CHAR *sha1_hash_string       = NULL;
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	uint8_t *data                       = NULL;
 #endif
 	off_t read_offset                   = 0;
@@ -1854,7 +1854,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 		return( -1 );
 	}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -1884,7 +1884,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		{
 			size = (size_t) ( media_size - total_read_count );
 		}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 		read_count = libewf_read_random( handle, (void *) data, size, read_offset );
 #else
 		read_count = libewf_read_random( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, read_offset );
@@ -1894,7 +1894,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read: error reading data.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
@@ -1903,7 +1903,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read: unexpected end of data.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
@@ -1912,14 +1912,14 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read: more bytes read than requested.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
 		}
 		if( calculate_sha1 == 1 )
 		{
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			ewfsha1_update( &sha1_context, data, read_count );
 #else
 			ewfsha1_update( &sha1_context, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, read_count );
@@ -1933,7 +1933,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 			callback( total_read_count, media_size );
 		}
   	}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	libewf_common_free( data );
 #endif
 
@@ -1973,7 +1973,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
  */
 int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_descriptor, uint64_t read_size, uint64_t read_offset, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	uint8_t *data            = NULL;
 #endif
 	ssize_t read_count       = 0;
@@ -2027,7 +2027,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 	}
 	read_all = (uint8_t) ( ( read_size == media_size ) && ( read_offset == 0 ) );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -2048,7 +2048,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		{
 			size = (size_t) ( media_size - total_read_count );
 		}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 		read_count = libewf_read_random( handle, (void *) data, size, (off_t) read_offset );
 #else
 		read_count = libewf_read_random( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, (off_t) read_offset );
@@ -2058,7 +2058,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: error reading data.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
@@ -2067,7 +2067,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: unexpected end of data.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
@@ -2076,14 +2076,14 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: more bytes read than requested.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
 		}
 		read_offset += size;
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 		write_count = libewf_common_write( output_file_descriptor, data, (size_t) read_count );
 #else
 		write_count = libewf_common_write( output_file_descriptor, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, (size_t) read_count );
@@ -2093,7 +2093,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		{
 			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: error writing data.\n" );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
 #endif
 			return( -1 );
@@ -2105,7 +2105,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 			callback( total_read_count, read_size );
 		}
   	}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	libewf_common_free( data );
 #endif
 
@@ -2120,16 +2120,20 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 	EWFSHA1_CONTEXT sha1_context;
 
 	LIBEWF_CHAR *sha1_hash_string = NULL;
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	uint8_t *data                 = NULL;
 #endif
 	static char *function         = "ewfcommon_write_from_file_descriptor";
+	ssize64_t total_write_count   = 0;
+	ssize64_t write_count         = 0;
 	size_t buffer_size            = 0;
-	int64_t total_write_count     = 0;
-	int64_t write_count           = 0;
-	int32_t read_count            = 0;
+	ssize_t read_count            = 0;
 	uint32_t chunk_size           = 0;
-#if defined( TEST_RAW_WRITE )
+#if defined( HAVE_RAW_ACCESS )
+	uint8_t *compressed_data      = NULL;
+	uint8_t *raw_write_data       = NULL;
+	size_t compressed_size        = 0;
+	ssize_t raw_write_count       = 0;
 	uint32_t chunk_crc            = 0;
 	int8_t is_compressed          = 0;
 	int8_t write_crc              = 0;
@@ -2176,7 +2180,10 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 
 				return( -1 );
 			}
-			if( libewf_common_lseek( input_file_descriptor, write_offset, SEEK_SET ) != (int64_t) write_offset )
+			if( libewf_common_lseek(
+			     input_file_descriptor,
+			     write_offset,
+			     SEEK_SET ) != (int64_t) write_offset )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to find write offset.\n",
 				 function );
@@ -2190,7 +2197,7 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 		LIBEWF_WARNING_PRINT( "%s: ignoring write offset in a stream mode.\n",
 		 function );
 	}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -2201,12 +2208,27 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 
 		return( -1 );
 	}
+#if defined( HAVE_RAW_ACCESS )
+	compressed_data = (uint8_t *) libewf_common_alloc( 2 * buffer_size * sizeof( uint8_t ) );
+
+	if( compressed_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate compressed data.\n",
+		 function );
+
+		libewf_common_free( data );
+
+		return( -1 );
+	}
+#endif
 #else
 	if( chunk_size > ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->allocated_size )
 	{
 		/* Add 4 bytes for CRC
 		 */
-		if( libewf_internal_handle_chunk_cache_realloc( (LIBEWF_INTERNAL_HANDLE *) handle, ( chunk_size + EWF_CRC_SIZE ) ) == NULL )
+		if( libewf_internal_handle_chunk_cache_realloc(
+		     (LIBEWF_INTERNAL_HANDLE *) handle,
+		     ( chunk_size + EWF_CRC_SIZE ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );
@@ -2223,6 +2245,13 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
 
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( compressed_data );
+#endif
+#endif
+
 			return( -1 );
 		}
 	}
@@ -2230,23 +2259,14 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 	{
 		/* Read a chunk from the file descriptor
 		 */
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 		read_count = ewfcommon_read_input(
 		              handle,
 		              input_file_descriptor,
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 		              data,
-		              buffer_size,
-		              total_write_count,
-		              write_size,
-		              read_error_retry,
-		              sector_error_granularity,
-		              wipe_block_on_read_error,
-		              seek_on_error );
 #else
-		read_count = ewfcommon_read_input(
-		              handle,
-		              input_file_descriptor,
 		              ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data,
+#endif
 		              buffer_size,
 		              total_write_count,
 		              write_size,
@@ -2254,15 +2274,17 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 		              sector_error_granularity,
 		              wipe_block_on_read_error,
 		              seek_on_error );
-#endif
 
 		if( read_count <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
 			 function );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( compressed_data );
+#endif
 #endif
 			return( -1 );
 		}
@@ -2273,42 +2295,80 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 				LIBEWF_WARNING_PRINT( "%s: unexpected end of input.\n",
 				 function );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 				libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+				libewf_common_free( compressed_data );
+#endif
 #endif
 				return( -1 );
 			}
 			break;
 		}
-#if defined( TEST_RAW_WRITE )
-		if( libewf_write_prepare_buffer(
+#if defined( HAVE_RAW_ACCESS )
+		if( libewf_raw_update_md5(
 		     handle,
 		     data,
-		     read_count,
-		     NULL,
-		     0,
-		     &is_compressed,
-		     &chunk_crc,
-		     &write_crc ) <= -1 )
+		     (size_t) read_count ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to update the internal MD5.\n",
 			 function );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( compressed_data );
+#endif
+#endif
+			return( -1 );
+		}
+		compressed_size = 2 * buffer_size;
+
+		raw_write_count = libewf_raw_write_prepare_buffer(
+		                   handle,
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+		                   data,
+#else
+		                   ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data,
+#endif
+		                   (size_t) read_count,
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+		                   compressed_data,
+#else
+		                   ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->compressed,
+#endif
+		                   &compressed_size,
+		                   &is_compressed,
+		                   &chunk_crc,
+		                   &write_crc );
+
+		if( raw_write_count <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer for write raw.\n",
+			 function );
+
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( compressed_data );
+#endif
 #endif
 			return( -1 );
 		}
 #endif
 		if( calculate_sha1 == 1 )
 		{
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-			ewfsha1_update( &sha1_context, data, read_count );
+			ewfsha1_update(
+			 &sha1_context,
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			 data,
 #else
-			ewfsha1_update( &sha1_context, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, read_count );
+			 ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data,
 #endif
+			 read_count );
 		}
-		if( ( write_size != 0 ) && ( ( total_write_count + read_count ) == (int64_t) write_size ) )
+		if( ( write_size != 0 )
+		 && ( ( total_write_count + read_count ) == (int64_t) write_size ) )
 		{
 			if( calculate_sha1 == 1 )
 			{
@@ -2319,55 +2379,119 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 					LIBEWF_WARNING_PRINT( "%s: unable to create SHA1 hash string.\n",
 					 function );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 					libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+					libewf_common_free( compressed_data );
+#endif
 #endif
 					return( -1 );
 				}
-				if( ewfcommon_get_sha1_hash( &sha1_context, sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
+				if( ewfcommon_get_sha1_hash(
+				     &sha1_context,
+				     sha1_hash_string,
+				     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
 					 function );
 
 					libewf_common_free( sha1_hash_string );
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 					libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+					libewf_common_free( compressed_data );
+#endif
 #endif
 					return( -1 );
 				}
 				/* The SHA1 hash must be set before the last chunk is written
 				 */
-				if( libewf_set_hash_value( handle, _S_LIBEWF_CHAR( "SHA1" ), sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
+				if( libewf_set_hash_value(
+				     handle,
+				     _S_LIBEWF_CHAR( "SHA1" ),
+				     sha1_hash_string,
+				     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string in handle.\n",
 					 function );
 
 					libewf_common_free( sha1_hash_string );
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 					libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+					libewf_common_free( compressed_data );
+#endif
 #endif
 					return( -1 );
 				}
 				libewf_common_free( sha1_hash_string );
 			}
 		}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-		write_count = libewf_write_buffer( handle, (void *) data, read_count );
+#if defined( HAVE_RAW_ACCESS )
+
+		if( is_compressed == 1 )
+		{
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			raw_write_data = compressed_data;
 #else
-		write_count = libewf_write_buffer( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, read_count );
+			raw_write_data = ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->compressed;
 #endif
+		}
+		else
+		{
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			raw_write_data = data;
+#else
+			raw_write_data = ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data;
+#endif
+		}
+		write_count = libewf_raw_write_buffer(
+		               handle,
+		               (void *) raw_write_data,
+		               (size_t) raw_write_count,
+		               (size_t) read_count,
+		               is_compressed,
+		               chunk_crc,
+		               write_crc );
+
+		if( write_count != raw_write_count )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
+			 function );
+
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( compressed_data );
+#endif
+#endif
+			return( -1 );
+		}
+#else
+		write_count = libewf_write_buffer(
+		               handle,
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+		               (void *) data,
+#else
+		               (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data,
+#endif
+		               read_count );
 
 		if( write_count != read_count )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
 			 function );
 
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( compressed_data );
+#endif
 #endif
 			return( -1 );
 		}
-		total_write_count += write_count;
+#endif
+		total_write_count += read_count;
 
 		/* Callback for status update
 		 */
@@ -2376,8 +2500,11 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			callback( (uint64_t) total_write_count, write_size );
 		}
 	}
-#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+#if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+	libewf_common_free( compressed_data );
+#endif
 #endif
 	if( write_size == 0 )
 	{

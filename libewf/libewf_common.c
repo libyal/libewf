@@ -33,7 +33,7 @@
 
 #include "libewf_includes.h"
 
-#ifdef HAVE_STRING_H
+#if defined( HAVE_STRING_H )
 #include <string.h>
 #endif
 

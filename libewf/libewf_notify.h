@@ -42,11 +42,13 @@
 extern "C" {
 #endif
 
-#ifdef HAVE_VERBOSE_OUTPUT
-#define LIBEWF_VERBOSE_EXEC( code )	if( libewf_notify_verbose != 0 ) { code };
+#if defined( HAVE_VERBOSE_OUTPUT )
+#define LIBEWF_VERBOSE_EXEC( code ) \
+	if( libewf_notify_verbose != 0 ) { code };
 
 #else
-#define LIBEWF_VERBOSE_EXEC( code )	/* code */
+#define LIBEWF_VERBOSE_EXEC( code ) \
+	/* code */
 
 #endif
 

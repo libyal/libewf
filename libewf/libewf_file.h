@@ -79,6 +79,8 @@ off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk
 
 LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
 
+LIBEWF_EXTERN int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size );
+
 LIBEWF_EXTERN int32_t libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN int32_t libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN ssize32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle );
