@@ -150,7 +150,7 @@ int main( int argc, char * const argv[] )
 	time_t timestamp_start                     = 0;
 	time_t timestamp_end                       = 0;
 	int64_t write_count                        = 0;
-	uint64_t segment_file_size                 = ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 );
+	uint64_t segment_file_size                 = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	uint64_t acquiry_offset                    = 0;
 	uint64_t acquiry_size                      = 0;
 	uint64_t sectors_per_chunk                 = 64;

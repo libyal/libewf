@@ -165,6 +165,12 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080212
+* fixed ewfverify the EWF file can be verified without the integrity hash
+  as pointed out by David Loveall
+* fixed incorrect default segment file size in ewfacquirestream
+  as pointed out by Dennis Schreiber
+
 Version: 20080202
 * code cleanup
 

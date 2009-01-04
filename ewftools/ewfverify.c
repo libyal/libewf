@@ -490,9 +490,11 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_EWF "\n", stored_md5_hash_string );
+			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_EWF "\n",
+			 stored_md5_hash_string );
 		}
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
+		 calculated_md5_hash_string );
 
 		match_md5_hash = ( libewf_string_compare(
 		                    stored_md5_hash_string,
@@ -510,9 +512,11 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs_EWF "\n", stored_sha1_hash_string );
+			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs_EWF "\n",
+			 stored_sha1_hash_string );
 		}
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
+		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
+		 calculated_sha1_hash_string );
 
 		match_sha1_hash = ( libewf_string_compare(
 		                     stored_sha1_hash_string,
@@ -522,9 +526,14 @@ int main( int argc, char * const argv[] )
 		libewf_common_free( stored_sha1_hash_string );
 		libewf_common_free( calculated_sha1_hash_string );
 	}
-	if( match_md5_hash
+	/* The EWF file can be verified without the integrity hash
+	 */
+	if( ( ( calculate_md5 == 0 )
+	  || ( stored_md5_hash_result == 0 )
+	  || match_md5_hash )
 	 && ( ( calculate_sha1 == 0 )
-	  || ( match_sha1_hash ) ) )
+	  || ( stored_sha1_hash_result == 0 )
+	  || match_sha1_hash ) )
 	{
 		fprintf( stdout, "\n%" PRIs_EWF ": SUCCESS\n", program );
 
