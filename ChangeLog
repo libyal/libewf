@@ -155,7 +155,13 @@ WORKING
 * make buffer passthrough default behavior
 * work on TODO in write
 * check unused parameters gcc -Wextra
-* fix raw write
+* API function get current chunk size?
+* refactor read and write
+* do not finalize on write error?
+* ewfcommon - size write buffer to chunk size for raw write
+
+Version: 20071103
+* fixed limit of amount of chunks written for raw write access
 
 Version: 20071030
 * fixed input handling of format in ewfexport wide string support

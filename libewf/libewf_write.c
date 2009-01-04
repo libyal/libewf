@@ -328,7 +328,7 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 /* Tests if the current segment file is full
  * Returns 1 if full, 0 if not, -1 on error
  */
-int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset )
+int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, int raw_access )
 {
 	static char *function               = "libewf_write_test_segment_file_full";
 	int64_t remaining_segment_file_size = 0;
@@ -379,7 +379,8 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	/* Check if the maximum amount of chunks has been reached
 	 */
-	if( ( internal_handle->media->amount_of_chunks != 0 )
+	if( ( raw_access == 0 )
+	 && ( internal_handle->media->amount_of_chunks != 0 )
 	 && ( internal_handle->media->amount_of_chunks == internal_handle->write->amount_of_chunks ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: all required chunks have been written.\n",
@@ -451,7 +452,7 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Tests if the current chunks section is full
  * Returns 1 if full, 0 if not, -1 on error
  */
-int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset )
+int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, int raw_access )
 {
 	static char *function               = "libewf_write_test_chunks_section_full";
 	int64_t remaining_segment_file_size = 0;
@@ -509,7 +510,8 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	/* Check if the maximum amount of chunks has been reached
 	 */
-	if( ( internal_handle->media->amount_of_chunks != 0 )
+	if( ( raw_access == 0 )
+	 && ( internal_handle->media->amount_of_chunks != 0 )
 	 && ( internal_handle->media->amount_of_chunks == internal_handle->write->amount_of_chunks ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: all required chunks have been written.\n",
@@ -1250,7 +1252,8 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	 */
 	result = libewf_write_test_chunks_section_full(
 	          internal_handle,
-	          internal_handle->segment_table->file_offset[ segment_number ] );
+	          internal_handle->segment_table->file_offset[ segment_number ],
+	          raw_access );
 
 	if( result == -1 )
 	{
@@ -1288,7 +1291,8 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	 */
 	result = libewf_write_test_segment_file_full(
 	          internal_handle,
-	          internal_handle->segment_table->file_offset[ segment_number ] );
+	          internal_handle->segment_table->file_offset[ segment_number ],
+	          raw_access );
 
 	if( result == -1 )
 	{

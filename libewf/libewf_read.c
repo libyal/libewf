@@ -255,16 +255,14 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	 || ( internal_handle->chunk_cache->chunk != chunk )
 	 || ( internal_handle->chunk_cache->cached == 0 ) )
 	{
-		segment_number = internal_handle->offset_table->segment_number[ chunk ];
-
 		/* Determine the size of the chunk including the CRC
 		 */
 		chunk_data_size = internal_handle->offset_table->size[ chunk ];
 
-		chunk_cache_data_used = (int) ( buffer == internal_handle->chunk_cache->data );
-
 		/* Make sure the chunk cache is large enough
 		 */
+		chunk_cache_data_used = (int) ( buffer == internal_handle->chunk_cache->data );
+
 		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
@@ -287,6 +285,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		}
 		chunk_data = internal_handle->chunk_cache->data;
 
+		/* Determine which buffer to read the chunk data
+		 */
 		if( raw_access != 0 )
 		{
 			chunk_data = (EWF_CHAR *) buffer;
@@ -322,6 +322,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 			}
 		}
 #endif
+
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */
@@ -343,6 +344,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
+		segment_number = internal_handle->offset_table->segment_number[ chunk ];
+
 		/* Read the chunk data
 		 */
 		chunk_read_count = ewf_string_read_to_buffer(
