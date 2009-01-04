@@ -89,7 +89,7 @@ int libewf_handle_initialize(
 		 */
 		if( libewf_file_io_pool_initialize(
 		     &( internal_handle->file_io_pool ),
-		     1,
+		     0,
 		     LIBEWF_FILE_IO_POOL_UNLIMITED_AMOUNT_OF_OPEN_FILES ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create file io pool.\n",

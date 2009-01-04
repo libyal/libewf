@@ -63,15 +63,18 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
+	fprintf( stream, "Usage: ewfinfo [ -d date_format ] [ -ehimvV ] ewf_files\n\n" );
 
-	fprintf( stream, "\t-d: specify the date format, options: ctime (default), dm (day/month), md (month/day), iso8601\n" );
-	fprintf( stream, "\t-e: only show EWF read error information\n" );
-	fprintf( stream, "\t-h: shows this help\n" );
-	fprintf( stream, "\t-i: only show EWF acquiry information\n" );
-	fprintf( stream, "\t-m: only show EWF media information\n" );
-	fprintf( stream, "\t-v: verbose output to stderr\n" );
-	fprintf( stream, "\t-V: print version\n" );
+	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
+
+	fprintf( stream, "\t-d:        specify the date format, options: ctime (default), dm (day/month),\n"
+	                 "\t           md (month/day), iso8601\n" );
+	fprintf( stream, "\t-e:        only show EWF read error information\n" );
+	fprintf( stream, "\t-h:        shows this help\n" );
+	fprintf( stream, "\t-i:        only show EWF acquiry information\n" );
+	fprintf( stream, "\t-m:        only show EWF media information\n" );
+	fprintf( stream, "\t-v:        verbose output to stderr\n" );
+	fprintf( stream, "\t-V:        print version\n" );
 }
 
 /* The main program
@@ -583,7 +586,10 @@ int main( int argc, char * const argv[] )
 		}
 		ewfoutput_hash_values_fprint(
 		 stdout,
-		 ewfcommon_libewf_handle );
+		 ewfcommon_libewf_handle,
+		 _CHARACTER_T_STRING( "\t" ),
+		 0,
+		 0 );
 
 		fprintf( stdout, "\n" );
 

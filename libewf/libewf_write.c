@@ -1589,6 +1589,17 @@ ssize_t libewf_raw_write_chunk_existing(
 
 					return( -1 );
 				}
+				if( libewf_section_list_values_free(
+				     last_list_element->value ) != 1 )
+				{
+					notify_warning_printf( "%s: unable to free last section values.\n",
+					 function );
+
+					memory_free(
+					 last_list_element );
+
+					return( -1 );
+				}
 				memory_free(
 				 last_list_element );
 
@@ -2655,13 +2666,20 @@ ssize_t libewf_write_finalize(
 		}
 		write_count_finalize += write_count;
 	}
-	segment_number      = internal_handle->segment_table->amount - 1;
+	segment_number = internal_handle->segment_table->amount - 1;
+
+	/* Check if no segment file was created
+	 */
+	if( segment_number == 0 )
+	{
+		return( 0 );
+	}
 	segment_file_handle = internal_handle->segment_table->segment_file_handle[ segment_number ];
 
 	if( segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid segment file.\n",
-		 function );
+		notify_warning_printf( "%s: invalid segment file: %" PRIu16 ".\n",
+		 function, segment_number );
 
 		return( -1 );
 	}
@@ -2916,6 +2934,55 @@ ssize_t libewf_write_finalize(
 					if( write_count == -1 )
 					{
 						notify_warning_printf( "%s: unable to correct data section.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
+				/* The last segment file should be terminated with a done section and not with a next section
+				 */
+				else if( ( segment_table_iterator == ( internal_handle->segment_table->amount - 1 ) )
+				      && ( memory_compare(
+				            section_list_values->type,
+				            "next",
+				            4 ) == 0 ) )
+		
+				{
+#if defined( HAVE_VERBOSE_OUTPUT )
+					notify_verbose_printf( "%s: correcting next section - closing last segment file.\n",
+					 function );
+#endif
+
+					if( libewf_file_io_pool_seek_offset(
+					     internal_handle->file_io_pool,
+					     segment_file_handle->file_io_pool_entry,
+					     section_list_values->start_offset,
+					     SEEK_SET ) == -1 )
+					{
+						notify_warning_printf( "%s: unable to find offset to data volume section.\n",
+						 function );
+
+						return( -1 );
+					}
+					write_count = libewf_segment_file_write_close(
+						       segment_file_handle,
+						       internal_handle->file_io_pool,
+						       segment_number,
+						       internal_handle->write->segment_amount_of_chunks,
+						       1,
+						       internal_handle->hash_sections,
+						       internal_handle->hash_values,
+						       internal_handle->media_values,
+						       internal_handle->sessions,
+						       internal_handle->acquiry_errors,
+						       internal_handle->compression_level,
+						       internal_handle->format,
+						       internal_handle->ewf_format,
+						       &( internal_handle->write->data_section ) );
+
+					if( write_count == -1 )
+					{
+						notify_warning_printf( "%s: unable to close segment file.\n",
 						 function );
 
 						return( -1 );

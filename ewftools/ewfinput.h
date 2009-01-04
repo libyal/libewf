@@ -112,38 +112,47 @@ int ewfinput_determine_yes_no(
      const character_t *argument,
      uint8_t *yes_no_value );
 
-int ewfinput_get_variable_string(
+int ewfinput_get_string_variable(
      FILE *stream,
      character_t *request_string,
-     character_t *variable_string,
-     size_t variable_string_size );
+     character_t *string_variable,
+     size_t string_variable_size );
 
-int ewfinput_get_variable_string_system_character(
+int ewfinput_get_string_variable_system_character(
      FILE *stream,
      character_t *request_string,
-     system_character_t *variable_string,
-     size_t variable_string_size );
+     system_character_t *string_variable,
+     size_t string_variable_size );
 
-uint64_t ewfinput_get_size_variable(
-          FILE *stream,
-          character_t *request_string,
-          uint64_t minimum,
-          uint64_t maximum,
-          uint64_t default_value );
+int ewfinput_get_size_variable(
+     FILE *stream,
+     character_t *input_buffer,
+     size_t input_buffer_size,
+     character_t *request_string,
+     uint64_t minimum,
+     uint64_t maximum,
+     uint64_t default_value,
+     uint64_t *size_variable );
 
-uint64_t ewfinput_get_byte_size_variable(
-          FILE *stream,
-          character_t *request_string,
-          uint64_t minimum,
-          uint64_t maximum,
-          uint64_t default_value );
+int ewfinput_get_byte_size_variable(
+     FILE *stream,
+     character_t *input_buffer,
+     size_t input_buffer_size,
+     character_t *request_string,
+     uint64_t minimum,
+     uint64_t maximum,
+     uint64_t default_value,
+     uint64_t *byte_size_variable );
 
-character_t *ewfinput_get_fixed_value(
-              FILE *stream,
-              character_t *request_string,
-              character_t **values,
-              uint8_t amount,
-              uint8_t default_value );
+int ewfinput_get_fixed_string_variable(
+     FILE *stream,
+     character_t *input_buffer,
+     size_t input_buffer_size,
+     character_t *request_string,
+     character_t **values,
+     uint8_t amount_of_values,
+     uint8_t default_value,
+     character_t **fixed_string_variable );
 
 #if defined( __cplusplus )
 }

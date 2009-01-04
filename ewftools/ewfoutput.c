@@ -1082,18 +1082,22 @@ void ewfoutput_header_values_fprint(
  */
 void ewfoutput_hash_values_fprint(
       FILE *stream,
-      libewf_handle_t *handle )
+      libewf_handle_t *handle,
+      character_t *indentation,
+      uint8_t ignore_md5,
+      uint8_t ignore_sha1 )
 {
 	character_t hash_identifier[ 32 ];
 	character_t hash_value[ 128 ];
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
-	character_t *stored_md5_hash_string = NULL;
-	static char *function               = "ewfoutput_hash_values_fprint";
-	uint32_t hash_identifier_length     = 32;
-	uint32_t hash_value_length          = 128;
-	uint32_t amount_of_values           = 0;
-	uint32_t iterator                   = 0;
+	character_t *stored_md5_hash_string  = NULL;
+	static char *function                = "ewfoutput_hash_values_fprint";
+	uint32_t hash_identifier_length      = 32;
+	uint32_t hash_value_length           = 128;
+	uint32_t amount_of_values            = 0;
+	uint32_t iterator                    = 0;
+	uint8_t print_additional_hash_values = 1;
 
 	if( stream == NULL )
 	{
@@ -1109,36 +1113,52 @@ void ewfoutput_hash_values_fprint(
 
 		return;
 	}
-	if( libewf_get_md5_hash( handle, md5_hash, EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
+	if( indentation == NULL )
 	{
-		notify_warning_printf( "%s: unable to retrieve MD5 hash.\n",
+		notify_warning_printf( "%s: invalid indentation.\n",
 		 function );
 
 		return;
 	}
-	stored_md5_hash_string = (character_t *) memory_allocate(
-	                                          sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+	if( ignore_md5 == 0 )
+	{
+		if( libewf_get_md5_hash(
+		     handle,
+		     md5_hash,
+		     EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to retrieve MD5 hash.\n",
+			 function );
 
-	if( ( stored_md5_hash_string != NULL )
-	 && ( ewfdigest_copy_to_string(
-	       md5_hash,
-	       EWFDIGEST_HASH_SIZE_MD5,
-	       stored_md5_hash_string,
-	       EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
-	{
-		fprintf( stream, "\tMD5 hash in file:\t%" PRIs "\n",
-		 stored_md5_hash_string );
+			return;
+		}
+		stored_md5_hash_string = (character_t *) memory_allocate(
+							  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
-		memory_free(
-		 stored_md5_hash_string );
+		if( ( stored_md5_hash_string != NULL )
+		 && ( ewfdigest_copy_to_string(
+		       md5_hash,
+		       EWFDIGEST_HASH_SIZE_MD5,
+		       stored_md5_hash_string,
+		       EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
+		{
+			fprintf( stream, "\tMD5 hash in file:\t%" PRIs "\n",
+			 stored_md5_hash_string );
+
+			memory_free(
+			 stored_md5_hash_string );
+		}
+		else
+		{
+			fprintf( stream, "\tMD5 hash in file:\tN/A\n" );
+		}
 	}
-	else
+	if( libewf_parse_hash_values(
+	     handle ) >= 0 )
 	{
-		fprintf( stream, "\tMD5 hash in file:\tN/A\n" );
-	}
-	if( libewf_parse_hash_values( handle ) == 1 )
-	{
-		if( libewf_get_amount_of_hash_values( handle, &amount_of_values ) == -1 )
+		if( libewf_get_amount_of_hash_values(
+		     handle,
+		     &amount_of_values ) == -1 )
 		{
 			notify_warning_printf( "%s: unable to retrieve amount of hash values.\n",
 			 function );
@@ -1149,24 +1169,53 @@ void ewfoutput_hash_values_fprint(
 		{
 			if( amount_of_values > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
 			{
-				fprintf( stream, "\n\tAdditional hash values:\n" );
-
 				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 				{
-					if( libewf_get_hash_value_identifier( handle, iterator, hash_identifier, hash_identifier_length ) != 1 )
+					if( libewf_get_hash_value_identifier(
+					     handle,
+					     iterator,
+					     hash_identifier,
+					     hash_identifier_length ) != 1 )
 					{
 						notify_warning_printf( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
 						 function, iterator );
 					}
-					else if( libewf_get_hash_value( handle, hash_identifier, hash_value, hash_value_length ) != 1 )
+					else if( ( ignore_md5 != 0 )
+					      && ( string_compare(
+					            hash_identifier,
+					            _CHARACTER_T_STRING( "MD5" ),
+					            3 ) == 0 ) )
+					{
+						continue;
+					}
+					else if( ( ignore_sha1 != 0 )
+					      && ( string_compare(
+					            hash_identifier,
+					            _CHARACTER_T_STRING( "SHA1" ),
+					            4 ) == 0 ) )
+					{
+						continue;
+					}
+					else if( libewf_get_hash_value(
+					          handle,
+					          hash_identifier,
+					          hash_value,
+					          hash_value_length ) != 1 )
 					{
 						notify_warning_printf( "%s: unable to retrieve the hash value for identifier: %" PRIs ".\n",
 						 function, hash_identifier );
 					}
 					else
 					{
-						fprintf( stream, "\t%" PRIs ":\t%" PRIs "\n",
-						 hash_identifier, hash_value );
+						if( print_additional_hash_values != 0 )
+						{
+							fprintf( stream, "\n%" PRIs "Additional hash values:\n",
+							 indentation );
+
+							print_additional_hash_values = 0;
+						}
+						fprintf( stream, "%" PRIs "%" PRIs ":\t%" PRIs "\n",
+						 indentation, hash_identifier, hash_value );
 					}
 				}
 			}

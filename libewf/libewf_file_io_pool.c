@@ -47,9 +47,9 @@ int libewf_file_io_pool_initialize(
 
 		return( -1 );
 	}
-	if( amount_of_files_io_handles <= 0 )
+	if( amount_of_files_io_handles < 0 )
 	{
-		notify_warning_printf( "%s: invalid amount of file io handles value zero or less.\n",
+		notify_warning_printf( "%s: invalid amount of file io handles value less than zero.\n",
 		 function );
 
 		return( -1 );
@@ -97,38 +97,6 @@ int libewf_file_io_pool_initialize(
 
 			return( -1 );
 		}
-		( *file_io_pool )->file_io_handle = (libewf_file_io_handle_t *) memory_allocate(
-		                                                                 file_io_pool_size );
-
-		if( ( *file_io_pool )->file_io_handle == NULL )
-		{
-			notify_warning_printf( "%s: unable to create file io handles.\n",
-			 function );
-
-			memory_free(
-			 *file_io_pool );
-
-			*file_io_pool = NULL;
-
-			return( -1 );
-		}
-		if( memory_set(
-		     ( *file_io_pool )->file_io_handle,
-		     0,
-		     file_io_pool_size ) == NULL )
-		{
-			notify_warning_printf( "%s: unable to clear file io handles.\n",
-			 function );
-
-			memory_free(
-			 ( *file_io_pool )->file_io_handle );
-			memory_free(
-			 *file_io_pool );
-
-			*file_io_pool = NULL;
-
-			return( -1 );
-		}
 		( *file_io_pool )->last_used_list = (libewf_list_t *) memory_allocate(
 		                                                       sizeof( libewf_list_t ) );
 
@@ -137,8 +105,6 @@ int libewf_file_io_pool_initialize(
 			notify_warning_printf( "%s: unable to create last used list.\n",
 			 function );
 
-			memory_free(
-			 ( *file_io_pool )->file_io_handle );
 			memory_free(
 			 *file_io_pool );
 
@@ -157,13 +123,50 @@ int libewf_file_io_pool_initialize(
 			memory_free(
 			 ( *file_io_pool )->last_used_list );
 			memory_free(
-			 ( *file_io_pool )->file_io_handle );
-			memory_free(
 			 *file_io_pool );
 
 			*file_io_pool = NULL;
 
 			return( -1 );
+		}
+		if( amount_of_files_io_handles > 0 )
+		{
+			( *file_io_pool )->file_io_handle = (libewf_file_io_handle_t *) memory_allocate(
+											 file_io_pool_size );
+
+			if( ( *file_io_pool )->file_io_handle == NULL )
+			{
+				notify_warning_printf( "%s: unable to create file io handles.\n",
+				 function );
+
+				memory_free(
+				 ( *file_io_pool )->last_used_list );
+				memory_free(
+				 *file_io_pool );
+
+				*file_io_pool = NULL;
+
+				return( -1 );
+			}
+			if( memory_set(
+			     ( *file_io_pool )->file_io_handle,
+			     0,
+			     file_io_pool_size ) == NULL )
+			{
+				notify_warning_printf( "%s: unable to clear file io handles.\n",
+				 function );
+
+				memory_free(
+				 ( *file_io_pool )->file_io_handle );
+				memory_free(
+				 ( *file_io_pool )->last_used_list );
+				memory_free(
+				 *file_io_pool );
+
+				*file_io_pool = NULL;
+
+				return( -1 );
+			}
 		}
 		( *file_io_pool )->amount_of_files_io_handles   = amount_of_files_io_handles;
 		( *file_io_pool )->maximum_amount_of_open_files = maximum_amount_of_open_files;
@@ -211,8 +214,11 @@ int libewf_file_io_pool_free(
 			notify_warning_printf( "%s: unable to free last used list.\n",
 			 function );
 		}
-		memory_free(
-		 ( *file_io_pool )->file_io_handle );
+		if( ( *file_io_pool )->file_io_handle != NULL )
+		{
+			memory_free(
+			 ( *file_io_pool )->file_io_handle );
+		}
 		memory_free(
 		 *file_io_pool );
 
@@ -298,13 +304,6 @@ int libewf_file_io_pool_create_file_io_handle(
 	if( file_io_pool == NULL )
 	{
 		notify_warning_printf( "%s: invalid file io pool.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( file_io_pool->file_io_handle == NULL )
-	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );

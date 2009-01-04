@@ -46,6 +46,7 @@
 
 #include <libewf.h>
 
+#include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfdigest_context.h"
 #include "ewfgetopt.h"
@@ -70,17 +71,21 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Usage: ewfverify [ -d digest_type ] [ -hqsvVw ] ewf_files\n\n" );
+	fprintf( stream, "Usage: ewfverify [ -d digest_type ] [ -l log_filename ]\n"
+	                 "                 [ -p process_buffer_size ] [ -hqsvVw ] ewf_files\n\n" );
 
-	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stream, "\t-h: shows this help\n" );
-	fprintf( stream, "\t-l: logs verification errors and the digest (hash) to the filename\n" );
-	fprintf( stream, "\t-q: quiet shows no status information\n" );
-	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stream, "\t-v: verbose output to stderr\n" );
-	fprintf( stream, "\t-V: print version\n" );
-	fprintf( stream, "\t-w: wipe sectors on CRC error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
+
+	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stream, "\t-h:        shows this help\n" );
+	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the log_filename\n" );
+	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
+	fprintf( stream, "\t-q:        quiet shows no status information\n" );
+	fprintf( stream, "\t-s:        swap byte pairs of the media data (from AB to BA)\n"
+	                 "\t           (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stream, "\t-v:        verbose output to stderr\n" );
+	fprintf( stream, "\t-V:        print version\n" );
+	fprintf( stream, "\t-w:        wipe sectors on CRC error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -98,11 +103,11 @@ int main( int argc, char * const argv[] )
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                            = NULL;
 #endif
-	character_t *stored_md5_hash_string        = NULL;
 	character_t *calculated_md5_hash_string    = NULL;
-	character_t *stored_sha1_hash_string       = NULL;
 	character_t *calculated_sha1_hash_string   = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfverify" );
+	character_t *stored_md5_hash_string        = NULL;
+	character_t *stored_sha1_hash_string       = NULL;
 
 	system_character_t * const *argv_filenames = NULL;
 	system_character_t **ewf_filenames         = NULL;
@@ -113,14 +118,16 @@ int main( int argc, char * const argv[] )
 
 	system_integer_t option                    = 0;
 	ssize64_t verify_count                     = 0;
+	size_t string_length                       = 0;
+	uint64_t process_buffer_size               = 0;
 	uint32_t amount_of_crc_errors              = 0;
-	int8_t stored_md5_hash_result              = 0;
-	int8_t stored_sha1_hash_result             = 0;
 	uint8_t calculate_md5                      = 1;
 	uint8_t calculate_sha1                     = 0;
 	uint8_t swap_byte_pairs                    = 0;
 	uint8_t wipe_chunk_on_error                = 0;
 	uint8_t verbose                            = 0;
+	int8_t stored_md5_hash_result              = 0;
+	int8_t stored_sha1_hash_result             = 0;
 	int amount_of_filenames                    = 0;
 	int match_md5_hash                         = 0;
 	int match_sha1_hash                        = 0;
@@ -134,7 +141,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:sqvVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:sp:qvVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -171,6 +178,24 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'l':
 				log_filename = optarg;
 
+				break;
+
+			case (system_integer_t) 'p':
+				string_length = system_string_length(
+				                 optarg );
+
+				result = ewfbyte_size_string_convert_system_character(
+				          optarg,
+				          string_length,
+				          &process_buffer_size );
+
+				if( ( result != 1 )
+				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
+				{
+					process_buffer_size = 0;
+
+					fprintf( stderr, "Unsupported process buffer size defaulting to: chunk size.\n" );
+				}
 				break;
 
 			case (system_integer_t) 'q':
@@ -455,6 +480,7 @@ int main( int argc, char * const argv[] )
 		                EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 		                swap_byte_pairs,
 		                wipe_chunk_on_error,
+		                process_buffer_size,
 		                callback );
 
 		if( verify_count <= -1 )
@@ -650,6 +676,10 @@ int main( int argc, char * const argv[] )
 				 log_filename );
 			}
 		}
+		fprintf(
+		 stdout,
+		 "\n" );
+
 		ewfoutput_crc_errors_fprint(
 		 stdout,
 		 ewfcommon_libewf_handle,
@@ -662,14 +692,41 @@ int main( int argc, char * const argv[] )
 			 ewfcommon_libewf_handle,
 			 &amount_of_crc_errors );
 		}
-	}
-	if( libewf_close(
-	     ewfcommon_libewf_handle ) != 0 )
-	{
-		fprintf( stderr, "Unable to close EWF file(s).\n" );
-
 		if( calculate_md5 == 1 )
 		{
+			if( stored_md5_hash_result == 0 )
+			{
+				fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "MD5 hash stored in file:\tN/A\n" );
+				}
+			}
+			else
+			{
+				fprintf( stdout, "MD5 hash stored in file:\t%" PRIs "\n",
+				 stored_md5_hash_string );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs "\n",
+					 stored_md5_hash_string );
+				}
+			}
+			fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs "\n",
+			 calculated_md5_hash_string );
+
+			if( log_file_stream != NULL )
+			{
+				fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
+				 calculated_md5_hash_string );
+			}
+			match_md5_hash = ( string_compare(
+					    stored_md5_hash_string,
+					    calculated_md5_hash_string,
+					    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
+
 			memory_free(
 			 stored_md5_hash_string );
 			memory_free(
@@ -677,11 +734,75 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
+			if( stored_sha1_hash_result == 0 )
+			{
+				fprintf( stdout, "SHA1 hash stored in file:\tN/A\n" );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "SHA1 hash stored in file:\tN/A\n" );
+				}
+			}
+			else
+			{
+				fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs "\n",
+				 stored_sha1_hash_string );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs "\n",
+					 stored_sha1_hash_string );
+				}
+			}
+			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs "\n",
+			 calculated_sha1_hash_string );
+
+			if( log_file_stream != NULL )
+			{
+				fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
+				 calculated_sha1_hash_string );
+			}
+			match_sha1_hash = ( string_compare(
+					     stored_sha1_hash_string,
+					     calculated_sha1_hash_string,
+					     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
+
 			memory_free(
 			 stored_sha1_hash_string );
 			memory_free(
 			 calculated_sha1_hash_string );
 		}
+		ewfoutput_hash_values_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle,
+		 _CHARACTER_T_STRING( "" ),
+		 calculate_md5,
+		 calculate_sha1 );
+
+		if( log_file_stream != NULL )
+		{
+			ewfoutput_hash_values_fprint(
+			 log_file_stream,
+			 ewfcommon_libewf_handle,
+			 _CHARACTER_T_STRING( "" ),
+			 calculate_md5,
+			 calculate_sha1 );
+		}
+	}
+	if( libewf_close(
+	     ewfcommon_libewf_handle ) != 0 )
+	{
+		fprintf( stderr, "Unable to close EWF file(s).\n" );
+
+		if( log_file_stream != NULL )
+		{
+			file_stream_io_fclose(
+			 log_file_stream );
+		}
+		return( EXIT_FAILURE );
+	}
+	if( status != EWFPROCESS_STATUS_COMPLETED )
+	{
 		if( log_file_stream != NULL )
 		{
 			file_stream_io_fclose(
@@ -692,109 +813,6 @@ int main( int argc, char * const argv[] )
 	if( ewfsignal_detach() != 1 )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
-	}
-	if( status != EWFPROCESS_STATUS_COMPLETED )
-	{
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 stored_md5_hash_string );
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 stored_sha1_hash_string );
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		if( log_file_stream != NULL )
-		{
-			file_stream_io_fclose(
-			 log_file_stream );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( calculate_md5 == 1 )
-	{
-		if( stored_md5_hash_result == 0 )
-		{
-			fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "MD5 hash stored in file:\tN/A\n" );
-			}
-		}
-		else
-		{
-			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs "\n",
-			 stored_md5_hash_string );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs "\n",
-				 stored_md5_hash_string );
-			}
-		}
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs "\n",
-		 calculated_md5_hash_string );
-
-		if( log_file_stream != NULL )
-		{
-			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
-			 calculated_md5_hash_string );
-		}
-		match_md5_hash = ( string_compare(
-		                    stored_md5_hash_string,
-		                    calculated_md5_hash_string,
-		                    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
-
-		memory_free(
-		 stored_md5_hash_string );
-		memory_free(
-		 calculated_md5_hash_string );
-	}
-	if( calculate_sha1 == 1 )
-	{
-		if( stored_sha1_hash_result == 0 )
-		{
-			fprintf( stdout, "SHA1 hash stored in file:\tN/A\n" );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "SHA1 hash stored in file:\tN/A\n" );
-			}
-		}
-		else
-		{
-			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs "\n",
-			 stored_sha1_hash_string );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs "\n",
-				 stored_sha1_hash_string );
-			}
-		}
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs "\n",
-		 calculated_sha1_hash_string );
-
-		if( log_file_stream != NULL )
-		{
-			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
-			 calculated_sha1_hash_string );
-		}
-		match_sha1_hash = ( string_compare(
-		                     stored_sha1_hash_string,
-		                     calculated_sha1_hash_string,
-		                     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
-
-		memory_free(
-		 stored_sha1_hash_string );
-		memory_free(
-		 calculated_sha1_hash_string );
 	}
 	if( log_file_stream != NULL )
 	{

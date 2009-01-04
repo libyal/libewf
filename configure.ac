@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080906],
+ [20080907],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080906])
+ [20080907])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -1113,8 +1113,8 @@ dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 dnl Set additional compiler flags
-CFLAGS="$CFLAGS -Wall";
-dnl CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
+dnl CFLAGS="$CFLAGS -Wall";
+CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
