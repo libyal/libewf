@@ -133,6 +133,8 @@ check TODO
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
+* have failed on open return a more sensible error (do not rely on errno)
+
 * API changes
   - add error parameter
   - remove write_finalize in API v2?
@@ -195,6 +197,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080917
+* Small change in configure.ac
 
 Version: 20080916
 * Fixed issue in error

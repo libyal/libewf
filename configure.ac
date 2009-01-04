@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080916],
+ [20080917],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080916])
+ [20080917])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -130,6 +130,9 @@ AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([unistd.h])
 
 dnl Other headers
+AC_CHECK_HEADERS([time.h])
+
+AC_CHECK_HEADERS([errno.h])
 AC_CHECK_HEADERS([glob.h])
 AC_CHECK_HEADERS([locale.h])
 AC_CHECK_HEADERS([signal.h])
@@ -247,7 +250,7 @@ AC_CHECK_FUNCS(
   [Missing function: realloc],
   [1]) ])
 
-dnl File input/output functions used in common/noitfy.h
+dnl File input/output functions used in common/notify.h
 AC_CHECK_FUNCS(
  [vfprintf],
  [],
