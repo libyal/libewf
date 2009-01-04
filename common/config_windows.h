@@ -48,6 +48,11 @@
 #undef HAVE_INTTYPES_H
 #undef HAVE_STDINT_H
 
+/* Windows does not have %jd and %zd printf conversion specifiers
+ */
+#undef HAVE_PRINTF_JD
+#undef HAVE_PRINTF_ZD
+
 /* Windows does not have <unistd.h> but uses <io.h> instead
  */
 #undef HAVE_UNISTD_H

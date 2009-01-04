@@ -409,6 +409,10 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	libewf_set_notify_values(
+	 stderr,
+	 verbose );
+
 	/* Check if to read from stdin
 	 */
 	if( system_string_compare(
@@ -804,10 +808,6 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to attach signal handler.\n" );
 	}
-	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-
 	if( ewfcommon_abort == 0 )
 	{
 		/* Set up the libewf handle

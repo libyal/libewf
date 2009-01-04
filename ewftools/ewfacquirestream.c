@@ -444,15 +444,15 @@ int main( int argc, char * const argv[] )
 				break;
 		}
 	}
+	libewf_set_notify_values(
+	 stderr,
+	 verbose );
+
 	if( ewfsignal_attach(
 	     ewfcommon_signal_handler ) != 1 )
 	{
 		fprintf( stderr, "Unable to attach signal handler.\n" );
 	}
-	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-
 	if( option_case_number != NULL )
 	{
 		string_length = system_string_length(

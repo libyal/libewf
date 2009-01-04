@@ -36,6 +36,10 @@
 
 #include "common.h"
 
+#if defined( MEMWATCH )
+#include "memwatch.h"
+#endif
+
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif

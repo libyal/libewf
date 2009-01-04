@@ -245,6 +245,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\common\string_conversion.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\common\system_string.c"
 				>
 			</File>
@@ -340,6 +344,10 @@
 			</File>
 			<File
 				RelativePath="..\..\common\notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\string_conversion.h"
 				>
 			</File>
 			<File

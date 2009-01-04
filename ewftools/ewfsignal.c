@@ -117,12 +117,12 @@ BOOL WINAPI ewfsignal_handler(
 				ewfsignal_signal_handler(
 				 signal );
 			}
-			return( 1 );
+			return( TRUE );
 
 		default:
 			break;
 	}
-	return( 0 );
+	return( FALSE );
 }
 
 /* Initialize memory usage and leakage debugging
@@ -166,7 +166,7 @@ int ewfsignal_attach(
 
 	if( SetConsoleCtrlHandler(
 	     ewfsignal_handler,
-	     TRUE ) != 0 )
+	     TRUE ) == 0 )
 	{
 		notify_warning_printf( "%s: unable to attach signal handler.\n",
 		 function );
@@ -175,9 +175,9 @@ int ewfsignal_attach(
 	}
 	if( SetConsoleCtrlHandler(
 	     NULL,
-	     FALSE ) != 0 )
+	     FALSE ) == 0 )
 	{
-		notify_warning_printf( "%s: unable to deattach default signal handler.\n",
+		notify_warning_printf( "%s: unable to attach break signal.\n",
 		 function );
 
 		return( -1 );
@@ -221,20 +221,10 @@ int ewfsignal_detach(
 	static char *function = "ewfsignal_detach";
 
 	if( SetConsoleCtrlHandler(
-	     NULL,
-	     TRUE ) != 0 )
-	{
-		notify_warning_printf( "%s: unable to attach default signal handler.\n",
-		 function );
-
-		return( -1 );
-	}
-
-	if( SetConsoleCtrlHandler(
 	     ewfsignal_handler,
-	     FALSE ) != 0 )
+	     FALSE ) == 0 )
 	{
-		notify_warning_printf( "%s: unable to deattach signal handler.\n",
+		notify_warning_printf( "%s: unable to detach signal handler.\n",
 		 function );
 
 		return( -1 );
