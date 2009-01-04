@@ -175,51 +175,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\ewf_crc.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_data.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_error2.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_file_header.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_hash.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_ltree.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_section.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_session.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\ewf_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_table.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_volume.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_volume_smart.c"
 				>
 			</File>
 			<File
@@ -291,6 +247,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_values_table.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_write.c"
 				>
 			</File>
@@ -302,10 +262,6 @@
 			>
 			<File
 				RelativePath="..\..\libewf\ewf_char.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_chunk.h"
 				>
 			</File>
 			<File
@@ -341,19 +297,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\ewf_header.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_header2.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\ewf_ltree.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libewf\ewf_section.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\ewf_session.h"
 				>
 			</File>
 			<File
@@ -454,6 +406,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_values_table.h"
 				>
 			</File>
 			<File

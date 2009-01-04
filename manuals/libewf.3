@@ -1,4 +1,4 @@
-.Dd September 19, 2007
+.Dd Oktober 27, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -54,14 +54,14 @@
 .Fn libewf_get_compression_level "LIBEWF_HANDLE *handle, int8_t compression_level"
 .Ft int
 .Fn libewf_get_media_size "LIBEWF_HANDLE *handle, size64_t *media_size"
-.Ft int8_t
-.Fn libewf_get_media_type "LIBEWF_HANDLE *handle"
-.Ft int8_t
-.Fn libewf_get_media_flags "LIBEWF_HANDLE *handle"
-.Ft int8_t
-.Fn libewf_get_volume_type "LIBEWF_HANDLE *handle"
-.Ft int8_t
-.Fn libewf_get_format "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_get_media_type "LIBEWF_HANDLE *handle, int8_t *media_type"
+.Ft int
+.Fn libewf_get_media_flags "LIBEWF_HANDLE *handle, int8_t *media_flags"
+.Ft int
+.Fn libewf_get_volume_type "LIBEWF_HANDLE *handle, int8_t *volume_type"
+.Ft int
+.Fn libewf_get_format "LIBEWF_HANDLE *handle, int8_t* format"
 .Ft int
 .Fn libewf_get_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
 .Ft int
@@ -69,7 +69,21 @@
 .Ft int
 .Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, uint8_t *filename, size_t size"
 .Ft int
+.Fn libewf_get_amount_of_acquiry_errors "LIBEWF_HANDLE *handle, uint32_t *amount_of_errors"
+.Ft int
+.Fn libewf_get_acquiry_error "LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors"
+.Ft int
+.Fn libewf_get_amount_of_crc_errors "LIBEWF_HANDLE *handle, uint32_t *amount_of_errors"
+.Ft int
+.Fn libewf_get_crc_error "LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors"
+.Ft int
 .Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks"
+.Ft int
+.Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks"
+.Ft int
+.Fn libewf_get_amount_of_header_values "LIBEWF_HANDLE *handle, uint32_t *amount_of_values"
+.Ft int
+.Fn libewf_get_amount_of_hash_values "LIBEWF_HANDLE *handle, uint32_t *amount_of_values"
 .Ft int
 .Fn libewf_set_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk"
 .Ft int

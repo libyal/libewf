@@ -27,10 +27,6 @@ To do/think about:
 * file: add function/flag to open segments files progressively using only the basename (like write)
 * libewf_string: enhance UTF16 conversion code
 * read: correct for errors in the table or table2 section for EWF-E01
-* read: add check for next and done segment
-  - really the last segment in the file
-  - offset pointing at themselves
-  - correct size
 * read: reduce multiple successive crc error entries to a single
 * write: reduce multiple successive acquiry error (error2) entries to a single
 * look at integrating support for carvefs (libmodewf.c) - EWF specifics only
@@ -38,7 +34,10 @@ To do/think about:
   - what about xml based media data output like in libmodewf.c ?
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
+  - use io pooling
 * make compilation resilient for missing crypto library
+  - remove the cryptographic options if crypto library is missing
+* implement raw split support in ewfexport and ewfacquire?
 
 * ewftools: add getoptlong
 * ewfacquire: make size input and output human friendly (support kM notation etc)
@@ -46,13 +45,13 @@ To do/think about:
 * ewfacquire: warn if values exceed maximum segment count
 * ewfacquire: add native Windows support for accessing devices
 * ewfacquire: read from pipe
+  - what about input size?
 * ewfacquire: non interactive mode - read settings from file?
-  no, but perhaps commandline parameters?
+  - no, but perhaps commandline parameters?
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
-  make a generic media access solution also useable for revit?
-* ewfacquire: add entire disk (physical) and partition only (logical) to volume type
-  description
+  - make a generic media access solution also useable for revit?
+* ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfdebug: create a tool to analyse a single segment file
 * ewfrecover: create a tool recover ewf files
@@ -62,10 +61,16 @@ To do/think about:
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: linux alternative to wmain?
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
-* implement raw split support in ewfexport and ewfacquire?
 
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   - header2 and ltree only affected sections
+
+Additional (integrity) checks:
+* check if successive headers match first header ?
+* read: add check for next and done segment
+  - really the last segment in the file
+  - offset pointing at themselves
+  - correct size
 
 Possible performance improvements:
 * create a offset table per segment file - create it on demand - section list per segment table is done
@@ -98,10 +103,6 @@ Next release:
 * add libewf_convert_date_xheader_value function ?
   - add raw date format to allow to print raw date string
 * change string duplicate function to macro?
-* check if successive headers match first header ?
-* have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
-* change section start to static definition in libewf_section_last_write and libewf_section_start_write
-* do not create human readable byte string if size <= 1024
 
 * add maximum check to set functions in internal handle
 * move any access to segment table in file, write and read to segment_file
@@ -112,45 +113,30 @@ TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
   write raw only checks for the raw access mode like prepare function
 * ewfacquire check if last segment file is closed before telling acquiry was completed
-* make buffer passthrough default behavior
 * remove internal_handle passing from most functions
   only pass the necessary values
 * segment table should only be updated by functions in segment file/table
 * rewrite ewfglob marcros to function macros (including arguments)
 * what about header values parsing with preservation of timestamps?
 
-* change int8_t return values into int return values
-* change libewf_get and libewf_set functions for api consistency
-  move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
-
-* change use of stdout and stderr in ewfexport
+  - change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
 
 * ewfexport: non interactive mode?
+* ewfacquire: account for backspace in user input
 
-* write api functions to rid ewfcommon of internal_handle
-  - acquiry errors
-  - CRC read errors
-  - the header values amount
-  - the hash values amount
+* what about setting errno for API set and get function i.e. for size too small
 
 * move wipe on error to ewftools, like in ewfacquire?
   WIPE_ON_ERROR
 * what about the crc errors in read_raw?
 
-* remove files from MSVC++ project
-  ewf_data.c
-  ewf_hash.c
-  ewf_section.c
-  ewf_session.c
-  ewf_table.c
-  ewf_ltree.c
-  ewf_error2.c
-  ewf_volume.c
-  ewf_volume_smart.c
+* read crc in function libewf_section_delta_chunk_read?
+
+* have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -164,8 +150,23 @@ CLOSED
   - if so remove libewf_string include from ewfacquire
   not needed
 
+WORKING
+* make buffer passthrough default behavior
+* fix error in ewfacquirestream
+
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions
+* Cleanup of set/get functions in internal handle
+* Added libewf_get_amount_of_acquiry_errors
+* Wrote API functions to rid ewfcommon of internal_handle for acquiry and
+  CRC errors, header and hash values
+* Moved duplicate code for handling header and hash values into libewf_values_table
+* Removed internal_handle from ewftools
+* ewftools no longer create human readable byte string if size <= 1024
+* changed int8_t return values into int return values
+* changed libewf_get and libewf_set functions for API consistency
+* moved several get and set functions from internal handle to file
+* fixed error in windows retrieving digest hashes
 
 Version: 20071016
 * Worked on cleaning up ewf struct read and write functions
@@ -173,6 +174,7 @@ Version: 20071016
 Version: 20071015
 * Worked on file io handler
 * Worked on cleaning up ewf struct read and write functions
+* change section start to static definition in libewf_section_last_write and libewf_section_start_write
 
 Version: 20071009
 * Worked on file io handler
@@ -261,7 +263,7 @@ Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy
   using memcpy instead
 * changed some int8_t return values into int return values
-* worked on changing libewf_get functions for api consistency
+* worked on changing libewf_get functions for API consistency
 * removed unused macros from internal handle
 * replaced libewf_set_media_values by libewf_set_sectors_per_chunk
   and libewf_set_bytes_per_sector
@@ -515,7 +517,7 @@ Version: 20070127
   - moved copy from and to char_t functions out of the library into ewfcommon
   - CHAR_T now removed from library
 * implemented internal_handle to hide handle representation from outside code
-  - added serveral api functions
+  - added serveral API functions
 * renamed handle where used as internal handle to internal_handle
 
 Version: 20070125
@@ -665,7 +667,7 @@ Version: 20061227
 * moved libewf header files to include/libewf - should fix missing header problem
 * worked on read and write mode
   - added seek_offset
-  - added read_buffer - added it to api and libewf man page
+  - added read_buffer - added it to API and libewf man page
   - added ewfalter (expirimental)
   - rewrote read_chunk not to do its own offset checking
   - added write_random
@@ -945,7 +947,7 @@ Version: 20061112
 Version: 20061111
 * ewfexport: added time estimate
 * moved byte print function to ewfcommon
-* added api functions to retrieve header values
+* added API functions to retrieve header values
 * string: add string copy
 * string: add string copy to char/w_char types
 
@@ -994,7 +996,7 @@ Version: 20061025
 * made one type (error sector) for crc and acquiry read error sectors
 * Worked on Win32 native port
   - fix for file open - not using the right parameters for Windows
-  - fix for crypto api calls for md5 context
+  - fix for crypto API calls for md5 context
   - rewrote some API functions to pass buffers from the application to the library
     so allocation and de-allocation is handled within the same program space
 
