@@ -163,6 +163,7 @@ Version: 20080501
 * Fixed the package config file (.pc) (Nicolas (kwizart))
 * Fixed the debian package files (Guy Voncke)n
 * Fixed minor issue in the manual (Guy Vonckens)
+* Fixed make lib (Christophe Grenier)
 
 Version: 20080430
 * Fixed in configuration for MSVCPP wide character compilation

@@ -123,6 +123,7 @@ libtool: @LIBTOOL_DEPS@
 lib: library
 
 library:
+	cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS)
 
 distclean: clean
