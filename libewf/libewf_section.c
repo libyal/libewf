@@ -2498,7 +2498,7 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 /* Reads a data section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_DATA *data             = NULL;
 	static char *function      = "libewf_section_data_read";
@@ -2525,24 +2525,24 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 		return( -1 );
 	}
-	if( file_descriptor == -1 )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: EWF-S01 format should not contain data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			return( -1 );
 		}
 	}
-	if( size != EWF_DATA_SIZE )
+	if( section_size != EWF_DATA_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: mismatch in section data size.\n",
 		 function );
@@ -2558,7 +2558,10 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 		return( -1 );
 	}
-	read_count = libewf_common_read( file_descriptor, data, EWF_DATA_SIZE );
+	read_count = libewf_segment_file_read(
+	              segment_file,
+	              data,
+	              EWF_DATA_SIZE );
 	
 	if( read_count != (ssize_t) EWF_DATA_SIZE )
 	{
@@ -2569,16 +2572,6 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 		return( -1 );
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown1, 3 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown2, 16 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown3, 3 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown4, 12 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown5, 3 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown6, 4 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown7, 963 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->signature, 5 ); );
-#endif
 	calculated_crc = ewf_crc_calculate( data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, data->crc ) != 1 )
@@ -2595,13 +2588,23 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 		 function, stored_crc, calculated_crc );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
 			return( -1 );
 		}
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown1, 3 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown2, 16 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown3, 3 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown4, 12 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown5, 3 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown6, 4 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown7, 963 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->signature, 5 ); );
+#endif
 	/* TODO add more checks
 	 */
 	if( internal_handle->media->media_type != data->media_type )
@@ -2609,7 +2612,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: media type does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2630,7 +2633,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: amount of chunks does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2651,7 +2654,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: sectors per chunk does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2672,7 +2675,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: bytes per sector does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2693,7 +2696,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: amount of sectors does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2714,7 +2717,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: error granularity does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2726,7 +2729,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: media flags do not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2738,7 +2741,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: GUID does not match in data section.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			libewf_common_free( data );
 
@@ -2747,7 +2750,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	libewf_common_free( data );
 
-	return( (ssize_t) size );
+	return( read_count );
 }
 
 /* Writes a data section to file
@@ -4327,8 +4330,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_data_read(
 		              internal_handle,
-		              segment_file->file_descriptor,
-		              (size_t) size );
+		              segment_file,
+		              (size_t) size,
+		              internal_handle->ewf_format,
+ 		              internal_handle->error_tollerance );
 	}
 	/* Read the hash section
 	 * The \0 byte is included in the compare
