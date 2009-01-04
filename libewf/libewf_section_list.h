@@ -67,6 +67,10 @@ struct libewf_section_list_entry
 	/* The next section list entry
 	 */
 	LIBEWF_SECTION_LIST_ENTRY *next;
+
+	/* The previous section list entry
+	 */
+	LIBEWF_SECTION_LIST_ENTRY *previous;
 };
 
 struct libewf_section_list
@@ -81,6 +85,7 @@ struct libewf_section_list
 };
 
 LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off64_t start_offset, off64_t end_offset );
+int libewf_section_list_remove_last( LIBEWF_SECTION_LIST *section_list );
 
 #if defined( __cplusplus )
 }

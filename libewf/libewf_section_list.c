@@ -79,6 +79,7 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 	section_list_entry->start_offset = start_offset;
 	section_list_entry->end_offset   = end_offset;
 	section_list_entry->next         = NULL;
+	section_list_entry->previous     = section_list->last;
 
 	if( section_list->first == NULL )
 	{
@@ -91,5 +92,57 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 	section_list->last = section_list_entry;
 
 	return( section_list );
+}
+
+/* Removes the last entry from the section list
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_section_list_remove_last( LIBEWF_SECTION_LIST *section_list )
+{
+	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
+	static char *function                         = "libewf_section_list_remove_last";
+
+	if( section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_list->last == NULL )
+	{
+		if( section_list->first != section_list->last )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid section list - corruption in list.\n",
+			 function );
+
+			return( -1 );
+		}
+		LIBEWF_VERBOSE_PRINT( "%s: section list is empty.\n",
+		 function );
+	}
+	else if( section_list->last->previous == NULL )
+	{
+		if( section_list->first != section_list->last )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid section list - corruption in list.\n",
+			 function );
+
+			return( -1 );
+		}
+		libewf_common_free( section_list->last );
+
+		section_list->first = NULL;
+		section_list->last  = NULL;
+	}
+	else
+	{
+		section_list_entry       = section_list->last;
+		section_list->last       = section_list_entry->previous;
+		section_list->last->next = NULL;
+
+		libewf_common_free( section_list_entry );
+	}
+	return( 1 );
 }
 

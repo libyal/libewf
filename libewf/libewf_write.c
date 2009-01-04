@@ -1613,6 +1613,14 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 			else
 			{
 				result = libewf_segment_file_exists( internal_handle->segment_table, segment_number );
+
+				if( libewf_section_list_remove_last( internal_handle->delta_segment_table->section_list[ segment_number ] ) != 1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to remove last section from list.\n",
+					 function );
+
+					return( -1 );
+				}
 			}
 		}
 
@@ -1658,8 +1666,11 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 				return( -1 );
 			}
-			internal_handle->offset_table->offset[ chunk ] = internal_handle->delta_segment_table->file_offset[ segment_number ];
 		}
+		LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %jd.\n",
+		 function, internal_handle->delta_segment_table->file_offset[ segment_number ] );
+
+		internal_handle->offset_table->offset[ chunk ] = internal_handle->delta_segment_table->file_offset[ segment_number ];
 	}
 	else
 	{
