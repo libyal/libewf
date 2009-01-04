@@ -40,7 +40,7 @@ int libewf_hash_sections_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.\n",
 		 function );
 
@@ -99,7 +99,7 @@ int libewf_hash_sections_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.\n",
 		 function );
 

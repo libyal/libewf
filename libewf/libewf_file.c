@@ -56,7 +56,7 @@ int libewf_check_file_signature(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.\n",
 		 function );
 
@@ -156,7 +156,7 @@ int libewf_glob(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.\n",
 		 function );
 
@@ -173,7 +173,7 @@ int libewf_glob(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid filename length.\n",
 		 function );
 
@@ -205,7 +205,7 @@ int libewf_glob(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.\n",
 		 function );
 
@@ -427,7 +427,7 @@ libewf_handle_t *libewf_open(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.\n",
 		 function );
 
@@ -443,7 +443,7 @@ libewf_handle_t *libewf_open(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid file amount at least 1 is required.\n",
 		 function );
 
@@ -596,15 +596,16 @@ libewf_handle_t *libewf_open(
 	}
 	/* Make sure format specific values are set
 	 */
-	if( libewf_internal_handle_initialize_format(
+	if( libewf_internal_handle_set_format(
 	     internal_handle,
+	     internal_handle->format,
 	     &error ) != 1 )
 	{
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to determine format specific values.\n",
+		 "%s: unable to set format.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -641,7 +642,7 @@ int libewf_close(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -727,7 +728,7 @@ off64_t libewf_seek_offset(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -761,7 +762,7 @@ off64_t libewf_seek_offset(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid offset value cannot be less than zero.\n",
 		 function );
 
@@ -772,7 +773,7 @@ off64_t libewf_seek_offset(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_LARGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE,
 		 "%s: attempting to read past the end of the file.\n",
 		 function );
 
@@ -873,7 +874,7 @@ off64_t libewf_get_offset(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 

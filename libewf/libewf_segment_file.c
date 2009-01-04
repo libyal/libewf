@@ -61,7 +61,7 @@ int libewf_segment_file_check_file_signature(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file descriptor.\n",
 		 function );
 
@@ -128,7 +128,7 @@ ssize_t libewf_segment_file_read_file_header(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -139,7 +139,7 @@ ssize_t libewf_segment_file_read_file_header(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment number.\n",
 		 function );
 
@@ -235,7 +235,7 @@ int libewf_segment_file_read_sections(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -246,7 +246,7 @@ int libewf_segment_file_read_sections(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid last segment file.\n",
 		 function );
 
@@ -332,7 +332,7 @@ ssize_t libewf_segment_file_write_headers(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -343,7 +343,7 @@ ssize_t libewf_segment_file_write_headers(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header sections.\n",
 		 function );
 
@@ -668,7 +668,7 @@ ssize_t libewf_segment_file_write_last_section(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -735,7 +735,7 @@ ssize_t libewf_segment_file_write_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -746,7 +746,7 @@ ssize_t libewf_segment_file_write_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid segment number.\n",
 		 function );
 
@@ -757,7 +757,7 @@ ssize_t libewf_segment_file_write_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section list.\n",
 		 function );
 
@@ -768,7 +768,7 @@ ssize_t libewf_segment_file_write_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid cached data section.\n",
 		 function );
 
@@ -973,7 +973,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -984,7 +984,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -995,7 +995,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table offsets.\n",
 		 function );
 
@@ -1006,7 +1006,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_SMALL,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: table offsets too small.\n",
 		 function );
 
@@ -1121,7 +1121,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -1132,7 +1132,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -1143,7 +1143,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk CRC.\n",
 		 function );
 
@@ -1154,7 +1154,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk data size value exceeds maximum.\n",
 		 function );
 
@@ -1307,7 +1307,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -1320,7 +1320,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk section size value exceeds maximum.\n",
 		 function );
 
@@ -1562,7 +1562,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -1573,7 +1573,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -1586,7 +1586,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].\n",
 		 function,
 		 chunk,
@@ -1678,7 +1678,7 @@ ssize_t libewf_segment_file_write_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.\n",
 		 function );
 
@@ -1689,7 +1689,7 @@ ssize_t libewf_segment_file_write_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.\n",
 		 function );
 
@@ -1700,7 +1700,7 @@ ssize_t libewf_segment_file_write_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.\n",
 		 function );
 
@@ -1711,7 +1711,7 @@ ssize_t libewf_segment_file_write_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sessions.\n",
 		 function );
 
@@ -1722,7 +1722,7 @@ ssize_t libewf_segment_file_write_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid acquiry errors.\n",
 		 function );
 

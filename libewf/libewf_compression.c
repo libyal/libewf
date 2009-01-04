@@ -57,7 +57,7 @@ int libewf_compress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compressed data buffer.\n",
 		 function );
 
@@ -68,7 +68,7 @@ int libewf_compress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed data buffer.\n",
 		 function );
 
@@ -79,7 +79,7 @@ int libewf_compress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed data buffer equals compressed data buffer.\n",
 		 function );
 
@@ -90,7 +90,7 @@ int libewf_compress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compressed size.\n",
 		 function );
 
@@ -200,7 +200,7 @@ int libewf_uncompress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed data buffer.\n",
 		 function );
 
@@ -211,7 +211,7 @@ int libewf_uncompress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compressed data buffer.\n",
 		 function );
 
@@ -222,7 +222,7 @@ int libewf_uncompress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compressed data buffer equals uncompressed data buffer.\n",
 		 function );
 
@@ -233,7 +233,7 @@ int libewf_uncompress(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed size.\n",
 		 function );
 

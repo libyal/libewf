@@ -73,7 +73,7 @@ int libewf_write_test_empty_block(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid block buffer.\n",
 		 function );
 
@@ -84,7 +84,7 @@ int libewf_write_test_empty_block(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.\n",
 		 function );
 
@@ -126,7 +126,7 @@ int libewf_write_calculate_chunks_per_segment(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunks per segment.\n",
 		 function );
 
@@ -137,7 +137,7 @@ int libewf_write_calculate_chunks_per_segment(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum section amount of chunks value.\n",
 		 function );
 
@@ -148,7 +148,7 @@ int libewf_write_calculate_chunks_per_segment(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.\n",
 		 function );
 
@@ -279,7 +279,7 @@ int libewf_write_calculate_chunks_per_chunks_section(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunks per chunks section.\n",
 		 function );
 
@@ -290,7 +290,7 @@ int libewf_write_calculate_chunks_per_chunks_section(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum section amount of chunks value.\n",
 		 function );
 
@@ -356,7 +356,7 @@ int libewf_write_test_segment_file_full(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.\n",
 		 function );
 
@@ -450,7 +450,7 @@ int libewf_write_test_chunks_section_full(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.\n",
 		 function );
 
@@ -461,7 +461,7 @@ int libewf_write_test_chunks_section_full(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid segment file offset value exceeds maximum.\n",
 		 function );
 
@@ -472,7 +472,7 @@ int libewf_write_test_chunks_section_full(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum section amount of chunks value.\n",
 		 function );
 
@@ -620,7 +620,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk cache.\n",
 		 function );
 
@@ -631,7 +631,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.\n",
 		 function );
 
@@ -642,7 +642,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.\n",
 		 function );
 
@@ -653,7 +653,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data buffer - same as chunk cache compressed.\n",
 		 function );
 
@@ -664,7 +664,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk data size value exceeds maximum.\n",
 		 function );
 
@@ -675,7 +675,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_LARGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE,
 		 "%s: invalid chunk data size value exceeds media values chunk size.\n",
 		 function );
 
@@ -686,7 +686,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk CRC.\n",
 		 function );
 
@@ -697,7 +697,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid is compressed.\n",
 		 function );
 
@@ -708,7 +708,7 @@ ssize_t libewf_write_process_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid write CRC.\n",
 		 function );
 
@@ -756,7 +756,7 @@ ssize_t libewf_write_process_chunk_data(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid compressed chunk data.\n",
 			 function );
 
@@ -767,7 +767,7 @@ ssize_t libewf_write_process_chunk_data(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid compressed chunk data is the same as chunk data.\n",
 			 function );
 
@@ -778,7 +778,7 @@ ssize_t libewf_write_process_chunk_data(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid compressed chunk data size.\n",
 			 function );
 
@@ -789,7 +789,7 @@ ssize_t libewf_write_process_chunk_data(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid compressed chunk data size value exceeds maximum.\n",
 			 function );
 
@@ -939,7 +939,7 @@ ssize_t libewf_raw_write_chunk_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -1045,7 +1045,7 @@ ssize_t libewf_raw_write_chunk_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.\n",
 		 function );
 
@@ -1056,7 +1056,7 @@ ssize_t libewf_raw_write_chunk_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid chunk size value is zero.\n",
 		 function );
 
@@ -1067,7 +1067,7 @@ ssize_t libewf_raw_write_chunk_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk size value exceeds maximum.\n",
 		 function );
 
@@ -1097,7 +1097,7 @@ ssize_t libewf_raw_write_chunk_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid segment number value out of range.\n",
 		 function );
 
@@ -1701,7 +1701,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -1756,7 +1756,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid chunk value out of range.\n",
 		 function );
 
@@ -1767,7 +1767,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.\n",
 		 function );
 
@@ -1778,7 +1778,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid chunk size value is zero.\n",
 		 function );
 
@@ -1789,7 +1789,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk size value exceeds maximum.\n",
 		 function );
 
@@ -2201,7 +2201,7 @@ ssize_t libewf_write_chunk_data_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -2251,7 +2251,7 @@ ssize_t libewf_write_chunk_data_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.\n",
 		 function );
 
@@ -2262,7 +2262,7 @@ ssize_t libewf_write_chunk_data_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache compressed.\n",
 		 function );
 
@@ -2475,7 +2475,7 @@ ssize_t libewf_write_chunk_data_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -2530,7 +2530,7 @@ ssize_t libewf_write_chunk_data_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid chunk value out of range.\n",
 		 function );
 
@@ -2541,7 +2541,7 @@ ssize_t libewf_write_chunk_data_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.\n",
 		 function );
 
@@ -2553,7 +2553,7 @@ ssize_t libewf_write_chunk_data_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
@@ -2564,7 +2564,7 @@ ssize_t libewf_write_chunk_data_existing(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid data size value exceeds maximum.\n",
 		 function );
 
@@ -2713,7 +2713,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -2748,7 +2748,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
@@ -2765,7 +2765,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid compressed buffer - same as chunk cache.\n",
 		 function );
 
@@ -2836,7 +2836,7 @@ ssize_t libewf_raw_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -2905,7 +2905,7 @@ ssize_t libewf_raw_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.\n",
 		 function );
 
@@ -2922,7 +2922,7 @@ ssize_t libewf_raw_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
@@ -2954,7 +2954,7 @@ ssize_t libewf_raw_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: data size cannot be larger than maximum chunk size.\n",
 		 function );
 
@@ -3067,7 +3067,7 @@ ssize_t libewf_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -3136,7 +3136,7 @@ ssize_t libewf_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.\n",
 		 function );
 
@@ -3153,7 +3153,7 @@ ssize_t libewf_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.\n",
 		 function );
 
@@ -3169,7 +3169,7 @@ ssize_t libewf_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.\n",
 		 function );
 
@@ -3190,7 +3190,7 @@ ssize_t libewf_write_buffer(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: chunk cache compressed cannot be used as buffer.\n",
 		 function );
 
@@ -3411,7 +3411,7 @@ ssize_t libewf_write_finalize(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 

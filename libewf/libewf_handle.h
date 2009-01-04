@@ -281,15 +281,16 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
      uint16_t *maximum_amount_of_segments,
      libewf_error_t **error );
 
-int libewf_internal_handle_initialize_media_values(
+int libewf_internal_handle_set_media_values(
      libewf_internal_handle_t *internal_handle,
      uint32_t sectors_per_chunk,
      uint32_t bytes_per_sector,
      size64_t media_size,
      libewf_error_t **error );
 
-int libewf_internal_handle_initialize_format(
+int libewf_internal_handle_set_format(
      libewf_internal_handle_t *internal_handle,
+     uint8_t format,
      libewf_error_t **error );
 
 int libewf_internal_handle_create_header_values(

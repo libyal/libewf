@@ -47,7 +47,7 @@ int libewf_file_io_pool_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -58,7 +58,7 @@ int libewf_file_io_pool_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid amount of file io handles value less than zero.\n",
 		 function );
 
@@ -69,7 +69,7 @@ int libewf_file_io_pool_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid maximum amount of open files value less than zero.\n",
 		 function );
 
@@ -231,7 +231,7 @@ int libewf_file_io_pool_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -302,7 +302,7 @@ int libewf_file_io_pool_resize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -313,7 +313,7 @@ int libewf_file_io_pool_resize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid amount of file io handles value zero or less.\n",
 		 function );
 
@@ -386,7 +386,7 @@ int libewf_file_io_pool_create_file_io_handle(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -397,7 +397,7 @@ int libewf_file_io_pool_create_file_io_handle(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle.\n",
 		 function );
 
@@ -408,7 +408,7 @@ int libewf_file_io_pool_create_file_io_handle(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -466,7 +466,7 @@ int libewf_file_io_pool_open_file_io_handle(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -477,7 +477,7 @@ int libewf_file_io_pool_open_file_io_handle(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle.\n",
 		 function );
 
@@ -510,7 +510,7 @@ int libewf_file_io_pool_open_file_io_handle(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid last used list element.\n",
 			 function );
 
@@ -639,7 +639,7 @@ int libewf_file_io_pool_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -662,7 +662,7 @@ int libewf_file_io_pool_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry value out of range.\n",
 		 function );
 
@@ -675,7 +675,7 @@ int libewf_file_io_pool_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );
@@ -723,7 +723,7 @@ int libewf_file_io_pool_reopen(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -746,7 +746,7 @@ int libewf_file_io_pool_reopen(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -759,7 +759,7 @@ int libewf_file_io_pool_reopen(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );
@@ -800,7 +800,7 @@ int libewf_file_io_pool_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -823,7 +823,7 @@ int libewf_file_io_pool_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -836,7 +836,7 @@ int libewf_file_io_pool_close(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );
@@ -876,7 +876,7 @@ int libewf_file_io_pool_close_all(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -921,7 +921,7 @@ ssize_t libewf_file_io_pool_read(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -944,7 +944,7 @@ ssize_t libewf_file_io_pool_read(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -957,7 +957,7 @@ ssize_t libewf_file_io_pool_read(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );
@@ -1023,7 +1023,7 @@ ssize_t libewf_file_io_pool_write(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -1046,7 +1046,7 @@ ssize_t libewf_file_io_pool_write(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -1059,7 +1059,7 @@ ssize_t libewf_file_io_pool_write(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );
@@ -1125,7 +1125,7 @@ off64_t libewf_file_io_pool_seek_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -1148,7 +1148,7 @@ off64_t libewf_file_io_pool_seek_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -1161,7 +1161,7 @@ off64_t libewf_file_io_pool_seek_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );
@@ -1225,7 +1225,7 @@ int libewf_file_io_pool_get_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io pool.\n",
 		 function );
 
@@ -1248,7 +1248,7 @@ int libewf_file_io_pool_get_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid entry.\n",
 		 function );
 
@@ -1259,7 +1259,7 @@ int libewf_file_io_pool_get_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset.\n",
 		 function );
 
@@ -1272,7 +1272,7 @@ int libewf_file_io_pool_get_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid file io handle for entry: %d.\n",
 		 function,
 		 entry );

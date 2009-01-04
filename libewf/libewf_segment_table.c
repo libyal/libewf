@@ -50,7 +50,7 @@ int libewf_segment_table_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -61,7 +61,7 @@ int libewf_segment_table_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid amount value cannot be zero.\n",
 		 function );
 
@@ -76,7 +76,7 @@ int libewf_segment_table_initialize(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid segment table size value exceeds maximum.\n",
 			 function );
 
@@ -175,7 +175,7 @@ int libewf_segment_table_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -231,7 +231,7 @@ int libewf_segment_table_resize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -246,7 +246,7 @@ int libewf_segment_table_resize(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid segment table size value exceeds maximum.\n",
 			 function );
 
@@ -317,7 +317,7 @@ int libewf_segment_table_build(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -420,7 +420,7 @@ int libewf_segment_table_get_basename(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -431,7 +431,7 @@ int libewf_segment_table_get_basename(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.\n",
 		 function );
 
@@ -448,7 +448,7 @@ int libewf_segment_table_get_basename(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_SMALL,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: basename too small.\n",
 		 function );
 
@@ -487,7 +487,7 @@ int libewf_segment_table_set_basename(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -498,7 +498,7 @@ int libewf_segment_table_set_basename(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.\n",
 		 function );
 
@@ -583,7 +583,7 @@ int libewf_segment_table_read_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -605,7 +605,7 @@ int libewf_segment_table_read_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid delta segment table.\n",
 		 function );
 
@@ -627,7 +627,7 @@ int libewf_segment_table_read_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.\n",
 		 function );
 
@@ -638,7 +638,7 @@ int libewf_segment_table_read_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid file amount at least 1 is required.\n",
 		 function );
 
@@ -657,7 +657,7 @@ int libewf_segment_table_read_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_SMALL,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: filename is too small.\n",
 		 function );
 
@@ -988,7 +988,7 @@ int libewf_segment_table_write_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -999,7 +999,7 @@ int libewf_segment_table_write_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filenames.\n",
 		 function );
 
@@ -1010,7 +1010,7 @@ int libewf_segment_table_write_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid file amount at least 1 is required.\n",
 		 function );
 
@@ -1024,7 +1024,7 @@ int libewf_segment_table_write_open(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: filename is empty.\n",
 		 function );
 
@@ -1074,7 +1074,7 @@ int libewf_segment_table_create_segment_file(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment table.\n",
 		 function );
 
@@ -1096,7 +1096,7 @@ int libewf_segment_table_create_segment_file(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid segment number: 0.\n",
 		 function );
 
@@ -1107,7 +1107,7 @@ int libewf_segment_table_create_segment_file(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_LARGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE,
 		 "%s: invalid segment number value out of range.\n",
 		 function );
 

@@ -51,7 +51,7 @@ int libewf_handle_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -525,7 +525,7 @@ int libewf_handle_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -711,7 +711,7 @@ int libewf_internal_handle_subhandle_read_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid subhandle read.\n",
 		 function );
 
@@ -790,7 +790,7 @@ int libewf_internal_handle_subhandle_read_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid subhandle read.\n",
 		 function );
 
@@ -831,7 +831,7 @@ int libewf_internal_handle_subhandle_write_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid subhandle write.\n",
 		 function );
 
@@ -895,7 +895,7 @@ int libewf_internal_handle_subhandle_write_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid subhandle write.\n",
 		 function );
 
@@ -936,7 +936,7 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid maximum amount of segments.\n",
 		 function );
 
@@ -968,17 +968,17 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
 	return( 1 );
 }
 
-/* Inializes the media values
- * Returns 1 if the values were successfully initialized, -1 on errror
+/* Set the media values
+ * Returns 1 if successful or -1 on errror
  */
-int libewf_internal_handle_initialize_media_values(
+int libewf_internal_handle_set_media_values(
      libewf_internal_handle_t *internal_handle,
      uint32_t sectors_per_chunk,
      uint32_t bytes_per_sector,
      size64_t media_size,
      libewf_error_t **error )
 {
-	static char *function            = "libewf_internal_handle_initialize_media_values";
+	static char *function            = "libewf_internal_handle_set_media_values";
 	size32_t chunk_size              = 0;
 	size64_t maximum_input_file_size = 0;
 	int64_t amount_of_chunks         = 0;
@@ -989,7 +989,7 @@ int libewf_internal_handle_initialize_media_values(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -1012,7 +1012,7 @@ int libewf_internal_handle_initialize_media_values(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid sectors per chunk.\n",
 		 function );
 
@@ -1024,7 +1024,7 @@ int libewf_internal_handle_initialize_media_values(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid bytes per sector.\n",
 		 function );
 
@@ -1035,7 +1035,7 @@ int libewf_internal_handle_initialize_media_values(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid media size value exceeds maximum.\n",
 		 function );
 
@@ -1123,32 +1123,58 @@ int libewf_internal_handle_initialize_media_values(
 	return( 1 );
 }
 
-/* Inializes internal values based on the EWF file format
- * Returns 1 if the values were successfully initialized, -1 on errror
+/* Sets internal values based on the EWF file format
+ * Returns 1 if successful or -1 on errror
  */
-int libewf_internal_handle_initialize_format(
+int libewf_internal_handle_set_format(
      libewf_internal_handle_t *internal_handle,
+     uint8_t format,
      libewf_error_t **error )
 {
-	static char *function = "libewf_internal_handle_initialize_format";
+	static char *function = "libewf_internal_handle_set_format";
 
 	if( internal_handle == NULL )
 	{
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( internal_handle->format == LIBEWF_FORMAT_EWF )
-	 || ( internal_handle->format == LIBEWF_FORMAT_SMART ) )
+	if( ( format != LIBEWF_FORMAT_ENCASE1 )
+	 && ( format != LIBEWF_FORMAT_ENCASE2 )
+	 && ( format != LIBEWF_FORMAT_ENCASE3 )
+	 && ( format != LIBEWF_FORMAT_ENCASE4 )
+	 && ( format != LIBEWF_FORMAT_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LINEN5 )
+	 && ( format != LIBEWF_FORMAT_LINEN6 )
+	 && ( format != LIBEWF_FORMAT_SMART )
+	 && ( format != LIBEWF_FORMAT_FTK )
+	 && ( format != LIBEWF_FORMAT_LVF )
+	 && ( format != LIBEWF_FORMAT_EWF )
+	 && ( format != LIBEWF_FORMAT_EWFX ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->format = format;
+
+	if( ( format == LIBEWF_FORMAT_EWF )
+	 || ( format == LIBEWF_FORMAT_SMART ) )
 	{
 		internal_handle->ewf_format = EWF_FORMAT_S01;
 	}
-	else if( internal_handle->format == LIBEWF_FORMAT_LVF )
+	else if( format == LIBEWF_FORMAT_LVF )
 	{
 		internal_handle->ewf_format = EWF_FORMAT_L01;
 	}
@@ -1158,12 +1184,12 @@ int libewf_internal_handle_initialize_format(
 	}
 	if( internal_handle->write != NULL )
 	{
-		if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		if( format == LIBEWF_FORMAT_ENCASE6 )
 		{
 			internal_handle->write->maximum_segment_file_size        = INT64_MAX;
 			internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6;
 		}
-		else if( internal_handle->format == LIBEWF_FORMAT_EWFX )
+		else if( format == LIBEWF_FORMAT_EWFX )
 		{
 			internal_handle->write->unrestrict_offset_amount         = 1;
 			internal_handle->write->maximum_segment_file_size        = INT32_MAX;
@@ -1208,7 +1234,7 @@ int libewf_internal_handle_create_header_values(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 
@@ -1403,7 +1429,7 @@ int libewf_internal_handle_write_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 

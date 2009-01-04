@@ -43,7 +43,7 @@ int libewf_sector_table_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.\n",
 		 function );
 
@@ -159,7 +159,7 @@ int libewf_sector_table_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.\n",
 		 function );
 
@@ -195,7 +195,7 @@ int libewf_sector_table_resize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.\n",
 		 function );
 
@@ -269,7 +269,7 @@ int libewf_sector_table_get_sector(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.\n",
 		 function );
 
@@ -295,7 +295,7 @@ int libewf_sector_table_get_sector(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid first sector.\n",
 		 function );
 
@@ -306,7 +306,7 @@ int libewf_sector_table_get_sector(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of sectors.\n",
 		 function );
 
@@ -317,7 +317,7 @@ int libewf_sector_table_get_sector(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid index out of range.\n",
 		 function );
 
@@ -349,7 +349,7 @@ int libewf_sector_table_add_sector(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.\n",
 		 function );
 
@@ -360,7 +360,7 @@ int libewf_sector_table_add_sector(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid first sector value is less than zero.\n",
 		 function );
 

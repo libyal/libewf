@@ -54,32 +54,32 @@ enum LIBEWF_ARGUMENT_ERROR
 
 	/* The argument contains an invalid value
 	 */
-	LIBEWF_ARGUMENT_ERROR_INVALID                = 1,
+	LIBEWF_ARGUMENT_ERROR_INVALID_VALUE          = 1,
 
 	/* The argument contains a value less than zero
 	 */
-	LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO         = 2,
+	LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO   = 2,
 
 	/* The argument contains a value zero or less
 	 */
-	LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS           = 3,
+	LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS     = 3,
 
 	/* The argument contains a value that exceeds the maximum
 	 * for the specific type
 	 */
-	LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM        = 4,
+	LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM   = 4,
 
 	/* The argument contains a value that is too small
 	 */
-	LIBEWF_ARGUMENT_ERROR_TOO_SMALL              = 5,
+	LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL        = 5,
 
 	/* The argument contains a value that is too large
 	 */
-	LIBEWF_ARGUMENT_ERROR_TOO_LARGE              = 6,
+	LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE        = 6,
 
 	/* The argument contains a value that is out of range
 	 */
-	LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE           = 7,
+	LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE     = 7,
 
 	/* The argument contains a value that is not supported
 	 */
@@ -242,21 +242,25 @@ enum LIBEWF_RUNTIME_ERROR
 	 */
 	LIBEWF_RUNTIME_ERROR_APPEND_FAILED           = 8,
 
+	/* The value could not be copied
+	 */
+	LIBEWF_RUNTIME_ERROR_COPY_FAILED             = 9,
+
 	/* The value could not be removed
 	 */
-	LIBEWF_RUNTIME_ERROR_REMOVE_FAILED           = 9,
+	LIBEWF_RUNTIME_ERROR_REMOVE_FAILED           = 10,
 
 	/* The value was out of range
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE      = 10,
+	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE      = 11,
 
 	/* The value exceeds the maximum for its specific type
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM   = 11,
+	LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM   = 12,
 
 	/* The value is unsupported
 	 */
-	LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE       = 12
+	LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE       = 13
 };
 
 /* The output error codes

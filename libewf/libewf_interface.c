@@ -68,13 +68,23 @@ int libewf_get_sectors_per_chunk(
      libewf_handle_t *handle,
      uint32_t *sectors_per_chunk )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_sectors_per_chunk";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -82,22 +92,49 @@ int libewf_get_sectors_per_chunk(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( sectors_per_chunk == NULL )
 	{
-		notify_warning_printf( "%s: invalid sectors per chunk.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid sectors per chunk.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
-		notify_warning_printf( "%s: invalid sectors per chunk value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid sectors per chunk value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -113,13 +150,23 @@ int libewf_get_bytes_per_sector(
      libewf_handle_t *handle,
      uint32_t *bytes_per_sector )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_bytes_per_sector";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -127,22 +174,49 @@ int libewf_get_bytes_per_sector(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( bytes_per_sector == NULL )
 	{
-		notify_warning_printf( "%s: invalid bytes per sector.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid bytes per sector.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		notify_warning_printf( "%s: invalid bytes per sector value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid bytes per sector value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -158,13 +232,23 @@ int libewf_get_amount_of_sectors(
      libewf_handle_t *handle,
      uint32_t *amount_of_sectors )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_sectors";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -172,22 +256,49 @@ int libewf_get_amount_of_sectors(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( amount_of_sectors == NULL )
 	{
-		notify_warning_printf( "%s: invalid bytes per sector.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid bytes per sector.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->amount_of_sectors > (uint32_t) INT32_MAX )
 	{
-		notify_warning_printf( "%s: invalid amount of sectors value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid amount of sectors value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -203,13 +314,23 @@ int libewf_get_chunk_size(
      libewf_handle_t *handle,
      size32_t *chunk_size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_chunk_size";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -217,22 +338,49 @@ int libewf_get_chunk_size(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( chunk_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid chunk size.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk size.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->chunk_size > (size32_t) INT32_MAX )
 	{
-		notify_warning_printf( "%s: invalid chunk size value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk size value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -248,13 +396,23 @@ int libewf_get_error_granularity(
      libewf_handle_t *handle,
      uint32_t *error_granularity )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_error_granularity";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -262,22 +420,49 @@ int libewf_get_error_granularity(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( error_granularity == NULL )
 	{
-		notify_warning_printf( "%s: invalid error granularity.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid error granularity.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->error_granularity > (uint32_t) INT32_MAX )
 	{
-		notify_warning_printf( "%s: invalid error granularity value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid error granularity value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -294,13 +479,23 @@ int libewf_get_compression_values(
      int8_t *compression_level,
      uint8_t *compress_empty_block )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_compression_values";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -308,15 +503,33 @@ int libewf_get_compression_values(
 
 	if( compression_level == NULL )
 	{
-		notify_warning_printf( "%s: invalid compression level.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compression level.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( compress_empty_block == NULL )
 	{
-		notify_warning_printf( "%s: invalid compress empty block.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid compress empty block.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -333,13 +546,23 @@ int libewf_get_media_size(
      libewf_handle_t *handle,
      size64_t *media_size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_size";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -347,15 +570,33 @@ int libewf_get_media_size(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( media_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid media size.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media size.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -366,8 +607,17 @@ int libewf_get_media_size(
 	}
 	if( internal_handle->media_values->media_size > (size64_t) INT64_MAX )
 	{
-		notify_warning_printf( "%s: invalid media size value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid media size value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -383,13 +633,23 @@ int libewf_get_media_type(
      libewf_handle_t *handle,
      uint8_t *media_type )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_type";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -397,22 +657,49 @@ int libewf_get_media_type(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->media_type > (uint8_t) INT8_MAX )
 	{
-		notify_warning_printf( "%s: invalid media type value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid media type value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( media_type == NULL )
 	{
-		notify_warning_printf( "%s: invalid media type.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media type.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -428,13 +715,23 @@ int libewf_get_media_flags(
      libewf_handle_t *handle,
      uint8_t *media_flags )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_flags";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -442,22 +739,49 @@ int libewf_get_media_flags(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->media_values->media_flags > (uint8_t) INT8_MAX )
 	{
-		notify_warning_printf( "%s: invalid media flags value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid media flags value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( media_flags == NULL )
 	{
-		notify_warning_printf( "%s: invalid media flags.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media flags.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -473,13 +797,23 @@ int libewf_get_volume_type(
      libewf_handle_t *handle,
      uint8_t *volume_type )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -487,15 +821,33 @@ int libewf_get_volume_type(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( volume_type == NULL )
 	{
-		notify_warning_printf( "%s: invalid volume type.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid volume type.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -517,13 +869,23 @@ int libewf_get_format(
      libewf_handle_t *handle,
      uint8_t *format )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -531,22 +893,49 @@ int libewf_get_format(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->format > (uint8_t) INT8_MAX )
 	{
-		notify_warning_printf( "%s: invalid format value exceeds maximum.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid format value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( format == NULL )
 	{
-		notify_warning_printf( "%s: invalid format.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid format.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -563,13 +952,23 @@ int libewf_get_guid(
      uint8_t *guid,
      size_t size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_guid";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -577,22 +976,49 @@ int libewf_get_guid(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( guid == NULL )
 	{
-		notify_warning_printf( "%s: invalid GUID.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid GUID.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( size < 16 )
 	{
-		notify_warning_printf( "%s: GUID too small.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: GUID too small.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -601,8 +1027,17 @@ int libewf_get_guid(
 	     internal_handle->media_values->guid,
 	     16 ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to set GUID.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set GUID.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -623,8 +1058,17 @@ int libewf_get_md5_hash(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -632,8 +1076,17 @@ int libewf_get_md5_hash(
 
 	if( internal_handle->hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing hash sections.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing hash sections.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -646,7 +1099,11 @@ int libewf_get_md5_hash(
 	       &( internal_handle->hash_sections->md5_hash_set ),
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to parse MD5 hash value for its value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse MD5 hash value for its value.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -662,15 +1119,33 @@ int libewf_get_md5_hash(
 	}
 	if( md5_hash == NULL )
 	{
-		notify_warning_printf( "%s: invalid MD5 hash.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MD5 hash.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( size < EWF_DIGEST_HASH_SIZE_MD5 )
 	{
-		notify_warning_printf( "%s: MD5 hash too small.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: MD5 hash too small.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -679,8 +1154,17 @@ int libewf_get_md5_hash(
 	     internal_handle->hash_sections->md5_hash,
 	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to set MD5 hash.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set MD5 hash.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -702,8 +1186,17 @@ int libewf_get_segment_filename(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -711,8 +1204,17 @@ int libewf_get_segment_filename(
 
 	if( internal_handle->segment_table == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing segment table.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -724,7 +1226,11 @@ int libewf_get_segment_filename(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to determine segment table basename.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment table basename.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -750,8 +1256,17 @@ int libewf_get_delta_segment_filename(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -759,8 +1274,17 @@ int libewf_get_delta_segment_filename(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing delta segment table.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -772,7 +1296,11 @@ int libewf_get_delta_segment_filename(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to determine segment table basename.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment table basename.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -790,13 +1318,23 @@ int libewf_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_acquiry_errors";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -804,15 +1342,33 @@ int libewf_get_amount_of_acquiry_errors(
 
 	if( internal_handle->acquiry_errors == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing acquiry errors.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing acquiry errors.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( amount_of_errors == NULL )
 	{
-		notify_warning_printf( "%s: invalid amount of errors.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of errors.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -836,8 +1392,17 @@ int libewf_get_acquiry_error(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -850,7 +1415,11 @@ int libewf_get_acquiry_error(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve acquiry error.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve acquiry error.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -868,13 +1437,23 @@ int libewf_get_amount_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_crc_errors";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -882,22 +1461,49 @@ int libewf_get_amount_of_crc_errors(
 
 	if( internal_handle->read == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing subhandle read.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle read.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->read->crc_errors == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - invalid subhandle read - missing crc errors.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - invalid subhandle read - missing crc errors.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( amount_of_errors == NULL )
 	{
-		notify_warning_printf( "%s: invalid amount of errors.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of errors.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -922,8 +1528,17 @@ int libewf_get_crc_error(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -931,8 +1546,17 @@ int libewf_get_crc_error(
 
 	if( internal_handle->read == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing subhandle read.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle read.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -945,7 +1569,11 @@ int libewf_get_crc_error(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve CRC error.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve CRC error.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -963,13 +1591,23 @@ int libewf_get_amount_of_sessions(
      libewf_handle_t *handle,
      uint32_t *amount_of_sessions )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_sessions";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -977,15 +1615,33 @@ int libewf_get_amount_of_sessions(
 
 	if( internal_handle->sessions == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing sessions.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing sessions.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( amount_of_sessions == NULL )
 	{
-		notify_warning_printf( "%s: invalid amount of sessions.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of sessions.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1009,8 +1665,17 @@ int libewf_get_session(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1023,7 +1688,11 @@ int libewf_get_session(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve session.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve session.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1041,13 +1710,23 @@ int libewf_get_write_amount_of_chunks(
      libewf_handle_t *handle,
      uint32_t *amount_of_chunks )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_write_amount_of_chunks";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1055,15 +1734,33 @@ int libewf_get_write_amount_of_chunks(
 
 	if( internal_handle->write == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing subhandle write.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle write.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( amount_of_chunks == NULL )
 	{
-		notify_warning_printf( "%s: invalid amount of chunks.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of chunks.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1079,13 +1776,23 @@ int libewf_get_header_codepage(
      libewf_handle_t *handle,
      int *header_codepage )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_codepage";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1093,15 +1800,33 @@ int libewf_get_header_codepage(
 
 	if( internal_handle->header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing header sections.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing header sections.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( header_codepage == NULL )
 	{
-		notify_warning_printf( "%s: invalid header codepage.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header codepage.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1117,13 +1842,23 @@ int libewf_get_amount_of_header_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_header_values";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1131,8 +1866,17 @@ int libewf_get_amount_of_header_values(
 
 	if( amount_of_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid amount of values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1161,8 +1905,17 @@ int libewf_get_header_value_identifier(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1181,7 +1934,11 @@ int libewf_get_header_value_identifier(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve header value identifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value identifier.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1209,8 +1966,17 @@ int libewf_get_header_value(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1218,15 +1984,33 @@ int libewf_get_header_value(
 
 	if( identifier == NULL )
 	{
-		notify_warning_printf( "%s: invalid indentifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( value == NULL )
 	{
-		notify_warning_printf( "%s: invalid value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1247,7 +2031,11 @@ int libewf_get_header_value(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve header value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1265,13 +2053,23 @@ int libewf_get_amount_of_hash_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_hash_values";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1279,8 +2077,17 @@ int libewf_get_amount_of_hash_values(
 
 	if( amount_of_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid amount of values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid amount of values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1309,8 +2116,17 @@ int libewf_get_hash_value_identifier(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1329,7 +2145,11 @@ int libewf_get_hash_value_identifier(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve hash value identifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value identifier.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1357,8 +2177,17 @@ int libewf_get_hash_value(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1366,15 +2195,33 @@ int libewf_get_hash_value(
 
 	if( identifier == NULL )
 	{
-		notify_warning_printf( "%s: invalid indentifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( value == NULL )
 	{
-		notify_warning_printf( "%s: invalid value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1396,7 +2243,11 @@ int libewf_get_hash_value(
 		     EWF_DIGEST_HASH_SIZE_MD5,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash for its value.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1421,7 +2272,11 @@ int libewf_get_hash_value(
 
 	if( result == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve hash value identifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value identifier.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1442,12 +2297,20 @@ int libewf_set_sectors_per_chunk(
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_sectors_per_chunk";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1455,37 +2318,59 @@ int libewf_set_sectors_per_chunk(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: sectors per chunk cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: sectors per chunk cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	result = libewf_internal_handle_initialize_media_values(
-	          internal_handle,
-	          sectors_per_chunk,
-	          internal_handle->media_values->bytes_per_sector,
-	          internal_handle->media_values->media_size,
-	          &error );
-
-	if( result != 1 )
+	if( libewf_internal_handle_set_media_values(
+	     internal_handle,
+	     sectors_per_chunk,
+	     internal_handle->media_values->bytes_per_sector,
+	     internal_handle->media_values->media_size,
+	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to intialize media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
 		libewf_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Sets the amount of bytes per sector in the media information
@@ -1498,12 +2383,20 @@ int libewf_set_bytes_per_sector(
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_bytes_per_sector";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1511,8 +2404,17 @@ int libewf_set_bytes_per_sector(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1520,29 +2422,42 @@ int libewf_set_bytes_per_sector(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: bytes per sector cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: bytes per sector cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	result = libewf_internal_handle_initialize_media_values(
-	          internal_handle,
-	          internal_handle->media_values->sectors_per_chunk,
-	          bytes_per_sector,
-	          internal_handle->media_values->media_size,
-	          &error );
-
-	if( result != 1 )
+	if( libewf_internal_handle_set_media_values(
+	     internal_handle,
+	     internal_handle->media_values->sectors_per_chunk,
+	     bytes_per_sector,
+	     internal_handle->media_values->media_size,
+	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to intialize media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
 		libewf_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Sets the error granularity
@@ -1552,13 +2467,23 @@ int libewf_set_error_granularity(
      libewf_handle_t *handle,
      uint32_t error_granularity )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_error_granularity";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1566,16 +2491,34 @@ int libewf_set_error_granularity(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: error granularity cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: error granularity cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1592,13 +2535,23 @@ int libewf_set_compression_values(
      int8_t compression_level,
      uint8_t compress_empty_block )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_compression_values";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1607,8 +2560,17 @@ int libewf_set_compression_values(
 	if( ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: compression values cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: compression values cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1616,8 +2578,17 @@ int libewf_set_compression_values(
 	 && ( compression_level != EWF_COMPRESSION_FAST )
 	 && ( compression_level != EWF_COMPRESSION_BEST ) )
 	{
-		notify_warning_printf( "%s: unsupported compression level.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported compression level.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1643,12 +2614,20 @@ int libewf_set_media_size(
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_media_size";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1656,8 +2635,17 @@ int libewf_set_media_size(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1665,29 +2653,42 @@ int libewf_set_media_size(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: media size cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: media size cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	result = libewf_internal_handle_initialize_media_values(
-	          internal_handle,
-	          internal_handle->media_values->sectors_per_chunk,
-	          internal_handle->media_values->bytes_per_sector,
-	          media_size,
-	          &error );
-
-	if( result != 1 )
+	if( libewf_internal_handle_set_media_values(
+	     internal_handle,
+	     internal_handle->media_values->sectors_per_chunk,
+	     internal_handle->media_values->bytes_per_sector,
+	     media_size,
+	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to intialize media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set media values.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
 		libewf_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Sets the segment file size
@@ -1697,13 +2698,23 @@ int libewf_set_segment_file_size(
      libewf_handle_t *handle,
      size64_t segment_file_size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_segment_file_size";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1713,23 +2724,50 @@ int libewf_set_segment_file_size(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: segment file size cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: segment file size cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( segment_file_size > (size64_t) INT64_MAX )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid segment file size value exceeds maximum.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( ( segment_file_size == 0 )
-	 || ( segment_file_size > (size64_t) INT64_MAX ) )
+	 || ( segment_file_size > internal_handle->write->maximum_segment_file_size ) )
 	{
-		notify_warning_printf( "%s: invalid segment file size value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid segment file size value out of range.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
-	{
-		notify_warning_printf( "%s: invalid segment file size value exceeds maximum segment file size.\n",
-		 function );
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1745,13 +2783,23 @@ int libewf_set_delta_segment_file_size(
      libewf_handle_t *handle,
      size64_t delta_segment_file_size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_delta_segment_file_size";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1760,23 +2808,49 @@ int libewf_set_delta_segment_file_size(
 	if( ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: delta segment file size cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: delta segment file size cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	if( ( delta_segment_file_size == 0 )
-	 || ( delta_segment_file_size > (size64_t) INT64_MAX ) )
+	if( delta_segment_file_size > (size64_t) INT64_MAX )
 	{
-		notify_warning_printf( "%s: invalid delta segment file size value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid delta segment file size value exceeds maximum.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	if( internal_handle->write->delta_segment_file_size > (size64_t) INT64_MAX )
+	if( delta_segment_file_size == 0 )
 	{
-		notify_warning_printf( "%s: invalid delta segment file size value exceeds maximum segment file size.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid delta segment file size value out of range.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1792,13 +2866,23 @@ int libewf_set_media_type(
      libewf_handle_t *handle,
      uint8_t media_type )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_media_type";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1806,8 +2890,17 @@ int libewf_set_media_type(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1815,8 +2908,17 @@ int libewf_set_media_type(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: media type cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: media type cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1832,13 +2934,23 @@ int libewf_set_volume_type(
      libewf_handle_t *handle,
      uint8_t volume_type )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_volume_type";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1846,8 +2958,17 @@ int libewf_set_volume_type(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1855,8 +2976,17 @@ int libewf_set_volume_type(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: volume type cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: volume type cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1872,8 +3002,17 @@ int libewf_set_volume_type(
 	}
 	else
 	{
-		notify_warning_printf( "%s: unsupported volume type.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported volume type.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1890,12 +3029,20 @@ int libewf_set_format(
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_format";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1905,47 +3052,40 @@ int libewf_set_format(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: format cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: format cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	if( ( format != LIBEWF_FORMAT_ENCASE1 )
-	 && ( format != LIBEWF_FORMAT_ENCASE2 )
-	 && ( format != LIBEWF_FORMAT_ENCASE3 )
-	 && ( format != LIBEWF_FORMAT_ENCASE4 )
-	 && ( format != LIBEWF_FORMAT_ENCASE5 )
-	 && ( format != LIBEWF_FORMAT_ENCASE6 )
-	 && ( format != LIBEWF_FORMAT_LINEN5 )
-	 && ( format != LIBEWF_FORMAT_LINEN6 )
-	 && ( format != LIBEWF_FORMAT_SMART )
-	 && ( format != LIBEWF_FORMAT_FTK )
-	 && ( format != LIBEWF_FORMAT_LVF )
-	 && ( format != LIBEWF_FORMAT_EWF )
-	 && ( format != LIBEWF_FORMAT_EWFX ) )
+	if( libewf_internal_handle_set_format(
+	     internal_handle,
+	     format,
+	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unsupported format.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->format = format;
-
-	result = libewf_internal_handle_initialize_format(
-	          internal_handle,
-	          &error );
-
-	if( result != 1 )
-	{
-		notify_warning_printf( "%s: unable to initialize format specific values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set format.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
 		libewf_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Sets the GUID
@@ -1956,13 +3096,23 @@ int libewf_set_guid(
      uint8_t *guid,
      size_t size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_guid";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1970,22 +3120,49 @@ int libewf_set_guid(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( guid == NULL )
 	{
-		notify_warning_printf( "%s: invalid GUID.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid GUID.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( size < 16 )
 	{
-		notify_warning_printf( "%s: GUID too small.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: GUID too small.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -1993,8 +3170,17 @@ int libewf_set_guid(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: GUID cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: GUID cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2003,8 +3189,17 @@ int libewf_set_guid(
 	     guid,
 	     16 ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to set GUID.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set GUID.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2025,8 +3220,17 @@ int libewf_set_md5_hash(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2034,36 +3238,66 @@ int libewf_set_md5_hash(
 
 	if( internal_handle->hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing hash sections.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing hash sections.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	if( internal_handle->read != NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->hash_sections->md5_hash_set ) )
 	{
-		notify_warning_printf( "%s: md5 hash cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: md5 hash cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( md5_hash == NULL )
 	{
-		notify_warning_printf( "%s: invalid MD5 hash.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid MD5 hash.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( size < EWF_DIGEST_HASH_SIZE_MD5 )
 	{
-		notify_warning_printf( "%s: MD5 hash too small.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: MD5 hash too small.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( internal_handle->hash_sections->md5_hash_set )
-	{
-		notify_warning_printf( "%s: MD5 hash cannot be changed.\n",
-		 function );
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2072,8 +3306,17 @@ int libewf_set_md5_hash(
 	     md5_hash,
 	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to set MD5 hash.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set MD5 hash.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2083,7 +3326,11 @@ int libewf_set_md5_hash(
 	     EWF_DIGEST_HASH_SIZE_MD5,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse MD5 hash for its value.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2109,12 +3356,20 @@ int libewf_set_segment_filename(
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_segment_filename";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2122,35 +3377,57 @@ int libewf_set_segment_filename(
 
 	if( internal_handle->write == NULL )
 	{
-		notify_warning_printf( "%s: segment filename cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: segment filename cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing segment table.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	result = libewf_segment_table_set_basename(
-	          internal_handle->segment_table,
-	          filename,
-	          length,
-	          &error );
-
-	if( result != 1 )
+	if( libewf_segment_table_set_basename(
+	     internal_handle->segment_table,
+	     filename,
+	     length,
+	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set segment table basename.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set segment table basename.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
 		libewf_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Sets the delta segment file
@@ -2164,12 +3441,20 @@ int libewf_set_delta_segment_filename(
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_delta_segment_filename";
-	int result                                = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2177,35 +3462,57 @@ int libewf_set_delta_segment_filename(
 
 	if( internal_handle->write == NULL )
 	{
-		notify_warning_printf( "%s: delta segment filename cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: delta segment filename cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing delta segment table.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
-	result = libewf_segment_table_set_basename(
-	          internal_handle->delta_segment_table,
-	          filename,
-	          length,
-	          &error );
-
-	if( result != 1 )
+	if( libewf_segment_table_set_basename(
+	     internal_handle->delta_segment_table,
+	     filename,
+	     length,
+	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set segment table basename.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set segment table basename.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
 		libewf_error_free(
 		 &error );
+
+		return( -1 );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Sets the read wipe chunk on error
@@ -2216,13 +3523,23 @@ int libewf_set_read_wipe_chunk_on_error(
      libewf_handle_t *handle,
      uint8_t wipe_on_error )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_read_wipe_chunk_on_error";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2230,8 +3547,17 @@ int libewf_set_read_wipe_chunk_on_error(
 
 	if( internal_handle->read == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing subhandle read.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle read.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2247,13 +3573,23 @@ int libewf_set_header_codepage(
      libewf_handle_t *handle,
      int header_codepage )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_header_codepage";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2261,8 +3597,17 @@ int libewf_set_header_codepage(
 
 	if( internal_handle->header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing header sections.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing header sections.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2275,8 +3620,17 @@ int libewf_set_header_codepage(
 	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1256 )
 	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1257 ) )
 	{
-		notify_warning_printf( "%s: unsupported header codepage.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported header codepage.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2301,8 +3655,17 @@ int libewf_set_header_value(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2312,15 +3675,33 @@ int libewf_set_header_value(
 	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		notify_warning_printf( "%s: header value cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: header value cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		notify_warning_printf( "%s: invalid identifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2331,7 +3712,11 @@ int libewf_set_header_value(
 		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header values.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header values.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2345,7 +3730,11 @@ int libewf_set_header_value(
 		     internal_handle->header_values,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to initialize header values.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize header values.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2367,7 +3756,11 @@ int libewf_set_header_value(
 	     length,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set header value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header value.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2396,8 +3789,17 @@ int libewf_set_hash_value(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2405,15 +3807,33 @@ int libewf_set_hash_value(
 
 	if( internal_handle->read != NULL )
 	{
-		notify_warning_printf( "%s: hash value cannot be changed.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: hash value cannot be changed.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		notify_warning_printf( "%s: invalid identifier.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2424,7 +3844,11 @@ int libewf_set_hash_value(
 		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create hash values.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2438,7 +3862,11 @@ int libewf_set_hash_value(
 		     internal_handle->hash_values,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to initialize hash values.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize hash values.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2460,7 +3888,11 @@ int libewf_set_hash_value(
 	     length,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set hash value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set hash value.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2484,7 +3916,11 @@ int libewf_set_hash_value(
 		     &( internal_handle->hash_sections->md5_hash_set ),
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to parse MD5 hash value for its value.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash value for its value.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2512,8 +3948,17 @@ int libewf_parse_header_values(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2521,8 +3966,17 @@ int libewf_parse_header_values(
 
 	if( internal_handle->header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing header sections.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing header sections.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2538,10 +3992,21 @@ int libewf_parse_header_values(
 	       date_format,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to parse xheader.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse xheader.\n",
 		 function );
 
-		/* TODO */
+		/* TODO error_tollerance */
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header2 != NULL )
@@ -2552,10 +4017,21 @@ int libewf_parse_header_values(
 	       date_format,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to parse header2.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse header2.\n",
 		 function );
 
-		/* TODO */
+		/* TODO error_tollerance */
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header != NULL )
@@ -2567,15 +4043,35 @@ int libewf_parse_header_values(
 	       date_format,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to parse header.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse header.\n",
 		 function );
 
-		/* TODO */
+		/* TODO error_tollerance */
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
 	}
 	if( internal_handle->header_values == NULL )
 	{
-		notify_warning_printf( "%s: unable to parse header(s) for values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse header(s) for values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2605,8 +4101,17 @@ int libewf_parse_hash_values(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2614,8 +4119,17 @@ int libewf_parse_hash_values(
 
 	if( internal_handle->hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing hash sections.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing hash sections.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2630,8 +4144,14 @@ int libewf_parse_hash_values(
 	       internal_handle->hash_sections->xhash_size,
 	       &error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to parse xhash for values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse xhash for values.\n",
 		 function );
+
+		/* TODO error_tollerance */
 
 		libewf_error_backtrace_notify(
 		 error);
@@ -2647,8 +4167,14 @@ int libewf_parse_hash_values(
 	            EWF_DIGEST_HASH_SIZE_MD5,
 	            &error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse MD5 hash for its value.\n",
 		 function );
+
+		/* TODO error_tollerance */
 
 		libewf_error_backtrace_notify(
 		 error);
@@ -2673,8 +4199,17 @@ int libewf_add_acquiry_error(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2685,7 +4220,11 @@ int libewf_add_acquiry_error(
 	     1,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to add acquiry error.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to add acquiry error.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2712,8 +4251,17 @@ int libewf_add_crc_error(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2721,8 +4269,17 @@ int libewf_add_crc_error(
 
 	if( internal_handle->read == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing subhandle read.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing subhandle read.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2733,7 +4290,11 @@ int libewf_add_crc_error(
 	     1,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to add CRC error.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to add CRC error.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2759,8 +4320,17 @@ int libewf_add_session(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2771,7 +4341,11 @@ int libewf_add_session(
 	     0,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to add session.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to add session.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2798,15 +4372,33 @@ int libewf_copy_header_values(
 
 	if( destination_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid destination handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( source_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid source handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2815,8 +4407,17 @@ int libewf_copy_header_values(
 
 	if( internal_source_handle->header_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid source handle - missing header values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid source handle - missing header values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2827,7 +4428,11 @@ int libewf_copy_header_values(
 		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header values in destination handle.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header values in destination handle.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2841,7 +4446,11 @@ int libewf_copy_header_values(
 		     internal_destination_handle->header_values,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to initialize header values.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize header values.\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2857,7 +4466,11 @@ int libewf_copy_header_values(
 	     internal_source_handle->header_values,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy header values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy header values.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2877,21 +4490,40 @@ int libewf_copy_media_values(
      libewf_handle_t *destination_handle,
      libewf_handle_t *source_handle )
 {
+	libewf_error_t *error                                 = NULL;
 	libewf_internal_handle_t *internal_destination_handle = NULL;
 	libewf_internal_handle_t *internal_source_handle      = NULL;
 	static char *function                                 = "libewf_copy_media_values";
 
 	if( destination_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid destination handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( source_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid source handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid source handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2900,15 +4532,33 @@ int libewf_copy_media_values(
 
 	if( internal_source_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid source handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid source handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
 	if( internal_destination_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid destination handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid destination handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}
@@ -2917,8 +4567,17 @@ int libewf_copy_media_values(
 	     internal_source_handle->media_values,
 	     sizeof( libewf_media_values_t ) ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to copy media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
 
 		return( -1 );
 	}

@@ -51,7 +51,7 @@ int libewf_signal_abort(
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.\n",
 		 function );
 

@@ -50,7 +50,7 @@ int libewf_offset_table_initialize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -166,7 +166,7 @@ int libewf_offset_table_free(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -206,7 +206,7 @@ int libewf_offset_table_resize(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset_table.\n",
 		 function );
 
@@ -291,7 +291,7 @@ int libewf_offset_table_fill(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -302,7 +302,7 @@ int libewf_offset_table_fill(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.\n",
 		 function );
 
@@ -313,7 +313,7 @@ int libewf_offset_table_fill(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.\n",
 		 function );
 
@@ -528,7 +528,7 @@ int libewf_offset_table_fill_last_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -550,7 +550,7 @@ int libewf_offset_table_fill_last_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section list.\n",
 		 function );
 
@@ -665,7 +665,7 @@ int libewf_offset_table_fill_offsets(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -687,7 +687,7 @@ int libewf_offset_table_fill_offsets(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.\n",
 		 function );
 
@@ -698,7 +698,7 @@ int libewf_offset_table_fill_offsets(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table offsets.\n",
 		 function );
 
@@ -709,7 +709,7 @@ int libewf_offset_table_fill_offsets(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_TOO_SMALL,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: amount of offsets too small.\n",
 		 function );
 
@@ -775,7 +775,7 @@ int libewf_offset_table_compare(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -786,7 +786,7 @@ int libewf_offset_table_compare(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.\n",
 		 function );
 
@@ -797,7 +797,7 @@ int libewf_offset_table_compare(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.\n",
 		 function );
 
@@ -1099,7 +1099,7 @@ int libewf_offset_table_compare_last_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -1121,7 +1121,7 @@ int libewf_offset_table_compare_last_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section list.\n",
 		 function );
 
@@ -1143,7 +1143,7 @@ int libewf_offset_table_compare_last_offset(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid section list values.\n",
 			 function );
 
@@ -1254,7 +1254,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.\n",
 		 function );
 
@@ -1276,7 +1276,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].\n",
 		 function,
 		 chunk,
