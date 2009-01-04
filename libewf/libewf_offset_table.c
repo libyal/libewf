@@ -989,7 +989,8 @@ int libewf_offset_table_compare_last_offset(
  */
 off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,
-          uint32_t chunk )
+         uint32_t chunk,
+         libewf_file_io_pool_t *file_io_pool )
 {
 	static char *function = "libewf_segment_table_seek_chunk_offset";
 
@@ -1014,9 +1015,18 @@ off64_t libewf_offset_table_seek_chunk_offset(
 
 		return( -1 );
 	}
-	if( libewf_segment_file_handle_seek_offset(
-	     offset_table->chunk_offset[ chunk ].segment_file_handle,
-	     offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+	if( offset_table->chunk_offset[ chunk ].segment_file_handle == NULL )
+	{
+		notify_warning_printf( "%s: missing segment file handle for chunk: %" PRIu32 ".\n",
+		 function, chunk );
+
+		return( -1 );
+	}
+	if( libewf_file_io_pool_seek_offset(
+	     file_io_pool,
+	     offset_table->chunk_offset[ chunk ].segment_file_handle->file_io_pool_entry,
+	     offset_table->chunk_offset[ chunk ].file_offset,
+	     SEEK_SET ) == -1 )
 	{
 		notify_warning_printf( "%s: cannot find chunk offset: %" PRIjd ".\n",
 		 function, offset_table->chunk_offset[ chunk ].file_offset );

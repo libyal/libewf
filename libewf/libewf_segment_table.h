@@ -27,6 +27,7 @@
 #include <system_string.h>
 #include <types.h>
 
+#include "libewf_file_io_pool.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_media_values.h"
@@ -73,6 +74,7 @@ int libewf_segment_table_resize(
 
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
+     libewf_file_io_pool_t *file_io_pool,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
@@ -94,11 +96,12 @@ int libewf_segment_table_get_basename(
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      system_character_t *basename,
-     size_t length );
+     size_t basename_length );
 
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
      libewf_segment_table_t *delta_segment_table,
+     libewf_file_io_pool_t *file_io_pool,
      system_character_t * const filenames[],
      uint16_t file_amount,
      uint8_t flags,
@@ -120,12 +123,10 @@ int libewf_segment_table_write_open(
      system_character_t * const filenames[],
      uint16_t file_amount );
 
-int libewf_segment_table_close_all(
-     libewf_segment_table_t *segment_table );
-
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,
+     libewf_file_io_pool_t *file_io_pool,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,

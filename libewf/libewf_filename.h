@@ -43,9 +43,9 @@ int libewf_filename_set_extension(
 
 int libewf_filename_create(
      system_character_t **filename,
-     size_t *length_filename,
+     size_t *filename_size,
      system_character_t *basename,
-     size_t length_basename,
+     size_t basename_length,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,

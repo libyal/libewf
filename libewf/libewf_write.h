@@ -43,9 +43,9 @@ int libewf_write_test_empty_block(
      size_t size );
 
 int64_t libewf_write_calculate_chunks_per_segment_file(
-         libewf_segment_file_handle_t *segment_file_handle,
          size64_t segment_file_size,
          size64_t maximum_segment_file_size,
+         off64_t segment_file_offset,
          uint32_t maximum_section_amount_of_chunks,
          uint32_t segment_amount_of_chunks,
          uint32_t amount_of_chunks,
@@ -125,8 +125,8 @@ ssize_t libewf_write_chunk_data_new(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
          void *buffer,
-         size_t size,
-         size_t chunk_data_size,
+         size_t buffer_size,
+         size_t data_size,
          int8_t force_write );
 
 ssize_t libewf_write_chunk_data_existing(
@@ -134,8 +134,8 @@ ssize_t libewf_write_chunk_data_existing(
          uint32_t chunk,
          uint32_t chunk_offset,
          void *buffer,
-         size_t size,
-         size_t chunk_data_size );
+         size_t buffer_size,
+         size_t data_size );
 
 LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        libewf_handle_t *handle,
@@ -150,7 +150,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
 LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
-                       size_t size,
+                       size_t buffer_size,
                        size_t data_size,
                        int8_t is_compressed,
                        uint32_t chunk_crc,

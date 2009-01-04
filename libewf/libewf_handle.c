@@ -85,6 +85,22 @@ int libewf_handle_initialize(
 		internal_handle->error_tollerance  = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 
 		/* The segment table is initially filled with a single entry
+		 * and no limitations on the amount of open files
+		 */
+		if( libewf_file_io_pool_initialize(
+		     &( internal_handle->file_io_pool ),
+		     1,
+		     LIBEWF_FILE_IO_POOL_UNLIMITED_AMOUNT_OF_OPEN_FILES ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create file io pool.\n",
+			 function );
+
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		/* The segment table is initially filled with a single entry
 		 */
 		if( libewf_segment_table_initialize(
 		     &( internal_handle->segment_table ),
@@ -93,6 +109,8 @@ int libewf_handle_initialize(
 			notify_warning_printf( "%s: unable to create segment table.\n",
 			 function );
 
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -109,6 +127,8 @@ int libewf_handle_initialize(
 
 			libewf_segment_table_free(
 			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -122,9 +142,11 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -140,9 +162,11 @@ int libewf_handle_initialize(
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -159,9 +183,11 @@ int libewf_handle_initialize(
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -180,9 +206,11 @@ int libewf_handle_initialize(
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -203,9 +231,11 @@ int libewf_handle_initialize(
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -229,9 +259,11 @@ int libewf_handle_initialize(
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -257,9 +289,11 @@ int libewf_handle_initialize(
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
-			 &( internal_handle->segment_table ) );
-			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ) );
+			libewf_segment_table_free(
+			 &( internal_handle->segment_table ) );
+			libewf_file_io_pool_free(
+			 &( internal_handle->file_io_pool ) );
 			memory_free(
 			 internal_handle );
 
@@ -288,9 +322,11 @@ int libewf_handle_initialize(
 				libewf_offset_table_free(
 				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
-				 &( internal_handle->segment_table ) );
-				libewf_segment_table_free(
 				 &( internal_handle->delta_segment_table ) );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ) );
+				libewf_file_io_pool_free(
+				 &( internal_handle->file_io_pool ) );
 				memory_free(
 				 internal_handle );
 
@@ -322,9 +358,11 @@ int libewf_handle_initialize(
 				libewf_offset_table_free(
 				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
-				 &( internal_handle->segment_table ) );
-				libewf_segment_table_free(
 				 &( internal_handle->delta_segment_table ) );
+				libewf_segment_table_free(
+				 &( internal_handle->segment_table ) );
+				libewf_file_io_pool_free(
+				 &( internal_handle->file_io_pool ) );
 				memory_free(
 				 internal_handle );
 
@@ -356,12 +394,6 @@ int libewf_handle_free(
 	{
 		internal_handle = (libewf_internal_handle_t *) *handle;
 
-		if( libewf_media_values_free(
-		     &( internal_handle->media_values ) ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to free media values.\n",
-			 function );
-		}
 		if( libewf_internal_handle_subhandle_read_free(
 		     &( internal_handle->read ) ) != 1 )
 		{
@@ -372,6 +404,12 @@ int libewf_handle_free(
 		     &( internal_handle->write ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to free subhandle write.\n",
+			 function );
+		}
+		if( libewf_file_io_pool_free(
+		     &( internal_handle->file_io_pool ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free file io pool.\n",
 			 function );
 		}
 		if( libewf_segment_table_free(
@@ -392,16 +430,16 @@ int libewf_handle_free(
 			notify_warning_printf( "%s: unable to free offset table.\n",
 			 function );
 		}
-		if( libewf_sector_table_free(
-		     &( internal_handle->sessions ) ) != 1 )
+		if( libewf_chunk_cache_free(
+		     &( internal_handle->chunk_cache ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to free sessions.\n",
+			notify_warning_printf( "%s: unable to free chunk cache.\n",
 			 function );
 		}
-		if( libewf_sector_table_free(
-		     &( internal_handle->acquiry_errors ) ) != 1 )
+		if( libewf_media_values_free(
+		     &( internal_handle->media_values ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to free acquiry errors.\n",
+			notify_warning_printf( "%s: unable to free media values.\n",
 			 function );
 		}
 		if( libewf_header_sections_free(
@@ -428,10 +466,16 @@ int libewf_handle_free(
 			notify_warning_printf( "%s: unable to free hash values.\n",
 			 function );
 		}
-		if( libewf_chunk_cache_free(
-		     &( internal_handle->chunk_cache ) ) != 1 )
+		if( libewf_sector_table_free(
+		     &( internal_handle->sessions ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to free chunk cache.\n",
+			notify_warning_printf( "%s: unable to free sessions.\n",
+			 function );
+		}
+		if( libewf_sector_table_free(
+		     &( internal_handle->acquiry_errors ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free acquiry errors.\n",
 			 function );
 		}
 		memory_free(

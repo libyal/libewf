@@ -339,6 +339,7 @@ libewf_handle_t *libewf_open(
 		if( libewf_segment_table_read_open(
 		     internal_handle->segment_table, 
 		     internal_handle->delta_segment_table, 
+		     internal_handle->file_io_pool, 
 		     filenames, 
 		     amount_of_files,
 		     flags,
@@ -439,19 +440,14 @@ int libewf_close(
 		libewf_write_finalize(
 		 handle );
 	}
-	if( libewf_segment_table_close_all(
-	     internal_handle->segment_table ) != 1 )
+	if( libewf_file_io_pool_close_all(
+	     internal_handle->file_io_pool ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to close all segment files in segment table.\n",
+		notify_warning_printf( "%s: unable to close all segment files.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( libewf_segment_table_close_all(
-	     internal_handle->delta_segment_table ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to close all segment files in delta segment table.\n",
-		 function );
+		libewf_handle_free(
+		 &handle );
 
 		return( -1 );
 	}
@@ -524,7 +520,8 @@ off64_t libewf_seek_offset(
 		}
 		if( libewf_offset_table_seek_chunk_offset(
 		     internal_handle->offset_table,
-		     (uint32_t) chunk ) == -1 )
+		     (uint32_t) chunk,
+		     internal_handle->file_io_pool ) == -1 )
 		{
 			notify_warning_printf( "%s: unable to seek chunk offset.\n",
 			 function );

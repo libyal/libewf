@@ -70,6 +70,10 @@ int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,
      int flags );
 
+int libewf_file_io_handle_reopen(
+     libewf_file_io_handle_t *file_io_handle,
+     int flags );
+
 int libewf_file_io_handle_close(
      libewf_file_io_handle_t *file_io_handle );
 
@@ -87,6 +91,10 @@ off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,
          off64_t offset,
          int whence );
+
+int libewf_file_io_handle_get_offset(
+     libewf_file_io_handle_t *file_io_handle,
+     off64_t *offset );
 
 #if defined( __cplusplus )
 }

@@ -52,7 +52,7 @@ int ewfguid_to_string(
 
 		return( -1 );
 	}
-	if( string_size < 37 )
+	if( string_size < EWFGUID_STRING_LENGTH )
 	{
 		notify_warning_printf( "%s: string too small.\n",
 		 function );
@@ -86,15 +86,14 @@ int ewfguid_to_string(
 	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
 	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
 	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "\n" ),
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 ),
 	               guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ],
 	               guid[ 4 ], guid[ 5 ],
 	               guid[ 6 ], guid[ 7 ],
 	               guid[ 8 ], guid[ 9 ],
 	               guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
 
-	if( print_count != 37 )
+	if( print_count != 36 )
 	{
 		notify_warning_printf( "%s: unable to format string.\n",
 		 function );

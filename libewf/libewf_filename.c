@@ -150,9 +150,9 @@ int libewf_filename_set_extension(
  */
 int libewf_filename_create(
      system_character_t **filename,
-     size_t *length_filename,
+     size_t *filename_size,
      system_character_t *basename,
-     size_t length_basename,
+     size_t basename_length,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
@@ -176,9 +176,9 @@ int libewf_filename_create(
 
 		return( -1 );
 	}
-	if( length_filename == NULL )
+	if( filename_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid length filename.\n",
+		notify_warning_printf( "%s: invalid filename size.\n",
 		 function );
 
 		return( -1 );
@@ -200,7 +200,7 @@ int libewf_filename_create(
 	/* The actual filename also contains a '.', 3 character extension and a end of string byte
 	 */
 	new_filename = memory_allocate(
-	                sizeof( system_character_t ) * ( length_basename + 5 ) );
+	                sizeof( system_character_t ) * ( basename_length + 5 ) );
 
 	if( new_filename == NULL )
 	{
@@ -214,7 +214,7 @@ int libewf_filename_create(
 	if( system_string_copy(
 	     new_filename,
 	     basename,
-	     ( length_basename + 1 ) ) == NULL )
+	     ( basename_length + 1 ) ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set basename.\n",
 		 function );
@@ -224,10 +224,10 @@ int libewf_filename_create(
 
 		return( -1 );
 	}
-	new_filename[ length_basename ] = (system_character_t) '.';
+	new_filename[ basename_length ] = (system_character_t) '.';
 
 	if( libewf_filename_set_extension(
-	     &( new_filename[ length_basename + 1 ] ),
+	     &( new_filename[ basename_length + 1 ] ),
 	     segment_number,
 	     maximum_amount_of_segments,
 	     segment_file_type,
@@ -242,8 +242,8 @@ int libewf_filename_create(
 
 		return( -1 );
 	}
-	*filename        = new_filename;
-	*length_filename = length_basename + 5;
+	*filename      = new_filename;
+	*filename_size = basename_length + 5;
 
 	return( 1 );
 }

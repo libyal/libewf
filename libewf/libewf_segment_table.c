@@ -30,6 +30,8 @@
 #include <libewf/definitions.h>
 
 #include "libewf_filename.h"
+#include "libewf_file_io_handle.h"
+#include "libewf_file_io_pool.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 
@@ -235,6 +237,7 @@ int libewf_segment_table_resize(
  */
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
+     libewf_file_io_pool_t *file_io_pool,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
@@ -278,6 +281,7 @@ int libewf_segment_table_build(
 
 		result = libewf_segment_file_read_sections(
 		          segment_table->segment_file_handle[ segment_number ],
+		          file_io_pool,
 		          &last_segment_file,
 		          header_sections,
 		          hash_sections,
@@ -378,7 +382,7 @@ int libewf_segment_table_get_basename(
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      system_character_t *basename,
-     size_t length )
+     size_t basename_length )
 {
 	static char *function = "libewf_segment_table_set_basename";
 
@@ -406,7 +410,7 @@ int libewf_segment_table_set_basename(
 	}
 	segment_table->basename = system_string_duplicate(
 	                           basename,
-	                           length + 1 );
+	                           basename_length + 1 );
 
 	if( segment_table->basename == NULL )
 	{
@@ -415,7 +419,7 @@ int libewf_segment_table_set_basename(
 
 		return( -1 );
 	}
-	segment_table->basename_length = length;
+	segment_table->basename_length = basename_length;
 
 	return( 1 );
 }
@@ -427,6 +431,7 @@ int libewf_segment_table_set_basename(
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
      libewf_segment_table_t *delta_segment_table,
+     libewf_file_io_pool_t *file_io_pool,
      system_character_t * const filenames[],
      uint16_t file_amount, uint8_t flags,
      libewf_header_sections_t *header_sections,
@@ -442,11 +447,13 @@ int libewf_segment_table_read_open(
      uint8_t error_tollerance,
      int *abort )
 {
+	libewf_file_io_handle_t *file_io_handle           = NULL;
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_segment_table_read_open";
-	size_t filename_length                            = 0;
+	size_t filename_size                              = 0;
 	uint32_t iterator                                 = 0;
 	uint16_t segment_number                           = 0;
+	int file_io_pool_entry                            = 0;
 
 	if( segment_table == NULL )
 	{
@@ -490,15 +497,17 @@ int libewf_segment_table_read_open(
 
 		return( -1 );
 	}
-	/* Get the basename of the first segment file and store it in
-	 * the 0'th entry
+	/* Get the basename of the first segment file
+	 * and store it in the segment tables
 	 */
-	filename_length = system_string_length(
-	                   filenames[ 0 ] );
+	filename_size = system_string_length(
+	                 filenames[ 0 ] );
 
-	if( filename_length <= 4 )
+        /* Make sure there is more to the filename than the extension
+	 */
+	if( filename_size <= 4 )
 	{
-		notify_warning_printf( "%s: filename is empty.\n",
+		notify_warning_printf( "%s: filename is too small.\n",
 		 function );
 
 		return( -1 );
@@ -508,7 +517,7 @@ int libewf_segment_table_read_open(
 	if( libewf_segment_table_set_basename(
 	     segment_table,
 	     filenames[ 0 ],
-	     ( filename_length - 4 ) ) != 1 )
+	     ( filename_size - 4 ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set basename in segment table.\n",
 		 function );
@@ -520,7 +529,7 @@ int libewf_segment_table_read_open(
 	if( libewf_segment_table_set_basename(
 	     delta_segment_table,
 	     filenames[ 0 ],
-	     ( filename_length - 4 ) ) != 1 )
+	     ( filename_size - 4 ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set basename in delta segment table.\n",
 		 function );
@@ -535,46 +544,53 @@ int libewf_segment_table_read_open(
 		notify_verbose_printf( "%s: trying to open file: %" PRIs_SYSTEM ".\n",
 		 function, filenames[ iterator ] );
 #endif
-		if( libewf_segment_file_handle_initialize(
-		     &segment_file_handle ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to create segment file handle.\n",
-			 function );
 
-			libewf_segment_file_handle_free(
-			 &segment_file_handle );
+		if( libewf_file_io_pool_create_file_io_handle(
+		     file_io_pool,
+		     &file_io_handle,
+		     &file_io_pool_entry ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create file io pool entry.\n",
+			 function );
 
 			return( -1 );
 		}
-		if( libewf_segment_file_handle_set_filename(
-		     segment_file_handle,
+		filename_size = 1 + system_string_length(
+		                     filenames[ iterator ] );
+
+		if( libewf_file_io_handle_set_filename(
+		     file_io_handle,
 		     filenames[ iterator ],
-		     system_string_length(
-		      filenames[ iterator ] ) ) != 1 )
+		     filename_size ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to set filename in segment file handle.\n",
+			notify_warning_printf( "%s: unable to set filename in file io handle.\n",
 			 function );
-
-			libewf_segment_file_handle_free(
-			 &segment_file_handle );
 
 			return( -1 );
 		}
-		if( libewf_segment_file_handle_open(
-		     segment_file_handle,
+		if( libewf_file_io_pool_open(
+		     file_io_pool,
+		     file_io_pool_entry,
 		     FILE_IO_O_RDONLY ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
 
-			libewf_segment_file_handle_free(
-			 &segment_file_handle );
+			return( -1 );
+		}
+		if( libewf_segment_file_handle_initialize(
+		     &segment_file_handle,
+		     file_io_pool_entry ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create segment file handle.\n",
+			 function );
 
 			return( -1 );
 		}
 		if( libewf_segment_file_read_file_header(
 		     segment_file_handle,
-		     &segment_number ) <= -1 )
+		     &segment_number,
+		     file_io_pool ) <= -1 )
 		{
 			notify_warning_printf( "%s: unable to read file header in: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
@@ -621,20 +637,20 @@ int libewf_segment_table_read_open(
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: added segment file: %" PRIs_SYSTEM " with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
+			 function, file_io_handle->filename, file_io_handle->file_descriptor, segment_number );
 #endif
 
 			segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
 		}
 		else if( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 		{
-			/* Make sure to re-open the delta segment file
-			 * to allow writing if necessary
+			/* Make sure to re-open the delta segment file with write access
 			 */
 			if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 			{
-				if( libewf_segment_file_handle_reopen(
-				     segment_file_handle,
+				if( libewf_file_io_pool_reopen(
+				     file_io_pool,
+				     file_io_pool_entry,
 				     FILE_IO_O_RDWR ) != 1 )
 				{
 					notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
@@ -657,7 +673,7 @@ int libewf_segment_table_read_open(
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: added delta segment file: %" PRIs_SYSTEM " with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
+			 function, file_io_handle->filename, file_io_handle->file_descriptor, segment_number );
 #endif
 
 			delta_segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
@@ -673,6 +689,7 @@ int libewf_segment_table_read_open(
 	}
 	if( libewf_segment_table_build(
 	     segment_table,
+	     file_io_pool,
 	     header_sections,
 	     hash_sections,
 	     media_values,
@@ -694,6 +711,7 @@ int libewf_segment_table_read_open(
 	if( ( delta_segment_table->amount > 1 )
 	 && ( libewf_segment_table_build(
 	       delta_segment_table,
+	       file_io_pool,
 	       header_sections,
 	       hash_sections,
 	       media_values,
@@ -773,53 +791,6 @@ int libewf_segment_table_write_open(
 	return( 1 );
 }
 
-/* Closes all the EWF segment file(s) in the segment table
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int libewf_segment_table_close_all(
-     libewf_segment_table_t *segment_table )
-{
-	static char *function = "libewf_segment_table_close_all";
-	uint16_t iterator     = 0;
-	int result            = 1;
-
-	if( segment_table == NULL )
-	{
-		notify_warning_printf( "%s: invalid segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->segment_file_handle == NULL )
-	{
-		notify_warning_printf( "%s: invalid segment table - missing segment file handles.\n",
-		 function );
-
-		return( -1 );
-	}
-	for( iterator = 1; iterator < segment_table->amount; iterator++ )
-	{
-		if( segment_table->segment_file_handle[ iterator ]->file_descriptor > 0 )
-		{
-			if( libewf_segment_file_handle_close( segment_table->segment_file_handle[ iterator ] ) != 0 )
-			{
-				if( segment_table->segment_file_handle[ iterator ]->filename == NULL )
-				{
-					notify_warning_printf( "%s: unable to close segment file: %" PRIu16 ".\n",
-					 function, iterator );
-				}
-				else
-				{
-					notify_warning_printf( "%s: unable to close segment file: %" PRIu16 " (%" PRIs_SYSTEM ").\n",
-					 function, iterator, segment_table->segment_file_handle[ iterator ]->filename );
-				}
-				result = 0;
-			}
-		}
-	}
-	return( result );
-}
-
 /* Creates a new segment file and opens it for writing
  * The necessary sections at the start of the segment file are written
  * Returns 1 if successful or -1 on error
@@ -827,14 +798,16 @@ int libewf_segment_table_close_all(
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,
+     libewf_file_io_pool_t *file_io_pool,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format )
 {
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	static char *function                             = "libewf_segment_table_create_segment_file";
-	int flags                                         = 0;
+	libewf_file_io_handle_t *file_io_handle = NULL;
+	static char *function                   = "libewf_segment_table_create_segment_file";
+	int file_io_pool_entry                  = 0;
+	int flags                               = 0;
 
 	if( segment_table == NULL )
 	{
@@ -864,7 +837,6 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-
 	/* Check if one additional entries in the segment table are needed
 	 */
 	if( segment_number >= segment_table->amount )
@@ -883,26 +855,26 @@ int libewf_segment_table_create_segment_file(
 	}
 	/* Check if the entry has already been filled
 	 */
-	else if( segment_table->segment_file_handle[ segment_number ] != NULL )
+	if( segment_table->segment_file_handle[ segment_number ] != NULL )
 	{
 		notify_warning_printf( "%s: segment file has already been created.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_segment_file_handle_initialize(
-	     &( segment_table->segment_file_handle[ segment_number ] ) ) != 1 )
+	if( libewf_file_io_pool_create_file_io_handle(
+	     file_io_pool,
+	     &file_io_handle,
+	     &file_io_pool_entry ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to create segment file handle.\n",
+		notify_warning_printf( "%s: unable to create file io pool entry.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_file_handle = segment_table->segment_file_handle[ segment_number ];
-
 	if( libewf_filename_create(
-	     &( segment_file_handle->filename ),
-	     &( segment_file_handle->length_filename ),
+	     &( file_io_handle->filename ),
+	     &( file_io_handle->filename_size ),
 	     segment_table->basename,
 	     segment_table->basename_length,
 	     segment_number,
@@ -916,8 +888,7 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-	if( ( segment_file_handle->filename == NULL )
-	 || ( segment_file_handle->length_filename == 0 ) )
+	if( file_io_handle->filename == NULL )
 	{
 		notify_warning_printf( "%s: filename is empty.\n",
 		 function );
@@ -925,9 +896,10 @@ int libewf_segment_table_create_segment_file(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: segment file created: %" PRIu32 " with name: %" PRIs_SYSTEM ".\n",
-	 function, segment_number, segment_file_handle->filename );
+	notify_verbose_printf( "%s: created segment file: %" PRIu16 " with filename: %" PRIs_SYSTEM ".\n",
+	 function, segment_number, file_io_handle->filename );
 #endif
+
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
 		flags = FILE_IO_O_RDWR | FILE_IO_O_CREAT | FILE_IO_O_TRUNC;
@@ -936,12 +908,22 @@ int libewf_segment_table_create_segment_file(
 	{
 		flags = FILE_IO_O_WRONLY | FILE_IO_O_CREAT | FILE_IO_O_TRUNC;
 	}
-	if( libewf_segment_file_handle_open(
-	     segment_file_handle,
+	if( libewf_file_io_pool_open(
+	     file_io_pool,
+	     file_io_pool_entry,
 	     flags ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
-		 function, segment_file_handle->filename );
+		notify_warning_printf( "%s: unable to open segment file: %" PRIu16 ".\n",
+		 function, segment_number );
+
+		return( -1 );
+	}
+	if( libewf_segment_file_handle_initialize(
+	     &( segment_table->segment_file_handle[ segment_number ] ),
+	     file_io_pool_entry ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to create segment file handle.\n",
+		 function );
 
 		return( -1 );
 	}

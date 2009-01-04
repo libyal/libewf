@@ -85,6 +85,8 @@ Possible performance improvements:
 * optimize string functions - pass size as much as possible
 * remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
   - currently used for verbose output
+* reduce amount of write by aligining chunk data and CRC
+  (requires rewrite of some functions, CRC should be passed as buffer)
 
 Code clean up
 * remove internal_handle passing from most functions
@@ -102,6 +104,7 @@ API
 * make libewf_handle_initialize and libewf_handle_free available
 * rewrite open and close in correspondence with handle_initialize and handle_free
 * change compress empty blocks into a compression level
+* allow for chunk data and CRC alignment
 * low level api
 
 Known issues:
@@ -117,6 +120,14 @@ Known issues:
 * MSVS C++ does not allow pre compiler macro in macro definitions
 
 Next release(s):
+
+* have segment file number in libewf_raw_read_chunk for warning output?
+
+* improve way to determine if a segment file has been closed after write
+
+* remove file io pool from lower levels and pass file io handle ?
+
+* ewfinfo check wchar in/output
 
 * create floppy-table-errors.E01 for testing purpose
   - error in primary offset table
@@ -183,7 +194,7 @@ CLOSED
 Version: 20080905
 * worked on refactoring code
 * rewrote _alloc() functions into _initialize() functions with corresponding _free() functions
-* worked on file pooling
+* worked on file io pooling
 
 Version: 20080904
 * worked on refactoring function in ewfinput

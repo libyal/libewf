@@ -47,9 +47,9 @@ int libewf_file_io_pool_initialize(
 
 		return( -1 );
 	}
-	if( amount_of_files_io_handles < 0 )
+	if( amount_of_files_io_handles <= 0 )
 	{
-		notify_warning_printf( "%s: invalid amount of file io handles value less than zero.\n",
+		notify_warning_printf( "%s: invalid amount of file io handles value zero or less.\n",
 		 function );
 
 		return( -1 );
@@ -239,9 +239,9 @@ int libewf_file_io_pool_resize(
 
 		return( -1 );
 	}
-	if( amount_of_files_io_handles < 0 )
+	if( amount_of_files_io_handles <= 0 )
 	{
-		notify_warning_printf( "%s: invalid amount of file io handles value less than zero.\n",
+		notify_warning_printf( "%s: invalid amount of file io handles value zero or less.\n",
 		 function );
 
 		return( -1 );
@@ -285,6 +285,74 @@ int libewf_file_io_pool_resize(
 	return( 1 );
 }
 
+/* Creates a new file io handle
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_io_pool_create_file_io_handle(
+     libewf_file_io_pool_t *file_io_pool,
+     libewf_file_io_handle_t **file_io_handle,
+     int *entry )
+{
+	static char *function = "libewf_file_io_pool_create_file_io_handle";
+
+	if( file_io_pool == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_pool->file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( entry == NULL )
+	{
+		notify_warning_printf( "%s: invalid entry.\n",
+		 function );
+
+		return( -1 );
+	}
+	*entry = file_io_pool->amount_of_files;
+
+	/* Resize the file io pool if necessary
+	 */
+	if( ( *entry + 1 ) >= file_io_pool->amount_of_files_io_handles )
+	{
+		if( libewf_file_io_pool_resize(
+		     file_io_pool,
+		     *entry + 1 ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to resize file io pool.\n",
+			 function );
+
+			*entry          = -1;
+			*file_io_handle = NULL;
+
+			return( -1 );
+		}
+	}
+	file_io_pool->amount_of_files++;
+
+	file_io_pool->file_io_handle[ *entry ].file_descriptor = -1;
+
+	/* Add the file io handle entry
+	 */
+	*file_io_handle = &( file_io_pool->file_io_handle[ *entry ] );
+
+	return( 1 );
+}
+
 /* Opens the file io handle
  * Returns 1 if successful or -1 on error
  */
@@ -310,8 +378,6 @@ int libewf_file_io_pool_open_file_io_handle(
 
 		return( -1 );
 	}
-	/* Do not bother with already open file io handles
-	 */
 	if( file_io_handle->file_descriptor != -1 )
 	{
 		return( 1 );
@@ -363,7 +429,7 @@ int libewf_file_io_pool_open_file_io_handle(
 	else
 	{
 		last_used_list_element = (libewf_list_element_t *) memory_allocate(
-		                                                    sizeof( libewf_list_element_t ) );
+								    sizeof( libewf_list_element_t ) );
 
 		if( last_used_list_element == NULL )
 		{
@@ -416,17 +482,15 @@ int libewf_file_io_pool_open_file_io_handle(
 }
 
 /* Adds a file to the file io pool and opens it
- * Returns the file io pool entry number or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
-     const system_character_t *filename,
+     int entry,
      int flags )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_open";
-	size_t filename_size                    = 0;
-	int entry                               = 0;
 
 	if( file_io_pool == NULL )
 	{
@@ -442,31 +506,14 @@ int libewf_file_io_pool_open(
 
 		return( -1 );
 	}
-	if( filename == NULL )
+	if( ( entry < 0 )
+	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		notify_warning_printf( "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
 	}
-	entry = file_io_pool->amount_of_files;
-
-	/* Resize the file io pool if necessary
-	 */
-	if( ( entry + 1 ) >= file_io_pool->amount_of_files_io_handles )
-	{
-		if( libewf_file_io_pool_resize(
-		     file_io_pool,
-		     entry + 1 ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to resize file io pool.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* Add the file io handle entry
-	 */
 	file_io_handle = &( file_io_pool->file_io_handle[ entry ] );
 
 	if( file_io_handle == NULL )
@@ -476,32 +523,76 @@ int libewf_file_io_pool_open(
 
 		return( -1 );
 	}
-	filename_size = 1 + system_string_length(
-	                     filename );
-
-	if( libewf_file_io_handle_set_filename(
-	     file_io_handle,
-	     filename,
-	     filename_size ) != 1 )
+	if( file_io_handle->file_descriptor == -1 )
 	{
-		notify_warning_printf( "%s: unable to set filename for entry: %d.\n",
+		file_io_handle->flags = flags;
+
+		if( libewf_file_io_pool_open_file_io_handle(
+		     file_io_pool,
+		     file_io_handle,
+		     file_io_handle->flags ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to open entry: %d.\n",
+			 function, entry );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Reopens a file in the file io pool
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_io_pool_reopen(
+     libewf_file_io_pool_t *file_io_pool,
+     int entry,
+     int flags )
+{
+	libewf_file_io_handle_t *file_io_handle = NULL;
+	static char *function                   = "libewf_file_io_pool_reopen";
+
+	if( file_io_pool == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_pool->file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( entry < 0 )
+	 || ( entry >= file_io_pool->amount_of_files ) )
+	{
+		notify_warning_printf( "%s: invalid entry.\n",
+		 function );
+
+		return( -1 );
+	}
+	file_io_handle = &( file_io_pool->file_io_handle[ entry ] );
+
+	if( file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
 		 function, entry );
 
 		return( -1 );
 	}
-	file_io_handle->file_descriptor = -1;
-
-	if( libewf_file_io_pool_open_file_io_handle(
-	     file_io_pool,
+	if( libewf_file_io_handle_reopen(
 	     file_io_handle,
-	     flags ) != 1 )
+	     flags ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to open entry: %d.\n",
+		notify_warning_printf( "%s: unable to reopen file io handle for entry: %d.\n",
 		 function, entry );
 
 		return( -1 );
 	}
-	return( entry );
+	return( 1 );
 }
 
 /* Closes a file in the file io pool
@@ -556,6 +647,37 @@ int libewf_file_io_pool_close(
 	return( 0 );
 }
 
+/* Closes all the files in the file io pool
+ * Returns 0 if successful or -1 on error
+ */
+int libewf_file_io_pool_close_all(
+     libewf_file_io_pool_t *file_io_pool )
+{
+	static char *function = "libewf_file_io_pool_close_all";
+	int iterator          = 0;
+	int result            = 0;
+
+	if( file_io_pool == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < file_io_pool->amount_of_files_io_handles; iterator++ )
+	{
+		if( libewf_file_io_handle_close(
+		     &( file_io_pool->file_io_handle[ iterator ] ) ) != 0 )
+		{
+			notify_warning_printf( "%s: unable to close file io handle: %d.\n",
+			 function, iterator );
+
+			result = -1;
+		}
+	}
+	return( result );
+}
+
 /* Read from a file in the file io pool
  * Returns the amount of bytes read or -1 on error
  */
@@ -593,12 +715,20 @@ ssize_t libewf_file_io_pool_read(
 	}
 	file_io_handle = &( file_io_pool->file_io_handle[ entry ] );
 
+	if( file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
+		 function, entry );
+
+		return( -1 );
+	}
 	/* Make sure the file io handle is open
 	 */
-	if( libewf_file_io_pool_open_file_io_handle(
-	     file_io_pool,
-	     file_io_handle,
-	     file_io_handle->flags ) != 1 )
+	if( ( file_io_handle->file_descriptor == -1 )
+	 && ( libewf_file_io_pool_open_file_io_handle(
+	       file_io_pool,
+	       file_io_handle,
+	       file_io_handle->flags ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to open entry: %d.\n",
 		 function, entry );
@@ -657,19 +787,27 @@ ssize_t libewf_file_io_pool_write(
 	}
 	file_io_handle = &( file_io_pool->file_io_handle[ entry ] );
 
+	if( file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
+		 function, entry );
+
+		return( -1 );
+	}
 	/* Make sure the file io handle is open
 	 */
-	if( libewf_file_io_pool_open_file_io_handle(
-	     file_io_pool,
-	     file_io_handle,
-	     file_io_handle->flags ) != 1 )
+	if( ( file_io_handle->file_descriptor == -1 )
+	 && ( libewf_file_io_pool_open_file_io_handle(
+	       file_io_pool,
+	       file_io_handle,
+	       file_io_handle->flags ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to open entry: %d.\n",
 		 function, entry );
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_handle_read(
+	write_count = libewf_file_io_handle_write(
 	               file_io_handle,
 	               buffer,
 	               size );
@@ -721,12 +859,20 @@ off64_t libewf_file_io_pool_seek_offset(
 	}
 	file_io_handle = &( file_io_pool->file_io_handle[ entry ] );
 
+	if( file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
+		 function, entry );
+
+		return( -1 );
+	}
 	/* Make sure the file io handle is open
 	 */
-	if( libewf_file_io_pool_open_file_io_handle(
-	     file_io_pool,
-	     file_io_handle,
-	     file_io_handle->flags ) != 1 )
+	if( ( file_io_handle->file_descriptor == -1 )
+	 && ( libewf_file_io_pool_open_file_io_handle(
+	       file_io_pool,
+	       file_io_handle,
+	       file_io_handle->flags ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to open entry: %d.\n",
 		 function, entry );
@@ -746,5 +892,72 @@ off64_t libewf_file_io_pool_seek_offset(
 		return( -1 );
 	}
 	return( seek_offset );
+}
+
+/* Retrieves the current offset in a file in the file io pool
+ * Returns the amount of bytes written or -1 on error
+ *  */
+int libewf_file_io_pool_get_offset(
+     libewf_file_io_pool_t *file_io_pool,
+     int entry,
+     off64_t *offset )
+{
+	libewf_file_io_handle_t *file_io_handle = NULL;
+	static char *function                   = "libewf_file_io_pool_get_offset";
+
+	if( file_io_pool == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_pool->file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( entry < 0 )
+	 || ( entry >= file_io_pool->amount_of_files ) )
+	{
+		notify_warning_printf( "%s: invalid entry.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset == NULL )
+	{
+		notify_warning_printf( "%s: invalid offset.\n",
+		 function );
+
+		return( -1 );
+	}
+	file_io_handle = &( file_io_pool->file_io_handle[ entry ] );
+
+	if( file_io_handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
+		 function, entry );
+
+		return( -1 );
+	}
+	/* Make sure the file io handle is open
+	 */
+	if( ( file_io_handle->file_descriptor == -1 )
+	 && ( libewf_file_io_pool_open_file_io_handle(
+	       file_io_pool,
+	       file_io_handle,
+	       file_io_handle->flags ) != 1 ) )
+	{
+		notify_warning_printf( "%s: unable to open entry: %d.\n",
+		 function, entry );
+
+		return( -1 );
+	}
+	*offset = file_io_handle->file_offset;
+
+	return( 1 );
 }
 

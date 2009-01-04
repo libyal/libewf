@@ -29,6 +29,7 @@
 
 #include <libewf/definitions.h>
 
+#include "libewf_file_io_pool.h"
 #include "libewf_hash_values.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"
@@ -37,6 +38,7 @@
 
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
+#include "ewfx_delta_chunk.h"
 
 const uint8_t dvf_file_signature[] = { 0x64, 0x76, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 const uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
@@ -110,7 +112,8 @@ int libewf_segment_file_check_file_signature(
  */
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
-         uint16_t *segment_number )
+         uint16_t *segment_number,
+         libewf_file_io_pool_t *file_io_pool )
 {
 	ewf_file_header_t file_header;
 
@@ -131,9 +134,10 @@ ssize_t libewf_segment_file_read_file_header(
 
 		return( -1 );
 	}
-	read_count = libewf_segment_file_handle_read(
-	              segment_file_handle,
-	              &file_header,
+	read_count = libewf_file_io_pool_read(
+	              file_io_pool,
+	              segment_file_handle->file_io_pool_entry,
+	              (uint8_t *) &file_header,
 	              sizeof( ewf_file_header_t ) );
 
 	if( read_count != (ssize_t) sizeof( ewf_file_header_t ) )
@@ -186,6 +190,7 @@ ssize_t libewf_segment_file_read_file_header(
  */
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
+     libewf_file_io_pool_t *file_io_pool,
      int *last_segment_file,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
@@ -228,6 +233,7 @@ int libewf_segment_file_read_sections(
 	while( result != -1 )
 	{
 		result = libewf_section_read(
+		          file_io_pool,
 		          segment_file_handle,
 		          header_sections,
 		          hash_sections,
@@ -277,6 +283,7 @@ int libewf_segment_file_read_sections(
  */
 ssize_t libewf_segment_file_write_headers(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          libewf_header_sections_t *header_sections,
          int8_t compression_level,
          uint8_t format )
@@ -321,6 +328,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * and using the compression used in the file
 		 */
 		write_count = libewf_section_header_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -347,6 +355,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -362,6 +371,7 @@ ssize_t libewf_segment_file_write_headers(
 		total_write_count += write_count;
 
 		write_count = libewf_section_header_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -398,6 +408,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
@@ -413,6 +424,7 @@ ssize_t libewf_segment_file_write_headers(
 		total_write_count += write_count;
 
 		write_count = libewf_section_header2_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
@@ -431,6 +443,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -475,6 +488,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_xheader_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->xheader,
 		               header_sections->xheader_size,
@@ -493,6 +507,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
@@ -511,6 +526,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -535,6 +551,7 @@ ssize_t libewf_segment_file_write_headers(
  */
 ssize_t libewf_segment_file_write_last_section(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          int last_segment_file,
          uint8_t format,
          uint8_t ewf_format )
@@ -561,6 +578,7 @@ ssize_t libewf_segment_file_write_last_section(
 	/* Write next or done section
 	 */
 	write_count = libewf_section_last_write(
+		       file_io_pool,
 		       segment_file_handle,
 		       last_section_type,
 		       4,
@@ -582,6 +600,7 @@ ssize_t libewf_segment_file_write_last_section(
  */
 ssize_t libewf_segment_file_write_start(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          uint16_t segment_number,
          uint8_t segment_file_type,
          libewf_media_values_t *media_values,
@@ -608,13 +627,6 @@ ssize_t libewf_segment_file_write_start(
 	if( segment_number == 0 )
 	{
 		notify_warning_printf( "%s: invalid segment number.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_handle->file_descriptor == -1 )
-	{
-		notify_warning_printf( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
@@ -677,9 +689,10 @@ ssize_t libewf_segment_file_write_start(
 
 	/* Write segment file header
 	 */
-	write_count = libewf_segment_file_handle_write(
-	               segment_file_handle,
-	               &file_header,
+	write_count = libewf_file_io_pool_write(
+	               file_io_pool,
+	               segment_file_handle->file_io_pool_entry,
+	               (uint8_t *) &file_header,
 	               sizeof( ewf_file_header_t ) );
 
 	if( write_count != (ssize_t) sizeof( ewf_file_header_t ) )
@@ -700,6 +713,7 @@ ssize_t libewf_segment_file_write_start(
 			 */
 			write_count = libewf_segment_file_write_headers(
 				       segment_file_handle,
+				       file_io_pool,
 				       header_sections,
 				       compression_level,
 				       format );
@@ -718,6 +732,7 @@ ssize_t libewf_segment_file_write_start(
 				/* Write volume (SMART) section
 				 */
 				write_count = libewf_section_volume_s01_write(
+					       file_io_pool,
 					       segment_file_handle,
 					       media_values,
 					       format,
@@ -728,6 +743,7 @@ ssize_t libewf_segment_file_write_start(
 				/* Write volume section
 				 */
 				write_count = libewf_section_volume_e01_write(
+					       file_io_pool,
 					       segment_file_handle,
 					       media_values,
 					       compression_level,
@@ -754,6 +770,7 @@ ssize_t libewf_segment_file_write_start(
 			/* Write data section
 			 */
 			write_count = libewf_section_data_write(
+				       file_io_pool,
 				       segment_file_handle,
 				       media_values,
 				       compression_level,
@@ -779,6 +796,7 @@ ssize_t libewf_segment_file_write_start(
  */
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          ewf_table_offset_t *table_offsets,
          uint32_t amount_of_table_offsets,
@@ -840,6 +858,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		/* Write table section start
 		 */
 		write_count = libewf_section_table_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               0,
 		               table_offsets,
@@ -867,6 +886,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		/* Write sectors section start
 		 */
 		write_count = libewf_section_sectors_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               section_size,
 		               1 );
@@ -888,23 +908,25 @@ ssize_t libewf_segment_file_write_chunks_section_start(
  */
 ssize_t libewf_segment_file_write_chunks_data(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_data,
-         size_t size,
+         size_t chunk_data_size,
          int8_t is_compressed,
          ewf_crc_t *chunk_crc,
          int8_t write_crc )
 {
-	uint8_t calculated_crc_buffer[ 4 ];
+	uint8_t crc_buffer[ 4 ];
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	char *chunk_type          = NULL;
+	char *chunk_type            = NULL;
 #endif
-	static char *function     = "libewf_segment_file_write_chunks_data";
-	ssize_t write_count       = 0;
-	ssize_t total_write_count = 0;
-	size_t chunk_size         = size;
+	static char *function       = "libewf_segment_file_write_chunks_data";
+	off64_t segment_file_offset = 0;
+	ssize_t write_count         = 0;
+	ssize_t total_write_count   = 0;
+	size_t chunk_size           = chunk_data_size;
 
 	if( segment_file_handle == NULL )
 	{
@@ -927,16 +949,9 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 		return( -1 );
 	}
-	if( size > (size_t) SSIZE_MAX )
+	if( chunk_data_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_handle->file_descriptor == -1 )
-	{
-		notify_warning_printf( "%s: invalid file descriptor.\n",
+		notify_warning_printf( "%s: invalid chunk data size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -959,10 +974,20 @@ ssize_t libewf_segment_file_write_chunks_data(
 			return( -1 );
 		}
 	}
+	if( libewf_file_io_pool_get_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     &segment_file_offset ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve current offset in segment file.\n",
+		 function );
+
+		return( -1 );
+	}
 	/* Set the values in the offset table
 	 */
 	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
+	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
 	offset_table->chunk_offset[ chunk ].compressed          = is_compressed;
 
@@ -978,17 +1003,18 @@ ssize_t libewf_segment_file_write_chunks_data(
 		chunk_type = "COMPRESSED";
 	}
 	notify_warning_printf( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
-	 function, chunk_type, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
+	 function, chunk_type, ( chunk + 1 ), segment_file_offset, chunk_size, *chunk_crc );
 #endif
 
 	/* Write the chunk data to the segment file
 	 */
-	write_count = libewf_segment_file_handle_write(
-	               segment_file_handle,
+	write_count = libewf_file_io_pool_write(
+	               file_io_pool,
+	               segment_file_handle->file_io_pool_entry,
 	               chunk_data,
-	               size );
+	               chunk_data_size );
 
-	if( write_count != (ssize_t) size )
+	if( write_count != (ssize_t) chunk_data_size )
 	{
 		notify_warning_printf( "%s: unable to write data.\n",
 		 function );
@@ -1002,12 +1028,13 @@ ssize_t libewf_segment_file_write_chunks_data(
 	if( write_crc != 0 )
 	{
 		endian_little_revert_32bit(
-		 calculated_crc_buffer,
+		 crc_buffer,
 		 *chunk_crc );
 
-		write_count = libewf_segment_file_handle_write(
-		               segment_file_handle,
-		               calculated_crc_buffer,
+		write_count = libewf_file_io_pool_write(
+		               file_io_pool,
+		               segment_file_handle->file_io_pool_entry,
+		               crc_buffer,
 		               sizeof( ewf_crc_t ) );
 
 		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
@@ -1028,6 +1055,7 @@ ssize_t libewf_segment_file_write_chunks_data(
  */
 ssize_t libewf_segment_file_write_chunks_correction(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          ewf_table_offset_t *table_offsets,
          uint32_t amount_of_table_offsets,
@@ -1087,8 +1115,16 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
-	last_segment_file_offset = segment_file_handle->file_offset;
+	if( libewf_file_io_pool_get_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     &last_segment_file_offset ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve current offset in segment file.\n",
+		 function );
 
+		return( -1 );
+	}
 	/* Seek the start of the data chunks
 	*/
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -1096,9 +1132,11 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	 function, chunks_section_offset );
 #endif
 
-	if( libewf_segment_file_handle_seek_offset(
-	     segment_file_handle,
-	     chunks_section_offset ) == -1 )
+	if( libewf_file_io_pool_seek_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     chunks_section_offset,
+	     SEEK_SET ) == -1 )
 	{
 		notify_warning_printf( "%s: unable to find offset to correct sectors size.\n",
 		 function );
@@ -1116,6 +1154,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Rewrite table section start
 		 */
 		write_count = libewf_section_table_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               0,
 		               table_offsets,
@@ -1145,6 +1184,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Rewrite sectors section start
 		 */
 		write_count = libewf_section_sectors_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               chunks_section_size,
 		               0 );
@@ -1164,9 +1204,11 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	 function, last_segment_file_offset );
 #endif
 
-	if( libewf_segment_file_handle_seek_offset(
-	     segment_file_handle,
-	     last_segment_file_offset ) == -1 )
+	if( libewf_file_io_pool_seek_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     last_segment_file_offset,
+	     SEEK_SET ) == -1 )
 	{
 		notify_warning_printf( "%s: unable to find offset to continue.\n",
 		 function );
@@ -1179,6 +1221,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Write table section start
 		 */
 		write_count = libewf_section_table_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               base_offset,
 		               table_offsets,
@@ -1202,6 +1245,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Write table2 section start
 		 */
 		write_count = libewf_section_table_write(
+		               file_io_pool,
 		               segment_file_handle,
 		               base_offset,
 		               table_offsets,
@@ -1230,6 +1274,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
  */
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_data,
@@ -1238,8 +1283,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
          uint8_t write_crc,
 	 uint8_t no_section_append )
 {
-	static char *function = "libewf_segment_file_write_delta_chunk";
-	ssize_t write_count   = 0;
+	static char *function       = "libewf_segment_file_write_delta_chunk";
+	off64_t segment_file_offset = 0;
+	ssize_t write_count         = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1264,16 +1310,27 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
+	if( libewf_file_io_pool_get_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     &segment_file_offset ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve current offset in segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	segment_file_offset += sizeof( ewfx_delta_chunk_header_t ) + sizeof( ewf_section_t );
+
 #if defined( HAVE_VERBOSE_OUTPUT )
-	/* Print a verbose notification
-	 */
 	notify_warning_printf( "%s: writing UNCOMPRESSED delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
-	 function, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
+	 function, ( chunk + 1 ), segment_file_offset, chunk_size, *chunk_crc );
 #endif
 
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_section_delta_chunk_write(
+	               file_io_pool,
 	               segment_file_handle,
 	               chunk, 
 	               chunk_data, 
@@ -1290,7 +1347,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	 && ( write_count > 0 ) )
 	{
 		offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset - chunk_size - sizeof( ewf_crc_t );
+		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( ewf_crc_t );
 		offset_table->chunk_offset[ chunk ].compressed          = 0;
 	}
@@ -1302,6 +1359,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
  */
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_file_io_pool_t *file_io_pool,
          uint16_t segment_number,
          uint32_t segment_amount_of_chunks,
          int last_segment_file,
@@ -1362,6 +1420,7 @@ ssize_t libewf_segment_file_write_close(
 		 && ( segment_number == 1 ) )
 		{
 			write_count = libewf_section_data_write(
+				       file_io_pool,
 				       segment_file_handle,
 				       media_values,
 				       compression_level,
@@ -1388,6 +1447,7 @@ ssize_t libewf_segment_file_write_close(
 		  || ( format == LIBEWF_FORMAT_EWFX ) ) )
 		{
 			write_count = libewf_section_session_write(
+			               file_io_pool,
 			               segment_file_handle,
 			               sessions );
 
@@ -1412,6 +1472,7 @@ ssize_t libewf_segment_file_write_close(
 		  || ( format == LIBEWF_FORMAT_EWFX ) ) )
 		{
 			write_count = libewf_section_error2_write(
+			               file_io_pool,
 			               segment_file_handle,
 			               acquiry_errors );
 
@@ -1429,6 +1490,7 @@ ssize_t libewf_segment_file_write_close(
 		if( hash_sections->md5_hash_set != 0 )
 		{
 			write_count = libewf_section_hash_write(
+			               file_io_pool,
 			               segment_file_handle,
 			               hash_sections->md5_hash );
 
@@ -1467,6 +1529,7 @@ ssize_t libewf_segment_file_write_close(
 				return( -1 );
 			}
 			write_count = libewf_section_xhash_write(
+			               file_io_pool,
 			               segment_file_handle,
 			               hash_sections->xhash,
 			               hash_sections->xhash_size,
@@ -1487,6 +1550,7 @@ ssize_t libewf_segment_file_write_close(
 	 */
 	write_count = libewf_segment_file_write_last_section(
 		       segment_file_handle,
+		       file_io_pool,
 	               last_segment_file,
 	               format,
 	               ewf_format );
@@ -1502,14 +1566,17 @@ ssize_t libewf_segment_file_write_close(
 
 	segment_file_handle->amount_of_chunks = segment_amount_of_chunks;
 
-	if( libewf_segment_file_handle_close(
-	     segment_file_handle ) != 0 )
+	if( libewf_file_io_pool_close(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to close segment file handle.\n",
-		 function );
+		notify_warning_printf( "%s: unable to close segment file: %" PRIu16 ".\n",
+		 function, segment_number );
 
 		return( -1 );
 	}
+	segment_file_handle->file_io_pool_entry = -1;
+
 	return( total_write_count );
 }
 

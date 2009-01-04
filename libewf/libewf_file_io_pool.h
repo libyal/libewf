@@ -79,6 +79,11 @@ int libewf_file_io_pool_resize(
      libewf_file_io_pool_t *file_io_pool,
      int amount_of_files_io_handles );
 
+int libewf_file_io_pool_create_file_io_handle(
+     libewf_file_io_pool_t *file_io_pool,
+     libewf_file_io_handle_t **file_io_handle,
+     int *entry );
+
 int libewf_file_io_pool_open_file_io_handle(
      libewf_file_io_pool_t *file_io_pool,
      libewf_file_io_handle_t *file_io_handle,
@@ -86,7 +91,7 @@ int libewf_file_io_pool_open_file_io_handle(
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
-     const system_character_t *filename,
+     int entry,
      int flags );
 
 int libewf_file_io_pool_reopen(
@@ -97,6 +102,9 @@ int libewf_file_io_pool_reopen(
 int libewf_file_io_pool_close(
      libewf_file_io_pool_t *file_io_pool,
      int entry );
+
+int libewf_file_io_pool_close_all(
+     libewf_file_io_pool_t *file_io_pool );
 
 ssize_t libewf_file_io_pool_read(
          libewf_file_io_pool_t *file_io_pool,
@@ -115,6 +123,11 @@ off64_t libewf_file_io_pool_seek_offset(
          int entry,
          off64_t offset,
          int whence );
+
+int libewf_file_io_pool_get_offset(
+     libewf_file_io_pool_t *file_io_pool,
+     int entry,
+     off64_t *offset );
 
 #if defined( __cplusplus )
 }

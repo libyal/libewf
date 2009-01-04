@@ -31,6 +31,7 @@
 #include "libewf_compression.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
+#include "libewf_file_io_pool.h"
 #include "libewf_interface.h"
 #include "libewf_read.h"
 #include "libewf_segment_file_handle.h"
@@ -164,7 +165,6 @@ ssize_t libewf_raw_read_chunk(
 	ssize_t chunk_read_count                          = 0;
 	ssize_t crc_read_count                            = 0;
 	size_t chunk_data_size                            = 0;
-	uint16_t segment_number                           = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -298,34 +298,35 @@ ssize_t libewf_raw_read_chunk(
 
 		return( -1 );
 	}
-	if( segment_file_handle->filename == NULL )
-	{
-		notify_warning_printf( "%s: invalid segment file - missing filename.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* Make sure the segment file offset is in the right place
 	 */
-	if( libewf_segment_file_handle_seek_offset(
-	     segment_file_handle,
-	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) <= -1 )
+	if( libewf_file_io_pool_seek_offset(
+	     internal_handle->file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
+	     SEEK_SET ) <= -1 )
 	{
-		notify_warning_printf( "%s: unable to seek chunk.\n",
+		notify_warning_printf( "%s: unable to seek chunk in segment file.\n",
 		 function );
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	notify_verbose_printf( "%s: reading chunk at offset: %" PRIjd ".\n",
+	 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
+#endif
+
 	/* Read the chunk data
 	 */
-	chunk_read_count = libewf_segment_file_handle_read(
-			    segment_file_handle,
+	chunk_read_count = libewf_file_io_pool_read(
+			    internal_handle->file_io_pool,
+			    segment_file_handle->file_io_pool_entry,
 			    chunk_buffer,
 			    chunk_data_size );
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
 	{
-		notify_warning_printf( "%s: unable to read chunk.\n",
+		notify_warning_printf( "%s: unable to read chunk in segment file.\n",
 		 function );
 
 		return( -1 );
@@ -334,15 +335,16 @@ ssize_t libewf_raw_read_chunk(
 	 */
 	if( *read_crc != 0 )
 	{
-		crc_read_count = libewf_segment_file_handle_read(
-				  segment_file_handle,
+		crc_read_count = libewf_file_io_pool_read(
+		                  internal_handle->file_io_pool,
+		                  segment_file_handle->file_io_pool_entry,
 				  stored_crc_buffer,
 				  sizeof( ewf_crc_t ) );
 
 		if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
-			notify_warning_printf( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_SYSTEM ").\n",
-			 function, chunk, segment_number, segment_file_handle->filename );
+			notify_warning_printf( "%s: error reading CRC of chunk: %" PRIu32 " from segment file.\n",
+			 function, chunk );
 
 			return( -1 );
 		}

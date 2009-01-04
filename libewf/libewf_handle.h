@@ -29,6 +29,7 @@
 #include <libewf/handle.h>
 
 #include "libewf_chunk_cache.h"
+#include "libewf_file_io_pool.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_media_values.h"
@@ -60,9 +61,9 @@ struct libewf_internal_handle
 	 */
 	libewf_internal_handle_write_t *write;
 
-	/* The media values
+	/* The file io pool
 	 */
-	libewf_media_values_t *media_values;
+	libewf_file_io_pool_t *file_io_pool;
 
 	/* The list of segment files
 	 */
@@ -80,6 +81,10 @@ struct libewf_internal_handle
 	 * same chunk while reading the data.
 	 */
 	libewf_chunk_cache_t *chunk_cache;
+
+	/* The media values
+	 */
+	libewf_media_values_t *media_values;
 
 	/* The stored header sections
 	 */

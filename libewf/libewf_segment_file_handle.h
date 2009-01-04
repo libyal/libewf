@@ -28,6 +28,7 @@
 #include <types.h>
 
 #include "libewf_section_list.h"
+#include "libewf_section_list.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -37,21 +38,9 @@ typedef struct libewf_segment_file_handle libewf_segment_file_handle_t;
 
 struct libewf_segment_file_handle
 {
-	/* The filename
+	/* The file io pool entry
 	 */
-	system_character_t *filename;
-
-	/* The length of the filename
-	 */
-	size_t length_filename;
-
-	/* The file descriptor
-	 */
-	int file_descriptor;
-
-	/* The file offset
-	 */
-	off64_t file_offset;
+	int file_io_pool_entry;
 
 	/* The amount of chunks
 	 */
@@ -67,45 +56,11 @@ struct libewf_segment_file_handle
 };
 
 int libewf_segment_file_handle_initialize(
-     libewf_segment_file_handle_t **segment_file_handle );
+     libewf_segment_file_handle_t **segment_file_handle,
+     int file_io_pool_entry );
 
 int libewf_segment_file_handle_free(
      libewf_segment_file_handle_t **segment_file_handle );
-
-int libewf_segment_file_handle_get_filename(
-     libewf_segment_file_handle_t *segment_file_handle,
-     system_character_t *filename,
-     size_t length_filename );
-
-int libewf_segment_file_handle_set_filename(
-     libewf_segment_file_handle_t *segment_file_handle,
-     const system_character_t *filename,
-     size_t length_filename );
-
-int libewf_segment_file_handle_open(
-     libewf_segment_file_handle_t *segment_file_handle,
-     int flags );
-
-int libewf_segment_file_handle_reopen(
-     libewf_segment_file_handle_t *segment_file_handle,
-     int flags );
-
-ssize_t libewf_segment_file_handle_read(
-         libewf_segment_file_handle_t *segment_file_handle,
-         void *buffer,
-         size_t size );
-
-ssize_t libewf_segment_file_handle_write(
-         libewf_segment_file_handle_t *segment_file_handle,
-         void *buffer,
-         size_t size );
-
-off64_t libewf_segment_file_handle_seek_offset(
-         libewf_segment_file_handle_t *segment_file_handle,
-         off64_t offset );
-
-int libewf_segment_file_handle_close(
-     libewf_segment_file_handle_t *segment_file_handle );
 
 #if defined( __cplusplus )
 }

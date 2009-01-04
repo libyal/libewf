@@ -27,6 +27,7 @@
 #include <types.h>
 
 #include "libewf_chunk_offset.h"
+#include "libewf_file_io_pool.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file_handle.h"
 
@@ -107,7 +108,8 @@ int libewf_offset_table_compare_last_offset(
 
 off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,
-         uint32_t chunk );
+         uint32_t chunk,
+         libewf_file_io_pool_t *file_io_pool );
 
 #if defined( __cplusplus )
 }
