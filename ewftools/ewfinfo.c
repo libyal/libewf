@@ -286,7 +286,8 @@ int main( int argc, char * const argv[] )
 	                           LIBEWF_OPEN_READ );
 #endif
 
-	if( ewfcommon_libewf_handle == NULL )
+	if( ( ewfcommon_abort == 0 )
+	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )

@@ -792,8 +792,6 @@ int main( int argc, char * const argv[] )
 	        read_error_retry,
 	        (uint8_t) wipe_chunk_on_error ) == 0 );
 
-	/* Done asking user input set up the libewf handle
-	 */
 	if( ewfsignal_attach(
 	     ewfcommon_signal_handler ) != 1 )
 	{
@@ -805,6 +803,8 @@ int main( int argc, char * const argv[] )
 
 	if( ewfcommon_abort == 0 )
 	{
+		/* Set up the libewf handle
+		 */
 		filenames[ 0 ] = filename;
 
 		ewfcommon_libewf_handle = libewf_open(
