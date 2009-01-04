@@ -847,27 +847,33 @@ int8_t libewf_internal_handle_get_format( LIBEWF_INTERNAL_HANDLE *internal_handl
  */
 int8_t libewf_internal_handle_get_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size )
 {
+	static char *function = "libewf_internal_handle_get_guid";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_guid: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( guid == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_guid: invalid guid.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid guid.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size < 16 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_guid: guid too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: guid too small.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memcpy( guid, internal_handle->guid, 16 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_guid: unable to set guid.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set guid.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -878,15 +884,19 @@ int8_t libewf_internal_handle_get_guid( LIBEWF_INTERNAL_HANDLE *internal_handle,
  */
 int64_t libewf_internal_handle_get_write_amount_of_chunks( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_write_amount_of_chunks";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_write_amount_of_chunks: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_write_amount_of_chunks: invalid handle - missing sub handle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -897,9 +907,12 @@ int64_t libewf_internal_handle_get_write_amount_of_chunks( LIBEWF_INTERNAL_HANDL
  */
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_write_maximum_amount_of_segments";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_write_maximum_amount_of_segments: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -917,7 +930,8 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_write_maximum_amount_of_segments: unsupported EWF format.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported EWF format.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -928,21 +942,26 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
  */
 int8_t libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
+	static char *function = "libewf_internal_handle_get_header_value";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_header_value: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_header_value: invalid indentifier.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid indentifier.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_header_value: invalid value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -958,21 +977,26 @@ int8_t libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal
  */
 int8_t libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
+	static char *function = "libewf_internal_handle_get_hash_value";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_hash_value: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_hash_value: invalid indentifier.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid indentifier.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_hash_value: invalid value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -988,9 +1012,12 @@ int8_t libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_h
  */
 int8_t libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size )
 {
+	static char *function = "libewf_internal_handle_set_header";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_header: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1005,9 +1032,12 @@ int8_t libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handl
  */
 int8_t libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size )
 {
+	static char *function = "libewf_internal_handle_set_header2";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_header2: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1022,9 +1052,12 @@ int8_t libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_hand
  */
 int8_t libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *xheader, size_t size )
 {
+	static char *function = "libewf_internal_handle_set_xheader";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_xheader: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1039,9 +1072,12 @@ int8_t libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_hand
  */
 int8_t libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *xhash, size_t size )
 {
+	static char *function = "libewf_internal_handle_set_xhash";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_xhash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1056,11 +1092,13 @@ int8_t libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle
  */
 int8_t libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash )
 {
-	size_t size = EWF_DIGEST_HASH_SIZE_MD5;
+	static char *function = "libewf_internal_handle_set_stored_md5_hash";
+	size_t size           = EWF_DIGEST_HASH_SIZE_MD5;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_stored_md5_hash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1068,13 +1106,15 @@ int8_t libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *inter
 
 	if( internal_handle->stored_md5_hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_stored_md5_hash: unable to create MD5 hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memcpy( internal_handle->stored_md5_hash, md5_hash, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_stored_md5_hash: unable to set MD5 hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
+		 function );
 
 		libewf_common_free( internal_handle->stored_md5_hash );
 
@@ -1090,33 +1130,41 @@ int8_t libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *inter
  */
 int8_t libewf_internal_handle_set_media_values( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector )
 {
+	static char *function = "libewf_internal_handle_set_media_values";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_media_values: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_media_values: invalid handle - missing sub handle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( internal_handle->write != NULL ) && ( internal_handle->write->values_initialized != 0 ) )
+	if( ( internal_handle->write != NULL )
+	 && ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_media_values: write values were initialized, therefore media values cannot be changed anymore.\n" );
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized, therefore media values cannot be changed anymore.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( sectors_per_chunk == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_media_values: invalid sectors per chunk.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( bytes_per_sector == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_media_values: invalid bytes per sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sectors.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1131,33 +1179,41 @@ int8_t libewf_internal_handle_set_media_values( LIBEWF_INTERNAL_HANDLE *internal
  */
 int8_t libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size )
 {
+	static char *function = "libewf_internal_handle_set_guid";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_guid: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( guid == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_guid: invalid guid.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid guid.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size < 16 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_guid: guid too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: guid too small.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( internal_handle->write != NULL ) && ( internal_handle->write->values_initialized != 0 ) )
+	if( ( internal_handle->write != NULL )
+	 && ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_guid: write values were initialized, therefore media values cannot be changed anymore.\n" );
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized, therefore media values cannot be changed anymore.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memcpy( internal_handle->guid, guid, 16 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_guid: unable to set guid.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set guid.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1210,21 +1266,27 @@ int8_t libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDL
  */
 int8_t libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity )
 {
+	static char *function = "libewf_internal_handle_set_write_error_granularity";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_error_granularity: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_error_granularity: invalid handle - missing sub handle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( internal_handle->write != NULL ) && ( internal_handle->write->values_initialized != 0 ) )
+	if( ( internal_handle->write != NULL )
+	 && ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_error_granularity: write values were initialized, therefore media values cannot be changed anymore.\n" );
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized, therefore media values cannot be changed anymore.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1238,15 +1300,19 @@ int8_t libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDL
  */
 int8_t libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block )
 {
+	static char *function = "libewf_internal_handle_set_write_compression_values";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_compression_values: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_compression_values: invalid handle - missing sub handle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1266,17 +1332,20 @@ int8_t libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HAND
  */
 int8_t libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_type, uint8_t volume_type )
 {
-	uint8_t media_flags = 0;
+	static char *function = "libewf_internal_handle_set_write_media_type";
+	uint8_t media_flags   = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_media_type: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_media_type: invalid handle - missing sub handle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1296,7 +1365,8 @@ int8_t libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *inte
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_media_type: unsupported volume type.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported volume type.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1308,15 +1378,19 @@ int8_t libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *inte
  */
 int8_t libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_flags )
 {
+	static char *function = "libewf_internal_handle_set_write_media_flags";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_media_flags: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_media_flags: invalid handle - missing sub handle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1330,9 +1404,12 @@ int8_t libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *int
  */
 int8_t libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t format )
 {
+	static char *function = "libewf_internal_handle_set_write_format";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_format: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1386,15 +1463,19 @@ int8_t libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE
  */
 int8_t libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
+	static char *function = "libewf_internal_handle_set_header_value";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_header_value: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_header_value: invalid identifier.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1404,7 +1485,8 @@ int8_t libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal
 
 		if( internal_handle->header_values == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_header_value: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -1417,15 +1499,19 @@ int8_t libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal
  */
 int8_t libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
+	static char *function = "libewf_internal_handle_set_hash_value";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_hash_value: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( identifier == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_hash_value: invalid identifier.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1435,7 +1521,8 @@ int8_t libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_h
 
 		if( internal_handle->hash_values == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_hash_value: unable to create hash values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create hash values.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -1448,9 +1535,12 @@ int8_t libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_h
  */
 int8_t libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs )
 {
+	static char *function = "libewf_internal_handle_set_swap_byte_pairs";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_swap_byte_pairs: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1599,9 +1689,12 @@ int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *inter
  */
 int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_determine_format";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1626,17 +1719,20 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 				/* The EnCase5 header2 contains av on the 6th position (0x36 ... 0x38 ...)
 				 * the header2 is an UTF16 string
 				 */
-				if( ( internal_handle->header2[ 36 ] == (EWF_CHAR) 'a' ) && ( internal_handle->header2[ 38 ] == (EWF_CHAR) 'v' ) )
+				if( ( internal_handle->header2[ 36 ] == (EWF_CHAR) 'a' )
+				 && ( internal_handle->header2[ 38 ] == (EWF_CHAR) 'v' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_ENCASE5;
 				}
-				else if( ( internal_handle->header2[ 36 ] == (EWF_CHAR) 'm' ) && ( internal_handle->header2[ 38 ] == (EWF_CHAR) 'd' ) )
+				else if( ( internal_handle->header2[ 36 ] == (EWF_CHAR) 'm' )
+				 && ( internal_handle->header2[ 38 ] == (EWF_CHAR) 'd' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_ENCASE6;
 				}
 				else
 				{
-					LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header2 format: %c%c.\n", (char) internal_handle->header2[ 36 ], (char) internal_handle->header2[ 38 ] );
+					LIBEWF_WARNING_PRINT( "%s: unsupported header2 format: %c%c.\n",
+					 function, (char) internal_handle->header2[ 36 ], (char) internal_handle->header2[ 38 ] );
 
 					return( -1 );
 				}
@@ -1647,7 +1743,8 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 			}
 			else
 			{
-				LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header2 version: %c.\n", (char) internal_handle->header2[ 2 ] );
+				LIBEWF_WARNING_PRINT( "%s: unsupported header2 version: %c.\n",
+				 function, (char) internal_handle->header2[ 2 ] );
 
 				return( -1 );
 			}
@@ -1659,17 +1756,20 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 				/* The linen5 header2 contains av on the 6th position (0x17 0x18)
 				 * the header2 is an UTF16 string
 				 */
-				if( ( internal_handle->header[ 17 ] == (EWF_CHAR) 'a' ) && ( internal_handle->header[ 18 ] == (EWF_CHAR) 'v' ) )
+				if( ( internal_handle->header[ 17 ] == (EWF_CHAR) 'a' )
+				 && ( internal_handle->header[ 18 ] == (EWF_CHAR) 'v' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_LINEN5;
 				}
-				else if( ( internal_handle->header[ 17 ] == (EWF_CHAR) 'm' ) && ( internal_handle->header[ 18 ] == (EWF_CHAR) 'd' ) )
+				else if( ( internal_handle->header[ 17 ] == (EWF_CHAR) 'm' )
+				 && ( internal_handle->header[ 18 ] == (EWF_CHAR) 'd' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_LINEN6;
 				}
 				else
 				{
-					LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header format: %c%c.\n", (char) internal_handle->header[ 17 ], (char) internal_handle->header[ 18 ] );
+					LIBEWF_WARNING_PRINT( "%s: unsupported header format: %c%c.\n",
+					 function, (char) internal_handle->header[ 17 ], (char) internal_handle->header[ 18 ] );
 
 					return( -1 );
 				}
@@ -1690,7 +1790,8 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 					}
 					else
 					{
-						LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header version.\n" );
+						LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+						 function );
 
 						return( -1 );
 					}
@@ -1705,28 +1806,32 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 					}
 					else
 					{
-						LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header version.\n" );
+						LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+						 function );
 
 						return( -1 );
 					}
 				}
 				else
 				{
-					LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header version.\n" );
+					LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+					 function );
 
 					return( -1 );
 				}
 			}
 			else
 			{
-				LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported header version.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+				 function );
 
 				return( -1 );
 			}
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: missing header information.\n" );
+			LIBEWF_WARNING_PRINT( "%s: missing header information.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -1737,7 +1842,8 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_determine_format: unsupported EWF file format.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unsupported EWF file format.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1756,16 +1862,19 @@ int8_t libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *inte
 	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "Notes" );
 	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "Undetermined" );
 	LIBEWF_CHAR *acquiry_software_version = LIBEWF_VERSION;
+	static char *function                 = "libewf_internal_handle_create_header_values";
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->header_values != NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: header values already created - cleaning up previous header values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: header values already created - cleaning up previous header values.\n",
+		 function );
 
 		libewf_header_values_free( internal_handle->header_values );
 	}
@@ -1773,53 +1882,90 @@ int8_t libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *inte
 
 	if( internal_handle->header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to create header values.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "case_number" ), case_number, libewf_string_length( case_number ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "case_number" ),
+	     case_number,
+	     libewf_string_length( case_number ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to set case number.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set case number.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "description" ), description, libewf_string_length( description ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "description" ),
+	     description,
+	     libewf_string_length( description ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to set description.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set description.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "evidence_number" ), evidence_number, libewf_string_length( evidence_number ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "evidence_number" ),
+	     evidence_number,
+	     libewf_string_length( evidence_number ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to set evidence number.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set evidence number.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "examiner_name" ), examiner_name, libewf_string_length( examiner_name ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "examiner_name" ),
+	     examiner_name,
+	     libewf_string_length( examiner_name ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to set examiner name.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set examiner name.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "notes" ), notes, libewf_string_length( notes ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "notes" ),
+	     notes,
+	     libewf_string_length( notes ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to set notes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set notes.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "acquiry_operating_system" ), acquiry_operating_system, libewf_string_length( acquiry_operating_system ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "acquiry_operating_system" ),
+	     acquiry_operating_system,
+	     libewf_string_length( acquiry_operating_system ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to acquiry operating system.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to acquiry operating system.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value( internal_handle->header_values, _S_LIBEWF_CHAR( "acquiry_software_version" ), acquiry_software_version, libewf_string_length( acquiry_software_version ) ) != 1 )
+	if( libewf_header_values_set_value(
+	     internal_handle->header_values,
+	     _S_LIBEWF_CHAR( "acquiry_software_version" ),
+	     acquiry_software_version,
+	     libewf_string_length( acquiry_software_version ) ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_header_values: unable to acquiry software version.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to acquiry software version.\n",
+		 function );
 
 		return( -1 );
 	}
-        /* The acquiry date, system date values and compression type will be generated automatically when set to NULL
+        /* The acquiry date, system date values and compression type
+	 * will be generated automatically when set to NULL
          */
 	return( 1 );
 }
@@ -1829,32 +1975,44 @@ int8_t libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *inte
  */
 int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values )
 {
-	time_t timestamp = time( NULL );
+	static char *function = "libewf_internal_handle_create_headers";
+	time_t timestamp      = time( NULL );
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->format == LIBEWF_FORMAT_EWF )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_ewf( header_values, timestamp, internal_handle->compression_level, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_ewf(
+		                           header_values,
+		                           timestamp,
+		                           internal_handle->compression_level,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
 	}
 	else if( internal_handle->format == LIBEWF_FORMAT_ENCASE1 )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_encase1( header_values, timestamp, internal_handle->compression_level, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_encase1(
+		                           header_values,
+		                           timestamp,
+		                           internal_handle->compression_level,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -1862,11 +2020,16 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE2 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE3 ) )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_encase2( header_values, timestamp, internal_handle->compression_level, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_encase2(
+		                           header_values,
+		                           timestamp,
+		                           internal_handle->compression_level,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -1874,30 +2037,43 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 	else if( ( internal_handle->format == LIBEWF_FORMAT_FTK )
 	 || ( internal_handle->format == LIBEWF_FORMAT_SMART ) )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_ftk( header_values, timestamp, internal_handle->compression_level, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_ftk(
+		                           header_values,
+		                           timestamp,
+		                           internal_handle->compression_level,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
 	}
 	else if( internal_handle->format == LIBEWF_FORMAT_ENCASE4 )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_encase4( header_values, timestamp, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_encase4(
+		                           header_values,
+		                           timestamp,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
-		internal_handle->header2 = libewf_header_values_generate_header2_string_encase4( header_values, timestamp, &internal_handle->header2_size );
+		internal_handle->header2 = libewf_header_values_generate_header2_string_encase4(
+		                            header_values,
+		                            timestamp,
+		                            &internal_handle->header2_size );
 
 		if( internal_handle->header2 == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header2 values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header2 values.\n",
+			 function );
 
 			libewf_common_free( internal_handle->header );
 
@@ -1909,19 +2085,27 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 	}
 	else if( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_encase4( header_values, timestamp, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_encase4(
+		                           header_values,
+		                           timestamp,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
-		internal_handle->header2 = libewf_header_values_generate_header2_string_encase5( header_values, timestamp, &internal_handle->header2_size );
+		internal_handle->header2 = libewf_header_values_generate_header2_string_encase5(
+		                            header_values,
+		                            timestamp,
+		                            &internal_handle->header2_size );
 
 		if( internal_handle->header2 == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header2 values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header2 values.\n",
+			 function );
 
 			libewf_common_free( internal_handle->header );
 
@@ -1933,19 +2117,27 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 	}
 	else if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_encase4( header_values, timestamp, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_encase4(
+		                           header_values,
+		                           timestamp,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
-		internal_handle->header2 = libewf_header_values_generate_header2_string_encase6( header_values, timestamp, &internal_handle->header2_size );
+		internal_handle->header2 = libewf_header_values_generate_header2_string_encase6(
+		                            header_values,
+		                            timestamp,
+		                            &internal_handle->header2_size );
 
 		if( internal_handle->header2 == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header2 values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header2 values.\n",
+			 function );
 
 			libewf_common_free( internal_handle->header );
 
@@ -1958,30 +2150,42 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 	else if( ( internal_handle->format == LIBEWF_FORMAT_LINEN5 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_encase5_linen( header_values, timestamp, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_encase5_linen(
+		                           header_values,
+		                           timestamp,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
 	}
 	else if( internal_handle->format == LIBEWF_FORMAT_EWFX )
 	{
-		internal_handle->header = libewf_header_values_generate_header_string_ewfx( header_values, timestamp, &internal_handle->header_size );
+		internal_handle->header = libewf_header_values_generate_header_string_ewfx(
+		                           header_values,
+		                           timestamp,
+		                           &internal_handle->header_size );
 
 		if( internal_handle->header == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+			 function );
 
 			return( -1 );
 		}
-		internal_handle->header2 = libewf_header_values_generate_header2_string_ewfx( header_values, timestamp, &internal_handle->header2_size );
+		internal_handle->header2 = libewf_header_values_generate_header2_string_ewfx(
+		                            header_values,
+		                            timestamp,
+		                            &internal_handle->header2_size );
 
 		if( internal_handle->header2 == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create header2 values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create header2 values.\n",
+			 function );
 
 			libewf_common_free( internal_handle->header );
 
@@ -1990,11 +2194,15 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 
 			return( -1 );
 		}
-		internal_handle->xheader = libewf_header_values_generate_xheader_string_ewfx( header_values, timestamp, &internal_handle->xheader_size );
+		internal_handle->xheader = libewf_header_values_generate_xheader_string_ewfx(
+		                            header_values,
+		                            timestamp,
+		                            &internal_handle->xheader_size );
 
 		if( internal_handle->xheader == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_internal_handle_create_headers: unable to create xheader values.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create xheader values.\n",
+			 function );
 
 			libewf_common_free( internal_handle->header );
 			libewf_common_free( internal_handle->header2 );

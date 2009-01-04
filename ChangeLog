@@ -10,7 +10,6 @@ Roadmap:
 * enhance thread safety
 
 To do/think about:
-* all: adjust the advertising clause in the license to be voluntary ?
 * all: add LVF support - ltree section
 * all: check for race conditions especially on change of data elements
 * all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
@@ -100,6 +99,7 @@ Next release:
 * check printf %jd and %zu for Cygwin
 
 * refactor function names into static char *
+  grep on 'PRINT( "libewf'
 * refactor some int64 to size64_t and off_t into off64_t
 * add maximum check to set functions in internal handle
 * rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
