@@ -44,7 +44,9 @@
 
 /* Function to wrap open()
  */
-int libewf_common_open( const char *filename, uint8_t flags )
+int libewf_common_open(
+     const char *filename,
+     uint8_t flags )
 {
 	static char *function = "libewf_common_open";
 #if defined( HAVE_WINDOWS_API )
@@ -95,7 +97,12 @@ int libewf_common_open( const char *filename, uint8_t flags )
 		return( -1 );
 	}
 #if defined( HAVE_WINDOWS_API )
-	if( _sopen_s( &file_descriptor, filename, open_flags, _SH_DENYRW, ( _S_IREAD | _S_IWRITE ) ) != 0 )
+	if( _sopen_s(
+	     &file_descriptor,
+	     filename,
+	     open_flags,
+	     _SH_DENYRW,
+	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: error opening file.\n",
 		 function );
@@ -104,7 +111,10 @@ int libewf_common_open( const char *filename, uint8_t flags )
 	}
 	return( file_descriptor );
 #else
-	return( open( filename, open_flags, 0644 ) );
+	return( open(
+	         filename,
+	         open_flags,
+	         0644 ) );
 #endif
 }
 
