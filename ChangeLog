@@ -40,8 +40,10 @@ Code clean up:
   if( ( section_list_entry->file_descriptor == file_descriptor ) && ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
 * all: wrap basic library calls in preperation of thread safety of library calls
 * all: remove unrequired includes
+* all: check for race conditions especially on change of data elements
 
 Finished:
+  - libewf_chunck_cache (c/h)
   - libewf_common (c/h)
   - libewf_endian (c/h)
   - libewf_header_values (c/h)
@@ -77,6 +79,10 @@ To do:
 
   - check all realloc and set values calls at the upper levels that memory is freed
     perhaps from surrounding code i.e. for the handle
+
+Version: 20060831
+* worked on code clean up and improved error handling
+* created seperate structure for chunk cache
 
 Version: 20060830
 * worked on code clean up and improved error handling

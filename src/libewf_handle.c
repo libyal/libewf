@@ -49,31 +49,32 @@
 #include "libewf_handle.h"
 
 /* Allocates memory for a new handle struct
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 {
-	LIBEWF_HANDLE *handle = (LIBEWF_HANDLE *) malloc( LIBEWF_HANDLE_SIZE );
+	LIBEWF_HANDLE *handle = NULL;
+
+	handle = (LIBEWF_HANDLE *) libewf_alloc( LIBEWF_HANDLE_SIZE );
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to allocate handle.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to allocate handle.\n" );
+
+		return( NULL );
 	}
-	/* 32k is the default chunk size
-	 */
 	handle->chunk_size                = EWF_MINIMUM_CHUNK_SIZE;
-	handle->sectors_per_chunk         = 64;
-	handle->bytes_per_sector          = 512;
+	handle->sectors_per_chunk         = 0;
+	handle->bytes_per_sector          = 0;
 	handle->chunk_count               = 0;
 	handle->sector_count              = 0;
 	handle->input_file_size           = 0;
-	/* The default maximimum size is about the size of a 64 minutes CDROM
-	 */
-	handle->ewf_file_size             = 650000000;
-	handle->chunks_per_file           = ( 650000000 - EWF_FILE_HEADER_SIZE - EWF_DATA_SIZE ) / EWF_MINIMUM_CHUNK_SIZE;
+	handle->ewf_file_size             = 0;
+	handle->chunks_per_file           = 0;
 	handle->segment_table             = NULL;
 	handle->offset_table              = NULL;
 	handle->secondary_offset_table    = NULL;
-	handle->error_granularity_sectors = 64;
+	handle->error_granularity_sectors = 0;
 	handle->error2_error_count        = 0;
 	handle->error2_sectors            = NULL;
 	handle->header                    = NULL;
@@ -87,7 +88,7 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 	handle->format                    = LIBEWF_FORMAT_UNKNOWN;
 	handle->ewf_format                = EWF_FORMAT_E01;
 	handle->index_build               = 0;
-	handle->read_error_retry          = 3;
+	handle->read_error_retry          = 0;
 	handle->cached_chunk              = 0;
 	handle->cached_data_size          = 0;
 	handle->media_type                = 0;
@@ -96,15 +97,20 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 
 	if( handle->segment_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to create segment table.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create segment table.\n" );
+
+		libewf_free( handle );
+
+		return( NULL );
 	}
 
-	handle = libewf_handle_cache_alloc( handle, ( handle->chunk_size + EWF_CRC_SIZE ) );
+	handle = libewf_handle_cache_alloc( handle, ( EWF_MINIMUM_CHUNK_SIZE + EWF_CRC_SIZE ) );
 
 	return( handle );
 }
 
 /* Allocates memory for the handle cache
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size )
 {
@@ -131,6 +137,7 @@ LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size )
 }
 
 /* Reallocates and wipes memory for the handle cache
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_HANDLE *libewf_handle_cache_realloc( LIBEWF_HANDLE *handle, uint32_t size )
 {

@@ -196,7 +196,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset
 	}
 	if( chunk > offset_table->amount )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_offset_table_set_values: allocating additional offset_table entries.\n" );
+		LIBEWF_VERBOSE_PRINT( "libewf_offset_table_set_values: allocating additional offset table entries.\n" );
 
 		offset_table = libewf_offset_table_realloc( offset_table, chunk );
 

@@ -1,5 +1,5 @@
 /*
- * EWF ltree section
+ * libewf chunk cache
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -33,59 +33,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_LTREE_H
-#define _EWF_LTREE_H
+#ifndef _LIBEWF_CHUNK_CACHE_H
+#define _LIBEWF_CHUNK_CACHE_H
 
 #include <inttypes.h>
 
-#include "ewf_header.h"
+#include "ewf_sectors.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define EWF_LTREE ewf_ltree_t
-#define EWF_LTREE_SIZE sizeof( EWF_LTREE )
+#define LIBEWF_CHUNK_CACHE libewf_chunk_cache_t
+#define LIBEWF_CHUNK_CACHE_SIZE sizeof( LIBEWF_CHUNK_CACHE )
 
-typedef struct ewf_ltree ewf_ltree_t;
+typedef struct libewf_chunk_cache libewf_chunk_cache_t;
 
-struct ewf_ltree
+struct libewf_chunk_cache
 {
-	/* Unknown
-	 * consists of 16 bytes
+	/* The amount of data in the chunk
 	 */
-	uint8_t unknown1[16];
+	uint32_t amount;
 
-	/* The size of the tree in bytes
-	 * consists of 4 bytes (32 bits)
+	/* The data buffer
 	 */
-	uint8_t tree_size[4];
+	EWF_SECTORS_CHUNK *data;
 
-	/* Unknown
-	 * consists of 4 bytes
-	 * contains 0x00
+	/* The identifier of the cached chunk
 	 */
-	uint8_t unknown2[4];
+	uint32_t identifier;
 
-	/* Unknown
-	 * consists of 4 bytes
+	/* The allocated size of the cached chunk
 	 */
-	uint8_t unknown3[4];
+	uint64_t size;
+};
 
-	/* Unknown
-	 * consists of 20 bytes
-	 * contains 0x00
-	 */
-	uint8_t unknown4[20];
-
-} __attribute__((packed));
-
-EWF_LTREE *ewf_ltree_alloc( void );
-void ewf_ltree_free( EWF_LTREE *ltree );
-EWF_LTREE *ewf_ltree_read( int file_descriptor );
-int32_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor );
-
-EWF_HEADER *ewf_tree_data_read( int file_descriptor, uint32_t size );
+LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( uint32_t size );
+LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, uint32_t size );
+void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache );
+LIBEWF_CHUNK_CACHE *libewf_chunk_cache_wipe( LIBEWF_CHUNK_CACHE *chunk_cache );
 
 #ifdef __cplusplus
 }
