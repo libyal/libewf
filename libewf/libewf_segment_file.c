@@ -2976,9 +2976,37 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		return( -1 );
 	}
+	if( internal_handle->chunk_cache == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->segment_table == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file offsets.\n",
 		 function );
 
 		return( -1 );
@@ -2990,9 +3018,30 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		return( -1 );
 	}
-	if( internal_handle->chunk_cache == NULL )
+	if( internal_handle->offset_table->file_descriptor == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table->offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table->segment_number == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing segment numbers.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table->dirty == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing dirty flags.\n",
 		 function );
 
 		return( -1 );
@@ -3018,16 +3067,33 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_offset[ segment_number ] != offset )
+	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
 	{
-		if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
+		if( internal_handle->segment_table->file_offset[ segment_number ] != offset )
 		{
-			LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
-			 function, offset );
+			if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
+				 function, offset );
 
-			return( -1 );
+				return( -1 );
+			}
+			internal_handle->segment_table->file_offset[ segment_number ] = offset;
 		}
-		internal_handle->segment_table->file_offset[ segment_number ] = offset;
+	}
+	else
+	{
+		if( internal_handle->delta_segment_table->file_offset[ segment_number ] != offset )
+		{
+			if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
+				 function, offset );
+
+				return( -1 );
+			}
+			internal_handle->delta_segment_table->file_offset[ segment_number ] = offset;
+		}
 	}
 	internal_handle->current_chunk = chunk;
 

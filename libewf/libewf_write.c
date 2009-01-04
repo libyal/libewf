@@ -1374,14 +1374,44 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
  */
 ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
 {
+	EWF_CHUNK *chunk_data   = NULL;
 	static char *function   = "libewf_write_existing_chunk";
 	size_t read_size        = 0;
+	size_t chunk_data_size  = 0;
 	uint16_t segment_number = 0;
 	int file_descriptor     = -1;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_cache == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file offsets.\n",
 		 function );
 
 		return( -1 );
@@ -1421,26 +1451,126 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	/* Check if the chunk already exists in a delta segment file
+	/* Determine the size of data to read
 	 */
-	if( internal_handle->offset_table->dirty[ chunk ] == 1 )
+	if( data_size < (size_t) internal_handle->media->chunk_size )
 	{
-		file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
-		segment_number  = internal_handle->offset_table->segment_number[ chunk ];
-
-		/* TODO
-		 * overwrite the chunk in the delta segment file
-		 */
+		read_size = (size_t) data_size;
 	}
 	else
 	{
-		/* TODO
-		 * or write the chunk to a delta segment file
+		read_size = internal_handle->media->chunk_size;
+	}
+	if( read_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid read size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+
+	/* TODO passthrough if data is chunk size
+	 * what about raw access?
+	 */
+
+	{
+		/* Read the chunk data into the chunk cache
 		 */
+		if( libewf_read_chunk(
+		     internal_handle,
+		     raw_access,
+		     chunk,
+		     0,
+		     internal_handle->chunk_cache->data,
+		     internal_handle->chunk_cache->allocated_size ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",
+			 function );
+
+			return( -1 );
+		}
+		/* Update the chunk data
+		 */
+		if( libewf_common_memcpy(
+		     &internal_handle->chunk_cache->data[ chunk_offset ],
+		     buffer,
+		     read_size ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to update data in chunk.\n",
+			 function );
+
+			return( -1 );
+		}
+		chunk_data      = internal_handle->chunk_cache->data;
+		chunk_data_size = internal_handle->chunk_cache->amount;
+	}
+	/* Swap bytes if necessary
+	 */
+	if( ( internal_handle->swap_byte_pairs == 1 )
+	 && ( libewf_endian_swap_byte_pairs( *chunk_data, chunk_data_size ) != 1 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Calculate the new CRC
+	 */
+	if( ewf_crc_calculate( chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if the chunk does not already exists in a delta segment file
+	 */
+	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
+	{
+		/* Write the chunk to a delta segment file
+		 */
+		/* TODO */
+
+		internal_handle->offset_table->dirty[ chunk ] = 1;
+	}
+	else
+	{
+		segment_number = internal_handle->offset_table->segment_number[ chunk ];
+
+		if( ( segment_number == 0 )
+		 || ( segment_number >= internal_handle->delta_segment_table->amount ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_segment_file_seek_chunk_offset( internal_handle, chunk ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
+			 function );
+
+			return( -1 );
+		}
+		/* Overwrite the chunk in the delta segment file
+		 */
+		if( libewf_section_delta_chunk_write(
+		     internal_handle, 
+		     internal_handle->offset_table->file_descriptor[ chunk ],
+		     internal_handle->delta_segment_table->file_offset[ segment_number ],
+		     chunk, 
+		     chunk_data, 
+		     chunk_crc ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write delta chunk data.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	/* Report the amount of chunk data written
 	 */
-	return( (ssize_t) read_size );
+	return( (ssize_t) write_size );
 }
 
 /* Writes a chunk of data in EWF format from a buffer at the current offset

@@ -117,10 +117,13 @@ TODO
   usage of the segment table for read/write
 * remove write_finalized
 * make buffer passthroug default behavior
+* remove libewf_common_string_copy and libewf_common_wide_string_copy ?
+  use memcpy instead
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
   chunk data and CRC
+* read dirty chunk from delta segment file
 
 Version: 20070812
 * worked on restructuring to improve internal structure
