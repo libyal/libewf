@@ -71,7 +71,7 @@
 void usage( void )
 {
 	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -f format ] [ -o offset ]\n" );
-	fprintf( stderr, "                 [ -S segment_file_size ] [ -t target_file ] [ -hsquvV ] ewf_files\n\n" );
+	fprintf( stderr, "                 [ -S segment_file_size ] [ -t target_file ] [ -hsquvVw ] ewf_files\n\n" );
 
 	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
 	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
@@ -93,6 +93,7 @@ void usage( void )
 	fprintf( stderr, "\t-u: unattended mode (disables user interaction)\n" );
 	fprintf( stderr, "\t-v: verbose output to stderr\n" );
 	fprintf( stderr, "\t-V: print version\n" );
+	fprintf( stdout, "\t-w: wipe sectors on CRC error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -133,7 +134,7 @@ int main( int argc, char * const argv[] )
 	int64_t segment_file_size    = 0;
 	uint8_t libewf_format        = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs      = 0;
-	uint8_t wipe_chunk_on_error  = 1;
+	uint8_t wipe_chunk_on_error  = 0;
 	uint8_t verbose              = 0;
 	int8_t compression_level     = LIBEWF_COMPRESSION_NONE;
 	int8_t compress_empty_block  = 0;
@@ -159,7 +160,7 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_version_fprint( stderr, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:f:ho:qsS:t:uvV" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -275,6 +276,11 @@ int main( int argc, char * const argv[] )
 				ewfoutput_copyright_fprint( stderr );
 
 				return( EXIT_SUCCESS );
+
+			case (INT_T) 'w':
+				wipe_chunk_on_error = 1;
+
+				break;
 		}
 	}
 	if( optind == argc )

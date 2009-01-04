@@ -71,7 +71,7 @@
  */
 void usage( void )
 {
-	fprintf( stdout, "Usage: ewfverify [ -d digest_type ] [ -hqsvV ] ewf_files\n\n" );
+	fprintf( stdout, "Usage: ewfverify [ -d digest_type ] [ -hqsvVw ] ewf_files\n\n" );
 
 	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stdout, "\t-h: shows this help\n" );
@@ -80,6 +80,7 @@ void usage( void )
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
 	fprintf( stdout, "\t-V: print version\n" );
+	fprintf( stdout, "\t-w: wipe sectors on CRC error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -117,7 +118,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                    = 1;
 	uint8_t calculate_sha1                   = 0;
 	uint8_t swap_byte_pairs                  = 0;
-	uint8_t wipe_chunk_on_error              = 1;
+	uint8_t wipe_chunk_on_error              = 0;
 	uint8_t verbose                          = 0;
 	int match_md5_hash                       = 0;
 	int match_sha1_hash                      = 0;
@@ -126,7 +127,7 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_version_fprint( stdout, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hsqvV" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hsqvVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -172,6 +173,11 @@ int main( int argc, char * const argv[] )
 				ewfoutput_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (INT_T) 'w':
+				wipe_chunk_on_error = 1;
+
+				break;
 		}
 	}
 	if( optind == argc )

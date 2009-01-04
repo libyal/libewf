@@ -5,6 +5,8 @@ Library:
 * improved read and write support uses delta segment files
   no changes are stored in the EWF files use ewfexport to
   create a set of changed EWF files for EnCase and FTK
+* MD5 calculation no longer part of library
+* added expirimental read/write support for > 2Gb segment files for EnCase 6.7
 
 EWF tools:
 * ewfexport no longer writes to stdout per default, default is now export.raw
@@ -13,4 +15,5 @@ EWF tools:
 Platform support:
 * Microsoft Visual Studio 2005 (express) project files have been
   added to the package
+* Debian package support added
 
