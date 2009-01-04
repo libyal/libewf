@@ -200,7 +200,7 @@ int glob_resolve(
      system_character_t * const patterns[],
      int amount_of_patterns )
 {
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	struct glob_finddata_t find_data;
 
 	system_character_t find_path[ _MAX_PATH ];
@@ -231,7 +231,7 @@ int glob_resolve(
 
 			return( -1 );
 		}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 		if( glob_splitpath(
 		     patterns[ iterator ],
 		     find_drive,

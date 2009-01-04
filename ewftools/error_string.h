@@ -31,7 +31,7 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WCSERROR_R )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define error_string_wcserror_r( error_number, string, size ) \
 	_wcserror_s( string, size, error_number )
 
@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 #if defined( HAVE_STRERROR_R )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define error_string_strerror_r( error_number, string, size ) \
 	strerror_s( string, size, error_number )
 

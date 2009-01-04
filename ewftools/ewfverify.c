@@ -22,9 +22,8 @@
  */
 
 #include <common.h>
-#include <file_stream_io.h>
 #include <memory.h>
-#include <system_string.h>
+#include <types.h>
 
 #include <stdio.h>
 
@@ -47,16 +46,18 @@
 
 #include "character_string.h"
 #include "byte_size_string.h"
+#include "digest_context.h"
 #include "ewfcommon.h"
-#include "ewfdigest_context.h"
 #include "ewfgetopt.h"
-#include "glob.h"
-#include "ewfmd5.h"
 #include "ewfoutput.h"
-#include "process_status.h"
 #include "ewfsignal.h"
-#include "ewfsha1.h"
 #include "ewfstring.h"
+#include "file_stream_io.h"
+#include "glob.h"
+#include "md5.h"
+#include "process_status.h"
+#include "sha1.h"
+#include "system_string.h"
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
@@ -113,11 +114,11 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
-	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 #endif
 
 #if !defined( HAVE_GLOB_H )
-	glob_t *glob                            = NULL;
+	glob_t *glob                               = NULL;
 #endif
 	character_t *calculated_md5_hash_string    = NULL;
 	character_t *calculated_sha1_hash_string   = NULL;
@@ -573,7 +574,7 @@ int main( int argc, char * const argv[] )
 			stored_md5_hash_result = libewf_get_md5_hash(
 						  ewfcommon_libewf_handle,
 						  md5_hash,
-						  EWFDIGEST_HASH_SIZE_MD5 );
+						  DIGEST_HASH_SIZE_MD5 );
 
 			if( stored_md5_hash_result == -1 )
 			{
@@ -596,9 +597,9 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( ewfdigest_copy_to_string(
+			if( digest_copy_to_string(
 			     md5_hash,
-			     EWFDIGEST_HASH_SIZE_MD5,
+			     DIGEST_HASH_SIZE_MD5,
 			     stored_md5_hash_string,
 			     EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
 			{

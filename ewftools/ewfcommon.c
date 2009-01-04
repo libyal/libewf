@@ -21,12 +21,10 @@
  */
 
 #include <common.h>
-#include <file_io.h>
 #include <memory.h>
 #include <narrow_string.h>
-#include <notify.h>
-#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include <errno.h>
 
@@ -65,8 +63,11 @@
 
 #include "character_string.h"
 #include "ewfcommon.h"
-#include "process_status.h"
 #include "ewfstring.h"
+#include "file_io.h"
+#include "notify.h"
+#include "process_status.h"
+#include "system_string.h"
 
 /* EWFCOMMON_BUFFER_SIZE definition is intended for testing purposes
  */
@@ -1199,11 +1200,11 @@ ssize64_t ewfcommon_read_verify(
            size_t data_buffer_size,
            void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
-	EWFMD5_CONTEXT md5_context;
-	EWFSHA1_CONTEXT sha1_context;
+	MD5_CONTEXT md5_context;
+	SHA1_CONTEXT sha1_context;
 
-	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data_buffer        = NULL;
 	uint8_t *uncompressed_data  = NULL;
@@ -1212,8 +1213,8 @@ ssize64_t ewfcommon_read_verify(
 	size64_t media_size         = 0;
 	size32_t chunk_size         = 0;
 	size_t read_size            = 0;
-	size_t md5_hash_size        = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size       = EWFDIGEST_HASH_SIZE_SHA1;
+	size_t md5_hash_size        = DIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size       = DIGEST_HASH_SIZE_SHA1;
 	ssize64_t total_read_count  = 0;
 	ssize_t read_count          = 0;
 #if defined( HAVE_RAW_ACCESS )
@@ -1320,7 +1321,7 @@ ssize64_t ewfcommon_read_verify(
 #endif
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_initialize(
+		if( md5_initialize(
 		     &md5_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
@@ -1331,7 +1332,7 @@ ssize64_t ewfcommon_read_verify(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_initialize(
+		if( sha1_initialize(
 		     &sha1_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
@@ -1453,14 +1454,14 @@ ssize64_t ewfcommon_read_verify(
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update(
+			md5_update(
 			 &md5_context,
 			 uncompressed_data,
 			 read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update(
+			sha1_update(
 			 &sha1_context,
 			 uncompressed_data,
 			 read_count );
@@ -1507,14 +1508,14 @@ ssize64_t ewfcommon_read_verify(
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_finalize( &md5_context, md5_hash, &md5_hash_size ) != 1 )
+		if( md5_finalize( &md5_context, md5_hash, &md5_hash_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash.\n",
 			 function );
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
@@ -1528,14 +1529,17 @@ ssize64_t ewfcommon_read_verify(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_finalize( &sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
+		if( sha1_finalize(
+		     &sha1_context,
+		     sha1_hash,
+		     &sha1_hash_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash.\n",
 			 function );
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
@@ -1574,11 +1578,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            size_t data_buffer_size,
            void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
-	EWFMD5_CONTEXT md5_context;
-	EWFSHA1_CONTEXT sha1_context;
+	MD5_CONTEXT md5_context;
+	SHA1_CONTEXT sha1_context;
 
-	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data_buffer         = NULL;
 	static char *function        = "ewfcommon_write_from_file_descriptor";
@@ -1586,8 +1590,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	ssize64_t write_count        = 0;
 	size32_t chunk_size          = 0;
 	ssize32_t read_count         = 0;
-	size_t md5_hash_size         = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size        = EWFDIGEST_HASH_SIZE_SHA1;
+	size_t md5_hash_size         = DIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size        = DIGEST_HASH_SIZE_SHA1;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *raw_write_data      = NULL;
 	size_t raw_write_buffer_size = 0;
@@ -1701,7 +1705,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_initialize(
+		if( md5_initialize(
 		     &md5_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
@@ -1712,7 +1716,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_initialize(
+		if( sha1_initialize(
 		     &sha1_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
@@ -1819,14 +1823,14 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update(
+			md5_update(
 			 &md5_context,
 			 data_buffer,
 			 read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update(
+			sha1_update(
 			 &sha1_context,
 			 data_buffer,
 			 read_count );
@@ -1885,7 +1889,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_finalize(
+		if( md5_finalize(
 		     &md5_context,
 		     md5_hash,
 		     &md5_hash_size ) != 1 )
@@ -1895,7 +1899,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
@@ -1937,7 +1941,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_finalize(
+		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
 		     &sha1_hash_size ) != 1 )
@@ -1947,7 +1951,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
@@ -2017,11 +2021,11 @@ ssize64_t ewfcommon_export_raw(
            size_t data_buffer_size,
            void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
-	EWFMD5_CONTEXT md5_context;
-	EWFSHA1_CONTEXT sha1_context;
+	MD5_CONTEXT md5_context;
+	SHA1_CONTEXT sha1_context;
 
-	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data_buffer        = NULL;
 	uint8_t *uncompressed_data  = NULL;
@@ -2029,8 +2033,8 @@ ssize64_t ewfcommon_export_raw(
 	size64_t media_size         = 0;
 	ssize64_t total_read_count  = 0;
 	size32_t chunk_size         = 0;
-	size_t md5_hash_size        = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size       = EWFDIGEST_HASH_SIZE_SHA1;
+	size_t md5_hash_size        = DIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size       = DIGEST_HASH_SIZE_SHA1;
 	size_t read_size            = 0;
 	ssize_t read_count          = 0;
 	ssize_t write_count         = 0;
@@ -2192,7 +2196,7 @@ ssize64_t ewfcommon_export_raw(
 #endif
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_initialize(
+		if( md5_initialize(
 		     &md5_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
@@ -2203,7 +2207,7 @@ ssize64_t ewfcommon_export_raw(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_initialize(
+		if( sha1_initialize(
 		     &sha1_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
@@ -2346,14 +2350,14 @@ ssize64_t ewfcommon_export_raw(
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update(
+			md5_update(
 			 &md5_context,
 			 uncompressed_data,
 			 read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update(
+			sha1_update(
 			 &sha1_context,
 			 uncompressed_data,
 			 read_count );
@@ -2400,7 +2404,7 @@ ssize64_t ewfcommon_export_raw(
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_finalize(
+		if( md5_finalize(
 		     &md5_context,
 		     md5_hash,
 		     &md5_hash_size ) != 1 )
@@ -2410,7 +2414,7 @@ ssize64_t ewfcommon_export_raw(
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
@@ -2424,7 +2428,7 @@ ssize64_t ewfcommon_export_raw(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_finalize(
+		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
 		     &sha1_hash_size ) != 1 )
@@ -2434,7 +2438,7 @@ ssize64_t ewfcommon_export_raw(
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
@@ -2479,11 +2483,11 @@ ssize64_t ewfcommon_export_ewf(
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
-	EWFMD5_CONTEXT md5_context;
-	EWFSHA1_CONTEXT sha1_context;
+	MD5_CONTEXT md5_context;
+	SHA1_CONTEXT sha1_context;
 
-	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data_buffer           = NULL;
 	uint8_t *uncompressed_data     = NULL;
@@ -2492,8 +2496,8 @@ ssize64_t ewfcommon_export_ewf(
 	size32_t chunk_size            = 0;
 	size_t read_size               = 0;
 	ssize64_t total_read_count     = 0;
-	size_t md5_hash_size           = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size          = EWFDIGEST_HASH_SIZE_SHA1;
+	size_t md5_hash_size           = DIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size          = DIGEST_HASH_SIZE_SHA1;
 	ssize_t read_count             = 0;
 	ssize_t write_count            = 0;
 	uint8_t read_all               = 0;
@@ -2759,7 +2763,7 @@ ssize64_t ewfcommon_export_ewf(
 #endif
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_initialize(
+		if( md5_initialize(
 		     &md5_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
@@ -2770,7 +2774,7 @@ ssize64_t ewfcommon_export_ewf(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_initialize(
+		if( sha1_initialize(
 		     &sha1_context ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
@@ -2936,14 +2940,14 @@ ssize64_t ewfcommon_export_ewf(
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update(
+			md5_update(
 			 &md5_context,
 			 uncompressed_data,
 			 read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update(
+			sha1_update(
 			 &sha1_context,
 			 uncompressed_data,
 			 read_count );
@@ -3004,7 +3008,7 @@ ssize64_t ewfcommon_export_ewf(
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_finalize(
+		if( md5_finalize(
 		     &md5_context,
 		     md5_hash,
 		     &md5_hash_size ) != 1 )
@@ -3014,7 +3018,7 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
@@ -3056,7 +3060,7 @@ ssize64_t ewfcommon_export_ewf(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_finalize(
+		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
 		     &sha1_hash_size ) != 1 )
@@ -3066,7 +3070,7 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
-		if( ewfdigest_copy_to_string(
+		if( digest_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,

@@ -1,5 +1,5 @@
 /*
- * SHA1 support for the ewftools
+ * SHA1 support
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,15 +20,15 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFSHA1_H )
-#define _EWFSHA1_H
+#if !defined( _SHA1_H )
+#define _SHA1_H
 
 #include <common.h>
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
 #include <openssl/sha.h>
 #else
-#include "ewfdigest_context.h"
+#include "digest_context.h"
 #endif
 
 #if defined( __cplusplus )
@@ -37,29 +37,29 @@ extern "C" {
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
 
-#define EWFSHA1_CONTEXT	SHA_CTX
+#define SHA1_CONTEXT	SHA_CTX
 
-#define ewfsha1_initialize( context ) \
+#define sha1_initialize( context ) \
 	SHA1_Init( context )
 
-#define ewfsha1_update( context, buffer, size ) \
+#define sha1_update( context, buffer, size ) \
 	SHA1_Update( context, buffer, size )
 
-#define ewfsha1_finalize( context, hash, size ) \
+#define sha1_finalize( context, hash, size ) \
 	SHA1_Final( hash, context )
 
 #else
 
-#define EWFSHA1_CONTEXT	EWFDIGEST_CONTEXT
+#define SHA1_CONTEXT	digest_context_t
 
-#define ewfsha1_initialize( context ) \
-	ewfdigest_context_initialize( context, EWFDIGEST_CONTEXT_TYPE_SHA1 )
+#define sha1_initialize( context ) \
+	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_SHA1 )
 
-#define ewfsha1_update( context, buffer, size ) \
-	ewfdigest_context_update( context, buffer, size )
+#define sha1_update( context, buffer, size ) \
+	digest_context_update( context, buffer, size )
 
-#define ewfsha1_finalize( context, hash, size ) \
-	ewfdigest_context_finalize( context, hash, size )
+#define sha1_finalize( context, hash, size ) \
+	digest_context_finalize( context, hash, size )
 
 #endif
 

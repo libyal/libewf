@@ -804,7 +804,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-#if !defined( HAVE_WINDOWS_API )
+#if !defined( WINAPI )
 	if( S_ISBLK( input_file_stat.st_mode )
 	 || S_ISCHR( input_file_stat.st_mode ) )
 	{

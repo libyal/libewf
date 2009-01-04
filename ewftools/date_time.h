@@ -38,14 +38,14 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WCTIME_R )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define date_time_wctime( timestamp, string, size ) \
 	( _wctime_s( string, size, timestamp ) != 0 ? NULL : string )
 #endif
 #endif
 
 #if defined( HAVE_LOCALTIME_R )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define date_time_localtime_r( timestamp, time_elements ) \
 	localtime_s( time_elements, timestamp )
 
@@ -56,7 +56,7 @@ extern "C" {
 #endif
 
 #if defined( HAVE_GMTIME_R )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define date_time_gmtime_r( timestamp, time_elements ) \
 	gmtime_s( time_elements, timestamp )
 
@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 #if defined( HAVE_CTIME_R )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define date_time_ctime( timestamp, string, size ) \
 	( ctime_s( string, size, timestamp ) != 0 ? NULL : string )
 
@@ -91,7 +91,7 @@ char *libewf_date_time_ctime(
 #endif
 
 #if defined( HAVE_MKTIME )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define date_time_mktime( time_elements ) \
 	mktime( time_elements )
 

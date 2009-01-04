@@ -80,7 +80,7 @@ int ewfsignal_detach(
 	return( 1 );
 }
 
-#elif defined(HAVE_WINDOWS_API)
+#elif defined(WINAPI)
 
 #include <windows.h>
 #include <winnt.h>

@@ -1,5 +1,5 @@
 /*
- * Crypographic digest wrapper code for ewftools
+ * Crypographic digest context
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,8 +20,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFDIGEST_CONTEXT_H )
-#define _EWFDIGEST_CONTEXT_H
+#if !defined( _DIGEST_CONTEXT_H )
+#define _DIGEST_CONTEXT_H
 
 #include <common.h>
 #include <types.h>
@@ -33,46 +33,43 @@
 #include <wincrypt.h>
 #endif
 
-#include "ewfdigest_hash.h"
+#include "digest_hash.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define EWFDIGEST_CONTEXT_TYPE_MD5		(uint8_t) 'm'
-#define EWFDIGEST_CONTEXT_TYPE_SHA1		(uint8_t) 's'
+#define DIGEST_CONTEXT_TYPE_MD5		(uint8_t) 'm'
+#define DIGEST_CONTEXT_TYPE_SHA1	(uint8_t) 's'
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-#define EWFDIGEST_CONTEXT EVP_MD_CTX
+typedef EVP_MD_CTX digest_context_t;
 
-#else
-#define EWFDIGEST_CONTEXT ewfdigest_context_t
+#elif defined( HAVE_WINCPRYPT_H )
+typedef struct digest_context digest_context_t;
 
-#if defined( HAVE_WINCPRYPT_H )
-typedef struct ewfdigest_context ewfdigest_context_t;
-
-struct ewfdigest_context
+struct digest_context
 {
 	HCRYPTPROV crypt_provider;
 	HCRYPTHASH hash;
 };
+
 #else
-typedef int ewfdigest_context_t;
-#endif
+typedef int digest_context_t;
 #endif
 
-int ewfdigest_context_initialize(
-     EWFDIGEST_CONTEXT *digest_context,
+int digest_context_initialize(
+     digest_context_t *digest_context,
      uint8_t type );
 
-int ewfdigest_context_update(
-     EWFDIGEST_CONTEXT *digest_context,
+int digest_context_update(
+     digest_context_t *digest_context,
      uint8_t *buffer,
      size_t size );
 
-int ewfdigest_context_finalize(
-     EWFDIGEST_CONTEXT *digest_context,
-     ewfdigest_hash_t *digest_hash,
+int digest_context_finalize(
+     digest_context_t *digest_context,
+     digest_hash_t *digest_hash,
      size_t *size );
 
 #if defined( __cplusplus )

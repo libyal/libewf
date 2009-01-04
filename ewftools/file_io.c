@@ -45,7 +45,7 @@ int libcommon_file_io_exists(
 
 		return( -1 );
 	}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
@@ -88,7 +88,7 @@ int libcommon_file_io_wexists(
 
 		return( -1 );
 	}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,
@@ -124,7 +124,7 @@ int libcommon_file_io_open(
 
 		return( -1 );
 	}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
@@ -169,7 +169,7 @@ int libcommon_file_io_wopen(
 
 		return( -1 );
 	}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,

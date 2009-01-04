@@ -1,5 +1,5 @@
 /*
- * Crypographic hash for ewftools
+ * Crypographic digest hash
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -24,18 +24,18 @@
 #include <notify.h>
 #include <types.h>
 
-#include "ewfdigest_hash.h"
+#include "digest_hash.h"
 
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful, 0 if hash was not set, or -1 on error
  */
-int ewfdigest_copy_to_string(
-     ewfdigest_hash_t *digest_hash,
+int digest_copy_to_string(
+     digest_hash_t *digest_hash,
      size_t size_digest_hash,
      character_t *string,
      size_t size_string )
 {
-	static char *function       = "ewfdigest_copy_to_string";
+	static char *function       = "digest_copy_to_string";
 	size_t string_iterator      = 0;
 	size_t digest_hash_iterator = 0;
 	uint8_t digest_digit        = 0;

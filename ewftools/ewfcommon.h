@@ -24,9 +24,6 @@
 #define _EWFCOMMON_H
 
 #include <common.h>
-#include <date_time.h>
-#include <file_stream_io.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <stdio.h>
@@ -35,12 +32,15 @@
 #include <libewf/handle.h>
 
 #include "character_string.h"
+#include "date_time.h"
+#include "digest_context.h"
 #include "error_string.h"
-#include "ewfdigest_context.h"
-#include "ewfmd5.h"
 #include "ewfsignal.h"
-#include "ewfsha1.h"
+#include "file_stream_io.h"
+#include "md5.h"
 #include "process_status.h"
+#include "sha1.h"
+#include "system_string.h"
 
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
 #define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1024 * 1024 )

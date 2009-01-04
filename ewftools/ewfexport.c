@@ -55,17 +55,17 @@
 
 #include "character_string.h"
 #include "byte_size_string.h"
+#include "digest_context.h"
 #include "ewfcommon.h"
-#include "ewfdigest_context.h"
 #include "ewfgetopt.h"
-#include "glob.h"
 #include "ewfinput.h"
-#include "ewfmd5.h"
 #include "ewfoutput.h"
-#include "process_status.h"
 #include "ewfsignal.h"
-#include "ewfsha1.h"
 #include "ewfstring.h"
+#include "glob.h"
+#include "md5.h"
+#include "process_status.h"
+#include "sha1.h"
 
 #define EWFEXPORT_INPUT_BUFFER_SIZE	64
 
@@ -254,7 +254,7 @@ int main( int argc, char * const argv[] )
 	ewfoutput_version_fprint(
 	 stderr,
 	 program );
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _setmode(
 	     _fileno(
 	      stdout ),

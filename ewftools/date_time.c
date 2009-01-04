@@ -127,7 +127,7 @@ struct tm *libewf_date_time_localtime(
 		return( NULL );
 	}
 #if defined( date_time_localtime_r )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( date_time_localtime_r(
 	     timestamp,
 	     time_elements ) != 0 )
@@ -207,7 +207,7 @@ struct tm *libewf_date_time_gmtime(
 		return( NULL );
 	}
 #if defined( date_time_gmtime_r )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( date_time_gmtime_r(
 	     timestamp,
 	     time_elements ) != 0 )

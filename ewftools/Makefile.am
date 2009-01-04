@@ -10,23 +10,23 @@ ewfacquire_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
 	date_time.c date_time.h \
+	digest_context.c digest_context.h \
+	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfacquire.c \
 	ewfcommon.c ewfcommon.h \
-	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
-	ewfmd5.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
-	ewfsha1.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
+	sha1.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
@@ -36,23 +36,23 @@ ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
 	date_time.c date_time.h \
+	digest_context.c digest_context.h \
+	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfacquirestream.c \
 	ewfcommon.c ewfcommon.h \
-	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
-	ewfmd5.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
-	ewfsha1.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
+	sha1.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
@@ -62,23 +62,23 @@ ewfalter_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
 	date_time.c date_time.h \
+	digest_context.c digest_context.h \
+	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfalter.c \
 	ewfcommon.c ewfcommon.h \
-	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
-	ewfmd5.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
-	ewfsha1.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
+	sha1.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
@@ -88,22 +88,22 @@ ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
 	date_time.c date_time.h \
+	digest_context.c digest_context.h \
+	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
-	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfexport.c \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
-	ewfmd5.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
-	ewfsha1.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
+	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
+	sha1.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
@@ -113,22 +113,22 @@ ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
 	date_time.c date_time.h \
+	digest_context.c digest_context.h \
+	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
-	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfguid.c ewfguid.h \
 	ewfinfo.c \
-	ewfmd5.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
-	ewfsha1.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
+	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
+	sha1.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
@@ -138,22 +138,22 @@ ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
 	date_time.c date_time.h \
+	digest_context.c digest_context.h \
+	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
-	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
-	ewfmd5.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
-	ewfsha1.h \
 	ewfverify.c \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
+	sha1.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 

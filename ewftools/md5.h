@@ -1,5 +1,5 @@
 /*
- * Crypographic hash for ewftools
+ * MD5 support
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,28 +20,48 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFDIGEST_HASH_H )
-#define _EWFDIGEST_HASH_H
+#if !defined( _MD5_H )
+#define _MD5_H
 
 #include <common.h>
-#include <types.h>
 
-#include "character_string.h"
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
+#include <openssl/md5.h>
+#else
+#include "digest_context.h"
+#endif
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define EWFDIGEST_HASH_SIZE_MD5		(size_t) ( sizeof( ewfdigest_hash_t ) * 16 )
-#define EWFDIGEST_HASH_SIZE_SHA1	(size_t) ( sizeof( ewfdigest_hash_t ) * 20 )
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
 
-typedef uint8_t ewfdigest_hash_t;
+#define MD5_CONTEXT	MD5_CTX
 
-int ewfdigest_copy_to_string(
-     ewfdigest_hash_t *digest_hash,
-     size_t size_digest_hash,
-     character_t *string,
-     size_t size_string );
+#define md5_initialize( context ) \
+	MD5_Init( context )
+
+#define md5_update( context, buffer, size ) \
+	MD5_Update( context, buffer, size )
+
+#define md5_finalize( context, hash, size ) \
+	MD5_Final( hash, context )
+
+#else
+
+#define MD5_CONTEXT	digest_context_t
+
+#define md5_initialize( context ) \
+	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_MD5 )
+
+#define md5_update( context, buffer, size ) \
+	digest_context_update( context, buffer, size )
+
+#define md5_finalize( context, hash, size ) \
+	digest_context_finalize( context, hash, size )
+
+#endif
 
 #if defined( __cplusplus )
 }

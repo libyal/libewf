@@ -21,10 +21,7 @@
  */
 
 #include <common.h>
-#include <date_time.h>
 #include <memory.h>
-#include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <errno.h>
@@ -80,12 +77,15 @@
 
 #include "character_string.h"
 #include "byte_size_string.h"
+#include "date_time.h"
+#include "digest_context.h"
 #include "error_string.h"
-#include "ewfdigest_context.h"
-#include "ewfmd5.h"
-#include "ewfsha1.h"
 #include "ewfstring.h"
 #include "ewfoutput.h"
+#include "md5.h"
+#include "notify.h"
+#include "sha1.h"
+#include "system_string.h"
 
 /* Print the version information to a stream
  */
@@ -1155,7 +1155,7 @@ void ewfoutput_hash_values_fprint(
 {
 	character_t hash_identifier[ 32 ];
 	character_t hash_value[ 128 ];
-	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 
 	character_t *stored_md5_hash_string  = NULL;
 	static char *function                = "ewfoutput_hash_values_fprint";
@@ -1191,7 +1191,7 @@ void ewfoutput_hash_values_fprint(
 		if( libewf_get_md5_hash(
 		     handle,
 		     md5_hash,
-		     EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
+		     DIGEST_HASH_SIZE_MD5 ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to retrieve MD5 hash.\n",
 			 function );
@@ -1202,9 +1202,9 @@ void ewfoutput_hash_values_fprint(
 							  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( ( stored_md5_hash_string != NULL )
-		 && ( ewfdigest_copy_to_string(
+		 && ( digest_copy_to_string(
 		       md5_hash,
-		       EWFDIGEST_HASH_SIZE_MD5,
+		       DIGEST_HASH_SIZE_MD5,
 		       stored_md5_hash_string,
 		       EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
 		{

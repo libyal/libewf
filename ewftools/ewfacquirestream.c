@@ -240,7 +240,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _setmode(
 	     _fileno(
 	      stdin ),
