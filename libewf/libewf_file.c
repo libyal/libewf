@@ -2505,8 +2505,6 @@ int libewf_parse_header_values(
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse xheader.\n",
 		 function );
-
-		return( -1 );
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header2 != NULL )
@@ -2518,8 +2516,6 @@ int libewf_parse_header_values(
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse header2.\n",
 		 function );
-
-		return( -1 );
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header != NULL )
@@ -2531,8 +2527,6 @@ int libewf_parse_header_values(
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse header.\n",
 		 function );
-
-		return( -1 );
 	}
 	if( internal_handle->header_values == NULL )
 	{
