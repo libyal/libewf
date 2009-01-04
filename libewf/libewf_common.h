@@ -210,7 +210,10 @@ char *libewf_common_ctime( const time_t *timestamp );
 wchar_t *libewf_common_wide_ctime( const time_t *timestamp );
 #endif
 
-#if defined( HAVE_MKTIME )
+#if defined( HAVE_WINDOWS_API )
+#define libewf_common_mktime( time_elements ) \
+	mktime( time_elements )
+#elif defined( HAVE_MKTIME )
 #define libewf_common_mktime( time_elements ) \
 	mktime( time_elements )
 #else

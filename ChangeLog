@@ -110,7 +110,6 @@ Code clean up
 
 Next release:
 * full platform test
-* change string duplicate function to macro?
 
 * add maximum check to set functions in file/internal handle
 * move open segment files in file to segment file to read segment table function
@@ -148,6 +147,8 @@ CLOSED
   - does this work with application and library memory space?
   - if so remove libewf_string include from ewfacquire
   not needed
+* change string duplicate function to macro?
+  no, strndup is not available on all platforms
 
 Version: 20071110
 * updated MSVSC++ project files
@@ -155,6 +156,7 @@ Version: 20071110
 * automated delta file testing
 * added libewf_convert_date_xheader_value
 * added ctime date format to ewfinfo which is now default
+  refactored header values dat conversion functions
 
 Version: 20071107
 * worked on delta file
