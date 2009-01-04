@@ -133,7 +133,6 @@ Next release:
 * libewf_parse_header_values refactor to check if header values are already
   set and pass header values reference as parameter
 
-* set crc errors in raw access verify
 * merge alloc and realloc blocks
 
 * change uppercase type definitions to lowercase _t type definitions
@@ -142,6 +141,8 @@ Next release:
 
 TODO
 * test abort
+* build in crc check before write to tackle corruption issue !
+
 * implement low memory usage
 
 * create libewf_create_handle and libewf_destroy_handle functions?
@@ -151,6 +152,8 @@ TODO
 * create internal value to limit memory use
   - for write only offset table is not needed etc.
 * what about open read write and set functions?
+* check >16375 chunks offset table in encase 4 and earlier formats?
+* refactor libewf_write_process_chunk_data not to use internal handle
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

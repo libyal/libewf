@@ -4284,7 +4284,8 @@ ssize_t libewf_section_debug_read(
 
 		return( -1 );
 	}
-	data = (uint8_t *) libewf_common_alloc( (size_t) section_size );
+	data = (uint8_t *) libewf_common_alloc(
+	                    (size_t) section_size );
 
 	if( data == NULL )
 	{
@@ -4307,7 +4308,8 @@ ssize_t libewf_section_debug_read(
 
 		return( -1 );
 	}
-	uncompressed_data = (uint8_t *) libewf_common_alloc( uncompressed_size );
+	uncompressed_data = (uint8_t *) libewf_common_alloc(
+	                                 uncompressed_size );
 
 	if( uncompressed_data == NULL )
 	{

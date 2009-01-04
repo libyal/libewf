@@ -1272,7 +1272,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_initialize( &md5_context ) != 1 )
+		if( ewfmd5_initialize(
+		     &md5_context ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 digest context.\n",
 			 function );
@@ -1282,7 +1283,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_initialize( &sha1_context ) != 1 )
+		if( ewfsha1_initialize(
+		     &sha1_context ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
@@ -1295,7 +1297,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 #else
 	data_buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-	data_buffer = (uint8_t *) libewf_common_alloc( data_buffer_size * sizeof( uint8_t ) );
+	data_buffer = (uint8_t *) libewf_common_alloc(
+	                           data_buffer_size * sizeof( uint8_t ) );
 
 	if( data_buffer == NULL )
 	{
@@ -1306,7 +1309,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 #if defined( HAVE_RAW_ACCESS )
 	raw_data_buffer_size = data_buffer_size * 2;
-	raw_data_buffer      = (uint8_t *) libewf_common_alloc( raw_data_buffer_size * sizeof( uint8_t ) );
+	raw_data_buffer      = (uint8_t *) libewf_common_alloc(
+	                                    raw_data_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_data_buffer == NULL )
 	{
@@ -1378,11 +1382,17 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update( &md5_context, data_buffer, read_count );
+			ewfmd5_update(
+			 &md5_context,
+			 data_buffer,
+			 read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update( &sha1_context, data_buffer, read_count );
+			ewfsha1_update(
+			 &sha1_context,
+			 data_buffer,
+			 read_count );
 		}
 #if defined( HAVE_RAW_ACCESS )
 		write_count = ewfcommon_raw_write_ewf(
@@ -1417,7 +1427,9 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		 */
 		if( callback != NULL )
 		{
-			callback( (size64_t) total_write_count, write_size );
+			callback(
+		         (size64_t) total_write_count,
+		         write_size );
 		}
 	}
 	libewf_common_free( data_buffer );
@@ -1427,7 +1439,10 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 	if( calculate_md5 == 1 )
 	{
-		if( ewfmd5_finalize( &md5_context, md5_hash, &md5_hash_size ) != 1 )
+		if( ewfmd5_finalize(
+		     &md5_context,
+		     md5_hash,
+		     &md5_hash_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
 			 function );
@@ -1472,7 +1487,10 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_finalize( &sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
+		if( ewfsha1_finalize(
+		     &sha1_context,
+		     sha1_hash,
+		     &sha1_hash_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
 			 function );
@@ -1520,7 +1538,14 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 /* Reads the media data and exports it in raw format
  * Returns a -1 on error, the amount of bytes read on success
  */
-ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t export_size, off64_t read_offset, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_export_raw(
+           LIBEWF_HANDLE *handle,
+           CHAR_T *target_filename,
+           size64_t export_size,
+           off64_t read_offset,
+           uint8_t swap_byte_pairs,
+           uint8_t wipe_chunk_on_error,
+           void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	uint8_t *data               = NULL;
 	uint8_t *uncompressed_data  = NULL;
@@ -1555,13 +1580,18 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 
 		return( -1 );
 	}
-	if( CHAR_T_COMPARE( target_filename, _S_CHAR_T( "-" ), 1 ) == 0 )
+	if( CHAR_T_COMPARE(
+	     target_filename,
+	     _S_CHAR_T( "-" ),
+	     1 ) == 0 )
 	{
 		file_descriptor = 1;
 	}
 	else
 	{
-		file_descriptor = libewf_common_open( target_filename, LIBEWF_OPEN_WRITE );
+		file_descriptor = libewf_common_open(
+		                   target_filename,
+		                   LIBEWF_OPEN_WRITE );
 
 		if( file_descriptor == -1 )
 		{
@@ -1571,14 +1601,18 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 			return( -1 );
 		}
 	}
-	if( libewf_get_media_size( handle, &media_size ) != 1 )
+	if( libewf_get_media_size(
+	     handle,
+	     &media_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
+	if( libewf_get_chunk_size(
+	     handle,
+	     &chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
 		 function );
@@ -1617,7 +1651,9 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 	}
 	read_all = (uint8_t) ( ( export_size == media_size ) && ( read_offset == 0 ) );
 
-	if( libewf_set_read_wipe_chunk_on_error( handle, wipe_chunk_on_error ) != 1 )
+	if( libewf_set_read_wipe_chunk_on_error(
+	     handle,
+	     wipe_chunk_on_error ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set wipe chunk on error.\n",
 		 function );
@@ -1625,14 +1661,18 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 		return( -1 );
 	}
 #if defined( HAVE_RAW_ACCESS )
-	if( libewf_get_sectors_per_chunk( handle, &sectors_per_chunk ) != 1 )
+	if( libewf_get_sectors_per_chunk(
+	     handle,
+	     &sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to get sectors per chunk.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) != 1 )
+	if( libewf_get_bytes_per_sector(
+	     handle,
+	     &bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sectors.\n",
 		 function );
@@ -1643,7 +1683,8 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 #else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-	data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
+	data = (uint8_t *) libewf_common_alloc(
+	                    buffer_size * sizeof( uint8_t ) );
 
 	if( data == NULL )
 	{
@@ -1656,7 +1697,8 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 	/* The EWF-S01 format uses compression this will add bytes
 	 */
 	raw_read_buffer_size = buffer_size * 2;
-	raw_read_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_read_data        = (uint8_t *) libewf_common_alloc(
+	                                    raw_read_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_read_data == NULL )
 	{
@@ -1786,7 +1828,16 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 /* Reads the media data and exports it in EWF format
  * Returns a -1 on error, the amount of bytes read on success
  */
-ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t export_size, off64_t read_offset, uint8_t calculate_md5, uint8_t calculate_sha1, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_export_ewf(
+           LIBEWF_HANDLE *handle,
+           LIBEWF_HANDLE *export_handle,
+           size64_t export_size,
+           off64_t read_offset,
+           uint8_t calculate_md5,
+           uint8_t calculate_sha1,
+           uint8_t swap_byte_pairs,
+           uint8_t wipe_chunk_on_error,
+           void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1835,14 +1886,18 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	if( libewf_get_media_size( handle, &media_size ) != 1 )
+	if( libewf_get_media_size(
+	     handle,
+	     &media_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
+	if( libewf_get_chunk_size(
+	     handle,
+	     &chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
 		 function );
@@ -1879,21 +1934,27 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	if( libewf_set_media_size( export_handle, export_size ) != 1 )
+	if( libewf_set_media_size(
+	     export_handle,
+	     export_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set media size in export handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_parse_header_values( handle, LIBEWF_DATE_FORMAT_ISO8601 ) != 1 )
+	if( libewf_parse_header_values(
+	     handle,
+	     LIBEWF_DATE_FORMAT_ISO8601 ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse header values in handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_copy_header_values( export_handle, handle ) != 1 )
+	if( libewf_copy_header_values(
+	     export_handle,
+	     handle ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set copy header values to export handle.\n",
 		 function );
@@ -1902,7 +1963,9 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	}
 	read_all = (uint8_t) ( ( export_size == media_size ) && ( read_offset == 0 ) );
 
-	if( libewf_set_read_wipe_chunk_on_error( handle, wipe_chunk_on_error ) != 1 )
+	if( libewf_set_read_wipe_chunk_on_error(
+	     handle,
+	     wipe_chunk_on_error ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set wipe chunk on error.\n",
 		 function );
@@ -1910,14 +1973,18 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		return( -1 );
 	}
 #if defined( HAVE_RAW_ACCESS )
-	if( libewf_get_sectors_per_chunk( handle, &sectors_per_chunk ) != 1 )
+	if( libewf_get_sectors_per_chunk(
+	     handle,
+	     &sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to get sectors per chunk.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) != 1 )
+	if( libewf_get_bytes_per_sector(
+	     handle,
+	     &bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sectors.\n",
 		 function );
@@ -1963,7 +2030,8 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	/* The EWF-S01 format uses compression this will add bytes
 	 */
 	raw_read_buffer_size = buffer_size * 2;
-	raw_read_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_read_data        = (uint8_t *) libewf_common_alloc(
+	                                    raw_read_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_read_data == NULL )
 	{
@@ -1975,7 +2043,8 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		return( -1 );
 	}
 	raw_write_buffer_size = buffer_size * 2;
-	raw_write_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_write_data        = (uint8_t *) libewf_common_alloc(
+	                                     raw_read_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_read_data == NULL )
 	{
@@ -2173,7 +2242,10 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	}
 	if( calculate_sha1 == 1 )
 	{
-		if( ewfsha1_finalize( &sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
+		if( ewfsha1_finalize(
+		     &sha1_context,
+		     sha1_hash,
+		     &sha1_hash_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
 			 function );
@@ -2192,7 +2264,8 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			return( -1 );
 		}
 	}
-	write_count = libewf_write_finalize( export_handle );
+	write_count = libewf_write_finalize(
+	               export_handle );
 
 	if( write_count == -1 )
 	{

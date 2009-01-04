@@ -1012,7 +1012,9 @@ ssize_t libewf_segment_file_write_chunks_data(
 	 */
 	if( write_crc != 0 )
 	{
-		if( libewf_endian_revert_32bit( *chunk_crc, calculated_crc_buffer ) != 1 )
+		if( libewf_endian_revert_32bit(
+		     *chunk_crc,
+		     calculated_crc_buffer ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 			 function );

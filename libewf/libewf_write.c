@@ -811,7 +811,11 @@ ssize_t libewf_write_process_chunk_data(
 	}
 	else
 	{
-		*chunk_crc      = ewf_crc_calculate( chunk_data, chunk_data_size, 1 );
+		*chunk_crc = ewf_crc_calculate(
+		              chunk_data,
+		              chunk_data_size,
+		              1 );
+
 		data_write_size = chunk_data_size;
 		*is_compressed  = 0;
 
