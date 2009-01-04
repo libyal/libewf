@@ -20,8 +20,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_DEFINIONS_H )
-#define _LIBEWF_DEFINIONS_H
+#if !defined( _LIBEWF_DEFINITIONS_H )
+#define _LIBEWF_DEFINITIONS_H
 
 #include <libewf/types.h>
 
