@@ -913,7 +913,7 @@ int libewf_internal_handle_initialize_media_values(
      size64_t media_size,
      libewf_error_t **error )
 {
-	static char *function            = "libewf_internal_handle_initialize_format";
+	static char *function            = "libewf_internal_handle_initialize_media_values";
 	size32_t chunk_size              = 0;
 	size64_t maximum_input_file_size = 0;
 	int64_t amount_of_chunks         = 0;

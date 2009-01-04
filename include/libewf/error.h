@@ -38,6 +38,7 @@ enum LIBEWF_ERROR_DOMAINS
 	LIBEWF_ERROR_DOMAIN_ARGUMENTS                = (int) 'a',
 	LIBEWF_ERROR_DOMAIN_CONVERSION               = (int) 'c',
 	LIBEWF_ERROR_DOMAIN_COMPRESSION              = (int) 'C',
+	LIBEWF_ERROR_DOMAIN_IO                       = (int) 'I',
 	LIBEWF_ERROR_DOMAIN_INPUT                    = (int) 'i',
 	LIBEWF_ERROR_DOMAIN_MEMORY                   = (int) 'm',
 	LIBEWF_ERROR_DOMAIN_OUTPUT                   = (int) 'o',
@@ -78,20 +79,27 @@ enum LIBEWF_COMPRESSION_ERROR
 	LIBEWF_COMPRESSION_ERROR_UNCOMPRESS_FAILED   = 2
 };
 
+/* The input/output error codes
+ */
+enum LIBEWF_IO_ERROR
+{
+	LIBEWF_IO_ERROR_GENERIC                      = 0,
+	LIBEWF_IO_ERROR_OPEN_FAILED                  = 1,
+	LIBEWF_IO_ERROR_CLOSE_FAILED                 = 2,
+	LIBEWF_IO_ERROR_SEEK_FAILED                  = 3,
+	LIBEWF_IO_ERROR_READ_FAILED                  = 4,
+	LIBEWF_IO_ERROR_WRITE_FAILED                 = 5,
+};
+
 /* The input error codes
  */
 enum LIBEWF_INPUT_ERROR
 {
 	LIBEWF_INPUT_ERROR_GENERIC                   = 0,
-	LIBEWF_INPUT_ERROR_OPEN_FAILED               = 1,
-	LIBEWF_INPUT_ERROR_CLOSE_FAILED              = 2,
-	LIBEWF_INPUT_ERROR_READ_FAILED               = 3,
-	LIBEWF_INPUT_ERROR_SEEK_FAILED               = 4,
-	LIBEWF_INPUT_ERROR_INVALID_DATA              = 5,
-
-	LIBEWF_INPUT_ERROR_CRC_MISMATCH              = 1000,
-	LIBEWF_INPUT_ERROR_MISSING_LAST_SEGMENT_FILE = 1001,
-	LIBEWF_INPUT_ERROR_MISSING_LAST_SECTION      = 1002
+	LIBEWF_INPUT_ERROR_INVALID_DATA              = 1,
+	LIBEWF_INPUT_ERROR_CRC_MISMATCH              = 2,
+	LIBEWF_INPUT_ERROR_MISSING_LAST_SEGMENT_FILE = 3,
+	LIBEWF_INPUT_ERROR_MISSING_LAST_SECTION      = 4
 };
 
 /* The memory error codes
@@ -127,11 +135,7 @@ enum LIBEWF_RUNTIME_ERROR
  */
 enum LIBEWF_OUTPUT_ERROR
 {
-	LIBEWF_OUTPUT_ERROR_GENERIC                  = 0,
-	LIBEWF_OUTPUT_ERROR_OPEN_FAILED              = 1,
-	LIBEWF_OUTPUT_ERROR_CLOSE_FAILED             = 2,
-	LIBEWF_OUTPUT_ERROR_WRITE_FAILED             = 3,
-	LIBEWF_OUTPUT_ERROR_SEEK_FAILED              = 4
+	LIBEWF_OUTPUT_ERROR_GENERIC                  = 0
 };
 
 #endif

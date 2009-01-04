@@ -398,8 +398,8 @@ ssize_t libewf_raw_read_chunk(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_SEEK_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek chunk in segment file.\n",
 		 function );
 
@@ -422,8 +422,8 @@ ssize_t libewf_raw_read_chunk(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_READ_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
 		 "%s: unable to read chunk in segment file.\n",
 		 function );
 
@@ -443,8 +443,8 @@ ssize_t libewf_raw_read_chunk(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_READ_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: error reading CRC of chunk: %" PRIu32 " from segment file.\n",
 			 function, chunk );
 
@@ -670,8 +670,8 @@ ssize_t libewf_read_chunk_data(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_READ_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: unable to read chunk.\n",
 			 function );
 
@@ -1016,8 +1016,8 @@ ssize_t libewf_raw_read_buffer(
 	{
 		libewf_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_READ_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
 		 "%s: unable to read chunk data.\n",
 		 function );
 
@@ -1195,8 +1195,8 @@ ssize_t libewf_read_buffer(
 		{
 			libewf_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_READ_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: unable to read data from chunk.\n",
 			 function );
 
@@ -1264,8 +1264,8 @@ ssize_t libewf_read_random(
 	{
 		libewf_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_SEEK_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.\n",
 		 function );
 
@@ -1282,8 +1282,8 @@ ssize_t libewf_read_random(
 	{
 		libewf_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_READ_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
 		 "%s: unable to read buffer.\n",
 		 function );
 

@@ -1188,8 +1188,8 @@ ssize_t libewf_raw_write_chunk_new(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_OPEN_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to create segment file for segment: %" PRIu16 ".\n",
 			 function,
 			 segment_number );
@@ -1221,8 +1221,8 @@ ssize_t libewf_raw_write_chunk_new(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write segment file start.\n",
 			 function );
 
@@ -1454,8 +1454,8 @@ ssize_t libewf_raw_write_chunk_new(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write chunk data.\n",
 		 function );
 
@@ -1575,8 +1575,8 @@ ssize_t libewf_raw_write_chunk_new(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to correct chunks section.\n",
 			 function );
 
@@ -1649,8 +1649,8 @@ ssize_t libewf_raw_write_chunk_new(
 				{
 					libewf_error_set(
 					 error,
-					 LIBEWF_ERROR_DOMAIN_OUTPUT,
-					 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+					 LIBEWF_ERROR_DOMAIN_IO,
+					 LIBEWF_IO_ERROR_WRITE_FAILED,
 					 "%s: unable to close segment file.\n",
 					 function );
 
@@ -1925,8 +1925,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			{
 				libewf_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_OUTPUT,
-				 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_SEEK_FAILED,
 				 "%s: cannot find offset: %" PRIjd ".\n",
 				 function,
 				 last_section_start_offset );
@@ -1953,8 +1953,8 @@ ssize_t libewf_raw_write_chunk_existing(
 				{
 					libewf_error_set(
 					 error,
-					 LIBEWF_ERROR_DOMAIN_OUTPUT,
-					 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+					 LIBEWF_ERROR_DOMAIN_IO,
+					 LIBEWF_IO_ERROR_WRITE_FAILED,
 					 "%s: unable to write last section.\n",
 					 function );
 
@@ -2021,8 +2021,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			{
 				libewf_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_OUTPUT,
-				 LIBEWF_OUTPUT_ERROR_OPEN_FAILED,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_OPEN_FAILED,
 				 "%s: unable to create delta segment file for segment: %" PRIu16 ".\n",
 				 function,
 				 segment_number );
@@ -2050,8 +2050,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			{
 				libewf_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_OUTPUT,
-				 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to write segment file start.\n",
 				 function );
 
@@ -2072,8 +2072,8 @@ ssize_t libewf_raw_write_chunk_existing(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_SEEK_FAILED,
 			 "%s: unable to seek chunk offset.\n",
 			 function );
 
@@ -2119,8 +2119,8 @@ ssize_t libewf_raw_write_chunk_existing(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write delta chunk.\n",
 		 function );
 
@@ -2144,8 +2144,8 @@ ssize_t libewf_raw_write_chunk_existing(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write last section.\n",
 			 function );
 
@@ -2422,8 +2422,8 @@ ssize_t libewf_write_chunk_data_new(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write chunk.\n",
 			 function );
 
@@ -2594,8 +2594,8 @@ ssize_t libewf_write_chunk_data_existing(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_READ_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: unable to read data from chunk.\n",
 			 function );
 
@@ -2661,8 +2661,8 @@ ssize_t libewf_write_chunk_data_existing(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write delta chunk.\n",
 		 function );
 
@@ -3014,8 +3014,8 @@ ssize_t libewf_raw_write_buffer(
 	{
 		libewf_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write raw chunk data.\n",
 		 function );
 
@@ -3263,8 +3263,8 @@ ssize_t libewf_write_buffer(
 		{
 			libewf_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write data from buffer.\n",
 			 function );
 
@@ -3336,8 +3336,8 @@ ssize_t libewf_write_random(
 	{
 		libewf_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.\n",
 		 function );
 
@@ -3357,8 +3357,8 @@ ssize_t libewf_write_random(
 	{
 		libewf_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write buffer.\n",
 		 function );
 
@@ -3534,8 +3534,8 @@ ssize_t libewf_write_finalize(
 		{
 			libewf_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to write remaining chunk data.\n",
 			 function );
 
@@ -3634,8 +3634,8 @@ ssize_t libewf_write_finalize(
 			{
 				libewf_error_set(
 				 &error,
-				 LIBEWF_ERROR_DOMAIN_OUTPUT,
-				 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_WRITE_FAILED,
 				 "%s: unable to correct chunks section.\n",
 				 function );
 
@@ -3678,8 +3678,8 @@ ssize_t libewf_write_finalize(
 		{
 			libewf_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_OUTPUT,
-			 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to close segment file.\n",
 			 function );
 
@@ -3785,8 +3785,8 @@ ssize_t libewf_write_finalize(
 			{
 				libewf_error_set(
 				 &error,
-				 LIBEWF_ERROR_DOMAIN_OUTPUT,
-				 LIBEWF_OUTPUT_ERROR_OPEN_FAILED,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_OPEN_FAILED,
 				 "%s: unable to open segment file: %" PRIu16 ".\n",
 				 function,
 				 segment_table_iterator );
@@ -3847,8 +3847,8 @@ ssize_t libewf_write_finalize(
 					{
 						libewf_error_set(
 						 &error,
-						 LIBEWF_ERROR_DOMAIN_OUTPUT,
-						 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+						 LIBEWF_ERROR_DOMAIN_IO,
+						 LIBEWF_IO_ERROR_SEEK_FAILED,
 						 "%s: unable to find offset to correct volume section.\n",
 						 function );
 
@@ -3890,8 +3890,8 @@ ssize_t libewf_write_finalize(
 					{
 						libewf_error_set(
 						 &error,
-						 LIBEWF_ERROR_DOMAIN_OUTPUT,
-						 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+						 LIBEWF_ERROR_DOMAIN_IO,
+						 LIBEWF_IO_ERROR_WRITE_FAILED,
 						 "%s: unable to correct volume section.\n",
 						 function );
 
@@ -3922,8 +3922,8 @@ ssize_t libewf_write_finalize(
 					{
 						libewf_error_set(
 						 &error,
-						 LIBEWF_ERROR_DOMAIN_OUTPUT,
-						 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+						 LIBEWF_ERROR_DOMAIN_IO,
+						 LIBEWF_IO_ERROR_SEEK_FAILED,
 						 "%s: unable to find offset to data volume section.\n",
 						 function );
 
@@ -3949,8 +3949,8 @@ ssize_t libewf_write_finalize(
 					{
 						libewf_error_set(
 						 &error,
-						 LIBEWF_ERROR_DOMAIN_OUTPUT,
-						 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+						 LIBEWF_ERROR_DOMAIN_IO,
+						 LIBEWF_IO_ERROR_WRITE_FAILED,
 						 "%s: unable to correct data section.\n",
 						 function );
 
@@ -3985,8 +3985,8 @@ ssize_t libewf_write_finalize(
 					{
 						libewf_error_set(
 						 &error,
-						 LIBEWF_ERROR_DOMAIN_OUTPUT,
-						 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+						 LIBEWF_ERROR_DOMAIN_IO,
+						 LIBEWF_IO_ERROR_SEEK_FAILED,
 						 "%s: unable to find offset to data volume section.\n",
 						 function );
 
@@ -4018,8 +4018,8 @@ ssize_t libewf_write_finalize(
 					{
 						libewf_error_set(
 						 &error,
-						 LIBEWF_ERROR_DOMAIN_OUTPUT,
-						 LIBEWF_OUTPUT_ERROR_WRITE_FAILED,
+						 LIBEWF_ERROR_DOMAIN_IO,
+						 LIBEWF_IO_ERROR_WRITE_FAILED,
 						 "%s: unable to close segment file.\n",
 						 function );
 
@@ -4039,8 +4039,8 @@ ssize_t libewf_write_finalize(
 			{
 				libewf_error_set(
 				 &error,
-				 LIBEWF_ERROR_DOMAIN_OUTPUT,
-				 LIBEWF_OUTPUT_ERROR_CLOSE_FAILED,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_CLOSE_FAILED,
 				 "%s: unable to close segment file: %" PRIu16 ".\n",
 				 function,
 				 segment_table_iterator );

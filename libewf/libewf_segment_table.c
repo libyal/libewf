@@ -364,8 +364,8 @@ int libewf_segment_table_build(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_READ_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: unable to read sections.\n",
 			 function );
 
@@ -746,8 +746,8 @@ int libewf_segment_table_read_open(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_OPEN_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
 
@@ -773,8 +773,8 @@ int libewf_segment_table_read_open(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_READ_FAILED,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: unable to read file header in: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
 
@@ -855,8 +855,8 @@ int libewf_segment_table_read_open(
 				{
 					libewf_error_set(
 					 error,
-					 LIBEWF_ERROR_DOMAIN_INPUT,
-					 LIBEWF_INPUT_ERROR_OPEN_FAILED,
+					 LIBEWF_ERROR_DOMAIN_IO,
+					 LIBEWF_IO_ERROR_OPEN_FAILED,
 					 "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
 					 function, filenames[ iterator ] );
 
@@ -1144,8 +1144,8 @@ int libewf_segment_table_create_segment_file(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_OPEN_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to create file io pool entry.\n",
 		 function );
 
@@ -1205,8 +1205,8 @@ int libewf_segment_table_create_segment_file(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_OUTPUT,
-		 LIBEWF_OUTPUT_ERROR_OPEN_FAILED,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open segment file: %" PRIu16 ".\n",
 		 function, segment_number );
 

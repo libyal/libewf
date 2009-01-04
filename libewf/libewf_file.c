@@ -46,14 +46,24 @@
 int libewf_check_file_signature(
      const system_character_t *filename )
 {
+	libewf_error_t *error = NULL;
 	static char *function = "libewf_check_file_signature";
 	int file_descriptor   = 0;
 	int result            = 0;
 
 	if( filename == NULL )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid filename.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -63,8 +73,17 @@ int libewf_check_file_signature(
 
 	if( file_descriptor == -1 )
 	{
-		notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file: %" PRIs_SYSTEM ".\n",
 		 function, filename );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -74,15 +93,33 @@ int libewf_check_file_signature(
 	if( file_io_close(
 	     file_descriptor ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to close file: %" PRIs_SYSTEM ".\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file: %" PRIs_SYSTEM ".\n",
 		 function, filename );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
 	if( result <= -1 )
 	{
-		notify_warning_printf( "%s: unable to read signature from file: %" PRIs_SYSTEM ".\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to read signature from file: %" PRIs_SYSTEM ".\n",
 		 function, filename );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -100,6 +137,7 @@ int libewf_glob(
      uint8_t format,
      system_character_t **filenames[] )
 {
+	libewf_error_t *error                = NULL;
 	system_character_t *segment_filename = NULL;
 	void *reallocation                   = NULL;
 	static char *function                = "libewf_glob";
@@ -111,16 +149,34 @@ int libewf_glob(
 
 	if( filename == NULL )
 	{
-		notify_warning_printf( "%s: invalid filename.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid filename.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
 	if( ( length == 0 )
 	 || ( length > (size_t) SSIZE_MAX ) )
 	{
-		notify_warning_printf( "%s: invalid filename length.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid filename length.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -142,8 +198,17 @@ int libewf_glob(
 	}
 	if( filenames == NULL )
 	{
-		notify_warning_printf( "%s: invalid filenames.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid filenames.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -151,8 +216,17 @@ int libewf_glob(
 	{
 		if( filename[ length - 4 ] != (system_character_t) '.' )
 		{
-			notify_warning_printf( "%s: invalid filename - missing extension.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid filename - missing extension.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -176,8 +250,17 @@ int libewf_glob(
 		}
 		else
 		{
-			notify_warning_printf( "%s: invalid filename - unsupported extension: .\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid filename - unsupported extension: .\n",
 			 function, &( filename[ length - 4 ] ) );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -204,8 +287,17 @@ int libewf_glob(
 
 		if( segment_filename == NULL )
 		{
-			notify_warning_printf( "%s: unable to create segment filename.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create segment filename.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -214,8 +306,17 @@ int libewf_glob(
 		     filename,
 		     length ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to copy filename.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy filename.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			memory_free(
 			 segment_filename );
@@ -234,8 +335,17 @@ int libewf_glob(
 		     format,
 		     ewf_format ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to set extension.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set extension.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			memory_free(
 			 segment_filename );
@@ -266,8 +376,17 @@ int libewf_glob(
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to resize filenames.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to resize filenames.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			memory_free(
 			 segment_filename );
@@ -299,23 +418,50 @@ libewf_handle_t *libewf_open(
 
 	if( filenames == NULL )
 	{
-		notify_warning_printf( "%s: invalid filenames.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid filenames.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( NULL );
 	}
-	if( amount_of_files < 1 )
+	if( amount_of_files <= 0 )
 	{
-		notify_warning_printf( "%s: invalid file amount at least 1 is required.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 "%s: invalid file amount at least 1 is required.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( NULL );
 	}
 	if( ( ( flags & LIBEWF_FLAG_READ ) != LIBEWF_FLAG_READ )
 	 && ( ( flags & LIBEWF_FLAG_WRITE ) != LIBEWF_FLAG_WRITE ) )
 	{
-		notify_warning_printf( "%s: unsupported flags.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported flags.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( NULL );
 	}
@@ -324,7 +470,11 @@ libewf_handle_t *libewf_open(
 	     flags,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to create handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create handle.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -363,7 +513,11 @@ libewf_handle_t *libewf_open(
 		     &( internal_handle->abort ),
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to open segment file(s).\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open segment file(s).\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -384,8 +538,11 @@ libewf_handle_t *libewf_open(
 		     internal_handle->ewf_format,
 		     &( internal_handle->format ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to determine format.\n",
+#if defined( HAVE_VERBOSE_OUTPUT )
+			notify_verbose_printf(
+			 "%s: unable to determine format.\n",
 			 function );
+#endif
 		}
 		/* Calculate the media size
 		 */
@@ -400,7 +557,11 @@ libewf_handle_t *libewf_open(
 		     amount_of_files,
 		     &error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to open segment file(s).\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open segment file(s).\n",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -421,7 +582,11 @@ libewf_handle_t *libewf_open(
 	     internal_handle,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to initialize format specific values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to determine format specific values.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -455,8 +620,17 @@ int libewf_close(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -476,8 +650,17 @@ int libewf_close(
 	if( libewf_file_io_pool_close_all(
 	     internal_handle->file_io_pool ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to close all segment files.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close all segment files.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		libewf_handle_free(
 		 &handle,
@@ -489,7 +672,11 @@ int libewf_close(
 	     &handle,
 	     &error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to free handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+		 "%s: unable to free handle.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -507,9 +694,10 @@ int libewf_close(
  * Returns the offset if seek is successful or -1 on error
  */
 off64_t libewf_seek_offset(
-     libewf_handle_t *handle,
-     off64_t offset )
+         libewf_handle_t *handle,
+         off64_t offset )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_seek_offset";
 	uint64_t chunk                            = 0;
@@ -517,8 +705,17 @@ off64_t libewf_seek_offset(
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -526,22 +723,44 @@ off64_t libewf_seek_offset(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
 	if( offset <= -1 )
 	{
-		notify_warning_printf( "%s: invalid offset value cannot be negative.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 "%s: invalid offset value cannot be less than zero.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset > (off64_t) internal_handle->media_values->media_size )
 	{
-		notify_warning_printf( "%s: attempting to read past the end of the file.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_TOO_LARGE,
+		 "%s: attempting to read past the end of the file.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -553,8 +772,17 @@ off64_t libewf_seek_offset(
 
 		if( chunk >= (uint64_t) INT32_MAX )
 		{
-			notify_warning_printf( "%s: invalid chunk value exceeds maximum.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+			 "%s: invalid chunk value exceeds maximum.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -563,8 +791,17 @@ off64_t libewf_seek_offset(
 		     (uint32_t) chunk,
 		     internal_handle->file_io_pool ) == -1 )
 		{
-			notify_warning_printf( "%s: unable to seek chunk offset.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek chunk offset.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -576,8 +813,17 @@ off64_t libewf_seek_offset(
 
 		if( chunk_offset >= (uint64_t) INT32_MAX )
 		{
-			notify_warning_printf( "%s: invalid chunk offset value exceeds maximum.\n",
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+			 "%s: invalid chunk offset value exceeds maximum.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -597,14 +843,24 @@ off64_t libewf_seek_offset(
 off64_t libewf_get_offset(
          libewf_handle_t *handle )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_seek_offset";
 	off64_t current_offset                    = 0;
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -612,8 +868,17 @@ off64_t libewf_get_offset(
 
 	if( internal_handle->media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
