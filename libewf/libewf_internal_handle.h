@@ -410,7 +410,6 @@ int libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_ha
 int libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );
-int libewf_internal_handle_set_calculate_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t calculate_md5 );
 
 int libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors );
 int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );

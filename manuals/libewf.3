@@ -1,4 +1,4 @@
-.Dd August 28, 2007
+.Dd September 5, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -87,8 +87,6 @@
 .Ft int
 .Fn libewf_set_swap_byte_pairs "LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs"
 .Ft int
-.Fn libewf_set_calculate_md5 "LIBEWF_HANDLE *handle, uint8_t calculate_md5"
-.Ft int
 .Fn libewf_parse_header_values "LIBEWF_HANDLE *handle, uint8_t date_format"
 .Ft int
 .Fn libewf_parse_hash_values "LIBEWF_HANDLE *handle"
@@ -157,8 +155,6 @@ When the library was compiled with narrow character support (default) the follow
 .Ft int
 .Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
-.Fn libewf_calculate_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
-.Ft int
 .Fn libewf_get_stored_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
 .Ft int
 .Fn libewf_get_calculated_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
@@ -218,8 +214,6 @@ When the library was compiled with wide character support the following function
 .Fn libewf_set_header_value_compression_type "LIBEWF_HANDLE *handle, wchar_t *compression_type, size_t length"
 .Ft int
 .Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_calculate_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
 .Ft int
 .Fn libewf_get_stored_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
 .Ft int

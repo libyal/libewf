@@ -2,6 +2,7 @@ Roadmap:
 * add read/write support for > 2Gb segment file for EnCase 6.7
 * raw read/write
 * move md5 calculation out library into ewftools
+* make compilation resilient for missing crypto library
 * move byte swap out library into ewftools
 
 * add read/write support for session section
@@ -142,18 +143,22 @@ TODO
 
 * remove libewf_set_media_values
 * remove get calculated md5 hash function
+* remove internal handle calculate md5
 
 * allow to set the delta file path
 * change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
+* fix >2Gb segment file write support for chunk offset value overflow
 
 Version: 20070905
 * worked on remove of MD5 calculation from library
   - removed MD5 calculation from read
   - implemented MD5 calculation in ewfcommon for ewfverify
   - removed hashed flags in offset table
+  - removed libewf_calculate_md5_hash from API
+* worked on read support for > 2Gb segment file for EnCase 6.7
 
 Version: 20070830
 * changed use of stdout and stderr in ewfacquirestream, ewfinfo, ewfalter

@@ -215,16 +215,6 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_calculate_md5( handle, 0 ) != 1 )
-	{
-		fprintf( stderr, "Unable to set calculate MD5 in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
 	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to determine media size.\n" );

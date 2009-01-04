@@ -1211,25 +1211,6 @@ int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal
 	return( 1 );
 }
 
-/* Sets the value to calculate the MD5 internally, used by both read and write
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_set_calculate_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t calculate_md5 )
-{
-	static char *function = "libewf_internal_handle_set_calculate_md5";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->calculate_md5 = calculate_md5;
-
-	return( 1 );
-}
-
 /* Add a acquiry read error sector to the list
  * Returns 1 if successful, -1 on error
  */

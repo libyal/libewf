@@ -119,9 +119,7 @@ LIBEWF_EXTERN int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *i
 LIBEWF_EXTERN int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 LIBEWF_EXTERN int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs );
-LIBEWF_EXTERN int libewf_set_calculate_md5( LIBEWF_HANDLE *handle, uint8_t calculate_md5 );
 
-LIBEWF_EXTERN int libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );
 LIBEWF_EXTERN int libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );
 LIBEWF_EXTERN int libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );
 
