@@ -120,8 +120,6 @@ Known issues:
 
 Next release(s):
 
-* ewfacquirestream will not be killed by CTRL+C
-
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?
 
@@ -199,6 +197,9 @@ Version: 20080907
 * ewfexport: added calculation of MD5 adn SHA1 hash of exported data
 * ewfexport: fixed bug exporting with SHA1 hash
 * ewftools: updated manuals
+* ewfacquirestream: fixed issue not being able to terminate by CTRL+C due to
+  block by reading from stding - stdin is now forced to close in the signal handler
+* file io pool now allows to be initialize with 0 file io handles
 
 Version: 20080906
 * refactored section list to use list type

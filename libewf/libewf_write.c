@@ -2655,13 +2655,20 @@ ssize_t libewf_write_finalize(
 		}
 		write_count_finalize += write_count;
 	}
-	segment_number      = internal_handle->segment_table->amount - 1;
+	segment_number = internal_handle->segment_table->amount - 1;
+
+	/* Check if no segment file was created
+	 */
+	if( segment_number == 0 )
+	{
+		return( 0 );
+	}
 	segment_file_handle = internal_handle->segment_table->segment_file_handle[ segment_number ];
 
 	if( segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid segment file.\n",
-		 function );
+		notify_warning_printf( "%s: invalid segment file: %" PRIu16 ".\n",
+		 function, segment_number );
 
 		return( -1 );
 	}

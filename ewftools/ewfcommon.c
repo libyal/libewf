@@ -101,6 +101,14 @@ void ewfcommon_signal_handler(
 		notify_warning_printf( "%s: unable to signal libewf to abort.\n",
 		 function );
 	}
+	/* Force stdin to close otherwise any function reading it will remain blocked
+	 */
+	if( file_io_close(
+	     0 ) != 0 )
+	{
+		notify_warning_printf( "%s: unable to close stdin.\n",
+		 function );
+	}
 }
 
 /* Swaps the byte order of byte pairs within a buffer of a certain size

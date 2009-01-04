@@ -453,11 +453,6 @@ int main( int argc, char * const argv[] )
 	 stderr,
 	 verbose );
 
-	if( ewfsignal_attach(
-	     ewfcommon_signal_handler ) != 1 )
-	{
-		fprintf( stderr, "Unable to attach signal handler.\n" );
-	}
 	if( option_case_number != NULL )
 	{
 		string_length = system_string_length(
@@ -631,6 +626,11 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
+	if( ewfsignal_attach(
+	     ewfcommon_signal_handler ) != 1 )
+	{
+		fprintf( stderr, "Unable to attach signal handler.\n" );
+	}
 	if( ewfcommon_abort == 0 )
 	{
 		if( ewfcommon_determine_operating_system_string(
@@ -639,7 +639,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stdout, "Unable to determine operating system string.\n" );
 
-			ewfcommon_abort = 1;
+			acquiry_operating_system[ 0 ] = 0;
 		}
 		acquiry_software_version = LIBEWF_VERSION_STRING;
 
@@ -760,11 +760,9 @@ int main( int argc, char * const argv[] )
 			memory_free(
 			 calculated_md5_hash_string );
 
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			return( EXIT_FAILURE );
 		}
 	}

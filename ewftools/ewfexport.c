@@ -1063,7 +1063,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to determine operating system string.\n" );
 
-				ewfcommon_abort = 1;
+				acquiry_operating_system[ 0 ] = 0;
 			}
 			acquiry_software_version = LIBEWF_VERSION_STRING;
 
