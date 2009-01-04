@@ -41,6 +41,7 @@
 				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\libewf"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_EXPORT"
 				SmallerTypeCheck="true"
+				RuntimeLibrary="3"
 				WarningLevel="4"
 				WarnAsError="false"
 				Detect64BitPortabilityProblems="true"
@@ -118,6 +119,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\libewf"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_EXPORT"
+				RuntimeLibrary="2"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

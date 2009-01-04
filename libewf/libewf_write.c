@@ -3378,10 +3378,10 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 		                     internal_handle->current_chunk_offset,
 		                     (void *) &( (uint8_t *) buffer )[ total_write_count ],
 		                     size,
-		                     0,
 		                     is_compressed,
 		                     chunk_crc,
-		                     write_crc );
+		                     write_crc,
+		                     0 );
 
 		/* libewf_write_chunk could relocate the chunk cache
 		 * correct buffer is chunk cache passthrough is used
@@ -3592,10 +3592,10 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		               internal_handle->current_chunk_offset,
 		               internal_handle->chunk_cache->data,
 		               internal_handle->chunk_cache->amount,
-		               1,
 		               0,
 		               0,
-		               0 );
+		               0,
+		               1 );
 
 		if( write_count == -1 )
 		{

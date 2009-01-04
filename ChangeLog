@@ -110,6 +110,9 @@ Version: 20070717
 * worked on allowing to write raw buffers as chunks
 * refactored function names into static char *
 * ewfacquire stream made physical default instead of logical just like in ewfacquire
+* fixed configuration error in MSVS C++ libewf_dll project file
+  wrong DLL compilation mode /MT
+* added fix for off_t being 32 it in MSVS C++
 
 Version: 20070716
 * worked on allowing to write raw buffers as chunks
