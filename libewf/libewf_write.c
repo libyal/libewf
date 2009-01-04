@@ -392,7 +392,8 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 	{
 		/* Calculate the remaining segment file size
 		 */
-		remaining_segment_file_size = (int32_t) internal_handle->write->segment_file_size - (int32_t) segment_file_offset;
+		remaining_segment_file_size = (int32_t) internal_handle->write->segment_file_size
+		                            - (int32_t) segment_file_offset;
 
 		/* Leave space for the done or next section
 		 */
@@ -400,11 +401,16 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		/* Leave space for the table and table2 sections
 		 */
-		remaining_segment_file_size -= 2 * ( EWF_SECTION_SIZE + ( internal_handle->write->section_amount_of_chunks * EWF_TABLE_OFFSET_SIZE ) + EWF_CRC_SIZE );
+		remaining_segment_file_size -= 2
+		                             * ( EWF_SECTION_SIZE
+		                               + ( internal_handle->write->section_amount_of_chunks
+		                                 * EWF_TABLE_OFFSET_SIZE )
+		                               + EWF_CRC_SIZE );
 
 		/* Determine if a chunk would fit in the segment file
 		 */
-		remaining_segment_file_size -= internal_handle->media->chunk_size + EWF_CRC_SIZE;
+		remaining_segment_file_size -= internal_handle->media->chunk_size
+		                             + EWF_CRC_SIZE;
 
 		if( remaining_segment_file_size <= 0 )
 		{
@@ -519,7 +525,11 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		/* Leave space for the table and table2 sections
 		 */
-		remaining_segment_file_size -= 2 * ( EWF_SECTION_SIZE + ( (int32_t) internal_handle->write->section_amount_of_chunks * EWF_TABLE_OFFSET_SIZE ) + EWF_CRC_SIZE );
+		remaining_segment_file_size -= 2
+		                             * ( EWF_SECTION_SIZE
+		                               + ( (int32_t) internal_handle->write->section_amount_of_chunks
+		                                 * EWF_TABLE_OFFSET_SIZE )
+		                               + EWF_CRC_SIZE );
 
 		/* Determine if a chunk would fit in the segment file
 		 */
@@ -1736,10 +1746,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	LIBEWF_INTERNAL_HANDLE *internal_handle        = NULL;
 	LIBEWF_SECTION_LIST_ENTRY *list_entry_iterator = NULL;
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *filename                              = NULL;
 	wchar_t *error_string                          = NULL;
 #else
-	char *filename                                 = NULL;
 	char *error_string                             = NULL;
 #endif
 	static char *function                          = "libewf_write_finalize";
@@ -1782,6 +1790,20 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	if( internal_handle->segment_table == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
 		 function );
 
 		return( -1 );
@@ -1906,62 +1928,61 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 		if( file_descriptor == -1 )
 		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			filename = libewf_segment_table_get_wide_filename( internal_handle->segment_table, segment_table_iterator );
-#else
-			filename = libewf_segment_table_get_filename( internal_handle->segment_table, segment_table_iterator );
-#endif
-
-			if( filename == NULL )
+			if( internal_handle->segment_table->filename[ segment_table_iterator ] == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: invalid filename for segment file: %" PRIu32 ".\n",
 				 function, segment_table_iterator );
 
 				return( -1 );
 			}
-			file_descriptor = libewf_common_open( filename, LIBEWF_OPEN_READ_WRITE );
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+			file_descriptor = libewf_common_wide_open(
+			                   internal_handle->segment_table->filename[ segment_table_iterator ],
+			                   LIBEWF_OPEN_READ_WRITE );
+#else
+			file_descriptor = libewf_common_open(
+			                   internal_handle->segment_table->filename[ segment_table_iterator ],
+			                   LIBEWF_OPEN_READ_WRITE );
+#endif
 
 			if( file_descriptor == -1 )
 			{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 				error_string = libewf_common_wide_strerror( errno );
-
-				if( error_string == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-					 function, filename );
-				}
-				else
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
-					 function, filename, error_string );
-
-					libewf_common_free( error_string );
-				}
 #else
 				error_string = libewf_common_strerror( errno );
+#endif
 
 				if( error_string == NULL )
 				{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+					 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
+#else
 					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-					 function, filename );
+					 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
+#endif
 				}
 				else
 				{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
+					 function, internal_handle->segment_table->filename[ segment_table_iterator ], error_string );
+#else
 					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-					 function, filename, error_string );
+					 function, internal_handle->segment_table->filename[ segment_table_iterator ], error_string );
+#endif
 
 					libewf_common_free( error_string );
 				}
-#endif
 				return( -1 );
 			}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 			LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %ls.\n",
-			 function, filename );
+			 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
 #else
 			LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %s.\n",
-			 function, filename );
+			 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
 #endif
 		}
 		list_entry_iterator = internal_handle->segment_table->section_list[ segment_table_iterator ]->first;

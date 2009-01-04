@@ -69,82 +69,20 @@ const LIBEWF_CHAR *libewf_get_version( void )
 	return( (const LIBEWF_CHAR *) LIBEWF_VERSION );
 }
 
+/* Detects if a file is an EWF file (check for the EWF file signature)
+ * Returns 1 if true, 0 if not, or -1 on error
+ */
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Detects if a file is an EWF file (check for the EWF file signature)
- * Returns 1 if true, 0 if not, or -1 on error
- */
 int libewf_check_file_signature( const wchar_t *filename )
-{
-	wchar_t *error_string = NULL;
-	static char *function = "libewf_check_file_signature";
-	int file_descriptor   = 0;
-	int result            = 0;
-
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	file_descriptor = libewf_common_wide_open( filename, LIBEWF_OPEN_READ );
-
-	if( file_descriptor < 0 )
-	{
-		error_string = libewf_common_wide_strerror( errno );
-
-		if( error_string == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-			 function, filename );
-		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
-			 function, filename, error_string );
-
-			libewf_common_free( error_string );
-		}
-		return( -1 );
-	}
-	result = libewf_segment_file_check_file_signature( file_descriptor );
-
-	if( libewf_common_close( file_descriptor ) != 0 )
-	{
-		error_string = libewf_common_strerror( errno );
-
-		if( error_string == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls.\n",
-			 function, filename );
-		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls with error: %ls.\n",
-			 function, filename, error_string );
-
-			libewf_common_free( error_string );
-		}
-		return( -1 );
-	}
-	if( result <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
-		 function, filename );
-
-		return( -1 );
-	}
-	return( result );
-}
 #else
-
-/* Detects if a file is an EWF file (check for the EWF file signature)
- * Returns 1 if true, 0 if not, or -1 on error
- */
 int libewf_check_file_signature( const char *filename )
+#endif
 {
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	wchar_t *error_string = NULL;
+#else
 	char *error_string    = NULL;
+#endif
 	static char *function = "libewf_check_file_signature";
 	int file_descriptor   = 0;
 	int result            = 0;
@@ -156,216 +94,103 @@ int libewf_check_file_signature( const char *filename )
 
 		return( -1 );
 	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	file_descriptor = libewf_common_wide_open( filename, LIBEWF_OPEN_READ );
+#else
 	file_descriptor = libewf_common_open( filename, LIBEWF_OPEN_READ );
-
-	if( file_descriptor < 0 )
-	{
-		error_string = libewf_common_strerror( errno );
-
-		if( error_string == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-			 function, filename );
-		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-			 function, filename, error_string );
-
-			libewf_common_free( error_string );
-		}
-		return( -1 );
-	}
-	result = libewf_segment_file_check_file_signature( file_descriptor );
-
-	if( libewf_common_close( file_descriptor ) != 0 )
-	{
-		error_string = libewf_common_strerror( errno );
-
-		if( error_string == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s.\n",
-			 function, filename );
-		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s with error: %s.\n",
-			 function, filename, error_string );
-
-			libewf_common_free( error_string );
-		}
-		return( -1 );
-	}
-	if( result <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
-		 function, filename );
-
-		return( -1 );
-	}
-	return( result );
-}
 #endif
 
+	if( file_descriptor < 0 )
+	{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Opens EWF file(s)
- * For reading files should contain all filenames that make up an EWF image
- * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Returns a pointer to the new instance of handle, NULL on error
- */
-LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
-{
-	EWF_FILE_HEADER file_header;
-
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_open";
-	uint32_t iterator                       = 0;
-
-	if( file_amount < 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	{
-		/* 1 additional entry required because
-		 * entry [ 0 ] is not used for reading
-		 */
-		internal_handle = libewf_internal_handle_alloc( ( file_amount + 1 ), flags );
-
-		if( internal_handle == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
-			 function );
-
-			return( NULL );
-		}
-		if( libewf_segment_file_read_wide_open(
-		     internal_handle, 
-		     filenames, 
-		     file_amount,
-		     flags ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		/* TODO: Get the basename of the first segment file and store it in
-		 * the 0'th entry
-		 */
-
-		/* Initialize the internal handle for reading
-		 */
-		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		/* Read the segment table from the segment files
-		 */
-		result = libewf_segment_file_read_segment_table( internal_handle );
-
-		if( result == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: error while trying to read the segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		else if( result != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		/* Determine the EWF file format
-		 */
-		if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
-			 function );
-		}
-		/* Calculate the media size
-		 */
-		internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
-						   * (size64_t) internal_handle->media->bytes_per_sector;
-
-		/* Flag that the segment table was build
-		 */
-		internal_handle->segment_table_build = 1;
-	}
-	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-	{
-		/* Allocate 2 entries
-		 * entry [ 0 ] is used for the base filename
-		 */
-		internal_handle = libewf_internal_handle_alloc( 1, flags );
-
-		if( internal_handle == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
-			 function );
-
-			return( NULL );
-		}
-		if( internal_handle->segment_table == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		if( libewf_segment_table_set_wide_filename(
-		     internal_handle->segment_table,
-		     0,
-		     filenames[ iterator ],
-		     libewf_common_wide_string_length( filenames[ iterator ] ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
-		 function );
-
-		return( NULL );
-	}
-	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
-	 function );
-
-	return( (LIBEWF_HANDLE *) internal_handle );
-}
+		error_string = libewf_common_wide_strerror( errno );
 #else
+		error_string = libewf_common_strerror( errno );
+#endif
 
-/* Opens EWF file(s)
+		if( error_string == NULL )
+		{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+			 function, filename );
+#else
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+			 function, filename );
+#endif
+		}
+		else
+		{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
+			 function, filename, error_string );
+#else
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
+			 function, filename, error_string );
+#endif
+
+			libewf_common_free( error_string );
+		}
+		return( -1 );
+	}
+	result = libewf_segment_file_check_file_signature( file_descriptor );
+
+	if( libewf_common_close( file_descriptor ) != 0 )
+	{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		error_string = libewf_common_wide_strerror( errno );
+#else
+		error_string = libewf_common_strerror( errno );
+#endif
+
+		if( error_string == NULL )
+		{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls.\n",
+			 function, filename );
+#else
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s.\n",
+			 function, filename );
+#endif
+		}
+		else
+		{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls with error: %ls.\n",
+			 function, filename, error_string );
+#else
+			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s with error: %s.\n",
+			 function, filename, error_string );
+#endif
+
+			libewf_common_free( error_string );
+		}
+		return( -1 );
+	}
+	if( result <= -1 )
+	{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
+		 function, filename );
+#else
+		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %s.\n",
+		 function, filename );
+#endif
+
+		return( -1 );
+	}
+	return( result );
+}
+
+/* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
  * Returns a pointer to the new instance of handle, NULL on error
  */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
+#else
 LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags )
+#endif
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_open";
@@ -393,11 +218,19 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		if( libewf_segment_file_read_wide_open(
+		     internal_handle, 
+		     filenames, 
+		     file_amount,
+		     flags ) != 1 )
+#else
 		if( libewf_segment_file_read_open(
 		     internal_handle, 
 		     filenames, 
 		     file_amount,
 		     flags ) != 1 )
+#endif
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
 			 function );
@@ -482,11 +315,19 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		if( libewf_segment_table_set_wide_filename(
+		     internal_handle->segment_table,
+		     0,
+		     filenames[ iterator ],
+		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+#else
 		if( libewf_segment_table_set_filename(
 		     internal_handle->segment_table,
 		     0,
 		     filenames[ iterator ],
 		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+#endif
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
 			 function );
@@ -508,7 +349,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 	return( (LIBEWF_HANDLE *) internal_handle );
 }
-#endif
 
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 0 if successful, or -1 on error

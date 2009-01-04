@@ -63,7 +63,7 @@ LIBEWF_EXTERN int libewf_check_file_signature( const wchar_t *filename );
 LIBEWF_EXTERN int libewf_check_file_signature( const char *filename );
 #endif
 
-/* Opens EWF file(s)
+/* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
  * Returns a pointer to the new instance of handle, NULL on error

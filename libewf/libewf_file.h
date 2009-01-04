@@ -57,10 +57,6 @@ extern "C" {
 
 LIBEWF_EXTERN const LIBEWF_CHAR *libewf_get_version( void );
 
-#if defined( LIBEWF_DLL_IMPORT )
-LIBEWF_EXTERN int libewf_is_dll( void );
-#endif
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 LIBEWF_EXTERN int libewf_check_file_signature( const wchar_t *filename );
 #else
