@@ -4,6 +4,9 @@ else
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror
 endif
 
+MEMWATCH_FILES = \
+	memwatch.c memwatch.h
+
 bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
 
 ewfacquire_SOURCES = \
@@ -161,7 +164,10 @@ ewfverify_SOURCES = \
 	process_status.c process_status.h \
 	sha1.h \
 	string_conversion.c string_conversion.h \
-	system_string.c system_string.h
+	storage_media_buffer.h \
+	system_string.c system_string.h \
+	verification_handle.c verification_handle.h \
+	$(MEMWATCH_FILES)
 
 ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 

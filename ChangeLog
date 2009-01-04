@@ -125,6 +125,10 @@ Other:
 check error tollerance
 check TODO
 
+* create imaging (acquiry)/verify/export handle and move code from ewfcommon
+  into handles
+  - verification_handle_set_input_values needed ?
+
 * Add description of functionality of tools in usage information
 
 * remove HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
@@ -205,6 +209,7 @@ CLOSED
 Version: 20081019
 * Updated liberror
 * Added splint make option
+* Worked on verification handle
 
 Version: 20081018
 * Minor adjustments
