@@ -178,7 +178,6 @@ int ewfcommon_determine_operating_system_string(
 	operating_system_length = narrow_string_length(
 	                           operating_system );
 
-
 	if( operating_system_string_size < ( operating_system_length + 1 ) )
 	{
 		notify_warning_printf( "%s: operating system string too small.\n",
@@ -189,7 +188,7 @@ int ewfcommon_determine_operating_system_string(
 	if( string_copy_from_char(
 	     operating_system_string,
 	     operating_system,
-	     operating_system_length ) != 1 )
+	     operating_system_length + 1 ) != 1 )
 	{
 		return( -1 );
 	}
@@ -281,7 +280,7 @@ int ewfcommon_initialize_write(
 		string_length = string_length(
 		                 case_number );
 	}
-	if( libewf_set_header_value_case_number(
+	if( ewfcommon_set_header_value_case_number(
 	     handle,
 	     case_number,
 	     string_length ) != 1 )
@@ -302,7 +301,7 @@ int ewfcommon_initialize_write(
 		string_length = string_length(
 		                 description );
 	}
-	if( libewf_set_header_value_description(
+	if( ewfcommon_set_header_value_description(
 	     handle,
 	     description,
 	     string_length ) != 1 )
@@ -323,7 +322,7 @@ int ewfcommon_initialize_write(
 		string_length = string_length(
 		                 evidence_number );
 	}
-	if( libewf_set_header_value_evidence_number(
+	if( ewfcommon_set_header_value_evidence_number(
 	     handle,
 	     evidence_number,
 	     string_length ) != 1 )
@@ -344,7 +343,7 @@ int ewfcommon_initialize_write(
 		string_length = string_length(
 		                 examiner_name );
 	}
-	if( libewf_set_header_value_examiner_name(
+	if( ewfcommon_set_header_value_examiner_name(
 	     handle,
 	     examiner_name,
 	     string_length ) != 1 )
@@ -365,7 +364,7 @@ int ewfcommon_initialize_write(
 		string_length = string_length(
 		                 notes );
 	}
-	if( libewf_set_header_value_notes(
+	if( ewfcommon_set_header_value_notes(
 	     handle,
 	     notes,
 	     string_length ) != 1 )
@@ -382,7 +381,7 @@ int ewfcommon_initialize_write(
 	 */
 
 	if( ( acquiry_operating_system != NULL )
-	 && ( libewf_set_header_value_acquiry_operating_system(
+	 && ( ewfcommon_set_header_value_acquiry_operating_system(
 	       handle,
 	       acquiry_operating_system,
 	       string_length(
@@ -393,7 +392,7 @@ int ewfcommon_initialize_write(
 
 		return( -1 );
 	}
-	if( libewf_set_header_value(
+	if( ewfcommon_set_header_value(
 	     handle,
 	     _CHARACTER_T_STRING( "acquiry_software" ),
 	     acquiry_software,
@@ -405,7 +404,7 @@ int ewfcommon_initialize_write(
 
 		return( -1 );
 	}
-	if( libewf_set_header_value_acquiry_software_version(
+	if( ewfcommon_set_header_value_acquiry_software_version(
 	     handle,
 	     acquiry_software_version,
 	     string_length(
@@ -1924,7 +1923,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 #if defined( USE_LIBEWF_SET_HASH_VALUE_MD5 )
 		/* The MD5 hash string must be set before write finalized is used
 		 */
-		if( libewf_set_hash_value_md5(
+		if( ewfcommon_set_hash_value_md5(
 		     handle,
 		     md5_hash_string,
 		     md5_hash_string_length ) != 1 )
@@ -1961,7 +1960,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		}
 		/* The SHA1 hash string must be set before write finalized is used
 		 */
-		if( libewf_set_hash_value_sha1(
+		if( ewfcommon_set_hash_value_sha1(
 		     handle,
 		     sha1_hash_string,
 		     sha1_hash_string_length ) != 1 )
@@ -2624,7 +2623,7 @@ ssize64_t ewfcommon_export_ewf(
 		return( -1 );
 	}
 	if( ( acquiry_operating_system != NULL )
-	 && ( libewf_set_header_value_acquiry_operating_system(
+	 && ( ewfcommon_set_header_value_acquiry_operating_system(
 	       export_handle,
 	       acquiry_operating_system,
 	       string_length(
@@ -2635,7 +2634,7 @@ ssize64_t ewfcommon_export_ewf(
 
 		return( -1 );
 	}
-	if( libewf_set_header_value(
+	if( ewfcommon_set_header_value(
 	     export_handle,
 	     _CHARACTER_T_STRING( "acquiry_software" ),
 	     acquiry_software,
@@ -2647,7 +2646,7 @@ ssize64_t ewfcommon_export_ewf(
 
 		return( -1 );
 	}
-	if( libewf_set_header_value_acquiry_software_version(
+	if( ewfcommon_set_header_value_acquiry_software_version(
 	     export_handle,
 	     acquiry_software_version,
 	     string_length(
@@ -3043,7 +3042,7 @@ ssize64_t ewfcommon_export_ewf(
 #if defined( USE_LIBEWF_SET_HASH_VALUE_MD5 )
 		/* The MD5 hash string must be set before write finalized is used
 		 */
-		if( libewf_set_hash_value_md5(
+		if( ewfcommon_set_hash_value_md5(
 		     export_handle,
 		     md5_hash_string,
 		     md5_hash_string_length ) != 1 )
@@ -3080,7 +3079,7 @@ ssize64_t ewfcommon_export_ewf(
 		}
 		/* The SHA1 hash string must be set before write finalized is used
 		 */
-		if( libewf_set_hash_value_sha1(
+		if( ewfcommon_set_hash_value_sha1(
 		     export_handle,
 		     sha1_hash_string,
 		     sha1_hash_string_length ) != 1 )

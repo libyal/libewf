@@ -1241,7 +1241,7 @@ int libewf_get_segment_filename(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the segment filename
  * The size should include the end of string character
@@ -1387,7 +1387,7 @@ int libewf_get_delta_segment_filename(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the delta segment filename
  * The size should include the end of string character
@@ -2100,7 +2100,7 @@ int libewf_get_header_value_identifier(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the header value identifier specified by its index
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2261,15 +2261,15 @@ int libewf_get_header_value(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_header_value_wide(
      libewf_handle_t *handle,
-     const char *identifier,
-     char *value,
+     const wchar_t *identifier,
+     wchar_t *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -2476,7 +2476,7 @@ int libewf_get_hash_value_identifier(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the hash value identifier specified by its index
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2667,7 +2667,7 @@ int libewf_get_hash_value(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the hash value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2771,7 +2771,7 @@ int libewf_get_hash_value_wide(
 	{
 		return( 0 );
 	}
-	result = libewf_values_table_get_value(
+	result = libewf_values_table_get_value_wide(
                   internal_handle->hash_values,
 	          identifier,
 	          identifier_length,
@@ -3945,7 +3945,7 @@ int libewf_set_segment_filename(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Sets the segment file
  * Returns 1 if successful or -1 on error
@@ -4127,7 +4127,7 @@ int libewf_set_delta_segment_filename(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Sets the delta segment file
  * Returns 1 if successful or -1 on error
@@ -4478,7 +4478,7 @@ int libewf_set_header_value(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Sets the header value specified by the identifier
  * Returns 1 if successful or -1 on error
@@ -4777,7 +4777,7 @@ int libewf_set_hash_value(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful or -1 on error

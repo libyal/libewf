@@ -67,6 +67,70 @@ extern "C" {
 
 #endif
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#define ewfcommon_set_hash_value_md5( handle, md5_hash, md5_hash_length ) \
+	libewf_set_hash_value_md5_wide( handle, md5_hash, md5_hash_length )
+
+#define ewfcommon_set_hash_value_sha1( handle, sha1_hash, sha1_hash_length ) \
+	libewf_set_hash_value_sha1_wide( handle, sha1_hash, sha1_hash_length )
+
+#define ewfcommon_set_header_value( handle, identifier, value, value_length ) \
+	libewf_set_header_value_wide( handle, identifier, value, value_length )
+
+#define ewfcommon_set_header_value_case_number( handle, case_number, case_number_length ) \
+	libewf_set_header_value_case_number_wide( handle, case_number, case_number_length )
+
+#define ewfcommon_set_header_value_description( handle, description, description_length ) \
+	libewf_set_header_value_description_wide( handle, description, description_length )
+
+#define ewfcommon_set_header_value_evidence_number( handle, evidence_number, evidence_number_length ) \
+	libewf_set_header_value_evidence_number_wide( handle, evidence_number, evidence_number_length )
+
+#define ewfcommon_set_header_value_examiner_name( handle, examiner_name, examiner_name_length ) \
+	libewf_set_header_value_examiner_name_wide( handle, examiner_name, examiner_name_length )
+
+#define ewfcommon_set_header_value_notes( handle, notes, notes_length ) \
+	libewf_set_header_value_notes_wide( handle, notes, notes_length )
+
+#define ewfcommon_set_header_value_acquiry_operating_system( handle, acquiry_operating_system, acquiry_operating_system_length ) \
+	libewf_set_header_value_acquiry_operating_system_wide( handle, acquiry_operating_system, acquiry_operating_system_length )
+
+#define ewfcommon_set_header_value_acquiry_software_version( handle, acquiry_software_version, acquiry_software_version_length ) \
+	libewf_set_header_value_acquiry_software_version_wide( handle, acquiry_software_version, acquiry_software_version_length )
+
+#else
+#define ewfcommon_set_hash_value_md5( handle, md5_hash, md5_hash_length ) \
+	libewf_set_hash_value_md5( handle, md5_hash, md5_hash_length )
+
+#define ewfcommon_set_hash_value_sha1( handle, sha1_hash, sha1_hash_length ) \
+	libewf_set_hash_value_sha1( handle, sha1_hash, sha1_hash_length )
+
+#define ewfcommon_set_header_value( handle, identifier, value, value_length ) \
+	libewf_set_header_value( handle, identifier, value, value_length )
+
+#define ewfcommon_set_header_value_case_number( handle, case_number, case_number_length ) \
+	libewf_set_header_value_case_number( handle, case_number, case_number_length )
+
+#define ewfcommon_set_header_value_description( handle, description, description_length ) \
+	libewf_set_header_value_description( handle, description, description_length )
+
+#define ewfcommon_set_header_value_evidence_number( handle, evidence_number, evidence_number_length ) \
+	libewf_set_header_value_evidence_number( handle, evidence_number, evidence_number_length )
+
+#define ewfcommon_set_header_value_examiner_name( handle, examiner_name, examiner_name_length ) \
+	libewf_set_header_value_examiner_name( handle, examiner_name, examiner_name_length )
+
+#define ewfcommon_set_header_value_notes( handle, notes, notes_length ) \
+	libewf_set_header_value_notes( handle, notes, notes_length )
+
+#define ewfcommon_set_header_value_acquiry_operating_system( handle, acquiry_operating_system, acquiry_operating_system_length ) \
+	libewf_set_header_value_acquiry_operating_system( handle, acquiry_operating_system, acquiry_operating_system_length )
+
+#define ewfcommon_set_header_value_acquiry_software_version( handle, acquiry_software_version, acquiry_software_version_length ) \
+	libewf_set_header_value_acquiry_software_version( handle, acquiry_software_version, acquiry_software_version_length )
+
+#endif
+
 extern int ewfcommon_abort;
 extern libewf_handle_t *ewfcommon_libewf_handle;
 

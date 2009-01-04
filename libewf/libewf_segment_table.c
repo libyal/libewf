@@ -587,10 +587,10 @@ int libewf_segment_table_set_basename(
 	}
 #if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( libewf_system_string_copy_from_narrow_string(
-	     basename,
-	     basename_size,
 	     segment_table->basename,
 	     segment_table->basename_size,
+	     basename,
+	     basename_size,
 	     error ) != 1 )
 	{
 		libewf_error_set(
@@ -784,7 +784,7 @@ int libewf_segment_table_set_basename_wide(
 #if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
 	segment_table->basename_size = basename_size;
 #else
-	if( libewf_system_string_size_from_narrow_string(
+	if( libewf_system_string_size_from_wide_string(
 	     basename,
 	     basename_size,
 	     &( segment_table->basename_size ),
@@ -839,10 +839,10 @@ int libewf_segment_table_set_basename_wide(
 	segment_table->basename[ basename_size - 1 ] = 0;
 #else
 	if( libewf_system_string_copy_from_wide_string(
-	     basename,
-	     basename_size,
 	     segment_table->basename,
 	     segment_table->basename_size,
+	     basename,
+	     basename_size,
 	     error ) != 1 )
 	{
 		libewf_error_set(

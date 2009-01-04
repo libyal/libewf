@@ -248,10 +248,10 @@ int libewf_file_io_handle_set_filename(
 	}
 #if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( libewf_system_string_copy_from_narrow_string(
-	     filename,
-	     filename_size,
 	     file_io_handle->filename,
 	     file_io_handle->filename_size,
+	     filename,
+	     filename_size,
 	     error ) != 1 )
 	{
 		libewf_error_set(
@@ -535,10 +535,10 @@ int libewf_file_io_handle_set_filename_wide(
 	file_io_handle->filename[ filename_size - 1 ] = 0;
 #else
 	if( libewf_system_string_copy_from_wide_string(
-	     filename,
-	     filename_size,
 	     file_io_handle->filename,
 	     file_io_handle->filename_size,
+	     filename,
+	     filename_size,
 	     error ) != 1 )
 	{
 		libewf_error_set(

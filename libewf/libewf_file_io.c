@@ -21,13 +21,14 @@
  */
 
 #include <common.h>
+#include <memory.h>
 #include <types.h>
 
 #include <errno.h>
 
 #include "libewf_error.h"
 #include "libewf_file_io.h"
-#include "libewf_system_string.h"
+#include "libewf_string.h"
 
 /* Function to open a file
  * Returns the file descriptor or -1 on error 
@@ -107,7 +108,8 @@ int libewf_file_io_open(
 	return( file_descriptor );
 }
 
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Function to open a file
  * Returns the file descriptor or -1 on error 
  */
@@ -116,7 +118,7 @@ int libewf_file_io_open_wide(
      int flags,
      libewf_error_t **error )
 {
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_TYPE ) && !defined( HAVE_WINDOWS_API )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WINDOWS_API )
 	char *narrow_filename       = NULL;
 	size_t filename_size        = 0;
 	size_t narrow_filename_size = 0;
@@ -145,10 +147,10 @@ int libewf_file_io_open_wide(
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
 #else
-	filename_size = 1 + libewf_system_string_length(
+	filename_size = 1 + wide_string_length(
 	                     filename );
 
-	if( utf8_string_size_from_libewf_system_string(
+	if( narrow_string_size_from_libewf_string(
 	     filename,
 	     filename_size,
 	     &narrow_filename_size,
@@ -177,7 +179,7 @@ int libewf_file_io_open_wide(
 
 		return( -1 );
 	}
-	if( utf8_string_copy_from_libewf_system_string(
+	if( narrow_string_copy_from_libewf_string(
 	     narrow_filename,
 	     narrow_filename_size,
 	     filename,
@@ -246,6 +248,7 @@ int libewf_file_io_open_wide(
 	}
 	return( file_descriptor );
 }
+
 #endif
 
 /* Function to determine if a file exists
@@ -328,7 +331,8 @@ int libewf_file_io_exists(
 	return( result );
 }
 
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Function to determine if a file exists
  * Return 1 if file exists, 0 if not or -1 on error
  */
@@ -408,5 +412,6 @@ int libewf_file_io_exists_wide(
 	}
 	return( result );
 }
+
 #endif
 

@@ -24,8 +24,10 @@
 #define _LIBEWF_FILENAME_H
 
 #include <common.h>
+#include <narrow_string.h>
 #include <memory.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_error.h"
 #include "libewf_system_string.h"
@@ -43,14 +45,16 @@ int libewf_filename_set_extension(
      uint8_t ewf_format,
      libewf_error_t **error );
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_filename_set_extension_wide(
-     char *extension,
+     wchar_t *extension,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
      libewf_error_t **error );
+#endif
 
 int libewf_filename_create(
      libewf_system_character_t **filename,

@@ -641,7 +641,7 @@ int main( int argc, char * const argv[] )
 
 			acquiry_operating_system[ 0 ] = 0;
 		}
-		acquiry_software_version = LIBEWF_VERSION_STRING;
+		acquiry_software_version = _CHARACTER_T_STRING( LIBEWF_VERSION_STRING );
 
 		fprintf( stdout, "Using the following acquiry parameters:\n" );
 

@@ -54,7 +54,7 @@ int libewf_hash_values_initialize(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_identifier(
+	if( libewf_values_table_set_identifier_libewf_string(
 	     hash_values,
 	     LIBEWF_HASH_VALUES_INDEX_MD5,
 	     _LIBEWF_STRING( "MD5" ),
@@ -153,7 +153,7 @@ int libewf_hash_values_parse_md5_hash(
 			return( -1 );
 		}
 	}
-	result = libewf_values_table_get_value(
+	result = libewf_values_table_get_value_libewf_string(
 	          *hash_values,
 	          _LIBEWF_STRING( "MD5" ),
 	          3,
@@ -201,7 +201,7 @@ int libewf_hash_values_parse_md5_hash(
 			md5_hash_string[ md5_hash_string_iterator++ ] = (libewf_character_t) ( (uint8_t) 'a' + ( md5_digit - 10 ) );
 		}
 	}
-	result = libewf_values_table_set_value(
+	result = libewf_values_table_set_value_libewf_string(
 		  *hash_values,
 		  _LIBEWF_STRING( "MD5" ),
 		  3,
@@ -379,7 +379,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		 */
 		*open_tag_end = 0;
 
-		if( libewf_values_table_set_value(
+		if( libewf_values_table_set_value_libewf_string(
 		     *hash_values,
 		     &open_tag_start[ 1 ],
 		     identifier_length,
@@ -975,7 +975,7 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( -1 );
 	}
-	result = libewf_values_table_get_value(
+	result = libewf_values_table_get_value_libewf_string(
 	          hash_values,
 	          _LIBEWF_STRING( "MD5" ),
 	          3,

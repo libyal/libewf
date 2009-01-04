@@ -1514,7 +1514,7 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "case_number" ),
 	     11,
@@ -1531,7 +1531,7 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "description" ),
 	     11,
@@ -1548,7 +1548,7 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "evidence_number" ),
 	     15,
@@ -1565,7 +1565,7 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "examiner_name" ),
 	     13,
@@ -1582,7 +1582,7 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "notes" ),
 	     5,
@@ -1599,7 +1599,7 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "acquiry_operating_system" ),
 	     24,
@@ -1616,13 +1616,13 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_value(
+	if( libewf_values_table_set_value_libewf_string(
 	     internal_handle->header_values,
 	     _LIBEWF_STRING( "acquiry_software_version" ),
 	     24,
-	     LIBEWF_VERSION_STRING,
+	     _LIBEWF_STRING( LIBEWF_VERSION_STRING ),
 	     libewf_string_length(
-	      LIBEWF_VERSION_STRING ),
+	      _LIBEWF_STRING( LIBEWF_VERSION_STRING ) ),
 	     error ) != 1 )
 	{
 		libewf_error_set(

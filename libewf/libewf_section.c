@@ -864,7 +864,6 @@ ssize_t libewf_section_header_read(
 		return( -1 );
 	}
 #endif
-
 	if( *cached_header == NULL )
 	{
 		*cached_header      = header;
@@ -937,7 +936,6 @@ ssize_t libewf_section_header_write(
 		return( -1 );
 	}
 #endif
-
 	section_write_count = libewf_section_write_compressed_string(
 	                       file_io_pool,
 	                       segment_file_handle,

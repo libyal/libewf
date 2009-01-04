@@ -684,13 +684,13 @@ int libewf_file_io_pool_add_file(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 /* Adds a file to the file io pool
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_io_pool_add_file_wide(
      libewf_file_io_pool_t *file_io_pool,
-     char *filename,
+     wchar_t *filename,
      int flags,
      int *entry,
      libewf_error_t **error )
@@ -713,7 +713,7 @@ int libewf_file_io_pool_add_file_wide(
 	if( libewf_file_io_pool_create_file_io_handle(
 	     file_io_pool,
 	     &file_io_handle,
-	     &file_io_pool_entry,
+	     entry,
 	     error ) != 1 )
 	{
 		libewf_error_set(

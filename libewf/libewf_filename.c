@@ -22,8 +22,9 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
@@ -161,7 +162,8 @@ int libewf_filename_set_extension(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Creates the filename extension for a certain segment file
  * For EWF-E01, EWF-S01 segment file extension naming schema
  * Returns 1 on success or -1 on error
@@ -290,6 +292,7 @@ int libewf_filename_set_extension_wide(
 
 	return( 1 );
 }
+
 #endif
 
 /* Creates a filename for a certain segment file

@@ -37,7 +37,7 @@ extern "C" {
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename );
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_check_file_signature_wide(
                    const wchar_t *filename );
 #endif
@@ -48,7 +48,7 @@ LIBEWF_EXTERN int libewf_glob(
                    uint8_t format,
                    char **filenames[] );
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_glob_wide(
                    const wchar_t *filename,
                    size_t length,
@@ -61,7 +61,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open(
                                 int amount_of_files,
                                 uint8_t flags );
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
                                 wchar_t * const filenames[],
                                 int amount_of_files,

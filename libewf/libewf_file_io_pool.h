@@ -103,10 +103,10 @@ int libewf_file_io_pool_add_file(
      int *entry,
      libewf_error_t **error );
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_file_io_pool_add_file_wide(
      libewf_file_io_pool_t *file_io_pool,
-     char *filename,
+     wchar_t *filename,
      int flags,
      int *entry,
      libewf_error_t **error );

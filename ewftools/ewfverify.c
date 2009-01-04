@@ -62,6 +62,22 @@
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
 #endif
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#define ewfverify_get_hash_value_md5( handle, hash_value, hash_value_length ) \
+	libewf_get_hash_value_md5_wide( handle, hash_value, hash_value_length )
+
+#define ewfverify_get_hash_value_sha1( handle, hash_value, hash_value_length ) \
+	libewf_get_hash_value_sha1_wide( handle, hash_value, hash_value_length )
+
+#else
+#define ewfverify_get_hash_value_md5( handle, hash_value, hash_value_length ) \
+	libewf_get_hash_value_md5( handle, hash_value, hash_value_length )
+
+#define ewfverify_get_hash_value_sha1( handle, hash_value, hash_value_length ) \
+	libewf_get_hash_value_sha1( handle, hash_value, hash_value_length )
+
+#endif
+
 /* Prints the executable usage information to the stream
  */
 void usage_fprint(
@@ -607,7 +623,7 @@ int main( int argc, char * const argv[] )
 			}
 #endif
 #if defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
-			stored_md5_hash_result = libewf_get_hash_value_md5(
+			stored_md5_hash_result = ewfverify_get_hash_value_md5(
 			                           ewfcommon_libewf_handle,
 			                           stored_md5_hash_string,
 			                           EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
@@ -637,7 +653,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_result = libewf_get_hash_value_sha1(
+			stored_sha1_hash_result = ewfverify_get_hash_value_sha1(
 						   ewfcommon_libewf_handle,
 						   stored_sha1_hash_string,
 						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );

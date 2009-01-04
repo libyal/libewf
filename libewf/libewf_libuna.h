@@ -41,6 +41,7 @@
 #elif( HAVE_LOCAL_LIBUNA )
 
 #include <libuna_byte_stream.h>
+#include <libuna_compare.h>
 #include <libuna_error.h>
 #include <libuna_unicode_character.h>
 #include <libuna_utf8_stream.h>

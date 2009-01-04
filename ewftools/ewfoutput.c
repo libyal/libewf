@@ -100,37 +100,55 @@ void ewfoutput_version_fprint(
 
 	if( stream == NULL )
 	{
-		notify_warning_printf( "%s: invalid stream.\n",
+		notify_warning_printf(
+		 "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( program == NULL )
 	{
-		notify_warning_printf( "%s: invalid program name.\n",
+		notify_warning_printf(
+		 "%s: invalid program name.\n",
 		 function );
 
 		return;
 	}
-	fprintf( stream, "%" PRIs " %" PRIs " (libewf %" PRIs "",
-	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING );
+	fprintf(
+	 stream,
+	 "%" PRIs " %s (libewf %s",
+	 program,
+	 LIBEWF_VERSION_STRING,
+	 LIBEWF_VERSION_STRING );
 
-	fprintf( stream, ", libuna %s",
+	fprintf(
+	 stream,
+	 ", libuna %s",
 	 LIBUNA_VERSION_STRING );
 
 #if defined( HAVE_LIBZ )
-	fprintf( stream, ", zlib %s", ZLIB_VERSION );
+	fprintf(
+	 stream,
+	 ", zlib %s",
+	 ZLIB_VERSION );
 #endif
 
 #if defined( HAVE_LIBCRYPTO )
-	fprintf( stream, ", libcrypto %s", SHLIB_VERSION_NUMBER );
+	fprintf(
+	 stream,
+	 ", libcrypto %s",
+	 SHLIB_VERSION_NUMBER );
 #endif
 
 #if defined( HAVE_LIBUUID )
-	fprintf( stream, ", libuuid" );
+	fprintf(
+	 stream,
+	 ", libuuid" );
 #endif
 
-	fprintf( stream, ")\n\n" );
+	fprintf(
+	 stream,
+	 ")\n\n" );
 }
 
 /* Prints the executable version information
@@ -856,14 +874,16 @@ void ewfoutput_header_values_fprint(
 
 	if( stream == NULL )
 	{
-		notify_warning_printf( "%s: invalid stream.\n",
+		notify_warning_printf(
+		 "%s: invalid stream.\n",
 		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		notify_warning_printf(
+		 "%s: invalid handle.\n",
 		 function );
 
 		return;
@@ -872,102 +892,127 @@ void ewfoutput_header_values_fprint(
 	     handle,
 	     &amount_of_values ) == -1 )
 	{
-		notify_warning_printf( "%s: unable to retrieve the amount of header values.\n",
+		notify_warning_printf(
+		 "%s: unable to retrieve the amount of header values.\n",
 		 function );
 
 		return;
 	}
 	if( amount_of_values == 0 )
 	{
-		fprintf( stream, "\tNo information found in file.\n" );
+		fprintf(
+		 stream,
+		 "\tNo information found in file.\n" );
 
 		return;
 	}
-	if( libewf_get_header_value_case_number(
+	if( ewfoutput_get_header_value_case_number(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tCase number:\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tCase number:\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_description(
+	if( ewfoutput_get_header_value_description(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tDescription:\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tDescription:\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_examiner_name(
+	if( ewfoutput_get_header_value_examiner_name(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tExaminer name:\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tExaminer name:\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_evidence_number(
+	if( ewfoutput_get_header_value_evidence_number(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tEvidence number:\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tEvidence number:\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_notes(
+	if( ewfoutput_get_header_value_notes(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tNotes:\t\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tNotes:\t\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_acquiry_date(
+	if( ewfoutput_get_header_value_acquiry_date(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tAcquiry date:\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tAcquiry date:\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_system_date(
+	if( ewfoutput_get_header_value_system_date(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tSystem date:\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tSystem date:\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_acquiry_operating_system(
+	if( ewfoutput_get_header_value_acquiry_operating_system(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tOperating system used:\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tOperating system used:\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_acquiry_software_version(
+	if( ewfoutput_get_header_value_acquiry_software_version(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tSoftware version used:\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tSoftware version used:\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_password(
+	if( ewfoutput_get_header_value_password(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tPassword:\t\t(hash: %" PRIs ")\n",
+		fprintf(
+		 stream,
+		 "\tPassword:\t\t(hash: %" PRIs ")\n",
 		 header_value );
 	}
 	else
 	{
-		fprintf( stream, "\tPassword:\t\tN/A\n" );
+		fprintf(
+		 stream,
+		 "\tPassword:\t\tN/A\n" );
 	}
-	if( libewf_get_header_value_compression_type(
+	if( ewfoutput_get_header_value_compression_type(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
@@ -976,98 +1021,125 @@ void ewfoutput_header_values_fprint(
 		     header_value,
 		     LIBEWF_COMPRESSION_TYPE_NONE, 1 ) == 0 )
 		{
-			fprintf( stream, "\tCompression type:\tno compression\n" );
+			fprintf(
+			 stream,
+			 "\tCompression type:\tno compression\n" );
 		}
 		else if( string_compare(
 		          header_value,
 		          LIBEWF_COMPRESSION_TYPE_FAST, 1 ) == 0 )
 		{
-			fprintf( stream, "\tCompression type:\tgood (fast) compression\n" );
+			fprintf(
+			 stream,
+			 "\tCompression type:\tgood (fast) compression\n" );
 		}
 		else if( string_compare(
 		          header_value,
 		          LIBEWF_COMPRESSION_TYPE_BEST, 1 ) == 0 )
 		{
-			fprintf( stream, "\tCompression type:\tbest compression\n" );
+			fprintf(
+			 stream,
+			 "\tCompression type:\tbest compression\n" );
 		}
 		else
 		{
-			fprintf( stream, "\tCompression type:\tunknown compression\n" );
+			fprintf(
+			 stream,
+			 "\tCompression type:\tunknown compression\n" );
 		}
 	}
-	if( libewf_get_header_value_model(
+	if( ewfoutput_get_header_value_model(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tModel:\t\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tModel:\t\t\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value_serial_number(
+	if( ewfoutput_get_header_value_serial_number(
 	     handle,
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tSerial number:\t\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tSerial number:\t\t%" PRIs "\n",
 		 header_value );
 	}
 	/* TODO figure out what this value represents and add get & set API functions to libewf
 	 */
-	if( libewf_get_header_value(
+	if( ewfoutput_get_header_value(
 	     handle,
 	     _CHARACTER_T_STRING( "unknown_pid" ),
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tUnknown value pid:\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tUnknown value pid:\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value(
+	if( ewfoutput_get_header_value(
 	     handle,
 	     _CHARACTER_T_STRING( "unknown_dc" ),
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tUnknown value dc:\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tUnknown value dc:\t%" PRIs "\n",
 		 header_value );
 	}
-	if( libewf_get_header_value(
+	if( ewfoutput_get_header_value(
 	     handle,
 	     _CHARACTER_T_STRING( "unknown_ext" ),
 	     header_value,
 	     header_value_length ) == 1 )
 	{
-		fprintf( stream, "\tUnknown value ext:\t%" PRIs "\n",
+		fprintf(
+		 stream,
+		 "\tUnknown value ext:\t%" PRIs "\n",
 		 header_value );
 	}
 	if( amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		fprintf( stream, "\n\tAdditional values:\n" );
+		fprintf(
+		 stream,
+		 "\n\tAdditional values:\n" );
 
 		for( iterator = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 		{
-			if( libewf_get_header_value_identifier(
+			if( ewfoutput_get_header_value_identifier(
 			     handle,
 			     iterator,
 			     header_identifier,
 			     header_identifier_length ) != 1 )
 			{
-				notify_warning_printf( "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
-				 function, iterator );
+				notify_warning_printf(
+				 "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
+				 function,
+				 iterator );
 			}
-			else if( libewf_get_header_value(
+			else if( ewfoutput_get_header_value(
 			          handle,
 			          header_identifier,
 			          header_value,
 			          header_value_length ) != 1 )
 			{
-				notify_warning_printf( "%s: unable to retrieve the header value for identifier: %" PRIs ".\n",
-				 function, header_identifier );
+				notify_warning_printf(
+				 "%s: unable to retrieve the header value for identifier: %" PRIs ".\n",
+				 function,
+				 header_identifier );
 			}
 			else
 			{
-				fprintf( stream, "\t%" PRIs ": %" PRIs "\n",
-				 header_identifier, header_value );
+				fprintf(
+				 stream,
+				 "\t%" PRIs ": %" PRIs "\n",
+				 header_identifier,
+				 header_value );
 			}
 		}
 	}
@@ -1166,7 +1238,7 @@ void ewfoutput_hash_values_fprint(
 			{
 				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 				{
-					if( libewf_get_hash_value_identifier(
+					if( ewfoutput_get_hash_value_identifier(
 					     handle,
 					     iterator,
 					     hash_identifier,
@@ -1191,7 +1263,7 @@ void ewfoutput_hash_values_fprint(
 					{
 						continue;
 					}
-					else if( libewf_get_hash_value(
+					else if( ewfoutput_get_hash_value(
 					          handle,
 					          hash_identifier,
 					          hash_value,

@@ -34,6 +34,114 @@
 
 #include "character_string.h"
 
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+#define ewfoutput_get_hash_value_identifier( handle, index, identifier, identifier_length ) \
+	libewf_get_hash_value_identifier_wide( handle, index, identifier, identifier_length )
+
+#define ewfoutput_get_hash_value( handle, identifier, value, value_length ) \
+	libewf_get_hash_value_wide( handle, identifier, value, value_length )
+
+#define ewfoutput_get_header_value_identifier( handle, index, identifier, identifier_length ) \
+	libewf_get_header_value_identifier_wide( handle, index, identifier, identifier_length )
+
+#define ewfoutput_get_header_value( handle, identifier, value, value_length ) \
+	libewf_get_header_value_wide( handle, identifier, value, value_length )
+
+#define ewfoutput_get_header_value_case_number( handle, case_number, case_number_length ) \
+	libewf_get_header_value_case_number_wide( handle, case_number, case_number_length )
+
+#define ewfoutput_get_header_value_description( handle, description, description_length ) \
+	libewf_get_header_value_description_wide( handle, description, description_length )
+
+#define ewfoutput_get_header_value_evidence_number( handle, evidence_number, evidence_number_length ) \
+	libewf_get_header_value_evidence_number_wide( handle, evidence_number, evidence_number_length )
+
+#define ewfoutput_get_header_value_examiner_name( handle, examiner_name, examiner_name_length ) \
+	libewf_get_header_value_examiner_name_wide( handle, examiner_name, examiner_name_length )
+
+#define ewfoutput_get_header_value_notes( handle, notes, notes_length ) \
+	libewf_get_header_value_notes_wide( handle, notes, notes_length )
+
+#define ewfoutput_get_header_value_acquiry_date( handle, acquiry_date, acquiry_date_length ) \
+	libewf_get_header_value_acquiry_date_wide( handle, acquiry_date, acquiry_date_length )
+
+#define ewfoutput_get_header_value_system_date( handle, system_date, system_date_length ) \
+	libewf_get_header_value_system_date_wide( handle, system_date, system_date_length )
+
+#define ewfoutput_get_header_value_password( handle, password, password_length ) \
+	libewf_get_header_value_password_wide( handle, password, password_length )
+
+#define ewfoutput_get_header_value_compression_type( handle, compression_type, compression_type_length ) \
+	libewf_get_header_value_compression_type_wide( handle, compression_type, compression_type_length )
+
+#define ewfoutput_get_header_value_acquiry_operating_system( handle, acquiry_operating_system, acquiry_operating_system_length ) \
+	libewf_get_header_value_acquiry_operating_system_wide( handle, acquiry_operating_system, acquiry_operating_system_length )
+
+#define ewfoutput_get_header_value_acquiry_software_version( handle, acquiry_software_version, acquiry_software_version_length ) \
+	libewf_get_header_value_acquiry_software_version_wide( handle, acquiry_software_version, acquiry_software_version_length )
+
+#define ewfoutput_get_header_value_model( handle, model, model_length ) \
+	libewf_get_header_value_model_wide( handle, model, model_length )
+
+#define ewfoutput_get_header_value_serial_number( handle, serial_number, serial_number_length ) \
+	libewf_get_header_value_serial_number_wide( handle, serial_number, serial_number_length )
+
+#else
+#define ewfoutput_get_hash_value_identifier( handle, index, identifier, identifier_length ) \
+	libewf_get_hash_value_identifier( handle, index, identifier, identifier_length )
+
+#define ewfoutput_get_hash_value( handle, identifier, value, value_length ) \
+	libewf_get_hash_value( handle, identifier, value, value_length )
+
+#define ewfoutput_get_header_value_identifier( handle, index, identifier, identifier_length ) \
+	libewf_get_header_value_identifier( handle, index, identifier, identifier_length )
+
+#define ewfoutput_get_header_value( handle, identifier, value, value_length ) \
+	libewf_get_header_value( handle, identifier, value, value_length )
+
+#define ewfoutput_get_header_value_case_number( handle, case_number, case_number_length ) \
+	libewf_get_header_value_case_number( handle, case_number, case_number_length )
+
+#define ewfoutput_get_header_value_description( handle, description, description_length ) \
+	libewf_get_header_value_description( handle, description, description_length )
+
+#define ewfoutput_get_header_value_evidence_number( handle, evidence_number, evidence_number_length ) \
+	libewf_get_header_value_evidence_number( handle, evidence_number, evidence_number_length )
+
+#define ewfoutput_get_header_value_examiner_name( handle, examiner_name, examiner_name_length ) \
+	libewf_get_header_value_examiner_name( handle, examiner_name, examiner_name_length )
+
+#define ewfoutput_get_header_value_notes( handle, notes, notes_length ) \
+	libewf_get_header_value_notes( handle, notes, notes_length )
+
+#define ewfoutput_get_header_value_acquiry_date( handle, acquiry_date, acquiry_date_length ) \
+	libewf_get_header_value_acquiry_date( handle, acquiry_date, acquiry_date_length )
+
+#define ewfoutput_get_header_value_system_date( handle, system_date, system_date_length ) \
+	libewf_get_header_value_system_date( handle, system_date, system_date_length )
+
+#define ewfoutput_get_header_value_password( handle, password, password_length ) \
+	libewf_get_header_value_password( handle, password, password_length )
+
+#define ewfoutput_get_header_value_compression_type( handle, compression_type, compression_type_length ) \
+	libewf_get_header_value_compression_type( handle, compression_type, compression_type_length )
+
+#define ewfoutput_get_header_value_acquiry_operating_system( handle, acquiry_operating_system, acquiry_operating_system_length ) \
+	libewf_get_header_value_acquiry_operating_system( handle, acquiry_operating_system, acquiry_operating_system_length )
+
+#define ewfoutput_get_header_value_acquiry_software_version( handle, acquiry_software_version, acquiry_software_version_length ) \
+	libewf_get_header_value_acquiry_software_version( handle, acquiry_software_version, acquiry_software_version_length )
+
+#define ewfoutput_get_header_value_model( handle, model, model_length ) \
+	libewf_get_header_value_model( handle, model, model_length )
+
+#define ewfoutput_get_header_value_serial_number( handle, serial_number, serial_number_length ) \
+	libewf_get_header_value_serial_number( handle, serial_number, serial_number_length )
+
+#endif
+
 #if defined( __cplusplus )
 extern "C" {
 #endif

@@ -162,7 +162,7 @@ int libewf_check_file_signature(
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_check_file_signature_wide(
      const wchar_t *filename )
 {
@@ -583,7 +583,8 @@ int libewf_glob(
 	return( amount_of_files );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Globs the segment files according to the EWF naming schema
  * if format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
@@ -799,7 +800,7 @@ int libewf_glob_wide(
 		{
 			segment_filename[ length ] = (wchar_t) '.';
 		}
-		if( libewf_filename_set_extension(
+		if( libewf_filename_set_extension_wide(
 		     &( segment_filename[ length + additional_length - 3 ] ),
 		     (uint16_t) ( amount_of_files + 1 ),
 		     UINT16_MAX,
@@ -1375,7 +1376,8 @@ libewf_handle_t *libewf_open(
 	return( handle );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
@@ -1632,12 +1634,12 @@ libewf_handle_t *libewf_open_wide(
 		}
 		/* Get the basename of the first segment file
 		 */
-		filename_length = narrow_string_length(
+		filename_length = wide_string_length(
 				   first_segment_filename );
 
 		/* Set segment table basename
 		 */
-		if( libewf_segment_table_set_basename(
+		if( libewf_segment_table_set_basename_wide(
 		     internal_handle->segment_table,
 		     first_segment_filename,
 		     filename_length - 4 + 1,
@@ -1663,12 +1665,12 @@ libewf_handle_t *libewf_open_wide(
 		}
 		/* Get the basename of the first segment file
 		 */
-		filename_length = narrow_string_length(
+		filename_length = wide_string_length(
 				   first_delta_segment_filename );
 
 		/* Set delta segment table basename
 		 */
-		if( libewf_segment_table_set_basename(
+		if( libewf_segment_table_set_basename_wide(
 		     internal_handle->delta_segment_table,
 		     first_delta_segment_filename,
 		     filename_length - 4 + 1,
@@ -1796,12 +1798,12 @@ libewf_handle_t *libewf_open_wide(
 	{
 		/* Get the basename and store it in the segment tables
 		 */
-		filename_length = narrow_string_length(
+		filename_length = wide_string_length(
 				   filenames[ 0 ] );
 
 		/* Set segment table basename
 		 */
-		if( libewf_segment_table_set_basename(
+		if( libewf_segment_table_set_basename_wide(
 		     internal_handle->segment_table,
 		     filenames[ 0 ],
 		     filename_length + 1,
@@ -1857,9 +1859,9 @@ libewf_handle_t *libewf_open_wide(
 	 "%s: open successful.\n",
 	 function );
 #endif
-
 	return( handle );
 }
+
 #endif
 
 /* Closes the EWF handle and frees memory used within the handle

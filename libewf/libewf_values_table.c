@@ -640,8 +640,8 @@ int libewf_values_table_get_index(
 
 			continue;
 		}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-		if( libewf_string_compare_with_wide_string(
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		if( libewf_string_compare_with_narrow_string(
 		     values_table->identifier[ values_table_iterator ],
 		     values_table->identifier_length[ values_table_iterator ] + 1,
 		     identifier,
@@ -671,14 +671,14 @@ int libewf_values_table_get_index(
 	return( 0 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves the index for a certain identifier
  * Returns 1 if successful, 0 if no index was found or -1 on error
  */
 int libewf_values_table_get_index_wide(
      libewf_values_table_t *values_table,
-     const char *identifier,
+     const wchar_t *identifier,
      size_t identifier_length,
      int *index,
      libewf_error_t **error )
@@ -778,7 +778,7 @@ int libewf_values_table_get_index_wide(
 
 			continue;
 		}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		if( values_table->identifier_length[ values_table_iterator ] != identifier_length )
 		{
 			continue;
@@ -793,7 +793,7 @@ int libewf_values_table_get_index_wide(
 			return( 1 );
 		}
 #else
-		if( libewf_string_compare_with_narrow_string(
+		if( libewf_string_compare_with_wide_string(
 		     values_table->identifier[ values_table_iterator ],
 		     values_table->identifier_length[ values_table_iterator ] + 1,
 		     identifier,
@@ -890,7 +890,7 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( narrow_string_size_from_libewf_string(
 	     values_table->identifier[ index ],
 	     values_table->identifier_length[ index ] + 1,
@@ -920,7 +920,7 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( narrow_string_copy_from_libewf_string(
 	     identifier,
 	     identifier_size,
@@ -1042,7 +1042,7 @@ int libewf_values_table_set_identifier(
 	{
 		identifier_length -= 1;
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_size_from_narrow_string(
 	     identifier,
 	     identifier_length + 1,
@@ -1076,12 +1076,12 @@ int libewf_values_table_set_identifier(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_copy_from_narrow_string(
-	     identifier,
-	     identifier_length + 1,
 	     values_table->identifier[ index ],
 	     values_table->identifier_length[ index ] + 1,
+	     identifier,
+	     identifier_length + 1,
 	     error ) != 1 )
 	{
 		libewf_error_set(
@@ -1125,7 +1125,7 @@ int libewf_values_table_set_identifier(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves an identifier in the values table
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -1206,7 +1206,7 @@ int libewf_values_table_get_identifier_wide(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	wide_identifier_size = values_table->identifier_length[ index ] + 1;
 #else
 	if( wide_string_size_from_libewf_string(
@@ -1236,7 +1236,7 @@ int libewf_values_table_get_identifier_wide(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_copy(
 	     identifier,
 	     values_table->identifier[ index ],
@@ -1280,7 +1280,7 @@ int libewf_values_table_get_identifier_wide(
 int libewf_values_table_set_identifier_wide(
      libewf_values_table_t *values_table,
      int index,
-     const char *identifier,
+     const wchar_t *identifier,
      size_t identifier_length,
      libewf_error_t **error )
 {
@@ -1358,7 +1358,7 @@ int libewf_values_table_set_identifier_wide(
 	{
 		identifier_length -= 1;
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	values_table->identifier_length[ index ] = identifier_length;
 #else
 	if( libewf_string_size_from_wide_string(
@@ -1392,7 +1392,7 @@ int libewf_values_table_set_identifier_wide(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_copy(
 	     values_table->identifier[ index ],
 	     identifier,
@@ -1416,10 +1416,10 @@ int libewf_values_table_set_identifier_wide(
 	( values_table->identifier[ index ] )[ identifier_length ] = 0;
 #else
 	if( libewf_string_copy_from_wide_string(
-	     identifier,
-	     identifier_length + 1,
 	     values_table->identifier[ index ],
 	     values_table->identifier_length[ index ] + 1,
+	     identifier,
+	     identifier_length + 1,
 	     error ) != 1 )
 	{
 		libewf_error_set(
@@ -1509,7 +1509,7 @@ int libewf_values_table_get_value(
 	{
 		return( 0 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( narrow_string_size_from_libewf_string(
 	     values_table->value[ index ],
 	     values_table->value_length[ index ] + 1,
@@ -1539,7 +1539,7 @@ int libewf_values_table_get_value(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( narrow_string_copy_from_libewf_string(
 	     value,
 	     value_size,
@@ -1665,7 +1665,7 @@ int libewf_values_table_set_value(
 		{
 			value_length -= 1;
 		}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		if( libewf_string_size_from_narrow_string(
 		     value,
 		     value_length + 1,
@@ -1699,12 +1699,12 @@ int libewf_values_table_set_value(
 
 			return( -1 );
 		}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		if( libewf_string_copy_from_narrow_string(
-		     value,
-		     value_length + 1,
 		     values_table->value[ index ],
 		     values_table->value_length[ index ] + 1,
+		     value,
+		     value_length + 1,
 		     error ) != 1 )
 		{
 			libewf_error_set(
@@ -1749,7 +1749,7 @@ int libewf_values_table_set_value(
 	return( 1 );
 }
 
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Retrieves a value in the values table
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -1817,7 +1817,7 @@ int libewf_values_table_get_value_wide(
 	{
 		return( 0 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	wide_value_size = values_table->value_length[ index ] + 1;
 #else
 	if( wide_string_size_from_libewf_string(
@@ -1847,7 +1847,7 @@ int libewf_values_table_get_value_wide(
 
 		return( -1 );
 	}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 	if( libewf_string_copy(
 	     value,
 	     values_table->value[ index ],
@@ -1973,7 +1973,7 @@ int libewf_values_table_set_value_wide(
 		{
 			value_length -= 1;
 		}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		values_table->value_length[ index ] = value_length;
 #else
 		if( libewf_string_size_from_wide_string(
@@ -2007,7 +2007,7 @@ int libewf_values_table_set_value_wide(
 
 			return( -1 );
 		}
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
 		if( libewf_string_copy(
 		     values_table->value[ index ],
 		     value,
@@ -2031,10 +2031,10 @@ int libewf_values_table_set_value_wide(
 		( values_table->value[ index ] )[ value_length ] = 0;
 #else
 		if( libewf_string_copy_from_wide_string(
-		     value,
-		     value_length + 1,
 		     values_table->value[ index ],
 		     values_table->value_length[ index ] + 1,
+		     value,
+		     value_length + 1,
 		     error ) != 1 )
 		{
 			libewf_error_set(
