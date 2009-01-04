@@ -320,6 +320,10 @@ struct libewf_internal_handle_write
          */
         uint32_t segment_amount_of_chunks;
 
+        /* The maximum amount of chunks that can be written to a chunks section
+         */
+        uint32_t maximum_section_amount_of_chunks;
+
         /* The amount of chunks written of the current chunks section
          */
         uint32_t section_amount_of_chunks;

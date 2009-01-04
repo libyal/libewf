@@ -362,26 +362,27 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 
 		return( NULL );
 	}
-	handle_write->data_section               = NULL;
-	handle_write->input_write_count          = 0;
-	handle_write->write_count                = 0;
-	handle_write->input_write_size           = 0;
-	handle_write->maximum_segment_file_size  = 0;
-	handle_write->segment_file_size          = 0;
-	handle_write->maximum_amount_of_segments = 0;
-	handle_write->chunks_section_write_count = 0;
-	handle_write->amount_of_chunks           = 0;
-	handle_write->chunks_per_segment         = 0;
-	handle_write->chunks_per_chunks_section  = 0;
-	handle_write->segment_amount_of_chunks   = 0;
-	handle_write->section_amount_of_chunks   = 0;
-	handle_write->chunks_section_offset      = 0;
-	handle_write->chunks_section_number      = 0;
-	handle_write->compress_empty_block       = 0;
-	handle_write->unrestrict_offset_amount   = 0;
-	handle_write->values_initialized         = 0;
-	handle_write->create_chunks_section      = 0;
-	handle_write->write_finalized            = 0;
+	handle_write->data_section                     = NULL;
+	handle_write->input_write_count                = 0;
+	handle_write->write_count                      = 0;
+	handle_write->input_write_size                 = 0;
+	handle_write->maximum_segment_file_size        = 0;
+	handle_write->segment_file_size                = 0;
+	handle_write->maximum_amount_of_segments       = 0;
+	handle_write->chunks_section_write_count       = 0;
+	handle_write->amount_of_chunks                 = 0;
+	handle_write->chunks_per_segment               = 0;
+	handle_write->chunks_per_chunks_section        = 0;
+	handle_write->segment_amount_of_chunks         = 0;
+	handle_write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
+	handle_write->section_amount_of_chunks         = 0;
+	handle_write->chunks_section_offset            = 0;
+	handle_write->chunks_section_number            = 0;
+	handle_write->compress_empty_block             = 0;
+	handle_write->unrestrict_offset_amount         = 0;
+	handle_write->values_initialized               = 0;
+	handle_write->create_chunks_section            = 0;
+	handle_write->write_finalized                  = 0;
 
 	return( handle_write );
 }
@@ -2044,28 +2045,6 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 		return( -1 );
 	}
-	if( internal_handle->write->segment_file_size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: the segment file size cannot be zero - using default value.\n",
-		 function );
-
-		internal_handle->write->segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-	}
-	if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	{
-		internal_handle->write->maximum_segment_file_size = INT64_MAX;
-	}
-	else
-	{
-		internal_handle->write->maximum_segment_file_size = INT32_MAX;
-	}
-	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( ( internal_handle->compression_level != EWF_COMPRESSION_NONE )
 	 && ( internal_handle->compression_level != EWF_COMPRESSION_FAST )
 	 && ( internal_handle->compression_level != EWF_COMPRESSION_BEST ) )
@@ -2136,10 +2115,37 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 		internal_handle->ewf_format = EWF_FORMAT_E01;
 	}
 	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_EWFX ) )
+	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
 	{
-		internal_handle->write->unrestrict_offset_amount = 1;
+		internal_handle->write->maximum_segment_file_size        = INT64_MAX;
+		internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6;
+	}
+	else if( internal_handle->format == LIBEWF_FORMAT_EWFX )
+	{
+		internal_handle->write->unrestrict_offset_amount         = 1;
+		internal_handle->write->maximum_segment_file_size        = INT32_MAX;
+		internal_handle->write->maximum_section_amount_of_chunks = INT32_MAX;
+	}
+	else
+	{
+		internal_handle->write->maximum_segment_file_size        = INT32_MAX;
+		internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
+	}
+	/* Determine if the segment file size is in allowed ranges
+	 */
+	if( internal_handle->write->segment_file_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: the segment file size cannot be zero - using default value.\n",
+		 function );
+
+		internal_handle->write->segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
+	}
+	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
 	}
 	/* Determine the maximum amount of segments allowed to write
 	 */

@@ -103,6 +103,13 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 
 		return( -1 );
 	}
+	if( internal_handle->write->maximum_section_amount_of_chunks == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->segment_table == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
@@ -165,7 +172,7 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 	if( internal_handle->write->unrestrict_offset_amount == 0 )
 	{
 		required_chunk_sections = maximum_chunks_per_segment
-		                        % EWF_MAXIMUM_OFFSETS_IN_TABLE;
+		                        % internal_handle->write->maximum_section_amount_of_chunks;
 	}
 	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	{
@@ -265,6 +272,13 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 
 		return( 0 );
 	}
+	if( internal_handle->write->maximum_section_amount_of_chunks == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->write->chunks_per_segment > (int64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunks per segment value exceeds maximum.\n",
@@ -290,20 +304,23 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 
 	if( internal_handle->write->chunks_section_number > 1 )
 	{
-		remaining_amount_of_chunks -= ( ( internal_handle->write->chunks_section_number - 1 ) * EWF_MAXIMUM_OFFSETS_IN_TABLE );
+		remaining_amount_of_chunks -= ( ( internal_handle->write->chunks_section_number - 1 )
+		                            * internal_handle->write->maximum_section_amount_of_chunks );
 	}
 	if( remaining_amount_of_chunks <= 0 )
 	{
 		return( 0 );
 	}
-	else if( ( remaining_amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
+	else if( ( remaining_amount_of_chunks > internal_handle->write->maximum_section_amount_of_chunks )
 	 && ( internal_handle->write->unrestrict_offset_amount == 0 ) )
 	{
-		return( EWF_MAXIMUM_OFFSETS_IN_TABLE );
+		return( internal_handle->write->maximum_section_amount_of_chunks );
 	}
-	else if( remaining_amount_of_chunks > (int64_t) UINT32_MAX )
+	/* Fail safe no more than 2^31 values are allowed
+	 */
+	else if( remaining_amount_of_chunks > (int64_t) INT32_MAX )
 	{
-		remaining_amount_of_chunks = UINT32_MAX;
+		remaining_amount_of_chunks = INT32_MAX;
 	}
 	return( (uint32_t) remaining_amount_of_chunks );
 }
@@ -460,6 +477,13 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		return( -1 );
 	}
+	if( internal_handle->write->maximum_section_amount_of_chunks == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file_offset > (off64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file offset value exceeds maximum.\n",
@@ -551,17 +575,16 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 	/* If the maximum offsets in table restriction should apply
 	 */
 	if( ( internal_handle->write->unrestrict_offset_amount == 0 )
-	 && ( internal_handle->write->section_amount_of_chunks >= EWF_MAXIMUM_OFFSETS_IN_TABLE ) )
+	 && ( internal_handle->write->section_amount_of_chunks > internal_handle->write->maximum_section_amount_of_chunks ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: no space left for additional chunk.\n",
 		 function );
 
 		return( 1 );
 	}
-	/* TODO */
-	/* Make sure the chunks section remains smaller than 2Gb
+	/* Fail safe no more than 2^31 values are allowed
 	 */
-	if( internal_handle->write->chunks_section_write_count > (ssize32_t) INT32_MAX )
+	if( internal_handle->write->section_amount_of_chunks > (uint32_t) INT32_MAX )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: no space left for additional chunk.\n",
 		 function );
