@@ -105,6 +105,51 @@
 
 #endif
 
+/* Input selection defintions
+ */
+LIBEWF_CHAR *ewfcommon_compression_levels[ 3 ] = \
+ { _S_LIBEWF_CHAR( "none" ),
+   _S_LIBEWF_CHAR( "fast" ),
+   _S_LIBEWF_CHAR( "best" ) };
+
+LIBEWF_CHAR *ewfcommon_format_types[ 12 ] = \
+ { _S_LIBEWF_CHAR( "ewf" ),
+   _S_LIBEWF_CHAR( "smart" ),
+   _S_LIBEWF_CHAR( "ftk" ),
+   _S_LIBEWF_CHAR( "encase1" ),
+   _S_LIBEWF_CHAR( "encase2" ),
+   _S_LIBEWF_CHAR( "encase3" ),
+   _S_LIBEWF_CHAR( "encase4" ),
+   _S_LIBEWF_CHAR( "encase5" ),
+   _S_LIBEWF_CHAR( "encase6" ),
+   _S_LIBEWF_CHAR( "linen5" ),
+   _S_LIBEWF_CHAR( "linen6" ),
+   _S_LIBEWF_CHAR( "ewfx" ) };
+
+LIBEWF_CHAR *ewfcommon_media_types[ 2 ] = \
+ { _S_LIBEWF_CHAR( "fixed" ),
+   _S_LIBEWF_CHAR( "removable" ) };
+
+LIBEWF_CHAR *ewfcommon_volume_types[ 2 ] = \
+ { _S_LIBEWF_CHAR( "logical" ),
+   _S_LIBEWF_CHAR( "physical" ) };
+
+LIBEWF_CHAR *ewfcommon_sector_per_block_sizes[ 10 ] = \
+ { _S_LIBEWF_CHAR( "64" ),
+   _S_LIBEWF_CHAR( "128" ),
+   _S_LIBEWF_CHAR( "256" ),
+   _S_LIBEWF_CHAR( "512" ),
+   _S_LIBEWF_CHAR( "1024" ),
+   _S_LIBEWF_CHAR( "2048" ),
+   _S_LIBEWF_CHAR( "4096" ),
+   _S_LIBEWF_CHAR( "8192" ),
+   _S_LIBEWF_CHAR( "16384" ),
+   _S_LIBEWF_CHAR( "32768" ) };
+
+LIBEWF_CHAR *ewfcommon_yes_no[ 2 ] = \
+ { _S_LIBEWF_CHAR( "yes" ),
+   _S_LIBEWF_CHAR( "no" ) };
+
 /* Function to wrap strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
@@ -463,17 +508,7 @@ uint8_t ewfcommon_determine_libewf_format( const CHAR_T *argument )
 
 		return( 0 );
 	}
-	/* This check must before the check for "ewf"
-	 */
-	if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
-	{
-		return( LIBEWF_FORMAT_EWFX );
-	}
-	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewf" ), 3 ) == 0 )
-	{
-		return( LIBEWF_FORMAT_EWF );
-	}
-	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "smart" ), 3 ) == 0 )
+	if( CHAR_T_COMPARE( argument, _S_CHAR_T( "smart" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_SMART );
 	}
@@ -513,7 +548,121 @@ uint8_t ewfcommon_determine_libewf_format( const CHAR_T *argument )
 	{
 		return( LIBEWF_FORMAT_LINEN6 );
 	}
+	/* This check must before the check for "ewf"
+	 */
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_EWFX );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewf" ), 3 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_EWF );
+	}
 	return( 0 );
+}
+
+/* Determines the compression level value from an argument string
+ * Returns the compression level value, or -1 on error
+ */
+int8_t ewfcommon_determine_compression_level( const CHAR_T *argument )
+{
+	static char *function = "ewfcommon_determine_compression_level";
+
+	if( argument == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "none" ), 4 ) == 0 )
+	{
+		return( LIBEWF_COMPRESSION_NONE );
+	}
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "fast" ), 4 ) == 0 )
+	{
+		return( LIBEWF_COMPRESSION_FAST );
+	}
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "best" ), 4 ) == 0 )
+	{
+		return( LIBEWF_COMPRESSION_BEST );
+	}
+	return( -1 );
+}
+
+/* Determines the media type value from an argument string
+ * Returns the media type value, or -1 on error
+ */
+int8_t ewfcommon_determine_media_type( const CHAR_T *argument )
+{
+	static char *function = "ewfcommon_determine_media_type";
+
+	if( argument == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "fixed" ), 5 ) == 0 )
+	{
+		return( LIBEWF_MEDIA_TYPE_FIXED );
+	}
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "removable" ), 9 ) == 0 )
+	{
+		return( LIBEWF_MEDIA_TYPE_REMOVABLE );
+	}
+	return( -1 );
+}
+
+/* Determines the volume type value from an argument string
+ * Returns the volume type value, or -1 on error
+ */
+int8_t ewfcommon_determine_volume_type( const CHAR_T *argument )
+{
+	static char *function = "ewfcommon_determine_volume_type";
+
+	if( argument == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "logical" ), 7 ) == 0 )
+	{
+		return( LIBEWF_VOLUME_TYPE_LOGICAL );
+	}
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "physical" ), 8 ) == 0 )
+	{
+		return( LIBEWF_VOLUME_TYPE_PHYSICAL );
+	}
+	return( -1 );
+}
+
+/* Determines the yes or no value from an argument string
+ * Returns 1 if yes, 0 if no, or -1 on error
+ */
+int8_t ewfcommon_determine_yes_no( const CHAR_T *argument )
+{
+	static char *function = "ewfcommon_determine_yes_no";
+
+	if( argument == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
+	{
+		return( 1 );
+	}
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
+	{
+		return( 0 );
+	}
+	return( -1 );
 }
 
 /* Copies the source string (of CHAR_T) into the destination string for a certain length

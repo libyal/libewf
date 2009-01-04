@@ -115,10 +115,8 @@ void usage( void )
  */
 int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, uint64_t acquiry_offset, uint64_t acquiry_size, uint32_t segment_file_size, uint64_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
 {
-	LIBEWF_CHAR *user_input  = NULL;
-	LIBEWF_CHAR *yes_no[ 2 ] = { _S_LIBEWF_CHAR( "yes" ),
-				     _S_LIBEWF_CHAR( "no" ) };
-	int input_confirmed      = -1;
+	LIBEWF_CHAR *user_input = NULL;
+	int input_confirmed     = -1;
 
 	fprintf( stdout, "The following acquiry parameters were provided:\n" );
 
@@ -150,23 +148,18 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 		user_input = ewfcommon_get_user_input_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Continue acquiry with these values" ),
-		              yes_no,
+		              ewfcommon_yes_no,
 		              2,
 		              0 );
-	
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
-		{
-			input_confirmed = 1;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
-		{
-			input_confirmed = 0;
-		}
-		else
+
+		input_confirmed = ewfcommon_determine_yes_no( user_input );
+
+		libewf_common_free( user_input );
+
+		if( input_confirmed <= -1 )	
 		{
 			fprintf( stdout, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
 		}
-		libewf_common_free( user_input );
 	}
 	fprintf( stdout, "\n" );
 
@@ -255,6 +248,7 @@ int main( int argc, char * const argv[] )
 	LIBEWF_CHAR *notes                        = NULL;
 	LIBEWF_CHAR *acquiry_operating_system     = NULL;
 	LIBEWF_CHAR *acquiry_software_version     = NULL;
+
 	CHAR_T *filename                          = NULL;
 	CHAR_T *time_string                       = NULL;
 #if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
@@ -274,12 +268,12 @@ int main( int argc, char * const argv[] )
 	uint64_t sectors_per_chunk                = 0;
 	uint32_t sector_error_granularity         = 0;
 	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
+	int8_t compress_empty_block               = 0;
 	int8_t result_md5_hash                    = 0;
 	int8_t result_sha1_hash                   = 0;
-	uint8_t media_type                        = LIBEWF_MEDIA_TYPE_FIXED;
-	uint8_t volume_type                       = LIBEWF_VOLUME_TYPE_LOGICAL;
-	uint8_t compress_empty_block              = 0;
-	uint8_t wipe_block_on_read_error          = 0;
+	int8_t media_type                         = LIBEWF_MEDIA_TYPE_FIXED;
+	int8_t volume_type                        = LIBEWF_VOLUME_TYPE_LOGICAL;
+	int8_t wipe_block_on_read_error           = 0;
 	uint8_t libewf_format                     = LIBEWF_FORMAT_UNKNOWN;
 	uint8_t read_error_retry                  = 2;
 	uint8_t swap_byte_pairs                   = 0;
@@ -287,38 +281,6 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                    = 0;
 	uint8_t verbose                           = 0;
 	int file_descriptor                       = 0;
-
-	LIBEWF_CHAR *compression_types[ 3 ]       = { _S_LIBEWF_CHAR( "none" ),
-						      _S_LIBEWF_CHAR( "fast" ),
-						      _S_LIBEWF_CHAR( "best" ) };
-	LIBEWF_CHAR *format_types[ 12 ]           = { _S_LIBEWF_CHAR( "ewf" ),
-						      _S_LIBEWF_CHAR( "smart" ),
-						      _S_LIBEWF_CHAR( "ftk" ),
-						      _S_LIBEWF_CHAR( "encase1" ),
-						      _S_LIBEWF_CHAR( "encase2" ),
-						      _S_LIBEWF_CHAR( "encase3" ),
-						      _S_LIBEWF_CHAR( "encase4" ),
-						      _S_LIBEWF_CHAR( "encase5" ),
-						      _S_LIBEWF_CHAR( "encase6" ),
-						      _S_LIBEWF_CHAR( "linen5" ),
-						      _S_LIBEWF_CHAR( "linen6" ),
-						      _S_LIBEWF_CHAR( "ewfx" ) };
-	LIBEWF_CHAR *media_types[ 2 ]             = { _S_LIBEWF_CHAR( "fixed" ),
-						      _S_LIBEWF_CHAR( "removable" ) };
-	LIBEWF_CHAR *volume_types[ 2 ]            = { _S_LIBEWF_CHAR( "logical" ),
-						      _S_LIBEWF_CHAR( "physical" ) };
-	LIBEWF_CHAR *sector_per_block_sizes[ 10 ] = { _S_LIBEWF_CHAR( "64" ),
-						      _S_LIBEWF_CHAR( "128" ),
-						      _S_LIBEWF_CHAR( "256" ),
-						      _S_LIBEWF_CHAR( "512" ),
-						      _S_LIBEWF_CHAR( "1024" ),
-						      _S_LIBEWF_CHAR( "2048" ),
-						      _S_LIBEWF_CHAR( "4096" ),
-						      _S_LIBEWF_CHAR( "8192" ),
-						      _S_LIBEWF_CHAR( "16384" ),
-						      _S_LIBEWF_CHAR( "32768" ) };
-	LIBEWF_CHAR *yes_no[ 2 ]                  = { _S_LIBEWF_CHAR( "yes" ),
-						      _S_LIBEWF_CHAR( "no" ) };
 
 	ewfsignal_initialize();
 
@@ -458,7 +420,9 @@ int main( int argc, char * const argv[] )
 		 */
 		while( filename == NULL )
 		{
-			filename = ewfcommon_get_user_input_variable_char_t( stdout, _S_LIBEWF_CHAR( "Image path and filename without extension" ) );
+			filename = ewfcommon_get_user_input_variable_char_t(
+			            stdout,
+			            _S_LIBEWF_CHAR( "Image path and filename without extension" ) );
 
 			if( filename == NULL )
 			{
@@ -467,181 +431,162 @@ int main( int argc, char * const argv[] )
 		}
 		/* Case number
 		 */
-		case_number = ewfcommon_get_user_input_variable( stdout, _S_LIBEWF_CHAR( "Case number" ) );
+		case_number = ewfcommon_get_user_input_variable(
+		               stdout,
+		               _S_LIBEWF_CHAR( "Case number" ) );
 
 		/* Description
 		 */
-		description = ewfcommon_get_user_input_variable( stdout, _S_LIBEWF_CHAR( "Description" ) );
+		description = ewfcommon_get_user_input_variable(
+		               stdout,
+		               _S_LIBEWF_CHAR( "Description" ) );
 
 		/* Evidence number
 		 */
-		evidence_number = ewfcommon_get_user_input_variable( stdout, _S_LIBEWF_CHAR( "Evidence number" ) );
+		evidence_number = ewfcommon_get_user_input_variable(
+		                   stdout,
+		                   _S_LIBEWF_CHAR( "Evidence number" ) );
 
 		/* Examiner name
 		 */
-		examiner_name = ewfcommon_get_user_input_variable( stdout, _S_LIBEWF_CHAR( "Examiner name" ) );
+		examiner_name = ewfcommon_get_user_input_variable(
+		                 stdout,
+		                 _S_LIBEWF_CHAR( "Examiner name" ) );
 
 		/* Notes
 		 */
-		notes = ewfcommon_get_user_input_variable( stdout, _S_LIBEWF_CHAR( "Notes" ) );
+		notes = ewfcommon_get_user_input_variable(
+		         stdout,
+		         _S_LIBEWF_CHAR( "Notes" ) );
 
 		/* Media type
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Media type" ), media_types, 2, 0 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "Media type" ),
+		              ewfcommon_media_types,
+		              EWFCOMMON_MEDIA_TYPES_AMOUNT,
+		              EWFCOMMON_MEDIA_TYPES_DEFAULT );
 
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "fixed" ), 5 ) == 0 )
-		{
-			media_type = LIBEWF_MEDIA_TYPE_FIXED;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "removable" ), 9 ) == 0 )
-		{
-			media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
-		}
-		else
+		media_type = ewfcommon_determine_media_type( user_input );
+
+		libewf_common_free( user_input );
+
+		if( media_type <= -1 )
 		{
 			fprintf( stderr, "ewfacquire: unsupported media type.\n" );
 
 			return( EXIT_FAILURE );
 		}
-		libewf_common_free( user_input );
 
 		/* Volume type
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Volume type" ), volume_types, 2, 1 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "Volume type" ),
+		              ewfcommon_volume_types,
+		              EWFCOMMON_VOLUME_TYPES_AMOUNT,
+		              EWFCOMMON_VOLUME_TYPES_DEFAULT );
 
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "logical" ), 7 ) == 0 )
-		{
-			volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "physical" ), 8 ) == 0 )
-		{
-			volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
-		}
-		else
+		volume_type = ewfcommon_determine_volume_type( user_input );
+
+		libewf_common_free( user_input );
+
+		if( volume_type <= -1 )
 		{
 			fprintf( stderr, "ewfacquire: unsupported volume type.\n" );
 
 			return( EXIT_FAILURE );
 		}
-		libewf_common_free( user_input );
 
 		/* Compression
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Use compression" ), compression_types, 3, 0 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "Use compression" ),
+		              ewfcommon_compression_levels,
+		              EWFCOMMON_COMPRESSION_LEVELS_AMOUNT,
+		              EWFCOMMON_COMPRESSION_LEVELS_DEFAULT );
 
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "none" ), 4 ) == 0 )
-		{
-			compression_level = LIBEWF_COMPRESSION_NONE;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "fast" ), 4 ) == 0 )
-		{
-			compression_level = LIBEWF_COMPRESSION_FAST;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "best" ), 4 ) == 0 )
-		{
-			compression_level = LIBEWF_COMPRESSION_BEST;
-		}
-		else
+		compression_level = ewfcommon_determine_compression_level( user_input );
+
+		libewf_common_free( user_input );
+
+		if( compression_level <= -1 )
 		{
 			fprintf( stderr, "ewfacquire: unsupported compression type.\n" );
 
 			return( EXIT_FAILURE );
 		}
-		libewf_common_free( user_input );
 
 		/* Empty block compression
 		 */
 		if( compression_level == LIBEWF_COMPRESSION_NONE )
 		{
-			user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Compress empty blocks" ), yes_no, 2, 1 );
+			user_input = ewfcommon_get_user_input_fixed_value(
+			              stdout,
+			              _S_LIBEWF_CHAR( "Compress empty blocks" ),
+			              ewfcommon_yes_no,
+			              2,
+			              1 );
 
-			if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
-			{
-				compress_empty_block = 1;
-			}
-			else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
-			{
-				compress_empty_block = 0;
-			}
-			else
+			compress_empty_block = ewfcommon_determine_yes_no( user_input );
+
+			libewf_common_free( user_input );
+
+			if( compress_empty_block <= -1 )
 			{
 				fprintf( stderr, "ewfacquire: unsupported answer.\n" );
 
 				return( EXIT_FAILURE );
 			}
-			libewf_common_free( user_input );
 		}
 
 		/* File format
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Use EWF file format" ), format_types, 12, 7 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "Use EWF file format" ),
+		              ewfcommon_format_types,
+		              EWFCOMMON_FORMAT_TYPES_AMOUNT,
+		              EWFCOMMON_FORMAT_TYPES_DEFAULT );
 
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "smart" ), 5 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_SMART;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "ftk" ), 3 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_FTK;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "encase1" ), 7 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_ENCASE1;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "encase2" ), 7 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_ENCASE2;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "encase3" ), 7 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_ENCASE3;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "encase4" ), 7 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_ENCASE4;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "encase5" ), 7 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_ENCASE5;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "encase6" ), 7 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_ENCASE6;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "linen5" ), 6 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_LINEN5;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "linen6" ), 6 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_LINEN6;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "ewfx" ), 4 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_EWFX;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "ewf" ), 3 ) == 0 )
-		{
-			libewf_format = LIBEWF_FORMAT_EWF;
-		}
-		else
+		libewf_format = ewfcommon_determine_libewf_format( user_input );
+
+		libewf_common_free( user_input );
+
+		if( libewf_format == 0 )
 		{
 			fprintf( stderr, "ewfacquire: unsupported EWF file format type.\n" );
 
-			libewf_common_free( user_input );
-
 			exit( EXIT_FAILURE );
 		}
-		libewf_common_free( user_input );
 
 		/* Size and offset of data to acquire
 		 */
-		acquiry_offset = ewfcommon_get_user_input_size_variable( stdout, _S_LIBEWF_CHAR( "Start to acquire at offset" ), 0, input_size, 0 );
-		acquiry_size   = ewfcommon_get_user_input_size_variable( stdout, _S_LIBEWF_CHAR( "Amount of bytes to acquire" ), 0, input_size, input_size );
+		acquiry_offset = ewfcommon_get_user_input_size_variable(
+		                  stdout,
+		                  _S_LIBEWF_CHAR( "Start to acquire at offset" ),
+		                  0,
+		                  input_size,
+		                  0 );
+
+		acquiry_size = ewfcommon_get_user_input_size_variable(
+		                stdout,
+		                _S_LIBEWF_CHAR( "Amount of bytes to acquire" ),
+		                0,
+		                input_size,
+		                input_size );
 
 		/* File size
 		 */
-		segment_file_size  = ewfcommon_get_user_input_size_variable( stdout, _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ), 1440, ( 2 * 1024 * 1024 ), ( 650 * 1024 ) );
+		segment_file_size = ewfcommon_get_user_input_size_variable(
+		                     stdout,
+		                     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
+		                     1440,
+		                     ( 2 * 1024 * 1024 ),
+		                     ( 650 * 1024 ) );
+
 		segment_file_size *= 1024;
 
 		/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
@@ -652,7 +597,12 @@ int main( int argc, char * const argv[] )
 		}
 		/* Chunk size (sectors per block)
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "The amount of sectors to read at once" ), sector_per_block_sizes, 10, 0 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "The amount of sectors to read at once" ),
+		              ewfcommon_sector_per_block_sizes,
+		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
 		sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
 
@@ -660,32 +610,41 @@ int main( int argc, char * const argv[] )
 
 		/* Error granularity
 		 */
-		sector_error_granularity = (uint32_t) ewfcommon_get_user_input_size_variable( stdout, _S_LIBEWF_CHAR( "The amount of sectors to be used as error granularity" ), 1, sectors_per_chunk, 64 );
+		sector_error_granularity = (uint32_t) ewfcommon_get_user_input_size_variable(
+		                                       stdout,
+		                                       _S_LIBEWF_CHAR( "The amount of sectors to be used as error granularity" ),
+		                                       1,
+		                                       sectors_per_chunk,
+		                                       64 );
 
 		/* The amount of read error retry
 		 */
-		read_error_retry = (uint8_t) ewfcommon_get_user_input_size_variable( stdout, _S_LIBEWF_CHAR( "The amount of retries when a read error occurs" ), 0, 255, 2 );
+		read_error_retry = (uint8_t) ewfcommon_get_user_input_size_variable(
+		                              stdout,
+		                              _S_LIBEWF_CHAR( "The amount of retries when a read error occurs" ),
+		                              0,
+		                              255,
+		                              2 );
 
 		/* Wipe the sector on error
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Wipe sectors on read error (mimic EnCase like behavior)" ), yes_no, 2, 0 );
+		user_input = ewfcommon_get_user_input_fixed_value(
+		              stdout,
+		              _S_LIBEWF_CHAR( "Wipe sectors on read error (mimic EnCase like behavior)" ),
+		              ewfcommon_yes_no,
+		              2,
+		              0 );
 
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
-		{
-			wipe_block_on_read_error = 1;
-		}
-		else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
-		{
-			wipe_block_on_read_error = 0;
-		}
-		else
+		wipe_block_on_read_error = ewfcommon_determine_yes_no( user_input );
+
+		libewf_common_free( user_input );
+
+		if( wipe_block_on_read_error <= -1 )
 		{
 			fprintf( stderr, "ewfacquire: unsupported answer.\n" );
 
 			return( EXIT_FAILURE );
 		}
-		libewf_common_free( user_input );
-
 		fprintf( stdout, "\n" );
 	}
 	/* Check if user is content with values
@@ -697,10 +656,10 @@ int main( int argc, char * const argv[] )
 	        evidence_number,
 	        examiner_name,
 	        notes,
-	        media_type,
-	        volume_type,
+	        (uint8_t) media_type,
+	        (uint8_t) volume_type,
 	        compression_level,
-	        compress_empty_block,
+	        (uint8_t) compress_empty_block,
 	        libewf_format,
 	        acquiry_offset,
 	        acquiry_size,
@@ -708,7 +667,7 @@ int main( int argc, char * const argv[] )
 	        sectors_per_chunk,
 	        sector_error_granularity,
 	        read_error_retry,
-	        wipe_block_on_read_error ) == 0 );
+	        (uint8_t) wipe_block_on_read_error ) == 0 );
 
 	/* Done asking user input set up the libewf handle
 	 */
@@ -776,7 +735,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_media_type( handle, media_type, volume_type ) != 1 )
+	if( libewf_set_write_media_type( handle, (uint8_t) media_type, (uint8_t) volume_type ) != 1 )
 	{
 		fprintf( stderr, "Unable to set write media type in handle.\n" );
 
@@ -792,7 +751,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_compression_values( handle, compression_level, compress_empty_block ) != 1 )
+	if( libewf_set_write_compression_values( handle, compression_level, (uint8_t) compress_empty_block ) != 1 )
 	{
 		fprintf( stderr, "Unable to set write compression values in handle.\n" );
 
@@ -972,11 +931,15 @@ int main( int argc, char * const argv[] )
 
 	/* Password is not used within libewf
 	 */
+
 	/* Acquiry date, system date and compression type will be generated automatically when set to NULL
 	 */
 	if( acquiry_operating_system != NULL )
 	{
-		if( libewf_set_header_value_acquiry_operating_system( handle, acquiry_operating_system, libewf_string_length( acquiry_operating_system ) ) != 1 )
+		if( libewf_set_header_value_acquiry_operating_system(
+		     handle,
+		     acquiry_operating_system,
+		     libewf_string_length( acquiry_operating_system ) ) != 1 )
 		{
 			fprintf( stderr, "Unable to set header value acquiry operating system in handle.\n" );
 
@@ -994,7 +957,11 @@ int main( int argc, char * const argv[] )
 		}
 		libewf_common_free( acquiry_operating_system );
 	}
-	if( libewf_set_header_value( handle, _S_LIBEWF_CHAR( "acquiry_software" ), _S_LIBEWF_CHAR( "ewfacquire" ), 10 ) != 1 )
+	if( libewf_set_header_value(
+	     handle,
+	     _S_LIBEWF_CHAR( "acquiry_software" ),
+	     _S_LIBEWF_CHAR( "ewfacquire" ),
+	     10 ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value acquiry software in handle.\n" );
 
@@ -1010,7 +977,10 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_header_value_acquiry_software_version( handle, acquiry_software_version, libewf_string_length( acquiry_software_version ) ) != 1 )
+	if( libewf_set_header_value_acquiry_software_version(
+	     handle,
+	     acquiry_software_version,
+	     libewf_string_length( acquiry_software_version ) ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value acquiry software version number in handle.\n" );
 
@@ -1090,7 +1060,7 @@ int main( int argc, char * const argv[] )
 	               acquiry_offset,
 	               read_error_retry,
 	               sector_error_granularity,
-	               wipe_block_on_read_error,
+	               (uint8_t) wipe_block_on_read_error,
 	               seek_on_error,
 	               calculate_sha1,
 	               callback );
@@ -1141,7 +1111,11 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			result_sha1_hash = libewf_get_hash_value( handle, _S_LIBEWF_CHAR( "SHA1" ), calculated_sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
+			result_sha1_hash = libewf_get_hash_value(
+			                    handle,
+			                    _S_LIBEWF_CHAR( "SHA1" ),
+			                    calculated_sha1_hash_string,
+			                    LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
 		}
 	}
 	if( libewf_common_close( file_descriptor ) != 0 )

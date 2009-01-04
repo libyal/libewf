@@ -136,6 +136,7 @@ Version: 20070819
 * completed reading dirty chunks from delta segment files
 * fixed spelling error in unsuported => unsupported in ewftools
 * rewritten #ifdef to #if defined() and #ifndef to #if !defined()
+* refactored user input handling code from ewftools to ewfcommon
 
 * worked on ewfexport exporting ewf formatted data for delta merge
   ewfexport no longer exports to stdout

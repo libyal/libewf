@@ -184,25 +184,20 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'c':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "none" ), 4 ) == 0 )
-				{
-					compression_level = LIBEWF_COMPRESSION_NONE;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "empty_block" ), 11 ) == 0 )
+				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "empty_block" ), 11 ) == 0 )
 				{
 					compress_empty_block = 1;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "fast" ), 4 ) == 0 )
-				{
-					compression_level = LIBEWF_COMPRESSION_FAST;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "best" ), 4 ) == 0 )
-				{
-					compression_level = LIBEWF_COMPRESSION_BEST;
-				}
 				else
 				{
-					fprintf( stderr, "Unsupported compression type defaulting to none.\n" );
+					compression_level = ewfcommon_determine_compression_level( optarg );
+				
+					if( compression_level <= -1 )
+					{
+						fprintf( stderr, "Unsupported compression type defaulting to none.\n" );
+
+						compression_level = LIBEWF_COMPRESSION_NONE;
+					}
 				}
 				break;
 

@@ -224,6 +224,28 @@ extern "C" {
 
 #endif
 
+extern LIBEWF_CHAR *ewfcommon_compression_levels[ 3 ];
+extern LIBEWF_CHAR *ewfcommon_format_types[ 12 ];
+extern LIBEWF_CHAR *ewfcommon_media_types[ 2 ];
+extern LIBEWF_CHAR *ewfcommon_volume_types[ 2 ];
+extern LIBEWF_CHAR *ewfcommon_sector_per_block_sizes[ 10 ];
+extern LIBEWF_CHAR *ewfcommon_yes_no[ 2 ];
+
+#define EWFCOMMON_COMPRESSION_LEVELS_AMOUNT		3
+#define EWFCOMMON_COMPRESSION_LEVELS_DEFAULT		0
+
+#define EWFCOMMON_FORMAT_TYPES_AMOUNT			12
+#define EWFCOMMON_FORMAT_TYPES_DEFAULT			7
+
+#define EWFCOMMON_MEDIA_TYPES_AMOUNT			2
+#define EWFCOMMON_MEDIA_TYPES_DEFAULT			0
+
+#define EWFCOMMON_VOLUME_TYPES_AMOUNT			2
+#define EWFCOMMON_VOLUME_TYPES_DEFAULT			1
+
+#define EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
+#define EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT	0
+
 char *ewfcommon_strerror( int error_number );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
@@ -234,8 +256,13 @@ LIBEWF_CHAR *ewfcommon_determine_operating_system( void );
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format );
 LIBEWF_CHAR *ewfcommon_determine_units_string( int factor );
 LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size );
-uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument );
+
 uint8_t ewfcommon_determine_libewf_format( const CHAR_T *argument );
+uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument );
+int8_t ewfcommon_determine_compression_level( const CHAR_T *argument );
+int8_t ewfcommon_determine_media_type( const CHAR_T *argument );
+int8_t ewfcommon_determine_volume_type( const CHAR_T *argument );
+int8_t ewfcommon_determine_yes_no( const CHAR_T *argument );
 
 int8_t ewfcommon_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const CHAR_T *source, size_t length );
 int8_t ewfcommon_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *destination, size_t length );
