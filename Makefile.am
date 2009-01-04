@@ -133,9 +133,9 @@ distclean: clean
 	/bin/rm -f debian/changelog
 	/bin/rm -f debian/shlibs.local.ex
 	/bin/rm -f include/libewf.h
-	/bin/rm -f include/libewf/libewf_definitions.h
-	/bin/rm -f include/libewf/libewf_types.h
-	/bin/rm -f libewf/libewf_config.h
+	/bin/rm -f include/libewf/definitions.h
+	/bin/rm -f include/libewf/types.h
+	/bin/rm -f common/config.h
 	/bin/rm -f macosx/Introduction.rtf
 	@for dir in ${subdirs}; do \
 		(cd $$dir && $(MAKE) distclean) \

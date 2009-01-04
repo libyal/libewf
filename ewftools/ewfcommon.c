@@ -522,7 +522,9 @@ ssize32_t ewfcommon_read_input(
 	size_t read_remaining_bytes       = 0;
 	size_t error_remaining_bytes      = 0;
 	int32_t read_amount_of_errors     = 0;
+#if defined( HAVE_VERBOSE_OUTPUT )
 	uint32_t chunk_amount             = 0;
+#endif
 	uint32_t read_error_offset        = 0;
 	uint32_t error_skip_bytes         = 0;
 	uint32_t error_granularity_offset = 0;
@@ -572,6 +574,7 @@ ssize32_t ewfcommon_read_input(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	if( libewf_get_write_amount_of_chunks(
 	     handle,
 	     &chunk_amount ) != 1 )
@@ -581,6 +584,7 @@ ssize32_t ewfcommon_read_input(
 
 		return( -1 );
 	}
+#endif
 	while( buffer_size > 0 )
 	{
 		/* Determine the amount of bytes to read from the input
@@ -603,8 +607,10 @@ ssize32_t ewfcommon_read_input(
 			              &( buffer[ buffer_offset + read_error_offset ] ),
 			              bytes_to_read );
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
 			 function, ( chunk_amount + 1 ), read_count );
+#endif
 
 			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
 
@@ -668,8 +674,10 @@ ssize32_t ewfcommon_read_input(
 
 					if( current_read_offset != current_calculated_offset )
 					{
+#if defined( HAVE_VERBOSE_OUTPUT )
 						notify_verbose_printf( "%s: correcting offset drift current: %" PRIjd ", calculated: %" PRIjd ".\n",
 						 function, current_read_offset, current_calculated_offset );
+#endif
 
 						if( current_read_offset < current_calculated_offset )
 						{
@@ -724,8 +732,10 @@ ssize32_t ewfcommon_read_input(
 				{
 					return( 0 );
 				}
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
 				 function, current_calculated_offset, read_count );
+#endif
 
 				/* There was a read error at a certain offset
 				 */
@@ -738,8 +748,10 @@ ssize32_t ewfcommon_read_input(
 			{
 				if( seek_on_error == 0 )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: unable to handle more input.\n",
 					 function );
+#endif
 
 					return( 0 );
 				}
@@ -758,7 +770,7 @@ ssize32_t ewfcommon_read_input(
 				}
 				if( read_remaining_bytes > (size_t) SSIZE_MAX )
 				{
-					notify_verbose_printf( "%s: invalid remaining bytes value exceeds maximum.\n",
+					notify_warning_printf( "%s: invalid remaining bytes value exceeds maximum.\n",
 					 function );
 
 					return( -1 );
@@ -771,8 +783,10 @@ ssize32_t ewfcommon_read_input(
 
 				if( wipe_chunk_on_error == 1 )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
 					 function, byte_error_granularity, error_granularity_offset );
+#endif
 
 					if( memory_set(
 					     &buffer[ error_granularity_offset ],
@@ -789,8 +803,10 @@ ssize32_t ewfcommon_read_input(
 				}
 				else
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: wiping remainder of chunk at offset %" PRIu32 ".\n",
 					 function, read_error_offset );
+#endif
 
 					if( memory_set(
 					     &buffer[ read_error_offset ],
@@ -817,19 +833,23 @@ ssize32_t ewfcommon_read_input(
 				}
 				acquiry_amount_of_errors++;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
 				 function, acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
 
 				notify_verbose_printf( "%s: skipping %" PRIu32 " bytes.\n",
 				 function, error_skip_bytes );
+#endif
 
 				/* At the end of the input
 				 */
 				if( ( total_input_size != 0 )
 				 && ( ( current_calculated_offset + (int64_t) read_remaining_bytes ) >= (int64_t) total_input_size ) )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: at end of input no remaining bytes to read from chunk.\n",
 					 function );
+#endif
 
 					read_count = (ssize_t) read_remaining_bytes;
 
@@ -866,15 +886,19 @@ ssize32_t ewfcommon_read_input(
 					read_error_offset     += error_skip_bytes;
 					read_amount_of_errors  = 0;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: remaining to read from chunk %" PRIzd " bytes.\n",
 					 function, bytes_to_read );
+#endif
 				}
 				else
 				{
 					read_count = (ssize_t) read_remaining_bytes;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: no remaining bytes to read from chunk.\n",
 					 function );
+#endif
 
 					break;
 				}
@@ -996,8 +1020,10 @@ ssize_t ewfcommon_raw_read_ewf(
 
 	if( read_count <= -1 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: unable to prepare buffer after raw read.\n",
 		 function );
+#endif
 
 		/* Wipe the chunk if nescessary
 		 */

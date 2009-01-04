@@ -36,7 +36,7 @@
 
 #include "common.h"
 
-#if defined( HAVE_SRING_H )
+#if defined( HAVE_STRING_H )
 #include <string.h>
 #endif
 

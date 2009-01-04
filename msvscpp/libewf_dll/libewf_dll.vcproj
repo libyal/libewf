@@ -179,10 +179,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\date_time_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\common\error_string.c"
 				>
 			</File>
@@ -212,14 +208,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_file.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_pool.c"
 				>
 			</File>
 			<File
@@ -322,10 +310,6 @@
 			</File>
 			<File
 				RelativePath="..\..\common\date_time.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\date_time_string.h"
 				>
 			</File>
 			<File
@@ -434,14 +418,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_pool.h"
 				>
 			</File>
 			<File

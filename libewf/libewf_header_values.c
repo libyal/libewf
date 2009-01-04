@@ -4709,7 +4709,7 @@ int libewf_header_values_generate_header_string_xml(
 	character_t *xml_head              = _CHARACTER_T_STRING( "<?xml version=\"1.0\"?>" );
 	character_t *xml_open_tag_xheader  = _CHARACTER_T_STRING( "<xheader>" );
 	character_t *xml_close_tag_xheader = _CHARACTER_T_STRING( "</xheader>" );
-	character_t *acquiry_date          = _CHARACTER_T_STRING( "" );
+	character_t *acquiry_date          = NULL;
 	static char *function              = "libewf_header_values_generate_header_string_xml";
 	uint32_t iterator                  = 0;
 	size_t acquiry_date_length         = 0;

@@ -38,19 +38,17 @@ To do/think about:
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
   - make a generic media access solution also useable for revit?
-* ewfacquire: detect disk full and ask for new segment file location?
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
-* ewfverify: verify against all available hashes that can be verified
+* ewfverify: verify against all available hashes that can be verified, print others
 * windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
 * windows port: linux alternative to wmain?
 
-* test if wide character mode is portable between big and little endian platforms due to conversion functions?
-  - header2 and ltree only affected sections
-
 Recovery and analysis:
+* ewfacquire: detect disk full and ask for new segment file location?
+  - have libewf allow to set the segment file path during write
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -82,8 +80,8 @@ Possible performance improvements:
 * optimize empty block test
 * what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
 * optimize string functions
-* remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use
-  local variable instead
+* remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
+  - currently used for verbose output
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -138,8 +136,6 @@ Next release(s):
 Next stable:
 * full platform test
 
-* fix verbose output to be limited to HAVE_VERBOSE_OUTPUT
-
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -154,6 +150,17 @@ CLOSED
   the basename
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   no
+* test if wide character mode is portable between big and little endian platforms due to conversion functions?
+  checks out ok
+
+Version: 20080315
+* corrected dist clean in Makefile.am
+* corrections for MSVCPP project
+* fixed binary stdout for WINDOWS version of ewfexport
+* fixed binary stdin for WINDOWS version of ewfacquirestream
+
+Version: 20080314
+* Fix for verbose output
 
 Version: 20080313
 * tested session section R/W functionality

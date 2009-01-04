@@ -79,7 +79,7 @@
 ewfglob_t *ewfglob_alloc(
             void )
 {
-	ewfglob_t *glob         = NULL;
+	ewfglob_t *glob       = NULL;
 	static char *function = "ewfglob_alloc";
 
 	glob = (ewfglob_t *) memory_allocate(

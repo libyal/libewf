@@ -189,10 +189,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\date_time_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\common\error_string.c"
 				>
 			</File>
@@ -280,10 +276,6 @@
 			</File>
 			<File
 				RelativePath="..\..\common\date_time.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\date_time_string.h"
 				>
 			</File>
 			<File

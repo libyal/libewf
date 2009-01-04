@@ -83,7 +83,7 @@ extern "C" {
 
 #if defined( HAVE_WINDOWS_API )
 #define date_time_ctime( timestamp, string, size ) \
-	ctime_s( string, size, timestamp ) != 0 ? NULL : string
+	( ctime_s( string, size, timestamp ) != 0 ? NULL : string )
 
 #elif defined( HAVE_CTIME_R )
 #if defined( HAVE_CTIME_R_SIZE )

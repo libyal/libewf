@@ -53,8 +53,10 @@ int ewfdigest_copy_to_string(
 
 	if( digest_hash == NULL )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: invalid digest hash.\n",
 		 function );
+#endif
 
 		return( 0 );
 	}

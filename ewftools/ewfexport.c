@@ -232,6 +232,20 @@ int main( int argc, char * const argv[] )
 	ewfoutput_version_fprint(
 	 stderr,
 	 program );
+#if defined( HAVE_WINDOWS_API )
+	if( _setmode(
+	     _fileno(
+	      stdout ),
+	     _O_BINARY ) == -1 )
+	{
+		fprintf( stderr, "Unable to set stdout to binary mode.\n" );
+
+		usage_fprint(
+		 stdout );
+
+		return( EXIT_FAILURE );
+	}
+#endif
 
 	while( ( option = ewfgetopt(
 	                   argc,
