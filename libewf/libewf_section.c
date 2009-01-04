@@ -3729,6 +3729,45 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	return( read_count );
 }
 
+/* Writes a xhash section to file
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *xhash, size_t xhash_size, int8_t compression_level )
+{
+	static char *function       = "libewf_section_xhash_write";
+	ssize_t section_write_count = 0;
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	LIBEWF_VERBOSE_PRINT( "%s: XHash:\n",
+	 function );
+
+	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, xhash, xhash_size ); );
+
+	section_write_count = libewf_section_write_compressed_string(
+	                       segment_file,
+	                       (EWF_CHAR *) "xhash",
+	                       5,
+	                       xhash,
+	                       xhash_size,
+	                       compression_level );
+
+	/* refactor */
+	if( section_write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write xhash to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( section_write_count );
+}
+
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
