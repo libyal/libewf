@@ -1329,9 +1329,10 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 {
 	EWF_CHUNK *chunk_data   = NULL;
 	static char *function   = "libewf_write_existing_chunk";
-	ssize_t write_count     = 0;
 	size_t write_size       = 0;
 	size_t chunk_data_size  = 0;
+	ssize_t read_count      = 0;
+	ssize_t write_count     = 0;
 	uint16_t segment_number = 0;
 	int file_descriptor     = -1;
 	int last_segment_file   = 0;
@@ -1457,17 +1458,19 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	/* Check if additional chunk data needs to be read
 	 */
-	if( write_size == internal_handle->media->chunk_size )
+	if( write_size != internal_handle->media->chunk_size )
 	{
 		/* Read the chunk data into the chunk cache
 		 */
-		if( libewf_read_chunk(
-		     internal_handle,
-		     raw_access,
-		     chunk,
-		     0,
-		     internal_handle->chunk_cache->data,
-		     internal_handle->chunk_cache->allocated_size ) == -1 )
+		read_count = libewf_read_chunk(
+		              internal_handle,
+		              raw_access,
+		              chunk,
+		              0,
+		              internal_handle->chunk_cache->data,
+		              internal_handle->chunk_cache->allocated_size );
+
+		if( read_count <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",
 			 function );
@@ -1487,7 +1490,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 			return( -1 );
 		}
 		chunk_data      = internal_handle->chunk_cache->data;
-		chunk_data_size = internal_handle->chunk_cache->amount;
+		chunk_data_size = (size_t) read_count;
 	}
 	else
 	{
@@ -1650,15 +1653,17 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	return( (ssize_t) chunk_data_size );
 }
 
-/* Writes a chunk of data in EWF format from a buffer at the current offset
- * The necessary settings of the write values must have been made
+/* Writes chunk data in EWF format from a buffer at the current offset
+ * the necessary settings of the write values must have been made
  * This function swaps byte pairs if necessary
- * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
+ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
 {
-	static char *function = "libewf_write_chunk";
-	ssize_t write_count   = 0;
+	static char *function     = "libewf_write_chunk_data";
+	ssize_t write_count       = 0;
+	ssize_t total_write_count = 0;
+	size_t chunk_data_size    = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1677,11 +1682,12 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_
 			return( -1 );
 		}
 	}
-	/* Check if the write was already finalized
-	 */
-	if( internal_handle->write->write_finalized == 1 )
+	if( internal_handle->chunk_cache == NULL )
 	{
-		return( 0 );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
+
+		return( -1 );
 	}
 	if( internal_handle->offset_table == NULL )
 	{
@@ -1693,75 +1699,6 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_
 	if( internal_handle->offset_table->file_descriptor == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if chunk has already been created within a segment file
-	 */
-	if( ( chunk < internal_handle->offset_table->amount )
-	 && ( internal_handle->offset_table->file_descriptor[ chunk ] != -1 ) )
-	{
-		write_count = libewf_write_existing_chunk(
-		               internal_handle,
-		               raw_access,
-		               internal_handle->current_chunk,
-		               internal_handle->current_chunk_offset,
-		               buffer,
-		               size,
-		               data_size,
-		               is_compressed,
-		               chunk_crc,
-		               write_crc,
-		               raw_access );
-	}
-	else
-	{
-		write_count = libewf_write_new_chunk(
-		               internal_handle,
-		               raw_access,
-		               internal_handle->current_chunk,
-		               internal_handle->current_chunk_offset,
-		               buffer,
-		               size,
-		               data_size,
-		               is_compressed,
-		               chunk_crc,
-		               write_crc,
-		               raw_access );
-	}
-	if( write_count <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write chunk.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( write_count );
-}
-
-/* Writes chunk data in EWF format from a buffer at the current offset
- * the necessary settings of the write values must have been made
- * This function swaps byte pairs if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
- */
-ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
-{
-	static char *function     = "libewf_write_chunk_data";
-	ssize_t chunk_write_count = 0;
-	ssize_t total_write_count = 0;
-	size_t chunk_data_size    = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -1825,38 +1762,46 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 	}
 	while( data_size > 0 )
 	{
-		/* The write is forced when the raw access mode is set
+		/* Check if chunk has already been created within a segment file
 		 */
-		chunk_write_count = libewf_write_chunk(
-		                     internal_handle,
-		                     raw_access,
-		                     internal_handle->current_chunk,
-		                     internal_handle->current_chunk_offset,
-		                     (void *) &( (uint8_t *) buffer )[ total_write_count ],
-		                     size,
-		                     data_size,
-		                     is_compressed,
-		                     chunk_crc,
-		                     write_crc,
-		                     raw_access );
-
-		if( chunk_write_count <= -1 )
+		if( ( chunk < internal_handle->offset_table->amount )
+		 && ( internal_handle->offset_table->file_descriptor[ chunk ] != -1 ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write data from chunk.\n",
-			 function );
-
-			return( -1 );
+			write_count = libewf_write_existing_chunk(
+				       internal_handle,
+				       raw_access,
+				       internal_handle->current_chunk,
+				       internal_handle->current_chunk_offset,
+		                       (void *) &( (uint8_t *) buffer )[ total_write_count ],
+				       size,
+				       data_size,
+				       is_compressed,
+				       chunk_crc,
+				       write_crc,
+				       raw_access );
 		}
-		else if( chunk_write_count == 0 )
+		else
 		{
-			break;
+			write_count = libewf_write_new_chunk(
+				       internal_handle,
+				       raw_access,
+				       internal_handle->current_chunk,
+				       internal_handle->current_chunk_offset,
+		                       (void *) &( (uint8_t *) buffer )[ total_write_count ],
+				       size,
+				       data_size,
+				       is_compressed,
+				       chunk_crc,
+				       write_crc,
+				       raw_access );
 		}
-		total_write_count += chunk_write_count;
-		data_size         -= chunk_write_count;
+		total_write_count += write_count;
+		data_size         -= write_count;
 
+		/* Refactor */
 		if( raw_access == 0 )
 		{
-			internal_handle->current_chunk_offset += (uint32_t) chunk_write_count;
+			internal_handle->current_chunk_offset += (uint32_t) write_count;
 
 			if( internal_handle->current_chunk_offset == internal_handle->media->chunk_size )
 			{

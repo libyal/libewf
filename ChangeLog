@@ -139,6 +139,7 @@ Version: 20070818
   - the data section is cached for multiple writes
   - refactored libewf_get_chunk_size out of ewfcommon_read_input
 * removed libewf_write_process_chunk_data no longer needed
+* removed libewf_write_chunk no longer needed
 
 Version: 20070816
 * worked on restructuring to improve internal structure
