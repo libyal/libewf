@@ -1,6 +1,5 @@
 /*
- * ewfsha1
- * SHA1 support for the ewftools
+ * crypographic digest wrapper code for ewftools
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -32,48 +31,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _EWFSHA1_H )
-#define _EWFSHA1_H
+#if !defined( _EWFDIGEST_CONTEXT_H )
+#define _EWFDIGEST_CONTEXT_H
 
 #include "../libewf/libewf_includes.h"
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
-#include <openssl/sha.h>
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
+#include <openssl/evp.h>
+#elif defined( HAVE_WINCPRYPT_H )
+#include <windows.h>
+#include <wincrypt.h>
 #else
-#include "ewfdigest_context.h"
+#error Unsupported cryptographic library.
 #endif
+
+#include "ewf_digest_hash.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
+#define EWFDIGEST_CONTEXT_TYPE_MD5		(uint8_t) 'm'
+#define EWFDIGEST_CONTEXT_TYPE_SHA1		(uint8_t) 's'
 
-#define EWFSHA1_CONTEXT	SHA_CTX
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 
-#define ewfsha1_initialize( context ) \
-	SHA1_Init( context )
-
-#define ewfsha1_update( context, buffer, size ) \
-	SHA1_Update( context, buffer, size )
-
-#define ewfsha1_finalize( context, hash, size ) \
-	SHA1_Final( hash, context )
+#define EWFDIGEST_CONTEXT EVP_MD_CTX
 
 #else
 
-#define EWFSHA1_CONTEXT	EWFDIGEST_CONTEXT
+#define EWFDIGEST_CONTEXT ewfdigest_context_t
 
-#define ewfsha1_initialize( context ) \
-	ewfdigest_context_initialize( context, EWFDIGEST_CONTEXT_TYPE_SHA1 )
+typedef struct ewfdigest_context ewfdigest_context_t;
 
-#define ewfsha1_update( context, buffer, size ) \
-	ewfdigest_context_update( context, buffer, size )
-
-#define ewfsha1_finalize( context, hash, size ) \
-	ewfdigest_context_finalize( context, hash, size )
+struct ewfdigest_context
+{
+#if defined( HAVE_WINCPRYPT_H )
+	HCRYPTPROV crypt_provider;
+	HCRYPTHASH hash;
+#else
+#error Unsupported cryptographic library.
+#endif
+};
 
 #endif
+
+int ewfdigest_context_initialize( EWFDIGEST_CONTEXT *digest_context, uint8_t type );
+int ewfdigest_context_update( EWFDIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size );
+int ewfdigest_context_finalize( EWFDIGEST_CONTEXT *digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size );
 
 #if defined( __cplusplus )
 }

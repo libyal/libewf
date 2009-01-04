@@ -1,6 +1,6 @@
 /*
- * ewfsha1
- * SHA1 support for the ewftools
+ * ewfmd5.h
+ * MD5 support for ewftools
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -32,13 +32,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _EWFSHA1_H )
-#define _EWFSHA1_H
+#if !defined( _EWFMD5_H )
+#define _EWFMD5_H
 
 #include "../libewf/libewf_includes.h"
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
-#include <openssl/sha.h>
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
+#include <openssl/md5.h>
 #else
 #include "ewfdigest_context.h"
 #endif
@@ -47,30 +47,30 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
+#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
 
-#define EWFSHA1_CONTEXT	SHA_CTX
+#define EWFMD5_CONTEXT	MD5_CTX
 
-#define ewfsha1_initialize( context ) \
-	SHA1_Init( context )
+#define ewfmd5_initialize( context ) \
+	MD5_Init( context )
 
-#define ewfsha1_update( context, buffer, size ) \
-	SHA1_Update( context, buffer, size )
+#define ewfmd5_update( context, buffer, size ) \
+	MD5_Update( context, buffer, size )
 
-#define ewfsha1_finalize( context, hash, size ) \
-	SHA1_Final( hash, context )
+#define ewfmd5_finalize( context, hash, size ) \
+	MD5_Final( hash, context )
 
 #else
 
-#define EWFSHA1_CONTEXT	EWFDIGEST_CONTEXT
+#define EWFMD5_CONTEXT	EWFDIGEST_CONTEXT
 
-#define ewfsha1_initialize( context ) \
-	ewfdigest_context_initialize( context, EWFDIGEST_CONTEXT_TYPE_SHA1 )
+#define ewfmd5_initialize( context ) \
+	ewfdigest_context_initialize( context, EWFDIGEST_CONTEXT_TYPE_MD5 )
 
-#define ewfsha1_update( context, buffer, size ) \
+#define ewfmd5_update( context, buffer, size ) \
 	ewfdigest_context_update( context, buffer, size )
 
-#define ewfsha1_finalize( context, hash, size ) \
+#define ewfmd5_finalize( context, hash, size ) \
 	ewfdigest_context_finalize( context, hash, size )
 
 #endif

@@ -41,6 +41,8 @@
 
 #include <libewf/libewf_handle.h>
 
+#include "ewfdigest_context.h"
+#include "ewfmd5.h"
 #include "ewfsha1.h"
 
 #include "../libewf/libewf_char.h"
@@ -272,7 +274,8 @@ CHAR_T *ewfcommon_get_user_input_variable_char_t( FILE *stream, LIBEWF_CHAR *req
 uint64_t ewfcommon_get_user_input_size_variable( FILE *stream, LIBEWF_CHAR *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value );
 LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *request_string, LIBEWF_CHAR **values, uint8_t amount, uint8_t default_value );
 
-int8_t ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size );
+int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_string, size_t size );
+int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size );
 
 struct tm *ewfcommon_gmtime( const time_t *timestamp );
 
@@ -294,6 +297,8 @@ void ewfcommon_stream_process_status_fprint( size64_t bytes_read, size64_t bytes
 void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end );
 
 ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error );
+
+ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
 ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 

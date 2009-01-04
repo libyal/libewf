@@ -58,9 +58,12 @@
 #include "../libewf/libewf_string.h"
 
 #include "ewfcommon.h"
+#include "ewfdigest_context.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfmd5.h"
 #include "ewfsignal.h"
+#include "ewfsha1.h"
 
 /* Prints the executable usage information
  */
@@ -104,9 +107,8 @@ int main( int argc, char * const argv[] )
 	time_t timestamp_end                     = 0;
 	int64_t count                            = 0;
 	int8_t stored_md5_hash_result            = 0;
-	int8_t calculated_md5_hash_result        = 0;
 	int8_t stored_sha1_hash_result           = 0;
-	int8_t calculated_sha1_hash_result       = 0;
+	uint8_t calculate_md5                    = 1;
 	uint8_t calculate_sha1                   = 0;
 	uint8_t verbose                          = 0;
 	int match_md5_hash                       = 0;
@@ -305,7 +307,15 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to get parse hash values.\n" );
 		}
 	}
-	count = ewfcommon_read( handle, calculate_sha1, callback );
+	count = ewfcommon_read_verify(
+	         handle,
+	         calculate_md5,
+	         stored_md5_hash_string,
+	         LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5,
+	         calculate_sha1,
+	         stored_sha1_hash_string,
+	         LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
+	         callback );
 
 	timestamp_end = time( NULL );
 	time_string   = libewf_common_ctime( &timestamp_end );
@@ -378,29 +388,6 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	calculated_md5_hash_result = libewf_get_calculated_md5_hash(
-	                              handle,
-	                              calculated_md5_hash_string,
-	                              LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
-
-	if( calculated_md5_hash_result != 1 )
-	{
-		fprintf( stderr, "Unable to calculate MD5 hash.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		libewf_common_free( stored_md5_hash_string );
-		libewf_common_free( calculated_md5_hash_string );
-
-		if( calculate_sha1 == 1 )
-		{
-			libewf_common_free( stored_sha1_hash_string );
-			libewf_common_free( calculated_sha1_hash_string );
-		}
-		return( EXIT_FAILURE );
-	}
 	if( calculate_sha1 == 1 )
 	{
 		stored_sha1_hash_result = libewf_get_hash_value(
@@ -412,42 +399,6 @@ int main( int argc, char * const argv[] )
 		if( stored_sha1_hash_result == -1 )
 		{
 			fprintf( stderr, "Unable to get stored SHA1 hash.\n" );
-
-			if( libewf_close( handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			libewf_common_free( stored_md5_hash_string );
-			libewf_common_free( calculated_md5_hash_string );
-			libewf_common_free( stored_sha1_hash_string );
-			libewf_common_free( calculated_sha1_hash_string );
-
-			return( EXIT_FAILURE );
-		}
-		calculated_sha1_hash_result = libewf_get_hash_value(
-		                               handle,
-		                               _S_LIBEWF_CHAR( "ewfcommon_calculated_SHA1" ),
-		                               calculated_sha1_hash_string,
-		                               LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
-
-		if( calculated_sha1_hash_result != 1 )
-		{
-			fprintf( stderr, "Unable to calculate SHA1 hash.\n" );
-
-			if( libewf_close( handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			libewf_common_free( stored_md5_hash_string );
-			libewf_common_free( calculated_md5_hash_string );
-			libewf_common_free( stored_sha1_hash_string );
-			libewf_common_free( calculated_sha1_hash_string );
-
-			return( EXIT_FAILURE );
-		}
-		if( calculated_sha1_hash_result != 1 )
-		{
-			fprintf( stderr, "Unable to calculate SHA1 hash.\n" );
 
 			if( libewf_close( handle ) != 0 )
 			{

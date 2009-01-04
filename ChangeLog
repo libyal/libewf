@@ -143,6 +143,9 @@ TODO
 * allow to set the delta file path
 * change use of stdout and stderr in ewfaexport
 
+Version: 20070905
+* worked on remove of MD5 calculation from library
+
 Version: 20070830
 * changed use of stdout and stderr in ewfacquirestream, ewfinfo, ewfalter
 * removed program: error output in ewfacquire, ewfverify
