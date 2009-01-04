@@ -38,10 +38,6 @@
 #include <notify.h>
 #include <types.h>
 
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
 #include <libewf/definitions.h>
 
 #include "libewf_endian.h"
@@ -524,7 +520,8 @@ int libewf_close(
 
 		return( -1 );
 	}
-	libewf_internal_handle_free( internal_handle );
+	libewf_internal_handle_free(
+	 internal_handle );
 
 	return( 0 );
 }
@@ -2860,6 +2857,8 @@ void libewf_set_notify_values(
       FILE *stream,
       uint8_t verbose )
 {
-	libewf_notify_set_values( stream, verbose );
+	libewf_notify_set_values(
+	 stream,
+	 verbose );
 }
 

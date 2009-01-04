@@ -31,18 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <common.h>
-#include <memory.h>
-#include <notify.h>
-#include <types.h>
+#include "common.h"
+#include "date_time.h"
+#include "memory.h"
+#include "notify.h"
+#include "types.h"
 
 #if defined( HAVE_STRING_H )
 #include <string.h>
 #endif
-
-#include <libewf/definitions.h>
-
-#include "date_time.h"
 
 #if !defined( HAVE_WINDOWS_API ) && !defined( HAVE_CTIME_R )
 
