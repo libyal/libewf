@@ -651,6 +651,12 @@ int libewf_values_table_set_identifier(
 
 		values_table->identifier[ index ] = NULL;
 	}
+	/* Do not include the end of string character in the identifier length
+	 */
+	if( identifier[ identifier_length - 1 ] == 0 )
+	{
+		identifier_length -= 1;
+	}
 	values_table->identifier[ index ] = (character_t *) memory_allocate(
 							     sizeof( character_t ) * ( identifier_length + 1 ) );
 
@@ -821,6 +827,12 @@ int libewf_values_table_set_value(
 	 && ( value[ 0 ] != 0 )
 	 && ( value_length > 0 ) )
 	{
+		/* Do not include the end of string character in the value length
+		 */
+		if( value[ value_length - 1 ] == 0 )
+		{
+			value_length -= 1;
+		}
 		values_table->value[ index ] = (character_t *) memory_allocate(
 		                                                sizeof( character_t ) * ( value_length + 1 ) );
 

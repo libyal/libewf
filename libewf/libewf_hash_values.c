@@ -32,6 +32,7 @@
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
+#include "ewf_digest_hash.h"
 
 /* Initializes the hash values
  * Returns 1 if successful or -1 on error
@@ -50,7 +51,7 @@ int libewf_hash_values_initialize(
 	}
 	if( libewf_values_table_set_identifier(
 	     hash_values,
-	     0,
+	     LIBEWF_HASH_VALUES_INDEX_MD5,
 	     _CHARACTER_T_STRING( "MD5" ),
 	     3 ) != 1 )
 	{
@@ -60,6 +61,123 @@ int libewf_hash_values_initialize(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Parses an MD5 hash for its value
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_values_parse_md5_hash(
+     libewf_values_table_t **hash_values,
+     uint8_t *md5_hash,
+     size_t md5_hash_size )
+{
+	character_t md5_hash_string[ 33 ];
+
+	static char *function           = "libewf_hash_values_parse_md5_hash";
+	size_t md5_hash_iterator        = 0;
+	size_t md5_hash_string_iterator = 0;
+	int result                      = 0;
+	uint8_t md5_digit               = 0;
+
+	if( hash_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid hash values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash == NULL )
+	{
+		notify_warning_printf( "%s: invalid MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash_size < EWF_DIGEST_HASH_SIZE_MD5 )
+	{
+		notify_warning_printf( "%s: invalid MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *hash_values == NULL )
+	{
+		if( libewf_values_table_initialize(
+		     hash_values,
+		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create hash values.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_hash_values_initialize(
+		     *hash_values ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to initialize the hash values.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	result = libewf_values_table_get_value(
+	          *hash_values,
+	          _CHARACTER_T_STRING( "MD5" ),
+	          3,
+	          md5_hash_string,
+	          33 );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to determine if MD5 hash value was set.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* The MD5 hash values has been set
+	 */
+	else if( result == 1 )
+	{
+		return( 1 );
+	}
+	for( md5_hash_iterator = 0; md5_hash_iterator < md5_hash_size; md5_hash_iterator++ )
+	{
+		md5_digit = md5_hash[ md5_hash_iterator ] / 16;
+
+		if( md5_digit <= 9 )
+		{
+			md5_hash_string[ md5_hash_string_iterator++ ] = (character_t) ( (uint8_t) '0' + md5_digit );
+		}
+		else
+		{
+			md5_hash_string[ md5_hash_string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( md5_digit - 10 ) );
+		}
+		md5_digit = md5_hash[ md5_hash_iterator ] % 16;
+
+		if( md5_digit <= 9 )
+		{
+			md5_hash_string[ md5_hash_string_iterator++ ] = (character_t) ( (uint8_t) '0' + md5_digit );
+		}
+		else
+		{
+			md5_hash_string[ md5_hash_string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( md5_digit - 10 ) );
+		}
+	}
+	result = libewf_values_table_set_value(
+		  *hash_values,
+		  _CHARACTER_T_STRING( "MD5" ),
+		  3,
+		  md5_hash_string,
+		  32 );
+
+	if( result != 1 )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf( "%s: unable to set value with identifier: MD5.\n",
+		 function );
+#endif
+	}
+	return( result );
 }
 
 /* Parse a XML hash string for the values
@@ -597,6 +715,116 @@ int libewf_hash_values_generate_hash_string_xml(
 	/* Make sure the string is terminated
 	 */
 	( *hash_string )[ *hash_string_size - 1 ] = 0;
+
+	return( 1 );
+}
+
+/* Generate an MD5 xhash
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_values_generate_md5_hash(
+     libewf_values_table_t *hash_values,
+     uint8_t *md5_hash,
+     size_t md5_hash_size,
+     uint8_t *md5_hash_set )
+{
+	character_t md5_hash_string[ 33 ];
+
+	static char *function           = "libewf_hash_values_generate_md5_hash";
+	size_t md5_hash_iterator        = 0;
+	size_t md5_hash_string_iterator = 0;
+	int result                      = 0;
+	uint8_t md5_digit               = 0;
+
+	if( hash_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid hash values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash == NULL )
+	{
+		notify_warning_printf( "%s: invalid MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash_size < EWF_DIGEST_HASH_SIZE_MD5 )
+	{
+		notify_warning_printf( "%s: invalid MD5 hash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash_set == NULL )
+	{
+		notify_warning_printf( "%s: invalid MD5 hash set.\n",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_values_table_get_value(
+	          hash_values,
+	          _CHARACTER_T_STRING( "MD5" ),
+	          3,
+	          md5_hash_string,
+	          33 );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to determine if MD5 hash value was set.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* No need to generate the MD5 hash
+	 */
+	else if( result == 0 )
+	{
+		*md5_hash_set = 0;
+
+		return( 1 );
+	}
+	for( md5_hash_string_iterator = 0; md5_hash_string_iterator < 33; md5_hash_string_iterator++ )
+	{
+		if( ( md5_hash_string[ md5_hash_string_iterator ] >= (character_t) '0' )
+		 && ( md5_hash_string[ md5_hash_string_iterator ] <= (character_t) '9' ) )
+		{
+			md5_digit = (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (character_t) '0' );
+		}
+		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (character_t) 'A' )
+		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (character_t) 'F' ) )
+		{
+			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (character_t) 'A' );
+		}
+		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (character_t) 'a' )
+		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (character_t) 'f' ) )
+		{
+			md5_digit = 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (character_t) 'a' );
+		}
+		md5_hash_string_iterator++;
+
+		md5_digit *= 16;
+
+		if( ( md5_hash_string[ md5_hash_string_iterator ] >= (character_t) '0' )
+		 && ( md5_hash_string[ md5_hash_string_iterator ] <= (character_t) '9' ) )
+		{
+			md5_digit += (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (character_t) '0' );
+		}
+		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (character_t) 'A' )
+		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (character_t) 'F' ) )
+		{
+			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (character_t) 'A' );
+		}
+		else if( ( md5_hash_string[ md5_hash_string_iterator ] >= (character_t) 'a' )
+		      && ( md5_hash_string[ md5_hash_string_iterator ] <= (character_t) 'f' ) )
+		{
+			md5_digit += 10 + (uint8_t) ( md5_hash_string[ md5_hash_string_iterator ] - (character_t) 'a' );
+		}
+		md5_hash[ md5_hash_iterator++ ] = md5_digit;
+	}
+	*md5_hash_set = 1;
 
 	return( 1 );
 }

@@ -39,6 +39,7 @@
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_file_io_pool.h"
+#include "libewf_hash_values.h"
 #include "libewf_list_type.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
@@ -2718,7 +2719,6 @@ ssize_t libewf_write_finalize(
 			write_count_finalize                += write_count;
 			internal_handle->write->write_count += write_count;
 		}
-
 		/* Close the segment file
 		 */
 #if defined( HAVE_VERBOSE_OUTPUT )

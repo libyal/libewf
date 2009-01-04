@@ -163,8 +163,6 @@ Next release(s):
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
-* retrieve md5 hash in md5 hash value function?
-
 * implement io pooling?
   - add means to set open file handle limit
 
@@ -196,6 +194,11 @@ CLOSED
 Version: 20080906
 * refactored section list to use list type
 * refactored libewf_values_table
+* parse hash values will now handle MD5 hash to MD5 hash value conversion
+* get MD5 hash will now handle MD5 hash value to MD5 hash conversion
+* set MD5 hash will now handle MD5 hash to MD5 hash value conversion
+* get MD5 hash value will now handle MD5 hash to MD5 hash value conversion
+* set MD5 hash value will now handle MD5 hash value to MD5 hash conversion
 
 Version: 20080905
 * worked on refactoring code

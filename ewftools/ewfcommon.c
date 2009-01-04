@@ -77,6 +77,10 @@
 #define LIBEWF_OPERATING_SYSTEM "Unknown"
 #endif
 
+#if !defined( USE_LIBEWF_SET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_SET_MD5_HASH )
+#define USE_LIBEWF_SET_HASH_VALUE_MD5
+#endif
+
 int ewfcommon_abort                      = 0;
 libewf_handle_t *ewfcommon_libewf_handle = NULL;
 
@@ -1867,6 +1871,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
+#if defined( USE_LIBEWF_SET_MD5_HASH )
 		/* The MD5 hash must be set before write finalized is used
 		 */
 		if( libewf_set_md5_hash(
@@ -1879,6 +1884,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
+#endif
+#if defined( USE_LIBEWF_SET_HASH_VALUE_MD5 )
 		/* The MD5 hash string must be set before write finalized is used
 		 */
 		if( libewf_set_hash_value_md5(
@@ -1891,6 +1898,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
+#endif
 	}
 	if( calculate_sha1 == 1 )
 	{
@@ -2820,6 +2828,7 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
+#if defined( USE_LIBEWF_SET_MD5_HASH )
 		/* The MD5 hash must be set before write finalized is used
 		 */
 		if( libewf_set_md5_hash(
@@ -2832,6 +2841,8 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
+#endif
+#if defined( USE_LIBEWF_SET_HASH_VALUE_MD5 )
 		/* The MD5 hash string must be set before write finalized is used
 		 */
 		if( libewf_set_hash_value_md5(
@@ -2844,6 +2855,7 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
+#endif
 	}
 	if( calculate_sha1 == 1 )
 	{
@@ -2864,6 +2876,18 @@ ssize64_t ewfcommon_export_ewf(
 		     sha1_hash_string_length ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string.\n",
+			 function );
+
+			return( -1 );
+		}
+		/* The SHA1 hash string must be set before write finalized is used
+		 */
+		if( libewf_set_hash_value_sha1(
+		     handle,
+		     sha1_hash_string,
+		     sha1_hash_string_length ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to set SHA1 hash string in handle.\n",
 			 function );
 
 			return( -1 );

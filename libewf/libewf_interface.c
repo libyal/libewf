@@ -35,6 +35,7 @@
 #include "libewf_segment_file_handle.h"
 
 #include "ewf_definitions.h"
+#include "ewf_digest_hash.h"
 
 /* Returns the flags for reading
  */
@@ -631,6 +632,19 @@ int libewf_get_md5_hash(
 	if( internal_handle->hash_sections == NULL )
 	{
 		notify_warning_printf( "%s: invalid handle - missing hash sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->hash_sections->md5_hash_set == 0 )
+	 && ( internal_handle->hash_values != NULL )
+	 && ( libewf_hash_values_generate_md5_hash(
+	       internal_handle->hash_values,
+	       internal_handle->hash_sections->md5_hash,
+	       EWF_DIGEST_HASH_SIZE_MD5,
+	       &( internal_handle->hash_sections->md5_hash_set ) ) != 1 ) )
+	{
+		notify_warning_printf( "%s: unable to parse MD5 hash value for its value.\n",
 		 function );
 
 		return( -1 );
@@ -1235,19 +1249,39 @@ int libewf_get_hash_value(
 
 		return( -1 );
 	}
+	identifier_length = string_length(
+	                     identifier );
+
+	if( ( internal_handle->hash_values == NULL )
+	 && ( internal_handle->hash_sections != NULL )
+	 && ( internal_handle->hash_sections->md5_hash_set != 0 )
+	 && ( identifier_length == 3 )
+	 && ( string_compare(
+	       identifier,
+	       _CHARACTER_T_STRING( "MD5" ),
+	       identifier_length ) == 0 ) )
+	{
+		if( libewf_hash_values_parse_md5_hash(
+		     &( internal_handle->hash_values ),
+		     internal_handle->hash_sections->md5_hash,
+		     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
 	if( internal_handle->hash_values == NULL )
 	{
 		return( 0 );
 	}
-	identifier_length = string_length(
-	                     identifier );
-
 	return( libewf_values_table_get_value(
                  internal_handle->hash_values,
-                 identifier,
-                 identifier_length,
-                 value,
-                 length ) );
+	         identifier,
+	         identifier_length,
+	         value,
+	         length ) );
 }
 
 /* Sets the amount of sectors per chunk in the media information
@@ -1841,6 +1875,16 @@ int libewf_set_md5_hash(
 
 		return( -1 );
 	}
+	if( libewf_hash_values_parse_md5_hash(
+	     &( internal_handle->hash_values ),
+	     md5_hash,
+	     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
+		 function );
+
+		return( -1 );
+	}
 	internal_handle->hash_sections->md5_hash_set = 1;
 
 	return( 1 );
@@ -2132,12 +2176,38 @@ int libewf_set_hash_value(
 	identifier_length = string_length(
 	                     identifier );
 
-	return( libewf_values_table_set_value(
-	         internal_handle->hash_values,
-	         identifier,
-	         identifier_length,
-	         value,
-	         length ) );
+	if( libewf_values_table_set_value(
+	     internal_handle->hash_values,
+	     identifier,
+	     identifier_length,
+	     value,
+	     length ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set hash value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->hash_sections != NULL )
+	 && ( identifier_length == 3 )
+	 && ( string_compare(
+	       identifier,
+	       _CHARACTER_T_STRING( "MD5" ),
+	       identifier_length ) == 0 ) )
+	{
+		if( libewf_hash_values_generate_md5_hash(
+		     internal_handle->hash_values,
+		     internal_handle->hash_sections->md5_hash,
+		     EWF_DIGEST_HASH_SIZE_MD5,
+		     &( internal_handle->hash_sections->md5_hash_set ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to parse MD5 hash value for its value.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
 }
 
 /* Parses the header values from the xheader, header2 or header section
@@ -2261,6 +2331,17 @@ int libewf_parse_hash_values(
 	       internal_handle->hash_sections->xhash_size ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse xhash for values.\n",
+		 function );
+
+		return( -1 );
+	}
+	else if( ( internal_handle->hash_sections->md5_hash_set != 0 )
+	      && ( libewf_hash_values_parse_md5_hash(
+	            &( internal_handle->hash_values ),
+	            internal_handle->hash_sections->md5_hash,
+	            EWF_DIGEST_HASH_SIZE_MD5 ) != 1 ) )
+	{
+		notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
 		 function );
 
 		return( -1 );

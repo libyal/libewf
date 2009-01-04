@@ -96,7 +96,7 @@ int ewfdigest_copy_to_string(
 			string[ string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
 		}
 	}
-	string[ string_iterator ] = (character_t) '\0';
+	string[ string_iterator ] = 0;
 
 	return( 1 );
 }

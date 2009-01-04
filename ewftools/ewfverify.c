@@ -57,6 +57,10 @@
 #include "ewfsha1.h"
 #include "ewfstring.h"
 
+#if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
+#define USE_LIBEWF_GET_HASH_VALUE_MD5
+#endif
+
 /* Prints the executable usage information to the stream
  */
 void usage_fprint(
@@ -87,7 +91,9 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+#if defined( USE_LIBEWF_GET_MD5_HASH )
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+#endif
 
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                            = NULL;
@@ -422,6 +428,7 @@ int main( int argc, char * const argv[] )
 		}
 		/* Start verifying data
 		 */
+#if defined( USE_LIBEWF_GET_MD5_HASH )
 		if( calculate_sha1 == 1 )
 		{
 			if( libewf_parse_hash_values(
@@ -430,6 +437,14 @@ int main( int argc, char * const argv[] )
 				fprintf( stderr, "Unable to get parse hash values.\n" );
 			}
 		}
+#endif
+#if defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
+		if( libewf_parse_hash_values(
+		     ewfcommon_libewf_handle ) != 1 )
+		{
+			fprintf( stderr, "Unable to get parse hash values.\n" );
+		}
+#endif
 		verify_count = ewfcommon_read_verify(
 		                ewfcommon_libewf_handle,
 		                calculate_md5,
@@ -512,6 +527,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( calculate_md5 == 1 )
 		{
+#if defined( USE_LIBEWF_GET_MD5_HASH )
 			stored_md5_hash_result = libewf_get_md5_hash(
 						  ewfcommon_libewf_handle,
 						  md5_hash,
@@ -563,12 +579,40 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
+#endif
+#if defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
+			stored_md5_hash_result = libewf_get_hash_value_md5(
+			                           ewfcommon_libewf_handle,
+			                           stored_md5_hash_string,
+			                           EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+
+			if( stored_md5_hash_result == -1 )
+			{
+				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+
+				memory_free(
+				 stored_md5_hash_string );
+				memory_free(
+				 calculated_md5_hash_string );
+
+				if( calculate_md5 == 1 )
+				{
+					memory_free(
+					 stored_md5_hash_string );
+					memory_free(
+					 calculated_md5_hash_string );
+				}
+				libewf_close(
+				 ewfcommon_libewf_handle );
+
+				return( EXIT_FAILURE );
+			}
+#endif
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_result = libewf_get_hash_value(
+			stored_sha1_hash_result = libewf_get_hash_value_sha1(
 						   ewfcommon_libewf_handle,
-						   _CHARACTER_T_STRING( "SHA1" ),
 						   stored_sha1_hash_string,
 						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
