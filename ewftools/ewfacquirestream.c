@@ -111,7 +111,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
-	CHAR_T *filenames[ 1 ]                  = { _S_CHAR_T( "stream" ) };
+	CHAR_T *filenames[ 1 ]                   = { _S_CHAR_T( "stream" ) };
 
 	LIBEWF_HANDLE *handle                    = NULL;
 	LIBEWF_CHAR *calculated_md5_hash_string  = NULL;
@@ -123,6 +123,7 @@ int main( int argc, char * const argv[] )
 	LIBEWF_CHAR *notes                       = NULL;
 	LIBEWF_CHAR *acquiry_operating_system    = NULL;
 	LIBEWF_CHAR *acquiry_software_version    = NULL;
+	LIBEWF_CHAR *program                     = _S_LIBEWF_CHAR( "ewfacquirestream" );
 	CHAR_T *option_case_number               = NULL;
 	CHAR_T *option_description               = NULL;
 	CHAR_T *option_examiner_name             = NULL;
@@ -158,7 +159,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, _S_LIBEWF_CHAR( "ewfacquirestream" ) );
+	ewfcommon_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:c:C:d:D:e:E:f:hm:M:N:sS:t:vV" ) ) ) != (INT_T) -1 )
 	{
@@ -658,7 +659,11 @@ int main( int argc, char * const argv[] )
 		}
 		libewf_common_free( acquiry_operating_system );
 	}
-	if( libewf_set_header_value( handle, _S_LIBEWF_CHAR( "acquiry_software" ), _S_LIBEWF_CHAR( "ewfacquirestream" ), 16 ) != 1 )
+	if( libewf_set_header_value(
+	     handle,
+	     _S_LIBEWF_CHAR( "acquiry_software" ),
+	     program,
+	     16 ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value acquiry software in handle.\n" );
 

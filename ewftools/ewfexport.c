@@ -82,7 +82,9 @@ void usage( void )
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stderr, "\t-t: specify the target file to export to (default is export)\n" );
 	fprintf( stderr, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n", (uint32_t) ( 650 * 1024 ) );
+#if defined( SPLIT_EXPORT )
 	fprintf( stderr, "\t    or the limit of the raw file size (default is no limit)" );
+#endif
 	fprintf( stderr, "\t-u: unattended mode (disables user interaction)\n" );
 	fprintf( stderr, "\t-v: verbose output to stderr\n" );
 	fprintf( stderr, "\t-V: print version\n" );
@@ -97,37 +99,55 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob                             = NULL;
-	int32_t glob_count                        = 0;
+	EWFGLOB *glob                = NULL;
+	int32_t glob_count           = 0;
 #endif
-	LIBEWF_HANDLE *handle                     = NULL;
-	LIBEWF_CHAR *user_input                   = NULL;
-	CHAR_T *end_of_string                     = NULL;
-	CHAR_T *target_filename                   = _S_CHAR_T( "export" );
-	CHAR_T *time_string                       = NULL;
-	void *callback                            = &ewfcommon_process_status_fprint;
-	INT_T option                              = 0;
-	size_t string_length                      = 0;
-	time_t timestamp_start                    = 0;
-	time_t timestamp_end                      = 0;
-	int64_t count                             = 0;
-	uint64_t size                             = 0;
-	uint64_t export_offset                    = 0;
-	uint64_t export_size                      = 0;
-	uint64_t sectors_per_chunk                = 64;
-	int64_t segment_file_size                 = 0;
-	uint8_t compress_empty_block              = 0;
-	uint8_t libewf_format                     = LIBEWF_FORMAT_ENCASE5;
-	uint8_t swap_byte_pairs                   = 0;
-	uint8_t verbose                           = 0;
-	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
-	int interactive_mode                      = 1;
-	int target_file_descriptor                = 0;
-	int output_raw                            = 1;
+	CHAR_T *filenames[ 1 ]       = { NULL };
+
+	LIBEWF_HANDLE *handle        = NULL;
+	LIBEWF_HANDLE *export_handle = NULL;
+	LIBEWF_CHAR *user_input      = NULL;
+	LIBEWF_CHAR *program         = _S_LIBEWF_CHAR( "ewfexport" );
+	CHAR_T *end_of_string        = NULL;
+	CHAR_T *target_filename      = NULL;
+	CHAR_T *time_string          = NULL;
+	void *callback               = &ewfcommon_process_status_fprint;
+	INT_T option                 = 0;
+	size_t string_length         = 0;
+	time_t timestamp_start       = 0;
+	time_t timestamp_end         = 0;
+	int64_t count                = 0;
+	uint64_t size                = 0;
+	uint64_t export_offset       = 0;
+	uint64_t export_size         = 0;
+	uint64_t sectors_per_chunk   = 64;
+	int64_t segment_file_size    = 0;
+	uint8_t compress_empty_block = 0;
+	uint8_t libewf_format        = LIBEWF_FORMAT_ENCASE5;
+	uint8_t swap_byte_pairs      = 0;
+	uint8_t verbose              = 0;
+	int8_t compression_level     = LIBEWF_COMPRESSION_NONE;
+	int interactive_mode         = 1;
+	int output_raw               = 1;
+
+	LIBEWF_CHAR *ewfexport_format_types[ 13 ] = \
+	 { _S_LIBEWF_CHAR( "raw" ),
+	   _S_LIBEWF_CHAR( "ewf" ),
+	   _S_LIBEWF_CHAR( "smart" ),
+	   _S_LIBEWF_CHAR( "ftk" ),
+	   _S_LIBEWF_CHAR( "encase1" ),
+	   _S_LIBEWF_CHAR( "encase2" ),
+	   _S_LIBEWF_CHAR( "encase3" ),
+	   _S_LIBEWF_CHAR( "encase4" ),
+	   _S_LIBEWF_CHAR( "encase5" ),
+	   _S_LIBEWF_CHAR( "encase6" ),
+	   _S_LIBEWF_CHAR( "linen5" ),
+	   _S_LIBEWF_CHAR( "linen6" ),
+	   _S_LIBEWF_CHAR( "ewfx" ) };
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, _S_LIBEWF_CHAR( "ewfexport" ) );
+	ewfcommon_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:f:ho:qsS:t:uvV" ) ) ) != (INT_T) -1 )
 	{
@@ -316,134 +336,178 @@ int main( int argc, char * const argv[] )
 		user_input = ewfcommon_get_user_input_fixed_value(
 		              stderr,
 		              _S_LIBEWF_CHAR( "Export to file format" ),
-		              ewfcommon_format_types,
-		              EWFCOMMON_FORMAT_TYPES_AMOUNT,
-		              EWFCOMMON_FORMAT_TYPES_DEFAULT );
+		              ewfexport_format_types,
+		              13,
+		              0 );
 
-		libewf_format = ewfcommon_determine_libewf_format( user_input );
-
-		libewf_common_free( user_input );
-
-		if( libewf_format == 0 )
+		if( CHAR_T_COMPARE( user_input, _S_CHAR_T( "raw" ), 3 ) == 0 )
 		{
-			fprintf( stderr, "ewfexport: unsupported EWF file format type.\n" );
-
-			exit( EXIT_FAILURE );
+			output_raw = 1;
 		}
-
-		/* Compression
-		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
-		              stderr,
-		              _S_LIBEWF_CHAR( "Use compression" ),
-		              ewfcommon_compression_levels,
-		              EWFCOMMON_COMPRESSION_LEVELS_AMOUNT,
-		              EWFCOMMON_COMPRESSION_LEVELS_DEFAULT );
-
-		compression_level = ewfcommon_determine_compression_level( user_input );
-
-		if( compression_level <= -1 )
+		else
 		{
-			fprintf( stderr, "ewfexport: unsupported compression type.\n" );
+			libewf_format = ewfcommon_determine_libewf_format( user_input );
 
-			return( EXIT_FAILURE );
-		}
-		libewf_common_free( user_input );
-
-		/* Empty block compression
-		 */
-		if( compression_level == LIBEWF_COMPRESSION_NONE )
-		{
-			user_input = ewfcommon_get_user_input_fixed_value(
-			              stderr,
-			              _S_LIBEWF_CHAR( "Compress empty blocks" ),
-			              ewfcommon_yes_no,
-			              2,
-			              1 );
-
-			if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
+			if( libewf_format == 0 )
 			{
-				compress_empty_block = 1;
-			}
-			else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
-			{
-				compress_empty_block = 0;
+				fprintf( stderr, "ewfexport: unsupported file format.\n" );
+
+				libewf_common_free( user_input );
+
+				exit( EXIT_FAILURE );
 			}
 			else
 			{
-				fprintf( stderr, "ewfexport: unsupported answer.\n" );
+				output_raw = 0;
+			}
+		}
+		libewf_common_free( user_input );
+
+		if( output_raw == 0 )
+		{
+			/* Target filename
+			 */
+			while( target_filename == NULL )
+			{
+				target_filename = ewfcommon_get_user_input_variable_char_t(
+				                   stderr,
+				                   _S_LIBEWF_CHAR( "Target path and filename without extension" ) );
+
+				if( target_filename == NULL )
+				{
+					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				}
+			}
+			/* Compression
+			 */
+			user_input = ewfcommon_get_user_input_fixed_value(
+				      stderr,
+				      _S_LIBEWF_CHAR( "Use compression" ),
+				      ewfcommon_compression_levels,
+				      EWFCOMMON_COMPRESSION_LEVELS_AMOUNT,
+				      EWFCOMMON_COMPRESSION_LEVELS_DEFAULT );
+
+			compression_level = ewfcommon_determine_compression_level( user_input );
+
+			if( compression_level <= -1 )
+			{
+				fprintf( stderr, "ewfexport: unsupported compression type.\n" );
 
 				return( EXIT_FAILURE );
 			}
 			libewf_common_free( user_input );
+
+			/* Empty block compression
+			 */
+			if( compression_level == LIBEWF_COMPRESSION_NONE )
+			{
+				user_input = ewfcommon_get_user_input_fixed_value(
+					      stderr,
+					      _S_LIBEWF_CHAR( "Compress empty blocks" ),
+					      ewfcommon_yes_no,
+					      2,
+					      1 );
+
+				if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
+				{
+					compress_empty_block = 1;
+				}
+				else if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
+				{
+					compress_empty_block = 0;
+				}
+				else
+				{
+					fprintf( stderr, "ewfexport: unsupported answer.\n" );
+
+					return( EXIT_FAILURE );
+				}
+				libewf_common_free( user_input );
+			}
+
+			/* Segment file size
+			 */
+			segment_file_size = ewfcommon_get_user_input_size_variable(
+					     stderr,
+					     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
+					     1440,
+					     ( 2 * 1024 * 1024 ),
+					     ( 650 * 1024 ) );
+
+			segment_file_size *= 1024;
+
+			/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
+			 */
+			if( segment_file_size >= (int64_t) INT32_MAX )
+			{
+				segment_file_size = (int64_t) INT32_MAX - 1;
+			}
+			/* Chunk size (sectors per block)
+			 */
+			user_input = ewfcommon_get_user_input_fixed_value( stderr,
+				      _S_LIBEWF_CHAR( "The amount of sectors to read at once" ),
+				      ewfcommon_sector_per_block_sizes,
+				      EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+				      EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+
+			sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
+
+			libewf_common_free( user_input );
 		}
-
-		/* File size
-		 */
-		segment_file_size = ewfcommon_get_user_input_size_variable(
-		                     stderr,
-		                     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
-		                     1440,
-		                     ( 2 * 1024 * 1024 ),
-		                     ( 650 * 1024 ) );
-
-		segment_file_size *= 1024;
-
-		/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
-		 */
-		if( segment_file_size >= (int64_t) INT32_MAX )
+		else
 		{
-			segment_file_size = (int64_t) INT32_MAX - 1;
+			/* Target filename
+			 */
+			while( target_filename == NULL )
+			{
+				target_filename = ewfcommon_get_user_input_variable_char_t(
+				                   stderr,
+				                   _S_LIBEWF_CHAR( "Target path and filename without extension or - for stdout" ) );
+
+				if( target_filename == NULL )
+				{
+					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				}
+			}
+#if defined( SPLIT_EXPORT )
+	 		if( CHAR_T_COMPARE( target_filename, _S_CHAR_T( "-" ), 1 ) != 0 )
+			{
+				/* Segment file size
+				 */
+				segment_file_size = ewfcommon_get_user_input_size_variable(
+						     stderr,
+						     _S_LIBEWF_CHAR( "Maximum export file size in kbytes (2^10) or 0 for no limit" ),
+						     0,
+						     ( INT64_MAX / 1024 ),
+						     ( 2 * 1024 * 1024 ) );
+
+				segment_file_size *= 1024;
+			}
+#endif
 		}
-		/* Chunk size (sectors per block)
-		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stderr,
-		              _S_LIBEWF_CHAR( "The amount of sectors to read at once" ),
-		              ewfcommon_sector_per_block_sizes,
-		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT );
-
-		sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
-
-		libewf_common_free( user_input );
-
 		export_offset = ewfcommon_get_user_input_size_variable(
-				 stderr,
-				 _S_LIBEWF_CHAR( "Start export at offset" ),
-				 0,
-				 size,
-				 export_offset );
-		export_size   = ewfcommon_get_user_input_size_variable(
-				 stderr,
-				 _S_LIBEWF_CHAR( "Amount of bytes to export" ),
-				 0,
-				 ( size - export_offset ),
-				 export_size );
+		                 stderr,
+		                 _S_LIBEWF_CHAR( "Start export at offset" ),
+		                 0,
+		                 size,
+		                 export_offset );
+
+		export_size = ewfcommon_get_user_input_size_variable(
+		               stderr,
+		               _S_LIBEWF_CHAR( "Amount of bytes to export" ),
+		               0,
+		               ( size - export_offset ),
+		               export_size );
 	}
-	if( target_filename != NULL )
+	if( target_filename == NULL )
 	{
-		fprintf( stderr, "Invalid target filename.\n" );
+		fprintf( stderr, "Missing target filename defaulting to export.\n" );
 
-		return( EXIT_FAILURE );
-	}
-	target_file_descriptor = libewf_common_open( target_filename, LIBEWF_OPEN_WRITE );
-
-	if( target_file_descriptor == -1 )
-	{
-		fprintf( stderr, "Unable to open target file: %" PRIs ".\n", target_filename );
-
-		return( EXIT_FAILURE );
+		target_filename = CHAR_T_DUPLICATE( _S_CHAR_T( "export" ) );
 	}
 	fprintf( stderr, "\n" );
 
-	if( ( output_raw == 1 )
-	 && ( CHAR_T_COMPARE( target_filename, _S_CHAR_T( "-" ), 1 ) == 0 ) )
-	{
-		target_file_descriptor = 1;
-	}
 	libewf_set_notify_values( stderr, verbose );
-
-	segment_file_size = ( 650 * 1024 );
 
 	/* Start exporting data
 	 */
@@ -466,8 +530,49 @@ int main( int argc, char * const argv[] )
 	}
 	fprintf( stderr, "This could take a while.\n\n" );
 
-	count = ewfcommon_read_to_file_descriptor( handle, target_file_descriptor, export_size, export_offset, callback );
+	if( output_raw == 0 )
+	{
+		filenames[ 0 ] = target_filename;
 
+		export_handle = libewf_open(
+		                 (CHAR_T * const *) filenames,
+		                 1,
+		                 LIBEWF_OPEN_WRITE );
+
+		libewf_common_free( target_filename );
+
+		if( export_handle == NULL )
+		{
+			fprintf( stderr, "Unable to open export EWF file handle.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		count = ewfcommon_export_ewf(
+		         handle,
+		         export_handle,
+		         export_size,
+		         export_offset,
+		         callback );
+
+		if( libewf_close( export_handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close export EWF file handle.\n" );
+
+			return( EXIT_FAILURE );
+		}
+	}
+	else
+	{
+		count = ewfcommon_export_raw(
+		         handle,
+		         target_filename,
+		         segment_file_size,
+		         export_size,
+		         export_offset,
+		         callback );
+
+		libewf_common_free( target_filename );
+	}
 	timestamp_end = time( NULL );
 	time_string   = libewf_common_ctime( &timestamp_end );
 

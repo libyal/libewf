@@ -126,6 +126,7 @@ TODO
   read is now in write_existing_chunk
 * "Amount of bytes to alter" correct for offset !!! also in ewfacquire?
 * ewfexport to export EWF format to merge delta file(s) and ewf file(s)
+* implement raw split support in ewfexport
 
 Version: 20070819
 * worked on restructuring to improve internal structure
@@ -137,7 +138,6 @@ Version: 20070819
 * fixed spelling error in unsuported => unsupported in ewftools
 * rewritten #ifdef to #if defined() and #ifndef to #if !defined()
 * refactored user input handling code from ewftools to ewfcommon
-
 * worked on ewfexport exporting ewf formatted data for delta merge
   ewfexport no longer exports to stdout
   specify '-t -' to write to stdout only for continuous raw output

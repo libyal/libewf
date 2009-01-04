@@ -232,59 +232,60 @@ int main( int argc, char * const argv[] )
 {
 	struct stat input_file_stat;
 
-#if defined(HAVE_UUID_UUID_H) && defined(HAVE_LIBUUID)
+#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
-	CHAR_T *filenames[ 1 ]                    = { NULL };
+	CHAR_T *filenames[ 1 ]                   = { NULL };
 
-	LIBEWF_HANDLE *handle                     = NULL;
-	LIBEWF_CHAR *calculated_md5_hash_string   = NULL;
-	LIBEWF_CHAR *calculated_sha1_hash_string  = NULL;
-	LIBEWF_CHAR *user_input                   = NULL;
-	LIBEWF_CHAR *case_number                  = NULL;
-	LIBEWF_CHAR *description                  = NULL;
-	LIBEWF_CHAR *evidence_number              = NULL;
-	LIBEWF_CHAR *examiner_name                = NULL;
-	LIBEWF_CHAR *notes                        = NULL;
-	LIBEWF_CHAR *acquiry_operating_system     = NULL;
-	LIBEWF_CHAR *acquiry_software_version     = NULL;
+	LIBEWF_HANDLE *handle                    = NULL;
+	LIBEWF_CHAR *calculated_md5_hash_string  = NULL;
+	LIBEWF_CHAR *calculated_sha1_hash_string = NULL;
+	LIBEWF_CHAR *user_input                  = NULL;
+	LIBEWF_CHAR *case_number                 = NULL;
+	LIBEWF_CHAR *description                 = NULL;
+	LIBEWF_CHAR *evidence_number             = NULL;
+	LIBEWF_CHAR *examiner_name               = NULL;
+	LIBEWF_CHAR *notes                       = NULL;
+	LIBEWF_CHAR *acquiry_operating_system    = NULL;
+	LIBEWF_CHAR *acquiry_software_version    = NULL;
+	LIBEWF_CHAR *program                     = _S_LIBEWF_CHAR( "ewfacquire" );
 
-	CHAR_T *filename                          = NULL;
-	CHAR_T *time_string                       = NULL;
-#if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
-	CHAR_T *error_string                      = NULL;
+	CHAR_T *filename                         = NULL;
+	CHAR_T *time_string                      = NULL;
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+	CHAR_T *error_string                     = NULL;
 #endif
-	void *callback                            = &ewfcommon_process_status_fprint;
+	void *callback                           = &ewfcommon_process_status_fprint;
 
-	INT_T option                              = 0;
-	ssize64_t write_count                     = 0;
-	size_t string_length                      = 0;
-	time_t timestamp_start                    = 0;
-	time_t timestamp_end                      = 0;
-	int64_t segment_file_size                 = 0;
-	uint64_t input_size                       = 0;
-	uint64_t acquiry_offset                   = 0;
-	uint64_t acquiry_size                     = 0;
-	uint64_t sectors_per_chunk                = 0;
-	uint32_t sector_error_granularity         = 0;
-	int8_t compression_level                  = LIBEWF_COMPRESSION_NONE;
-	int8_t compress_empty_block               = 0;
-	int8_t result_md5_hash                    = 0;
-	int8_t result_sha1_hash                   = 0;
-	int8_t media_type                         = LIBEWF_MEDIA_TYPE_FIXED;
-	int8_t volume_type                        = LIBEWF_VOLUME_TYPE_LOGICAL;
-	int8_t wipe_block_on_read_error           = 0;
-	uint8_t libewf_format                     = LIBEWF_FORMAT_UNKNOWN;
-	uint8_t read_error_retry                  = 2;
-	uint8_t swap_byte_pairs                   = 0;
-	uint8_t seek_on_error                     = 1;
-	uint8_t calculate_sha1                    = 0;
-	uint8_t verbose                           = 0;
-	int file_descriptor                       = 0;
+	INT_T option                             = 0;
+	ssize64_t write_count                    = 0;
+	size_t string_length                     = 0;
+	time_t timestamp_start                   = 0;
+	time_t timestamp_end                     = 0;
+	int64_t segment_file_size                = 0;
+	uint64_t input_size                      = 0;
+	uint64_t acquiry_offset                  = 0;
+	uint64_t acquiry_size                    = 0;
+	uint64_t sectors_per_chunk               = 0;
+	uint32_t sector_error_granularity        = 0;
+	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
+	int8_t compress_empty_block              = 0;
+	int8_t result_md5_hash                   = 0;
+	int8_t result_sha1_hash                  = 0;
+	int8_t media_type                        = LIBEWF_MEDIA_TYPE_FIXED;
+	int8_t volume_type                       = LIBEWF_VOLUME_TYPE_LOGICAL;
+	int8_t wipe_block_on_read_error          = 0;
+	uint8_t libewf_format                    = LIBEWF_FORMAT_UNKNOWN;
+	uint8_t read_error_retry                 = 2;
+	uint8_t swap_byte_pairs                  = 0;
+	uint8_t seek_on_error                    = 1;
+	uint8_t calculate_sha1                   = 0;
+	uint8_t verbose                          = 0;
+	int file_descriptor                      = 0;
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, _S_LIBEWF_CHAR( "ewfacquire" ) );
+	ewfcommon_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hqsvV" ) ) ) != (INT_T) -1 )
 	{
@@ -578,7 +579,7 @@ int main( int argc, char * const argv[] )
 		                input_size,
 		                input_size );
 
-		/* File size
+		/* Segment file size
 		 */
 		segment_file_size = ewfcommon_get_user_input_size_variable(
 		                     stdout,
@@ -960,7 +961,7 @@ int main( int argc, char * const argv[] )
 	if( libewf_set_header_value(
 	     handle,
 	     _S_LIBEWF_CHAR( "acquiry_software" ),
-	     _S_LIBEWF_CHAR( "ewfacquire" ),
+	     program,
 	     10 ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value acquiry software in handle.\n" );
