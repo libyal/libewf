@@ -111,18 +111,14 @@ Code clean up
 Next release:
 * full platform test
 
-* add maximum check to set functions in file/internal handle
-
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
 * ewfexport
-  - non interactive mode?
   - ewfcommon_export_ewf - add raw access write support
   - allow to set sha1 and md5 calculation support
-  - update ewfexport man page
 * ewfacquire
-  - account for backspace in user input
+  - account for backspace in user input (no issue on Fedora Core 8)
   - ewfinput_get_size_variable uses strtoul, max is ULONG_MAX
     change to full 64bit value support?
 * ewfalter
@@ -154,6 +150,7 @@ CLOSED
 Version: 20071111
 * changed default wipe behavior for ewfacquire(stream)
   default behavior is that only remainder of the chunk is wiped instead of the entire chunk
+* Updated manual pages
 
 Version: 20071110
 * updated MSVSC++ project files
