@@ -65,8 +65,6 @@
 
 #include <libewf/types.h>
 
-#include "libewf_char.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif

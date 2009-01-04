@@ -35,12 +35,11 @@
 #define _LIBEWF_DEBUG_H
 
 #include <common.h>
+#include <character_string.h>
 
 #include <stdio.h>
 
 #include <libewf/types.h>
-
-#include "libewf_char.h"
 
 #include "ewf_char.h"
 #include "ewf_section.h"
@@ -60,7 +59,7 @@ void libewf_debug_section_fprint(
 
 void libewf_debug_header_string_fprint(
       FILE *stream,
-      libewf_char_t *header_string );
+      character_t *header_string );
 
 void libewf_debug_header_fprint(
       FILE *stream,

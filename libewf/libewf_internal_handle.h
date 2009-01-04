@@ -38,7 +38,6 @@
 
 #include <libewf/types.h>
 
-#include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"

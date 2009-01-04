@@ -42,21 +42,21 @@
 extern "C" {
 #endif
 
-extern int notify_verbose;
+extern int libewf_notify_verbose;
 
-void notify_set_values(
+void libewf_notify_set_values(
       FILE *stream,
       int verbose );
 
-void notify_printf(
+void libewf_notify_printf(
       char *format,
       ... );
 
 #define notify_verbose_printf \
-	if( notify_verbose != 0 ) notify_printf
+	if( libewf_notify_verbose != 0 ) libewf_notify_printf
 
 #define notify_warning_printf \
-	notify_printf
+	libewf_notify_printf
 
 #if defined( __cplusplus )
 }

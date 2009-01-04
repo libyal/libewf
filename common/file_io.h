@@ -79,14 +79,21 @@ extern "C" {
 
 #endif
 
-int file_io_open(
+int libewf_file_io_open(
      const char *filename,
      int flags );
 
+#define file_io_open( filename, flags ) \
+	libewf_file_io_open( filename, flags )
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int file_io_wopen(
+int libewf_file_io_wopen(
      const wchar_t *filename,
      int flags );
+
+#define file_io_wopen( filename, flags ) \
+	libewf_file_io_wopen( filename, flags )
+
 #endif
 
 #if defined( HAVE_WINDOWS_API )

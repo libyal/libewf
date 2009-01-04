@@ -33,7 +33,9 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
+#include <system_string.h>
 
 #include <errno.h>
 
@@ -56,7 +58,6 @@
 
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_notify.h"
-#include "../libewf/libewf_string.h"
 
 #include "ewfstring.h"
 
@@ -207,17 +208,17 @@ wchar_t *ewfstring_wide_strerror(
 }
 #endif
 
-/* Copies the source string (of CHAR_T) into the destination string for a certain length
+/* Copies the source string (of system_character_t) into the destination string for a certain length
  * Terminates the destination string with \0 at ( length - 1 )
  * Returns 1 if successful, -1 on error
  */
-int ewfstring_copy_libewf_char_from_char_t(
-     libewf_char_t *destination,
-     const CHAR_T *source,
+int ewfstring_copy_system_string_to_character_string(
+     character_t *destination,
+     const system_character_t *source,
      size_t length )
 {
-	static char *function = "ewfstring_copy_libewf_char_from_char_t";
-	ssize_t conversion    = (ssize_t) ( sizeof( libewf_char_t ) - sizeof( CHAR_T ) );
+	static char *function = "ewfstring_copy_system_string_to_character_string";
+	ssize_t conversion    = (ssize_t) ( sizeof( character_t ) - sizeof( system_character_t ) );
 	size_t iterator       = 0;
 
 	if( source == NULL )
@@ -238,17 +239,17 @@ int ewfstring_copy_libewf_char_from_char_t(
 	{
 		if( conversion == 0 )
 		{
-			destination[ iterator ] = (libewf_char_t) source[ iterator ];
+			destination[ iterator ] = (character_t) source[ iterator ];
 		}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
-			destination[ iterator ] = (libewf_char_t) btowc(
+			destination[ iterator ] = (character_t) btowc(
 			                                           (int) source[ iterator ] );
 		}
 		else if( conversion < 0 )
 		{
-			destination[ iterator ] = (libewf_char_t) wctob(
+			destination[ iterator ] = (character_t) wctob(
 			                                           (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
@@ -267,22 +268,22 @@ int ewfstring_copy_libewf_char_from_char_t(
 			return( -1 );
 		}
 	}
-	destination[ length - 1 ] = (libewf_char_t) '\0';
+	destination[ length - 1 ] = (character_t) '\0';
 
 	return( 1 );
 }
 
-/* Copies the source string into the destination string (of CHAR_T) for a certain length
+/* Copies the source string into the destination string (of system_character_t) for a certain length
  * Terminates the destination string with \0 at ( length - 1 )
  * Returns 1 if successful, -1 on error
  */
-int ewfstring_copy_libewf_char_to_char_t(
-     const libewf_char_t *source,
-     CHAR_T *destination,
+int ewfstring_copy_character_string_to_system_string(
+     system_character_t *destination,
+     const character_t *source,
      size_t length )
 {
-	static char *function = "ewfstring_copy_libewf_char_to_char_t";
-	ssize_t conversion    = (ssize_t) ( sizeof( libewf_char_t ) - sizeof( CHAR_T ) );
+	static char *function = "ewfstring_copy_character_string_to_system_string";
+	ssize_t conversion    = (ssize_t) ( sizeof( character_t ) - sizeof( system_character_t ) );
 	size_t iterator       = 0;
 
 	if( source == NULL )
@@ -303,12 +304,12 @@ int ewfstring_copy_libewf_char_to_char_t(
 	{
 		if( conversion == 0 )
 		{
-			destination[ iterator ] = (CHAR_T) source[ iterator ];
+			destination[ iterator ] = (system_character_t) source[ iterator ];
 		}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
-			destination[ iterator ] = (CHAR_T) wctob(
+			destination[ iterator ] = (system_character_t) wctob(
 			                                    (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
@@ -320,7 +321,7 @@ int ewfstring_copy_libewf_char_to_char_t(
 		}
 		else if( conversion < 0 )
 		{
-			destination[ iterator ] = (CHAR_T) btowc(
+			destination[ iterator ] = (system_character_t) btowc(
 			                                    (int) source[ iterator ] );
 		}
 #endif
@@ -332,7 +333,7 @@ int ewfstring_copy_libewf_char_to_char_t(
 			return( -1 );
 		}
 	}
-	destination[ length - 1 ] = (CHAR_T) '\0';
+	destination[ length - 1 ] = (system_character_t) '\0';
 
 	return( 1 );
 }

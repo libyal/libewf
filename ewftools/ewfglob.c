@@ -50,7 +50,6 @@
 
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_notify.h"
-#include "../libewf/libewf_string.h"
 
 #include "ewfglob.h"
 
@@ -121,10 +120,10 @@ ewfglob_t *ewfglob_realloc(
             ewfglob_t *glob,
             uint16_t new_amount )
 {
-	CHAR_T **reallocation = NULL;
-	static char *function = "ewfglob_realloc";
-	size_t previous_size  = 0;
-	size_t new_size       = 0;
+	system_character_t **reallocation = NULL;
+	static char *function             = "ewfglob_realloc";
+	size_t previous_size              = 0;
+	size_t new_size                   = 0;
 
 	if( glob == NULL )
 	{
@@ -140,8 +139,8 @@ ewfglob_t *ewfglob_realloc(
 
 		return( NULL );
 	}
-	previous_size = sizeof( CHAR_T* ) * glob->amount;
-	new_size      = sizeof( CHAR_T* ) * new_amount;
+	previous_size = sizeof( system_character_t * ) * glob->amount;
+	new_size      = sizeof( system_character_t * ) * new_amount;
 
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (size_t) SSIZE_MAX ) )
@@ -153,12 +152,12 @@ ewfglob_t *ewfglob_realloc(
 	}
 	if( glob->amount == 0 )
 	{
-		reallocation = (CHAR_T **) memory_allocate(
+		reallocation = (system_character_t **) memory_allocate(
 		                            new_size );
 	}
 	else
 	{
-		reallocation  = (CHAR_T **) memory_reallocate(
+		reallocation  = (system_character_t **) memory_reallocate(
 		                             glob->results,
 		                             new_size );
 	}
@@ -223,17 +222,17 @@ void ewfglob_free(
  */
 int32_t ewfglob_resolve(
          ewfglob_t *glob,
-         CHAR_T * const patterns[],
+         system_character_t * const patterns[],
          uint32_t amount_of_patterns )
 {
 #if defined( HAVE_WINDOWS_API )
 	struct ewfglob_finddata_t find_data;
 
-	CHAR_T find_path[ _MAX_PATH ];
-	CHAR_T find_drive[ _MAX_DRIVE ];
-	CHAR_T find_directory[ _MAX_DIR ];
-	CHAR_T find_name[ _MAX_FNAME ];
-	CHAR_T find_extension[ _MAX_EXT ];
+	system_character_t find_path[ _MAX_PATH ];
+	system_character_t find_drive[ _MAX_DRIVE ];
+	system_character_t find_directory[ _MAX_DIR ];
+	system_character_t find_name[ _MAX_FNAME ];
+	system_character_t find_extension[ _MAX_EXT ];
 
 	intptr_t find_handle  = 0;
 #endif
@@ -296,14 +295,17 @@ int32_t ewfglob_resolve(
 				     find_drive,
 				     find_directory,
 				     find_data.name,
-				     _S_CHAR_T( "" )  ) != 0 )
+				     _SYSTEM_CHARACTER_T_STRING( "" )  ) != 0 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to make path.\n",
 					 function );
 
 					return( -1 );
 				}
-				glob->results[ glob->amount - 1 ] = CHAR_T_DUPLICATE( find_path );
+				glob->results[ glob->amount - 1 ] = system_string_duplicate(
+				                                     find_path,
+				                                     system_string_length(
+				                                      find_path ) );
 
 				globs_found++;
 

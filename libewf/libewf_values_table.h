@@ -35,10 +35,9 @@
 #define _LIBEWF_VALUES_TABLE_H
 
 #include <common.h>
+#include <character_string.h>
 
 #include <libewf/types.h>
-
-#include "libewf_char.h"
 
 #include "ewf_char.h"
 
@@ -56,11 +55,11 @@ struct libewf_values_table
 
 	/* The value identifiers
 	 */
-	libewf_char_t **identifiers;
+	character_t **identifiers;
 
 	/* The values
 	 */
-	libewf_char_t **values;
+	character_t **values;
 };
 
 libewf_values_table_t *libewf_values_table_alloc(
@@ -76,24 +75,24 @@ void libewf_values_table_free(
 
 int32_t libewf_values_table_get_index(
          libewf_values_table_t *values_table,
-         libewf_char_t *identifier );
+         character_t *identifier );
 
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      uint32_t index,
-     libewf_char_t *identifier,
+     character_t *identifier,
      size_t length );
 
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length );
 
 #if defined( __cplusplus )

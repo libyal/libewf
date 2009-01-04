@@ -1113,7 +1113,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		if( write_count == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to rewrite %" PRIs_EWF " section.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to rewrite %" PRIs " section.\n",
 			 function, table_section_string );
 
 			return( -1 );

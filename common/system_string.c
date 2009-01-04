@@ -32,20 +32,20 @@
  */
 
 #include "common.h"
-#include "character_string.h"
 #include "memory.h"
 #include "notify.h"
 #include "types.h"
+#include "system_string.h"
 
 /* Duplicates a string
  * Returns the pointer to the duplicate string, or NULL on error
  */
-character_t *libewf_string_duplicate(
-              character_t *string,
-              size_t size )
+system_character_t *libewf_system_string_duplicate(
+                     system_character_t *string,
+                     size_t size )
 {
-	character_t *duplicate = NULL;
-	static char *function  = "libewf_string_duplicate";
+	system_character_t *duplicate = NULL;
+	static char *function         = "libewf_system_string_duplicate";
 
 	if( string == NULL )
 	{
@@ -66,8 +66,8 @@ character_t *libewf_string_duplicate(
 	 */
 	size += 1;
 
-	duplicate = (character_t *) memory_allocate(
-	                             sizeof( character_t ) * size );
+	duplicate = (system_character_t *) memory_allocate(
+	                                    sizeof( system_character_t ) * size );
 
 	if( duplicate == NULL )
 	{
@@ -76,7 +76,7 @@ character_t *libewf_string_duplicate(
 
 		return( NULL );
 	}
-	if( string_copy(
+	if( system_string_copy(
 	     duplicate,
 	     string, size ) == NULL )
 	{
@@ -88,20 +88,20 @@ character_t *libewf_string_duplicate(
 
 		return( NULL );
 	}
-	duplicate[ size - 1 ] = (character_t) '\0';
+	duplicate[ size - 1 ] = (system_character_t) '\0';
 
 	return( duplicate );
 }
 
 /* Returns the value represented by a string, returns 0 error
  */
-int64_t libewf_string_to_int64(
-         const character_t *string,
+int64_t libewf_system_string_to_int64(
+         const system_character_t *string,
          size_t size )
 {
-	character_t *end_of_string = NULL;
-	static char *function      = "libewf_string_to_int64";
-	int64_t value              = 0;
+	system_character_t *end_of_string = NULL;
+	static char *function             = "libewf_system_string_to_int64";
+	int64_t value                     = 0;
 
 	if( string == NULL )
 	{
@@ -124,9 +124,9 @@ int64_t libewf_string_to_int64(
 
 		return( 0 );
 	}
-	end_of_string = (character_t *) &string[ size - 1 ];
+	end_of_string = (system_character_t *) &string[ size - 1 ];
 
-	value = string_to_signed_long_long(
+	value = system_string_to_signed_long_long(
 	         string,
 	         &end_of_string,
 	         0 );
@@ -143,13 +143,13 @@ int64_t libewf_string_to_int64(
 
 /* Returns the value represented by a string, returns 0 on error
  */
-uint64_t libewf_string_to_uint64(
-          const character_t *string,
+uint64_t libewf_system_string_to_uint64(
+          const system_character_t *string,
           size_t size )
 {
-	character_t *end_of_string = NULL;
-	static char *function      = "libewf_string_to_uint64";
-	uint64_t value             = 0;
+	system_character_t *end_of_string = NULL;
+	static char *function             = "libewf_system_string_to_uint64";
+	uint64_t value                    = 0;
 
 	if( string == NULL )
 	{
@@ -172,9 +172,9 @@ uint64_t libewf_string_to_uint64(
 
 		return( 0 );
 	}
-	end_of_string = (character_t *) &string[ size - 1 ];
+	end_of_string = (system_character_t *) &string[ size - 1 ];
 
-	value = string_to_unsigned_long_long(
+	value = system_string_to_unsigned_long_long(
 	         string,
 	         &end_of_string,
 	         0 );

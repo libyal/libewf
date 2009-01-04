@@ -20,7 +20,6 @@ libewf_la_SOURCES = \
 	ewf_volume_smart.h \
 	ewfx_delta_chunk.h \
 	libewf.c \
-	libewf_char.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
 	libewf_chunk_offset.h \
 	libewf_common.c libewf_common.h \

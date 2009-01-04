@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <notify.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -43,98 +44,6 @@
 #include "libewf_common.h"
 #include "libewf_notify.h"
 
-#if defined( HAVE_STDARG_H )
-
-#include <stdarg.h>
-
-#define VARARGS( function, type, argument ) \
-	function( type argument, ... )
-#define VASTART( argument_list, type, name ) \
-	va_start( argument_list, name )
-#define VAEND( argument_list ) \
-	va_end( argument_list )
-
-#elif defined( HAVE_VARARGS_H )
-
-#include <varargs.h>
-
-#define VARARGS( function, type, argument ) \
-	function( va_alist ) va_dcl
-#define VASTART( argument_list, type, name ) \
-	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
-#define VAEND( argument_list ) \
-	va_end( argument_list ); }
-
-#else
-#error No variable argument support available
-#endif
-
-FILE *libewf_notify_stream    = NULL;
-uint8_t libewf_notify_verbose = 0;
-
-/* Set the notify values
- */
-void libewf_notify_set_values(
-      FILE *stream,
-      uint8_t verbose )
-{
-	libewf_notify_stream  = stream;
-	libewf_notify_verbose = verbose;
-}
-
-/* Print a remark on libewf notify stream and continue
- */
-void VARARGS( libewf_verbose_print, char *, format )
-{
-#if defined( HAVE_VERBOSE_OUTPUT )
-	va_list argument_list;
-
-	if( ( libewf_notify_stream != NULL )
-	 && ( libewf_notify_verbose != 0 ) )
-	{
-		VASTART( argument_list, char *, format );
-
-		vfprintf( libewf_notify_stream, format, argument_list );
-
-		VAEND( argument_list );
-	}
-#endif
-}
-
-/* Print error on libewf notify stream, does not terminate
- */
-void VARARGS( libewf_warning_print, char *, format )
-{
-	va_list argument_list;
-
-	if( ( libewf_notify_stream != NULL )
-	 && ( libewf_notify_verbose != 0 ) )
-	{
-		VASTART( argument_list, char *, format );
-
-		vfprintf( libewf_notify_stream, format, argument_list );
-
-		VAEND( argument_list );
-	}
-}
-
-/* Print a fatal error on libewf notify stream, and terminate
- */
-void VARARGS( libewf_fatal_print, char *, format )
-{
-	va_list argument_list;
-
-	if( libewf_notify_stream != NULL )
-	{
-		VASTART( argument_list, char *, format );
-
-		vfprintf( libewf_notify_stream, format, argument_list );
-
-		VAEND( argument_list );
-	}
-	exit( EXIT_FAILURE );
-}
-
 /* Prints a dump of data
  */
 void libewf_dump_data(
@@ -143,32 +52,30 @@ void libewf_dump_data(
 {
 	size_t iterator = 0;
 
-	if( libewf_notify_stream == NULL )
-	{
-		return;
-	}
 	while( iterator < size )
 	{
 		if( iterator % 16 == 0 )
 		{
-			fprintf( libewf_notify_stream, "%.8" PRIzx ": ", iterator );
+			notify_verbose_printf( "%.8" PRIzx ": ",
+			 iterator );
 		}
-		fprintf( libewf_notify_stream, "%.2" PRIx8 "", data[ iterator++ ] );
+		notify_verbose_printf( "%.2" PRIx8 "",
+		 data[ iterator++ ] );
 
 		if( iterator % 16 == 0 )
 		{
-			fprintf( libewf_notify_stream, "\n" );
+			notify_verbose_printf( "\n" );
 		}
 		else if( iterator % 8 == 0 )
 		{
-			fprintf( libewf_notify_stream, "  " );
+			notify_verbose_printf( "  " );
 		}
 	}
 	if( iterator % 16 != 0 )
 	{
-		fprintf( libewf_notify_stream, "\n" );
+		notify_verbose_printf( "\n" );
 	}
-	fprintf( libewf_notify_stream, "\n" );
+	notify_verbose_printf( "\n" );
 
 	iterator = 0;
 
@@ -176,23 +83,25 @@ void libewf_dump_data(
 	{
 		if( iterator % 32 == 0 )
 		{
-			fprintf( libewf_notify_stream, "%.8" PRIzx ": ", iterator );
+			notify_verbose_printf( "%.8" PRIzx ": ",
+			 iterator );
 		}
-		fprintf( libewf_notify_stream, "%c ", (char) data[ iterator++ ] );
+		notify_verbose_printf( "%c ",
+		 (char) data[ iterator++ ] );
 
 		if( iterator % 32 == 0 )
 		{
-			fprintf( libewf_notify_stream, "\n" );
+			notify_verbose_printf( "\n" );
 		}
 		else if( iterator % 8 == 0 )
 		{
-			fprintf( libewf_notify_stream, "  " );
+			notify_verbose_printf( "  " );
 		}
 	}
 	if( iterator % 32 != 0 )
 	{
-		fprintf( libewf_notify_stream, "\n" );
+		notify_verbose_printf( "\n" );
 	}
-	fprintf( libewf_notify_stream, "\n" );
+	notify_verbose_printf( "\n" );
 }
 

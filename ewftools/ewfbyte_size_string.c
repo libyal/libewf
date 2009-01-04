@@ -33,6 +33,8 @@
  */
 
 #include <common.h>
+#include <character_string.h>
+#include <system_string.h>
 
 #include <errno.h>
 
@@ -55,36 +57,35 @@
 
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_notify.h"
-#include "../libewf/libewf_string.h"
 
 #include "ewfbyte_size_string.h"
 
 /* Determines the factor string of a certain factor value
  * Returns the string if successful or NULL on error
  */
-const libewf_char_t *ewfbyte_size_string_get_factor_string(
-                      int8_t factor )
+const character_t *ewfbyte_size_string_get_factor_string(
+                    int8_t factor )
 {
 	switch( factor )
 	{
 		case 0:
-			return( _S_LIBEWF_CHAR( "" ) );
+			return( _CHARACTER_T_STRING( "" ) );
 		case 1:
-			return( _S_LIBEWF_CHAR( "K" ) );
+			return( _CHARACTER_T_STRING( "K" ) );
 		case 2:
-			return( _S_LIBEWF_CHAR( "M" ) );
+			return( _CHARACTER_T_STRING( "M" ) );
 		case 3:
-			return( _S_LIBEWF_CHAR( "G" ) );
+			return( _CHARACTER_T_STRING( "G" ) );
 		case 4:
-			return( _S_LIBEWF_CHAR( "T" ) );
+			return( _CHARACTER_T_STRING( "T" ) );
 		case 5:
-			return( _S_LIBEWF_CHAR( "P" ) );
+			return( _CHARACTER_T_STRING( "P" ) );
 		case 6:
-			return( _S_LIBEWF_CHAR( "E" ) );
+			return( _CHARACTER_T_STRING( "E" ) );
 		case 7:
-			return( _S_LIBEWF_CHAR( "Z" ) );
+			return( _CHARACTER_T_STRING( "Z" ) );
 		case 8:
-			return( _S_LIBEWF_CHAR( "Y" ) );
+			return( _CHARACTER_T_STRING( "Y" ) );
 		default :
 			break;
 	}
@@ -95,7 +96,7 @@ const libewf_char_t *ewfbyte_size_string_get_factor_string(
  * Returns the factor if successful or -1 on error
  */
 int8_t ewfbyte_size_string_get_factor(
-        libewf_char_t factor )
+        character_t factor )
 {
 	switch( factor )
 	{
@@ -133,19 +134,19 @@ int8_t ewfbyte_size_string_get_factor(
  * Returns 1 if successful or -1 on error
  */
 int ewfbyte_size_string_create(
-     libewf_char_t *byte_size_string,
+     character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units )
 {
-	const libewf_char_t *factor_string = NULL;
-	const libewf_char_t *units_string  = NULL;
-	static char *function              = "ewfbyte_size_string_create";
-	ssize_t print_count                = 0;
-	uint64_t factored_size             = 0;
-	uint64_t last_factored_size        = 0;
-	int8_t factor                      = 0;
-	int8_t remainder                   = -1;
+	const character_t *factor_string = NULL;
+	const character_t *units_string  = NULL;
+	static char *function            = "ewfbyte_size_string_create";
+	ssize_t print_count              = 0;
+	uint64_t factored_size           = 0;
+	uint64_t last_factored_size      = 0;
+	int8_t factor                    = 0;
+	int8_t remainder                 = -1;
 
 	if( byte_size_string == NULL )
 	{
@@ -166,11 +167,11 @@ int ewfbyte_size_string_create(
 	if( ( size < 1024 )
 	 || ( units == EWFBYTE_SIZE_STRING_UNIT_MEGABYTE ) )
 	{
-		units_string = _S_LIBEWF_CHAR( "B" );
+		units_string = _CHARACTER_T_STRING( "B" );
 	}
 	else if( units == EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE )
 	{
-		units_string = _S_LIBEWF_CHAR( "iB" );
+		units_string = _CHARACTER_T_STRING( "iB" );
 	}
 	factored_size = size;
 
@@ -212,13 +213,13 @@ int ewfbyte_size_string_create(
 	}
 	if( remainder >= 0 )
 	{
-		print_count = libewf_string_snprintf(
+		print_count = string_snprintf(
 		               byte_size_string,
 		               byte_size_string_length,
-		               _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 )
-		               _S_LIBEWF_CHAR( ".%" ) _S_LIBEWF_CHAR( PRIu8 )
-		               _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF )
-		               _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIs_EWF ),
+		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIu64 )
+		               _CHARACTER_T_STRING( ".%" ) _CHARACTER_T_STRING( PRIu8 )
+		               _CHARACTER_T_STRING( " %" ) _CHARACTER_T_STRING( PRIs )
+		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ),
 		               factored_size,
 		               remainder,
 		               factor_string,
@@ -226,12 +227,12 @@ int ewfbyte_size_string_create(
 	}
 	else
 	{
-		print_count = libewf_string_snprintf(
+		print_count = string_snprintf(
 		               byte_size_string,
 		               byte_size_string_length,
-		               _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 )
-		               _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF )
-		               _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIs_EWF ),
+		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIu64 )
+		               _CHARACTER_T_STRING( " %" ) _CHARACTER_T_STRING( PRIs )
+		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ),
 		               factored_size,
 		               factor_string,
 		               units_string );
@@ -250,7 +251,7 @@ int ewfbyte_size_string_create(
  * Returns 1 if successful or -1 on error
  */
 int ewfbyte_size_string_convert(
-     libewf_char_t *byte_size_string,
+     character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
@@ -291,9 +292,32 @@ int ewfbyte_size_string_convert(
 	{
 		byte_size_string_iterator++;
 
-		remainder = byte_size_string[ byte_size_string_iterator ] - '0';
+		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
+		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
+		{
+			remainder = ( byte_size_string[ byte_size_string_iterator ] - '0' );
 
-		byte_size_string_iterator++;
+			byte_size_string_iterator++;
+		}
+		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
+		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
+		{
+			remainder *= 10;
+			remainder += ( byte_size_string[ byte_size_string_iterator ] - '0' );
+
+			byte_size_string_iterator++;
+		}
+		/* Ignore more than 2 digits after seperator
+		 */
+		while( byte_size_string_iterator < byte_size_string_length )
+		{
+			if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
+			 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
+			{
+				break;
+			}
+			byte_size_string_iterator++;
+		}
 	}
 	if( byte_size_string[ byte_size_string_iterator ] == ' ' )
 	{
@@ -365,7 +389,7 @@ int ewfbyte_size_string_convert(
  * Returns the factor if successful or -1 on error
  */
 int8_t ewfbyte_size_string_get_factor_char_t(
-        CHAR_T factor )
+        system_character_t factor )
 {
 	switch( factor )
 	{
@@ -403,7 +427,7 @@ int8_t ewfbyte_size_string_get_factor_char_t(
  * Returns 1 if successful or -1 on error
  */
 int ewfbyte_size_string_convert_char_t(
-     CHAR_T *byte_size_string,
+     system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
@@ -444,9 +468,32 @@ int ewfbyte_size_string_convert_char_t(
 	{
 		byte_size_string_iterator++;
 
-		remainder = byte_size_string[ byte_size_string_iterator ] - '0';
+		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
+		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
+		{
+			remainder = ( byte_size_string[ byte_size_string_iterator ] - '0' );
 
-		byte_size_string_iterator++;
+			byte_size_string_iterator++;
+		}
+		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
+		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
+		{
+			remainder *= 10;
+			remainder += ( byte_size_string[ byte_size_string_iterator ] - '0' );
+
+			byte_size_string_iterator++;
+		}
+		/* Ignore more than 2 digits after seperator
+		 */
+		while( byte_size_string_iterator < byte_size_string_length )
+		{
+			if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
+			 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
+			{
+				break;
+			}
+			byte_size_string_iterator++;
+		}
 	}
 	if( byte_size_string[ byte_size_string_iterator ] == ' ' )
 	{

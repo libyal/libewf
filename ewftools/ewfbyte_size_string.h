@@ -36,12 +36,10 @@
 #define _EWFBYTE_SIZE_STRING_H
 
 #include <common.h>
+#include <character_string.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
-
-#include "../libewf/libewf_char.h"
-
-#include "ewfstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -50,28 +48,28 @@ extern "C" {
 #define EWFBYTE_SIZE_STRING_UNIT_MEGABYTE		1000
 #define EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE		1024
 
-const libewf_char_t *ewfbyte_size_string_get_factor_string(
-                      int8_t factor );
+const character_t *ewfbyte_size_string_get_factor_string(
+                    int8_t factor );
 
 int8_t ewfbyte_size_string_get_factor(
-        libewf_char_t factor );
+        character_t factor );
 
 int ewfbyte_size_string_create(
-     libewf_char_t *byte_size_string,
+     character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units );
 
 int ewfbyte_size_string_convert(
-     libewf_char_t *byte_size_string,
+     character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );
 
 int8_t ewfbyte_size_string_get_factor_char_t(
-        CHAR_T factor );
+        system_character_t factor );
 
 int ewfbyte_size_string_convert_char_t(
-     CHAR_T *byte_size_string,
+     system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );
 

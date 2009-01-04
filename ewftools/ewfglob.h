@@ -36,6 +36,7 @@
 #define _EWFGLOB_H
 
 #include <common.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
 
@@ -57,7 +58,7 @@ struct ewfglob
 
 	/* The resolved globs
 	 */
-	CHAR_T **results;
+	system_character_t **results;
 };
 
 ewfglob_t *ewfglob_alloc(
@@ -72,7 +73,7 @@ void ewfglob_free(
 
 int32_t ewfglob_resolve(
          ewfglob_t *glob,
-         CHAR_T * const patterns[],
+         system_character_t * const patterns[],
          uint32_t amount_of_patterns );
 
 #endif

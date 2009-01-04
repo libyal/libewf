@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
 #include <types.h>
 
@@ -59,8 +60,8 @@ int libewf_hash_values_initialize(
 
 		return( -1 );
 	}
-	hash_values->identifiers[ 0 ] = libewf_string_duplicate(
-	                                 _S_LIBEWF_CHAR( "MD5" ),
+	hash_values->identifiers[ 0 ] = string_duplicate(
+	                                 _CHARACTER_T_STRING( "MD5" ),
 	                                 3 );
 
 	return( 1 );
@@ -71,18 +72,18 @@ int libewf_hash_values_initialize(
  */
 int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t **hash_values,
-     libewf_char_t *hash_string_xml,
+     character_t *hash_string_xml,
      size_t length )
 {
-	libewf_char_t **lines          = NULL;
-	libewf_char_t *open_tag_start  = NULL;
-	libewf_char_t *open_tag_end    = NULL;
-	libewf_char_t *close_tag_start = NULL;
-	libewf_char_t *close_tag_end   = NULL;
-	static char *function          = "libewf_hash_values_parse_hash_string_xml";
-	size_t string_length           = 0;
-	uint32_t line_count            = 0;
-	uint32_t iterator              = 0;
+	character_t **lines          = NULL;
+	character_t *open_tag_start  = NULL;
+	character_t *open_tag_end    = NULL;
+	character_t *close_tag_start = NULL;
+	character_t *close_tag_end   = NULL;
+	static char *function        = "libewf_hash_values_parse_hash_string_xml";
+	size_t string_length         = 0;
+	uint32_t line_count          = 0;
+	uint32_t iterator            = 0;
 
 	if( hash_string_xml == NULL )
 	{
@@ -92,9 +93,9 @@ int libewf_hash_values_parse_hash_string_xml(
 		return( -1 );
 	}
 	lines = libewf_string_split(
-	         (libewf_char_t *) hash_string_xml,
+	         (character_t *) hash_string_xml,
 	         length,
-	         (libewf_char_t) '\n',
+	         (character_t) '\n',
 	         &line_count );
 
 	if( lines == NULL )
@@ -133,11 +134,11 @@ int libewf_hash_values_parse_hash_string_xml(
 	for( iterator = 0; iterator < line_count; iterator++ )
 	{
 		if( ( lines[ iterator ] == NULL )
-		 || ( lines[ iterator ] == (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
+		 || ( lines[ iterator ] == (character_t *) _CHARACTER_T_STRING( "" ) ) )
 		{
 			continue;
 		}
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 lines[ iterator ] );
 
 		/* Ignore empty lines
@@ -146,9 +147,9 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		open_tag_start = libewf_string_search(
+		open_tag_start = string_search(
 		                  lines[ iterator ],
-		                  (libewf_char_t) '<',
+		                  (character_t) '<',
 		                  string_length );
 
 		/* Ignore lines without an open tag
@@ -157,9 +158,9 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		open_tag_end = libewf_string_search(
+		open_tag_end = string_search(
 		                lines[ iterator ],
-		                (libewf_char_t) '>',
+		                (character_t) '>',
 		                string_length );
 
 		/* Ignore lines without an open tag
@@ -178,9 +179,9 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		close_tag_start = libewf_string_search_reverse(
+		close_tag_start = string_search_reverse(
 		                   &open_tag_end[ 1 ],
-		                   (libewf_char_t) '<',
+		                   (character_t) '<',
 		                   string_length );
 
 		/* Ignore lines without a close tag
@@ -189,9 +190,9 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		close_tag_end = libewf_string_search_reverse(
+		close_tag_end = string_search_reverse(
 		                 &open_tag_end[ 1 ],
-		                 (libewf_char_t) '>',
+		                 (character_t) '>',
 		                 string_length );
 
 		/* Ignore lines without a close tag
@@ -206,7 +207,7 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		/* Make sure the identifier string will be terminated
 		 */
-		*open_tag_end = (libewf_char_t) '\0';
+		*open_tag_end = (character_t) '\0';
 
 		if( libewf_values_table_set_value(
 		     *hash_values,
@@ -214,7 +215,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		     &open_tag_end[ 1 ],
 		     string_length ) != 1 )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs_EWF ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs ".\n",
 			 function, &open_tag_start[ 1 ] );
 		}
 	}
@@ -233,9 +234,9 @@ int libewf_hash_values_parse_xhash(
      ewf_char_t *xhash,
      size_t size )
 {
-	libewf_char_t *xml_hash_string = NULL;
-	static char *function          = "libewf_hash_values_parse_xhash";
-	int result                     = 0;
+	character_t *xml_hash_string = NULL;
+	static char *function        = "libewf_hash_values_parse_xhash";
+	int result                   = 0;
 
 	if( xhash == NULL )
 	{
@@ -244,8 +245,8 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
-	xml_hash_string = (libewf_char_t *) memory_allocate(
-	                                     sizeof( libewf_char_t ) * ( size + 1 ) );
+	xml_hash_string = (character_t *) memory_allocate(
+	                                   sizeof( character_t ) * ( size + 1 ) );
 
 	if( xml_hash_string == NULL )
 	{
@@ -289,7 +290,7 @@ int libewf_hash_values_parse_xhash(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_convert_hash_string_to_hash(
-     libewf_char_t *hash_string,
+     character_t *hash_string,
      size_t hash_string_length,
      ewf_char_t **hash,
      size_t *hash_length )
@@ -372,16 +373,16 @@ int libewf_hash_values_convert_hash_string_to_hash(
  */
 int libewf_hash_values_generate_hash_string_xml(
      libewf_values_table_t *hash_values,
-     libewf_char_t **hash_string,
+     character_t **hash_string,
      size_t *hash_string_length )
 {
-	libewf_char_t *xml_head            = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
-	libewf_char_t *xml_open_tag_xhash  = _S_LIBEWF_CHAR( "<xhash>" );
-	libewf_char_t *xml_close_tag_xhash = _S_LIBEWF_CHAR( "</xhash>" );
-	static char *function              = "libewf_hash_values_generate_hash_string_xml";
-	uint32_t iterator                  = 0;
-	int string_offset                  = 0;
-	int character_count                = 0;
+	character_t *xml_head            = _CHARACTER_T_STRING( "<?xml version=\"1.0\"?>" );
+	character_t *xml_open_tag_xhash  = _CHARACTER_T_STRING( "<xhash>" );
+	character_t *xml_close_tag_xhash = _CHARACTER_T_STRING( "</xhash>" );
+	static char *function            = "libewf_hash_values_generate_hash_string_xml";
+	uint32_t iterator                = 0;
+	int string_offset                = 0;
+	int character_count              = 0;
 
 	if( hash_values == NULL )
 	{
@@ -413,13 +414,13 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	/* Add space for the xml data and an end of line
 	 */
-	*hash_string_length = 1 + libewf_string_length(
+	*hash_string_length = 1 + string_length(
 	                           xml_head );
 
-	*hash_string_length += 1 + libewf_string_length(
+	*hash_string_length += 1 + string_length(
 	                            xml_open_tag_xhash );
 
-	*hash_string_length += 1 + libewf_string_length(
+	*hash_string_length += 1 + string_length(
 	                            xml_close_tag_xhash );
 
 	for( iterator = 0; iterator < hash_values->amount; iterator++ )
@@ -435,12 +436,12 @@ int libewf_hash_values_generate_hash_string_xml(
 		{
 			/* Add space for a leading tab, <identifier></identifier> and an end of line
 			 */
-			*hash_string_length += 7 + ( 2 * libewf_string_length(
+			*hash_string_length += 7 + ( 2 * string_length(
 			                                  hash_values->identifiers[ iterator ] ) );
 
 			/* Add space for the hash value
 			 */
-			*hash_string_length += libewf_string_length(
+			*hash_string_length += string_length(
 			                        hash_values->values[ iterator ] );
 		}
 	}
@@ -448,8 +449,8 @@ int libewf_hash_values_generate_hash_string_xml(
 	 */
 	*hash_string_length += 2;
 
-	*hash_string = (libewf_char_t *) memory_allocate(
-                                         sizeof( libewf_char_t ) * *hash_string_length );
+	*hash_string = (character_t *) memory_allocate(
+                                        sizeof( character_t ) * *hash_string_length );
 
 	if( *hash_string == NULL )
 	{
@@ -460,11 +461,11 @@ int libewf_hash_values_generate_hash_string_xml(
 
 		return( -1 );
 	}
-	character_count = libewf_string_snprintf(
+	character_count = string_snprintf(
 	                   *hash_string,
 	                   *hash_string_length,
-	                   _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "\n%" )
-	                   _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "\n" ),
+	                   _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n%" )
+	                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n" ),
 	                   xml_head,
 	                   xml_open_tag_xhash );
 
@@ -494,12 +495,12 @@ int libewf_hash_values_generate_hash_string_xml(
 		}
 		if( hash_values->values[ iterator ] != NULL )
 		{
-			character_count = libewf_string_snprintf(
+			character_count = string_snprintf(
 			                   &( ( *hash_string) [ string_offset ] ),
 			                   ( *hash_string_length - string_offset ),
-			                   _S_LIBEWF_CHAR( "\t<%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( ">%" )
-			                   _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "</%" ) _S_LIBEWF_CHAR( PRIs_EWF )
-			                   _S_LIBEWF_CHAR( ">\n" ),
+			                   _CHARACTER_T_STRING( "\t<%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( ">%" )
+			                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "</%" ) _CHARACTER_T_STRING( PRIs )
+			                   _CHARACTER_T_STRING( ">\n" ),
 			                   hash_values->identifiers[ iterator ],
 			                   hash_values->values[ iterator ],
 			                   hash_values->identifiers[ iterator ] );
@@ -520,10 +521,10 @@ int libewf_hash_values_generate_hash_string_xml(
 			string_offset += character_count;
 		}
 	}
-	character_count = libewf_string_snprintf(
+	character_count = string_snprintf(
 	                   &( ( *hash_string )[ string_offset ] ),
 	                   ( *hash_string_length - string_offset ),
-	                   _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "\n\n" ),
+	                   _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n\n" ),
 	                   xml_close_tag_xhash );
 
 	if( character_count <= -1 )
@@ -541,7 +542,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *hash_string )[ *hash_string_length - 1 ] = (libewf_char_t) '\0';
+	( *hash_string )[ *hash_string_length - 1 ] = (character_t) '\0';
 
 	return( 1 );
 }
@@ -554,9 +555,9 @@ int libewf_hash_values_generate_xhash_string_ewfx(
      ewf_char_t **hash,
      size_t *hash_length )
 {
-	libewf_char_t *hash_string = NULL;
-	static char *function      = "libewf_hash_values_generate_xhash_string_ewfx";
-	int result                 = 0;
+	character_t *hash_string = NULL;
+	static char *function    = "libewf_hash_values_generate_xhash_string_ewfx";
+	int result               = 0;
 
 	if( libewf_hash_values_generate_hash_string_xml(
 	     hash_values,

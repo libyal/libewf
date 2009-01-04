@@ -36,6 +36,8 @@
 #define _EWFCOMMON_H
 
 #include <common.h>
+#include <character_string.h>
+#include <system_string.h>
 
 #include <stdio.h>
 
@@ -49,10 +51,8 @@
 #include "ewfsha1.h"
 #include "ewfstring.h"
 
-#include "../libewf/libewf_char.h"
-
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
-#define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1440 * 1024 )
+#define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1024 * 1024 )
 #define EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT	INT32_MAX
 #define EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT	INT64_MAX
 
@@ -70,8 +70,8 @@ int ewfcommon_swap_byte_pairs(
      uint8_t *buffer,
      size_t size );
 
-libewf_char_t *ewfcommon_determine_operating_system(
-                void );
+character_t *ewfcommon_determine_operating_system(
+              void );
 
 int8_t ewfcommon_determine_guid(
         uint8_t *guid,
@@ -79,14 +79,14 @@ int8_t ewfcommon_determine_guid(
 
 int ewfcommon_initialize_write(
      LIBEWF_HANDLE *handle,
-     libewf_char_t *case_number,
-     libewf_char_t *description,
-     libewf_char_t *evidence_number,
-     libewf_char_t *examiner_name,
-     libewf_char_t *notes,
-     libewf_char_t *acquiry_operating_system,
-     libewf_char_t *acquiry_software,
-     libewf_char_t *acquiry_software_version,
+     character_t *case_number,
+     character_t *description,
+     character_t *evidence_number,
+     character_t *examiner_name,
+     character_t *notes,
+     character_t *acquiry_operating_system,
+     character_t *acquiry_software,
+     character_t *acquiry_software_version,
      uint8_t media_type,
      uint8_t volume_type,
      int8_t compression_level,
@@ -135,10 +135,10 @@ ssize_t ewfcommon_raw_write_ewf(
 ssize64_t ewfcommon_read_verify(
            LIBEWF_HANDLE *handle,
            uint8_t calculate_md5,
-           libewf_char_t *md5_hash_string,
+           character_t *md5_hash_string,
            size_t md5_hash_string_length,
            uint8_t calculate_sha1,
-           libewf_char_t *sha1_hash_string,
+           character_t *sha1_hash_string,
            size_t sha1_hash_string_length,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
@@ -156,17 +156,17 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            uint8_t wipe_chunk_on_error,
            uint8_t seek_on_error,
            uint8_t calculate_md5,
-           libewf_char_t *md5_hash_string,
+           character_t *md5_hash_string,
            size_t md5_hash_string_length,
            uint8_t calculate_sha1,
-           libewf_char_t *sha1_hash_string,
+           character_t *sha1_hash_string,
            size_t sha1_hash_string_length,
            uint8_t swap_byte_pairs,
            void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
 ssize64_t ewfcommon_export_raw(
            LIBEWF_HANDLE *handle,
-           CHAR_T *target_filename,
+           system_character_t *target_filename,
            size64_t export_size,
            off64_t read_offset,
            uint8_t swap_byte_pairs,

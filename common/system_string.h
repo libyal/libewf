@@ -1,5 +1,5 @@
 /*
- * Character string functions
+ * System character string functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _CHARACTER_STRING_H )
-#define _CHARACTER_STRING_H
+#if !defined( _SYSTEM_STRING_H )
+#define _SYSTEM_STRING_H
 
 #include "common.h"
 
@@ -42,40 +42,41 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
-typedef wchar_t character_t;
+typedef wchar_t system_character_t;
+typedef wint_t system_integer_t;
 
-#define PRIc	"lc"
-#define PRIs	"ls"
+#define PRIc_SYSTEM	"lc"
+#define PRIs_SYSTEM	"ls"
 
 /* Intermediate version of the macro required
  * for correct evaluation predefined string
  */
-#define _CHARACTER_T_STRING_INTERMEDIATE( string ) \
+#define _SYSTEM_CHARACTER_T_STRING_INTERMEDIATE( string ) \
 	L ## string
 
-#define _CHARACTER_T_STRING( string ) \
-	_CHARACTER_T_STRING_INTERMEDIATE( string )
+#define _SYSTEM_CHARACTER_T_STRING( string ) \
+	_SYSTEM_CHARACTER_T_STRING_INTERMEDIATE( string )
 
 #if defined( HAVE_WCSLEN )
 
-#define string_length( string ) \
+#define system_string_length( string ) \
 	wcslen( string )
 #else
 #error Missing wide character string length function (wcslen)
 #endif
 
 #if defined( HAVE_WMEMCMP )
-#define string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	wmemcmp( (void *) string1, (void *) string2, size )
 
 #elif defined( HAVE_WCSNCMP )
-#define string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	wcsncmp( string1, string2, size )
 
 #elif defined( HAVE_WCSCMP )
-#define string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	wcscmp( string1, string2 )
 
 #else
@@ -83,15 +84,15 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_WMEMCPY )
-#define string_copy( destination, source, size ) \
-	(character_t *) wmemcpy( (void *) destination, (void *) source, size )
+#define system_string_copy( destination, source, size ) \
+	(system_character_t *) wmemcpy( (void *) destination, (void *) source, size )
 
 #elif defined( HAVE_WCSNCPY )
-#define string_copy( destination, source, size ) \
+#define system_string_copy( destination, source, size ) \
 	wcsncpy( destination, source, size )
 
 #elif defined( HAVE_WCSCPY )
-#define string_copy( destination, source, size ) \
+#define system_string_copy( destination, source, size ) \
 	wcscpy( destination, source )
 
 #else
@@ -99,11 +100,11 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_WMEMCHR )
-#define string_search( string, character, size ) \
-	(character_t *) wmemchr( (void *) string, (wchar_t) character, size )
+#define system_string_search( string, character, size ) \
+	(system_character_t *) wmemchr( (void *) string, (wchar_t) character, size )
 
 #elif defined( HAVE_WCSCHR )
-#define string_search( string, character, size ) \
+#define system_string_search( string, character, size ) \
 	wcschr( string, (wchar_t) character )
 
 #else
@@ -111,11 +112,11 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_WMEMRCHR )
-#define string_search_reverse( string, character, size ) \
-	(character_t *) wmemrchr( (void *) string, (wchar_t) character, size )
+#define system_string_search_reverse( string, character, size ) \
+	(system_character_t *) wmemrchr( (void *) string, (wchar_t) character, size )
 
 #elif defined( HAVE_WCSRCHR )
-#define string_search_reverse( string, character, size ) \
+#define system_string_search_reverse( string, character, size ) \
 	wcsrchr( string, (wchar_t) character )
 
 #else
@@ -123,11 +124,11 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define string_snprintf( target, size, format, ... ) \
+#define system_string_snprintf( target, size, format, ... ) \
 	swprintf_s( target, size, format, __VA_ARGS__ )
 
 #elif defined( HAVE_SWPRINTF )
-#define string_snprintf( target, size, format, ... ) \
+#define system_string_snprintf( target, size, format, ... ) \
 	swprintf( target, size, format, __VA_ARGS__ )
 
 #else
@@ -135,7 +136,7 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_FGETWS )
-#define string_get_from_stream( string, size, stream ) \
+#define system_string_get_from_stream( string, size, stream ) \
 	fgetws( string, size, stream )
 
 #else
@@ -143,11 +144,11 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define string_to_signed_long_long( string, end_of_string, base ) \
+#define system_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) _wtoi64( string )
 
 #elif defined( HAVE_WCSTOLL )
-#define string_to_signed_long_long( string, end_of_string, base ) \
+#define system_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) wcstoll( string, end_of_string, base )
 
 #else
@@ -155,11 +156,11 @@ typedef wchar_t character_t;
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define string_to_unsigned_long_long( string, end_of_string, base ) \
+#define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) _wtoi64( string )
 
 #elif defined( HAVE_WCSTOULL )
-#define string_to_unsigned_long_long( string, end_of_string, base ) \
+#define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) wcstoull( string, end_of_string, base )
 
 #else
@@ -168,31 +169,32 @@ typedef wchar_t character_t;
 
 #else
 
-typedef char character_t;
+typedef char system_character_t;
+typedef int system_integer_t;
 
-#define PRIc	"c"
-#define PRIs	"s"
+#define PRIc_SYSTEM	"c"
+#define PRIs_SYSTEM	"s"
 
-#define _CHARACTER_T_STRING( string ) \
+#define _SYSTEM_CHARACTER_T_STRING( string ) \
 	string
 
 #if defined( HAVE_STRLEN )
-#define string_length( string ) \
+#define system_string_length( string ) \
 	strlen( string )
 #else
 #error Missing string length function (strlen)
 #endif
 
 #if defined( HAVE_MEMCMP )
-#define string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	memcmp( (void *) string1, (void *) string2, size )
 
 #elif defined( HAVE_STRNCMP )
-#define string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	strncmp( string1, string2, size )
 
 #elif defined( HAVE_STRCMP )
-#define string_compare( string1, string2, size ) \
+#define system_string_compare( string1, string2, size ) \
 	strcmp( string1, string2 )
 
 #else
@@ -200,15 +202,15 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_MEMCPY )
-#define string_copy( destination, source, size ) \
-	(character_t *) memcpy( (void *) destination, (void *) source, size )
+#define system_string_copy( destination, source, size ) \
+	(system_character_t *) memcpy( (void *) destination, (void *) source, size )
 
 #elif defined( HAVE_STRNCPY )
-#define string_copy( destination, source, size ) \
+#define system_string_copy( destination, source, size ) \
 	strncpy( destination, source, size )
 
 #elif defined( HAVE_STRCPY )
-#define string_copy( destination, source, size ) \
+#define system_string_copy( destination, source, size ) \
 	strcpy( destination, source )
 
 #else
@@ -216,11 +218,11 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_MEMCHR )
-#define string_search( string, character, size ) \
-	(character_t *) memchr( (void *) string, (int) character, size )
+#define system_string_search( string, character, size ) \
+	(system_character_t *) memchr( (void *) string, (int) character, size )
 
 #elif defined( HAVE_STRCHR )
-#define string_search( string, character, size ) \
+#define system_string_search( string, character, size ) \
 	strchr( string, (int) character )
 
 #else
@@ -228,11 +230,11 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_MEMRCHR ) && HAVE_DECL_MEMRCHR_ == 1
-#define string_search_reverse( string, character, size ) \
-	(character_t *) memrchr( (void *) string, (int) character, size )
+#define system_string_search_reverse( string, character, size ) \
+	(system_character_t *) memrchr( (void *) string, (int) character, size )
 
 #elif defined( HAVE_STRRCHR )
-#define string_search_reverse( string, character, size ) \
+#define system_string_search_reverse( string, character, size ) \
 	strrchr( string, (int) character )
 
 #else
@@ -240,15 +242,15 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define string_snprintf( target, size, format, ... ) \
+#define system_string_snprintf( target, size, format, ... ) \
 	sprintf_s( target, size, format, __VA_ARGS__ )
 
 #elif defined( HAVE_SNPRINTF )
-#define string_snprintf( target, size, format, ... ) \
+#define system_string_snprintf( target, size, format, ... ) \
 	snprintf( target, size, format, __VA_ARGS__ )
 
 #elif defined( HAVE_SPRINTF )
-#define string_snprintf( target, size, format, ... ) \
+#define system_string_snprintf( target, size, format, ... ) \
 	sprintf( target, format, __VA_ARGS__ )
 
 #else
@@ -256,7 +258,7 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_FGETS )
-#define string_get_from_stream( string, size, stream ) \
+#define system_string_get_from_stream( string, size, stream ) \
 	fgets( string, size, stream )
 
 #else
@@ -264,15 +266,15 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define string_to_signed_long_long( string, end_of_string, base ) \
+#define system_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) _atoi64( string )
 
 #elif defined( HAVE_STRTOLL )
-#define string_to_signed_long_long( string, end_of_string, base ) \
+#define system_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) strtoll( string, end_of_string, base )
 
 #elif defined( HAVE_ATOLL )
-#define string_to_signed_long_long( string, end_of_string, base ) \
+#define system_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) atoll( string )
 
 #else
@@ -280,15 +282,15 @@ typedef char character_t;
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define string_to_unsigned_long_long( string, end_of_string, base ) \
+#define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) _atoi64( string )
 
 #elif defined( HAVE_STRTOULL )
-#define string_to_unsigned_long_long( string, end_of_string, base ) \
+#define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) strtoull( string, end_of_string, base )
 
 #elif defined( HAVE_ATOLL )
-#define string_to_unsigned_long_long( string, end_of_string, base ) \
+#define system_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) atoll( string )
 
 #else
@@ -297,26 +299,26 @@ typedef char character_t;
 
 #endif
 
-character_t *libewf_string_duplicate(
-              character_t *string,
-              size_t size );
+system_character_t *libewf_system_string_duplicate(
+                     system_character_t *string,
+                     size_t size );
 
-#define string_duplicate( string, size ) \
-	libewf_string_duplicate( string, size )
+#define system_string_duplicate( string, size ) \
+	libewf_system_string_duplicate( string, size )
 
-int64_t libewf_string_to_int64(
-         const character_t *string,
+int64_t libewf_system_string_to_int64(
+         const system_character_t *string,
          size_t size );
 
-#define string_to_int64( string, size ) \
-	 libewf_string_to_int64( string, size )
+#define system_string_to_int64( string, size ) \
+	 libewf_system_string_to_int64( string, size )
 
-uint64_t libewf_string_to_uint64(
-          const character_t *string,
+uint64_t libewf_system_string_to_uint64(
+          const system_character_t *string,
           size_t size );
 
-#define string_to_uint64( string, size ) \
-	 libewf_string_to_uint64( string, size )
+#define system_string_to_uint64( string, size ) \
+	 libewf_system_string_to_uint64( string, size )
 
 #if defined( __cplusplus )
 }

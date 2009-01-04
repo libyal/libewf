@@ -33,7 +33,9 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
+#include <system_string.h>
 
 #include <errno.h>
 
@@ -58,9 +60,7 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_char.h"
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_string.h"
 
 #include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
@@ -98,20 +98,20 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	libewf_char_t media_size_string[ 16 ];
+	character_t media_size_string[ 16 ];
 	uint8_t guid[ 16 ];
 
-	libewf_char_t *program            = _S_LIBEWF_CHAR( "ewfinfo" );
+	character_t *program              = _CHARACTER_T_STRING( "ewfinfo" );
 
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                   = NULL;
 	int32_t glob_count                = 0;
 #endif
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        CHAR_T *error_string              = NULL;
+        system_character_t *error_string  = NULL;
 #endif
 	char *file_format_string          = NULL;
-	INT_T option                      = 0;
+	system_integer_t option           = 0;
 	size64_t media_size               = 0;
 	uint32_t bytes_per_sector         = 0;
 	uint32_t amount_of_sectors        = 0;
@@ -136,13 +136,13 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _S_CHAR_T( "d:ehimvV" ) ) ) != (INT_T) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "d:ehimvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (INT_T) '?':
+			case (system_integer_t) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs "\n",
+				fprintf( stderr, "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -150,29 +150,42 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (INT_T) 'd':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "dm" ), 3 ) == 0 )
+			case (system_integer_t) 'd':
+				if( system_string_compare(
+				     optarg,
+				     _SYSTEM_CHARACTER_T_STRING( "dm" ),
+				     3 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_DAYMONTH;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "md" ), 3 ) == 0 )
+				else if( system_string_compare(
+				          optarg,
+				          _SYSTEM_CHARACTER_T_STRING( "md" ),
+				          3 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_MONTHDAY;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "iso8601" ), 8 ) == 0 )
+				else if( system_string_compare(
+				          optarg,
+				          _SYSTEM_CHARACTER_T_STRING( "iso8601" ),
+				          8 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_ISO8601;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ctime" ), 3 ) != 0 )
+				else if( system_string_compare(
+				          optarg,
+				          _SYSTEM_CHARACTER_T_STRING( "ctime" ),
+				          3 ) != 0 )
 				{
-					fprintf( stderr, "Unsupported date format: %" PRIs " using default ctime.\n", optarg );
+					fprintf( stderr, "Unsupported date format: %" PRIs_SYSTEM " using default ctime.\n",
+					 optarg );
 				}
 				break;
 
-			case (INT_T) 'e':
+			case (system_integer_t) 'e':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n",
+					fprintf( stderr, "Conflicting options: %" PRIc_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -184,16 +197,16 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (INT_T) 'h':
+			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (INT_T) 'i':
+			case (system_integer_t) 'i':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n",
+					fprintf( stderr, "Conflicting options: %" PRIc_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -205,10 +218,10 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (INT_T) 'm':
+			case (system_integer_t) 'm':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n",
+					fprintf( stderr, "Conflicting options: %" PRIc_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -220,12 +233,12 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (INT_T) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (INT_T) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -298,7 +311,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( error_string != NULL )
 		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
 			 error_string );
 
 			memory_free(
@@ -498,7 +511,7 @@ int main( int argc, char * const argv[] )
 
 			if( result == 1 )
 			{
-				fprintf( stdout, "\tMedia size:\t\t%" PRIs_EWF " (%" PRIu64 " bytes)\n",
+				fprintf( stdout, "\tMedia size:\t\t%" PRIs " (%" PRIu64 " bytes)\n",
 				 media_size_string, media_size );
 			}
 			else
@@ -593,7 +606,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
+		fprintf( stdout, "%" PRIs ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

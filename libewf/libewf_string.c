@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
 #include <types.h>
 
@@ -43,264 +44,48 @@
 
 #include "ewf_char.h"
 
-/* Duplicates a string
- * Returns the pointer to the duplicate string, or NULL on error
- */
-libewf_char_t *libewf_string_duplicate(
-                libewf_char_t *string,
-                size_t size )
-{
-	libewf_char_t *duplicate = NULL;
-	static char *function    = "libewf_string_duplicate";
-
-	if( string == NULL )
-	{
-		return( NULL );
-	}
-	if( size == 0 )
-	{
-		return( NULL );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* Add an additional character for the end of string
-	 */
-	size += 1;
-
-	duplicate = (libewf_char_t *) memory_allocate(
-	                               sizeof( libewf_char_t ) * size );
-
-	if( duplicate == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create duplicate string.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( libewf_string_copy(
-	     duplicate,
-	     string, size ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set duplicate string.\n",
-		 function );
-
-		memory_free(
-		 duplicate );
-
-		return( NULL );
-	}
-	duplicate[ size - 1 ] = (libewf_char_t) '\0';
-
-	return( duplicate );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
-	(int64_t) _wtoi64( string )
-
-#elif defined( HAVE_WCSTOLL )
-#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
-	(int64_t) wcstoll( string, end_of_string, base )
-#endif
-
-#else
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
-	(int64_t) _atoi64( string )
-
-#elif defined( HAVE_STRTOLL )
-#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
-	(int64_t) strtoll( string, end_of_string, base )
-
-#elif defined( HAVE_ATOLL )
-#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
-	(int64_t) atoll( string )
-#endif
-
-#endif
-
-/* Returns the value represented by a string, returns 0 error
- */
-int64_t libewf_string_to_int64(
-         const libewf_char_t *string,
-         size_t size )
-{
-	libewf_char_t *end_of_string = NULL;
-	static char *function        = "libewf_string_to_int64";
-	int64_t value                = 0;
-
-	if( string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: string is emtpy.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( 0 );
-	}
-	end_of_string = (libewf_char_t *) &string[ size - 1 ];
-
-#if defined( libewf_string_to_signed_long_long )
-	value = libewf_string_to_signed_long_long(
-	         string,
-	         &end_of_string,
-	         0 );
-#else
-#error Missing equivalent of strtoll
-#endif
-
-	if( value == (int64_t) LONG_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert string.\n",
-		 function );
-
-		return( 0 );
-	}
-	return( value );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
-	(uint64_t) _wtoi64( string )
-
-#elif defined( HAVE_WCSTOULL )
-#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
-	(uint64_t) wcstoull( string, end_of_string, base )
-#endif
-
-#else
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
-	(uint64_t) _atoi64( string )
-
-#elif defined( HAVE_STRTOULL )
-#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
-	(uint64_t) strtoull( string, end_of_string, base )
-
-#elif defined( HAVE_ATOLL )
-#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
-	(uint64_t) atoll( string )
-#endif
-
-#endif
-
-/* Returns the value represented by a string, returns 0 on error
- */
-uint64_t libewf_string_to_uint64(
-          const libewf_char_t *string,
-          size_t size )
-{
-	libewf_char_t *end_of_string = NULL;
-	static char *function        = "libewf_string_to_uint64";
-	uint64_t value               = 0;
-
-	if( string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: string is emtpy.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( 0 );
-	}
-	end_of_string = (libewf_char_t *) &string[ size - 1 ];
-
-#if defined( libewf_string_to_unsigned_long_long )
-	value = libewf_string_to_unsigned_long_long(
-	         string,
-	         &end_of_string,
-	         0 );
-#else
-#error Missing equivalent of strtoull
-#endif
-
-	if( value == (uint64_t) LONG_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert string.\n",
-		 function );
-
-		return( 0 );
-	}
-	return( value );
-}
-
 /* Split a string into elements using a delimiter character
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t **libewf_string_split(
-                 libewf_char_t *string,
-                 size_t size,
-                 libewf_char_t delimiter,
-                 uint32_t *amount )
+character_t **libewf_string_split(
+               character_t *string,
+               size_t size,
+               character_t delimiter,
+               uint32_t *amount )
 {
-	libewf_char_t **lines     = NULL;
-	libewf_char_t *line_start = NULL;
-	libewf_char_t *line_end   = NULL;
-	libewf_char_t *string_end = NULL;
-	static char *function     = "libewf_string_split";
-	size_t size_string        = 0;
-	size_t line_size          = 0;
-	uint32_t iterator         = 0;
+	character_t **lines     = NULL;
+	character_t *line_start = NULL;
+	character_t *line_end   = NULL;
+	character_t *string_end = NULL;
+	static char *function   = "libewf_string_split";
+	size_t size_string      = 0;
+	size_t line_size        = 0;
+	uint32_t iterator       = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( amount == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount.\n",
+		notify_warning_printf( "%s: invalid amount.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: string is empty.\n",
+		notify_warning_printf( "%s: string is empty.\n",
 		 function );
 
 		return( NULL );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( NULL );
@@ -312,10 +97,10 @@ libewf_char_t **libewf_string_split(
 
 	do
 	{
-		line_end = (libewf_char_t *) libewf_string_search(
-		                              line_start,
-		                              delimiter,
-		                              size_string );
+		line_end = (character_t *) string_search(
+		                            line_start,
+		                            delimiter,
+		                            size_string );
 
 		iterator++;
 
@@ -339,12 +124,12 @@ libewf_char_t **libewf_string_split(
 	while( line_end != NULL );
 
 	*amount = iterator;
-	lines   = (libewf_char_t **) memory_allocate(
-	                              ( sizeof( libewf_char_t * ) * *amount ) );
+	lines   = (character_t **) memory_allocate(
+	                            ( sizeof( character_t * ) * *amount ) );
 
 	if( lines == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic array lines.\n",
+		notify_warning_printf( "%s: unable to allocate dynamic array lines.\n",
 		 function );
 
 		return( NULL );
@@ -354,7 +139,7 @@ libewf_char_t **libewf_string_split(
 	     0,
 	     *amount ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic array lines.\n",
+		notify_warning_printf( "%s: unable to clear dynamic array lines.\n",
 		 function );
 
 		return( NULL );
@@ -369,10 +154,10 @@ libewf_char_t **libewf_string_split(
 		{
 			line_start = line_end + 1;
 		}
-		line_end = (libewf_char_t *) libewf_string_search(
-		                              line_start,
-		                              delimiter,
-		                              size_string );
+		line_end = (character_t *) string_search(
+		                            line_start,
+		                            delimiter,
+		                            size_string );
 
 		/* Check for last value
 		 */
@@ -388,12 +173,12 @@ libewf_char_t **libewf_string_split(
 		 */
 		line_size += 1;
 
-		lines[ iterator ] = (libewf_char_t *) memory_allocate(
-                                                       sizeof( libewf_char_t ) * line_size );
+		lines[ iterator ] = (character_t *) memory_allocate(
+                                                     sizeof( character_t ) * line_size );
 
 		if( lines[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocate line string.\n",
+			notify_warning_printf( "%s: unable to allocate line string.\n",
 			 function );
 
 			libewf_string_split_values_free(
@@ -402,12 +187,12 @@ libewf_char_t **libewf_string_split(
 
 			return( NULL );
 		}
-		if( libewf_string_copy(
+		if( string_copy(
 		     lines[ iterator ],
 		     line_start,
 		     line_size ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set dynamic array lines.\n",
+			notify_warning_printf( "%s: unable to set dynamic array lines.\n",
 			 function );
 
 			libewf_string_split_values_free(
@@ -416,7 +201,7 @@ libewf_char_t **libewf_string_split(
 
 			return( NULL );
 		}
-		lines[ iterator ][ line_size - 1 ] = (libewf_char_t) '\0';
+		lines[ iterator ][ line_size - 1 ] = (character_t) '\0';
 
 		/* Include delimiter character
 		 */
@@ -435,7 +220,7 @@ libewf_char_t **libewf_string_split(
 /* Clears a split values array
  */
 void libewf_string_split_values_free(
-      libewf_char_t **split_values,
+      character_t **split_values,
       uint32_t amount )
 {
 	static char *function = "libewf_string_split_values_free";
@@ -443,7 +228,7 @@ void libewf_string_split_values_free(
 
 	if( split_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid split values array.\n",
+		notify_warning_printf( "%s: invalid split values array.\n",
 		 function );
 
 		return;
@@ -452,7 +237,7 @@ void libewf_string_split_values_free(
 	{
 		if( split_values[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: empty value.\n",
+			notify_warning_printf( "%s: empty value.\n",
 			 function );
 		}
 		else
@@ -469,7 +254,7 @@ void libewf_string_split_values_free(
  * Returns 1 if successful, on -1 on error
  */
 int libewf_string_copy_from_utf16(
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string,
      ewf_char_t *utf16_string,
      size_t size_utf16 )
@@ -531,13 +316,13 @@ int libewf_string_copy_from_utf16(
 		LIBEWF_VERBOSE_PRINT( "%s: no byte order in UTF16 string.\n",
 		 function );
 
-		if( ( utf16_string[ 0 ] == (libewf_char_t) '\0' )
-		 && ( utf16_string[ 1 ] != (libewf_char_t) '\0' ) )
+		if( ( utf16_string[ 0 ] == (character_t) '\0' )
+		 && ( utf16_string[ 1 ] != (character_t) '\0' ) )
 		{
 			byte_order = LIBEWF_STRING_LITTLE_ENDIAN;
 		}
-		else if( ( utf16_string[ 0 ] != (libewf_char_t) '\0' )
-		 && ( utf16_string[ 1 ] == (libewf_char_t) '\0' ) )
+		else if( ( utf16_string[ 0 ] != (character_t) '\0' )
+		 && ( utf16_string[ 1 ] == (character_t) '\0' ) )
 		{
 			byte_order = LIBEWF_STRING_LITTLE_ENDIAN;
 		}
@@ -615,7 +400,7 @@ int libewf_string_copy_from_utf16(
 		utf16_iterator  += 2;
 		string_iterator += 1;
 	}
-	string[ size_string - 1 ] = (libewf_char_t) '\0';
+	string[ size_string - 1 ] = (character_t) '\0';
 
 	return( 1 );
 }
@@ -624,7 +409,7 @@ int libewf_string_copy_from_utf16(
  * Returns 1 if successful, on -1 on error
  */
 int libewf_string_copy_to_utf16(
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string,
      ewf_char_t *utf16_string,
      size_t size_utf16,
@@ -745,7 +530,7 @@ int libewf_string_copy_to_utf16(
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
 int libewf_string_copy_from_ewf_char(
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string,
      ewf_char_t *ewf_char_string,
      size_t size_ewf_char_string )
@@ -791,7 +576,7 @@ int libewf_string_copy_from_ewf_char(
 		string[ iterator ] = (char) ewf_char_string[ iterator ];
 #endif
 	}
-	string[ size_ewf_char_string - 1 ] = (libewf_char_t) '\0';
+	string[ size_ewf_char_string - 1 ] = (character_t) '\0';
 
 	return( 1 );
 }
@@ -800,7 +585,7 @@ int libewf_string_copy_from_ewf_char(
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
 int libewf_string_copy_to_ewf_char(
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string,
      ewf_char_t *ewf_char_string,
      size_t size_ewf_char_string )
@@ -862,7 +647,7 @@ int libewf_string_copy_to_ewf_char(
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
 int libewf_string_copy_from_header2(
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string,
      ewf_char_t *header2,
      size_t size_header2 )
@@ -916,7 +701,7 @@ int libewf_string_copy_from_header2(
  * Returns 1 if successful, 0 if header2 was not set, or -1 on error
  */
 int libewf_string_copy_to_header2(
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string,
      ewf_char_t *header2,
      size_t size_header2 )
@@ -973,7 +758,7 @@ int libewf_string_copy_to_header2(
  */
 int libewf_string_ctime(
      const time_t *timestamp,
-     libewf_char_t **ctime_string,
+     character_t **ctime_string,
      size_t *ctime_string_length )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
@@ -1032,8 +817,8 @@ int libewf_string_ctime(
 
                 return( -1 );
         }
-        *ctime_string = (libewf_char_t *) memory_allocate(
-                                           sizeof( libewf_char_t ) * *ctime_string_length );
+        *ctime_string = (character_t *) memory_allocate(
+                                         sizeof( character_t ) * *ctime_string_length );
 
         if( *ctime_string == NULL )
         {

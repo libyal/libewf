@@ -35,10 +35,10 @@
 #define _LIBEWF_HASH_VALUES_H
 
 #include <common.h>
+#include <character_string.h>
 
 #include <libewf/types.h>
 
-#include "libewf_char.h"
 #include "libewf_values_table.h"
 
 #include "ewf_char.h"
@@ -54,7 +54,7 @@ int libewf_hash_values_initialize(
 
 int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t **hash_values,
-     libewf_char_t *hash_string_xml,
+     character_t *hash_string_xml,
      size_t length );
 
 int libewf_hash_values_parse_xhash( 
@@ -63,14 +63,14 @@ int libewf_hash_values_parse_xhash(
      size_t size );
 
 int libewf_hash_values_convert_hash_string_to_hash(
-     libewf_char_t *hash_string,
+     character_t *hash_string,
      size_t hash_string_length,
      ewf_char_t **hash,
      size_t *hash_length );
 
 int libewf_hash_values_generate_hash_string_xml(
      libewf_values_table_t *hash_values,
-     libewf_char_t **hash_string,
+     character_t **hash_string,
      size_t *hash_string_length );
 
 int libewf_hash_values_generate_xhash_string_ewfx(

@@ -41,7 +41,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_common.h"
 #include "libewf_compression.h"

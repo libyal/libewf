@@ -65,29 +65,29 @@
 
 #include "notify.h"
 
-FILE *notify_stream = NULL;
-int notify_verbose  = 0;
+FILE *libewf_notify_stream = NULL;
+int libewf_notify_verbose  = 0;
 
 /* Set the notify values
  */
-void notify_set_values(
+void libewf_notify_set_values(
       FILE *stream,
       int verbose )
 {
-	notify_stream  = stream;
-	notify_verbose = verbose;
+	libewf_notify_stream  = stream;
+	libewf_notify_verbose = verbose;
 }
 
 /* Print a formatted string on the notify stream
  */
 void VARARGS(
-      notify_printf,
+      libewf_notify_printf,
       char *,
       format )
 {
 	va_list argument_list;
 
-	if( notify_stream != NULL )
+	if( libewf_notify_stream != NULL )
 	{
 		VASTART(
 		 argument_list,
@@ -95,7 +95,7 @@ void VARARGS(
 		 format );
 
 		vfprintf(
-		 notify_stream,
+		 libewf_notify_stream,
 		 format,
 		 argument_list );
 

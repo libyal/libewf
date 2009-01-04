@@ -45,7 +45,7 @@
 int ewfdigest_copy_to_string(
      ewfdigest_hash_t *digest_hash,
      size_t size_digest_hash,
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string )
 {
 	static char *function       = "ewfdigest_copy_to_string";
@@ -90,24 +90,24 @@ int ewfdigest_copy_to_string(
 
 		if( digest_digit <= 9 )
 		{
-			string[ string_iterator++ ] = (libewf_char_t) ( (uint8_t) '0' + digest_digit );
+			string[ string_iterator++ ] = (character_t) ( (uint8_t) '0' + digest_digit );
 		}
 		else
 		{
-			string[ string_iterator++ ] = (libewf_char_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
+			string[ string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
 		}
 		digest_digit = digest_hash[ digest_hash_iterator ] % 16;
 
 		if( digest_digit <= 9 )
 		{
-			string[ string_iterator++ ] = (libewf_char_t) ( (uint8_t) '0' + digest_digit );
+			string[ string_iterator++ ] = (character_t) ( (uint8_t) '0' + digest_digit );
 		}
 		else
 		{
-			string[ string_iterator++ ] = (libewf_char_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
+			string[ string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
 		}
 	}
-	string[ string_iterator ] = (libewf_char_t) '\0';
+	string[ string_iterator ] = (character_t) '\0';
 
 	return( 1 );
 }

@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
 #include <types.h>
 
@@ -67,10 +68,10 @@
 
 /* Returns the library version
  */
-const libewf_char_t *libewf_get_version(
+const character_t *libewf_get_version(
                       void )
 {
-	return( (const libewf_char_t *) LIBEWF_VERSION_STRING );
+	return( (const character_t *) LIBEWF_VERSION_STRING );
 }
 
 /* Returns the flags for reading
@@ -281,7 +282,7 @@ int libewf_glob(
 		}
 		if( additional_length > 0 )
 		{
-			segment_filename[ length ] = (libewf_char_t) '.';
+			segment_filename[ length ] = (character_t) '.';
 		}
 		if( libewf_filename_set_extension(
 		     &( segment_filename[ length + additional_length - 3 ] ),
@@ -299,7 +300,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		segment_filename[ length + additional_length ] = (libewf_char_t) '\0';
+		segment_filename[ length + additional_length ] = (character_t) '\0';
 
 		file_descriptor = libewf_common_open(
 		                   segment_filename,
@@ -1532,7 +1533,7 @@ int libewf_get_amount_of_header_values(
 int libewf_get_header_value_identifier(
      LIBEWF_HANDLE *handle,
      uint32_t index,
-     libewf_char_t *value,
+     character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1563,8 +1564,8 @@ int libewf_get_header_value_identifier(
  */
 int libewf_get_header_value(
      LIBEWF_HANDLE *handle,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1645,7 +1646,7 @@ int libewf_get_amount_of_hash_values(
 int libewf_get_hash_value_identifier(
      LIBEWF_HANDLE *handle,
      uint32_t index,
-     libewf_char_t *value,
+     character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1676,8 +1677,8 @@ int libewf_get_hash_value_identifier(
  */
 int libewf_get_hash_value(
      LIBEWF_HANDLE *handle,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2406,8 +2407,8 @@ int libewf_set_read_wipe_chunk_on_error(
  */
 int libewf_set_header_value(
      LIBEWF_HANDLE *handle,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2471,8 +2472,8 @@ int libewf_set_header_value(
  */
 int libewf_set_hash_value(
      LIBEWF_HANDLE *handle,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;

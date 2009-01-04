@@ -35,6 +35,7 @@
 #define _LIBEWF_NOTIFY_H
 
 #include <common.h>
+#include <notify.h>
 
 #include <stdio.h>
 
@@ -54,19 +55,8 @@ extern "C" {
 
 #endif
 
-#define LIBEWF_VERBOSE_PRINT	libewf_verbose_print
-#define LIBEWF_WARNING_PRINT	libewf_warning_print
-#define LIBEWF_FATAL_PRINT	libewf_fatal_print
-
-extern uint8_t libewf_notify_verbose;
-
-void libewf_notify_set_values(
-      FILE *stream,
-      uint8_t verbose );
-
-void libewf_verbose_print( char *, ... );
-void libewf_warning_print( char *, ... );
-void libewf_fatal_print( char *, ... );
+#define LIBEWF_VERBOSE_PRINT	notify_verbose_printf
+#define LIBEWF_WARNING_PRINT	notify_warning_printf
 
 void libewf_dump_data(
       uint8_t *data,

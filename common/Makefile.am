@@ -8,6 +8,7 @@ libcommon_la_SOURCES = \
 	file_io.h \
 	memory.h \
 	notify.c notify.h \
+	system_string.c system_string.h \
 	types.h
 
 distclean: clean

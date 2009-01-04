@@ -36,8 +36,7 @@
 #define _EWFGETOPT_H
 
 #include <common.h>
-
-#include "ewfcommon.h"
+#include <system_string.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -50,7 +49,7 @@ extern "C" {
 
 /* The current option argument
  */
-extern CHAR_T *optarg;
+extern system_character_t *optarg;
 
 /* The option index
  */
@@ -58,12 +57,12 @@ extern int optind;
 
 /* Value to indicate the current option
  */
-extern INT_T optopt;
+extern system_integer_t optopt;
 
-INT_T ewfgetopt(
-       int argument_count,
-       CHAR_T * const argument_values[],
-       const CHAR_T *options_string );
+system_integer_t ewfgetopt(
+                  int argument_count,
+                  system_character_t * const argument_values[],
+                  const system_character_t *options_string );
 
 #endif
 

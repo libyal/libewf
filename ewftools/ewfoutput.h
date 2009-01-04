@@ -36,15 +36,13 @@
 #define _EWFOUTPUT_H
 
 #include <common.h>
+#include <character_string.h>
+#include <system_string.h>
 
 #include <stdio.h>
 
 #include <libewf/handle.h>
 #include <libewf/types.h>
-
-#include "ewfstring.h"
-
-#include "../libewf/libewf_char.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -55,19 +53,19 @@ struct tm *ewfoutput_gmtime(
 
 void ewfoutput_version_fprint(
       FILE *stream,
-      libewf_char_t *program );
+      character_t *program );
 
 void ewfoutput_copyright_fprint(
       FILE *stream );
 
 void ewfoutput_acquiry_parameters_fprint(
       FILE *stream,
-      CHAR_T *filename,
-      libewf_char_t *case_number,
-      libewf_char_t *description,
-      libewf_char_t *evidence_number,
-      libewf_char_t *examiner_name,
-      libewf_char_t *notes,
+      system_character_t *filename,
+      character_t *case_number,
+      character_t *description,
+      character_t *evidence_number,
+      character_t *examiner_name,
+      character_t *notes,
       uint8_t media_type,
       uint8_t volume_type,
       int8_t compression_level,
@@ -119,7 +117,7 @@ void ewfoutput_bytes_fprint(
 
 void ewfoutput_process_status_initialize(
       FILE *stream,
-      libewf_char_t *string,
+      character_t *string,
       time_t timestamp_start );
 
 void ewfoutput_process_status_fprint(
@@ -132,7 +130,7 @@ void ewfoutput_stream_process_status_fprint(
 
 void ewfoutput_process_summary_fprint(
       FILE *stream,
-      libewf_char_t *string,
+      character_t *string,
       ssize64_t byte_count,
       time_t timestamp_start,
       time_t timestamp_end );

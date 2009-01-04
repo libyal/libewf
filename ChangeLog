@@ -38,6 +38,7 @@ To do/think about:
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
   - make a generic media access solution also useable for revit?
+* ewfacquire: detect disk full and ask for new segment file location?
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
 * ewfverify: verify against all available hashes that can be verified
@@ -134,6 +135,10 @@ Next release(s):
 
 * use libewf_glob instead of ewfglob ?
 
+Documentation update:
+* DVD also uses CD media type
+* No additional session values in EnCase 6
+
 Next stable:
 * full platform test
 
@@ -151,6 +156,11 @@ Next stable:
 * refactor character_string_split to return int
 
 * change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T
+
+* missing \n in some headers?
+
+* ewfinfo: change session print
+* determine session size
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -174,6 +184,11 @@ CLOSED
   the basename
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   - no
+
+Version: 20080308
+* worked on seperating common code
+* fixed issue with minimum segement file size in ewf tools also lowered values
+  to 1.0 MiB
 
 Version: 20080306
 * worked on seperating common code

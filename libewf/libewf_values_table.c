@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
 #include <types.h>
 
@@ -64,7 +65,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	values_table_size = amount * sizeof( libewf_char_t * );
+	values_table_size = amount * sizeof( character_t * );
 
 	if( values_table_size > (size_t) SSIZE_MAX )
 	{
@@ -76,7 +77,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	values_table->identifiers = (libewf_char_t **) memory_allocate(
+	values_table->identifiers = (character_t **) memory_allocate(
 	                                                values_table_size );
 
 	if( values_table->identifiers == NULL )
@@ -104,7 +105,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	values_table->values = (libewf_char_t **) memory_allocate(
+	values_table->values = (character_t **) memory_allocate(
 	                                           values_table_size );
 
 	if( values_table->values == NULL )
@@ -149,10 +150,10 @@ int libewf_values_table_realloc(
      uint32_t previous_amount,
      uint32_t new_amount )
 {
-	libewf_char_t **reallocation = NULL;
-	static char *function        = "libewf_values_table_realloc";
-	size_t previous_size         = previous_amount * sizeof( libewf_char_t * );
-	size_t new_size              = new_amount * sizeof( libewf_char_t * );
+	character_t **reallocation = NULL;
+	static char *function      = "libewf_values_table_realloc";
+	size_t previous_size       = previous_amount * sizeof( character_t * );
+	size_t new_size            = new_amount * sizeof( character_t * );
 
 	if( values_table == NULL )
 	{
@@ -184,7 +185,7 @@ int libewf_values_table_realloc(
 
 		return( -1 );
 	}
-	reallocation = (libewf_char_t **) memory_reallocate(
+	reallocation = (character_t **) memory_reallocate(
 	                                   values_table->identifiers,
 	                                   new_size );
 
@@ -207,7 +208,7 @@ int libewf_values_table_realloc(
 
                 return( -1 );
         }
-	reallocation = (libewf_char_t **) memory_reallocate(
+	reallocation = (character_t **) memory_reallocate(
 	                                   values_table->values,
 	                                   new_size );
 
@@ -282,7 +283,7 @@ void libewf_values_table_free(
  */
 int32_t libewf_values_table_get_index(
          libewf_values_table_t *values_table,
-         libewf_char_t *identifier )
+         character_t *identifier )
 {
 	static char *function    = "libewf_values_table_get_index";
 	size_t string_length     = 0;
@@ -303,7 +304,8 @@ int32_t libewf_values_table_get_index(
 
 		return( -1 );
 	}
-	identifier_length = libewf_string_length( identifier );
+	identifier_length = string_length(
+	                     identifier );
 
 	if( identifier_length == 0 )
 	{
@@ -328,7 +330,7 @@ int32_t libewf_values_table_get_index(
 
 			continue;
 		}
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 values_table->identifiers[ iterator ] );
 
 		if( string_length == 0 )
@@ -342,7 +344,7 @@ int32_t libewf_values_table_get_index(
 		{
 			continue;
 		}
-		if( libewf_string_compare(
+		if( string_compare(
 		     identifier,
 		     values_table->identifiers[ iterator ],
 		     identifier_length ) == 0 )
@@ -360,7 +362,7 @@ int32_t libewf_values_table_get_index(
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      uint32_t index,
-     libewf_char_t *identifier,
+     character_t *identifier,
      size_t length )
 {
 	static char *function    = "libewf_values_table_get_identifier";
@@ -398,7 +400,7 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	identifier_length = libewf_string_length(
+	identifier_length = string_length(
 	                     values_table->identifiers[ index ] );
 
 	/* Don't bother with empty values
@@ -418,7 +420,7 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	if( libewf_string_copy(
+	if( string_copy(
 	     identifier,
 	     values_table->identifiers[ index ],
 	     identifier_length ) == NULL )
@@ -428,7 +430,7 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	identifier[ identifier_length - 1 ] = (libewf_char_t) '\0';
+	identifier[ identifier_length - 1 ] = (character_t) '\0';
 
 	return( 1 );
 }
@@ -439,8 +441,8 @@ int libewf_values_table_get_identifier(
  */
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length )
 {
 	static char *function = "libewf_values_table_get_value";
@@ -460,7 +462,7 @@ int libewf_values_table_get_value(
 
 	if( index <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs_EWF ".\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs ".\n",
 		 function, identifier );
 
 		return( -1 );
@@ -473,7 +475,7 @@ int libewf_values_table_get_value(
 	{
 		return( 0 );
 	}
-	value_length = libewf_string_length(
+	value_length = string_length(
 	                values_table->values[ index ] );
 
 	/* Don't bother with empty values
@@ -493,7 +495,7 @@ int libewf_values_table_get_value(
 
 		return( -1 );
 	}
-	if( libewf_string_copy(
+	if( string_copy(
 	     value,
 	     values_table->values[ index ],
 	     value_length ) == NULL )
@@ -503,7 +505,7 @@ int libewf_values_table_get_value(
 
 		return( -1 );
 	}
-	value[ value_length - 1 ] = (libewf_char_t) '\0';
+	value[ value_length - 1 ] = (character_t) '\0';
 
 	return( 1 );
 }
@@ -515,8 +517,8 @@ int libewf_values_table_get_value(
  */
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     libewf_char_t *identifier,
-     libewf_char_t *value,
+     character_t *identifier,
+     character_t *value,
      size_t length )
 {
 	static char *function = "libewf_values_table_set_value";
@@ -529,14 +531,14 @@ int libewf_values_table_set_value(
 
 	if( index <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs_EWF ".\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs ".\n",
 		 function, identifier );
 
 		return( -1 );
 	}
 	if( (uint32_t) index >= values_table->amount )
 	{
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 identifier );
 
 		if( string_length == 0 )
@@ -556,7 +558,7 @@ int libewf_values_table_set_value(
 
 			return( -1 );
 		}
-		values_table->identifiers[ index ] = libewf_string_duplicate(
+		values_table->identifiers[ index ] = string_duplicate(
 		                                      identifier,
 		                                      string_length );
 
@@ -592,7 +594,7 @@ int libewf_values_table_set_value(
 	{
 		return( 1 );
 	}
-	values_table->values[ index ] = libewf_string_duplicate(
+	values_table->values[ index ] = string_duplicate(
 	                                 value,
 	                                 length );
 

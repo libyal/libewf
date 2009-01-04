@@ -35,10 +35,10 @@
 #define _LIBEWF_HEADER_VALUES_H
 
 #include <common.h>
+#include <character_string.h>
 
 #include <libewf/types.h>
 
-#include "libewf_char.h"
 #include "libewf_values_table.h"
 
 #include <time.h>
@@ -80,31 +80,31 @@ void libewf_header_values_free(
 int libewf_convert_timestamp(
      time_t timestamp,
      uint8_t date_format,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_convert_date_header_value(
-     libewf_char_t *header_value,
+     character_t *header_value,
      size_t header_value_length,
      uint8_t date_format,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_generate_date_header_value(
      time_t timestamp,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_convert_date_header2_value(
-     libewf_char_t *header_value,
+     character_t *header_value,
      size_t header_value_length,
      uint8_t date_format,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_generate_date_header2_value(
      time_t timestamp,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_header_values_copy(
@@ -113,7 +113,7 @@ int libewf_header_values_copy(
 
 int libewf_header_values_parse_header_string(
      libewf_values_table_t **header_values,
-     libewf_char_t *header_string,
+     character_t *header_string,
      size_t length,
      uint8_t date_format );
 
@@ -130,13 +130,13 @@ int libewf_header_values_parse_header2(
      uint8_t date_format );
 
 int libewf_header_values_convert_header_string_to_header(
-     libewf_char_t *header_string,
+     character_t *header_string,
      size_t header_string_length,
      ewf_char_t **header,
      size_t *header_length );
 
 int libewf_header_values_convert_header_string_to_header2(
-     libewf_char_t *header_string,
+     character_t *header_string,
      size_t header_string_length,
      ewf_char_t **header2,
      size_t *header2_length );
@@ -145,58 +145,58 @@ int libewf_header_values_generate_header_string_type1(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_string_type2(
      libewf_values_table_t *header_values,
      time_t timestamp, 
      int8_t compression_level,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_string_type3(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_string_type4(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_string_type5(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_string_type6(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_string_type7(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     libewf_char_t *header_string_head,
-     libewf_char_t *header_string_tail,
-     libewf_char_t **header_string,
+     character_t *header_string_head,
+     character_t *header_string_tail,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_ewf(
@@ -264,20 +264,20 @@ int libewf_header_values_generate_header2_encase6(
      size_t *header2_length );
 
 int libewf_convert_date_xheader_value(
-     libewf_char_t *header_value,
+     character_t *header_value,
      size_t header_value_length,
      uint8_t date_format,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_generate_date_xheader_value(
      time_t timestamp,
-     libewf_char_t **date_string,
+     character_t **date_string,
      size_t *date_string_length );
 
 int libewf_header_values_parse_header_string_xml(
      libewf_values_table_t **header_values,
-     libewf_char_t *header_string_xml,
+     character_t *header_string_xml,
      size_t length,
      uint8_t date_format );
 
@@ -290,7 +290,7 @@ int libewf_header_values_parse_xheader(
 int libewf_header_values_generate_header_string_xml(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     libewf_char_t **header_string,
+     character_t **header_string,
      size_t *header_string_length );
 
 int libewf_header_values_generate_header_ewfx(

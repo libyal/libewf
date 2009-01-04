@@ -35,10 +35,9 @@
 #define _EWFDIGEST_HASH_H
 
 #include <common.h>
+#include <character_string.h>
 
 #include <libewf/types.h>
-
-#include "../libewf/libewf_char.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -52,7 +51,7 @@ typedef uint8_t ewfdigest_hash_t;
 int ewfdigest_copy_to_string(
      ewfdigest_hash_t *digest_hash,
      size_t size_digest_hash,
-     libewf_char_t *string,
+     character_t *string,
      size_t size_string );
 
 #if defined( __cplusplus )

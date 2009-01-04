@@ -33,6 +33,7 @@
  */
 
 #include <common.h>
+#include <system_string.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -46,7 +47,7 @@
 
 /* The current option argument
  */
-CHAR_T *optarg = NULL;
+system_character_t *optarg = NULL;
 
 /* The option index
  * Start with argument 1 (argument 0 is the program name)
@@ -55,18 +56,21 @@ int optind = 1;
 
 /* Value to indicate the current option
  */
-INT_T optopt = 0;
+system_integer_t optopt = 0;
 
 /* Get the program options
  * Function for platforms that do not have the getopt function
  * Returns the option character processed, or -1 on error,
  * ? if the option was not in the options string, : if the option argument was missing
  */
-INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHAR_T *options_string )
+system_integer_t ewfgetopt(
+                  int argument_count,
+                  system_character_t * const argument_values[],
+                  const system_character_t *options_string )
 {
-	CHAR_T *option_value   = NULL;
-	CHAR_T *argument_value = NULL;
-	static char *function  = "ewfgetopt";
+	system_character_t *option_value   = NULL;
+	system_character_t *argument_value = NULL;
+	static char *function              = "ewfgetopt";
 
 	if( optind >= argument_count )
 	{
@@ -76,13 +80,13 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 
 	/* Check if the argument value is not an empty string
 	 */
-	if( *argument_value == (CHAR_T) '\0' )
+	if( *argument_value == (system_character_t) '\0' )
 	{
 		return( -1 );
 	}
 	/* Check if the first character is a option marker '-'
 	 */
-	if( *argument_value != (CHAR_T) '-' )
+	if( *argument_value != (system_character_t) '-' )
 	{
 		return( -1 );
 	}
@@ -90,49 +94,55 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 
 	/* Check if long options are provided '--'
 	 */
-	if( *argument_value == (CHAR_T) '-' )
+	if( *argument_value == (system_character_t) '-' )
 	{
 		optind++;
 
 		return( -1 );
 	}
 	optopt       = *argument_value;
-	option_value = CHAR_T_SEARCH( options_string, optopt, CHAR_T_LENGTH( options_string ) );
+	option_value = system_string_search(
+	                options_string,
+	                optopt,
+	                system_string_length(
+	                 options_string ) );
 
 	argument_value++;
 
 	/* Check if an argument was specified or that the option was not found
 	 * in the option string
 	 */
-	if( ( optopt == (INT_T) ':' ) || ( option_value == NULL ) )
+	if( ( optopt == (system_integer_t) ':' )
+	 || ( option_value == NULL ) )
 	{
-		if( *argument_value == (CHAR_T) '\0' )
+		if( *argument_value == (system_character_t) '\0' )
 		{
 			optind++;
 		}
-		if( ( *options_string != (CHAR_T) ':' ) && ( optopt != (INT_T) '?' ) )
+		if( ( *options_string != (system_character_t) ':' )
+		 && ( optopt != (system_integer_t) '?' ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: no such option: %" PRIc ".\n",
+			LIBEWF_WARNING_PRINT( "%s: no such option: %" PRIc_SYSTEM ".\n",
 			 function, optopt );
 		}
-		return( (INT_T) '?' );
+		return( (system_integer_t) '?' );
 	}
 	option_value++;
 
 	/* Check if no option argument is required
 	 */
-	if( *option_value != (CHAR_T) ':' )
+	if( *option_value != (system_character_t) ':' )
 	{
 		optarg = NULL;
 
-		if( *argument_value == (CHAR_T) '\0' )
+		if( *argument_value == (system_character_t) '\0' )
 		{
 			optind++;
 		}
 	}
 	/* Check if the argument is right after the option flag with no space in between
 	 */
-	else if( *argument_value != (CHAR_T) '\0' )
+	else if( *argument_value != (system_character_t) '\0' )
 	{
 		optarg = argument_value;
 
@@ -148,18 +158,18 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 		{
 			if( *option_value == ':' )
 			{
-				return( (INT_T) ':' );
+				return( (system_integer_t) ':' );
 			}
-			LIBEWF_WARNING_PRINT( "%s: option: %" PRIc " requires an argument.\n",
+			LIBEWF_WARNING_PRINT( "%s: option: %" PRIc_SYSTEM " requires an argument.\n",
 			 function, optopt );
 
-			return( (INT_T) '?' );
+			return( (system_integer_t) '?' );
 		}
 		optarg = argument_values[ optind ];
 
 		optind++;
 	}
-	return( (INT_T) optopt );
+	return( (system_integer_t) optopt );
 }
 
 #endif

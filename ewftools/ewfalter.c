@@ -91,24 +91,24 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob         = NULL;
-	int32_t glob_count      = 0;
+	ewfglob_t *glob                     = NULL;
+	int32_t glob_count                  = 0;
 #endif
 
-	libewf_char_t *program  = _S_LIBEWF_CHAR( "ewfalter" );
+	character_t *program                = _CHARACTER_T_STRING( "ewfalter" );
 
-	CHAR_T *target_filename = NULL;
+	system_character_t *target_filename = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        CHAR_T *error_string    = NULL;
+        system_character_t *error_string    = NULL;
 #endif
-	uint8_t *buffer         = NULL;
-	INT_T option            = 0;
-	size64_t media_size     = 0;
-	int64_t count           = 0;
-	uint64_t alter_offset   = 0;
-	uint64_t alter_size     = 0;
-	uint8_t swap_byte_pairs = 0;
-	uint8_t verbose         = 0;
+	uint8_t *buffer                     = NULL;
+	system_integer_t option             = 0;
+	size64_t media_size                 = 0;
+	int64_t count                       = 0;
+	uint64_t alter_offset               = 0;
+	uint64_t alter_size                 = 0;
+	uint8_t swap_byte_pairs             = 0;
+	uint8_t verbose                     = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -120,43 +120,43 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _S_CHAR_T( "hqst:vV" ) ) ) != (INT_T) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "hqst:vV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (INT_T) '?':
+			case (system_integer_t) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs ".\n",
+				fprintf( stderr, "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind ] );
 
 				usage();
 
 				return( EXIT_FAILURE );
 
-			case (INT_T) 'h':
+			case (system_integer_t) 'h':
 				usage();
 
 				return( EXIT_SUCCESS );
 
-			case (INT_T) 'q':
+			case (system_integer_t) 'q':
 				break;
 
-			case (INT_T) 's':
+			case (system_integer_t) 's':
 				swap_byte_pairs = 1;
 
 				break;
 
-			case (INT_T) 't':
+			case (system_integer_t) 't':
 				target_filename = optarg;
 
 				break;
 
-			case (INT_T) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (INT_T) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
@@ -226,7 +226,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( error_string != NULL )
 		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
 			 error_string );
 
 			memory_free(
@@ -263,14 +263,14 @@ int main( int argc, char * const argv[] )
 
 		alter_offset = ewfinput_get_size_variable(
 				stdout,
-				_S_LIBEWF_CHAR( "Start altering at offset" ),
+				_CHARACTER_T_STRING( "Start altering at offset" ),
 				0,
 				media_size,
 				0 );
 
 		alter_size = ewfinput_get_size_variable(
 			      stdout,
-			      _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
+			      _CHARACTER_T_STRING( "Amount of bytes to alter" ),
 			      0,
 			      ( media_size - alter_offset ),
 			      ( media_size - alter_offset ) );
@@ -317,7 +317,8 @@ int main( int argc, char * const argv[] )
 			if( libewf_set_delta_segment_filename(
 			     ewfcommon_libewf_handle,
 			     target_filename,
-			     CHAR_T_LENGTH( target_filename ) ) != 1 )
+			     system_string_length(
+			      target_filename ) ) != 1 )
 			{
 				fprintf( stderr, "Unable to set delta segment filename in handle.\n" );
 
@@ -402,7 +403,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
+		fprintf( stdout, "%" PRIs ": ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

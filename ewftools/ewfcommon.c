@@ -33,7 +33,9 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #include <errno.h>
@@ -73,7 +75,6 @@
 
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_notify.h"
-#include "../libewf/libewf_string.h"
 
 #include "../libewf/ewf_digest_hash.h"
 
@@ -146,10 +147,10 @@ int ewfcommon_swap_byte_pairs(
 
 /* Determines the current platform, or NULL on error
  */
-libewf_char_t *ewfcommon_determine_operating_system(
-                void )
+character_t *ewfcommon_determine_operating_system(
+              void )
 {
-	libewf_char_t *string  = NULL;
+	character_t *string    = NULL;
 	char *operating_system = NULL;
 	uint32_t length        = 0;
 
@@ -173,11 +174,11 @@ libewf_char_t *ewfcommon_determine_operating_system(
 	length = (uint32_t) strlen(
 	                     operating_system ) + 1;
 
-	string = (libewf_char_t *) memory_allocate(
-	                            sizeof( libewf_char_t ) * length );
+	string = (character_t *) memory_allocate(
+	                          sizeof( character_t ) * length );
 
 	if( ( string != NULL )
-	 && ( ewfstring_copy_libewf_char_from_char_t(
+	 && ( ewfstring_copy_system_string_to_character_string(
 	       string,
 	       operating_system,
 	       length ) != 1 ) )
@@ -233,14 +234,14 @@ int8_t ewfcommon_determine_guid(
  */
 int ewfcommon_initialize_write(
      LIBEWF_HANDLE *handle,
-     libewf_char_t *case_number,
-     libewf_char_t *description,
-     libewf_char_t *evidence_number,
-     libewf_char_t *examiner_name,
-     libewf_char_t *notes,
-     libewf_char_t *acquiry_operating_system,
-     libewf_char_t *acquiry_software,
-     libewf_char_t *acquiry_software_version,
+     character_t *case_number,
+     character_t *description,
+     character_t *evidence_number,
+     character_t *examiner_name,
+     character_t *notes,
+     character_t *acquiry_operating_system,
+     character_t *acquiry_software,
+     character_t *acquiry_software_version,
      uint8_t media_type,
      uint8_t volume_type,
      int8_t compression_level,
@@ -270,7 +271,7 @@ int ewfcommon_initialize_write(
 	}
 	else
 	{
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 case_number );
 	}
 	if( libewf_set_header_value_case_number(
@@ -291,7 +292,7 @@ int ewfcommon_initialize_write(
 	}
 	else
 	{
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 description );
 	}
 	if( libewf_set_header_value_description(
@@ -312,7 +313,7 @@ int ewfcommon_initialize_write(
 	}
 	else
 	{
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 evidence_number );
 	}
 	if( libewf_set_header_value_evidence_number(
@@ -333,7 +334,7 @@ int ewfcommon_initialize_write(
 	}
 	else
 	{
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 examiner_name );
 	}
 	if( libewf_set_header_value_examiner_name(
@@ -354,7 +355,7 @@ int ewfcommon_initialize_write(
 	}
 	else
 	{
-		string_length = libewf_string_length(
+		string_length = string_length(
 		                 notes );
 	}
 	if( libewf_set_header_value_notes(
@@ -377,7 +378,7 @@ int ewfcommon_initialize_write(
 	 && ( libewf_set_header_value_acquiry_operating_system(
 	       handle,
 	       acquiry_operating_system,
-	       libewf_string_length(
+	       string_length(
 	        acquiry_operating_system ) ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set header value acquiry operating system in handle.\n",
@@ -387,7 +388,7 @@ int ewfcommon_initialize_write(
 	}
 	if( libewf_set_header_value(
 	     handle,
-	     _S_LIBEWF_CHAR( "acquiry_software" ),
+	     _CHARACTER_T_STRING( "acquiry_software" ),
 	     acquiry_software,
 	     10 ) != 1 )
 	{
@@ -399,7 +400,7 @@ int ewfcommon_initialize_write(
 	if( libewf_set_header_value_acquiry_software_version(
 	     handle,
 	     acquiry_software_version,
-	     libewf_string_length(
+	     string_length(
 	      acquiry_software_version ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set header value acquiry software version number in handle.\n",
@@ -508,7 +509,7 @@ ssize32_t ewfcommon_read_input(
            uint8_t seek_on_error )
 {
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-	CHAR_T *error_string              = NULL;
+	system_character_t *error_string  = NULL;
 #endif
 	static char *function             = "ewfcommon_read_input";
 	off64_t current_read_offset       = 0;
@@ -1144,10 +1145,10 @@ ssize_t ewfcommon_raw_write_ewf(
 ssize64_t ewfcommon_read_verify(
            LIBEWF_HANDLE *handle,
            uint8_t calculate_md5,
-           libewf_char_t *md5_hash_string,
+           character_t *md5_hash_string,
            size_t md5_hash_string_length,
            uint8_t calculate_sha1,
-           libewf_char_t *sha1_hash_string,
+           character_t *sha1_hash_string,
            size_t sha1_hash_string_length,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
@@ -1499,10 +1500,10 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            uint8_t wipe_chunk_on_error,
            uint8_t seek_on_error,
            uint8_t calculate_md5,
-           libewf_char_t *md5_hash_string,
+           character_t *md5_hash_string,
            size_t md5_hash_string_length,
            uint8_t calculate_sha1,
-           libewf_char_t *sha1_hash_string,
+           character_t *sha1_hash_string,
            size_t sha1_hash_string_length,
            uint8_t swap_byte_pairs,
            void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
@@ -1909,7 +1910,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
  */
 ssize64_t ewfcommon_export_raw(
            LIBEWF_HANDLE *handle,
-           CHAR_T *target_filename,
+           system_character_t *target_filename,
            size64_t export_size,
            off64_t read_offset,
            uint8_t swap_byte_pairs,
@@ -1949,9 +1950,9 @@ ssize64_t ewfcommon_export_raw(
 
 		return( -1 );
 	}
-	if( CHAR_T_COMPARE(
+	if( system_string_compare(
 	     target_filename,
-	     _S_CHAR_T( "-" ),
+	     _SYSTEM_CHARACTER_T_STRING( "-" ),
 	     1 ) == 0 )
 	{
 		file_descriptor = 1;
@@ -2241,8 +2242,8 @@ ssize64_t ewfcommon_export_ewf(
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
-	libewf_char_t md5_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_MD5 ];
-	libewf_char_t sha1_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ];
+	character_t md5_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_MD5 ];
+	character_t sha1_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ];
 
 	uint8_t *data                  = NULL;
 	uint8_t *uncompressed_data     = NULL;

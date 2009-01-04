@@ -46,7 +46,6 @@
 #include <libewf/extern.h>
 #include <libewf/handle.h>
 
-#include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_internal_handle.h"
 #include "libewf_media_values.h"

@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
 
 #include <time.h>
@@ -818,14 +819,14 @@ int libewf_internal_handle_initialize_format(
 int libewf_internal_handle_create_header_values(
      libewf_internal_handle_t *internal_handle )
 {
-	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "Case Number" );
-	libewf_char_t *description              = _S_LIBEWF_CHAR( "Description" );
-	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "Evidence Number" );
-	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "Examiner Name" );
-	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "Notes" );
-	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "Undetermined" );
-	libewf_char_t *acquiry_software_version = LIBEWF_VERSION_STRING;
-	static char *function                   = "libewf_internal_handle_create_header_values";
+	character_t *case_number              = _CHARACTER_T_STRING( "Case Number" );
+	character_t *description              = _CHARACTER_T_STRING( "Description" );
+	character_t *evidence_number          = _CHARACTER_T_STRING( "Evidence Number" );
+	character_t *examiner_name            = _CHARACTER_T_STRING( "Examiner Name" );
+	character_t *notes                    = _CHARACTER_T_STRING( "Notes" );
+	character_t *acquiry_operating_system = _CHARACTER_T_STRING( "Undetermined" );
+	character_t *acquiry_software_version = LIBEWF_VERSION_STRING;
+	static char *function                 = "libewf_internal_handle_create_header_values";
 
 	if( internal_handle == NULL )
 	{
@@ -862,9 +863,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "case_number" ),
+	     _CHARACTER_T_STRING( "case_number" ),
 	     case_number,
-	     libewf_string_length( case_number ) ) != 1 )
+	     string_length(
+	      case_number ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set case number.\n",
 		 function );
@@ -873,9 +875,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "description" ),
+	     _CHARACTER_T_STRING( "description" ),
 	     description,
-	     libewf_string_length( description ) ) != 1 )
+	     string_length(
+	      description ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set description.\n",
 		 function );
@@ -884,9 +887,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "evidence_number" ),
+	     _CHARACTER_T_STRING( "evidence_number" ),
 	     evidence_number,
-	     libewf_string_length( evidence_number ) ) != 1 )
+	     string_length(
+	      evidence_number ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set evidence number.\n",
 		 function );
@@ -895,9 +899,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "examiner_name" ),
+	     _CHARACTER_T_STRING( "examiner_name" ),
 	     examiner_name,
-	     libewf_string_length( examiner_name ) ) != 1 )
+	     string_length(
+	      examiner_name ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set examiner name.\n",
 		 function );
@@ -906,9 +911,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "notes" ),
+	     _CHARACTER_T_STRING( "notes" ),
 	     notes,
-	     libewf_string_length( notes ) ) != 1 )
+	     string_length(
+	      notes ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set notes.\n",
 		 function );
@@ -917,9 +923,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "acquiry_operating_system" ),
+	     _CHARACTER_T_STRING( "acquiry_operating_system" ),
 	     acquiry_operating_system,
-	     libewf_string_length( acquiry_operating_system ) ) != 1 )
+	     string_length(
+	      acquiry_operating_system ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to acquiry operating system.\n",
 		 function );
@@ -928,9 +935,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _S_LIBEWF_CHAR( "acquiry_software_version" ),
+	     _CHARACTER_T_STRING( "acquiry_software_version" ),
 	     acquiry_software_version,
-	     libewf_string_length( acquiry_software_version ) ) != 1 )
+	     string_length(
+	      acquiry_software_version ) ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to acquiry software version.\n",
 		 function );

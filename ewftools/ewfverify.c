@@ -33,7 +33,9 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
+#include <system_string.h>
 
 #include <errno.h>
 
@@ -57,7 +59,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_string.h"
 
 #include "ewfcommon.h"
 #include "ewfdigest_context.h"
@@ -102,39 +103,39 @@ int main( int argc, char * const argv[] )
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                            = NULL;
-	int32_t glob_count                         = 0;
+	ewfglob_t *glob                          = NULL;
+	int32_t glob_count                       = 0;
 #endif
-	libewf_char_t *stored_md5_hash_string      = NULL;
-	libewf_char_t *calculated_md5_hash_string  = NULL;
-	libewf_char_t *stored_sha1_hash_string     = NULL;
-	libewf_char_t *calculated_sha1_hash_string = NULL;
-	libewf_char_t *program                     = _S_LIBEWF_CHAR( "ewfverify" );
+	character_t *stored_md5_hash_string      = NULL;
+	character_t *calculated_md5_hash_string  = NULL;
+	character_t *stored_sha1_hash_string     = NULL;
+	character_t *calculated_sha1_hash_string = NULL;
+	character_t *program                     = _CHARACTER_T_STRING( "ewfverify" );
 
-	CHAR_T *log_filename                       = NULL;
-	CHAR_T *time_string                        = NULL;
+	system_character_t *log_filename         = NULL;
+	system_character_t *time_string          = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        CHAR_T *error_string                       = NULL;
+        system_character_t *error_string         = NULL;
 #endif
 
-	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfoutput_process_status_fprint;
+	FILE *log_file_stream                    = NULL;
+	void *callback                           = &ewfoutput_process_status_fprint;
 
-	INT_T option                               = 0;
-	time_t timestamp_start                     = 0;
-	time_t timestamp_end                       = 0;
-	int64_t count                              = 0;
-	uint32_t amount_of_crc_errors              = 0;
-	int8_t stored_md5_hash_result              = 0;
-	int8_t stored_sha1_hash_result             = 0;
-	uint8_t calculate_md5                      = 1;
-	uint8_t calculate_sha1                     = 0;
-	uint8_t swap_byte_pairs                    = 0;
-	uint8_t wipe_chunk_on_error                = 0;
-	uint8_t verbose                            = 0;
-	int match_md5_hash                         = 0;
-	int match_sha1_hash                        = 0;
-	int result                                 = 0;
+	system_integer_t option                  = 0;
+	time_t timestamp_start                   = 0;
+	time_t timestamp_end                     = 0;
+	int64_t count                            = 0;
+	uint32_t amount_of_crc_errors            = 0;
+	int8_t stored_md5_hash_result            = 0;
+	int8_t stored_sha1_hash_result           = 0;
+	uint8_t calculate_md5                    = 1;
+	uint8_t calculate_sha1                   = 0;
+	uint8_t swap_byte_pairs                  = 0;
+	uint8_t wipe_chunk_on_error              = 0;
+	uint8_t verbose                          = 0;
+	int match_md5_hash                       = 0;
+	int match_sha1_hash                      = 0;
+	int result                               = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -143,13 +144,13 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _S_CHAR_T( "d:hl:sqvVw" ) ) ) != (INT_T) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:sqvVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (INT_T) '?':
+			case (system_integer_t) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs "\n",
+				fprintf( stderr, "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -157,10 +158,10 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (INT_T) 'd':
-				if( CHAR_T_COMPARE(
+			case (system_integer_t) 'd':
+				if( system_string_compare(
 				     optarg,
-				     _S_CHAR_T( "sha1" ),
+				     _SYSTEM_CHARACTER_T_STRING( "sha1" ),
 				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
@@ -171,38 +172,38 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (INT_T) 'h':
+			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (INT_T) 'l':
+			case (system_integer_t) 'l':
 				log_filename = optarg;
 
 				break;
 
-			case (INT_T) 'q':
+			case (system_integer_t) 'q':
 				callback = NULL;
 
 				break;
 
-			case (INT_T) 's':
+			case (system_integer_t) 's':
 				swap_byte_pairs = 1;
 
 				break;
-			case (INT_T) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (INT_T) 'V':
+			case (system_integer_t) 'V':
 				ewfoutput_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (INT_T) 'w':
+			case (system_integer_t) 'w':
 				wipe_chunk_on_error = 1;
 
 				break;
@@ -274,7 +275,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( error_string != NULL )
 		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
 			 error_string );
 
 			memory_free(
@@ -292,8 +293,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		stored_md5_hash_string = (libewf_char_t *) memory_allocate(
-		                                            sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+		stored_md5_hash_string = (character_t *) memory_allocate(
+		                                          sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( stored_md5_hash_string == NULL )
 		{
@@ -301,8 +302,8 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		calculated_md5_hash_string = (libewf_char_t *) memory_allocate( 
-		                                                sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+		calculated_md5_hash_string = (character_t *) memory_allocate( 
+		                                              sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -316,8 +317,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		stored_sha1_hash_string = (libewf_char_t *) memory_allocate( 
-		                                             sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+		stored_sha1_hash_string = (character_t *) memory_allocate( 
+		                                           sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( stored_sha1_hash_string == NULL )
 		{
@@ -332,8 +333,8 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		calculated_sha1_hash_string = (libewf_char_t *) memory_allocate( 
-		                                                 sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+		calculated_sha1_hash_string = (character_t *) memory_allocate( 
+		                                               sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{
@@ -362,7 +363,7 @@ int main( int argc, char * const argv[] )
 
 		if( time_string != NULL )
 		{
-			fprintf( stdout, "Verify started at: %" PRIs "\n",
+			fprintf( stdout, "Verify started at: %" PRIs_SYSTEM "\n",
 			 time_string );
 
 			memory_free(
@@ -376,7 +377,7 @@ int main( int argc, char * const argv[] )
 		{
 			ewfoutput_process_status_initialize(
 			 stdout,
-			 _S_LIBEWF_CHAR( "verified" ),
+			 _CHARACTER_T_STRING( "verified" ),
 			 timestamp_start );
 		}
 		fprintf( stdout, "This could take a while.\n\n" );
@@ -411,7 +412,7 @@ int main( int argc, char * const argv[] )
 		{
 			if( time_string != NULL )
 			{
-				fprintf( stdout, "Verify failed at: %" PRIs "\n",
+				fprintf( stdout, "Verify failed at: %" PRIs_SYSTEM "\n",
 				 time_string );
 
 				memory_free(
@@ -444,7 +445,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( time_string != NULL )
 		{
-			fprintf( stdout, "Verify completed at: %" PRIs "\n",
+			fprintf( stdout, "Verify completed at: %" PRIs_SYSTEM "\n",
 			 time_string );
 
 			memory_free(
@@ -456,7 +457,7 @@ int main( int argc, char * const argv[] )
 		}
 		ewfoutput_process_summary_fprint(
 		 stdout,
-		 _S_LIBEWF_CHAR( "Read" ),
+		 _CHARACTER_T_STRING( "Read" ),
 		 count,
 		 timestamp_start,
 		 timestamp_end );
@@ -525,7 +526,7 @@ int main( int argc, char * const argv[] )
 		{
 			stored_sha1_hash_result = libewf_get_hash_value(
 						   ewfcommon_libewf_handle,
-						   _S_LIBEWF_CHAR( "SHA1" ),
+						   _CHARACTER_T_STRING( "SHA1" ),
 						   stored_sha1_hash_string,
 						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
@@ -610,7 +611,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
+		fprintf( stdout, "%" PRIs_SYSTEM ": ABORTED\n",
 		 program );
 
 		if( calculate_md5 == 1 )
@@ -647,24 +648,24 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_EWF "\n",
+			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
 			 stored_md5_hash_string );
 
 			if( log_file_stream != NULL )
 			{
-				fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs_EWF "\n",
+				fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
 				 stored_md5_hash_string );
 			}
 		}
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 		 calculated_md5_hash_string );
 
 		if( log_file_stream != NULL )
 		{
-			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
+			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 			 calculated_md5_hash_string );
 		}
-		match_md5_hash = ( libewf_string_compare(
+		match_md5_hash = ( string_compare(
 		                    stored_md5_hash_string,
 		                    calculated_md5_hash_string,
 		                    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
@@ -687,24 +688,24 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs_EWF "\n",
+			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
 			 stored_sha1_hash_string );
 
 			if( log_file_stream != NULL )
 			{
-				fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs_EWF "\n",
+				fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
 				 stored_sha1_hash_string );
 			}
 		}
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
+		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 		 calculated_sha1_hash_string );
 
 		if( log_file_stream != NULL )
 		{
-			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
+			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 			 calculated_sha1_hash_string );
 		}
-		match_sha1_hash = ( libewf_string_compare(
+		match_sha1_hash = ( string_compare(
 		                     stored_sha1_hash_string,
 		                     calculated_sha1_hash_string,
 		                     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
@@ -733,14 +734,14 @@ int main( int argc, char * const argv[] )
 	  || ( stored_sha1_hash_result == 0 )
 	  || match_sha1_hash ) )
 	{
-		fprintf( stdout, "\n%" PRIs_EWF ": SUCCESS\n",
+		fprintf( stdout, "\n%" PRIs_SYSTEM ": SUCCESS\n",
 		 program );
 
 		result = EXIT_SUCCESS;
 	}
 	else
 	{
-		fprintf( stdout, "\n%" PRIs_EWF ": FAILURE\n",
+		fprintf( stdout, "\n%" PRIs_SYSTEM ": FAILURE\n",
 		 program );
 
 		result = EXIT_FAILURE;

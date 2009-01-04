@@ -37,11 +37,11 @@
 
 /* Function to wrap open()
  */
-int file_io_open(
+int libewf_file_io_open(
      const char *filename,
      int flags )
 {
-	static char *function = "file_io_open";
+	static char *function = "libewf_file_io_open";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
@@ -79,11 +79,11 @@ int file_io_open(
 
 /* Function to wrap wopen() which is the wide character equivalent of open()
  */
-int file_io_wopen(
+int libewf_file_io_wopen(
      const wchar_t *filename,
      uint8_t flags )
 {
-	static char *function = "file_io_wopen";
+	static char *function = "libewf_file_io_wopen";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )

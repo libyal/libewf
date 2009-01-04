@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <character_string.h>
 #include <memory.h>
 #include <types.h>
 
@@ -162,7 +163,7 @@ void libewf_debug_section_fprint(
  */
 void libewf_debug_header_string_fprint(
       FILE *stream,
-      libewf_char_t *header_string )
+      character_t *header_string )
 {
 	static char *function = "libewf_debug_header_string_fprint";
 
@@ -180,7 +181,7 @@ void libewf_debug_header_string_fprint(
 
 		return;
 	}
-	fprintf( stream, "%" PRIs_EWF "",
+	fprintf( stream, "%" PRIs "",
 	 header_string );
 }
 
@@ -191,8 +192,8 @@ void libewf_debug_header_fprint(
       ewf_char_t *header,
       size_t size )
 {
-	libewf_char_t *header_string = NULL;
-	static char *function        = "libewf_debug_header_fprint";
+	character_t *header_string = NULL;
+	static char *function      = "libewf_debug_header_fprint";
 
 	if( header == NULL )
 	{
@@ -201,8 +202,8 @@ void libewf_debug_header_fprint(
 
 		return;
 	}
-	header_string = (libewf_char_t *) memory_allocate(
-	                                   sizeof( libewf_char_t ) * size );
+	header_string = (character_t *) memory_allocate(
+	                                 sizeof( character_t ) * size );
 
 	if( header_string == NULL )
 	{
@@ -239,9 +240,9 @@ void libewf_debug_header2_fprint(
       ewf_char_t *header2,
       size_t size )
 {
-	libewf_char_t *header_string = NULL;
-	static char *function        = "libewf_debug_header2_fprint";
-	size_t header_size           = 0;
+	character_t *header_string = NULL;
+	static char *function      = "libewf_debug_header2_fprint";
+	size_t header_size         = 0;
 
 	if( header2 == NULL )
 	{
@@ -251,8 +252,8 @@ void libewf_debug_header2_fprint(
 		return;
 	}
 	header_size   = ( size - 1 ) / 2;
-	header_string = (libewf_char_t *) memory_allocate(
-	                                   sizeof( libewf_char_t ) * header_size );
+	header_string = (character_t *) memory_allocate(
+	                                 sizeof( character_t ) * header_size );
 
 	if( header_string == NULL )
 	{
