@@ -308,14 +308,14 @@ ssize_t libewf_raw_read_chunk(
 
 	if( segment_file_handle == NULL )
 	{
-		notify_verbose_printf( "%s: invalid segment file.\n",
+		notify_warning_printf( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_file_handle->filename == NULL )
 	{
-		notify_verbose_printf( "%s: invalid segment file - missing filename.\n",
+		notify_warning_printf( "%s: invalid segment file - missing filename.\n",
 		 function );
 
 		return( -1 );
@@ -482,8 +482,10 @@ ssize_t libewf_read_chunk_data(
 
 		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
 			 function, chunk_data_size );
+#endif
 
 			if( libewf_chunk_cache_realloc(
 			     internal_handle->chunk_cache,
@@ -855,8 +857,10 @@ ssize_t libewf_read_buffer(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: reading size: %" PRIzu ".\n",
 	 function, size );
+#endif
 
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents some reallocations of the chunk cache
@@ -865,8 +869,10 @@ ssize_t libewf_read_buffer(
 
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function, chunk_data_size );
+#endif
 
 		if( libewf_chunk_cache_realloc(
 		     internal_handle->chunk_cache,

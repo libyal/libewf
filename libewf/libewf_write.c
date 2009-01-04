@@ -424,8 +424,10 @@ int libewf_write_test_segment_file_full(
 	 */
 	if( segment_file_offset == 0 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: no segment file has been created.\n",
 		 function );
+#endif
 
 		return( 0 );
 	}
@@ -434,8 +436,10 @@ int libewf_write_test_segment_file_full(
 	if( ( media_values->amount_of_chunks != 0 )
 	 && ( media_values->amount_of_chunks == current_amount_of_chunks ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: all required chunks have been written.\n",
 		 function );
+#endif
 
 		return( 1 );
 	}
@@ -444,8 +448,10 @@ int libewf_write_test_segment_file_full(
 	if( ( media_values->media_size != 0 )
 	 && ( internal_handle->write->input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: all required data has been written.\n",
 		 function );
+#endif
 
 		return( 1 );
 	}
@@ -456,8 +462,10 @@ int libewf_write_test_segment_file_full(
 	{
 		if( segment_amount_of_chunks >= internal_handle->write->chunks_per_segment )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: no space left for additional chunk.\n",
 			 function );
+#endif
 
 			return( 1 );
 		}
@@ -488,14 +496,18 @@ int libewf_write_test_segment_file_full(
 		 */
 		if( remaining_segment_file_size > segment_file_size )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: no space left for additional chunk.\n",
 			 function );
+#endif
 
 			return( 1 );
 		}
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: space left for additional chunk.\n",
 	 function );
+#endif
 
 	return( 0 );
 }
@@ -578,8 +590,10 @@ int libewf_write_test_chunks_section_full(
 	 */
 	if( internal_handle->write->chunks_section_offset == 0 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: no chunks section has been created.\n",
 		 function );
+#endif
 
 		return( 0 );
 	}
@@ -588,8 +602,10 @@ int libewf_write_test_chunks_section_full(
 	if( ( media_values->amount_of_chunks != 0 )
 	 && ( media_values->amount_of_chunks == internal_handle->write->amount_of_chunks ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: all required chunks have been written.\n",
 		 function );
+#endif
 
 		return( 1 );
 	}
@@ -598,8 +614,10 @@ int libewf_write_test_chunks_section_full(
 	if( ( media_values->media_size != 0 )
 	 && ( internal_handle->write->input_write_count >= (ssize64_t) media_values->media_size ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: all required data has been written.\n",
 		 function );
+#endif
 
 		return( 1 );
 	}
@@ -610,8 +628,10 @@ int libewf_write_test_chunks_section_full(
 	{
 		if( section_amount_of_chunks >= internal_handle->write->chunks_per_chunks_section )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: no space left for additional chunk.\n",
 			 function );
+#endif
 
 			return( 1 );
 		}
@@ -643,8 +663,10 @@ int libewf_write_test_chunks_section_full(
 		 */
 		if( remaining_segment_file_size > segment_file_size )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: no space left for additional chunk.\n",
 			 function );
+#endif
 
 			return( 1 );
 		}
@@ -654,8 +676,10 @@ int libewf_write_test_chunks_section_full(
 	if( ( unrestrict_offset_amount == 0 )
 	 && ( section_amount_of_chunks >= maximum_section_amount_of_chunks ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: no space left for additional chunk.\n",
 		 function );
+#endif
 
 		return( 1 );
 	}
@@ -663,13 +687,17 @@ int libewf_write_test_chunks_section_full(
 	 */
 	if( section_amount_of_chunks > (uint32_t) INT32_MAX )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: no space left for additional chunk.\n",
 		 function );
+#endif
 
 		return( 1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: space left for additional chunk.\n",
 	 function );
+#endif
 
 	return( 0 );
 }
@@ -1033,8 +1061,10 @@ ssize_t libewf_raw_write_chunk_new(
 	{
 		return( 0 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing chunk of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, chunk_size, chunk_data_size );
+#endif
 
 	segment_number = internal_handle->segment_table->amount - 1;
 
@@ -1098,8 +1128,10 @@ ssize_t libewf_raw_write_chunk_new(
 
 		segment_number += 1;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: creating segment file with segment number: %" PRIu16 ".\n",
 		 function, segment_number );
+#endif
 
 		/* Create a new segment file
 		 */
@@ -1159,15 +1191,19 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: calculated amount of chunks for segment: %" PRIu32 ".\n",
 		 function, internal_handle->write->chunks_per_segment );
+#endif
 	}
 	/* Check if another chunk section should be created
 	 */
 	if( internal_handle->write->create_chunks_section == 1 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: creating chunks section.\n",
 		 function );
+#endif
 
 		internal_handle->write->create_chunks_section      = 0;
 		internal_handle->write->section_amount_of_chunks   = 0;
@@ -1199,8 +1235,10 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: calculated amount of chunks for segment: %" PRIu32 ".\n",
 		 function, internal_handle->write->chunks_per_segment );
+#endif
 
 		internal_handle->write->chunks_per_chunks_section = libewf_write_calculate_chunks_per_chunks_section(
 		                                                     internal_handle->write->segment_file_size,
@@ -1217,8 +1255,10 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: calculated amount of chunks for chunks section: %" PRIu32 ".\n",
 		 function, internal_handle->write->chunks_per_chunks_section );
+#endif
 
 		/* Write the section start of the chunks section
 		 */
@@ -1233,8 +1273,10 @@ ssize_t libewf_raw_write_chunk_new(
 
 		if( write_count == -1 )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: unable to write section start for chunks.\n",
 			 function );
+#endif
 
 			return( -1 );
 		}
@@ -1243,8 +1285,10 @@ ssize_t libewf_raw_write_chunk_new(
 	}
 	/* Write the chunk data
 	 */
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing %" PRIzd " bytes to segment file: %" PRIu16 ".\n",
 	 function, chunk_size, segment_number );
+#endif
 
 	write_count = libewf_segment_file_write_chunks_data(
 		       internal_handle->segment_table->segment_file_handle[ segment_number ],
@@ -1294,8 +1338,10 @@ ssize_t libewf_raw_write_chunk_new(
 	}
 	else if( result == 1 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: closing chunks section amount of data written: %" PRIi64 ".\n",
 		 function, internal_handle->write->chunks_section_write_count );
+#endif
 
 		/* Correct the offset, size in the chunks section
 		 */
@@ -1349,8 +1395,10 @@ ssize_t libewf_raw_write_chunk_new(
 		if( ( internal_handle->media_values->media_size == 0 )
 		 || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->media_values->media_size ) )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: closing segment file with segment number: %" PRIu16 ".\n",
 			 function, segment_number );
+#endif
 
 			/* Finish and close the segment file
 			 */
@@ -1486,8 +1534,10 @@ ssize_t libewf_raw_write_chunk_existing(
 	}
 	segment_file_type = segment_file_handle->file_type;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing delta chunk of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, chunk_size, chunk_data_size );
+#endif
 
 	/* Check if the chunk already exists in a delta segment file
 	 */
@@ -1514,28 +1564,28 @@ ssize_t libewf_raw_write_chunk_existing(
 
 			if( segment_file_handle == NULL )
 			{
-				notify_verbose_printf( "%s: invalid segment file.\n",
+				notify_warning_printf( "%s: invalid segment file.\n",
 				 function );
 
 				return( -1 );
 			}
 			if( segment_file_handle->file_descriptor == -1 )
 			{
-				notify_verbose_printf( "%s: invalid segment file - invalid file descriptor.\n",
+				notify_warning_printf( "%s: invalid segment file - invalid file descriptor.\n",
 				 function );
 
 				return( -1 );
 			}
 			if( segment_file_handle->section_list == NULL )
 			{
-				notify_verbose_printf( "%s: invalid segment file - missing section list.\n",
+				notify_warning_printf( "%s: invalid segment file - missing section list.\n",
 				 function );
 
 				return( -1 );
 			}
 			if( segment_file_handle->section_list->last == NULL )
 			{
-				notify_verbose_printf( "%s: invalid segment file - invalid section list - missing last section.\n",
+				notify_warning_printf( "%s: invalid segment file - invalid section list - missing last section.\n",
 				 function );
 
 				return( -1 );
@@ -1654,8 +1704,10 @@ ssize_t libewf_raw_write_chunk_existing(
 			return( -1 );
 		}
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing chunk at offset: %" PRIjd ".\n",
 	 function, segment_file_handle->file_offset );
+#endif
 
 	/* Write the chunk in the delta segment file
 	 */
@@ -1773,8 +1825,10 @@ ssize_t libewf_write_chunk_data_new(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing buffer of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
+#endif
 
 	/* Determine the size of data to read
 	 */
@@ -1817,8 +1871,10 @@ ssize_t libewf_write_chunk_data_new(
 		{
 			read_size = remaining_chunk_size;
 		}
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: reading %" PRIzu " bytes from buffer.\n",
 		 function, read_size );
+#endif
 
 		if( memory_copy(
 		     &internal_handle->chunk_cache->data[ internal_handle->chunk_cache->offset ],
@@ -2006,8 +2062,10 @@ ssize_t libewf_write_chunk_data_existing(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing buffer of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
+#endif
 
 	/* Check if the data size exceeds the chunk size
 	 */
@@ -2245,10 +2303,12 @@ ssize_t libewf_raw_write_buffer(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing chunk: %d of total: %d.\n",
 	 function, ( internal_handle->current_chunk + 1 ), internal_handle->offset_table->amount );
 	notify_verbose_printf( "%s: writing buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
+#endif
 
 	/* Check if chunk has already been created within a segment file
 	 */
@@ -2383,8 +2443,10 @@ ssize_t libewf_write_buffer(
 	}
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function, chunk_data_size );
+#endif
 
 		if( libewf_chunk_cache_realloc(
 		     internal_handle->chunk_cache,
@@ -2573,8 +2635,10 @@ ssize_t libewf_write_finalize(
 	{
 		return( 0 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: finalizing write.\n",
 	 function );
+#endif
 
 	/* Write data remaining in the chunk cache to file
 	 */
@@ -2584,8 +2648,10 @@ ssize_t libewf_write_finalize(
 	 && ( ( internal_handle->media_values->media_size == 0 )
 	  || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->media_values->media_size ) ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: writing chunk remainder at offset: %" PRIu32 " with size: %" PRIu32 "\n",
 		 function, internal_handle->current_chunk_offset, internal_handle->chunk_cache->amount );
+#endif
 
 		write_count = libewf_write_chunk_data_new(
 		               internal_handle,
@@ -2624,8 +2690,10 @@ ssize_t libewf_write_finalize(
 		{
 			/* Correct the offset, size in the chunks section
 			 */
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: correcting chunks section.\n",
 			 function );
+#endif
 
 			write_count = libewf_segment_file_write_chunks_correction(
 				       segment_file_handle,
@@ -2650,8 +2718,10 @@ ssize_t libewf_write_finalize(
 
 		/* Close the segment file
 		 */
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: closing last segment file.\n",
 		 function );
+#endif
 
 		write_count = libewf_segment_file_write_close(
 		               segment_file_handle,
@@ -2733,8 +2803,10 @@ ssize_t libewf_write_finalize(
 					 function, segment_file_handle->filename );
 					return( -1 );
 				}
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: correcting segment file: %" PRIs_SYSTEM ".\n",
 				 function, segment_file_handle->filename );
+#endif
 			}
 			list_entry_iterator = segment_file_handle->section_list->first;
 
@@ -2745,8 +2817,10 @@ ssize_t libewf_write_finalize(
 				     "volume",
 				     6 ) == 0 )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: correcting volume section.\n",
 					 function );
+#endif
 
 					if( libewf_segment_file_handle_seek_offset(
 					     segment_file_handle,
@@ -2795,8 +2869,10 @@ ssize_t libewf_write_finalize(
 				          "data",
 				          4 ) == 0 )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: correcting data section.\n",
 					 function );
+#endif
 
 					if( libewf_segment_file_handle_seek_offset(
 					     segment_file_handle,

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080313],
+ [20080314],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080313])
+ [20080314])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -203,7 +203,15 @@ AC_C_VOLATILE
 
 dnl Checks for libraries and library functions
 dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
-AC_CHECK_LIB( z, adler32, [], [ AC_MSG_FAILURE( [Missing function: adler32 in library: zlib.], 1 ) ] )
+AC_CHECK_LIB(
+ z,
+ adler32,
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: adler32 in library: zlib.],
+  1)]
+)
+
 AC_CHECK_LIB( z, compress2, [ ac_libewf_dummy=yes ], [ AC_MSG_FAILURE( [Missing function: compress2 in library: zlib.], 1 ) ] )
 AC_CHECK_LIB( z, compressBound, [AC_DEFINE( [HAVE_COMPRESS_BOUND], [1], [Defines if compressBound funtion is present in zlib.] ) ] )
 AC_CHECK_LIB( z, uncompress, [ ac_libewf_dummy=yes ], [ AC_MSG_FAILURE( [Missing function: uncompress in library: zlib.], 1 ) ] )

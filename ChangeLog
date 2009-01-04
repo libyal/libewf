@@ -130,17 +130,15 @@ Next release(s):
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing
 
+* refactor character string split to return int
+
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-* refactor character_string_split to return int
-
-Documentation update:
-* DVD also uses CD media type
-* No additional session values in EnCase 6
-
 Next stable:
 * full platform test
+
+* fix verbose output to be limited to HAVE_VERBOSE_OUTPUT
 
 CLOSED
 * what about read+write and compression?

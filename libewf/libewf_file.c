@@ -472,8 +472,10 @@ LIBEWF_HANDLE *libewf_open(
 		notify_warning_printf( "%s: unable to initialize format specific values.\n",
 		 function );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: open successful.\n",
 	 function );
+#endif
 
 	return( (LIBEWF_HANDLE *) internal_handle );
 }
@@ -499,10 +501,13 @@ int libewf_close(
 	if( ( internal_handle->write != NULL )
 	 && ( internal_handle->write->write_finalized == 0 ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: finalizing write.\n",
 		 function );
+#endif
 
-		libewf_write_finalize( handle );
+		libewf_write_finalize(
+		 handle );
 	}
 	if( libewf_segment_table_close_all(
 	     internal_handle->segment_table ) != 1 )

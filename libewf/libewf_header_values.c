@@ -719,8 +719,10 @@ int libewf_header_values_copy(
 		 */
 		if( source_header_values->values[ index ] == NULL )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: missing header value for index: %" PRIi32 ".\n",
 			 function, index );
+#endif
 
 			continue;
 		}
@@ -731,8 +733,10 @@ int libewf_header_values_copy(
 		 */
 		if( string_length == 0 )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: empty header value for index: %" PRIi32 ".\n",
 			 function, index );
+#endif
 
 			continue;
 		}
@@ -903,8 +907,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set acquiry software version.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -918,8 +924,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set unknown: dc.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -933,8 +941,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set model.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -948,8 +958,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set acquiry operating system.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -963,8 +975,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set serial_number.\n",
 				 function );
+#endif
 			}
 		}
 		else if( ( string_compare(
@@ -1023,8 +1037,10 @@ int libewf_header_values_parse_header_string(
 					     date_string,
 					     string_length ) != 1 )
 					{
+#if defined( HAVE_VERBOSE_OUTPUT )
 						notify_verbose_printf( "%s: unable to set acquiry date.\n",
 						 function );
+#endif
 					}
 				}
 				else if( string_compare(
@@ -1038,8 +1054,10 @@ int libewf_header_values_parse_header_string(
 					     date_string,
 					     string_length ) != 1 )
 					{
+#if defined( HAVE_VERBOSE_OUTPUT )
 						notify_verbose_printf( "%s: unable to set system date.\n",
 						 function );
+#endif
 					}
 				}
 				memory_free(
@@ -1072,8 +1090,10 @@ int libewf_header_values_parse_header_string(
 				     values[ iterator ],
 				     string_length ) != 1 )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: unable to set password.\n",
 					 function );
+#endif
 				}
 			}
 		}
@@ -1088,8 +1108,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set description.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -1103,7 +1125,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
-				notify_verbose_printf( "%s: unable to set case number.\n" );
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf( "%s: unable to set case number.\n",
+				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -1117,8 +1142,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set evidence number.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -1132,8 +1159,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set examiner name.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -1147,8 +1176,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set notes.\n",
 				 function );
+#endif
 			}
 		}
 		else if( string_compare(
@@ -1162,8 +1193,10 @@ int libewf_header_values_parse_header_string(
 			     values[ iterator ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set compression type.\n",
 				 function );
+#endif
 			}
 		}
 		else
@@ -4572,8 +4605,10 @@ int libewf_header_values_parse_header_string_xml(
 				     string_length(
 				      date_string ) ) != 1 )
 				{
+#if defined( HAVE_VERBOSE_OUTPUT )
 					notify_verbose_printf( "%s: unable to set value with identifier: %" PRIs ".\n",
 					 function, &open_tag_start[ 1 ] );
+#endif
 				}
 				memory_free(
 				 date_string );
@@ -4587,8 +4622,10 @@ int libewf_header_values_parse_header_string_xml(
 			     &open_tag_end[ 1 ],
 			     string_length ) != 1 )
 			{
+#if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf( "%s: unable to set value with identifier: %" PRIs ".\n",
 				 function, &open_tag_start[ 1 ] );
+#endif
 			}
 		}
 	}

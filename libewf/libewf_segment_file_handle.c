@@ -328,7 +328,7 @@ int libewf_segment_file_handle_reopen(
 	if( file_io_close(
 	     segment_file_handle->file_descriptor ) != 0 )
 	{
-		notify_verbose_printf( "%s: unable to close segment file: %" PRIs_SYSTEM ".\n",
+		notify_warning_printf( "%s: unable to close segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 	}
 	segment_file_handle->file_descriptor = libewf_filename_open(
@@ -524,8 +524,10 @@ off64_t libewf_segment_file_handle_seek_offset(
 	}
 	if( segment_file_handle->file_offset != offset )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in segment file: %" PRIs_SYSTEM " with file descriptor: %d.\n",
 		 function, offset, segment_file_handle->filename, segment_file_handle->file_descriptor );
+#endif
 
 		if( file_io_lseek(
 		     segment_file_handle->file_descriptor,

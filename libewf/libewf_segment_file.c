@@ -855,7 +855,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		if( write_count == -1 )
 		{
-			notify_verbose_printf( "%s: unable to write table section.\n",
+			notify_warning_printf( "%s: unable to write table section.\n",
 			 function );
 
 			return( -1 );
@@ -875,7 +875,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		if( write_count == -1 )
 		{
-			notify_verbose_printf( "%s: unable to write sectors section.\n",
+			notify_warning_printf( "%s: unable to write sectors section.\n",
 			 function );
 
 			return( -1 );
@@ -979,7 +979,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	notify_verbose_printf( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	notify_warning_printf( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function, chunk_type, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
 #endif
 
@@ -1078,8 +1078,10 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 	/* Seek the start of the data chunks
 	*/
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
 	 function, chunks_section_offset );
+#endif
 
 	if( libewf_segment_file_handle_seek_offset(
 	     segment_file_handle,
@@ -1093,8 +1095,10 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	if( ( ewf_format == EWF_FORMAT_S01 )
 	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
 		 function, chunks_section_size, chunks_section_offset );
+#endif
 
 		/* Rewrite table section start
 		 */
@@ -1121,8 +1125,10 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	}
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
 		 function, chunks_section_size, chunks_section_offset );
+#endif
 
 		/* Rewrite sectors section start
 		 */
@@ -1140,9 +1146,11 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		}
 	}
 	/* Seek the end of the chunks section
-	*/
+	 */
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
 	 function, last_segment_file_offset );
+#endif
 
 	if( libewf_segment_file_handle_seek_offset(
 	     segment_file_handle,

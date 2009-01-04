@@ -1111,11 +1111,13 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
 
 	notify_verbose_printf( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
 	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );
+#endif
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file_handle,
@@ -1539,11 +1541,13 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
 
 	notify_verbose_printf( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
 	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );
+#endif
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file_handle,
@@ -1704,11 +1708,13 @@ ssize_t libewf_section_volume_read(
 	{
 		media_values->chunk_size = (uint32_t) bytes_per_chunk;
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
 
 	notify_verbose_printf( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
 	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );
+#endif
 
 	if( media_values->amount_of_chunks == 0 )
 	{
@@ -1833,9 +1839,10 @@ ssize_t libewf_section_table_read(
 	 table.padding2,
 	 4 );
 #endif
-
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
 	 function, amount_of_chunks, stored_crc, calculated_crc );
+#endif
 
 	if( amount_of_chunks == 0 )
 	{
@@ -1981,8 +1988,10 @@ ssize_t libewf_section_table_read(
 		if( ( ewf_format != EWF_FORMAT_S01 )
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: unexpected data found after table offsets.\n",
 			 function );
+#endif
 		}
 		if( libewf_segment_file_handle_seek_offset(
 		     segment_file_handle,
@@ -2176,8 +2185,10 @@ ssize_t libewf_section_table_write(
 			if( ( format == LIBEWF_FORMAT_ENCASE6 )
 			 || ( format == LIBEWF_FORMAT_LINEN6 ) )
 			{
-				notify_verbose_printf( "%s: chunk offset overflow at: %" PRIi64 ".\n",
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf( "%s: compensating for chunk offset overflow at: %" PRIi64 ".\n",
 				 function, offset64_value );
+#endif
 
 				overflow = 1;
 			}
@@ -2745,8 +2756,10 @@ ssize_t libewf_section_session_read(
 #endif
 		if( sessions->sector != NULL )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: session entries already set in handle - removing previous one.\n",
 			 function );
+#endif
 
 			memory_free(
 			 sessions->sector );
@@ -3683,8 +3696,10 @@ ssize_t libewf_section_error2_read(
 #endif
 		if( acquiry_errors->sector != NULL )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: acquiry error sectors already set in handle - removing previous one.\n",
 			 function );
+#endif
 
 			memory_free(
 			 acquiry_errors->sector );
@@ -4317,7 +4332,7 @@ ssize_t libewf_section_xheader_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: Header:\n",
+	notify_verbose_printf( "%s: XHeader:\n",
 	 function );
 
 	if( libewf_notify_verbose != 0 )
@@ -4451,7 +4466,7 @@ ssize_t libewf_section_xhash_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: Hash:\n",
+	notify_verbose_printf( "%s: XHash:\n",
 	 function );
 
 	if( libewf_notify_verbose != 0 )

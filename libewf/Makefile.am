@@ -27,8 +27,6 @@ libewf_la_SOURCES = \
 	libewf_endian.c libewf_endian.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \
-	libewf_file_io_handle.c libewf_file_io_handle.h \
-	libewf_file_io_pool.c libewf_file_io_pool.h \
 	libewf_hash_sections.c libewf_hash_sections.h \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_sections.c libewf_header_sections.h \
@@ -46,6 +44,10 @@ libewf_la_SOURCES = \
 	libewf_string.c libewf_string.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
+
+IGNORE = \
+	libewf_file_io_handle.c libewf_file_io_handle.h \
+	libewf_file_io_pool.c libewf_file_io_pool.h
 
 libewf_la_LIBADD  = ../common/libcommon.la
 libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0

@@ -225,8 +225,10 @@ int libewf_segment_table_build(
 	 */
 	for( segment_number = 1; segment_number < segment_table->amount; segment_number++ )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: reading section list for segment number: %" PRIu16 ".\n",
 		 function, segment_number );
+#endif
 
 		result = libewf_segment_file_read_sections(
 		          segment_table->segment_file_handle[ segment_number ],
@@ -406,8 +408,10 @@ int libewf_segment_table_read_open(
 	 */
 	for( iterator = 0; iterator < file_amount; iterator++ )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: trying to open file: %" PRIs_SYSTEM ".\n",
 		 function, filenames[ iterator ] );
+#endif
 
 		segment_file_handle = libewf_segment_file_handle_alloc();
 
@@ -494,8 +498,10 @@ int libewf_segment_table_read_open(
 					return( -1 );
 				}
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: added segment file: %" PRIs_SYSTEM " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
+#endif
 
 			segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
 		}
@@ -528,8 +534,10 @@ int libewf_segment_table_read_open(
 					return( -1 );
 				}
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: added delta segment file: %" PRIs_SYSTEM " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
+#endif
 
 			delta_segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
 		}
@@ -833,8 +841,10 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: segment file created: %" PRIu32 " with name: %" PRIs_SYSTEM ".\n",
 	 function, segment_number, segment_file_handle->filename );
+#endif
 
 	if( libewf_segment_file_handle_open(
 	     segment_file_handle,

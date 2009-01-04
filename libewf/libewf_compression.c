@@ -129,8 +129,10 @@ int libewf_compress(
 	}
 	else if( result == Z_BUF_ERROR )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: unable to write compressed data: target buffer too small.\n",
 		 function );
+#endif
 
 #if defined( HAVE_COMPRESS_BOUND )
 		/* Use compressBound to determine the size of the uncompressed buffer
@@ -217,8 +219,10 @@ int libewf_uncompress(
 	}
 	else if( result == Z_DATA_ERROR )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: unable to read compressed data: data error.\n",
 		 function );
+#endif
 
 		*uncompressed_size = 0;
 
@@ -226,8 +230,10 @@ int libewf_uncompress(
 	}
 	else if( result == Z_BUF_ERROR )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: unable to read compressed data: target buffer too small.\n",
 		 function );
+#endif
 
 		/* Estimate that a factor 2 enlargement should suffice
 		 */

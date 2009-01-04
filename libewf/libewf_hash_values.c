@@ -214,8 +214,10 @@ int libewf_hash_values_parse_hash_string_xml(
 		     &open_tag_end[ 1 ],
 		     string_length ) != 1 )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: unable to set value with identifier: %" PRIs ".\n",
 			 function, &open_tag_start[ 1 ] );
+#endif
 		}
 	}
 	libewf_string_split_values_free(

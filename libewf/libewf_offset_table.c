@@ -298,8 +298,10 @@ int libewf_offset_table_fill(
 
 				return( -1 );
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 			 function, current_offset, next_offset );
+#endif
 
 			chunk_size = raw_offset - current_offset;
 		}
@@ -350,8 +352,10 @@ int libewf_offset_table_fill(
 		if( ( overflow == 0 )
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: chunk offset overflow at: %" PRIu32 ".\n",
 			 function, current_offset );
+#endif
 
 			overflow   = 1;
 			compressed = 0;
@@ -476,9 +480,10 @@ int libewf_offset_table_calculate_last_offset(
 			}
 			offset_table->chunk_offset[ offset_table->last ].size = (size_t) chunk_size;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu ".\n",
 			 function, ( offset_table->last + 1 ), last_offset, (size_t) chunk_size );
-
+#endif
 			break;
 		}
 		section_list_entry = section_list_entry->next;
@@ -528,8 +533,10 @@ int libewf_offset_table_compare(
 	 */
 	if( offset_table1->amount != offset_table2->amount )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: offset tables differ in size.\n",
 		 function );
+#endif
 
 		return( 0 );
 	}
@@ -539,8 +546,10 @@ int libewf_offset_table_compare(
 	{
 		if( offset_table1->chunk_offset[ iterator ].file_offset != offset_table2->chunk_offset[ iterator ].file_offset )
 		{
+#if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n",
 			 function, iterator, offset_table1->chunk_offset[ iterator ].file_offset, offset_table2->chunk_offset[ iterator ].file_offset );
+#endif
 
 			return( 0 );
 		}

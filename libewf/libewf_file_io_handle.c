@@ -249,8 +249,10 @@ off64_t libewf_file_io_handle_seek_offset(
 	}
 	if( file_io_handle->file_offset != offset )
 	{
+#if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in file io handle: %" PRIs_SYSTEM " with file descriptor: %d.\n",
 		 function, offset, file_io_handle->filename, file_io_handle->file_descriptor );
+#endif
 
 		if( file_io_lseek(
 		     file_io_handle->file_descriptor,
