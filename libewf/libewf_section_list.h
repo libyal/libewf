@@ -64,9 +64,6 @@ int libewf_section_list_append(
      off64_t start_offset,
      off64_t end_offset );
 
-int libewf_section_list_remove_last(
-     libewf_list_t *section_list );
-
 #if defined( __cplusplus )
 }
 #endif

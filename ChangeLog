@@ -136,8 +136,6 @@ Next release(s):
 
 * remove error_tollerance, just be error tollerant ?
 
-* have section list use list type
-
 * improve offset table correction
   - add error flag ?
 
@@ -192,6 +190,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080906
+* refactored section list to use list type
 
 Version: 20080905
 * worked on refactoring code

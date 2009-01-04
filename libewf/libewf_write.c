@@ -1372,6 +1372,7 @@ ssize_t libewf_raw_write_chunk_existing(
          ewf_crc_t chunk_crc,
          int8_t write_crc )
 {
+	libewf_list_element_t *last_list_element          = NULL;
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_raw_write_chunk_existing";
 	off64_t last_section_start_offset                 = 0;
@@ -1506,21 +1507,23 @@ ssize_t libewf_raw_write_chunk_existing(
 
 				return( -1 );
 			}
-			if( segment_file_handle->section_list->last == NULL )
+			last_list_element = segment_file_handle->section_list->last;
+
+			if( last_list_element == NULL )
 			{
-				notify_warning_printf( "%s: invalid segment file - invalid section list - missing last element.\n",
+				notify_warning_printf( "%s: missing last section list element.\n",
 				 function );
 
 				return( -1 );
 			}
-			if( segment_file_handle->section_list->last->value == NULL )
+			if( last_list_element->value == NULL )
 			{
-				notify_warning_printf( "%s: invalid segment file - invalid section list - invalid last element - missing values.\n",
+				notify_warning_printf( "%s: invalid last section list element element - missing values.\n",
 				 function );
 
 				return( -1 );
 			}
-			last_section_start_offset = ( (libewf_section_list_values_t * ) segment_file_handle->section_list->last->value )->start_offset;
+			last_section_start_offset = ( (libewf_section_list_values_t * ) last_list_element->value )->start_offset;
 
 			if( libewf_file_io_pool_get_offset(
 			     internal_handle->file_io_pool,
@@ -1576,14 +1579,18 @@ ssize_t libewf_raw_write_chunk_existing(
 			}
 			else
 			{
-				if( libewf_section_list_remove_last(
-				     segment_file_handle->section_list ) != 1 )
+				if( libewf_list_remove_element(
+				     segment_file_handle->section_list,
+				     last_list_element ) != 1 )
 				{
 					notify_warning_printf( "%s: unable to remove last section from list.\n",
 					 function );
 
 					return( -1 );
 				}
+				memory_free(
+				 last_list_element );
+
 				result = 1;
 			}
 		}

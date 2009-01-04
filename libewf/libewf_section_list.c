@@ -144,38 +144,3 @@ int libewf_section_list_append(
 	return( 1 );
 }
 
-/* Removes the last entry from the section list
- * Returns 1 if successful or -1 on error
- */
-int libewf_section_list_remove_last(
-     libewf_list_t *section_list )
-{
-	libewf_list_element_t *list_element = NULL;
-	static char *function               = "libewf_section_list_remove_last";
-
-	if( section_list == NULL )
-	{
-		notify_warning_printf( "%s: invalid section list.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( section_list->last != NULL )
-	{
-		list_element = section_list->last;
-
-		if( libewf_list_remove_element(
-		     section_list,
-		     list_element ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to remove last element.\n",
-			 function );
-
-			return( -1 );
-		}
-		memory_free(
-		 list_element );
-	}
-	return( 1 );
-}
-
