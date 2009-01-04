@@ -2428,7 +2428,6 @@ int libewf_parse_header_values(
      LIBEWF_HANDLE *handle,
      uint8_t date_format )
 {
-	libewf_values_table_t *header_values      = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_parse_header_values";
 
@@ -2464,25 +2463,31 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
-	if( ( header_values == NULL )
-	 && internal_handle->header_sections->header2 != NULL )
+	if( ( internal_handle->header_values == NULL )
+	 && ( internal_handle->header_sections->header2 != NULL )
+	 && ( libewf_header_values_parse_header2(
+	       internal_handle->header_sections->header2,
+	       internal_handle->header_sections->header2_size,
+	       date_format,
+	       &( internal_handle->header_values ) ) != 1 ) )
 	{
-		header_values = libewf_header_values_parse_header2(
-		                 internal_handle->header_sections->header2,
-		                 internal_handle->header_sections->header2_size,
-		                 date_format );
+		LIBEWF_WARNING_PRINT( "%s: unable to parse header2.\n",
+		 function );
 
-		internal_handle->header_values = header_values;
+		return( -1 );
 	}
-	if( ( header_values == NULL )
-	 && ( internal_handle->header_sections->header != NULL ) )
+	if( ( internal_handle->header_values == NULL )
+	 && ( internal_handle->header_sections->header != NULL )
+	 && ( libewf_header_values_parse_header(
+	       internal_handle->header_sections->header,
+	       internal_handle->header_sections->header_size,
+	       date_format,
+	       &( internal_handle->header_values ) ) != 1 ) )
 	{
-		header_values = libewf_header_values_parse_header(
-		                 internal_handle->header_sections->header,
-		                 internal_handle->header_sections->header_size,
-		                 date_format );
+		LIBEWF_WARNING_PRINT( "%s: unable to parse header.\n",
+		 function );
 
-		internal_handle->header_values = header_values;
+		return( -1 );
 	}
 	if( internal_handle->header_values == NULL )
 	{

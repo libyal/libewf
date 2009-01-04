@@ -98,20 +98,23 @@ int libewf_header_values_copy(
      libewf_values_table_t *destination_header_values,
      libewf_values_table_t *source_header_values );
 
-libewf_values_table_t *libewf_header_values_parse_header_string(
-                        libewf_char_t *header_string,
-                        size_t length,
-                        uint8_t date_format );
+int libewf_header_values_parse_header_string(
+     libewf_char_t *header_string,
+     size_t length,
+     uint8_t date_format,
+     libewf_values_table_t **header_values );
 
-libewf_values_table_t *libewf_header_values_parse_header(
-                        ewf_char_t *header,
-                        size_t size,
-                        uint8_t date_format );
+int libewf_header_values_parse_header(
+     ewf_char_t *header,
+     size_t size,
+     uint8_t date_format,
+     libewf_values_table_t **header_values );
 
-libewf_values_table_t *libewf_header_values_parse_header2(
-                        ewf_char_t *header2,
-                        size_t size,
-                        uint8_t date_format );
+int libewf_header_values_parse_header2(
+     ewf_char_t *header2,
+     size_t size,
+     uint8_t date_format,
+     libewf_values_table_t **header_values );
 
 ewf_char_t *libewf_header_values_convert_header_string_to_header(
              libewf_char_t *header_string,

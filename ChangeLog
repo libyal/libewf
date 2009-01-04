@@ -134,11 +134,6 @@ Next stable:
 
 * work on TODO in write
 
-* libewf_header_values.h
-  - code clean
-  - libewf_parse_header_values refactor to pass header values reference as parameter
-    libewf_header_values_parse_header2, libewf_header_values_parse_header
-
 * merge alloc and realloc blocks
 
 * change ewf_char/string into byte_char/string
@@ -182,6 +177,7 @@ CLOSED
 
 Version: 20080228
 * Worked on not finalizing on error
+* Refactored libewf_header_values_parse_header and libewf_header_values_parse_header2
 
 Version: 20080227
 * refactored ewfdigest_hash
