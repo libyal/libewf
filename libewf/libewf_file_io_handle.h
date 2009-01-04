@@ -85,7 +85,8 @@ ssize_t libewf_file_io_handle_write(
 
 off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,
-         off64_t offset );
+         off64_t offset,
+         int whence );
 
 #if defined( __cplusplus )
 }

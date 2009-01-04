@@ -91,12 +91,12 @@ int libewf_file_io_pool_open(
 
 int libewf_file_io_pool_reopen(
      libewf_file_io_pool_t *file_io_pool,
-     size_t entry,
+     int entry,
      int flags );
 
 int libewf_file_io_pool_close(
      libewf_file_io_pool_t *file_io_pool,
-     size_t entry );
+     int entry );
 
 ssize_t libewf_file_io_pool_read(
          libewf_file_io_pool_t *file_io_pool,

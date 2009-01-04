@@ -38,7 +38,6 @@ int libewf_file_io_pool_initialize(
      int maximum_amount_of_open_files )
 {
 	static char *function    = "libewf_file_io_pool_initialize";
-	size_t iterator          = 0;
 	size_t file_io_pool_size = 0;
 
 	if( file_io_pool == NULL )
@@ -122,7 +121,7 @@ int libewf_file_io_pool_initialize(
 			 function );
 
 			memory_free(
-			 ( *file_io_pool )->file_io_handles );
+			 ( *file_io_pool )->file_io_handle );
 			memory_free(
 			 *file_io_pool );
 
@@ -139,7 +138,7 @@ int libewf_file_io_pool_initialize(
 			 function );
 
 			memory_free(
-			 ( *file_io_pool )->file_io_handles );
+			 ( *file_io_pool )->file_io_handle );
 			memory_free(
 			 *file_io_pool );
 
@@ -158,7 +157,7 @@ int libewf_file_io_pool_initialize(
 			memory_free(
 			 ( *file_io_pool )->last_used_list );
 			memory_free(
-			 ( *file_io_pool )->file_io_handles );
+			 ( *file_io_pool )->file_io_handle );
 			memory_free(
 			 *file_io_pool );
 
@@ -179,7 +178,7 @@ int libewf_file_io_pool_free(
      libewf_file_io_pool_t **file_io_pool )
 {
 	static char *function = "libewf_file_io_pool_free";
-	size_t iterator       = 0;
+	int iterator          = 0;
 
 	if( file_io_pool == NULL )
 	{
@@ -231,7 +230,6 @@ int libewf_file_io_pool_resize(
 {
 	void *reallocation       = NULL;
 	static char *function    = "libewf_file_io_pool_resize";
-	size_t iterator          = 0;
 	size_t file_io_pool_size = 0;
 
 	if( file_io_pool == NULL )
@@ -282,7 +280,7 @@ int libewf_file_io_pool_resize(
 
 			return( -1 );
 		}
-		file_io_pool->amount_of_files_io_handles = amount_of_files;
+		file_io_pool->amount_of_files_io_handles = amount_of_files_io_handles;
 	}
 	return( 1 );
 }
@@ -458,7 +456,7 @@ int libewf_file_io_pool_open(
 	if( ( entry + 1 ) >= file_io_pool->amount_of_files_io_handles )
 	{
 		if( libewf_file_io_pool_resize(
-		     libewf_file_io_pool_t *file_io_pool,
+		     file_io_pool,
 		     entry + 1 ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to resize file io pool.\n",
@@ -511,7 +509,7 @@ int libewf_file_io_pool_open(
  */
 int libewf_file_io_pool_close(
      libewf_file_io_pool_t *file_io_pool,
-     size_t entry )
+     int entry )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_close";
@@ -547,7 +545,7 @@ int libewf_file_io_pool_close(
 
 		return( -1 );
 	}
-	if( file_io_handle_close(
+	if( libewf_file_io_handle_close(
 	     file_io_handle ) != 0 )
 	{
 		notify_warning_printf( "%s: unable to close file io handle for entry: %d.\n",
@@ -563,7 +561,7 @@ int libewf_file_io_pool_close(
  */
 ssize_t libewf_file_io_pool_read(
          libewf_file_io_pool_t *file_io_pool,
-         size_t entry,
+         int entry,
          uint8_t *buffer,
          size_t size )
 {
@@ -600,14 +598,14 @@ ssize_t libewf_file_io_pool_read(
 	if( libewf_file_io_pool_open_file_io_handle(
 	     file_io_pool,
 	     file_io_handle,
-	     flags ) != 1 )
+	     file_io_handle->flags ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to open entry: %d.\n",
 		 function, entry );
 
 		return( -1 );
 	}
-	read_count = file_io_handle_read(
+	read_count = libewf_file_io_handle_read(
 	              file_io_handle,
 	              buffer,
 	              size );
@@ -627,7 +625,7 @@ ssize_t libewf_file_io_pool_read(
  */
 ssize_t libewf_file_io_pool_write(
          libewf_file_io_pool_t *file_io_pool,
-         size_t entry,
+         int entry,
          uint8_t *buffer,
          size_t size )
 {
@@ -664,14 +662,14 @@ ssize_t libewf_file_io_pool_write(
 	if( libewf_file_io_pool_open_file_io_handle(
 	     file_io_pool,
 	     file_io_handle,
-	     flags ) != 1 )
+	     file_io_handle->flags ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to open entry: %d.\n",
 		 function, entry );
 
 		return( -1 );
 	}
-	write_count = file_io_handle_read(
+	write_count = libewf_file_io_handle_read(
 	               file_io_handle,
 	               buffer,
 	               size );
@@ -691,7 +689,7 @@ ssize_t libewf_file_io_pool_write(
  */
 off64_t libewf_file_io_pool_seek_offset(
          libewf_file_io_pool_t *file_io_pool,
-         size_t entry,
+         int entry,
          off64_t offset,
          int whence )
 {
@@ -728,14 +726,14 @@ off64_t libewf_file_io_pool_seek_offset(
 	if( libewf_file_io_pool_open_file_io_handle(
 	     file_io_pool,
 	     file_io_handle,
-	     flags ) != 1 )
+	     file_io_handle->flags ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to open entry: %d.\n",
 		 function, entry );
 
 		return( -1 );
 	}
-	seek_offset = file_io_handle_seek_offset(
+	seek_offset = libewf_file_io_handle_seek_offset(
 	               file_io_handle,
 	               offset,
 	               whence );

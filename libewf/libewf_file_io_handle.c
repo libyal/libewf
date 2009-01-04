@@ -372,7 +372,8 @@ ssize_t libewf_file_io_handle_write(
  */
 off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,
-         off64_t offset )
+         off64_t offset,
+         int whence )
 {
 	static char *function = "libewf_file_io_handle_seek_offset";
 
@@ -414,7 +415,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		if( file_io_lseek(
 		     file_io_handle->file_descriptor,
 		     offset,
-		     SEEK_SET ) == -1 )
+		     whence ) == -1 )
 		{
 			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in file io handle: %" PRIs_SYSTEM ".\n",
 			 function, offset, file_io_handle->filename );

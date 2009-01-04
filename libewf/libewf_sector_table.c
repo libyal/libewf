@@ -269,11 +269,10 @@ int libewf_sector_table_add_sector(
      uint32_t amount_of_sectors,
      int merge_continious_entries )
 {
-	libewf_sector_table_entry_t *reallocation = NULL;
-	static char *function                     = "libewf_sector_table_add_sector";
-	off64_t last_sector                       = 0;
-	off64_t last_range_sector                 = 0;
-	uint32_t iterator                         = 0;
+	static char *function     = "libewf_sector_table_add_sector";
+	off64_t last_sector       = 0;
+	off64_t last_range_sector = 0;
+	uint32_t iterator         = 0;
 
 	if( sector_table == NULL )
 	{
@@ -316,26 +315,6 @@ int libewf_sector_table_add_sector(
 	}
 	/* Create a new sector
 	 */
-#ifdef REFACTOR
-	/* 20080905 */
-	reallocation = (libewf_sector_table_entry_t *) memory_reallocate(
-	                                                sector_table->sector,
-	                                                ( sizeof( libewf_sector_table_entry_t ) * ( sector_table->amount + 1 ) ) );
-
-	if( reallocation == NULL )
-	{
-		notify_warning_printf( "%s: unable to create sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	sector_table->sector = reallocation;
-
-	sector_table->sector[ sector_table->amount ].first_sector      = first_sector;
-	sector_table->sector[ sector_table->amount ].amount_of_sectors = amount_of_sectors;
-
-	sector_table->amount += 1;
-#else
 	if( libewf_sector_table_resize(
 	     sector_table,
 	     sector_table->amount + 1 ) != 1 )
@@ -347,7 +326,6 @@ int libewf_sector_table_add_sector(
 	}
 	sector_table->sector[ sector_table->amount - 1 ].first_sector      = first_sector;
 	sector_table->sector[ sector_table->amount - 1 ].amount_of_sectors = amount_of_sectors;
-#endif
 
 	return( 1 );
 }
