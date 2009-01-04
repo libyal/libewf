@@ -145,6 +145,17 @@ Next release(s):
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
+Update common from libpff
+* libpff_string_duplicate requires 0 byte in size
+* change libpff_string_to_uint64 and libpff_string_to_int64 into a single
+  function that requires the value as argument
+* move guid to common
+* use utf16 stream functions
+
+* rename _char_t functions to _system_character functions
+* rewrite ewfinput determine functions to pass value as argument
+  and have return value be 1 or -1
+
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -161,6 +172,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080830
+* removed errno.h include from ewftools where not used
 
 Version: 20080821
 * ewfalter now support single segment file as argument

@@ -1,1 +1,1 @@
-liblibewf 20080821 libewf (>> 20080821-0), libewf (<< 20080821-99)
+liblibewf 20080830 libewf (>> 20080830-0), libewf (<< 20080830-99)

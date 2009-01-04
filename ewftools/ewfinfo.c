@@ -27,11 +27,7 @@
 #include <system_string.h>
 #include <types.h>
 
-#include <errno.h>
-
 #include <stdio.h>
-
-#include <time.h>
 
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>

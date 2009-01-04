@@ -28,8 +28,6 @@
 #include <system_string.h>
 #include <types.h>
 
-#include <errno.h>
-
 #include <stdio.h>
 
 #if defined( HAVE_SYS_IOCTL_H )

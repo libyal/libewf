@@ -25,8 +25,6 @@
 #include <memory.h>
 #include <types.h>
 
-#include <errno.h>
-
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
