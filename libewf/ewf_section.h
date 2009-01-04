@@ -75,7 +75,6 @@ struct ewf_section
 	uint8_t crc[ 4 ];
 };
 
-ssize_t ewf_section_read( EWF_SECTION *section, int file_descriptor );
 ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor );
 
 int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );

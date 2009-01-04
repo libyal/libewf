@@ -93,7 +93,7 @@ struct ewf_volume_smart
 	uint8_t signature[ 5 ];
 
 	/* The section crc of all (previous) volume data
-	 * consits of 4 bytes (32 bits)
+	 * consists of 4 bytes (32 bits)
 	 * starts with offset 76
 	 */
 	uint8_t crc[ 4 ];

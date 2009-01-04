@@ -74,7 +74,7 @@ struct ewf_table
 	uint8_t padding2[ 4 ];
 
 	/* The section crc of all (previous) table data
-	 * consits of 4 bytes
+	 * consists of 4 bytes
 	 * starts with offset 76
 	 */
 	uint8_t crc[ 4 ];
@@ -90,7 +90,7 @@ struct ewf_table
 struct ewf_table_offset
 {
 	/* An offset
-	 * consits of 4 bytes
+	 * consists of 4 bytes
 	 */
 	uint8_t offset[ 4 ];
 };

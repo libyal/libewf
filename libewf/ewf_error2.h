@@ -63,13 +63,13 @@ struct ewf_error2
 	uint8_t unknown[ 512 ];
 
 	/* The section crc of all (previous) error2 data
-	 * consits of 4 bytes
+	 * consists of 4 bytes
 	 * starts with sector 76
 	 */
 	uint8_t crc[ 4 ];
 
 	/* The sector array
-	 * consits of 8 bytes per sector
+	 * consists of 8 bytes per sector
 	 * as long as necessary
 	 */
 

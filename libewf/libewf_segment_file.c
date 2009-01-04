@@ -1310,6 +1310,7 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 		       internal_handle,
 		       file_descriptor,
 		       last_section_type,
+		       4,
 		       start_offset );
 
 	if( write_count == -1 )
@@ -1644,6 +1645,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		               total_chunk_amount,
 		               segment_chunk_amount,
 		               (EWF_CHAR *) "table",
+		               5,
 		               0 );
 
 		if( write_count == -1 )
@@ -1664,6 +1666,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		write_count = libewf_section_start_write(
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               (EWF_CHAR *) "sectors",
+		               7,
 		               section_size,
 		               internal_handle->segment_table->file_offset[ segment_number ] );
 
@@ -1947,6 +1950,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
 		               (EWF_CHAR *) "table",
+		               5,
 		               chunks_section_size );
 
 		if( write_count == -1 )
@@ -1978,6 +1982,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		write_count = libewf_section_start_write(
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               (EWF_CHAR *) "sectors",
+		               7,
 		               chunks_section_size,
 		               chunks_section_offset );
 
@@ -2034,6 +2039,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
 		               (EWF_CHAR *) "table",
+		               5,
 		               0 );
 
 		if( write_count == -1 )
@@ -2068,6 +2074,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
 		               (EWF_CHAR *) "table2",
+		               6,
 		               0 );
 
 		if( write_count == -1 )

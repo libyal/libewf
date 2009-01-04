@@ -43,41 +43,6 @@
 #include "ewf_section.h"
 #include "ewf_string.h"
 
-/* Reads the section from a file descriptor
- * Returns the amount of bytes read, or -1 on error
- */
-ssize_t ewf_section_read( EWF_SECTION *section, int file_descriptor )
-{
-	static char *function = "ewf_section_read";
-	ssize_t count         = 0;
-	size_t size           = EWF_SECTION_SIZE;
-
-	if( section == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( file_descriptor == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
-		 function );
-
-		return( -1 );
-	}
-	count = libewf_common_read( file_descriptor, section, size );
-
-	if( count < (ssize_t) size )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read section.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( count );
-}
-
 /* Writes a section to a file descriptor
  * Returns the amount of bytes written, or -1 on error
  */

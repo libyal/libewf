@@ -53,7 +53,7 @@ struct ewf_session
 	uint8_t unknown[ 68 ];
 
 	/* The section crc of all (previous) session data
-	 * consits of 4 bytes (32 bits)
+	 * consists of 4 bytes (32 bits)
 	 * starts with offset 76
 	 */
 	uint8_t crc[ 4 ];
