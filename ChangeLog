@@ -144,7 +144,10 @@ TODO
 * remove get calculated md5 hash function
 
 * allow to set the delta file path
-* change use of stdout and stderr in ewfaexport
+* change use of stdout and stderr in ewfexport
+* check chunk size for >2Gb table offsets
+  the current assumption is that these chunks only can be uncompressed
+  because the MSB is normally used to mark if the chunk is compressed
 
 Version: 20070905
 * worked on remove of MD5 calculation from library

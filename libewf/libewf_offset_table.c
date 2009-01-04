@@ -360,6 +360,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	uint32_t raw_offset     = 0;
 	uint32_t iterator       = 0;
 	uint8_t compressed      = 0;
+	uint8_t overflow        = 0;
 
 	if( offset_table == NULL )
 	{
@@ -410,9 +411,15 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	 */
 	while( iterator < ( amount_of_chunks - 1 ) )
 	{
-		compressed     = (uint8_t) ( raw_offset >> 31 );
-		current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
-
+		if( overflow == 0 )
+		{
+			compressed     = (uint8_t) ( raw_offset >> 31 );
+			current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+		}
+		else
+		{
+			current_offset = raw_offset;
+		}
 		if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator + 1 ].offset ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
@@ -420,30 +427,37 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 
 			return( -1 );
 		}
-		next_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+		if( overflow == 0 )
+		{
+			next_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
+		}
+		else
+		{
+			next_offset = raw_offset;
+		}
 
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6
 		 */
 		if( next_offset < current_offset )
 		{
-			LIBEWF_WARNING_PRINT( "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
+			if( raw_offset < current_offset )
+			{
+				LIBEWF_WARNING_PRINT( "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
+				 function, current_offset, raw_offset );
+
+				return( -1 );
+			}
+			LIBEWF_VERBOSE_PRINT( "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 			 function, current_offset, next_offset );
 
-			chunk_size = next_offset;
+			chunk_size = raw_offset - current_offset;
 		}
 		else
 		{
 			chunk_size = next_offset - current_offset;
 		}
 
-		if( current_offset > (uint32_t) INT32_MAX )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
-			 function );
-
-			return( -1 );
-		}
 		if( chunk_size == 0 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid chunk size - size is zero.\n",
@@ -496,18 +510,14 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6
 		 */
-		if( next_offset < current_offset )
+		if( ( overflow == 0 )
+		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
-fprintf( stderr, "D: 0x%08" PRIx32 "\n", raw_offset );
-			base_offset += current_offset;
+			LIBEWF_VERBOSE_PRINT( "%s: chunk offset overflow at: %" PRIu32 ".\n",
+			 function, current_offset );
 
-			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround new base %" PRIu32 ".\n",
-			 function, base_offset );
+			overflow = 1;
 		}
-/* TODO code is obsolete
-		current_offset = next_offset;
- */
-
 		iterator++;
 	}
 	if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator ].offset ) != 1 )
@@ -517,16 +527,16 @@ fprintf( stderr, "D: 0x%08" PRIx32 "\n", raw_offset );
 
 		return( -1 );
 	}
-	compressed     = (uint8_t) ( raw_offset >> 31 );
-	current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
-
-	if( current_offset > (uint32_t) INT32_MAX )
+	if( overflow == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
+		compressed     = (uint8_t) ( raw_offset >> 31 );
+		current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
 	}
+	else
+	{
+		current_offset = raw_offset;
+	}
+
 	if( libewf_offset_table_set_values(
 	     offset_table,
 	     offset_table->last,
@@ -596,7 +606,7 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 	while( section_list_entry != NULL )
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
-		LIBEWF_VERBOSE_PRINT( "%s: start offset: %jd last offset: %jd.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
 		 function, section_list_entry->start_offset, last_offset );
 #endif
 
