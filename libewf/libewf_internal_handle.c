@@ -706,7 +706,8 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 
 		libewf_values_table_free( internal_handle->header_values );
 	}
-	internal_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+	internal_handle->header_values = libewf_values_table_alloc(
+	                                  LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 	if( internal_handle->header_values == NULL )
 	{
@@ -715,7 +716,8 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 
 		return( -1 );
 	}
-	if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
+	if( libewf_header_values_initialize(
+             internal_handle->header_values ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
 		 function );
@@ -808,7 +810,8 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 /* Initializes the read values
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_read_initialize( libewf_internal_handle_t *internal_handle )
+int libewf_internal_handle_read_initialize(
+     libewf_internal_handle_t *internal_handle )
 {
 	static char *function = "libewf_internal_handle_read_initialize";
 
@@ -832,7 +835,8 @@ int libewf_internal_handle_read_initialize( libewf_internal_handle_t *internal_h
 /* Initializes the write values
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_handle )
+int libewf_internal_handle_write_initialize(
+     libewf_internal_handle_t *internal_handle )
 {
 	static char *function               = "libewf_internal_handle_write_initialize";
 	int64_t required_amount_of_segments = 0;

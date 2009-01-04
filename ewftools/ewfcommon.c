@@ -1195,7 +1195,17 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		LIBEWF_WARNING_PRINT( "%s: ignoring write offset in a stream mode.\n",
 		 function );
 	}
-	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
+	if( libewf_write_initialize(
+	     handle ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_get_chunk_size(
+	     handle,
+	     &chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
 		 function );
@@ -1209,7 +1219,9 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 		return( -1 );
 	}
-	if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) != 1 )
+	if( libewf_get_bytes_per_sector(
+	     handle,
+	     &bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sector.\n",
 		 function );

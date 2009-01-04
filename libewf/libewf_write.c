@@ -1896,7 +1896,7 @@ ssize_t libewf_write_chunk_data_existing( libewf_internal_handle_t *internal_han
  * intended for raw write
  * The buffer size cannot be larger than the chunk size
  * The function sets the chunk crc, is compressed and write crc values
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the resulting chunk size, or -1 on error
  */
 ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc )
@@ -1946,13 +1946,10 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
 	}
 	if( internal_handle->write->values_initialized == 0 )
 	{
-		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
-			 function );
+		LIBEWF_WARNING_PRINT( "%s: write values are not initialized.\n",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	chunk_data_size = libewf_write_process_chunk_data(
 	                   internal_handle,
@@ -1978,7 +1975,7 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc )
@@ -2012,13 +2009,10 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 	}
 	if( internal_handle->write->values_initialized == 0 )
 	{
-		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
-			 function );
+		LIBEWF_WARNING_PRINT( "%s: write values are not initialized.\n",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	if( buffer == NULL )
 	{
@@ -2103,7 +2097,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
@@ -2132,13 +2126,10 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	}
 	if( internal_handle->write->values_initialized == 0 )
 	{
-		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
-			 function );
+		LIBEWF_WARNING_PRINT( "%s: write values are not initialized.\n",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	if( internal_handle->offset_table == NULL )
 	{
@@ -2264,7 +2255,7 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset )
@@ -2291,8 +2282,30 @@ ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, o
 	return( write_count );
 }
 
+/* Initializes the write by calculating the necessary values
+ * This function is required to be called before the write functions
+ * Returns the amount of bytes written, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_write_initialize( LIBEWF_HANDLE *handle )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_write_initialize";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	return( libewf_internal_handle_write_initialize(
+	         internal_handle ) );
+}
+
 /* Finalizes the write by correcting the EWF the meta data in the segment files
- * This function is required after write from stream
+ * This function is required to be called after the write functions
  * Returns the amount of bytes written, or -1 on error
  */
 ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )

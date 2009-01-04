@@ -120,7 +120,7 @@ LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, s
  * intended for raw write
  * The buffer size cannot be larger than the chunk size
  * The function sets the chunk crc, is compressed and write crc values
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the resulting chunk size, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc );
@@ -129,27 +129,33 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, vo
  * the necessary settings of the write values must have been made
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc );
 
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
- * Will initialize write if necessary
+ * Write must be initialized
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
+/* Initializes the write by calculating the necessary values
+ * This function is required to be called before the write functions
+ * Returns the amount of bytes written, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_write_initialize( LIBEWF_HANDLE *handle );
+
 /* Finalizes the write by correcting the EWF the meta data in the segment files
- * This function is required after writing from stream
+ * This function is required to be called after the write functions
  * Returns the amount of input bytes written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );

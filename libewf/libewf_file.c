@@ -549,13 +549,10 @@ int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 	if( ( internal_handle->write != NULL )
 	 && ( internal_handle->write->values_initialized == 0 ) )
 	{
-		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
-			 function );
+		LIBEWF_WARNING_PRINT( "%s: write values are not initialized.\n",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	*chunk_size = internal_handle->media_values->chunk_size;
 

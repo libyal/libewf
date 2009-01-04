@@ -75,6 +75,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buff
 LIBEWF_EXTERN ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
+LIBEWF_EXTERN int libewf_write_initialize( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
 
 #if defined( __cplusplus )
