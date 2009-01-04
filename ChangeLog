@@ -148,6 +148,8 @@ TODO
 * rename/move libewf_internal_handle_determine_format and 
   libewf_internal_handle_get_write_maximum_amount_of_segments
 * implement abort
+* create internal value to limit memory use
+  - for write only offset table is not needed etc.
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
