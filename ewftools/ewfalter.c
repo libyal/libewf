@@ -283,7 +283,7 @@ int main( int argc, char * const argv[] )
 		     0,
 		     media_size,
 		     0,
-		     &alter_offset ) != 1 )
+		     &alter_offset ) == -1 )
 		{
 			alter_offset = 0;
 
@@ -298,7 +298,7 @@ int main( int argc, char * const argv[] )
 		     0,
 		     ( media_size - alter_offset ),
 		     ( media_size - alter_offset ),
-		     &alter_size ) != 1 )
+		     &alter_size ) == -1 )
 		{
 			alter_size = media_size - alter_offset;
 
@@ -313,7 +313,7 @@ int main( int argc, char * const argv[] )
 		     1,
 		     SSIZE_MAX,
 		     ( 64 * 512 ),
-		     &alter_buffer_size ) != 1 )
+		     &alter_buffer_size ) == -1 )
 		{
 			alter_buffer_size = 64 * 512;
 

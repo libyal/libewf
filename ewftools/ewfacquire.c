@@ -530,7 +530,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     _CHARACTER_T_STRING( "Case number" ),
 		     case_number,
-		     256 ) != 1 )
+		     256 ) == -1 )
 		{
 			fprintf( stderr, "Unable to set case number string.\n" );
 
@@ -556,7 +556,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     _CHARACTER_T_STRING( "Description" ),
 		     description,
-		     256 ) != 1 )
+		     256 ) == -1 )
 		{
 			fprintf( stderr, "Unable to set description string.\n" );
 
@@ -584,7 +584,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     _CHARACTER_T_STRING( "Evidence number" ),
 		     evidence_number,
-		     256 ) != 1 )
+		     256 ) == -1 )
 		{
 			fprintf( stderr, "Unable to set evidence number string.\n" );
 
@@ -614,7 +614,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     _CHARACTER_T_STRING( "Examiner name" ),
 		     examiner_name,
-		     256 ) != 1 )
+		     256 ) == -1 )
 		{
 			fprintf( stderr, "Unable to set examiner name string.\n" );
 
@@ -646,7 +646,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     _CHARACTER_T_STRING( "Notes" ),
 		     notes,
-		     256 ) != 1 )
+		     256 ) == -1 )
 		{
 			fprintf( stderr, "Unable to set notes string.\n" );
 
@@ -757,7 +757,7 @@ int main( int argc, char * const argv[] )
 		     0,
 		     input_size,
 		     0,
-		     &acquiry_offset ) != 1 )
+		     &acquiry_offset ) == -1 )
 		{
 			acquiry_offset = 0;
 
@@ -772,7 +772,7 @@ int main( int argc, char * const argv[] )
 		     0,
 		     ( input_size - acquiry_offset ),
 		     ( input_size - acquiry_offset ),
-		     &acquiry_size ) != 1 )
+		     &acquiry_size ) == -1 )
 		{
 			acquiry_size = input_size - acquiry_offset;
 
@@ -789,13 +789,21 @@ int main( int argc, char * const argv[] )
 		{
 			maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 		}
-		segment_file_size = ewfinput_get_byte_size_variable(
-		                     stdout,
-		                     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
-		                     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE ),
-		                     ( maximum_segment_file_size ),
-		                     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE ) );
+		if( ewfinput_get_byte_size_variable(
+		     stdout,
+		     input_buffer,
+		     64,
+		     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+		     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE ),
+		     ( maximum_segment_file_size ),
+		     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE ),
+		     &segment_file_size ) == -1 )
+		{
+			segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
+			fprintf( stderr, "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
+			 segment_file_size );
+		}
 		/* Make sure the segment file size is smaller than or equal to the maximum
 		 */
 		if( segment_file_size > maximum_segment_file_size )
@@ -833,7 +841,7 @@ int main( int argc, char * const argv[] )
 		     1,
 		     (uint64_t) sectors_per_chunk,
 		     64,
-		     &input_size_variable ) != 1 )
+		     &input_size_variable ) == -1 )
 		{
 			input_size_variable = 64;
 
@@ -852,7 +860,7 @@ int main( int argc, char * const argv[] )
 		     0,
 		     255,
 		     2,
-		     &input_size_variable ) != 1 )
+		     &input_size_variable ) == -1 )
 		{
 			input_size_variable = 2;
 

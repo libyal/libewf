@@ -651,13 +651,21 @@ int main( int argc, char * const argv[] )
 				}
 				/* Segment file size
 				 */
-				segment_file_size = ewfinput_get_byte_size_variable(
-						     stderr,
-						     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
-						     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-						     maximum_segment_file_size,
-						     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+				if( ewfinput_get_byte_size_variable(
+				     stderr,
+				     input_buffer,
+				     64,
+				     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+				     maximum_segment_file_size,
+				     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
+				     &segment_file_size ) == -1 )
+				{
+					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
+					fprintf( stderr, "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
+					 segment_file_size );
+				}
 				/* Make sure the segment file size is smaller than or equal to the maximum
 				 */
 				if( segment_file_size > maximum_segment_file_size )
@@ -720,11 +728,11 @@ int main( int argc, char * const argv[] )
 			     0,
 			     media_size,
 			     export_offset,
-			     &export_offset ) != 1 )
+			     &export_offset ) == -1 )
 			{
 				export_offset = 0;
 
-				fprintf( stderr, "Unable to determine the export offset defaulting to: %" PRIu64 ".\n",
+				fprintf( stderr, "Unable to determine export offset defaulting to: %" PRIu64 ".\n",
 				 export_offset );
 			}
 		}
@@ -738,11 +746,11 @@ int main( int argc, char * const argv[] )
 			     0,
 			     ( media_size - export_offset ),
 			     export_size,
-			     &export_size ) != 1 )
+			     &export_size ) == -1 )
 			{
 				export_size = media_size - export_offset;
 
-				fprintf( stderr, "Unable to determine the export size defaulting to: %" PRIu64 ".\n",
+				fprintf( stderr, "Unable to determine export size defaulting to: %" PRIu64 ".\n",
 				 export_size );
 			}
 		}

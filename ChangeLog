@@ -145,6 +145,8 @@ Next release(s):
 
 * rewrite ewfinput determine functions to pass value as argument
   and have return value be 1 or -1
+* handle overflow in input buffer by flushing stdin before requesting user
+  input (+/-)
 
 * rename length into size, make sure string size contains end of string
   character
