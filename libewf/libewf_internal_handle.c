@@ -38,6 +38,7 @@
 #include <libewf/libewf_definitions.h>
 
 #include "libewf_common.h"
+#include "libewf_error.h"
 #include "libewf_header_values.h"
 #include "libewf_internal_handle.h"
 #include "libewf_notify.h"
@@ -88,6 +89,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 	internal_handle->ewf_format               = EWF_FORMAT_UNKNOWN;
 	internal_handle->error_tollerance         = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 	internal_handle->abort                    = 0;
+	internal_handle->error                    = LIBEWF_ERROR_NONE;
 
 	/* The segment table is initially filled with a single entry
 	 */

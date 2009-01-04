@@ -34,14 +34,14 @@
 #if !defined( _LIBEWF_DEFINIONS_H )
 #define _LIBEWF_DEFINIONS_H
 
-#define LIBEWF_VERSION				20080227
+#define LIBEWF_VERSION				20080228
 
 /* The libewf version string
  */
 #if 0
-#define LIBEWF_VERSION_STRING			L"20080227"
+#define LIBEWF_VERSION_STRING			L"20080228"
 #else
-#define LIBEWF_VERSION_STRING			"20080227"
+#define LIBEWF_VERSION_STRING			"20080228"
 #endif
 
 /* The libewf file access

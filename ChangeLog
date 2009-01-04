@@ -121,8 +121,7 @@ Next release(s):
 * create libewf_create_handle and libewf_destroy_handle functions?
 
 * improve error handling
-  - store error in handle? or additional paremeter?
-  - do not finalize on error
+  - store error in handle? or additional parameter?
 
 Next stable:
 * full platform test
@@ -134,7 +133,6 @@ Next stable:
   - allow to set maximum delta file size default 4 GiB?
 
 * work on TODO in write
-* do not finalize on write error?
 
 * libewf_header_values.h
   - code clean
@@ -177,16 +175,23 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+* do not finalize on error
+  no, does not add any additional value
+  if a write error did occur the library should not make any guesses about if
+  this is write or wrong
+
+Version: 20080228
+* Worked on not finalizing on error
 
 Version: 20080227
 * refactored ewfdigest_hash
 * changed LIBEWF_VERSION into LIBEWF_VERSION_STRING and added numeric LIBEWF_VERSION
 * added LIBEWF_WIDE_CHARACTER_TYPE definition
-* Worked on improved error handling
+* Worked on not finalizing on error
 * Code clean up
 
 Version: 20080225
-* Worked on improved error handling
+* Worked on not finalizing on error
 
 Version: 20080224
 * Added error output to the log

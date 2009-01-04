@@ -2461,14 +2461,19 @@ ssize_t libewf_write_random(
 	static char *function = "libewf_write_random";
 	ssize_t write_count   = 0;
 
-	if( libewf_seek_offset( handle, offset ) == -1 )
+	if( libewf_seek_offset(
+	     handle,
+	     offset ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to seek offset.\n",
 		 function );
 
 		return( -1 );
 	}
-	write_count = libewf_write_buffer( handle, buffer, size );
+	write_count = libewf_write_buffer(
+	               handle,
+	               buffer,
+	               size );
 
 	if( write_count <= -1 )
 	{

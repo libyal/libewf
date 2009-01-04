@@ -41,7 +41,6 @@
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
-#include "libewf_error.h"
 #include "libewf_notify.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
@@ -107,8 +106,6 @@ int libewf_check_file_signature(
 		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
 		 function );
 
-		libewf_error = LIBEWF_ERROR_INVALID_ARGUMENT;
-
 		return( -1 );
 	}
 	file_descriptor = libewf_filename_open(
@@ -168,8 +165,6 @@ int libewf_glob(
 		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
 		 function );
 
-		libewf_error = LIBEWF_ERROR_INVALID_ARGUMENT;
-
 		return( -1 );
 	}
 	if( ( length == 0 )
@@ -177,8 +172,6 @@ int libewf_glob(
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid filename length.\n",
 		 function );
-
-		libewf_error = LIBEWF_ERROR_INVALID_ARGUMENT;
 
 		return( -1 );
 	}
@@ -202,8 +195,6 @@ int libewf_glob(
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid filenames.\n",
 		 function );
-
-		libewf_error = LIBEWF_ERROR_INVALID_ARGUMENT;
 
 		return( -1 );
 	}
