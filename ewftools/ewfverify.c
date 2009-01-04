@@ -552,7 +552,7 @@ int main( int argc, char * const argv[] )
 		{
 			log_file_stream = ewfcommon_fopen(
 					   log_filename,
-					   _SYSTEM_CHARACTER_T_STRING( "w" ) );
+					   _SYSTEM_CHARACTER_T_STRING( "a" ) );
 
 			if( log_file_stream == NULL )
 			{
