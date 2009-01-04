@@ -304,6 +304,7 @@ LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void )
 	handle_read->crc_error_sectors    = NULL;
 	handle_read->crc_amount_of_errors = 0;
 	handle_read->values_initialized   = 0;
+	handle_read->wipe_on_error        = 1;
 
 	return( handle_read );
 }
@@ -416,75 +417,6 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 
 		return( -1 );
 	}
-}
-
-/* Add a CRC error sector to the list
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk ) 
-{
-	LIBEWF_ERROR_SECTOR *crc_error_sectors = NULL;
-	static char *function                  = "libewf_internal_handle_add_crc_error_chunk";
-	off64_t sector                         = 0;
-	uint32_t iterator                      = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->read == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle read.\n",
-		 function );
-
-		return( -1 );
-	}
-	sector = (off64_t) chunk * (off64_t) internal_handle->media->sectors_per_chunk;
-
-	if( internal_handle->read->crc_error_sectors == NULL )
-	{
-		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
-	}
-	else
-	{
-		/* Check if CRC error is already in list
-		 */
-		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
-		{
-			if( internal_handle->read->crc_error_sectors[ iterator ].sector == sector )
-			{
-				return( 1 );
-			}
-		}
-		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
-		                     internal_handle->read->crc_error_sectors,
-		                     ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->read->crc_amount_of_errors + 1 ) ) );
-	}
-	if( crc_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create CRC error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->read->crc_error_sectors = crc_error_sectors;
-
-	internal_handle->read->crc_error_sectors[ internal_handle->read->crc_amount_of_errors ].sector            = sector;
-	internal_handle->read->crc_error_sectors[ internal_handle->read->crc_amount_of_errors ].amount_of_sectors = internal_handle->media->sectors_per_chunk;
-
-	internal_handle->read->crc_amount_of_errors++;
-
-	return( 1 );
 }
 
 /* Determines the EWF file format based on known characteristics

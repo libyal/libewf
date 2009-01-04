@@ -126,6 +126,8 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, wcha
 LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length );
 #endif
 
+LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_error );
+
 LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size );
 LIBEWF_EXTERN int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity );
 LIBEWF_EXTERN int libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block );
@@ -140,6 +142,7 @@ LIBEWF_EXTERN int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t dat
 LIBEWF_EXTERN int libewf_parse_hash_values( LIBEWF_HANDLE *handle );
 
 LIBEWF_EXTERN int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
+LIBEWF_EXTERN int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle );
 

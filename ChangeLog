@@ -134,7 +134,8 @@ TODO
   WIPE_ON_ERROR
 * what about the crc errors in read_raw?
 
-* read crc in function libewf_section_delta_chunk_read?
+* what about protecting the chunk number in the delta chunks sections
+  using a crc?
 
 * have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 
@@ -152,10 +153,15 @@ CLOSED
 
 WORKING
 * make buffer passthrough default behavior
+* work on TODO in write
+* check unused parameters gcc -Wextra
 
 Version: 20071028
 * fixed error in write finalize for ewfacquirestream, due to restrictive check
 * fixed error for handling wide character delta segment filenames
+* worked on read wipe chunk on error
+* fixed miscalculation for CRC error in last chunk in read
+* added function to API to add CRC errors
 
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions

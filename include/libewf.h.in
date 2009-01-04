@@ -494,6 +494,12 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, wcha
 LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length );
 #endif
 
+/* Sets the read wipe chunk on error
+ * The chunk is not wiped if read raw is used
+ * Returns 1 if successful, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_error );
+
 /* Sets the write segment file size
  * Returns 1 if successful, or -1 on error
  */
@@ -722,6 +728,11 @@ LIBEWF_EXTERN int libewf_parse_hash_values( LIBEWF_HANDLE *handle );
  * Returns 1 if successful, or -1 on error
  */
 LIBEWF_EXTERN int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
+
+/* Add a CRC error
+ * Returns 1 if successful, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_add_chunk_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
 
 /* Copies the header values from the source to the destination handle
  * Returns 1 if successful, or -1 on error

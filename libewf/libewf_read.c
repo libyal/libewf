@@ -127,18 +127,19 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
-	EWF_CHAR *chunk_data      = NULL;
-	EWF_CHAR *chunk_read      = NULL;
+	EWF_CHAR *chunk_data       = NULL;
+	EWF_CHAR *chunk_read       = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
-        char *chunk_type          = NULL;
+        char *chunk_type           = NULL;
 #endif
-	static char *function     = "libewf_read_chunk";
-	ssize_t chunk_read_count  = 0;
-	ssize_t crc_read_count    = 0;
-	size_t chunk_data_size    = 0;
-	size_t bytes_available    = 0;
-	uint16_t segment_number   = 0;
-	int chunk_cache_data_used = 0;
+	static char *function      = "libewf_read_chunk";
+	ssize_t chunk_read_count   = 0;
+	ssize_t crc_read_count     = 0;
+	size_t chunk_data_size     = 0;
+	size_t bytes_available     = 0;
+	uint32_t amount_of_sectors = 0;
+	uint16_t segment_number    = 0;
+	int chunk_cache_data_used  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -425,20 +426,35 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 			     &chunk_data_size,
 			     internal_handle->offset_table->compressed[ chunk ] ) == -1 )
 			{
-#if defined( WIPE_ON_ERROR )
-				/* The chunk data is wiped
+				/* Wipe the chunk if nescessary
 				 */
-				if( libewf_common_memset( chunk_read, 0, internal_handle->media->chunk_size ) == NULL )
+				if( internal_handle->read->wipe_on_error != 0 )
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
+					if( libewf_common_memset( chunk_read, 0, internal_handle->media->chunk_size ) == NULL )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
+				/* Add CRC error
+				 */
+				amount_of_sectors = chunk_read_count / internal_handle->media->sectors_per_chunk;
+
+				if( ( chunk_read_count % internal_handle->media->sectors_per_chunk ) != 0 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: read count was no multitude of sectors per chunk.\n",
 					 function );
 
-					return( -1 );
+					amount_of_sectors++;
 				}
-#endif
-				if( libewf_internal_handle_add_crc_error_chunk( internal_handle, chunk ) != 1 )
+				if( libewf_add_crc_error(
+				     (LIBEWF_HANDLE *) internal_handle,
+				     ( (off64_t) chunk * (off64_t) internal_handle->media->sectors_per_chunk ),
+				     amount_of_sectors ) != 1 )
 				{
-					LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to set CRC error.\n",
 					 function );
 
 					return( -1 );

@@ -117,6 +117,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5                    = 1;
 	uint8_t calculate_sha1                   = 0;
 	uint8_t swap_byte_pairs                  = 0;
+	uint8_t wipe_chunk_on_error              = 1;
 	uint8_t verbose                          = 0;
 	int match_md5_hash                       = 0;
 	int match_sha1_hash                      = 0;
@@ -325,6 +326,7 @@ int main( int argc, char * const argv[] )
 	         calculated_sha1_hash_string,
 	         LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
 	         swap_byte_pairs,
+	         wipe_chunk_on_error,
 	         callback );
 
 	timestamp_end = time( NULL );

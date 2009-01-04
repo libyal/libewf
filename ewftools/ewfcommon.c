@@ -556,7 +556,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
  * Returns the amount of bytes read if successful, or -1 on error
  */
-ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -581,6 +581,8 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	ssize_t raw_read_count     = 0;
 	size_t uncompressed_size   = 0;
 	uint32_t chunk_crc         = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t sectors_per_chunk = 0;
 	int8_t is_compressed       = 0;
 	int8_t read_crc            = 0;
 #endif
@@ -640,6 +642,22 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 		return( -1 );
 	}
+	if( libewf_set_read_wipe_chunk_on_error( handle, wipe_chunk_on_error ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set wipe chunk on error.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_RAW_ACCESS )
+	if( libewf_get_sectors_per_chunk( handle, &sectors_per_chunk ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to get sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -733,13 +751,40 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to prepare read raw buffer.\n",
+			LIBEWF_VERBOSE_PRINT( "%s: unable to prepare read raw buffer.\n",
 			 function );
 
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
+			/* Wipe the chunk if nescessary
+			 */
+			if( wipe_chunk_on_error != 0 )
+			{
+				if( libewf_common_memset( raw_read_data, 0, (size_t) raw_read_count ) == NULL )
+				{
+					 LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
+					 function );
 
-			return( -1 );
+					return( -1 );
+				}
+			}
+			/* Add a CRC error
+			 */
+			amount_of_sectors = raw_read_count / sectors_per_chunk;
+
+			if( ( raw_read_count % sectors_per_chunk ) != 0 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: read count was no multitude of sectors per chunk.\n",
+				 function );
+
+				amount_of_sectors++;
+			}
+			if( libewf_add_crc_error( handle, read_offset, amount_of_sectors ) != 1 )
+			{
+				 LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
+				 function );
+
+				return( -1 );
+			}
+			is_compressed = 0;
 		}
 		if( is_compressed == 1 )
 		{

@@ -91,6 +91,8 @@
 .Ft int
 .Fn libewf_set_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
 .Ft int
+.Fn libewf_set_read_wipe_chunk_on_error "LIBEWF_HANDLE *handle, uint8_t wipe_on_error"
+.Ft int
 .Fn libewf_set_write_segment_file_size "LIBEWF_HANDLE *handle, size64_t segment_file_size"
 .Ft int
 .Fn libewf_set_write_error_granularity "LIBEWF_HANDLE *handle, uint32_t error_granularity"
@@ -108,6 +110,8 @@
 .Fn libewf_parse_hash_values "LIBEWF_HANDLE *handle"
 .Ft int
 .Fn libewf_add_acquiry_error "LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors"
+.Ft int
+.Fn libewf_add_crc_error "LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors"
 .Ft int
 .Fn libewf_copy_header_values "LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle"
 .Ft void

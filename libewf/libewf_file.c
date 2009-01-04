@@ -1653,6 +1653,36 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, si
 #endif
 }
 
+/* Sets the read wipe chunk on error
+ * The chunk is not wiped if read raw is used
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_error )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_read_wipe_chunk_on_error";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->read == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle read.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->read->wipe_on_error = wipe_on_error;
+
+	return( 1 );
+}
+
 /* Sets the write segment file size
  * Returns 1 if successful, or -1 on error
  */
@@ -2150,6 +2180,75 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].amount_of_sectors = amount_of_sectors;
 
 	internal_handle->acquiry_amount_of_errors++;
+
+	return( 1 );
+}
+
+/* Add a CRC error
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	LIBEWF_ERROR_SECTOR *crc_error_sectors  = NULL;
+	static char *function                   = "libewf_add_crc_error";
+	uint32_t iterator                       = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->read == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle read.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->read->crc_error_sectors == NULL )
+	{
+		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
+	}
+	else
+	{
+		/* Check if CRC error is already in list
+		 */
+		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
+		{
+			if( internal_handle->read->crc_error_sectors[ iterator ].sector == sector )
+			{
+				return( 1 );
+			}
+		}
+		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
+		                     internal_handle->read->crc_error_sectors,
+		                     ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->read->crc_amount_of_errors + 1 ) ) );
+	}
+	if( crc_error_sectors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create CRC error sectors.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->read->crc_error_sectors = crc_error_sectors;
+
+	internal_handle->read->crc_error_sectors[ internal_handle->read->crc_amount_of_errors ].sector            = sector;
+	internal_handle->read->crc_error_sectors[ internal_handle->read->crc_amount_of_errors ].amount_of_sectors = amount_of_sectors;
+
+	internal_handle->read->crc_amount_of_errors++;
 
 	return( 1 );
 }

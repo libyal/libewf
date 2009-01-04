@@ -249,6 +249,10 @@ struct libewf_internal_handle_read
 	/* Value to indicate the write values were initialized
 	 */
 	uint8_t values_initialized;
+
+	/* A value to indicate if a chunk should be wiped on error
+	 */
+	uint8_t wipe_on_error;
 };
 
 /* Additional subhandle for write specific parameters
@@ -356,8 +360,6 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void );
 void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_write );
 
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
-int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );
 
 int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
