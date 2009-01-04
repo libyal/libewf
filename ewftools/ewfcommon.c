@@ -573,6 +573,15 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	size_t sha1_hash_size      = 0;
 	ssize64_t total_read_count = 0;
 	ssize_t read_count         = 0;
+#if defined( HAVE_RAW_ACCESS )
+	uint8_t *compressed_data    = NULL;
+	uint8_t *raw_write_data     = NULL;
+	size_t compressed_size      = 0;
+	ssize_t raw_write_count     = 0;
+	uint32_t chunk_crc          = 0;
+	int8_t is_compressed        = 0;
+	int8_t read_crc             = 0;
+#endif
 
 	if( handle == NULL )
 	{
@@ -668,7 +677,11 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		{
 			read_size = (size_t) ( media_size - total_read_count );
 		}
+#if defined( HAVE_RAW_ACCESS )
+		read_count = libewf_raw_read_buffer( handle, (void *) data, read_size, &is_compressed, &chunk_crc, &read_crc );
+#else
 		read_count = libewf_read_random( handle, (void *) data, read_size, read_offset );
+#endif
 
 		if( read_count <= -1 )
 		{

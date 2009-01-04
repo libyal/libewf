@@ -205,7 +205,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfinput.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfoutput.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfsignal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfstring.c"
 				>
 			</File>
 			<File
@@ -247,7 +259,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfinput.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfmd5.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfoutput.h"
 				>
 			</File>
 			<File
@@ -256,6 +276,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfsignal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfstring.h"
 				>
 			</File>
 			<File

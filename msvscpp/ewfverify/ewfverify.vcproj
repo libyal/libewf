@@ -201,7 +201,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfoutput.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfsignal.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfstring.c"
 				>
 			</File>
 			<File
@@ -251,11 +259,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfoutput.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfsha1.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfsignal.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfstring.h"
 				>
 			</File>
 			<File

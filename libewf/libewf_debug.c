@@ -107,7 +107,7 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 		return;
 	}
-	data = (uint8_t *) libewf_common_alloc( size );
+	data = (uint8_t *) libewf_common_alloc( (size_t) size );
 
 	if( data == NULL )
 	{
@@ -127,7 +127,7 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 		return;
 	}
-	uncompressed_size = size + 1024;
+	uncompressed_size = (size_t) ( size + 1024 );
 
 	if( uncompressed_size > (size_t) SSIZE_MAX )
 	{
@@ -147,14 +147,14 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 		return;
 	}
-	result = ewf_uncompress( uncompressed_data, &uncompressed_size, data, size );
+	result = ewf_uncompress( uncompressed_data, &uncompressed_size, data, (size_t) size );
 
 	if( result == 0 )
 	{
 		fprintf( stderr, "%s: data is UNCOMPRESSED.\n",
 		 function );
 
-		libewf_debug_dump_data( data, size );
+		libewf_debug_dump_data( data, (size_t) size );
 	}
 	else if( result == 1 )
 	{
