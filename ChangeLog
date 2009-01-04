@@ -152,8 +152,6 @@ CLOSED
   not needed
 
 CURRENT
-* write api functions to rid ewftools of internal_handle
-
 * remove files from MSVC++ project
   ewf_crc.c
   ewf_data.c
@@ -169,6 +167,9 @@ CURRENT
   ewf_header.h
   ewf_header2.h
 
+From ewftools
+  internal_handle
+
 Add:
   libewf_values_table.c and .h
 
@@ -179,7 +180,7 @@ Version: 20071027
 * Wrote api functions to rid ewfcommon of internal_handle for acquiry and
   CRC errors, header and hash values
 * Moved duplicate code for handling header and hash values into libewf_values_table
-* Removed internal_handle from ewfoutput
+* Removed internal_handle from ewftools
 
 Version: 20071016
 * Worked on cleaning up ewf struct read and write functions
