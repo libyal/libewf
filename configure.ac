@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20071228], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20071229], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20071228])
+AM_INIT_AUTOMAKE([libewf], [20071229])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -125,7 +125,7 @@ AC_CHECK_LIB( crypto, EVP_DigestInit_ex, [ ac_libewf_dummy=yes ], [ ac_libewf_ha
 AC_CHECK_LIB( crypto, EVP_DigestUpdate, [ ac_libewf_dummy=yes ], [ ac_libewf_have_libcrypto_evp=no ] )
 AC_CHECK_LIB( crypto, EVP_DigestFinal_ex, [ ac_libewf_dummy=yes ], [ ac_libewf_have_libcrypto_evp=no ] )
 
-AC_CHECK_LIB( uuid, uuid_generate )
+AC_CHECK_LIB( uuid, uuid_generate, [], [ ac_libewf_have_libuuid=no ] )
 AC_CHECK_LIB( uuid, uuid_generate_random, [AC_DEFINE( [HAVE_UUID_GENERATE_RANDOM], [1], [Defines if uuid_generate_random funtion is present in libuuid.] ) ] )
 AC_CHECK_LIB( uuid, uuid_generate_time, [AC_DEFINE( [HAVE_UUID_GENERATE_TIME], [1], [Defines if uuid_generate_time funtion is present in libuuid.] ) ] )
 
@@ -145,7 +145,7 @@ AC_CHECK_HEADERS([stdint.h],
 	AC_SUBST([HAVE_STDINT_H],[1])],
 	[AC_SUBST([HAVE_STDINT_H],[0])])
 
-AC_CHECK_HEADERS( cygwin/fs.h fcntl.h glob.h limits.h linux/fs.h openssl/opensslv.h signal.h stdarg.h stdlib.h string.h sys/disk.h sys/disklabel.h sys/ioctl.h sys/signal.h sys/utsname.h unistd.h uuid/uuid.h varargs.h zlib.h )
+AC_CHECK_HEADERS( cygwin/fs.h fcntl.h glob.h limits.h linux/fs.h openssl/opensslv.h signal.h stdarg.h stdlib.h string.h sys/disk.h sys/disklabel.h sys/ioctl.h sys/signal.h sys/utsname.h unistd.h varargs.h zlib.h )
 
 AC_HEADER_STDC
 
@@ -176,7 +176,8 @@ LIBEWF_FUNC_CTIME_R
 dnl Check for enabling libcrypto EVP support
 AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
 	[AC_CHECK_HEADERS([openssl/evp.h])
-	AC_MSG_NOTICE([Support for libcrypto EVP will be build.])],
+	AC_MSG_NOTICE([Support for libcrypto EVP will be build.])
+	ac_libewf_have_libcrypto_evp=yes ],
 	[AS_IF([test "x$ac_libewf_have_libcrypto_md5" == xno],
 		[AC_MSG_NOTICE([No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])],
 		[AC_CHECK_HEADERS([openssl/md5.h])
@@ -188,26 +189,39 @@ AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
 		AC_MSG_NOTICE([Support for calculating SHA1 hashes will be build.])] )
 	])
 
+dnl Check for enabling libuuid support
+AS_IF([test "x$ac_libewf_have_libuuid" != xno],
+	[AC_CHECK_HEADERS([uuid/uuid.h])
+	AC_MSG_NOTICE([Support for libuuid will be build.])
+	ac_libewf_have_libuuid=yes ])
+
+dnl Check if libewf should be build with wide character type support
 AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
 	[AC_DEFINE([HAVE_WIDE_CHARACTER_TYPE],[1],[Defines if wide character type should be used])
-		AC_CHECK_FUNCS([btowc fgetws mbsinit mbsrtowcs swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstoll wcstoull])
-		AC_CHECK_HEADERS([wchar.h],
-			[AC_DEFINE([HAVE_WCHAR_H],[1],[Define to 1 if you have the <wchar.h> header file.])
-			AC_SUBST([HAVE_WCHAR_H],[1])],
-			[AC_SUBST([HAVE_WCHAR_H],[0])])
-
-		AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[1])],
+	AC_CHECK_FUNCS([btowc fgetws mbsinit mbsrtowcs swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstoll wcstoull])
+	AC_CHECK_HEADERS([wchar.h],
+		[AC_DEFINE([HAVE_WCHAR_H],[1],[Define to 1 if you have the <wchar.h> header file.])
+		AC_SUBST([HAVE_WCHAR_H],[1])],
+		[AC_SUBST([HAVE_WCHAR_H],[0])])
+	AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[1])
+	ac_libewf_enable_wide_character_type=yes],
 	[AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[0])
 	AC_SUBST([HAVE_WCHAR_H],[0])])
 
+dnl Check if ewftools should be build with raw read and write support
 AS_IF([test "x$ac_libewf_enable_raw_access" != xno ],
-	[AC_DEFINE( [HAVE_RAW_ACCESS], [1], [Defines if libewf's read and write raw functionality should be used in the ewf tools] ) ] )
+	[AC_DEFINE( [HAVE_RAW_ACCESS], [1], [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
+	ac_libewf_enable_raw_access=yes])
 
+dnl Check if libewf should be build with verbose output
 AS_IF([test "x$ac_libewf_enable_verbose_output" != xno ],
-	[AC_DEFINE( [HAVE_VERBOSE_OUTPUT], [1], [Defines if verbose output should be used] ) ] )
+	[AC_DEFINE( [HAVE_VERBOSE_OUTPUT], [1], [Defines if verbose output should be used] )
+	ac_libewf_enable_verbose_output=yes])
 
+dnl Check if libewf should be build with debug output
 AS_IF([test "x$ac_libewf_enable_debug_output" != xno ],
-	[AC_DEFINE( [HAVE_DEBUG_OUTPUT], [1], [Defines if debug output should be used] ) ] )
+	[AC_DEFINE( [HAVE_DEBUG_OUTPUT], [1], [Defines if debug output should be used] )
+	ac_libewf_enable_debug_output=yes])
 
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
@@ -218,4 +232,17 @@ AC_CONFIG_FILES([Makefile libewf/Makefile ewftools/Makefile manuals/Makefile deb
 AC_CONFIG_HEADERS([libewf/libewf_config.h])
 
 AC_OUTPUT
+
+dnl Print a summary
+AC_MSG_RESULT([
+Building:
+   libcrypto EVP support:                   $ac_libewf_have_libcrypto_evp
+   libuuid support:                         $ac_libewf_have_libuuid
+
+Features:
+   Wide character type support:             $ac_libewf_enable_wide_character_type
+   ewftools use raw read and write support: $ac_libewf_enable_raw_access
+   Verbose output:                          $ac_libewf_enable_verbose_output
+   Debug output:                            $ac_libewf_enable_debug_output
+]);
 

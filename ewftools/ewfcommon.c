@@ -286,7 +286,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 		{
 			read_count = libewf_common_read(
 			              file_descriptor,
-			              &buffer[ buffer_offset + read_error_offset ],
+			              &( buffer[ buffer_offset + read_error_offset ] ),
 			              bytes_to_read );
 
 			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi32 " with size: %zi.\n",
@@ -1705,7 +1705,10 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 
 			return( -1 );
 		}
-		write_count = libewf_common_write( file_descriptor, uncompressed_data, (size_t) read_count );
+		write_count = libewf_common_write(
+		               file_descriptor,
+		               uncompressed_data,
+		               (size_t) read_count );
 
 		if( write_count < read_count )
 		{
