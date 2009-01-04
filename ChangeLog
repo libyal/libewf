@@ -137,8 +137,6 @@ TODO
   move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
-* set errno in libewf open to fix
-  "Unable to open EWF file(s) with failure: Success."
 
 * remove libewf_set_media_values
 
@@ -147,6 +145,9 @@ Version: 20070829
 * worked on write support for > 2Gb segment file for EnCase 6.7
 * worked on session section support
 * corrected use of stdout and stderr in ewfverify
+* added errno == 0 check in ewftools after libewf open to prevent
+  the following output
+  "Unable to open EWF file(s) with failure: Success."
 
 Version: 20070828
 * worked on read support for > 2Gb segment file for EnCase 6.7

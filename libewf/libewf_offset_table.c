@@ -454,14 +454,20 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 		}
 		next_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
 
+		/* This is to compensate for the crappy >2Gb segment file
+		 * solution in EnCase 6
+		 */
 		if( next_offset < current_offset )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset: %" PRIu32 " larger than next: %" PRIu32 ".\n",
+			LIBEWF_WARNING_PRINT( "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 			 function, current_offset, next_offset );
 
-			return( -1 );
+			chunk_size = next_offset;
 		}
-		chunk_size = next_offset - current_offset;
+		else
+		{
+			chunk_size = next_offset - current_offset;
+		}
 
 		if( current_offset > (uint32_t) INT32_MAX )
 		{
@@ -519,22 +525,20 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 		LIBEWF_VERBOSE_PRINT( "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 ".\n",
 		 function, chunk_type, offset_table->last, base_offset, current_offset, chunk_size );
 #endif
-
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6
 		 */
-		if( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX )
+		if( next_offset < current_offset )
 		{
 			base_offset += current_offset;
-			raw_offset   = 0;
 
-			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround, new base: %" PRIu32 ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround new base %" PRIu32 ".\n",
 			 function, base_offset );
 		}
-		else
-		{
-			current_offset = next_offset;
-		}
+/* TODO code is obsolete
+		current_offset = next_offset;
+ */
+
 		iterator++;
 	}
 	if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator ].offset ) != 1 )

@@ -181,14 +181,20 @@ int main( int argc, char * const argv[] )
 	if( handle == NULL )
 	{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-		error_string = ewfcommon_strerror( errno );
-
+		if( errno != 0 )
+		{
+			error_string = ewfcommon_strerror( errno );
+		}
 		if( error_string != NULL )
 		{
 			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
 			 error_string );
 
 			libewf_common_free( error_string );
+		}
+		else
+		{
+			fprintf( stderr, "Unable to open EWF file(s).\n" );
 		}
 #else
 		fprintf( stderr, "Unable to open EWF file(s).\n" );
