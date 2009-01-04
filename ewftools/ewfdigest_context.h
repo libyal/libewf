@@ -41,8 +41,6 @@
 #elif defined( HAVE_WINCPRYPT_H )
 #include <windows.h>
 #include <wincrypt.h>
-#else
-#error Unsupported cryptographic library.
 #endif
 
 #include <libewf/types.h>
@@ -57,25 +55,22 @@ extern "C" {
 #define EWFDIGEST_CONTEXT_TYPE_SHA1		(uint8_t) 's'
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
-
 #define EWFDIGEST_CONTEXT EVP_MD_CTX
 
 #else
-
 #define EWFDIGEST_CONTEXT ewfdigest_context_t
 
+#if defined( HAVE_WINCPRYPT_H )
 typedef struct ewfdigest_context ewfdigest_context_t;
 
 struct ewfdigest_context
 {
-#if defined( HAVE_WINCPRYPT_H )
 	HCRYPTPROV crypt_provider;
 	HCRYPTHASH hash;
-#else
-#error Unsupported cryptographic library.
-#endif
 };
-
+#else
+typedef int ewfdigest_context_t;
+#endif
 #endif
 
 int ewfdigest_context_initialize(

@@ -158,6 +158,10 @@ CLOSED
 
 Version: 20080320
 * performance testing
+* fix for %jd and %zd detection for gcc-2.95 on Debian 3.1
+* fix for openssl evp and gcc-2.95 on Debian 3.1
+* fixed sha.h detection error in autoconf/make scripts
+* updated manuals
 
 Version: 20080319
 * refactored test write functions

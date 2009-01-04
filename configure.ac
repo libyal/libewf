@@ -40,12 +40,19 @@ AC_DEFUN([LIBEWF_PRINTF_JD],
 		 [[printf( "%jd" ); ]]),
 		[AC_MSG_RESULT(
 		 [no])],
-		[AC_MSG_RESULT(
-		 [yes])
-		AC_DEFINE(
-		 [HAVE_PRINTF_JD],
-		 [1],
-		 [Define to 1 if printf supports the conversion specifier "%jd".] )] )
+	 	[AC_LINK_IFELSE(
+			AC_LANG_PROGRAM(
+			 [[#include <sys/types.h>
+#include <stdio.h>]],
+		 	 [[printf( "%jd", (off_t) 1024 ); ]]),
+			[AC_MSG_RESULT(
+			 [yes])
+			AC_DEFINE(
+			 [HAVE_PRINTF_JD],
+			 [1],
+			 [Define to 1 if printf supports the conversion specifier "%jd".] )],
+			[AC_MSG_RESULT(
+			 [no])] )] )
 	AC_LANG_POP(C)
 	CFLAGS="$SAVE_CFLAGS"]
 )
@@ -63,12 +70,19 @@ AC_DEFUN([LIBEWF_PRINTF_ZD],
 		 [[printf( "%zd" ); ]]),
 		[AC_MSG_RESULT(
 		 [no])],
-		[AC_MSG_RESULT(
-		 [yes])
-		AC_DEFINE(
-		 [HAVE_PRINTF_ZD],
-		 [1],
-		 [Define to 1 if printf supports the conversion specifier "%zd".] )] )
+	 	[AC_LINK_IFELSE(
+			AC_LANG_PROGRAM(
+			 [[#include <sys/types.h>
+#include <stdio.h>]],
+			 [[printf( "%zd", (size_t) 1024 ); ]]),
+			[AC_MSG_RESULT(
+			 [yes])
+			AC_DEFINE(
+			 [HAVE_PRINTF_ZD],
+			 [1],
+			 [Define to 1 if printf supports the conversion specifier "%zd".] )],
+			[AC_MSG_RESULT(
+			 [no])] )] )
 	AC_LANG_POP(C)
 	CFLAGS="$SAVE_CFLAGS"]
 )
@@ -98,7 +112,8 @@ AC_DEFUN([LIBEWF_FUNC_CTIME_R],
 			AC_LANG_PROGRAM(
 			 [[#include <time.h>]],
 			 [[ctime_r(NULL,NULL)]]),
-			 [AC_MSG_RESULT(yes)],
+			 [AC_MSG_RESULT(
+			  [yes])],
 			 [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
 			 AC_LINK_IFELSE(
 				AC_LANG_PROGRAM(
@@ -237,7 +252,7 @@ AC_CHECK_LIB( uuid, uuid_generate_random, [AC_DEFINE( [HAVE_UUID_GENERATE_RANDOM
 AC_CHECK_LIB( uuid, uuid_generate_time, [AC_DEFINE( [HAVE_UUID_GENERATE_TIME], [1], [Defines if uuid_generate_time funtion is present in libuuid.] ) ] )
 
 dnl Check for headers
-AC_CHECK_HEADERS(
+AC_CHECK_HEADER(
  [sys/types.h],
  [AC_DEFINE(
   [HAVE_SYS_TYPES_H],
@@ -250,7 +265,7 @@ AC_CHECK_HEADERS(
   [HAVE_SYS_TYPES_H],
   [0])])
 
-AC_CHECK_HEADERS(
+AC_CHECK_HEADER(
  [inttypes.h],
  [AC_DEFINE(
   [HAVE_INTTYPES_H],
@@ -263,7 +278,7 @@ AC_CHECK_HEADERS(
   [HAVE_INTTYPES_H],
   [0])])
 
-AC_CHECK_HEADERS(
+AC_CHECK_HEADER(
  [stdint.h],
  [AC_DEFINE(
   [HAVE_STDINT_H],
@@ -402,42 +417,77 @@ LIBEWF_PRINTF_ZD
 dnl Check for enabling libcrypto EVP support
 AS_IF(
 	[test "x$ac_libewf_have_libcrypto_evp" != xno],
-	 [AC_CHECK_HEADERS(
-	  [openssl/evp.h])
-	 AC_MSG_NOTICE(
-	  [Support for libcrypto EVP will be build.])
-	 ac_libewf_have_libcrypto_evp=yes
-	 ac_libewf_have_libcrypto_md5=evp
-	 ac_libewf_have_libcrypto_sha1=evp ],
+	[ac_libewf_have_libcrypto_evp=no
+	 AC_CHECK_HEADER(
+	  [openssl/evp.h],
+	  [AC_LANG_PUSH(C)
+	  AC_MSG_CHECKING(
+	   [if openssl/evp.h can be used in combination with zlib.h])
+	  AC_LINK_IFELSE(
+		AC_LANG_PROGRAM(
+		 [[#include <zlib.h>
+#include <openssl/evp.h>]],
+		 [[ ]]),
+		 [AC_MSG_RESULT(
+		  [yes])
+		 AC_DEFINE(
+		  [HAVE_OPENSSL_EVP_H],
+		  [1],
+		  [Define to 1 if you have the <openssl/evp.h> header file.])
+		 AC_SUBST(
+		  [HAVE_OPENSSL_EVP_H],
+		  [1])
+		 AC_MSG_NOTICE(
+		  [Support for libcrypto EVP will be build.])
+		 ac_libewf_have_libcrypto_evp=yes
+		 ac_libewf_have_libcrypto_md5=evp
+		 ac_libewf_have_libcrypto_sha1=evp ],
+		 [AC_MSG_RESULT(
+		  [no]) ])
+	  AC_LANG_POP(C)]) ])
+AS_IF(
+	[test "x$ac_libewf_have_libcrypto_evp" == xno],
+	[AC_SUBST(
+	 [HAVE_OPENSSL_EVP_H],
+	 [0])] )
 
-	 dnl Check for libcrypto MD5 and SHA1 support
-	 [AS_IF(
-		[test "x$ac_libewf_have_libcrypto_md5" == xno],
-		[AC_MSG_NOTICE(
-		 [No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])]
-		[AC_CHECK_HEADERS(
-		 [openssl/md5.h])
-		AC_MSG_NOTICE(
-		 [Support for calculating MD5 hashes will be build.])
-		ac_libewf_have_libcrypto_md5=yes])
+dnl Check for libcrypto MD5 support
+AS_IF(
+	[test "x$ac_libewf_have_libcrypto_md5" != xno && test "x$ac_libewf_have_libcrypto_md5" != xevp ],
+	[ac_libewf_have_libcrypto_md5=no
+	AC_CHECK_HEADERS(
+	 [openssl/md5.h],
+	 [AC_MSG_NOTICE(
+	  [Support for calculating MD5 hashes will be build.])
+	  ac_libewf_have_libcrypto_md5=yes ]) ])
+AS_IF(
+	[test "x$ac_libewf_have_libcrypto_md5" == xno],
+	[AC_MSG_NOTICE(
+	 [No support for calculating MD5 hashes, if required install (openssl) libcrypto with MD5 support.]) ])
 
-	AS_IF(
-		[test "x$ac_libewf_have_libcrypto_sha1" == xno],
-		[AC_MSG_NOTICE(
-		 [No support for calculating SHA1 hashes, if required install libcrypto with SHA1 support.])]
-		[AC_CHECK_HEADERS(
-		 [openssl/sha.h])
-		AC_MSG_NOTICE(
-		 [Support for calculating SHA1 hashes will be build.])
-		ac_libewf_have_libcrypto_sha1=yes])
-])
+dnl Check for libcrypto SHA1 support
+AS_IF(
+	[test "x$ac_libewf_have_libcrypto_sha1" != xno && test "x$ac_libewf_have_libcrypto_sha1" != xevp ],
+	[ac_libewf_have_libcrypto_sha1=no
+	AC_CHECK_HEADERS(
+	 [openssl/sha.h],
+	 [AC_MSG_NOTICE(
+	  [Support for calculating SHA1 hashes will be build.])
+	  ac_libewf_have_libcrypto_sha1=yes ]) ])
+AS_IF(
+	[test "x$ac_libewf_have_libcrypto_sha1" == xno],
+	[AC_MSG_NOTICE(
+	 [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support.]) ])
 
 dnl Check for enabling libuuid support
 AS_IF(
 	[test "x$ac_libewf_have_libuuid" != xno],
-	[AC_CHECK_HEADERS([uuid/uuid.h])
-	AC_MSG_NOTICE([Support for libuuid will be build.])
-	ac_libewf_have_libuuid=yes ])
+	[ac_libewf_have_libuuid=no
+	AC_CHECK_HEADERS(
+	 [uuid/uuid.h],
+	 [AC_MSG_NOTICE(
+	  [Support for libuuid will be build.])
+	 ac_libewf_have_libuuid=yes ]) ])
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
@@ -545,7 +595,7 @@ AC_CONFIG_HEADERS([common/config.h])
 AC_OUTPUT
 
 dnl Print a summary
-AC_MSG_RESULT([
+AC_MSG_NOTICE([
 Building:
    libcrypto EVP support:                   $ac_libewf_have_libcrypto_evp
    libcrypto MD5 support:                   $ac_libewf_have_libcrypto_md5
