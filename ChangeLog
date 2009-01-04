@@ -167,6 +167,7 @@ Version: 20071123
 * worked on refactoring code
 * moved libewf_offset_table_compare after the full index build
   in libewf_segment_file_read_open
+* added chunk size to delta chunk for redundancy
 
 Version: 20071121
 * worked on refactoring code

@@ -2014,7 +2014,7 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t b
 /* Reads a sectors section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	static char *function = "libewf_section_sectors_read";
 
@@ -2048,7 +2048,7 @@ ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, off64_
 	 */
 	if( libewf_segment_file_seek_offset(
 	     segment_file,
-	     ( section_offset + section_size ) ) == -1 )
+	     ( segment_file->file_offset + section_size ) ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 		 function );
@@ -3567,7 +3567,7 @@ ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR 
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint8_t error_tollerance )
+ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint8_t error_tollerance )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 
@@ -3575,6 +3575,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
 	uint32_t chunk         = 0;
+	uint32_t chunk_size    = 0;
 
 	if( segment_file == NULL )
 	{
@@ -3607,17 +3608,6 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 
 		return( -1 );
 	}
-	/* The chunk value is stored + 1 count in the file
-	 */
-	if( libewf_endian_convert_32bit( &chunk, delta_chunk_header.chunk ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk value.\n",
-		 function );
-
-		return( -1 );
-	}
-	chunk -= 1;
-
 	calculated_crc = ewf_crc_calculate( &delta_chunk_header, ( EWFX_DELTA_CHUNK_HEADER_SIZE - EWF_CRC_SIZE ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, delta_chunk_header.crc ) != 1 )
@@ -3637,17 +3627,17 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 			return( -1 );
 		}
 	}
-	/* Skip the chunk data within the section
+	/* The chunk value is stored + 1 count in the file
 	 */
-	if( libewf_segment_file_seek_offset(
-	     segment_file,
-	     ( section_offset + section_size ) ) == -1 )
+	if( libewf_endian_convert_32bit( &chunk, delta_chunk_header.chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk value.\n",
 		 function );
 
 		return( -1 );
 	}
+	chunk -= 1;
+
 	if( chunk >= offset_table->amount )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid delta chunk: %" PRIu32 " value outside offset table.\n",
@@ -3655,14 +3645,43 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 
 		return( -1 );
 	}
+	if( libewf_endian_convert_32bit( &chunk_size, delta_chunk_header.chunk_size ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk size value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size != ( section_size - EWFX_DELTA_CHUNK_HEADER_SIZE ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: chunk size does not match size of data in section.\n",
+		 function );
+
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		{
+			return( -1 );
+		}
+		chunk_size = section_size - EWFX_DELTA_CHUNK_HEADER_SIZE;
+	}
 	/* Update the chunk data in the offset table
 	 */
 	offset_table->chunk_offset[ chunk ].segment_file = segment_file;
-	offset_table->chunk_offset[ chunk ].file_offset  = section_offset + EWFX_DELTA_CHUNK_HEADER_SIZE;
-	offset_table->chunk_offset[ chunk ].size         = section_size - EWFX_DELTA_CHUNK_HEADER_SIZE;
+	offset_table->chunk_offset[ chunk ].file_offset  = segment_file->file_offset;
+	offset_table->chunk_offset[ chunk ].size         = chunk_size;
 	offset_table->chunk_offset[ chunk ].compressed   = 0;
 	offset_table->chunk_offset[ chunk ].dirty        = 1;
 
+	/* Skip the chunk data within the section
+	 */
+	if( libewf_segment_file_seek_offset(
+	     segment_file,
+	     ( segment_file->file_offset + section_size - EWFX_DELTA_CHUNK_HEADER_SIZE ) ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( (ssize_t) section_size );
 }
 
@@ -3710,6 +3729,12 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 	if( libewf_endian_revert_32bit( ( chunk + 1 ), delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk value.\n" );
+
+		return( -1 );
+	}
+	if( libewf_endian_revert_32bit( chunk_size, delta_chunk_header.chunk_size ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk size value.\n" );
 
 		return( -1 );
 	}
@@ -4052,8 +4077,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_sectors_read(
 		              segment_file,
- 		              *section_start_offset,
- 		              (size_t) size,
+ 		              (size64_t) size,
  		              internal_handle->ewf_format,
  		              internal_handle->error_tollerance );
 	}
@@ -4064,7 +4088,6 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_delta_chunk_read(
  		              segment_file,
- 		              *section_start_offset,
  		              (size_t) size,
  		              internal_handle->offset_table,
  		              internal_handle->error_tollerance );
