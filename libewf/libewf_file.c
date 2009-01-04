@@ -338,7 +338,8 @@ int libewf_glob(
 		     UINT16_MAX,
 		     segment_file_type,
 		     format,
-		     ewf_format ) != 1 )
+		     ewf_format,
+		     &error ) != 1 )
 		{
 			libewf_error_set(
 			 &error,

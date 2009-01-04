@@ -29,6 +29,8 @@
 #include <system_string.h>
 #include <types.h>
 
+#include "libewf_error.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -39,7 +41,8 @@ int libewf_filename_set_extension(
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format );
+     uint8_t ewf_format,
+     libewf_error_t **error );
 
 int libewf_filename_create(
      system_character_t **filename,
@@ -50,7 +53,8 @@ int libewf_filename_create(
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format );
+     uint8_t ewf_format,
+     libewf_error_t **error );
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 #define libewf_filename_open( filename, flags ) \

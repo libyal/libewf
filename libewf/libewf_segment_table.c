@@ -1171,7 +1171,8 @@ int libewf_segment_table_create_segment_file(
 	     maximum_amount_of_segments,
 	     segment_file_type,
 	     format,
-	     ewf_format ) != 1 )
+	     ewf_format,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1187,7 +1188,7 @@ int libewf_segment_table_create_segment_file(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: filename is empty.\n",
 		 function );
 
