@@ -994,7 +994,8 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 /* Initializes the write values
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_handle )
+int libewf_internal_handle_write_initialize(
+     libewf_internal_handle_t *internal_handle )
 {
 	static char *function               = "libewf_internal_handle_write_initialize";
 	int64_t required_amount_of_segments = 0;
@@ -1006,15 +1007,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
-#ifdef REFACTOR
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	if( internal_handle->media_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
@@ -1082,22 +1074,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 			return( -1 );
 		}
 	}
-#ifdef REFACTOR
-	/* Make sure the chuck cache is large enough
-	 */
-	if( ( internal_handle->media_values->chunk_size + sizeof( ewf_crc_t ) ) > internal_handle->chunk_cache->allocated_size )
-	{
-		if( libewf_chunk_cache_realloc(
-		     internal_handle->chunk_cache,
-		     ( internal_handle->media_values->chunk_size + sizeof( ewf_crc_t ) ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-#endif
 	/* Flag that the write values were initialized
 	 */
 	internal_handle->write->values_initialized = 1;
