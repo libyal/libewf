@@ -30,6 +30,7 @@ libewf_la_SOURCES = \
 	libewf_endian.c libewf_endian.h \
 	libewf_error_sector.h \
 	libewf_file.c libewf_file.h \
+	libewf_file_io_handler.c libewf_file_io_handler.h \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_includes.h \
