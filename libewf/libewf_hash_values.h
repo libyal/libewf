@@ -41,28 +41,28 @@ int libewf_hash_values_initialize(
 int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t **hash_values,
      character_t *hash_string_xml,
-     size_t length );
+     size_t hash_string_xml_size );
 
 int libewf_hash_values_parse_xhash( 
      libewf_values_table_t **hash_values,
      uint8_t *xhash, 
      size_t xhash_size );
 
-int libewf_hash_values_convert_hash_string_to_hash(
+int libewf_hash_values_convert_hash_string_to_xhash(
      character_t *hash_string,
-     size_t hash_string_length,
-     uint8_t **hash,
-     size_t *hash_length );
+     size_t hash_string_size,
+     uint8_t **xhash,
+     size_t *xhash_size );
 
 int libewf_hash_values_generate_hash_string_xml(
      libewf_values_table_t *hash_values,
      character_t **hash_string,
-     size_t *hash_string_length );
+     size_t *hash_string_size );
 
 int libewf_hash_values_generate_xhash_string_ewfx(
      libewf_values_table_t *hash_values,
-     uint8_t **hash,
-     size_t *hash_length );
+     uint8_t **xhash,
+     size_t *xhash_size );
 
 #if defined( __cplusplus )
 }

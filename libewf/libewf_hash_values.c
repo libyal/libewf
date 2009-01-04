@@ -61,7 +61,7 @@ int libewf_hash_values_initialize(
 int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t **hash_values,
      character_t *hash_string_xml,
-     size_t length )
+     size_t hash_string_xml_size )
 {
 	character_t **lines          = NULL;
 	character_t *open_tag_start  = NULL;
@@ -81,8 +81,8 @@ int libewf_hash_values_parse_hash_string_xml(
 		return( -1 );
 	}
 	if( libewf_string_split(
-	     (character_t *) hash_string_xml,
-	     length,
+	     hash_string_xml,
+	     hash_string_xml_size,
 	     (character_t) '\n',
 	     &lines,
 	     &amount_of_lines ) != 1 )
@@ -294,16 +294,17 @@ int libewf_hash_values_parse_xhash(
 }
 
 /* Converts a hash string into a hash
- * Sets the hash and hash length
+ * Sets the hash and hash size
  * Returns 1 if successful or -1 on error
  */
-int libewf_hash_values_convert_hash_string_to_hash(
+int libewf_hash_values_convert_hash_string_to_xhash(
      character_t *hash_string,
-     size_t hash_string_length,
-     uint8_t **hash,
-     size_t *hash_length )
+     size_t hash_string_size,
+     uint8_t **xhash,
+     size_t *xhash_size )
 {
-	static char *function = "libewf_hash_values_convert_hash_string_to_hash";
+	static char *function    = "libewf_hash_values_convert_hash_string_to_xhash";
+	ssize_t utf8_stream_size = 0;
 
 	if( hash_string == NULL )
 	{
@@ -312,76 +313,85 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 		return( -1 );
 	}
-	if( ( hash_string_length == 0 )
-	 || ( hash_string_length > (size_t) SSIZE_MAX ) )
+	if( ( hash_string_size == 0 )
+	 || ( hash_string_size > (size_t) SSIZE_MAX ) )
 	{
-		notify_warning_printf( "%s: invalid hash string length.\n",
+		notify_warning_printf( "%s: invalid hash string size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( hash == NULL )
+	if( xhash == NULL )
 	{
-		notify_warning_printf( "%s: invalid hash.\n",
+		notify_warning_printf( "%s: invalid xhash.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( hash_length == NULL )
+	if( xhash_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid hash length.\n",
+		notify_warning_printf( "%s: invalid xhash size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( *hash != NULL )
+	if( *xhash != NULL )
 	{
-		notify_warning_printf( "%s: hash already created .\n",
+		notify_warning_printf( "%s: xhash already created .\n",
 		 function );
 
 		return( -1 );
 	}
-	*hash_length = hash_string_length;
+	utf8_stream_size = utf8_stream_size_from_string(
+	                    hash_string,
+	                    hash_string_size );
 
-	*hash = (uint8_t *) memory_allocate(
-	                     sizeof( uint8_t ) * *hash_length );
-
-	if( *hash == NULL )
+	if( utf8_stream_size < 0 )
 	{
-		notify_warning_printf( "%s: unable to create hash.\n",
+		notify_warning_printf( "%s: unable to determine xhash size.\n",
 		 function );
-
-		*hash_length = 0;
 
 		return( -1 );
 	}
-	if( string_copy_to_char(
-	     (char *) *hash,
+	*xhash = (uint8_t *) memory_allocate(
+	                      sizeof( uint8_t ) * (size_t) utf8_stream_size );
+
+	if( *xhash == NULL )
+	{
+		notify_warning_printf( "%s: unable to create xhash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_stream_copy_from_string(
+	     *xhash,
+	     (size_t) utf8_stream_size,
 	     hash_string,
-	     hash_string_length ) != 1 )
+	     hash_string_size ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set hash.\n",
+		notify_warning_printf( "%s: unable to set xhash.\n",
 		 function );
 
 		memory_free(
-		 *hash );
+		 *xhash );
 
-		*hash        = NULL;
-		*hash_length = 0;
+		*xhash = NULL;
 
 		return( -1 );
 	}
+	*xhash_size = (size_t) utf8_stream_size;
+
 	return( 1 );
 }
 
 /* Generate a hash format in XML
- * Sets hash sting and hash string length
+ * Sets hash sting and hash string size
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_generate_hash_string_xml(
      libewf_values_table_t *hash_values,
      character_t **hash_string,
-     size_t *hash_string_length )
+     size_t *hash_string_size )
 {
 	character_t *xml_head            = _CHARACTER_T_STRING( "<?xml version=\"1.0\"?>" );
 	character_t *xml_open_tag_xhash  = _CHARACTER_T_STRING( "<xhash>" );
@@ -412,23 +422,23 @@ int libewf_hash_values_generate_hash_string_xml(
 
 		return( -1 );
 	}
-	if( hash_string_length == NULL )
+	if( hash_string_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid hash string length.\n",
+		notify_warning_printf( "%s: invalid hash string size.\n",
 		 function );
 
 		return( -1 );
 	}
 	/* Add space for the XML data and an end of line
 	 */
-	*hash_string_length = 1 + string_length(
-	                           xml_head );
+	*hash_string_size = 1 + string_length(
+	                         xml_head );
 
-	*hash_string_length += 1 + string_length(
-	                            xml_open_tag_xhash );
+	*hash_string_size += 1 + string_length(
+	                          xml_open_tag_xhash );
 
-	*hash_string_length += 1 + string_length(
-	                            xml_close_tag_xhash );
+	*hash_string_size = 1 + string_length(
+	                         xml_close_tag_xhash );
 
 	for( iterator = 0; iterator < hash_values->amount; iterator++ )
 	{
@@ -443,34 +453,34 @@ int libewf_hash_values_generate_hash_string_xml(
 		{
 			/* Add space for a leading tab, <identifier></identifier> and an end of line
 			 */
-			*hash_string_length += 7 + ( 2 * string_length(
-			                                  hash_values->identifiers[ iterator ] ) );
+			*hash_string_size += 7 + ( 2 * string_length(
+			                                hash_values->identifiers[ iterator ] ) );
 
 			/* Add space for the hash value
 			 */
-			*hash_string_length += string_length(
-			                        hash_values->values[ iterator ] );
+			*hash_string_size += string_length(
+			                      hash_values->values[ iterator ] );
 		}
 	}
 	/* allow for an empty line and an end of string
 	 */
-	*hash_string_length += 2;
+	*hash_string_size += 2;
 
 	*hash_string = (character_t *) memory_allocate(
-                                        sizeof( character_t ) * *hash_string_length );
+                                        sizeof( character_t ) * *hash_string_size );
 
 	if( *hash_string == NULL )
 	{
 		notify_warning_printf( "%s: unable to create hash string.\n",
 		 function );
 
-		*hash_string_length = 0;
+		*hash_string_size = 0;
 
 		return( -1 );
 	}
 	character_count = string_snprintf(
 	                   *hash_string,
-	                   *hash_string_length,
+	                   *hash_string_size,
 	                   _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n%" )
 	                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n" ),
 	                   xml_head,
@@ -484,8 +494,8 @@ int libewf_hash_values_generate_hash_string_xml(
 		memory_free(
 		 *hash_string );
 
-		*hash_string        = NULL;
-		*hash_string_length = 0;
+		*hash_string      = NULL;
+		*hash_string_size = 0;
 
 		return( -1 );
 	}
@@ -504,7 +514,7 @@ int libewf_hash_values_generate_hash_string_xml(
 		{
 			character_count = string_snprintf(
 			                   &( ( *hash_string) [ string_offset ] ),
-			                   ( *hash_string_length - string_offset ),
+			                   ( *hash_string_size - string_offset ),
 			                   _CHARACTER_T_STRING( "\t<%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( ">%" )
 			                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "</%" ) _CHARACTER_T_STRING( PRIs )
 			                   _CHARACTER_T_STRING( ">\n" ),
@@ -520,8 +530,8 @@ int libewf_hash_values_generate_hash_string_xml(
 				memory_free(
 				 *hash_string );
 
-				*hash_string        = NULL;
-				*hash_string_length = 0;
+				*hash_string      = NULL;
+				*hash_string_size = 0;
 
 				return( -1 );
 			}
@@ -530,7 +540,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	character_count = string_snprintf(
 	                   &( ( *hash_string )[ string_offset ] ),
-	                   ( *hash_string_length - string_offset ),
+	                   ( *hash_string_size - string_offset ),
 	                   _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n\n" ),
 	                   xml_close_tag_xhash );
 
@@ -542,14 +552,14 @@ int libewf_hash_values_generate_hash_string_xml(
 		memory_free(
 		 *hash_string );
 
-		*hash_string        = NULL;
-		*hash_string_length = 0;
+		*hash_string      = NULL;
+		*hash_string_size = 0;
 
 		return( -1 );
 	}
 	/* Make sure the string is terminated
 	 */
-	( *hash_string )[ *hash_string_length - 1 ] = (character_t) '\0';
+	( *hash_string )[ *hash_string_size - 1 ] = 0;
 
 	return( 1 );
 }
@@ -559,28 +569,29 @@ int libewf_hash_values_generate_hash_string_xml(
  */
 int libewf_hash_values_generate_xhash_string_ewfx(
      libewf_values_table_t *hash_values,
-     uint8_t **hash,
-     size_t *hash_length )
+     uint8_t **xhash,
+     size_t *xhash_size )
 {
-	character_t *hash_string = NULL;
-	static char *function    = "libewf_hash_values_generate_xhash_string_ewfx";
-	int result               = 0;
+	character_t *xml_hash_string = NULL;
+	static char *function        = "libewf_hash_values_generate_xhash_string_ewfx";
+	size_t xml_hash_string_size  = 0;
+	int result                   = 0;
 
 	if( libewf_hash_values_generate_hash_string_xml(
 	     hash_values,
-	     &hash_string,
-	     hash_length ) != 1 )
+	     &xml_hash_string,
+	     &xml_hash_string_size ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to create xhash string.\n",
+		notify_warning_printf( "%s: unable to create XML hash string.\n",
 		 function );
 
 		return( -1 );
 	}
-	result = libewf_hash_values_convert_hash_string_to_hash(
-	          hash_string,
-	          *hash_length,
-	          hash,
-	          hash_length );
+	result = libewf_hash_values_convert_hash_string_to_xhash(
+	          xml_hash_string,
+	          xml_hash_string_size,
+	          xhash,
+	          xhash_size );
 
 	if( result != 1 )
 	{
@@ -588,7 +599,7 @@ int libewf_hash_values_generate_xhash_string_ewfx(
 		 function );
 	}
 	memory_free(
-	 hash_string );
+	 xml_hash_string );
 
 	return( result );
 }
