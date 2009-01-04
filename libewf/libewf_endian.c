@@ -34,7 +34,6 @@
 #include <common.h>
 #include <notify.h>
 
-#include "libewf_common.h"
 #include "libewf_endian.h"
 
 /* Converts a byte array into a 16bit little endian value

@@ -1,5 +1,5 @@
 /*
- * libewf debug
+ * Date and time string functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,38 +31,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_DEBUG_H )
-#define _LIBEWF_DEBUG_H
+#if !defined( _DATE_TIME_STRING_H )
+#define _DATE_TIME_STRING_H
 
-#include <common.h>
-#include <character_string.h>
-
-#include <stdio.h>
-
-#include <libewf/types.h>
-
-#include "ewf_char.h"
-#include "ewf_section.h"
-#include "ewf_ltree.h"
+#include "common.h"
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-void libewf_debug_dump_data(
-      uint8_t *data,
-      size_t size );
+int libewf_date_time_string_ctime(
+     const time_t *timestamp,
+     character_t **ctime_string,
+     size_t *ctime_string_length );
 
-void libewf_debug_section_print(
-      ewf_section_t *section );
-
-void libewf_debug_header_print(
-      ewf_char_t *header,
-      size_t size );
-
-void libewf_debug_header2_print(
-      ewf_char_t *header2,
-      size_t size );
+#define date_time_string_ctime( timestamp, string, length ) \
+	libewf_date_time_string_ctime( timestamp, string, length )
 
 #if defined( __cplusplus )
 }

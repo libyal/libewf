@@ -49,8 +49,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_common.h"
-
 #include "ewfglob.h"
 
 #if !defined( HAVE_GLOB_H )

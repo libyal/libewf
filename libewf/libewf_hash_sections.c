@@ -35,7 +35,6 @@
 #include <memory.h>
 #include <notify.h>
 
-#include "libewf_common.h"
 #include "libewf_hash_sections.h"
 
 /* Allocates memory for a new hash sections struct

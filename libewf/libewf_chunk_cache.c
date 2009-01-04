@@ -37,7 +37,6 @@
 #include <types.h>
 
 #include "libewf_chunk_cache.h"
-#include "libewf_common.h"
 
 /* Allocates memory for the chunk cache cache
  * Returns a pointer to the new instance, NULL on error

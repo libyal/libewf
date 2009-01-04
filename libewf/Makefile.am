@@ -22,7 +22,6 @@ libewf_la_SOURCES = \
 	libewf.c \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
 	libewf_chunk_offset.h \
-	libewf_common.c libewf_common.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_endian.c libewf_endian.h \

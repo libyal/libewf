@@ -33,12 +33,13 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <date_time.h>
+#include <date_time_string.h>
 #include <memory.h>
 #include <notify.h>
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_header_values.h"
 #include "libewf_string.h"
 
@@ -166,7 +167,7 @@ int libewf_convert_timestamp(
 	}
 	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		if( libewf_string_ctime(
+		if( libewf_date_time_string_ctime(
 		     &timestamp,
 		     date_string,
 		     date_string_length ) != 1 )
@@ -188,7 +189,7 @@ int libewf_convert_timestamp(
 	}
 	else
 	{
-		time_elements = libewf_common_localtime(
+		time_elements = date_time_localtime(
 		                 &timestamp );
 
 		if( time_elements == NULL )
@@ -409,7 +410,7 @@ int libewf_convert_date_header_value(
 
 	/* Create a timestamp
 	 */
-	timestamp = libewf_common_mktime(
+	timestamp = date_time_mktime(
 	             &time_elements );
 
 	libewf_string_split_values_free(
@@ -470,7 +471,7 @@ int libewf_generate_date_header_value(
 
 		return( -1 );
 	}
-	time_elements = libewf_common_localtime(
+	time_elements = date_time_localtime(
 	                 &timestamp );
 
 	if( time_elements == NULL )
@@ -4246,7 +4247,7 @@ int libewf_convert_date_xheader_value(
 
 		/* Create a timestamp
 		 */
-		timestamp = libewf_common_mktime(
+		timestamp = date_time_mktime(
 		             &time_elements );
 
 		libewf_string_split_values_free(
@@ -4308,7 +4309,7 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	if( libewf_string_ctime(
+	if( libewf_date_time_string_ctime(
 	     &timestamp,
 	     date_string,
 	     date_string_length ) != 1 )

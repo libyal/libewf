@@ -34,6 +34,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <date_time.h>
 #include <memory.h>
 #include <system_string.h>
 
@@ -57,8 +58,6 @@
 #endif
 
 #include <libewf.h>
-
-#include "../libewf/libewf_common.h"
 
 #include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
@@ -774,9 +773,14 @@ int main( int argc, char * const argv[] )
 		/* Start exporting data
 		 */
 		timestamp_start = time( NULL );
-		time_string     = libewf_common_ctime(
-				   &timestamp_start );
 
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		time_string = date_time_wctime(
+		               &timestamp_start );
+#else
+		time_string = date_time_ctime(
+		               &timestamp_start );
+#endif
 		if( time_string != NULL )
 		{
 			fprintf( stderr, "Export started at: %" PRIs_SYSTEM "\n",
@@ -880,9 +884,14 @@ int main( int argc, char * const argv[] )
 			 target_filename );
 		}
 		timestamp_end = time( NULL );
-		time_string   = libewf_common_ctime(
-				 &timestamp_end );
 
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		time_string = date_time_wctime(
+		               &timestamp_end );
+#else
+		time_string = date_time_ctime(
+		               &timestamp_end );
+#endif
 		if( count <= -1 )
 		{
 			if( time_string != NULL )

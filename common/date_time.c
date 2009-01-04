@@ -1,5 +1,5 @@
 /*
- * Common code for libewf - wraps external function calls
+ * Date and time functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -42,62 +42,18 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
-
-/* Check for empty block, a block that contains the same value for every byte
- * Returns 1 if block is empty, or 0 otherwise
- */
-int libewf_common_test_empty_block(
-     uint8_t *block_buffer,
-     size_t size )
-{
-	static char *function = "libewf_common_test_empty_block";
-	size_t iterator       = 0;
-
-	if( block_buffer == NULL )
-	{
-		notify_warning_printf( "%s: invalid block buffer.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( 0 );
-	}
-	for( iterator = 1; iterator < size; iterator++ )
-	{
-		if( block_buffer[ 0 ] != block_buffer[ iterator ] )
-		{
-			return( 0 );
-		}
-	}
-	return( 1 );
-}
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_common_localtime_r( timestamp, time_elements ) \
-	localtime_s( time_elements, timestamp )
-
-#elif defined( HAVE_LOCALTIME_R )
-#define libewf_common_localtime_r( timestamp, time_elements ) \
-	localtime_r( timestamp, time_elements )
-
-#endif
+#include "date_time.h"
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-struct tm *libewf_common_localtime(
+struct tm *libewf_date_time_localtime(
             const time_t *timestamp )
 {
-#if !defined( libewf_common_localtime_r ) && defined( HAVE_LOCALTIME )
+#if !defined( date_time_localtime_r ) && defined( HAVE_LOCALTIME )
 	struct tm *static_time_elements = NULL;
 #endif
 	struct tm *time_elements        = NULL;
-	static char *function           = "libewf_common_localtime";
+	static char *function           = "libewf_date_time_localtime";
 
 	if( timestamp == NULL )
 	{
@@ -116,13 +72,13 @@ struct tm *libewf_common_localtime(
 
 		return( NULL );
 	}
-#if defined( libewf_common_localtime_r )
+#if defined( date_time_localtime_r )
 #if defined( HAVE_WINDOWS_API )
-	if( libewf_common_localtime_r(
+	if( date_time_localtime_r(
 	     timestamp,
 	     time_elements ) != 0 )
 #else
-	if( libewf_common_localtime_r(
+	if( date_time_localtime_r(
 	     timestamp,
 	     time_elements ) == NULL )
 #endif
@@ -163,34 +119,94 @@ struct tm *libewf_common_localtime(
 
 		return( NULL );
 	}
-#else
-#error Missing equivalent of function localtime
 #endif
 }
 
+/* Returns a structured representation of a time using UTC (GMT), or NULL on error
+ */
+struct tm *libewf_date_time_gmtime(
+            const time_t *timestamp )
+{
+#if !defined( date_time_gmtime_r ) && defined( HAVE_GMTIME )
+	struct tm *static_time_elements = NULL;
+#endif
+	struct tm *time_elements        = NULL;
+	static char *function           = "libewf_date_time_gmtime";
+
+	if( timestamp == NULL )
+	{
+		notify_warning_printf( "%s: invalid time stamp.\n",
+		 function );
+
+		return( NULL );
+	}
+	time_elements = (struct tm *) memory_allocate(
+	                               sizeof( struct tm ) );
+
+	if( time_elements == NULL )
+	{
+		notify_warning_printf( "%s: unable to create time elements.\n",
+		 function );
+
+		return( NULL );
+	}
+#if defined( date_time_gmtime_r )
 #if defined( HAVE_WINDOWS_API )
-#define libewf_common_ctime_r( timestamp, string, size ) \
-	ctime_s( string, size, timestamp )
-
-#elif defined( HAVE_CTIME_R )
-#if defined( HAVE_CTIME_R_SIZE )
-#define libewf_common_ctime_r( timestamp, string, size ) \
-	ctime_r( timestamp, string, size )
-
+	if( date_time_gmtime_r(
+	     timestamp,
+	     time_elements ) != 0 )
 #else
-#define libewf_common_ctime_r( timestamp, string, size ) \
-	ctime_r( timestamp, string )
+	if( date_time_gmtime_r(
+	     timestamp,
+	     time_elements ) == NULL )
+#endif
+	{
+		notify_warning_printf( "%s: unable to set time elements.\n",
+		 function );
 
+		memory_free(
+		 time_elements );
+
+		return( NULL );
+	}
+	return( time_elements );
+#elif defined( HAVE_GMTIME )
+	static_time_elements = gmtime(
+	                        timestamp );
+
+	if( static_time_elements == NULL )
+	{
+		notify_warning_printf( "%s: unable to create static time elements.\n",
+		 function );
+
+		memory_free(
+		 time_elements );
+
+		return( NULL );
+	}
+	if( memory_copy(
+	     time_elements,
+	     static_time_elements,
+	     sizeof( struct tm ) ) == NULL )
+	{
+		notify_warning_printf( "%s: unable to set time elements.\n",
+		 function );
+
+		memory_free(
+		 time_elements );
+
+		return( NULL );
+	}
 #endif
-#endif
+}
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-char *libewf_common_ctime(
+char *libewf_date_time_ctime(
        const time_t *timestamp )
 {
-	static char *function    = "libewf_common_ctime";
-#if !defined( libewf_common_ctime_r ) && defined( HAVE_CTIME )
+	static char *function    = "libewf_date_time_ctime";
+#if !defined( date_time_ctime_r ) && defined( HAVE_CTIME )
 	char *static_time_string = NULL;
 #endif
 	char *time_string        = NULL;
@@ -213,14 +229,14 @@ char *libewf_common_ctime(
 
 		return( NULL );
 	}
-#if defined( libewf_common_ctime_r )
+#if defined( date_time_ctime_r )
 #if defined( HAVE_WINDOWS_API )
-	if( libewf_common_ctime_r(
+	if( date_time_ctime_r(
              timestamp,
              time_string,
              time_string_size ) != 0 )
 #else
-	if( libewf_common_ctime_r(
+	if( date_time_ctime_r(
 	     timestamp,
 	     time_string,
 	     time_string_size ) == NULL )
@@ -249,7 +265,7 @@ char *libewf_common_ctime(
 
 		return( NULL );
 	}
-	if( libewf_common_string_copy(
+	if( date_time_string_copy(
              time_string,
              static_time_string,
              time_string_size ) == NULL )
@@ -263,27 +279,17 @@ char *libewf_common_ctime(
 		return( NULL );
 	}
 	return( time_string );
-#else
-#error Missing equivalent of function ctime
 #endif
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
-#if defined( HAVE_WINDOWS_API )
-#define libewf_common_wide_ctime_r( timestamp, string, size ) \
-	_wctime_s( string, size, timestamp )
-
-#else
-#error Missing wide character equivalent of function ctime()
-#endif
-
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-wchar_t *libewf_common_wide_ctime(
+wchar_t *libewf_date_time_wctime(
           const time_t *timestamp )
 {
-	static char *function   = "libewf_common_wide_ctime";
+	static char *function   = "libewf_date_time_wctime";
 	wchar_t *time_string    = NULL;
 	size_t time_string_size = 32;
 
@@ -304,8 +310,8 @@ wchar_t *libewf_common_wide_ctime(
 
 		return( NULL );
 	}
-#if defined( libewf_common_wide_ctime_r )
-	if( libewf_common_wide_ctime_r(
+#if defined( date_time_wctime_r )
+	if( date_time_wctime_r(
 	     timestamp,
 	     time_string,
 	     time_string_size ) != 0 )
@@ -321,102 +327,5 @@ wchar_t *libewf_common_wide_ctime(
 	return( time_string );
 #endif
 }
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Copies the source string (of wchar_t) into the destination string (of char) for a certain size
- * Terminates the destination string with \0 at ( size - 1 )
- * Returns 1 if successful, -1 on error
- */
-int libewf_common_copy_wchar_to_char(
-     char *destination,
-     const wchar_t *source,
-     size_t size )
-{
-	static char *function = "libewf_common_copy_wchar_to_char";
-	size_t iterator       = 0;
-
-	if( source == NULL )
-	{
-		notify_warning_printf( "%s: invalid source.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( destination == NULL )
-	{
-		notify_warning_printf( "%s: invalid destination.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	for( iterator = 0; iterator < size; iterator++ )
-	{
-		destination[ iterator ] = (char) wctob(
-		                                  (wint_t) source[ iterator ] );
-
-		/* If character is out of the basic ASCII range use '_' as a place holder
-		 */
-		if( destination[ iterator ] == EOF )
-		{
-			destination[ iterator ] = '_';
-		}
-	}
-	destination[ size - 1 ] = (char) '\0';
-
-	return( 1 );
-}
-
-/* Copies the source string (of char) into the destination string (of wchar_t) for a certain size
- * Terminates the destination string with \0 at ( size - 1 )
- * Returns 1 if successful, -1 on error
- */
-int libewf_common_copy_char_to_wchar(
-     wchar_t *destination,
-     const char *source,
-     size_t size )
-{
-	static char *function = "libewf_common_copy_char_to_wchar";
-	size_t iterator       = 0;
-
-	if( source == NULL )
-	{
-		notify_warning_printf( "%s: invalid source.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( destination == NULL )
-	{
-		notify_warning_printf( "%s: invalid destination.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	for( iterator = 0; iterator < size; iterator++ )
-	{
-		destination[ iterator ] = (wchar_t) btowc(
-		                                     (int) source[ iterator ] );
-	}
-	destination[ size - 1 ] = (wchar_t) '\0';
-
-	return( 1 );
-}
-
 #endif
 

@@ -48,9 +48,6 @@
 extern "C" {
 #endif
 
-struct tm *ewfoutput_gmtime(
-            const time_t *timestamp );
-
 void ewfoutput_version_fprint(
       FILE *stream,
       character_t *program );

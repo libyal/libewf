@@ -35,7 +35,6 @@
 #include <memory.h>
 #include <notify.h>
 
-#include "libewf_common.h"
 #include "libewf_sector_table.h"
 
 /* Allocates memory for a sector table struct

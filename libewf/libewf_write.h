@@ -55,6 +55,10 @@
 extern "C" {
 #endif
 
+int libewf_write_test_empty_block(
+     uint8_t *block_buffer,
+     size_t size );
+
 int64_t libewf_write_calculate_chunks_per_segment_file(
          libewf_segment_file_handle_t *segment_file_handle,
          size64_t segment_file_size,

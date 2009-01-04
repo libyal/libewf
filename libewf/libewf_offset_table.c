@@ -38,7 +38,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_offset_table.h"
 

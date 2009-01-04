@@ -35,7 +35,6 @@
 #include <memory.h>
 #include <notify.h>
 
-#include "libewf_common.h"
 #include "libewf_media_values.h"
 
 #include "ewf_definitions.h"

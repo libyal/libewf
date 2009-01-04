@@ -36,27 +36,7 @@
 #include <character_string.h>
 #include <notify.h>
 #include <system_string.h>
-
-#include <errno.h>
-
-#if defined( HAVE_STDLIB_H )
-#include <stdlib.h>
-#endif
-
-#if defined( HAVE_INTTYPES_H )
-#include <inttypes.h>
-#endif
-
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
-#include "../libewf/libewf_common.h"
+#include <types.h>
 
 #include "ewfbyte_size_string.h"
 

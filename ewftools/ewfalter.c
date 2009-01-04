@@ -57,8 +57,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_common.h"
-
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"

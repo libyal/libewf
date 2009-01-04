@@ -52,6 +52,9 @@ void libewf_notify_printf(
       char *format,
       ... );
 
+#define notify_printf \
+	libewf_notify_printf
+
 #define notify_verbose_printf \
 	if( libewf_notify_verbose != 0 ) libewf_notify_printf
 

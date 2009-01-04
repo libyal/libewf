@@ -35,7 +35,6 @@
 #include <memory.h>
 #include <notify.h>
 
-#include "libewf_common.h"
 #include "libewf_section_list.h"
 
 /* Append an entry to the section list

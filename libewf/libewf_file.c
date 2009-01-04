@@ -44,7 +44,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"

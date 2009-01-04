@@ -37,8 +37,6 @@
 
 #include "ewfdigest_context.h"
 
-#include "../libewf/libewf_common.h"
-
 /* Initializes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */

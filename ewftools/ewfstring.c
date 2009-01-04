@@ -57,8 +57,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_common.h"
-
 #include "ewfstring.h"
 
 #if defined( HAVE_WINDOWS_API )

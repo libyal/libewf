@@ -60,8 +60,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_common.h"
-
 #include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"

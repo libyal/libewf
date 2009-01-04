@@ -37,7 +37,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
 #include "libewf_string.h"

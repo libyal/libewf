@@ -39,7 +39,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_compression.h"
 #include "libewf_debug.h"
 #include "libewf_endian.h"
@@ -84,30 +83,22 @@ void libewf_debug_dump_data(
 	}
 	else
 	{
-		fprintf( stderr, "%s: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		notify_printf( "%s: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
 		 function, stored_crc, calculated_crc );
 	}
 }
 
-/* Prints the section data to a stream
+/* Prints the section data to notify stream
  */
-void libewf_debug_section_fprint(
-      FILE *stream,
+void libewf_debug_section_print(
       ewf_section_t *section )
 {
-	static char *function    = "libewf_debug_section_fprint";
+	static char *function    = "libewf_debug_section_print";
 	ewf_crc_t calculated_crc = 0;
 	ewf_crc_t stored_crc     = 0;
 	uint64_t next            = 0;
 	uint64_t size            = 0;
 
-	if( stream == NULL )
-	{
-		notify_warning_printf( "%s: invalid stream.\n",
-		 function );
-
-		return;
-	}
 	if( section == NULL )
 	{
 		notify_warning_printf( "%s: invalid section.\n",
@@ -147,53 +138,26 @@ void libewf_debug_section_fprint(
 
 		return;
 	}
-	fprintf( stream, "Section:\n" );
-	fprintf( stream, "type: %s\n",
+	notify_printf( "Section:\n" );
+	notify_printf( "type: %s\n",
 	 (char *) section->type );
-	fprintf( stream, "next: %" PRIu64 "\n",
+	notify_printf( "next: %" PRIu64 "\n",
 	 next );
-	fprintf( stream, "size: %" PRIu64 "\n",
+	notify_printf( "size: %" PRIu64 "\n",
 	 size );
-	fprintf( stream, "crc: %" PRIu32 " ( %" PRIu32 " )\n",
+	notify_printf( "crc: %" PRIu32 " ( %" PRIu32 " )\n",
 	 stored_crc, calculated_crc );
-	fprintf( stream, "\n" );
+	notify_printf( "\n" );
 }
 
-/* Prints a header string to a stream
+/* Prints the header data to the notify stream
  */
-void libewf_debug_header_string_fprint(
-      FILE *stream,
-      character_t *header_string )
-{
-	static char *function = "libewf_debug_header_string_fprint";
-
-	if( stream == NULL )
-	{
-		notify_warning_printf( "%s: invalid stream.\n",
-		 function );
-
-		return;
-	}
-	if( header_string == NULL )
-	{
-		notify_warning_printf( "%s: invalid header string.\n",
-		 function );
-
-		return;
-	}
-	fprintf( stream, "%" PRIs "",
-	 header_string );
-}
-
-/* Prints the header data to a stream
- */
-void libewf_debug_header_fprint(
-      FILE *stream,
+void libewf_debug_header_print(
       ewf_char_t *header,
       size_t size )
 {
 	character_t *header_string = NULL;
-	static char *function      = "libewf_debug_header_fprint";
+	static char *function      = "libewf_debug_header_print";
 
 	if( header == NULL )
 	{
@@ -225,23 +189,21 @@ void libewf_debug_header_fprint(
 
 		return;
 	}
-	libewf_debug_header_string_fprint(
-	 stream,
+	notify_printf( "%" PRIs "",
 	 header_string );
 
 	memory_free(
 	 header_string );
 }
 
-/* Prints the header2 data to a stream
+/* Prints the header2 data to the notify stream
  */
-void libewf_debug_header2_fprint(
-      FILE *stream,
+void libewf_debug_header2_print(
       ewf_char_t *header2,
       size_t size )
 {
 	character_t *header_string = NULL;
-	static char *function      = "libewf_debug_header2_fprint";
+	static char *function      = "libewf_debug_header2_print";
 	size_t header_size         = 0;
 
 	if( header2 == NULL )
@@ -275,37 +237,10 @@ void libewf_debug_header2_fprint(
 
 		return;
 	}
-	libewf_debug_header_string_fprint(
-	 stream,
+	notify_printf( "%" PRIs "",
 	 header_string );
 
 	memory_free(
 	 header_string );
-}
-
-/* Print the chunk data to a stream
- */
-void libewf_debug_chunk_fprint(
-      FILE *stream,
-      ewf_char_t *chunk )
-{
-	static char *function = "libewf_debug_chunk_fprint";
-
-	if( stream == NULL )
-	{
-		notify_warning_printf( "%s: invalid stream.\n",
-		 function );
-
-		return;
-	}
-	if( chunk == NULL )
-	{
-		notify_warning_printf( "%s: invalid chunk.\n",
-		 function );
-
-		return;
-	}
-	fprintf( stream, "%s",
-	 (char *) chunk );
 }
 

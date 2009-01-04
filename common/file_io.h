@@ -87,7 +87,7 @@ int libewf_file_io_open(
 #define file_io_open( filename, flags ) \
 	libewf_file_io_open( filename, flags )
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 int libewf_file_io_wopen(
      const wchar_t *filename,
      int flags );

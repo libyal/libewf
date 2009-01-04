@@ -38,7 +38,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_compression.h"
 #include "libewf_debug.h"
 #include "libewf_endian.h"
@@ -122,8 +121,7 @@ ssize_t libewf_section_start_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_section_fprint(
-		 stderr,
+		libewf_debug_section_print(
 		 section );
 	}
 #endif
@@ -613,8 +611,7 @@ ssize_t libewf_section_header_read(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_fprint(
-		 stderr,
+		libewf_debug_header_print(
 		 header,
 		 header_size );
 	}
@@ -657,8 +654,7 @@ ssize_t libewf_section_header_write(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_fprint(
-		 stderr,
+		libewf_debug_header_print(
 		 header,
 		 header_size );
 	}
@@ -750,8 +746,7 @@ ssize_t libewf_section_header2_read(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header2_fprint(
-		 stderr,
+		libewf_debug_header2_print(
 		 header2,
 		 header2_size );
 	}
@@ -794,8 +789,7 @@ ssize_t libewf_section_header2_write(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header2_fprint(
-		 stderr,
+		libewf_debug_header2_print(
 		 header2,
 		 header2_size );
 	}
@@ -2530,8 +2524,7 @@ ssize_t libewf_section_ltree_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header2_fprint(
-		 stderr,
+		libewf_debug_header2_print(
 		 ltree_data,
 		 ltree_data_size );
 	}
@@ -4316,8 +4309,7 @@ ssize_t libewf_section_xheader_read(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_fprint(
-		 stderr,
+		libewf_debug_header_print(
 		 xheader,
 		 xheader_size );
 	}
@@ -4360,8 +4352,7 @@ ssize_t libewf_section_xheader_write(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_fprint(
-		 stderr,
+		libewf_debug_header_print(
 		 xheader,
 		 xheader_size );
 	}
@@ -4452,8 +4443,7 @@ ssize_t libewf_section_xhash_read(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_fprint(
-		 stderr,
+		libewf_debug_header_print(
 		 xhash,
 		 xhash_size );
 	}
@@ -4496,8 +4486,7 @@ ssize_t libewf_section_xhash_write(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_fprint(
-		 stderr,
+		libewf_debug_header_print(
 		 xhash,
 		 xhash_size );
 	}
@@ -4927,7 +4916,7 @@ ssize_t libewf_section_debug_read(
 
 	if( result == 0 )
 	{
-		fprintf( stderr, "%s: data is UNCOMPRESSED.\n",
+		notify_printf( "%s: data is UNCOMPRESSED.\n",
 		 function );
 
 		libewf_debug_dump_data(
@@ -4936,7 +4925,7 @@ ssize_t libewf_section_debug_read(
 	}
 	else if( result == 1 )
 	{
-		fprintf( stderr, "%s: data is zlib COMPRESSED.\n",
+		notify_printf( "%s: data is zlib COMPRESSED.\n",
 		 function );
 
 		libewf_debug_dump_data(

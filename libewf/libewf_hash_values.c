@@ -39,7 +39,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_hash_values.h"
 #include "libewf_string.h"
 

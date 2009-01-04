@@ -34,6 +34,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <date_time.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -71,7 +72,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_common.h"
 #include "../libewf/libewf_hash_values.h"
 #include "../libewf/libewf_header_values.h"
 
@@ -81,91 +81,6 @@
 #include "ewfsha1.h"
 #include "ewfstring.h"
 #include "ewfoutput.h"
-
-#if defined( HAVE_WINDOWS_API )
-#define ewfoutput_gmtime_r( timestamp, time_elements ) \
-	gmtime_s( time_elements, timestamp )
-
-#elif defined( HAVE_GMTIME_R )
-#define ewfoutput_gmtime_r( timestamp, time_elements ) \
-	gmtime_r( timestamp, time_elements )
-
-#endif
-
-/* Returns a structured representation of a time using UTC (GMT), or NULL on error
- */
-struct tm *ewfoutput_gmtime(
-            const time_t *timestamp )
-{
-#if !defined( ewfoutput_gmtime_r ) && defined( HAVE_GMTIME )
-	struct tm *static_time_elements = NULL;
-#endif
-	struct tm *time_elements        = NULL;
-	static char *function           = "ewfoutput_gmtime";
-
-	if( timestamp == NULL )
-	{
-		notify_warning_printf( "%s: invalid time stamp.\n",
-		 function );
-
-		return( NULL );
-	}
-	time_elements = (struct tm *) memory_allocate(
-	                               sizeof( struct tm ) );
-
-	if( time_elements == NULL )
-	{
-		notify_warning_printf( "%s: unable to create time elements.\n",
-		 function );
-
-		return( NULL );
-	}
-#if defined( ewfoutput_gmtime_r )
-#if defined( HAVE_WINDOWS_API )
-	if( ewfoutput_gmtime_r( timestamp, time_elements ) != 0 )
-#else
-	if( ewfoutput_gmtime_r( timestamp, time_elements ) == NULL )
-#endif
-	{
-		notify_warning_printf( "%s: unable to set time elements.\n",
-		 function );
-
-		memory_free(
-		 time_elements );
-
-		return( NULL );
-	}
-	return( time_elements );
-#elif defined( HAVE_GMTIME )
-	static_time_elements = gmtime( timestamp );
-
-	if( static_time_elements == NULL )
-	{
-		notify_warning_printf( "%s: unable to create static time elements.\n",
-		 function );
-
-		memory_free(
-		 time_elements );
-
-		return( NULL );
-	}
-	if( memory_copy(
-	     time_elements,
-	     static_time_elements,
-	     sizeof( struct tm ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to set time elements.\n",
-		 function );
-
-		memory_free(
-		 time_elements );
-
-		return( NULL );
-	}
-#else
-#error Missing equivalent of function gmtime
-#endif
-}
 
 /* Print the version information to a stream
  */
@@ -1011,7 +926,7 @@ void ewfoutput_timestamp_fprint(
 	{
 		return;
 	}
-	time_elements = ewfoutput_gmtime(
+	time_elements = date_time_gmtime(
 	                 &timestamp );
 
 	if( time_elements != NULL )

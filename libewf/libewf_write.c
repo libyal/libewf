@@ -44,7 +44,6 @@
 #include <libewf/definitions.h>
 
 #include "libewf_chunk_cache.h"
-#include "libewf_common.h"
 #include "libewf_compression.h"
 #include "libewf_endian.h"
 #include "libewf_file.h"
@@ -63,6 +62,40 @@
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
+
+/* Check for empty block, a block that contains the same value for every byte
+ * Returns 1 if block is empty, or 0 otherwise
+ */
+int libewf_write_test_empty_block(
+     uint8_t *block_buffer,
+     size_t size )
+{
+	static char *function = "libewf_write_test_empty_block";
+	size_t iterator       = 0;
+
+	if( block_buffer == NULL )
+	{
+		notify_warning_printf( "%s: invalid block buffer.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( 0 );
+	}
+	for( iterator = 1; iterator < size; iterator++ )
+	{
+		if( block_buffer[ 0 ] != block_buffer[ iterator ] )
+		{
+			return( 0 );
+		}
+	}
+	return( 1 );
+}
 
 /* Calculates an estimate of the amount of chunks that fit within a segment file
  * Returns the amount of chunks that could fit in the segment file, or -1 on error
@@ -737,7 +770,7 @@ ssize_t libewf_write_process_chunk_data(
 	 */
 	if( ( chunk_compression_level == EWF_COMPRESSION_NONE )
 	 && ( compress_empty_block == 1 )
-	 && ( libewf_common_test_empty_block(
+	 && ( libewf_write_test_empty_block(
 	       chunk_data,
 	       chunk_data_size ) == 1 ) )
 	{

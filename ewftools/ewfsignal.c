@@ -34,8 +34,6 @@
 #include <common.h>
 #include <notify.h>
 
-#include "../libewf/libewf_common.h"
-
 #include "ewfsignal.h"
 
 #if defined( HAVE_SIGNAL_H )

@@ -37,8 +37,6 @@
 
 #include "ewfdigest_hash.h"
 
-#include "../libewf/libewf_common.h"
-
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful, 0 if hash was not set, or -1 on error
  */

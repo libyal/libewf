@@ -55,8 +55,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_common.h"
-
 #include "ewfbyte_size_string.h"
 #include "ewfinput.h"
 #include "ewfstring.h"
