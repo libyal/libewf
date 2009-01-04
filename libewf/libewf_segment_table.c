@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -111,7 +111,7 @@ int libewf_segment_table_initialize(
 		}
 		if( memory_set(
 		     ( *segment_table )->segment_file_handle,
-		     0, 
+		     0,
 		     segment_table_size ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear segment file array.\n",
@@ -125,7 +125,7 @@ int libewf_segment_table_initialize(
 			*segment_table = NULL;
 
 			return( -1 );
-		} 
+		}
 		( *segment_table )->amount = amount;
 	}
 	return( 1 );
@@ -218,14 +218,14 @@ int libewf_segment_table_resize(
 
 		if( memory_set(
 		     &( segment_table->segment_file_handle[ segment_table->amount ] ),
-		     0, 
+		     0,
 		     ( ( amount - segment_table->amount ) * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear file handle array.\n",
 			 function );
 
 			return( 1 );
-		} 
+		}
 		segment_table->amount = amount;
 	}
 	return( 1 );

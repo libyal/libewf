@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,6 +26,7 @@
 #include <system_string.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_handle.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
@@ -616,6 +617,7 @@ int libewf_get_md5_hash(
      uint8_t *md5_hash,
      size_t size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_md5_hash";
 
@@ -641,10 +643,16 @@ int libewf_get_md5_hash(
 	       internal_handle->hash_values,
 	       internal_handle->hash_sections->md5_hash,
 	       EWF_DIGEST_HASH_SIZE_MD5,
-	       &( internal_handle->hash_sections->md5_hash_set ) ) != 1 ) )
+	       &( internal_handle->hash_sections->md5_hash_set ),
+	       &error ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse MD5 hash value for its value.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -1221,6 +1229,7 @@ int libewf_get_hash_value(
      libewf_character_t *value,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value";
 	size_t identifier_length                  = 0;
@@ -1263,10 +1272,16 @@ int libewf_get_hash_value(
 		if( libewf_hash_values_parse_md5_hash(
 		     &( internal_handle->hash_values ),
 		     internal_handle->hash_sections->md5_hash,
-		     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+		     EWF_DIGEST_HASH_SIZE_MD5,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1817,6 +1832,7 @@ int libewf_set_md5_hash(
      uint8_t *md5_hash,
      size_t size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_md5_hash";
 
@@ -1877,10 +1893,16 @@ int libewf_set_md5_hash(
 	if( libewf_hash_values_parse_md5_hash(
 	     &( internal_handle->hash_values ),
 	     md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+	     EWF_DIGEST_HASH_SIZE_MD5,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -2125,6 +2147,7 @@ int libewf_set_hash_value(
      libewf_character_t *value,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_hash_value";
 	size_t identifier_length                  = 0;
@@ -2164,10 +2187,16 @@ int libewf_set_hash_value(
 			return( -1 );
 		}
 		if( libewf_hash_values_initialize(
-		     internal_handle->hash_values ) != 1 )
+		     internal_handle->hash_values,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize hash values.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2198,10 +2227,16 @@ int libewf_set_hash_value(
 		     internal_handle->hash_values,
 		     internal_handle->hash_sections->md5_hash,
 		     EWF_DIGEST_HASH_SIZE_MD5,
-		     &( internal_handle->hash_sections->md5_hash_set ) ) != 1 )
+		     &( internal_handle->hash_sections->md5_hash_set ),
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to parse MD5 hash value for its value.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2300,6 +2335,7 @@ int libewf_parse_header_values(
 int libewf_parse_hash_values(
      libewf_handle_t *handle )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_parse_hash_values";
 
@@ -2327,10 +2363,16 @@ int libewf_parse_hash_values(
 	 && ( libewf_hash_values_parse_xhash(
 	       &( internal_handle->hash_values ),
 	       internal_handle->hash_sections->xhash,
-	       internal_handle->hash_sections->xhash_size ) != 1 ) )
+	       internal_handle->hash_sections->xhash_size,
+	       &error ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse xhash for values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -2338,10 +2380,16 @@ int libewf_parse_hash_values(
 	      && ( libewf_hash_values_parse_md5_hash(
 	            &( internal_handle->hash_values ),
 	            internal_handle->hash_sections->md5_hash,
-	            EWF_DIGEST_HASH_SIZE_MD5 ) != 1 ) )
+	            EWF_DIGEST_HASH_SIZE_MD5,
+	            &error ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse MD5 hash for its value.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}

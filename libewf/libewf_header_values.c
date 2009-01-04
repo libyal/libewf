@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -233,7 +233,7 @@ int libewf_header_values_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_convert_timestamp(
-     time_t timestamp, 
+     time_t timestamp,
      uint8_t date_format,
      libewf_character_t *date_string,
      size_t date_string_size )
@@ -1946,7 +1946,7 @@ int libewf_header_values_convert_header_string_to_header2(
  */
 int libewf_header_values_generate_header_string_type1(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      int8_t compression_level,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,
@@ -2626,7 +2626,7 @@ int libewf_header_values_generate_header_string_type2(
  */
 int libewf_header_values_generate_header_string_type3(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
@@ -2939,7 +2939,7 @@ int libewf_header_values_generate_header_string_type3(
  */
 int libewf_header_values_generate_header_string_type4(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
@@ -3246,7 +3246,7 @@ int libewf_header_values_generate_header_string_type4(
  */
 int libewf_header_values_generate_header_string_type5(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
@@ -3574,7 +3574,7 @@ int libewf_header_values_generate_header_string_type5(
  */
 int libewf_header_values_generate_header_string_type6(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
@@ -3924,7 +3924,7 @@ int libewf_header_values_generate_header_string_type6(
  */
 int libewf_header_values_generate_header_string_type7(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
@@ -5040,7 +5040,7 @@ int libewf_convert_date_xheader_value(
  * Returns 1 if successful or -1 on error
  */
 int libewf_generate_date_xheader_value(
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t **date_string,
      size_t *date_string_size )
 {
@@ -5620,7 +5620,7 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
  */
 int libewf_header_values_generate_header_string_xml(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      libewf_character_t **header_string,
      size_t *header_string_size )
 {

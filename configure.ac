@@ -408,7 +408,7 @@ AC_CHECK_FUNCS(
  [],
  [AC_MSG_FAILURE(
   [Missing function: fgets],
-  [1]) ]) 
+  [1]) ])
 
 AC_CHECK_FUNCS(
  [snprintf],

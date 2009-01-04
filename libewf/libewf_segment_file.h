@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,6 +26,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_error.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
@@ -153,7 +154,8 @@ ssize_t libewf_segment_file_write_close(
          int8_t compression_level,
          uint8_t format,
          uint8_t ewf_format,
-         ewf_data_t **cached_data_section );
+         ewf_data_t **cached_data_section,
+         libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

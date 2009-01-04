@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -704,9 +704,9 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
  * Returns 1 if the values were successfully initialized, -1 on errror
  */
 int libewf_internal_handle_initialize_media_values(
-     libewf_internal_handle_t *internal_handle, 
-     uint32_t sectors_per_chunk, 
-     uint32_t bytes_per_sector, 
+     libewf_internal_handle_t *internal_handle,
+     uint32_t sectors_per_chunk,
+     uint32_t bytes_per_sector,
      size64_t media_size )
 {
 	static char *function            = "libewf_internal_handle_initialize_format";

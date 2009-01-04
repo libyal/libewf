@@ -1,4 +1,4 @@
-/* 
+/*
  * List type functions
  *
  * Copyright (C) 2008, Joachim Metz <forensics@hoffmannbv.nl>,

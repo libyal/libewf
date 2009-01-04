@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,6 +29,7 @@
 #include <libewf/handle.h>
 
 #include "libewf_chunk_cache.h"
+#include "libewf_error.h"
 #include "libewf_extern.h"
 #include "libewf_handle.h"
 #include "libewf_media_values.h"
@@ -40,7 +41,8 @@ extern "C" {
 
 int libewf_write_test_empty_block(
      uint8_t *block_buffer,
-     size_t size );
+     size_t size,
+     libewf_error_t **error );
 
 int libewf_write_calculate_chunks_per_segment(
      uint32_t *chunks_per_segment,
@@ -51,14 +53,16 @@ int libewf_write_calculate_chunks_per_segment(
      libewf_media_values_t *media_values,
      uint8_t format,
      uint8_t ewf_format,
-     uint8_t unrestrict_offset_amount );
+     uint8_t unrestrict_offset_amount,
+     libewf_error_t **error );
 
 int libewf_write_calculate_chunks_per_chunks_section(
      uint32_t *chunks_per_chunks_section,
      uint32_t maximum_section_amount_of_chunks,
      uint32_t chunks_per_segment,
      uint8_t chunks_section_number,
-     uint8_t unrestrict_offset_amount );
+     uint8_t unrestrict_offset_amount,
+     libewf_error_t **error );
 
 int libewf_write_test_segment_file_full(
      ssize64_t remaining_segment_file_size,
@@ -68,7 +72,8 @@ int libewf_write_test_segment_file_full(
      uint32_t chunks_per_segment,
      uint32_t current_amount_of_chunks,
      uint8_t format,
-     uint8_t ewf_format );
+     uint8_t ewf_format,
+     libewf_error_t **error );
 
 int libewf_write_test_chunks_section_full(
      off64_t chunks_section_offset,
@@ -82,7 +87,8 @@ int libewf_write_test_chunks_section_full(
      uint32_t chunks_per_chunks_section,
      uint8_t format,
      uint8_t ewf_format,
-     uint8_t unrestrict_offset_amount );
+     uint8_t unrestrict_offset_amount,
+     libewf_error_t **error );
 
 ssize_t libewf_write_process_chunk_data(
          libewf_chunk_cache_t *chunk_cache,
@@ -96,7 +102,8 @@ ssize_t libewf_write_process_chunk_data(
          size_t *compressed_chunk_data_size,
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
-         int8_t *write_crc );
+         int8_t *write_crc,
+         libewf_error_t **error );
 
 ssize_t libewf_raw_write_chunk_new(
          libewf_internal_handle_t *internal_handle,
@@ -106,7 +113,8 @@ ssize_t libewf_raw_write_chunk_new(
          size_t chunk_data_size,
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
-         int8_t write_crc );
+         int8_t write_crc,
+         libewf_error_t **error );
 
 ssize_t libewf_raw_write_chunk_existing(
          libewf_internal_handle_t *internal_handle,
@@ -116,7 +124,8 @@ ssize_t libewf_raw_write_chunk_existing(
          size_t chunk_data_size,
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
-         int8_t write_crc );
+         int8_t write_crc,
+         libewf_error_t **error );
 
 ssize_t libewf_write_chunk_data_new(
          libewf_internal_handle_t *internal_handle,
@@ -124,7 +133,8 @@ ssize_t libewf_write_chunk_data_new(
          void *buffer,
          size_t buffer_size,
          size_t data_size,
-         int8_t force_write );
+         int8_t force_write,
+         libewf_error_t **error );
 
 ssize_t libewf_write_chunk_data_existing(
          libewf_internal_handle_t *internal_handle,
@@ -132,7 +142,8 @@ ssize_t libewf_write_chunk_data_existing(
          uint32_t chunk_offset,
          void *buffer,
          size_t buffer_size,
-         size_t data_size );
+         size_t data_size,
+         libewf_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        libewf_handle_t *handle,

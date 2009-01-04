@@ -10,18 +10,19 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <common.h>
 #include <memory.h>
+#include <notify.h>
 
 #if defined( HAVE_STDARG_H )
 #include <stdarg.h>
@@ -52,8 +53,8 @@
 
 #endif
 
-/* Set an error initializes the error with the error domain and code if necessary
- * Otherwise it will just append the error message for back tracing
+/* Set an error initializes the error
+ * The error domain and code are set and the error message is appended for backtracing
  */
 void VARARGS(
       libewf_error_set,
@@ -78,12 +79,13 @@ void VARARGS(
 		{
 			return;
 		}
-		( (libewf_internal_error_t *) *error )->domain             = error_domain;
-		( (libewf_internal_error_t *) *error )->code               = error_code;
 		( (libewf_internal_error_t *) *error )->amount_of_messages = 0;
 		( (libewf_internal_error_t *) *error )->message            = NULL;
 
 	}
+	( (libewf_internal_error_t *) *error )->domain = error_domain;
+	( (libewf_internal_error_t *) *error )->code   = error_code;
+
 	VASTART(
 	 argument_list,
 	 const char *,
@@ -237,11 +239,11 @@ void libewf_error_fprint(
 {
 	int message_iterator = 0;
 
-	if( stream == NULL )
+	if( error == NULL )
 	{
 		return;
 	}
-	if( error == NULL )
+	if( stream == NULL )
 	{
 		return;
 	}
@@ -274,11 +276,11 @@ void libewf_error_backtrace_fprint(
 {
 	int message_iterator = 0;
 
-	if( stream == NULL )
+	if( error == NULL )
 	{
 		return;
 	}
-	if( error == NULL )
+	if( stream == NULL )
 	{
 		return;
 	}
@@ -299,6 +301,37 @@ void libewf_error_backtrace_fprint(
 		{
 			fprintf(
 			 stream,
+			 "<missing>" );
+		}
+	}
+}
+
+/* Prints a backtrace of the error using notify_printf
+ */
+void libewf_error_backtrace_notify(
+     libewf_error_t *error )
+{
+	int message_iterator = 0;
+
+	if( error == NULL )
+	{
+		return;
+	}
+	if( ( (libewf_internal_error_t *) *error )->message == NULL )
+	{
+		return;
+	}
+	for( message_iterator = 0; message_iterator < ( (libewf_internal_error_t *) error )->amount_of_messages; message_iterator++ )
+	{
+		if( ( (libewf_internal_error_t *) *error )->message[ message_iterator ] != NULL )
+		{
+			notify_printf(
+			 "%s\n",
+			 ( (libewf_internal_error_t *) *error )->message[ message_iterator ] );
+		}
+		else
+		{
+			notify_printf(
 			 "<missing>" );
 		}
 	}

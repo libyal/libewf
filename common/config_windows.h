@@ -95,7 +95,7 @@
 
 /* If wide character support was enabled
  * make use of the wide character support functions
- */ 
+ */
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if !defined( HAVE_WCHAR_H )
 #define HAVE_WCHAR_H            1
@@ -108,8 +108,8 @@
 #define SIZEOF_WCHAR_T		2
 
 #define HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS	1
-#endif 
-    
+#endif
+
 /* Make sure the function definitions are available
  * these should be normally defined in config.h
  * use the following defintions to control the function
@@ -172,7 +172,7 @@
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-#define HAVE_WMKDIR		1 
+#define HAVE_WMKDIR		1
 #endif
 
 #else

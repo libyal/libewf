@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -142,7 +142,7 @@ int libewf_header_values_generate_header_string_type1(
 
 int libewf_header_values_generate_header_string_type2(
      libewf_values_table_t *header_values,
-     time_t timestamp, 
+     time_t timestamp,
      int8_t compression_level,
      libewf_character_t *header_string_head,
      libewf_character_t *header_string_tail,

@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -879,7 +879,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	}
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
-		section_size = segment_chunk_amount 
+		section_size = segment_chunk_amount
 		             * ( chunk_size + sizeof( ewf_crc_t ) );
 
 		/* Write sectors section start
@@ -1331,9 +1331,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	write_count = libewf_section_delta_chunk_write(
 	               file_io_pool,
 	               segment_file_handle,
-	               chunk, 
-	               chunk_data, 
-	               chunk_size, 
+	               chunk,
+	               chunk_data,
+	               chunk_size,
 	               chunk_crc,
 	               write_crc,
 	               no_section_append );
@@ -1370,7 +1370,8 @@ ssize_t libewf_segment_file_write_close(
          int8_t compression_level,
          uint8_t format,
          uint8_t ewf_format,
-         ewf_data_t **cached_data_section )
+         ewf_data_t **cached_data_section,
+	 libewf_error_t **error )
 {
 	static char *function     = "libewf_segment_file_write_close";
 	ssize_t total_write_count = 0;
@@ -1436,7 +1437,7 @@ ssize_t libewf_segment_file_write_close(
 			}
 			total_write_count += write_count;
 		}
-		/* Write the session section if required 
+		/* Write the session section if required
 		 */
 		if( ( sessions->amount > 0 )
 		 && ( ( format == LIBEWF_FORMAT_ENCASE5 )
@@ -1459,7 +1460,7 @@ ssize_t libewf_segment_file_write_close(
 			}
 			total_write_count += write_count;
 		}
-		/* Write the error2 section if required 
+		/* Write the error2 section if required
 		 */
 		if( ( acquiry_errors->amount > 0 )
 		 && ( ( format == LIBEWF_FORMAT_ENCASE3 )
@@ -1520,7 +1521,8 @@ ssize_t libewf_segment_file_write_close(
 			if( libewf_hash_values_generate_xhash_string_ewfx(
 			     hash_values,
 			     &( hash_sections->xhash ),
-			     &( hash_sections->xhash_size ) ) != 1 )
+			     &( hash_sections->xhash_size ),
+			     error ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to generate xhash.\n",
 				 function );

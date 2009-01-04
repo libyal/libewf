@@ -10,12 +10,12 @@
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -335,10 +335,10 @@ libewf_handle_t *libewf_open(
 			segment_file_size = &( internal_handle->write->segment_file_size );
 		}
 		if( libewf_segment_table_read_open(
-		     internal_handle->segment_table, 
-		     internal_handle->delta_segment_table, 
-		     internal_handle->file_io_pool, 
-		     filenames, 
+		     internal_handle->segment_table,
+		     internal_handle->delta_segment_table,
+		     internal_handle->file_io_pool,
+		     filenames,
 		     amount_of_files,
 		     flags,
 		     internal_handle->header_sections,
@@ -380,8 +380,8 @@ libewf_handle_t *libewf_open(
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
 		if( libewf_segment_table_write_open(
-		     internal_handle->segment_table, 
-		     filenames, 
+		     internal_handle->segment_table,
+		     filenames,
 		     amount_of_files ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to open segment file(s).\n",

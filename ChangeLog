@@ -125,6 +125,8 @@ Next release(s):
   - update library (keep error in library due to multi threading)
   - update API later
 
+* clean up libewf_write_finalize ?
+
 * separate narrow and wide character library functions
   - Linux can change wide character into UTF8, but what about Windows ASCII with codepage?
 
