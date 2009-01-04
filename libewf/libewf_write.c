@@ -277,7 +277,7 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
 	if( internal_handle->write->chunks_per_segment > (int64_t) INT64_MAX )
 	{

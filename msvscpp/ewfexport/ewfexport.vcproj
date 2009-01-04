@@ -185,6 +185,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfdigest_context.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfdigest_hash.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfexport.c"
 				>
 			</File>
@@ -202,10 +210,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_common.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_digest_context.c"
 				>
 			</File>
 			<File
@@ -227,11 +231,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\ewfdigest_context.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfdigest_hash.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfgetopt.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfglob.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfmd5.h"
 				>
 			</File>
 			<File
