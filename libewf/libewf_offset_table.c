@@ -28,7 +28,9 @@
 
 #include <libewf/definitions.h>
 
+#include "libewf_list_type.h"
 #include "libewf_offset_table.h"
+#include "libewf_section_list.h"
 
 #include "ewf_definitions.h"
 
@@ -424,13 +426,14 @@ int libewf_offset_table_fill(
  */
 int libewf_offset_table_fill_last_offset(
      libewf_offset_table_t *offset_table,
-     libewf_section_list_t *section_list,
+     libewf_list_t *section_list,
      uint8_t error_tollerance )
 {
-	libewf_section_list_entry_t *section_list_entry = NULL;
-	static char *function                           = "libewf_offset_table_fill_last_offset";
-	off64_t last_offset                             = 0;
-	off64_t chunk_size                              = 0;
+	libewf_list_element_t *list_element               = NULL;
+	libewf_section_list_values_t *section_list_values = NULL;
+	static char *function                             = "libewf_offset_table_fill_last_offset";
+	off64_t last_offset                               = 0;
+	off64_t chunk_size                                = 0;
 
 	if( offset_table == NULL )
 	{
@@ -457,20 +460,29 @@ int libewf_offset_table_fill_last_offset(
 	 * However it can be determined where the next section starts within the file.
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
-	section_list_entry = section_list->first;
-	last_offset        = offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].file_offset;
+	list_element = section_list->first;
+	last_offset  = offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].file_offset;
 
-	while( section_list_entry != NULL )
+	while( list_element != NULL )
 	{
+		section_list_values = (libewf_section_list_values_t *) list_element->value;
+
+		if( section_list_values == NULL )
+		{
+			notify_warning_printf( "%s: invalid section list values.\n",
+			 function );
+
+			return( -1 );
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		notify_verbose_printf( "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
-		 function, section_list_entry->start_offset, last_offset );
+		 function, section_list_values->start_offset, last_offset );
 #endif
 
-		if( ( section_list_entry->start_offset < last_offset )
-		 && ( last_offset < section_list_entry->end_offset ) )
+		if( ( section_list_values->start_offset < last_offset )
+		 && ( last_offset < section_list_values->end_offset ) )
 		{
-			chunk_size = section_list_entry->end_offset - last_offset;
+			chunk_size = section_list_values->end_offset - last_offset;
 
 			if( last_offset > (off64_t) INT64_MAX )
 			{
@@ -505,7 +517,7 @@ int libewf_offset_table_fill_last_offset(
 
 			break;
 		}
-		section_list_entry = section_list_entry->next;
+		list_element = list_element->next;
 	}
 	return( 1 );
 }
@@ -875,15 +887,16 @@ int libewf_offset_table_compare(
  */
 int libewf_offset_table_compare_last_offset(
      libewf_offset_table_t *offset_table,
-     libewf_section_list_t *section_list,
+     libewf_list_t *section_list,
      uint8_t correct_errors,
      uint8_t error_tollerance )
 {
-	libewf_section_list_entry_t *section_list_entry = NULL;
-	static char *function                           = "libewf_offset_table_fill_last_offset";
-	off64_t last_offset                             = 0;
-	off64_t chunk_size                              = 0;
-	uint8_t mismatch                                = 0;
+	libewf_list_element_t *list_element               = NULL;
+	libewf_section_list_values_t *section_list_values = NULL;
+	static char *function                             = "libewf_offset_table_fill_last_offset";
+	off64_t last_offset                               = 0;
+	off64_t chunk_size                                = 0;
+	uint8_t mismatch                                  = 0;
 
 	if( offset_table == NULL )
 	{
@@ -910,20 +923,29 @@ int libewf_offset_table_compare_last_offset(
 	 * However it can be determined where the next section starts within the file.
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
-	section_list_entry = section_list->first;
-	last_offset        = offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset;
+	list_element = section_list->first;
+	last_offset  = offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset;
 
-	while( section_list_entry != NULL )
+	while( list_element != NULL )
 	{
+		section_list_values = (libewf_section_list_values_t *) list_element->value;
+
+		if( section_list_values == NULL )
+		{
+			notify_warning_printf( "%s: invalid section list values.\n",
+			 function );
+
+			return( -1 );
+		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		notify_verbose_printf( "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
-		 function, section_list_entry->start_offset, last_offset );
+		 function, section_list_values->start_offset, last_offset );
 #endif
 
-		if( ( section_list_entry->start_offset < last_offset )
-		 && ( last_offset < section_list_entry->end_offset ) )
+		if( ( section_list_values->start_offset < last_offset )
+		 && ( last_offset < section_list_values->end_offset ) )
 		{
-			chunk_size = section_list_entry->end_offset - last_offset;
+			chunk_size = section_list_values->end_offset - last_offset;
 
 			if( last_offset > (off64_t) INT64_MAX )
 			{
@@ -979,7 +1001,7 @@ int libewf_offset_table_compare_last_offset(
 			}
 			break;
 		}
-		section_list_entry = section_list_entry->next;
+		list_element = list_element->next;
 	}
 	return( 1 );
 }

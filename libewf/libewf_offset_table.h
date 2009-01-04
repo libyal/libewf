@@ -28,7 +28,7 @@
 
 #include "libewf_chunk_offset.h"
 #include "libewf_file_io_pool.h"
-#include "libewf_section_list.h"
+#include "libewf_list_type.h"
 #include "libewf_segment_file_handle.h"
 
 #include "ewf_table.h"
@@ -80,7 +80,7 @@ int libewf_offset_table_fill(
 
 int libewf_offset_table_fill_last_offset(
      libewf_offset_table_t *offset_table,
-     libewf_section_list_t *section_list,
+     libewf_list_t *section_list,
      uint8_t error_tollerance );
 
 int libewf_offset_table_fill_offsets(
@@ -102,7 +102,7 @@ int libewf_offset_table_compare(
 
 int libewf_offset_table_compare_last_offset(
      libewf_offset_table_t *offset_table,
-     libewf_section_list_t *section_list,
+     libewf_list_t *section_list,
      uint8_t correct_errors,
      uint8_t error_tollerance );
 

@@ -26,23 +26,24 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_list_type.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libewf_section_list_entry libewf_section_list_entry_t;
-typedef struct libewf_section_list libewf_section_list_t;
+typedef struct libewf_section_list_values libewf_section_list_values_t;
 
-struct libewf_section_list_entry
+struct libewf_section_list_values
 {
         /* The section type string
          * consists of 16 bytes at the most
          */
         uint8_t type[ 16 ];
 
-	/* The section type string length
+	/* The section type string size
 	 */
-	size_t type_length;
+	size_t type_size;
 
 	/* The start offset of the section
 	 */
@@ -51,36 +52,20 @@ struct libewf_section_list_entry
 	/* The end offset of the section
 	 */
 	off64_t end_offset;
-
-	/* The next section list entry
-	 */
-	libewf_section_list_entry_t *next;
-
-	/* The previous section list entry
-	 */
-	libewf_section_list_entry_t *previous;
 };
 
-struct libewf_section_list
-{
-	/* The first entry in the list
-	 */
-	libewf_section_list_entry_t *first;
+int libewf_section_list_values_free(
+     intptr_t *value );
 
-	/* The last entry in the list
-	 */
-	libewf_section_list_entry_t *last;
-};
-
-libewf_section_list_t *libewf_section_list_append(
-                        libewf_section_list_t *section_list,
-                        uint8_t *type,
-                        size_t type_length,
-                        off64_t start_offset,
-                        off64_t end_offset );
+int libewf_section_list_append(
+     libewf_list_t *section_list,
+     uint8_t *type,
+     size_t type_length,
+     off64_t start_offset,
+     off64_t end_offset );
 
 int libewf_section_list_remove_last(
-     libewf_section_list_t *section_list );
+     libewf_list_t *section_list );
 
 #if defined( __cplusplus )
 }

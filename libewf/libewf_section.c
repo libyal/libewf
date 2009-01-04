@@ -536,7 +536,7 @@ ssize_t libewf_section_write_compressed_string(
 	     section_type,
 	     section_type_length,
 	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
+	     ( section_offset + section_write_count ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 		 function, (char *) section_type );
@@ -1103,7 +1103,7 @@ ssize_t libewf_section_volume_s01_write(
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + section_write_count ) ) == NULL )
+		     ( section_offset + section_write_count ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -1449,7 +1449,7 @@ ssize_t libewf_section_volume_e01_write(
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + section_write_count ) ) == NULL )
+		     ( section_offset + section_write_count ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -2349,7 +2349,7 @@ ssize_t libewf_section_table_write(
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + section_size ) ) == NULL )
+		     ( section_offset + section_size ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -2468,7 +2468,7 @@ ssize_t libewf_section_sectors_write(
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + sectors_data_size ) ) == NULL )
+		     ( section_offset + sectors_data_size ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -3034,7 +3034,7 @@ ssize_t libewf_section_session_write(
 	     section_type,
 	     section_type_length,
 	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
+	     ( section_offset + section_write_count ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to append %s section to section list.\n",
 		 function, (char *) section_type );
@@ -3475,7 +3475,7 @@ ssize_t libewf_section_data_write(
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + section_write_count ) ) == NULL )
+		     ( section_offset + section_write_count ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -3891,7 +3891,7 @@ ssize_t libewf_section_error2_write(
 	     section_type,
 	     section_type_length,
 	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
+	     ( section_offset + section_write_count ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to append %s section to section list.\n",
 		 function, (char *) section_type );
@@ -4083,7 +4083,7 @@ ssize_t libewf_section_hash_write(
 	     section_type,
 	     section_type_length,
 	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
+	     ( section_offset + section_write_count ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to append %s section to section list.\n",
 		 function, (char *) section_type );
@@ -4213,7 +4213,7 @@ ssize_t libewf_section_last_write(
 	     section_type,
 	     section_type_length,
 	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
+	     ( section_offset + section_write_count ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to append %s section to section list.\n",
 		 function, (char *) section_type );
@@ -4798,7 +4798,7 @@ ssize_t libewf_section_delta_chunk_write(
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + section_write_count ) ) == NULL )
+		     ( section_offset + section_write_count ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -5089,7 +5089,7 @@ int libewf_section_read(
 	     section->type,
 	     section_type_length,
 	     *section_start_offset,
-	     section_end_offset ) == NULL )
+	     section_end_offset ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to append value to section list.\n",
 		 function );

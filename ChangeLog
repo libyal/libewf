@@ -105,7 +105,8 @@ API
 * rewrite open and close in correspondence with handle_initialize and handle_free
 * change compress empty blocks into a compression level
 * allow for chunk data and CRC alignment
-* low level api
+* low level API
+* file structure API
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -165,6 +166,7 @@ Next release(s):
 * retrieve md5 hash in md5 hash value function?
 
 * implement io pooling?
+  - add means to set open file handle limit
 
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing

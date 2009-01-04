@@ -28,6 +28,8 @@
 #include <system_string.h>
 
 #include "libewf_filename.h"
+#include "libewf_list_type.h"
+#include "libewf_section_list.h"
 #include "libewf_segment_file_handle.h"
 
 /* Initialize the segment file handle
@@ -73,8 +75,8 @@ int libewf_segment_file_handle_initialize(
 
 			return( -1 );
 		}
-		( *segment_file_handle )->section_list = (libewf_section_list_t *) memory_allocate(
-		                                                                    sizeof( libewf_section_list_t ) );
+		( *segment_file_handle )->section_list = (libewf_list_t *) memory_allocate(
+		                                                            sizeof( libewf_list_t ) );
 
 		if( ( *segment_file_handle )->section_list == NULL )
 		{
@@ -91,7 +93,7 @@ int libewf_segment_file_handle_initialize(
 		if( memory_set(
 		     ( *segment_file_handle )->section_list,
 		     0,
-		     sizeof( libewf_section_list_t ) ) == NULL )
+		     sizeof( libewf_list_t ) ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear section list.\n",
 			 function );
@@ -116,9 +118,7 @@ int libewf_segment_file_handle_initialize(
 int libewf_segment_file_handle_free(
      libewf_segment_file_handle_t **segment_file_handle )
 {
-        libewf_section_list_entry_t *section_list_entry         = NULL;
-        libewf_section_list_entry_t *current_section_list_entry = NULL;
-	static char *function                                   = "libewf_segment_file_handle_free";
+	static char *function = "libewf_segment_file_handle_free";
 
 	if( segment_file_handle == NULL )
 	{
@@ -131,18 +131,13 @@ int libewf_segment_file_handle_free(
 	{
 		if( ( *segment_file_handle )->section_list != NULL )
 		{
-			section_list_entry = ( *segment_file_handle )->section_list->first;
-
-			while( section_list_entry != NULL )
+			if( libewf_list_free(
+			     ( *segment_file_handle )->section_list,
+			     &libewf_section_list_values_free ) != 1 )
 			{
-				current_section_list_entry = section_list_entry;
-				section_list_entry         = section_list_entry->next;
-
-				memory_free(
-				 current_section_list_entry );
+				notify_warning_printf( "%s: unable to free section list.\n",
+				 function );
 			}
-			memory_free(
-			 ( *segment_file_handle )->section_list );
 		}
 		memory_free(
 		 *segment_file_handle );

@@ -27,8 +27,7 @@
 #include <system_string.h>
 #include <types.h>
 
-#include "libewf_section_list.h"
-#include "libewf_section_list.h"
+#include "libewf_list_type.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -48,7 +47,7 @@ struct libewf_segment_file_handle
 
         /* The list of all the sections
          */
-        libewf_section_list_t *section_list;
+        libewf_list_t *section_list;
 
 	/* The segment file type
 	 */

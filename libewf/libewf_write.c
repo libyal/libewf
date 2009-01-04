@@ -39,6 +39,7 @@
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_file_io_pool.h"
+#include "libewf_list_type.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
 #include "libewf_section.h"
@@ -1373,6 +1374,7 @@ ssize_t libewf_raw_write_chunk_existing(
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_raw_write_chunk_existing";
+	off64_t last_section_start_offset                 = 0;
 	off64_t segment_file_offset                       = 0;
 	ssize_t total_write_count                         = 0;
 	ssize_t write_count                               = 0;
@@ -1506,11 +1508,20 @@ ssize_t libewf_raw_write_chunk_existing(
 			}
 			if( segment_file_handle->section_list->last == NULL )
 			{
-				notify_warning_printf( "%s: invalid segment file - invalid section list - missing last section.\n",
+				notify_warning_printf( "%s: invalid segment file - invalid section list - missing last element.\n",
 				 function );
 
 				return( -1 );
 			}
+			if( segment_file_handle->section_list->last->value == NULL )
+			{
+				notify_warning_printf( "%s: invalid segment file - invalid section list - invalid last element - missing values.\n",
+				 function );
+
+				return( -1 );
+			}
+			last_section_start_offset = ( (libewf_section_list_values_t * ) segment_file_handle->section_list->last->value )->start_offset;
+
 			if( libewf_file_io_pool_get_offset(
 			     internal_handle->file_io_pool,
 			     segment_file_handle->file_io_pool_entry,
@@ -1523,22 +1534,21 @@ ssize_t libewf_raw_write_chunk_existing(
 			}
 			/* Make sure the current segment file offset points to the start of the last section
 			 */
-			if( segment_file_offset != segment_file_handle->section_list->last->start_offset )
+			if( segment_file_offset != last_section_start_offset )
 			{
 				if( libewf_file_io_pool_seek_offset(
 				     internal_handle->file_io_pool,
 				     segment_file_handle->file_io_pool_entry,
-				     segment_file_handle->section_list->last->start_offset,
+				     last_section_start_offset,
 				     SEEK_SET ) == -1 )
 				{
 					notify_warning_printf( "%s: cannot find offset: %" PRIjd ".\n",
-					 function, segment_file_handle->section_list->last->start_offset );
+					 function, last_section_start_offset );
 
 					return( -1 );
 				}
 			}
-			segment_file_offset = segment_file_handle->section_list->last->start_offset
-			                    + chunk_size + sizeof( ewf_crc_t ) + sizeof( ewf_section_t );
+			segment_file_offset = last_section_start_offset + chunk_size + sizeof( ewf_crc_t ) + sizeof( ewf_section_t );
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
@@ -2538,7 +2548,8 @@ ssize_t libewf_write_finalize(
          libewf_handle_t *handle )
 {
 	libewf_internal_handle_t *internal_handle         = NULL;
-	libewf_section_list_entry_t *list_entry_iterator  = NULL;
+	libewf_list_element_t *list_element               = NULL;
+	libewf_section_list_values_t *section_list_values = NULL;
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	void *reallocation                                = NULL;
 	static char *function                             = "libewf_write_finalize";
@@ -2794,12 +2805,21 @@ ssize_t libewf_write_finalize(
 			 function, segment_table_iterator );
 #endif
 
-			list_entry_iterator = segment_file_handle->section_list->first;
+			list_element = segment_file_handle->section_list->first;
 
-			while( list_entry_iterator != NULL )
+			while( list_element != NULL )
 			{
+				section_list_values = (libewf_section_list_values_t *) list_element->value;
+
+				if( section_list_values == NULL )
+				{
+					notify_warning_printf( "%s: missing section list values for segment file: %" PRIu16 ".\n",
+					 function, segment_table_iterator );
+
+					return( -1 );
+				}
 				if( memory_compare(
-				     list_entry_iterator->type,
+				     section_list_values->type,
 				     "volume",
 				     6 ) == 0 )
 				{
@@ -2811,7 +2831,7 @@ ssize_t libewf_write_finalize(
 					if( libewf_file_io_pool_seek_offset(
 					     internal_handle->file_io_pool,
 					     segment_file_handle->file_io_pool_entry,
-					     list_entry_iterator->start_offset,
+					     section_list_values->start_offset,
 					     SEEK_SET ) == -1 )
 					{
 						notify_warning_printf( "%s: unable to find offset to correct volume section.\n",
@@ -2855,7 +2875,7 @@ ssize_t libewf_write_finalize(
 					}
 				}
 				else if( memory_compare(
-				          list_entry_iterator->type,
+				          section_list_values->type,
 				          "data",
 				          4 ) == 0 )
 				{
@@ -2867,7 +2887,7 @@ ssize_t libewf_write_finalize(
 					if( libewf_file_io_pool_seek_offset(
 					     internal_handle->file_io_pool,
 					     segment_file_handle->file_io_pool_entry,
-					     list_entry_iterator->start_offset,
+					     section_list_values->start_offset,
 					     SEEK_SET ) == -1 )
 					{
 						notify_warning_printf( "%s: unable to find offset to data volume section.\n",
@@ -2894,7 +2914,7 @@ ssize_t libewf_write_finalize(
 						return( -1 );
 					}
 				}
-				list_entry_iterator = list_entry_iterator->next;
+				list_element = list_element->next;
 			}
 			if( libewf_file_io_pool_close(
 			     internal_handle->file_io_pool,
