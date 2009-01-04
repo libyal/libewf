@@ -160,6 +160,7 @@ CLOSED
 Version: 20080301
 * Code clean up
 * Refactored hash and header value functions
+* fixed not writing linen6 header correctly
 
 Version: 20080229
 * Code clean up

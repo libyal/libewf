@@ -127,13 +127,12 @@ int libewf_header_sections_create(
 	}
 	if( format == LIBEWF_FORMAT_EWF )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_ewf(
-		                           header_values,
-		                           timestamp,
-		                           compression_level,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_ewf(
+		     header_values,
+		     timestamp,
+		     compression_level,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
@@ -143,13 +142,12 @@ int libewf_header_sections_create(
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE1 )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_encase1(
-		                           header_values,
-		                           timestamp,
-		                           compression_level,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_encase1(
+		     header_values,
+		     timestamp,
+		     compression_level,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
@@ -160,13 +158,12 @@ int libewf_header_sections_create(
 	else if( ( format == LIBEWF_FORMAT_ENCASE2 )
 	 || ( format == LIBEWF_FORMAT_ENCASE3 ) )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_encase2(
-		                           header_values,
-		                           timestamp,
-		                           compression_level,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_encase2(
+		     header_values,
+		     timestamp,
+		     compression_level,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
@@ -177,13 +174,12 @@ int libewf_header_sections_create(
 	else if( ( format == LIBEWF_FORMAT_FTK )
 	 || ( format == LIBEWF_FORMAT_SMART ) )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_ftk(
-		                           header_values,
-		                           timestamp,
-		                           compression_level,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_ftk(
+		     header_values,
+		     timestamp,
+		     compression_level,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
@@ -193,29 +189,28 @@ int libewf_header_sections_create(
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE4 )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_encase4(
-		                           header_values,
-		                           timestamp,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_encase4(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
 		}
-		header_sections->header2 = libewf_header_values_generate_header2_string_encase4(
-		                            header_values,
-		                            timestamp,
-		                            &( header_sections->header2_size ) );
-
-		if( header_sections->header2 == NULL )
+		if( libewf_header_values_generate_header2_encase4(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header2 ),
+		     &( header_sections->header2_size ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create header2 sections.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create header2 section.\n",
 			 function );
 
-			libewf_common_free( header_sections->header );
+			libewf_common_free(
+			 header_sections->header );
 
 			header_sections->header      = NULL;
 			header_sections->header_size = 0;
@@ -225,29 +220,28 @@ int libewf_header_sections_create(
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE5 )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_encase4(
-		                           header_values,
-		                           timestamp,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_encase4(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
 		}
-		header_sections->header2 = libewf_header_values_generate_header2_string_encase5(
-		                            header_values,
-		                            timestamp,
-		                            &( header_sections->header2_size ) );
-
-		if( header_sections->header2 == NULL )
+		if( libewf_header_values_generate_header2_encase5(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header2 ),
+		     &( header_sections->header2_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header2 sections.\n",
 			 function );
 
-			libewf_common_free( header_sections->header );
+			libewf_common_free(
+			 header_sections->header );
 
 			header_sections->header      = NULL;
 			header_sections->header_size = 0;
@@ -257,29 +251,28 @@ int libewf_header_sections_create(
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE6 )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_encase4(
-		                           header_values,
-		                           timestamp,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_encase4(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
 		}
-		header_sections->header2 = libewf_header_values_generate_header2_string_encase6(
-		                            header_values,
-		                            timestamp,
-		                            &( header_sections->header2_size ) );
-
-		if( header_sections->header2 == NULL )
+		if( libewf_header_values_generate_header2_encase6(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header2 ),
+		     &( header_sections->header2_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header2 sections.\n",
 			 function );
 
-			libewf_common_free( header_sections->header );
+			libewf_common_free(
+			 header_sections->header );
 
 			header_sections->header      = NULL;
 			header_sections->header_size = 0;
@@ -287,15 +280,27 @@ int libewf_header_sections_create(
 			return( -1 );
 		}
 	}
-	else if( ( format == LIBEWF_FORMAT_LINEN5 )
-	 || ( format == LIBEWF_FORMAT_LINEN6 ) )
+	else if( format == LIBEWF_FORMAT_LINEN5 )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_encase5_linen(
-		                           header_values,
-		                           timestamp,
-		                           &( header_sections->header_size ) );
+		if( libewf_header_values_generate_header_linen5(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
+			 function );
 
-		if( header_sections->header == NULL )
+			return( -1 );
+		}
+	}
+	else if( format == LIBEWF_FORMAT_LINEN6 )
+	{
+		if( libewf_header_values_generate_header_linen6(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
@@ -305,47 +310,47 @@ int libewf_header_sections_create(
 	}
 	else if( format == LIBEWF_FORMAT_EWFX )
 	{
-		header_sections->header = libewf_header_values_generate_header_string_ewfx(
-		                           header_values,
-		                           timestamp,
-		                           &( header_sections->header_size ) );
-
-		if( header_sections->header == NULL )
+		if( libewf_header_values_generate_header_ewfx(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header ),
+		     &( header_sections->header_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
 		}
-		header_sections->header2 = libewf_header_values_generate_header2_string_ewfx(
-		                            header_values,
-		                            timestamp,
-		                            &( header_sections->header2_size ) );
-
-		if( header_sections->header2 == NULL )
+		if( libewf_header_values_generate_header2_ewfx(
+		     header_values,
+		     timestamp,
+		     &( header_sections->header2 ),
+		     &( header_sections->header2_size ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create header2 sections.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create header2 section.\n",
 			 function );
 
-			libewf_common_free( header_sections->header );
+			libewf_common_free(
+			 header_sections->header );
 
 			header_sections->header      = NULL;
 			header_sections->header_size = 0;
 
 			return( -1 );
 		}
-		header_sections->xheader = libewf_header_values_generate_xheader_string_ewfx(
-		                            header_values,
-		                            timestamp,
-		                            &( header_sections->xheader_size ) );
-
-		if( header_sections->xheader == NULL )
+		if( libewf_header_values_generate_xheader_ewfx(
+		     header_values,
+		     timestamp,
+		     &( header_sections->xheader ),
+		     &( header_sections->xheader_size ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create xheader section.\n",
 			 function );
 
-			libewf_common_free( header_sections->header );
-			libewf_common_free( header_sections->header2 );
+			libewf_common_free(
+			 header_sections->header );
+			libewf_common_free(
+			 header_sections->header2 );
 
 			header_sections->header       = NULL;
 			header_sections->header_size  = 0;
