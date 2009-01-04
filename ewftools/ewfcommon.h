@@ -35,6 +35,8 @@
 #if !defined( _EWFCOMMON_H )
 #define _EWFCOMMON_H
 
+#include <common.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <stdio.h>

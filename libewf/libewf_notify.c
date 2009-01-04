@@ -42,6 +42,32 @@
 #include "libewf_common.h"
 #include "libewf_notify.h"
 
+#if defined( HAVE_STDARG_H )
+
+#include <stdarg.h>
+
+#define VARARGS( function, type, argument ) \
+	function( type argument, ... )
+#define VASTART( argument_list, type, name ) \
+	va_start( argument_list, name )
+#define VAEND( argument_list ) \
+	va_end( argument_list )
+
+#elif defined( HAVE_VARARGS_H )
+
+#include <varargs.h>
+
+#define VARARGS( function, type, argument ) \
+	function( va_alist ) va_dcl
+#define VASTART( argument_list, type, name ) \
+	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
+#define VAEND( argument_list ) \
+	va_end( argument_list ); }
+
+#else
+#error No variable argument support available
+#endif
+
 FILE *libewf_notify_stream    = NULL;
 uint8_t libewf_notify_verbose = 0;
 

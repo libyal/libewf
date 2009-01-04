@@ -1,5 +1,5 @@
 /*
- * Memory functions
+ * Notification function
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,55 +31,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _MEMORY_H )
-#define _MEMORY_H
+#if !defined( _NOTIFY_H )
+#define _NOTIFY_H
 
 #include "common.h"
 
-#if defined( HAVE_STDLIB_H )
-#include <stdlib.h>
-#endif
-
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
+#include <stdio.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define memory_allocate( size ) \
-	malloc( size )
+extern int notify_verbose;
 
-#define memory_reallocate( buffer, size ) \
-	realloc( (void *) buffer, size )
+void notify_set_values(
+      FILE *stream,
+      int verbose );
 
-#define memory_free( buffer ) \
-	free( (void *) buffer )
+void notify_printf(
+      char *format,
+      ... );
 
-#if defined( HAVE_MEMCMP )
-#define memory_compare( buffer1, buffer2, size ) \
-	memcmp( (const void *) buffer1, (const void *) buffer2, size )
+#define notify_verbose_printf \
+	if( notify_verbose != 0 ) notify_printf
 
-#else
-#error Missing function memcmp
-#endif
-
-#if defined( HAVE_MEMCPY )
-#define memory_copy( destination, source, count ) \
-	memcpy( (void *) destination, (void *) source, count )
-
-#else
-#error Missing function memcpy
-#endif
-
-#if defined( HAVE_MEMSET )
-#define memory_set( buffer, value, count ) \
-	memset( (void *) buffer, (int) value, count )
-
-#else
-#error Missing function memset
-#endif
+#define notify_warning_printf \
+	notify_printf
 
 #if defined( __cplusplus )
 }

@@ -149,6 +149,8 @@ Next stable:
 
 * rename include/libewf/libewf_x to include/libewf/x
 
+* change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -174,7 +176,6 @@ CLOSED
 
 Version: 20080306
 * worked on seperating common code
-  - refactored libewf_common_alloc, libewf_common_realloc
 
 Version: 20080305
 * worked on signal handling

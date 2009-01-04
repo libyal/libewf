@@ -1,5 +1,5 @@
 /*
- * Memory functions
+ * Notification functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,59 +31,76 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _MEMORY_H )
-#define _MEMORY_H
-
 #include "common.h"
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
+#include <stdio.h>
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
+#if defined( HAVE_STDARG_H )
+#include <stdarg.h>
 
-#define memory_allocate( size ) \
-	malloc( size )
+#define VARARGS( function, type, argument ) \
+	function( type argument, ... )
+#define VASTART( argument_list, type, name ) \
+	va_start( argument_list, name )
+#define VAEND( argument_list ) \
+	va_end( argument_list )
 
-#define memory_reallocate( buffer, size ) \
-	realloc( (void *) buffer, size )
+#elif defined( HAVE_VARARGS_H )
+#include <varargs.h>
 
-#define memory_free( buffer ) \
-	free( (void *) buffer )
-
-#if defined( HAVE_MEMCMP )
-#define memory_compare( buffer1, buffer2, size ) \
-	memcmp( (const void *) buffer1, (const void *) buffer2, size )
-
-#else
-#error Missing function memcmp
-#endif
-
-#if defined( HAVE_MEMCPY )
-#define memory_copy( destination, source, count ) \
-	memcpy( (void *) destination, (void *) source, count )
+#define VARARGS( function, type, argument ) \
+	function( va_alist ) va_dcl
+#define VASTART( argument_list, type, name ) \
+	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
+#define VAEND( argument_list ) \
+	va_end( argument_list ); }
 
 #else
-#error Missing function memcpy
+#error No variable argument support available
 #endif
 
-#if defined( HAVE_MEMSET )
-#define memory_set( buffer, value, count ) \
-	memset( (void *) buffer, (int) value, count )
+#include "notify.h"
 
-#else
-#error Missing function memset
-#endif
+FILE *notify_stream = NULL;
+int notify_verbose  = 0;
 
-#if defined( __cplusplus )
+/* Set the notify values
+ */
+void notify_set_values(
+      FILE *stream,
+      int verbose )
+{
+	notify_stream  = stream;
+	notify_verbose = verbose;
 }
-#endif
 
-#endif
+/* Print a formatted string on the notify stream
+ */
+void VARARGS(
+      libewf_printf,
+      char *,
+      format )
+{
+	va_list argument_list;
+
+	if( notify_stream != NULL )
+	{
+		VASTART(
+		 argument_list,
+		 char *,
+		 format );
+
+		vfprintf(
+		 notify_stream,
+		 format,
+		 argument_list );
+
+		VAEND(
+		 argument_list );
+	}
+}
 

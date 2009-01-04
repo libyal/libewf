@@ -1,5 +1,5 @@
 /*
- * Common code for libewf - wraps external function calls
+ * File IO functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,10 +31,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_COMMON_H )
-#define _LIBEWF_COMMON_H
+#if !defined( _FILE_IO_H )
+#define _FILE_IO_H
 
-#include "libewf_includes.h"
+#include "common.h"
+
+#if defined( HAVE_WINDOWS_API )
+#include <io.h>
+#include <share.h>
+
+#else
+#if defined( HAVE_SYS_TYPES_H )
+#include <sys/types.h>
+#endif
 
 #if defined( HAVE_SYS_STAT_H )
 #include <sys/stat.h>
@@ -44,141 +53,79 @@
 #include <fcntl.h>
 #endif
 
-#if defined( HAVE_STDLIB_H )
-#include <stdlib.h>
-#endif
-
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
-
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
 
-#if defined( HAVE_IO_H )
-#include <io.h>
-#include <share.h>
 #endif
-
-#include <time.h>
-
-#include "libewf_char.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_STRLEN )
-#define libewf_common_string_length( string ) \
-	strlen( string )
+#if defined( HAVE_WINDOWS_API )
+#define FILE_IO_CREAT   _O_CREAT
+#define FILE_IO_RDONLY	_O_RDONLY
+#define FILE_IO_RDWR	_O_RDWR
+#define FILE_IO_WRONLY	_O_WRONLY
+#define FILE_IO_TRUNC   _O_TRUNC
+
 #else
-#error Missing string length function (strlen)
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-#if defined( HAVE_WCSLEN )
-#define libewf_common_wide_string_length( string ) \
-	wcslen( string )
-#else
-#error Missing wide character string length function (wcslen)
-#endif
-
-#if defined( HAVE_WMEMCPY )
-#define libewf_common_wide_memcpy( destination, source, length ) \
-	(wchar_t *) wmemcpy( (void *) destination, (void *) source, length )
-#else
-#error Missing wide character memory copy function (wmemcpy)
-#endif
+#define FILE_IO_CREAT   O_CREAT
+#define FILE_IO_RDONLY	O_RDONLY
+#define FILE_IO_RDWR	O_RDWR
+#define FILE_IO_WRONLY	O_WRONLY
+#define FILE_IO_TRUNC   O_TRUNC
 
 #endif
 
-int libewf_common_open(
+int file_io_open(
      const char *filename,
-     uint8_t flags );
+     int flags );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_common_wide_open(
+int file_io_wopen(
      const wchar_t *filename,
-     uint8_t flags );
+     int flags );
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_read( file_descriptor, buffer, size ) \
+#define file_io_read( file_descriptor, buffer, size ) \
 	_read( file_descriptor, (void *) buffer, (unsigned int) size )
-#else
 
-#define libewf_common_read( file_descriptor, buffer, size ) \
+#else
+#define file_io_read( file_descriptor, buffer, size ) \
 	read( file_descriptor, (void *) buffer, size )
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_lseek( file_descriptor, offset, whence ) \
+#define file_io_lseek( file_descriptor, offset, whence ) \
 	_lseeki64( file_descriptor, offset, whence )
-#else
 
-#define libewf_common_lseek( file_descriptor, offset, whence ) \
+#else
+#define file_io_lseek( file_descriptor, offset, whence ) \
 	lseek( file_descriptor, offset, whence ) 
+
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_write( file_descriptor, buffer, size ) \
+#define file_io_write( file_descriptor, buffer, size ) \
 	_write( file_descriptor, (const void *) buffer, (unsigned int) size )
-#else
 
-#define libewf_common_write( file_descriptor, buffer, size ) \
+#else
+#define file_io_write( file_descriptor, buffer, size ) \
 	write( file_descriptor, (const void *) buffer, size )
+
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_close( file_descriptor ) \
+#define file_io_close( file_descriptor ) \
 	_close( file_descriptor )
-#else
 
-#define libewf_common_close( file_descriptor ) \
+#else
+#define file_io_close( file_descriptor ) \
 	close( file_descriptor )
-#endif
 
-int libewf_common_test_empty_block(
-     uint8_t *block_buffer,
-     size_t size );
-
-struct tm *libewf_common_localtime(
-            const time_t *timestamp );
-
-char *libewf_common_ctime(
-       const time_t *timestamp );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_common_wide_ctime(
-          const time_t *timestamp );
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_common_mktime( time_elements ) \
-	mktime( time_elements )
-#elif defined( HAVE_MKTIME )
-#define libewf_common_mktime( time_elements ) \
-	mktime( time_elements )
-#else
-#error Missing function mktime
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-int libewf_common_copy_wchar_to_char(
-     char *destination,
-     const wchar_t *source,
-     size_t length );
-
-int libewf_common_copy_char_to_wchar(
-     wchar_t *destination,
-     const char *source,
-     size_t length );
 #endif
 
 #if defined( __cplusplus )

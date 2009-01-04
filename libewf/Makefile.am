@@ -51,6 +51,7 @@ libewf_la_SOURCES = \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 
+libewf_la_LIBADD  = ../common/libcommon.la
 libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0
 
 distclean: clean

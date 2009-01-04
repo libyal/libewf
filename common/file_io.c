@@ -1,5 +1,5 @@
 /*
- * libewf character type to wrap both char and wchar_t
+ * File IO functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,43 +31,85 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_CHAR_H )
-#define _LIBEWF_CHAR_H
+#include "common.h"
+#include "file_io.h"
+#include "notify.h"
 
-#include "libewf_includes.h"
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-typedef wchar_t libewf_char_t;
-
-#define PRIc_EWF			"lc"
-#define PRIs_EWF			"ls"
-
-/* Intermediate version of the macro
- * required for correct evaluation
- * predefined string
+/* Function to wrap open()
  */
-#define _S_LIBEWF_CHAR_I( string )	L ## string
-#define _S_LIBEWF_CHAR( string )	_S_LIBEWF_CHAR_I( string )
+int file_io_open(
+     const char *filename,
+     int flags )
+{
+	static char *function = "file_io_open";
+	int file_descriptor   = 0;
 
+	if( filename == NULL )
+	{
+		notify_warning_printf( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WINDOWS_API )
+	if( _sopen_s(
+	     &file_descriptor,
+	     filename,
+	     ( flags | _O_BINARY ),
+	     _SH_DENYRW,
+	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 #else
+	file_descriptor = open(
+	                   filename,
+	                   flags,
+	                   0644 );
 
-typedef char libewf_char_t;
-
-#define PRIc_EWF			"c"
-#define PRIs_EWF			"s"
-
-#define _S_LIBEWF_CHAR( string )	string
-
+	if( file_descriptor == -1 )
 #endif
+	{
+		notify_warning_printf( "%s: error opening file: %s.\n",
+		 function, filename );
 
-#if defined( __cplusplus )
+		return( -1 );
+	}
+	return( file_descriptor );
 }
-#endif
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+/* Function to wrap wopen() which is the wide character equivalent of open()
+ */
+int file_io_wopen(
+     const wchar_t *filename,
+     uint8_t flags )
+{
+	static char *function = "file_io_wopen";
+	int file_descriptor   = 0;
+
+	if( filename == NULL )
+	{
+		notify_warning_printf( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WINDOWS_API )
+	if( _wsopen_s(
+	     &file_descriptor,
+	     filename,
+	     ( flags | _O_BINARY ),
+	     _SH_DENYRW,
+	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+	{
+		notify_warning_printf( "%s: error opening file: %s.\n",
+		 function, filename );
+
+		return( -1 );
+	}
+	return( file_descriptor );
+#else
+#error missing wopen()
+#endif
+}
 #endif
 
