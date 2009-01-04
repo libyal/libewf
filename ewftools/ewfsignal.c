@@ -91,29 +91,20 @@ int ewfsignal_detach(
 	return( 1 );
 }
 
-/* TODO remove function */
-void ewfsignal_initialize( void )
-{
-}
-
 #elif defined(HAVE_WINDOWS_API)
 
 #include <windows.h>
 #include <winnt.h>
 #include <crtdbg.h>
 
-/* You can pass this variable to your api if you
- * want to support cancellation.  The control handler
- * does nothing more than set the value of this variable to 1L.
- * On *nix you have to use signals to achieve the same result.
- */
-volatile int32_t cancelled;
+void (*ewfsignal_signal_handler)( ewfsignal_t ) = NULL;
 
 /* Signal handler for Ctrl+C or Ctrl+Break signals
  */
-int WINAPI ewfsignal_signal_handler( unsigned long signal )
+BOOL WINAPI ewfsignal_handler(
+             unsigned long signal )
 {
-	static char *function = "ewfsignal_signal_handler";
+	static char *function = "ewfsignal_handler";
 
 	switch( signal )
 	{
@@ -121,11 +112,11 @@ int WINAPI ewfsignal_signal_handler( unsigned long signal )
 		 */
 		case CTRL_BREAK_EVENT:
 		case CTRL_C_EVENT:
-			notify_warning_printf( "%s: stopping at break signal.\n",
-			 function );
-
-			InterlockedExchange( (long *) &cancelled, 1 );
-
+			if( ewfsignal_signal_handler != NULL )
+			{
+				ewfsignal_signal_handler(
+				 signal );
+			}
 			return( 1 );
 
 		default:
@@ -136,13 +127,15 @@ int WINAPI ewfsignal_signal_handler( unsigned long signal )
 
 /* Initialize memory usage and leakage debugging
  */
-void ewfsignal_initialize_memory_debug( void )
+void ewfsignal_initialize_memory_debug(
+      void )
 {
 	int flag = 0;
 
 	/* Get the current state of the flag and store it in a temporary variable
 	 */
-	flag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
+	flag = _CrtSetDbgFlag(
+	         _CRTDBG_REPORT_FLAG );
 
 	/* Turn on client block identifiers and automatic leak detection
 	 */
@@ -150,38 +143,105 @@ void ewfsignal_initialize_memory_debug( void )
 
 	/* Set the new state for the flag
 	 */
-	_CrtSetDbgFlag( flag );
+	_CrtSetDbgFlag(
+	 flag );
 }
 
-/* Set up signal handling
+/* Attaches a signal handler for Ctrl+C or Ctrl+Break signals
+ * Returns 1 if successful or -1 on error
  */
-void ewfsignal_initialize( void )
+int ewfsignal_attach(
+     void (*signal_handler)( ewfsignal_t ) )
 {
-	SetConsoleCtrlHandler( ewfsignal_signal_handler, 1 );
+	static char *function = "ewfsignal_attach";
 
-	SetConsoleCtrlHandler( NULL, FALSE );
+	if( signal_handler == NULL )
+	{
+		notify_warning_printf( "%s: invalid signal handler.\n",
+		 function );
 
+		return( -1 );
+	}
+	ewfsignal_signal_handler = signal_handler;
+
+	if( SetConsoleCtrlHandler(
+	     ewfsignal_handler,
+	     TRUE ) != 0 )
+	{
+		notify_warning_printf( "%s: unable to attach signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( SetConsoleCtrlHandler(
+	     NULL,
+	     FALSE ) != 0 )
+	{
+		notify_warning_printf( "%s: unable to deattach default signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
 	ewfsignal_initialize_memory_debug();
 
-	SetErrorMode( SEM_FAILCRITICALERRORS );
+	SetErrorMode(
+	 SEM_FAILCRITICALERRORS );
 
 #if defined( LOCALE_SUPPORT )
 	/* Allow subsequent threads to have their own locale.
 	 * The current application is single threaded so this
 	 * call has no practical effect here.
 	 */
-	_configthreadlocale( _ENABLE_PER_THREAD_LOCALE );
+	_configthreadlocale(
+	  _ENABLE_PER_THREAD_LOCALE );
 
 	/* Set the current thread locale to the user default
 	 * ANSI code page.
 	 */
-	setlocale( LC_ALL, "" );
+	setlocale(
+	 LC_ALL,
+	 "" );
 
 	/* Set the the code page used by multibyte functions
 	 * to use the same code page as the previous call to setlocale.
 	 */
-	_setmbcp( _MB_CP_LOCALE );
+	_setmbcp(
+	  _MB_CP_LOCALE );
 #endif
+
+	return( 1 );
+}
+
+/* Detaches a signal handler for Ctrl+C or Ctrl+Break signals
+ * Returns 1 if successful or -1 on error
+ */
+int ewfsignal_detach(
+     void )
+{
+	static char *function = "ewfsignal_detach";
+
+	if( SetConsoleCtrlHandler(
+	     NULL,
+	     TRUE ) != 0 )
+	{
+		notify_warning_printf( "%s: unable to attach default signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+
+	if( SetConsoleCtrlHandler(
+	     ewfsignal_handler,
+	     FALSE ) != 0 )
+	{
+		notify_warning_printf( "%s: unable to deattach signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	ewfsignal_signal_handler = NULL;
+
+	return( 1 );
 }
 
 #endif

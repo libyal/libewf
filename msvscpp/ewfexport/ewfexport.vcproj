@@ -193,6 +193,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\common\error_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfbyte_size_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\ewfcommon.c"
 				>
 			</File>
@@ -272,6 +280,14 @@
 			</File>
 			<File
 				RelativePath="..\..\common\date_time_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\error_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewfbyte_size_string.h"
 				>
 			</File>
 			<File

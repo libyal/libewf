@@ -34,7 +34,6 @@
 
 #include <common.h>
 #include <character_string.h>
-#include <date_time.h>
 #include <memory.h>
 #include <system_string.h>
 
@@ -357,14 +356,9 @@ int main( int argc, char * const argv[] )
 		/* Start verifying data
 		 */
 		timestamp_start = time( NULL );
+		time_string     = ewfstring_ctime(
+		                   &timestamp_start );
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-		time_string = date_time_wctime(
-		               &timestamp_start );
-#else
-		time_string = date_time_ctime(
-		               &timestamp_start );
-#endif
 		if( time_string != NULL )
 		{
 			fprintf( stdout, "Verify started at: %" PRIs_SYSTEM "\n",
@@ -409,14 +403,9 @@ int main( int argc, char * const argv[] )
 	if( ewfcommon_abort == 0 )
 	{
 		timestamp_end = time( NULL );
+		time_string   = ewfstring_ctime(
+		                 &timestamp_end );
 
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-		time_string = date_time_wctime(
-		               &timestamp_end );
-#else
-		time_string = date_time_ctime(
-		               &timestamp_end );
-#endif
 		if( count <= -1 )
 		{
 			if( time_string != NULL )

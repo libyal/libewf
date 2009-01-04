@@ -49,7 +49,6 @@
 #include "ewfmd5.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
-#include "ewfstring.h"
 
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
 #define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1024 * 1024 )

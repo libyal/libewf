@@ -34,177 +34,8 @@
 
 #include <common.h>
 #include <character_string.h>
-#include <memory.h>
 #include <notify.h>
 #include <system_string.h>
-
-#include <errno.h>
-
-#if defined( HAVE_STDLIB_H )
-#include <stdlib.h>
-#endif
-
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
-
-/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
- * before including libewf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_IMPORT
-#endif
-
-#include <libewf.h>
-
-#include "ewfstring.h"
-
-#if defined( HAVE_WINDOWS_API )
-#define ewfcommon_strerror_r( error_number, string, size ) \
-	strerror_s( string, size, error_number )
-
-#define LIBEWF_COMMON_STRERROR_R_RETURN_ERROR	0
-
-#elif defined( HAVE_STRERROR_R )
-#define ewfcommon_strerror_r( error_number, string, size ) \
-	strerror_r( error_number, string, size )
-
-#if defined( STRERROR_R_CHAR_P )
-#define LIBEWF_COMMON_STRERROR_R_RETURN_ERROR	NULL
-#else
-#define LIBEWF_COMMON_STRERROR_R_RETURN_ERROR	0
-#endif
-
-#endif
-
-/* Function to wrap strerror()
- * Returns a new instance to a string containing the error string, NULL on error
- */
-char *ewfstring_strerror(
-       int error_number )
-{
-	static char *function     = "ewfstring_strerror";
-#if !defined( ewfstring_strerror_r ) && defined( HAVE_STRERROR )
-	char *static_error_string = NULL;
-#endif
-#if defined( ewfstring_strerror_r ) || defined( HAVE_STRERROR )
-	char *error_string        = NULL;
-	size_t error_string_size  = 256;
-
-	error_string = (char *) memory_allocate(
-	                         sizeof( char ) * error_string_size );
-
-	if( error_string == NULL )
-	{
-		notify_warning_printf( "%s: unable to create error string.\n",
-		 function );
-
-		return( NULL );
-	}
-#endif
-#if defined( ewfstring_strerror_r )
-	if( ewfstring_strerror_r(
-	     error_number,
-	     error_string,
-	     error_string_size ) != LIBEWF_COMMON_STRERROR_R_RETURN_ERROR )
-	{
-		notify_warning_printf( "%s: unable to set error string.\n",
-		 function );
-
-		memory_free(
-		 error_string );
-
-		return( NULL );
-	}
-	return( error_string );
-
-#elif defined( HAVE_STRERROR )
-	static_error_string = strerror(
-	                       error_number );
-
-	if( static_error_string == NULL )
-	{
-		notify_warning_printf( "%s: unable to create static error string.\n",
-		 function );
-
-		memory_free(
-		 error_string );
-
-		return( NULL );
-	}
-	if( memory_copy(
-	     error_string,
-	     static_error_string,
-	     error_string_size ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to set error string.\n",
-		 function );
-
-		memory_free(
-		 error_string );
-
-		return( NULL );
-	}
-	return( error_string );
-#else
-
-	return( NULL );
-#endif
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-#if defined( HAVE_WINDOWS_API )
-#define ewfstring_wide_strerror_r( error_number, string, size ) \
-	_wcserror_s( string, size, error_number )
-
-#define LIBEWF_COMMON_WIDE_STRERROR_R_RETURN_ERROR	0
-
-#else
-#error Missing wide character equivalent of strerror()
-#endif
-
-/* Function to wrap wide character equivalent of strerror()
- * Returns a new instance to a string containing the error string, NULL on error
- */
-wchar_t *ewfstring_wide_strerror(
-          int error_number )
-{
-	static char *function      = "ewfstring_wide_strerror";
-#if defined( libewf_wide_common_strerror_r )
-	wchar_t *error_string      = NULL;
-	uint16_t error_string_size = 256;
-
-	error_string = (wchar_t *) memory_allocate(
-	                            sizeof( wchar_t ) * error_string_size );
-
-	if( error_string == NULL )
-	{
-		notify_warning_printf( "%s: unable to create error string.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( ewfstring_wide_strerror_r(
-	     error_number,
-	     error_string,
-	     error_string_size ) != LIBEWF_COMMON_STRERROR_R_RETURN_ERROR )
-	{
-		notify_warning_printf( "%s: unable to set error string.\n",
-		 function );
-
-		memory_free(
-		 error_string );
-
-		return( NULL );
-	}
-	return( error_string );
-#else
-
-	return( NULL );
-#endif
-}
-#endif
 
 /* Copies the source string (of system_character_t) into the destination string for a certain length
  * Terminates the destination string with \0 at ( length - 1 )
@@ -243,12 +74,12 @@ int ewfstring_copy_system_string_to_character_string(
 		else if( conversion > 0 )
 		{
 			destination[ iterator ] = (character_t) btowc(
-			                                           (int) source[ iterator ] );
+			                                         (int) source[ iterator ] );
 		}
 		else if( conversion < 0 )
 		{
 			destination[ iterator ] = (character_t) wctob(
-			                                           (wint_t) source[ iterator ] );
+			                                         (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
 			 */
@@ -308,7 +139,7 @@ int ewfstring_copy_character_string_to_system_string(
 		else if( conversion > 0 )
 		{
 			destination[ iterator ] = (system_character_t) wctob(
-			                                    (wint_t) source[ iterator ] );
+			                                                (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
 			 */
@@ -320,7 +151,7 @@ int ewfstring_copy_character_string_to_system_string(
 		else if( conversion < 0 )
 		{
 			destination[ iterator ] = (system_character_t) btowc(
-			                                    (int) source[ iterator ] );
+			                                                (int) source[ iterator ] );
 		}
 #endif
 		else

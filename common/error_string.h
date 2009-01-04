@@ -1,5 +1,5 @@
 /*
- * Signal handling functions
+ * Error string functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,48 +31,64 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _EWFSIGNAL_H )
-#define _EWFSIGNAL_H
+#if !defined( _ERROR_STRING_H )
+#define _ERROR_STRING_H
 
-#include <common.h>
+#include "common.h"
 
-#if defined( HAVE_WINDOWS_API )
-#include <windows.h>
-#endif
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_SIGNAL_H )
-typedef int ewfsignal_t;
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
-int ewfsignal_attach(
-     void (*signal_handler)( ewfsignal_t ) );
+#if defined( HAVE_WINDOWS_API )
+#define error_string_wcserror_r( error_number, string, size ) \
+	_wcserror_s( string, size, error_number )
 
-int ewfsignal_detach(
-     void );
-
-#elif defined( HAVE_WINDOWS_API )
-typedef unsigned long ewfsignal_t;
-
-BOOL WINAPI ewfsignal_handler(
-             ewfsignal_t signal );
-
-void ewfsignal_initialize_memory_debug(
-      void );
-
-int ewfsignal_attach(
-     void (*signal_handler)( ewfsignal_t ) );
-
-int ewfsignal_detach(
-     void );
+#define ERROR_STRING_WCSTRERROR_R_RETURN_ERROR	0
 
 #else
-
-#error missing signal function
+#error Missing wide character equivalent of strerror()
 #endif
 
+#endif
+
+#if defined( HAVE_WINDOWS_API )
+#define error_string_strerror_r( error_number, string, size ) \
+	strerror_s( string, size, error_number )
+
+#define ERROR_STRING_STRERROR_R_RETURN_ERROR	0
+
+#elif defined( HAVE_STRERROR_R )
+#define error_string_strerror_r( error_number, string, size ) \
+	strerror_r( error_number, string, size )
+
+#if defined( STRERROR_R_CHAR_P )
+#define ERROR_STRING_STRERROR_R_RETURN_ERROR	NULL
+
+#else
+#define ERROR_STRING_STRERROR_R_RETURN_ERROR	0
+#endif
+
+#endif
+
+char *libewf_error_string_strerror(
+       int error_number );
+
+#define error_string_strerror( error_number ) \
+	libewf_error_string_strerror( error_number )
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+wchar_t *libewf_error_string_wcerror(
+          int error_number );
+
+#define error_string_wcserror( error_number ) \
+	libewf_error_string_wcrerror( error_number )
+
+#endif
 
 #if defined( __cplusplus )
 }

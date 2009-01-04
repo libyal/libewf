@@ -78,6 +78,7 @@
 #include "../libewf/ewf_digest_hash.h"
 
 #include "ewfcommon.h"
+#include "ewfstring.h"
 
 /* EWFCOMMON_BUFFER_SIZE definition is intended for testing purposes
  */
@@ -602,7 +603,7 @@ ssize32_t ewfcommon_read_input(
 			              &( buffer[ buffer_offset + read_error_offset ] ),
 			              bytes_to_read );
 
-			notify_verbose_printf( "%s: read chunk: %" PRIi32 " with size: %" PRIzi ".\n",
+			notify_verbose_printf( "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
 			 function, ( chunk_amount + 1 ), read_count );
 
 			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
@@ -615,7 +616,8 @@ ssize32_t ewfcommon_read_input(
 				 || ( errno == ENXIO )
 				 || ( errno == ENODEV ) )
 				{
-					error_string = ewfstring_strerror( errno );
+					error_string = ewfstring_strerror(
+					                errno );
 
 					if( error_string != NULL )
 					{
@@ -666,7 +668,7 @@ ssize32_t ewfcommon_read_input(
 
 					if( current_read_offset != current_calculated_offset )
 					{
-						notify_verbose_printf( "%s: correcting offset drift current: %" PRIji ", calculated: %" PRIji ".\n",
+						notify_verbose_printf( "%s: correcting offset drift current: %" PRIjd ", calculated: %" PRIjd ".\n",
 						 function, current_read_offset, current_calculated_offset );
 
 						if( current_read_offset < current_calculated_offset )
@@ -722,7 +724,7 @@ ssize32_t ewfcommon_read_input(
 				{
 					return( 0 );
 				}
-				notify_verbose_printf( "%s: read error at offset %" PRIji " after reading %" PRIzi " bytes.\n",
+				notify_verbose_printf( "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
 				 function, current_calculated_offset, read_count );
 
 				/* There was a read error at a certain offset
@@ -863,7 +865,7 @@ ssize32_t ewfcommon_read_input(
 					read_error_offset     += error_skip_bytes;
 					read_amount_of_errors  = 0;
 
-					notify_verbose_printf( "%s: remaining to read from chunk %" PRIzi " bytes.\n",
+					notify_verbose_printf( "%s: remaining to read from chunk %" PRIzd " bytes.\n",
 					 function, bytes_to_read );
 				}
 				else

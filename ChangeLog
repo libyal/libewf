@@ -157,7 +157,10 @@ Next stable:
 
 * missing \n in some headers?
 
-* ewfinfo: change session print
+* ewfinfo: change session print?
+
+* WIN32: fix ewfcommon_determine_operating_system
+* WIN32: system_char and fopen?
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

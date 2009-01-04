@@ -380,7 +380,7 @@ ssize_t libewf_raw_read_chunk(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	notify_verbose_printf( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzi ".\n",
+	notify_verbose_printf( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
 	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type,
 	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
