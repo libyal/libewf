@@ -1257,9 +1257,9 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
  */
 ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, LIBEWF_SECTION_LIST *section_list, off_t start_offset, int last_segment_file )
 {
-	EWF_CHAR *last_section = NULL;
-	static char *function  = "libewf_segment_file_write_last_section";
-	ssize_t write_count    = 0;
+	EWF_CHAR *last_section_type = NULL;
+	static char *function       = "libewf_segment_file_write_last_section";
+	ssize_t write_count         = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1284,35 +1284,35 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	if( last_segment_file == 0 )
 	{
-		last_section = (EWF_CHAR *) "next";
+		last_section_type = (EWF_CHAR *) "next";
 	}
 	else
 	{
-		last_section = (EWF_CHAR *) "done";
+		last_section_type = (EWF_CHAR *) "done";
 	}
 	/* Write next or done section
 	 */
 	write_count = libewf_section_last_write(
 		       internal_handle,
 		       file_descriptor,
-		       last_section,
+		       last_section_type,
 		       start_offset );
 
 	if( write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write %s section.\n",
-		 function, (char *) last_section );
+		 function, (char *) last_section_type );
 
 		return( -1 );
 	}
 	if( libewf_section_list_append(
 	     section_list,
-	     last_section
+	     last_section_type,
 	     start_offset,
 	     ( start_offset + write_count ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to append %s section to section list.\n",
-		 function, (char *) last_section );
+		 function, (char *) last_section_type );
 
 		return( -1 );
 	}
@@ -1530,38 +1530,7 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 
 		return( -1 );
 	}
-	if( last_segment_file == 0 )
-	{
-		/* Write next section
-		 */
-		write_count = libewf_section_last_write(
-		               internal_handle,
-		               file_descriptor,
-		               (EWF_CHAR *) "next",
-		               start_offset );
-
-		if( write_count == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write next section.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_section_list_append(
-		     section_list,
-		     (EWF_CHAR *) "next",
-		     start_offset,
-		     ( start_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append next section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		start_offset      += write_count;
-		total_write_count += write_count;
-	}
-	else
+	if( last_segment_file != 0 )
 	{
 		if( internal_handle->calculated_md5_hash != NULL )
 		{
@@ -1694,35 +1663,25 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 			start_offset      += write_count;
 			total_write_count += write_count;
 		}
-		/* Write the done section
-		 */
-		write_count = libewf_section_last_write(
-		               internal_handle,
-		               file_descriptor,
-		               (EWF_CHAR *) "done",
-		               start_offset );
-
-		if( write_count == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write done section.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_section_list_append(
-		     section_list,
-		     (EWF_CHAR *) "done",
-		     start_offset,
-		     ( start_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append done section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		start_offset      += write_count;
-		total_write_count += write_count;
 	}
+	/* Write the last section
+	 */
+	write_count = libewf_segment_file_write_last_section(
+	               internal_handle,
+	               file_descriptor,
+	               section_list,
+	               start_offset,
+	               last_segment_file );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+		 function );
+
+		return( -1 );
+	}
+	total_write_count += write_count;
+
 	return( total_write_count );
 }
 

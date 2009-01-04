@@ -119,6 +119,8 @@ TODO
 * make buffer passthroug default behavior
 * remove libewf_common_string_copy and libewf_common_wide_string_copy ?
   use memcpy instead
+* remove libewf_write_process_chunk_data ?
+  move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
