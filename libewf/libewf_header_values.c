@@ -1421,7 +1421,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string( LIBEWF_CHAR *hea
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_HEADER *header, size_t size, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_CHAR *header, size_t size, uint8_t date_format )
 {
 	LIBEWF_HEADER_VALUES* header_values = NULL;
 	LIBEWF_CHAR *header_string          = NULL;
@@ -1462,7 +1462,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_HEADER *header, siz
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_header2( EWF_HEADER2 *header2, size_t size, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_header2( EWF_CHAR *header2, size_t size, uint8_t date_format )
 {
 	LIBEWF_HEADER_VALUES* header_values = NULL;
 	LIBEWF_CHAR *header_string          = NULL;
@@ -1507,9 +1507,9 @@ LIBEWF_HEADER_VALUES *libewf_header_values_parse_header2( EWF_HEADER2 *header2, 
  * Sets header length
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *header_string, size_t string_length, size_t *header_length )
+EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *header_string, size_t string_length, size_t *header_length )
 {
-	EWF_HEADER *header    = NULL;
+	EWF_CHAR *header      = NULL;
 	static char *function = "libewf_header_values_convert_header_string_to_header";
 
 	if( header_string == NULL )
@@ -1526,7 +1526,7 @@ EWF_HEADER *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *h
 
 		return( NULL );
 	}
-	header = (EWF_HEADER *) libewf_common_alloc( EWF_HEADER_SIZE * string_length );
+	header = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * string_length );
 
 	if( header == NULL )
 	{
@@ -1561,9 +1561,9 @@ EWF_HEADER *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *h
  * Sets header2 length
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER2 *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *header_string, size_t string_length, size_t *header2_length )
+EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *header_string, size_t string_length, size_t *header2_length )
 {
-	EWF_HEADER2 *header2  = NULL;
+	EWF_CHAR *header2     = NULL;
 	static char *function = "libewf_header_values_convert_header_string_to_header2";
 
 	if( header_string == NULL )
@@ -1584,7 +1584,7 @@ EWF_HEADER2 *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR 
 	 */
 	*header2_length = ( string_length + 1 ) * 2;
 
-	header2 = (EWF_HEADER2 *) libewf_common_alloc( EWF_HEADER2_SIZE * *header2_length );
+	header2 = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * *header2_length );
 
 	if( header2 == NULL )
 	{
@@ -3167,9 +3167,9 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_HEADER_VA
 /* Generate an EWF header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_ewf( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tm\tu\tp\tr\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3200,9 +3200,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_ewf( LIBEWF_HEADER_VALUE
 /* Generate an EnCase1 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_encase1( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
@@ -3233,9 +3233,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase1( LIBEWF_HEADER_V
 /* Generate an FTK Imager header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3266,9 +3266,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 /* Generate an EnCase2 and EnCase3 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_encase2( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
@@ -3299,9 +3299,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase2( LIBEWF_HEADER_V
 /* Generate an EnCase4 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
@@ -3331,9 +3331,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 /* Generate an EnCase5 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3363,9 +3363,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_HE
 /* Generate an EnCase6 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_HEADER *header              = NULL;
+	EWF_CHAR *header                = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3395,9 +3395,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_HE
 /* Generate an EnCase4 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER2 *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
+EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_HEADER2 *header2            = NULL;
+	EWF_CHAR *header2               = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3427,9 +3427,9 @@ EWF_HEADER2 *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER
 /* Generate an EnCase5 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER2 *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
+EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_HEADER2 *header2            = NULL;
+	EWF_CHAR *header2               = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\tdc\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3459,9 +3459,9 @@ EWF_HEADER2 *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER
 /* Generate an EnCase6 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER2 *libewf_header_values_generate_header2_string_encase6( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
+EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_HEADER2 *header2            = NULL;
+	EWF_CHAR *header2               = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3689,7 +3689,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR 
 /* Parse an EWF xheader for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_xheader( EWF_HEADER *xheader, size_t size, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size_t size, uint8_t date_format )
 {
 	LIBEWF_HEADER_VALUES* header_values = NULL;
 	LIBEWF_CHAR *xml_header_string      = NULL;
@@ -3933,9 +3933,9 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_HEADER_VALU
 /* Generate an EWFX header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_header_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_HEADER  *header             = NULL;
+	EWF_CHAR  *header               = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3965,9 +3965,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_ewfx( LIBEWF_HEADER_VALU
 /* Generate an EWFX header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER2 *libewf_header_values_generate_header2_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
+EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_HEADER  *header2            = NULL;
+	EWF_CHAR  *header2              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3998,9 +3998,9 @@ EWF_HEADER2 *libewf_header_values_generate_header2_string_ewfx( LIBEWF_HEADER_VA
 /* Generate an EWFX xheader
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_HEADER *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
+EWF_CHAR *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_HEADER  *xheader       = NULL;
+	EWF_CHAR  *xheader         = NULL;
 	LIBEWF_CHAR *header_string = NULL;
 	static char *function      = "libewf_header_values_generate_xheader_string_ewfx";
 
@@ -4009,10 +4009,10 @@ EWF_HEADER *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_HEADER_VAL
 	                 timestamp,
 	                 header_length );
 
-	xheader       = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+	xheader = libewf_header_values_convert_header_string_to_header(
+	           header_string,
+	           *header_length,
+	           header_length );
 
 	if( xheader == NULL )
 	{

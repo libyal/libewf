@@ -698,19 +698,19 @@ int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF
 	for( iterator = 0; iterator < size_string; iterator++ )
 	{
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-		ewf_char_string[ iterator ] = (EWF_HEADER) wctob( string[ iterator ] );
+		ewf_char_string[ iterator ] = (EWF_CHAR) wctob( string[ iterator ] );
 
 		/* If character is out of the basic ASCII range use '_' as a place holder
 		 */
-		if( ewf_char_string[ iterator ] == (EWF_HEADER) EOF )
+		if( ewf_char_string[ iterator ] == (EWF_CHAR) EOF )
 		{
-			ewf_char_string[ iterator ] = (EWF_HEADER) '_';
+			ewf_char_string[ iterator ] = (EWF_CHAR) '_';
 		}
 #else
-		ewf_char_string[ iterator ] = (EWF_HEADER) string[ iterator ];
+		ewf_char_string[ iterator ] = (EWF_CHAR) string[ iterator ];
 #endif
 	}
-	ewf_char_string[ size_string - 1 ] = (EWF_HEADER) '\0';
+	ewf_char_string[ size_string - 1 ] = (EWF_CHAR) '\0';
 
 	return( 1 );
 }
@@ -718,7 +718,7 @@ int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF
 /* Converts an EWF header2 to a string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
+int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *header2, size_t size_header2 )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
@@ -774,8 +774,8 @@ int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EW
 
 		return( -1 );
 	}
-	if( ( header2[ 0 ] == (EWF_HEADER2) 0xff )
-	 || ( header2[ 0 ] == (EWF_HEADER2) 0xfe ) )
+	if( ( header2[ 0 ] == (EWF_CHAR) 0xff )
+	 || ( header2[ 0 ] == (EWF_CHAR) 0xfe ) )
 	{
 		header2_pointer = (char *) &header2[ 2 ];
 	}
@@ -807,7 +807,7 @@ int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EW
 /* Converts a string to an EWF header2
  * Returns 1 if successful, 0 if header2 was not set, or -1 on error
  */
-int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
+int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *header2, size_t size_header2 )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
@@ -881,15 +881,15 @@ int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_
 		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( header2[ 4 ] == (EWF_HEADER2) '\0' )
+	if( header2[ 4 ] == (EWF_CHAR) '\0' )
 	{
-		header2[ 0 ] = (EWF_HEADER2) 0xfe;
-		header2[ 1 ] = (EWF_HEADER2) 0xff;
+		header2[ 0 ] = (EWF_CHAR) 0xfe;
+		header2[ 1 ] = (EWF_CHAR) 0xff;
 	}
 	else
 	{
-		header2[ 0 ] = (EWF_HEADER2) 0xff;
-		header2[ 1 ] = (EWF_HEADER2) 0xfe;
+		header2[ 0 ] = (EWF_CHAR) 0xff;
+		header2[ 1 ] = (EWF_CHAR) 0xfe;
 	}
 #endif
 	return( 1 );

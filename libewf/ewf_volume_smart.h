@@ -99,8 +99,6 @@ struct ewf_volume_smart
 	uint8_t crc[ 4 ];
 };
 
-ssize32_t ewf_volume_smart_calculate_chunk_size( EWF_VOLUME_SMART *volume );
-
 #if defined( __cplusplus )
 }
 #endif

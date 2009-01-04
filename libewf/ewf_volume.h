@@ -154,8 +154,6 @@ struct ewf_volume
 	uint8_t crc[ 4 ];
 };
 
-ssize32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume );
-
 #if defined( __cplusplus )
 }
 #endif

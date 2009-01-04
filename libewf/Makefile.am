@@ -4,24 +4,21 @@ lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
 	ewf_char.h \
-	ewf_chunk.h \
 	ewf_compress.c ewf_compress.h \
-	ewf_crc.c ewf_crc.h \
+	ewf_crc.h \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest_hash.h \
 	ewf_error2.h \
-	ewf_file_header.c ewf_file_header.h \
+	ewf_file_header.h \
 	ewf_hash.h \
-	ewf_header2.h \
-	ewf_header.h \
 	ewf_ltree.h \
 	ewf_section.h \
 	ewf_session.h \
 	ewf_string.c ewf_string.h \
 	ewf_table.h \
-	ewf_volume.c ewf_volume.h \
-	ewf_volume_smart.c ewf_volume_smart.h \
+	ewf_volume.h \
+	ewf_volume_smart.h \
 	libewf.c \
 	libewf_char.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \

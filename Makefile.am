@@ -39,6 +39,8 @@ EXTRA_DIST = \
 	debian/shlibs.local.ex \
 	debian/shlibs.local.ex.in \
 	debian/watch.ex \
+	doc/header.txt \
+	doc/header2.txt \
 	include/libewf.h.in \
 	include/libewf/libewf_definitions.h.in \
 	include/libewf/libewf_types.h.in \
