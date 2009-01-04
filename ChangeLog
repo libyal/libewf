@@ -1,6 +1,6 @@
 Roadmap:
-* add read/write support for session section
-* create iso2ewf tool
+* add read/write support for session section - partial read support
+* create iso2ewf tool?
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -14,7 +14,7 @@ Further analysis of the EWF format:
 * 16 bytes in hash section (EWF-E01)
 * values in EnCase5 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
-* values in session section
+* values in session section (+/-)
 
 To do/think about:
 * all: add LVF support - ltree section
@@ -27,9 +27,6 @@ To do/think about:
 * file: add function/flag to open segments files progressively using only the basename (like write)
 * libewf_string: enhance UTF16 conversion code
 * read: correct for errors in the table or table2 section for EWF-E01
-* look at integrating support for carvefs (libmodewf.c) - EWF specifics only
-  - put it in contrib for now ?
-  - what about xml based media data output like in libmodewf.c ?
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
   - use io pooling
@@ -89,6 +86,7 @@ Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
   virtualisation could be part of the problem
 * output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
+  - binary mode of the stdout file descriptor
 * The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
 * check chunk size for > 2 GiB table offsets
   the current assumption is that these chunks only can be uncompressed
@@ -112,11 +110,7 @@ Next release:
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
-* ewfacquire
-  - account for backspace in user input (no issue on Fedora Core 8)
 * ewfalter
-  - allow to set delta segment file path/basename
-    test if no delta files were added before change
   - allow to set maximum delta file size default 4 GiB?
 
 * work on TODO in write
@@ -162,6 +156,7 @@ Version: 20071124
 * change string to (u)int64 conversion routines to use long long equivalents
 * ewfacquirestream and ewfexport added > 2 GiB segment file support
 * libewf_filename_create now takes string and length as parameters
+* ewfalter added functionality to set delta segment file path/basename
 
 Version: 20071123
 * worked on refactoring code
