@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080412],
+ [20080416],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080412])
+ [20080416])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -250,12 +250,31 @@ AC_CHECK_LIB(
  [],
  [AC_MSG_FAILURE(
   [Missing function: adler32 in library: zlib.],
-  1)]
-)
+  [1])])
 
-AC_CHECK_LIB( z, compress2, [ ac_libewf_dummy=yes ], [ AC_MSG_FAILURE( [Missing function: compress2 in library: zlib.], 1 ) ] )
-AC_CHECK_LIB( z, compressBound, [AC_DEFINE( [HAVE_COMPRESS_BOUND], [1], [Defines if compressBound funtion is present in zlib.] ) ] )
-AC_CHECK_LIB( z, uncompress, [ ac_libewf_dummy=yes ], [ AC_MSG_FAILURE( [Missing function: uncompress in library: zlib.], 1 ) ] )
+AC_CHECK_LIB(
+ z,
+ compress2,
+ [ac_libewf_dummy=yes],
+ [AC_MSG_FAILURE(
+  [Missing function: compress2 in library: zlib.],
+  [1])])
+
+AC_CHECK_LIB(
+ z,
+ compressBound,
+ [AC_DEFINE(
+  [HAVE_COMPRESS_BOUND],
+  [1],
+  [Defines if compressBound funtion is present in zlib.])])
+
+AC_CHECK_LIB(
+ z,
+ uncompress,
+ [ac_libewf_dummy=yes],
+ [AC_MSG_FAILURE(
+  [Missing function: uncompress in library: zlib.],
+  [1])])
 
 AC_CHECK_LIB( crypto, MD5_Init, [], [ ac_libewf_have_libcrypto_md5=no ] )
 AC_CHECK_LIB( crypto, MD5_Update, [ ac_libewf_dummy=yes ], [ ac_libewf_have_libcrypto_md5=no ] )

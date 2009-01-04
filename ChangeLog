@@ -156,6 +156,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080416
+* Minor changes
+
 Version: 20080412
 * Fixed issue (introduced by RW fixes) in libewf_glob 
 * Uncommented dh_makeshlibs in debian/rules
