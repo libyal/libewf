@@ -163,6 +163,7 @@ WORKING
 
 Version: 20071104
 * refactored write functions
+* refactored read functions
 
 Version: 20071103
 * refactored write functions
