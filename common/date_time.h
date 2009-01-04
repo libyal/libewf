@@ -48,6 +48,9 @@ extern "C" {
 #define date_time_wctime_r( timestamp, string, size ) \
 	_wctime_s( string, size, timestamp )
 
+#define date_time_wctime( timestamp, string, size ) \
+	_wctime_s( string, size, timestamp )
+
 #else
 #error Missing wide character equivalent of function ctime()
 #endif
@@ -80,20 +83,38 @@ extern "C" {
 
 #if defined( HAVE_WINDOWS_API )
 #define date_time_ctime_r( timestamp, string, size ) \
-	ctime_s( string, size, timestamp )
+	ctime_s( string, size, timestamp ) != 0 ? NULL : string
+
+#define date_time_ctime( timestamp, string, size ) \
+	ctime_s( string, size, timestamp ) != 0 ? NULL : string
 
 #elif defined( HAVE_CTIME_R )
 #if defined( HAVE_CTIME_R_SIZE )
 #define date_time_ctime_r( timestamp, string, size ) \
 	ctime_r( timestamp, string, size )
 
+#define date_time_ctime( timestamp, string, size ) \
+	ctime_r( timestamp, string, size )
+
 #else
 #define date_time_ctime_r( timestamp, string, size ) \
 	ctime_r( timestamp, string )
 
+#define date_time_ctime( timestamp, string, size ) \
+	ctime_r( timestamp, string )
+
 #endif
 
-#elif !defined( HAVE_CTIME )
+#elif defined( HAVE_CTIME )
+char *libewf_date_time_ctime(
+       const time_t *timestamp,
+       char *string,
+       size_t length );
+
+#define date_time_ctime( timestamp, string, size ) \
+	libewf_date_time_ctime( timestamp, string, size )
+
+#else
 #error Missing ctime function
 #endif
 
@@ -121,19 +142,15 @@ struct tm *libewf_date_time_gmtime(
 #define date_time_gmtime( timestamp ) \
 	libewf_date_time_gmtime( timestamp )
 
-char *libewf_date_time_ctime(
+/* TODO refactor start */
+char *libewf_date_time_ctime2(
        const time_t *timestamp );
 
-#define date_time_ctime( timestamp ) \
-	libewf_date_time_ctime( timestamp )
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_date_time_wctime(
+wchar_t *libewf_date_time_wctime2(
           const time_t *timestamp );
-
-#define date_time_wctime( timestamp ) \
-	libewf_date_time_wctime( timestamp )
 #endif
+/* TODO refactor end */
 
 #if defined( __cplusplus )
 }

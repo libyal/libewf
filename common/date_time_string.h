@@ -36,18 +36,32 @@
 
 #include "common.h"
 #include "character_string.h"
+#include "date_time.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libewf_date_time_string_ctime(
-     const time_t *timestamp,
-     character_t **ctime_string,
-     size_t *ctime_string_length );
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#define date_time_string_ctime( timestamp, string, length ) \
+	date_time_wctime( timestamp, string, length )
+
+#else
+character_t *libewf_date_time_string_ctime(
+              const time_t *timestamp,
+              character_t *string,
+              size_t length );
 
 #define date_time_string_ctime( timestamp, string, length ) \
 	libewf_date_time_string_ctime( timestamp, string, length )
+
+#endif
+#else
+#define date_time_string_ctime( timestamp, string, length ) \
+	date_time_ctime( timestamp, string, length )
+
+#endif
 
 #if defined( __cplusplus )
 }

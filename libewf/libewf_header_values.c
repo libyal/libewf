@@ -155,6 +155,20 @@ int libewf_convert_timestamp(
 
 		return( -1 );
 	}
+	*date_string_length = 32;
+
+	*date_string = (character_t *) memory_allocate(
+	                                sizeof( character_t ) * *date_string_length );
+
+	if( *date_string == NULL )
+	{
+		notify_warning_printf( "%s: unable to create date string.\n",
+		 function );
+
+		*date_string_length = 0;
+
+		return( -1 );
+	}
 	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
 	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
@@ -167,10 +181,10 @@ int libewf_convert_timestamp(
 	}
 	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		if( libewf_date_time_string_ctime(
+		if( date_time_string_ctime(
 		     &timestamp,
-		     date_string,
-		     date_string_length ) != 1 )
+		     *date_string,
+		     *date_string_length ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to create ctime string.\n",
 			 function );
@@ -4308,10 +4322,24 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	if( libewf_date_time_string_ctime(
+	*date_string_length = 32;
+
+	*date_string = (character_t *) memory_allocate(
+	                                sizeof( character_t ) * *date_string_length );
+
+	if( *date_string == NULL )
+	{
+		notify_warning_printf( "%s: unable to create date string.\n",
+		 function );
+
+		*date_string_length = 0;
+
+		return( -1 );
+	}
+	if( date_time_string_ctime(
 	     &timestamp,
-	     date_string,
-	     date_string_length ) != 1 )
+	     *date_string,
+	     *date_string_length ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to create ctime string.\n",
 		 function );

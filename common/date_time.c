@@ -44,6 +44,73 @@
 
 #include "date_time.h"
 
+#if !defined( HAVE_WINDOWS_API ) && !defined( HAVE_CTIME_R )
+
+/* Sets ctime in the string
+ * The string must be at least 32 characters of length
+ * Returns the pointer to the string if successful or NULL on error
+ */
+char *libewf_date_time_ctime(
+       const time_t *timestamp,
+       char *string,
+       size_t length )
+{
+	char *ctime_string    = NULL;
+	static char *function = "libewf_date_time_ctime";
+
+	if( timestamp == NULL )
+	{
+		notify_warning_printf( "%s: invalid timestamp.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( string == NULL )
+	{
+		notify_warning_printf( "%s: invalid string.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( length > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid length.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( length < 32 )
+	{
+		notify_warning_printf( "%s: string too small.\n",
+		 function );
+
+		return( NULL );
+	}
+	ctime_string = ctime(
+	                timestamp );
+
+	if( ctime_string == NULL )
+	{
+		notify_warning_printf( "%s: unable to create ctime string.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( strncpy(
+             string,
+             ctime_string,
+             strlen(
+	      ctime_string ) ) == NULL )
+	{
+		notify_warning_printf( "%s: unable to set time string.\n",
+		 function );
+
+		return( NULL );
+	}
+	return( string );
+}
+#endif
+
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
 struct tm *libewf_date_time_localtime(
@@ -202,10 +269,10 @@ struct tm *libewf_date_time_gmtime(
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-char *libewf_date_time_ctime(
+char *libewf_date_time_ctime2(
        const time_t *timestamp )
 {
-	static char *function    = "libewf_date_time_ctime";
+	static char *function    = "libewf_date_time_ctime2";
 #if !defined( date_time_ctime_r ) && defined( HAVE_CTIME )
 	char *static_time_string = NULL;
 #endif
@@ -286,10 +353,10 @@ char *libewf_date_time_ctime(
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-wchar_t *libewf_date_time_wctime(
+wchar_t *libewf_date_time_wctime2(
           const time_t *timestamp )
 {
-	static char *function   = "libewf_date_time_wctime";
+	static char *function   = "libewf_date_time_wctime2";
 	wchar_t *time_string    = NULL;
 	size_t time_string_size = 32;
 

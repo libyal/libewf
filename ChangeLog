@@ -130,10 +130,6 @@ Next release(s):
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing
 
-* refactor time/date string functions to only set the string not allocate it?
-
-* use libewf_glob instead of ewfglob ?
-
 Documentation update:
 * DVD also uses CD media type
 * No additional session values in EnCase 6
@@ -149,10 +145,14 @@ Next stable:
 
 * refactor character_string_split to return int
 
-* change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T
+* refactor time/date string functions to only set the string not allocate it?
+* refactor ewfcommon_ctime and remove libewf xctime2 functions
+* remove date_time_ctime_r macros
+* refactor libewf_date_time_string_ctime to macro and fallback function
+  like date_time_ctime
 
+* change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T?
 * missing \n in some headers?
-
 * ewfinfo: change session print?
 
 CLOSED
@@ -169,6 +169,9 @@ CLOSED
   the basename
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   no
+
+Version: 20080312
+* Code clean up
 
 Version: 20080309
 * Code clean up

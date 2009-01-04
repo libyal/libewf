@@ -64,7 +64,7 @@ extern "C" {
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 #define ewfcommon_ctime( timestamp ) \
-	date_time_wctime( timestamp )
+	libewf_date_time_wctime2( timestamp )
 
 #define ewfcommon_strerror( error_number ) \
 	error_string_wcserror( error_number )
@@ -74,7 +74,7 @@ extern "C" {
 
 #else
 #define ewfcommon_ctime( timestamp ) \
-	date_time_ctime( timestamp )
+	libewf_date_time_ctime2( timestamp )
 
 #define ewfcommon_strerror( error_number ) \
 	error_string_strerror( error_number )
