@@ -60,6 +60,7 @@
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_string.h"
 
+#include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
@@ -215,6 +216,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_md5              = 1;
 	uint8_t calculate_sha1             = 0;
 	int output_raw                     = 1;
+	int result                         = 1;
 
 	libewf_char_t *ewfexport_format_types[ 13 ] = \
 	 { _S_LIBEWF_CHAR( "raw" ),
@@ -381,17 +383,15 @@ int main( int argc, char * const argv[] )
 				string_length = CHAR_T_LENGTH(
 				                 optarg );
 
-				end_of_string = &optarg[ string_length - 1 ];
-
-				segment_file_size  = (uint64_t) CHAR_T_TOLONG(
-				                                 optarg,
-				                                 &end_of_string,
-				                                 0 );
+				result = ewfbyte_size_string_convert_char_t(
+				          optarg,
+				          string_length,
+				          &segment_file_size );
 
 				argument_set_size  = 1;
-				segment_file_size *= 1024;
 
-				if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				if( ( result != 1 )
+				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
 				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
@@ -684,14 +684,12 @@ int main( int argc, char * const argv[] )
 				}
 				/* Segment file size
 				 */
-				segment_file_size = ewfinput_get_size_variable(
+				segment_file_size = ewfinput_get_byte_size_variable(
 						     stderr,
-						     _S_LIBEWF_CHAR( "Evidence segment file size in kibitytes (KiB)" ),
-						     1440,
-						     ( 2 * 1024 * 1024 ),
+						     _S_LIBEWF_CHAR( "Evidence segment file size in bytes" ),
+						     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
+						     maximum_segment_file_size,
 						     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
-
-				segment_file_size *= 1024;
 
 				/* Make sure the segment file size is smaller than or equal to the maximum
 				 */

@@ -1052,9 +1052,6 @@ void ewfoutput_bytes_fprint(
 		 stream,
 		 " %" PRIs_EWF " (%" PRIi64 " bytes)",
 		 bytes_string, bytes );
-
-		libewf_common_free(
-		 bytes_string );
 	}
 	else
 	{

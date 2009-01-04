@@ -61,6 +61,7 @@
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_string.h"
 
+#include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
@@ -96,6 +97,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	libewf_char_t media_size_string[ 16 ];
 	uint8_t guid[ 16 ];
 
 	libewf_char_t *program            = _S_LIBEWF_CHAR( "ewfinfo" );
@@ -125,6 +127,7 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                   = 0;
 	uint8_t date_format               = LIBEWF_DATE_FORMAT_CTIME;
 	char info_option                  = 'a';
+	int result                        = 0;
 
 	ewfsignal_initialize();
 
@@ -479,8 +482,22 @@ int main( int argc, char * const argv[] )
 		     handle,
 		     &media_size ) == 1 )
 		{
-			fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n",
-			 media_size );
+			result = ewfbyte_size_string_create(
+			          media_size_string,
+			          16,
+			          media_size,
+			          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+
+			if( result == 1 )
+			{
+				fprintf( stdout, "\tMedia size:\t\t%" PRIs_EWF " (%" PRIu64 " bytes)\n",
+				 media_size_string, media_size );
+			}
+			else
+			{
+				fprintf( stdout, "\tMedia size:\t\t%" PRIu64 " bytes\n",
+				 media_size );
+			}
 		}
 		else
 		{

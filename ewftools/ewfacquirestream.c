@@ -197,7 +197,6 @@ int main( int argc, char * const argv[] )
 	CHAR_T *option_evidence_number             = NULL;
 	CHAR_T *option_notes                       = NULL;
 	CHAR_T *time_string                        = NULL;
-	CHAR_T *end_of_string                      = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string                       = NULL;
 #endif
@@ -229,6 +228,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                     = 0;
 	uint8_t verbose                            = 0;
 	int error_abort                            = 0;
+	int result                                 = 0;
 
 	ewfsignal_initialize();
 
@@ -406,16 +406,13 @@ int main( int argc, char * const argv[] )
 				string_length = CHAR_T_LENGTH(
 				                 optarg );
 
-				end_of_string = &optarg[ string_length - 1 ];
+				result = ewfbyte_size_string_convert_char_t(
+				          optarg,
+				          string_length,
+				          &segment_file_size );
 
-				segment_file_size  = (uint64_t) CHAR_T_TOLONG(
-				                                 optarg,
-				                                 &end_of_string,
-				                                 0 );
-
-				segment_file_size *= 1024;
-
-				if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				if( ( result != 1 )
+				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
 				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )

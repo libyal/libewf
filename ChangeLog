@@ -133,8 +133,6 @@ Next release(s):
 
 * refactor time/date string functions to only set the string not allocate it?
 
-* have ewfacquirestream and ewfexport convert byte size string for segment file size
-
 Next stable:
 * full platform test
 
@@ -167,13 +165,17 @@ CLOSED
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   - no
 
+Version: 20080303
+* added byte size string to ewfinfo
+* updated manuals of ewfinfo
+
 Version: 20080302
 * Code clean up
 * worked on session support
 * ewfinfo will now output session information if present part of media information
 * worked on byte size string
-* added byte size string to ewfacquire segment file size, not to acquiry size
-  due to possible rounding errors
+* added byte size string to ewfacquire, ewfacquirestream and ewfexport
+  segment file size, not to acquiry size due to possible rounding errors
 * updated manuals of ewfacquire, ewfacquirestream and ewfexport
 
 Version: 20080301
