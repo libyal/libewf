@@ -175,6 +175,14 @@ struct libewf_internal_handle_write
 	 */
 	ewf_data_t *data_section;
 
+	/* A cached version of the table offsets
+	 */
+	ewf_table_offset_t *table_offsets;
+
+	/* The amount of allocated table offsets
+	 */
+	uint32_t amount_of_table_offsets;
+
 	/* The amount of bytes of the input written
 	 */
 	ssize64_t input_write_count;

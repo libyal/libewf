@@ -152,8 +152,7 @@ ssize_t libewf_section_table_read(
 ssize_t libewf_section_table_write(
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t base_offset,
-         libewf_offset_table_t *offset_table,
-         uint32_t offset_table_index,
+         ewf_table_offset_t *offsets,
          uint32_t amount_of_offsets,
          ewf_char_t *section_type,
          size_t section_type_length,

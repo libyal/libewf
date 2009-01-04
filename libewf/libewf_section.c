@@ -2015,8 +2015,7 @@ ssize_t libewf_section_table_read(
 ssize_t libewf_section_table_write(
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t base_offset,
-         libewf_offset_table_t *offset_table,
-         uint32_t offset_table_index,
+         ewf_table_offset_t *offsets,
          uint32_t amount_of_offsets,
          ewf_char_t *section_type,
          size_t section_type_length,
@@ -2028,17 +2027,13 @@ ssize_t libewf_section_table_write(
 	ewf_table_t table;
 	uint8_t calculated_crc_buffer[ 4 ];
 
-	ewf_table_offset_t *offsets = NULL;
 	static char *function       = "libewf_section_table_write";
 	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
-	off64_t offset64_value      = 0;
 	ssize_t section_write_count = 0;
 	ssize_t write_count         = 0;
 	size_t section_size         = 0;
 	size_t offsets_size         = 0;
-	uint32_t offset32_value     = 0;
-	uint32_t iterator           = 0;
 	uint8_t write_crc           = 0;
 
 	if( segment_file_handle == NULL )
@@ -2048,23 +2043,16 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	if( base_offset <= -1 )
+	if( base_offset < 0 )
 	{
 		notify_warning_printf( "%s: invalid base offset.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( offset_table == NULL )
+	if( offsets == NULL )
 	{
-		notify_warning_printf( "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->chunk_offset == NULL )
-	{
-		notify_warning_printf( "%s: invalid offset table - missing chunk offsets.\n",
+		notify_warning_printf( "%s: invalid offsets.\n",
 		 function );
 
 		return( -1 );
@@ -2120,51 +2108,6 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	offsets = (ewf_table_offset_t *) memory_allocate(
-	                                  offsets_size );
-
-	if( offsets == NULL )
-	{
-		notify_warning_printf( "%s: unable to create offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	for( iterator = 0; iterator < amount_of_offsets; iterator++ )
-	{
-		offset64_value = offset_table->chunk_offset[ offset_table_index + iterator ].file_offset
-		               - base_offset;
-
-		if( ( offset64_value < 0 )
-		 || ( offset64_value > (off64_t) INT32_MAX ) )
-		{
-			notify_warning_printf( "%s: invalid chunk offset value.\n",
-			 function );
-
-			memory_free(
-			 offsets );
-
-			return( -1 );
-		}
-		offset32_value = (uint32_t) offset64_value;
-
-		if( offset_table->chunk_offset[ offset_table_index + iterator ].compressed != 0 )
-		{
-			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
-		}
-		if( libewf_endian_revert_32bit(
-		     offset32_value,
-		     (uint8_t *) offsets[ iterator ].offset ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert start offset.\n",
-			 function );
-
-			memory_free(
-			 offsets );
-
-			return( -1 );
-		}
-	}
 	if( write_crc != 0 )
 	{
 		calculated_crc = ewf_crc_calculate(
@@ -2183,9 +2126,6 @@ ssize_t libewf_section_table_write(
 		notify_warning_printf( "%s: unable to write section: %s to file.\n",
 		 function, (char *) section_type );
 
-		memory_free(
-		 offsets );
-
 		return( -1 );
 	}
 	write_count = libewf_segment_file_handle_write(
@@ -2198,9 +2138,6 @@ ssize_t libewf_section_table_write(
 		notify_warning_printf( "%s: unable to write table to file.\n",
 		 function );
 
-		memory_free(
-		 offsets );
-
 		return( -1 );
 	}
 	section_write_count += write_count;
@@ -2209,9 +2146,6 @@ ssize_t libewf_section_table_write(
 	               segment_file_handle,
 	               offsets,
 	               offsets_size );
-
-	memory_free(
-	 offsets );
 
 	if( write_count != (ssize_t) offsets_size )
 	{
@@ -2224,7 +2158,9 @@ ssize_t libewf_section_table_write(
 
 	if( write_crc != 0 )
 	{
-		if( libewf_endian_revert_32bit( calculated_crc, calculated_crc_buffer ) != 1 )
+		if( libewf_endian_revert_32bit(
+		     calculated_crc,
+		     calculated_crc_buffer ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to revert CRC value.\n",
 			 function );

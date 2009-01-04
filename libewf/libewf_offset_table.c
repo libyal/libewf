@@ -178,7 +178,7 @@ void libewf_offset_table_free(
 	 offset_table );
 }
 
-/* Fills the offset table
+/* Fills the offset table from the table offsets
  * Returns 1 if successful, or -1 on error
  */
 int libewf_offset_table_fill(
@@ -244,8 +244,6 @@ int libewf_offset_table_fill(
 			return( -1 );
 		}
 	}
-	/* Read the offsets from file
-	 */
 	if( libewf_endian_convert_32bit(
 	     &raw_offset,
 	     offsets[ iterator ].offset ) != 1 )
@@ -397,6 +395,90 @@ int libewf_offset_table_fill(
 	 function, chunk_type, ( offset_table->last + 1 ), base_offset, current_offset );
 #endif
 
+	return( 1 );
+}
+
+/* Fills the offsets from the offset table
+ * amount_of_chunk_offsets contains the amount of chunk offsets to fill
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_offset_table_fill_offsets(
+     libewf_offset_table_t *offset_table,
+     uint32_t offset_table_index,
+     uint32_t amount_of_chunk_offsets,
+     off64_t base_offset,
+     ewf_table_offset_t *offsets,
+     uint32_t amount_of_offsets )
+{
+	static char *function   = "libewf_offset_table_fill_offsets";
+	off64_t offset64_value  = 0;
+	uint32_t offset32_value = 0;
+	uint32_t iterator       = 0;
+
+	if( offset_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->chunk_offset == NULL )
+	{
+		notify_warning_printf( "%s: invalid offset table - missing chunk offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( base_offset < 0 )
+	{
+		notify_warning_printf( "%s: invalid base offset.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offsets == NULL )
+	{
+		notify_warning_printf( "%s: invalid table offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_offsets < amount_of_chunk_offsets )
+	{
+		notify_warning_printf( "%s: offsets too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < amount_of_chunk_offsets; iterator++ )
+	{
+		offset64_value = offset_table->chunk_offset[ offset_table_index + iterator ].file_offset
+		               - base_offset;
+
+		if( ( offset64_value < 0 )
+		 || ( offset64_value > (off64_t) INT32_MAX ) )
+		{
+			notify_warning_printf( "%s: invalid chunk offset value.\n",
+			 function );
+
+			return( -1 );
+		}
+		offset32_value = (uint32_t) offset64_value;
+
+		if( offset_table->chunk_offset[ offset_table_index + iterator ].compressed != 0 )
+		{
+			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+		}
+		if( libewf_endian_revert_32bit(
+		     offset32_value,
+		     (uint8_t *) offsets[ iterator ].offset ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to revert start offset.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
 	return( 1 );
 }
 

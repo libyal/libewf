@@ -102,6 +102,8 @@ ssize_t libewf_segment_file_write_start(
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_offset_table_t *offset_table,
+         ewf_table_offset_t *table_offsets,
+         uint32_t amount_of_table_offsets,
          size32_t chunk_size,
          uint32_t total_chunk_amount,
          uint32_t segment_chunk_amount,
@@ -121,6 +123,8 @@ ssize_t libewf_segment_file_write_chunks_data(
 ssize_t libewf_segment_file_write_chunks_correction(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_offset_table_t *offset_table,
+         ewf_table_offset_t *table_offsets,
+         uint32_t amount_of_table_offsets,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
          uint32_t amount_of_chunks,

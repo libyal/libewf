@@ -797,6 +797,8 @@ ssize_t libewf_segment_file_write_start(
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_offset_table_t *offset_table,
+         ewf_table_offset_t *table_offsets,
+         uint32_t amount_of_table_offsets,
          size32_t chunk_size,
          uint32_t total_chunk_amount,
          uint32_t segment_chunk_amount,
@@ -817,6 +819,20 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	if( offset_table == NULL )
 	{
 		notify_warning_printf( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( table_offsets == NULL )
+	{
+		notify_warning_printf( "%s: invalid table offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_table_offsets < segment_chunk_amount )
+	{
+		notify_warning_printf( "%s: table offsets too small.\n",
 		 function );
 
 		return( -1 );
@@ -843,8 +859,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		write_count = libewf_section_table_write(
 		               segment_file_handle,
 		               0,
-		               offset_table,
-		               total_chunk_amount,
+		               table_offsets,
 		               segment_chunk_amount,
 		               (ewf_char_t *) "table",
 		               5,
@@ -1036,6 +1051,8 @@ ssize_t libewf_segment_file_write_chunks_data(
 ssize_t libewf_segment_file_write_chunks_correction(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_offset_table_t *offset_table,
+         ewf_table_offset_t *table_offsets,
+         uint32_t amount_of_table_offsets,
          off64_t chunks_section_offset,
          size64_t chunks_section_size,
          uint32_t amount_of_chunks,
@@ -1074,6 +1091,19 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
+	if( libewf_offset_table_fill_offsets(
+	     offset_table,
+	     ( amount_of_chunks - section_amount_of_chunks ),
+	     section_amount_of_chunks,
+	     base_offset,
+	     table_offsets,
+	     amount_of_table_offsets ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to fill table offsets.\n",
+		 function );
+
+		return( -1 );
+	}
 	last_segment_file_offset = segment_file_handle->file_offset;
 
 	/* Seek the start of the data chunks
@@ -1105,8 +1135,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		write_count = libewf_section_table_write(
 		               segment_file_handle,
 		               0,
-		               offset_table,
-		               ( amount_of_chunks - section_amount_of_chunks ),
+		               table_offsets,
 		               section_amount_of_chunks,
 		               (ewf_char_t *) "table",
 		               5,
@@ -1174,8 +1203,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		write_count = libewf_section_table_write(
 		               segment_file_handle,
 		               base_offset,
-		               offset_table,
-		               ( amount_of_chunks - section_amount_of_chunks ),
+		               table_offsets,
 		               section_amount_of_chunks,
 		               (ewf_char_t *) "table",
 		               5,
@@ -1198,8 +1226,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		write_count = libewf_section_table_write(
 		               segment_file_handle,
 		               base_offset,
-		               offset_table,
-		               ( amount_of_chunks - section_amount_of_chunks ),
+		               table_offsets,
 		               section_amount_of_chunks,
 		               (ewf_char_t *) "table2",
 		               6,

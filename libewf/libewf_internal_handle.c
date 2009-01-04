@@ -548,6 +548,8 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 		return( NULL );
 	}
 	handle_write->data_section                     = NULL;
+	handle_write->table_offsets                    = NULL;
+	handle_write->amount_of_table_offsets          = 0;
 	handle_write->input_write_count                = 0;
 	handle_write->write_count                      = 0;
 	handle_write->maximum_segment_file_size        = INT32_MAX;
@@ -590,6 +592,11 @@ void libewf_internal_handle_write_free(
 	{
 		memory_free(
 		 handle_write->data_section );
+	}
+	if( handle_write->table_offsets != NULL )
+	{
+		memory_free(
+		 handle_write->table_offsets );
 	}
 	memory_free(
 	 handle_write );

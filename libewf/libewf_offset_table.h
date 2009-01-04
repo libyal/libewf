@@ -84,6 +84,14 @@ int libewf_offset_table_fill(
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t error_tollerance );
 
+int libewf_offset_table_fill_offsets(
+     libewf_offset_table_t *offset_table,
+     uint32_t offset_table_index,
+     uint32_t amount_of_chunk_offsets,
+     off64_t base_offset,
+     ewf_table_offset_t *offsets,
+     uint32_t amount_of_offsets );
+
 int libewf_offset_table_calculate_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_section_list_t *section_list,

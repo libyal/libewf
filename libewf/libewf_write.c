@@ -831,6 +831,7 @@ ssize_t libewf_raw_write_chunk_new(
          ewf_crc_t chunk_crc,
          int8_t write_crc )
 {
+	void *reallocation        = NULL;
 	static char *function     = "libewf_raw_write_chunk_new";
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
@@ -1147,11 +1148,29 @@ ssize_t libewf_raw_write_chunk_new(
 		 function, internal_handle->write->chunks_per_chunks_section );
 #endif
 
+		if( internal_handle->write->amount_of_table_offsets < internal_handle->write->chunks_per_chunks_section )
+		{
+			reallocation = memory_reallocate(
+			                internal_handle->write->table_offsets,
+			                sizeof( ewf_table_offset_t ) * internal_handle->write->chunks_per_chunks_section );
+
+			if( reallocation == NULL )
+			{
+				notify_warning_printf( "%s: unable to create table offsets.\n",
+				function );
+
+				return( -1 );
+			}
+			internal_handle->write->table_offsets           = (ewf_table_offset_t *) reallocation;
+			internal_handle->write->amount_of_table_offsets = internal_handle->write->chunks_per_chunks_section;
+		}
 		/* Write the section start of the chunks section
 		 */
 		write_count = libewf_segment_file_write_chunks_section_start(
 		               internal_handle->segment_table->segment_file_handle[ segment_number ],
 		               internal_handle->offset_table,
+		               internal_handle->write->table_offsets,
+		               internal_handle->write->amount_of_table_offsets,
 		               internal_handle->media_values->chunk_size,
 		               internal_handle->write->amount_of_chunks,
 		               internal_handle->write->chunks_per_chunks_section,
@@ -1237,12 +1256,30 @@ ssize_t libewf_raw_write_chunk_new(
 		notify_verbose_printf( "%s: closing chunks section amount of data written: %" PRIi64 ".\n",
 		 function, internal_handle->write->chunks_section_write_count );
 #endif
+		if( internal_handle->write->amount_of_table_offsets < internal_handle->write->section_amount_of_chunks )
+		{
+			reallocation = memory_reallocate(
+			                internal_handle->write->table_offsets,
+			                sizeof( ewf_table_offset_t ) * internal_handle->write->section_amount_of_chunks );
+
+			if( reallocation == NULL )
+			{
+				notify_warning_printf( "%s: unable to create table offsets.\n",
+				function );
+
+				return( -1 );
+			}
+			internal_handle->write->table_offsets           = (ewf_table_offset_t *) reallocation;
+			internal_handle->write->amount_of_table_offsets = internal_handle->write->section_amount_of_chunks;
+		}
 
 		/* Correct the offset, size in the chunks section
 		 */
 		write_count = libewf_segment_file_write_chunks_correction(
 		               internal_handle->segment_table->segment_file_handle[ segment_number ],
 		               internal_handle->offset_table,
+		               internal_handle->write->table_offsets,
+		               internal_handle->write->amount_of_table_offsets,
 		               internal_handle->write->chunks_section_offset,
 		               (size64_t) internal_handle->write->chunks_section_write_count,
 		               internal_handle->write->amount_of_chunks,
@@ -2471,6 +2508,7 @@ ssize_t libewf_write_finalize(
 	libewf_internal_handle_t *internal_handle         = NULL;
 	libewf_section_list_entry_t *list_entry_iterator  = NULL;
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	void *reallocation                                = NULL;
 	static char *function                             = "libewf_write_finalize";
 	ssize_t write_count_finalize                      = 0;
 	ssize_t write_count                               = 0;
@@ -2591,9 +2629,27 @@ ssize_t libewf_write_finalize(
 			 function );
 #endif
 
+			if( internal_handle->write->amount_of_table_offsets < internal_handle->write->section_amount_of_chunks )
+			{
+				reallocation = memory_reallocate(
+				                internal_handle->write->table_offsets,
+				                sizeof( ewf_table_offset_t ) * internal_handle->write->section_amount_of_chunks );
+
+				if( reallocation == NULL )
+				{
+					notify_warning_printf( "%s: unable to create table offsets.\n",
+					function );
+
+					return( -1 );
+				}
+				internal_handle->write->table_offsets           = (ewf_table_offset_t *) reallocation;
+				internal_handle->write->amount_of_table_offsets = internal_handle->write->section_amount_of_chunks;
+			}
 			write_count = libewf_segment_file_write_chunks_correction(
 				       segment_file_handle,
 				       internal_handle->offset_table,
+			               internal_handle->write->table_offsets,
+			               internal_handle->write->amount_of_table_offsets,
 				       internal_handle->write->chunks_section_offset,
 				       (size64_t) internal_handle->write->chunks_section_write_count,
 				       internal_handle->write->amount_of_chunks,
