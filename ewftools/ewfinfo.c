@@ -586,7 +586,10 @@ int main( int argc, char * const argv[] )
 		}
 		ewfoutput_hash_values_fprint(
 		 stdout,
-		 ewfcommon_libewf_handle );
+		 ewfcommon_libewf_handle,
+		 _CHARACTER_T_STRING( "\t" ),
+		 0,
+		 0 );
 
 		fprintf( stdout, "\n" );
 

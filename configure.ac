@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080907],
+ [20080908],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080907])
+ [20080908])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -277,40 +277,48 @@ AC_CHECK_FUNCS(
   [Missing function: realloc],
   [1]) ])
 
+dnl File input/output functions used in common/noitfy.h
+AC_CHECK_FUNCS(
+ [vfprintf],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: vfprintf],
+  [1]) ])
+
 dnl File input/output functions used in common/file_io.h
 AC_CHECK_FUNCS(
  [close],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: close],
+  [Missing function: close],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [lseek],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: lseek],
+  [Missing function: lseek],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [open],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: open],
+  [Missing function: open],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [read],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: read],
+  [Missing function: read],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [write],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: write],
+  [Missing function: write],
   [1]) ])
 
 dnl File input/output functions used in common/file_stream_io.h
@@ -318,35 +326,35 @@ AC_CHECK_FUNCS(
  [fclose],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: fclose],
+  [Missing function: fclose],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [feof],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: feof],
+  [Missing function: feof],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [fopen],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: fopen],
+  [Missing function: fopen],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [fread],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: fread],
+  [Missing function: fread],
   [1]) ])
 
 AC_CHECK_FUNCS(
  [fwrite],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: fwrite],
+  [Missing function: fwrite],
   [1]) ])
 
 dnl Directory functions used in common/directory_io.h
@@ -354,7 +362,7 @@ AC_CHECK_FUNCS(
  [mkdir],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: mkdir],
+  [Missing function: mkdir],
   [1]) ])
 
 dnl Date and time functions used in common/date_time.h
@@ -399,7 +407,7 @@ AC_CHECK_FUNCS(
  [fgets],
  [],
  [AC_MSG_FAILURE(
-  [Missing functions: fgets],
+  [Missing function: fgets],
   [1]) ]) 
 
 AC_CHECK_FUNCS(
@@ -954,14 +962,14 @@ AS_IF(
 	 [btowc],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: btowc],
+	  [Missing function: btowc],
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
 	 [wctob],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: wctob],
+	  [Missing function: wctob],
 	  [1]) ])
 
 	dnl Wide character string functions used in common/wide_string.h
@@ -969,14 +977,14 @@ AS_IF(
 	 [fgetws],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: fgetws],
+	  [Missing function: fgetws],
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
 	 [swprintf],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: swprintf],
+	  [Missing function: swprintf],
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
@@ -1019,7 +1027,7 @@ AS_IF(
 	 [wcslen],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: wcslen],
+	  [Missing function: wcslen],
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
@@ -1036,14 +1044,14 @@ AS_IF(
 	 [wcstoll],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: wcstoll],
+	  [Missing function: wcstoll],
 	  [1]) ])
 
 	AC_CHECK_FUNCS(
 	 [wcstoull],
 	 [],
 	 [AC_MSG_FAILURE(
-	  [Missing functions: wcstoull],
+	  [Missing function: wcstoull],
 	  [1]) ])
 
 	dnl Make the necessary definitions

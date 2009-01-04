@@ -104,7 +104,10 @@ void ewfoutput_header_values_fprint(
 
 void ewfoutput_hash_values_fprint(
       FILE *stream,
-      libewf_handle_t *handle );
+      libewf_handle_t *handle,
+      character_t *indentation,
+      uint8_t ignore_md5,
+      uint8_t ignore_sha1 );
 
 #if defined( __cplusplus )
 }

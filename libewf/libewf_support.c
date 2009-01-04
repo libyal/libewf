@@ -29,7 +29,7 @@
 #include "libewf_handle.h"
 #include "libewf_support.h"
 
-/* Returns the library version
+/* Returns the library version as a string
  */
 const character_t *libewf_get_version(
                     void )

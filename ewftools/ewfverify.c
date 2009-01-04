@@ -676,6 +676,10 @@ int main( int argc, char * const argv[] )
 				 log_filename );
 			}
 		}
+		fprintf(
+		 stdout,
+		 "\n" );
+
 		ewfoutput_crc_errors_fprint(
 		 stdout,
 		 ewfcommon_libewf_handle,
@@ -688,6 +692,102 @@ int main( int argc, char * const argv[] )
 			 ewfcommon_libewf_handle,
 			 &amount_of_crc_errors );
 		}
+		if( calculate_md5 == 1 )
+		{
+			if( stored_md5_hash_result == 0 )
+			{
+				fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "MD5 hash stored in file:\tN/A\n" );
+				}
+			}
+			else
+			{
+				fprintf( stdout, "MD5 hash stored in file:\t%" PRIs "\n",
+				 stored_md5_hash_string );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs "\n",
+					 stored_md5_hash_string );
+				}
+			}
+			fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs "\n",
+			 calculated_md5_hash_string );
+
+			if( log_file_stream != NULL )
+			{
+				fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
+				 calculated_md5_hash_string );
+			}
+			match_md5_hash = ( string_compare(
+					    stored_md5_hash_string,
+					    calculated_md5_hash_string,
+					    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
+
+			memory_free(
+			 stored_md5_hash_string );
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			if( stored_sha1_hash_result == 0 )
+			{
+				fprintf( stdout, "SHA1 hash stored in file:\tN/A\n" );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "SHA1 hash stored in file:\tN/A\n" );
+				}
+			}
+			else
+			{
+				fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs "\n",
+				 stored_sha1_hash_string );
+
+				if( log_file_stream != NULL )
+				{
+					fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs "\n",
+					 stored_sha1_hash_string );
+				}
+			}
+			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs "\n",
+			 calculated_sha1_hash_string );
+
+			if( log_file_stream != NULL )
+			{
+				fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
+				 calculated_sha1_hash_string );
+			}
+			match_sha1_hash = ( string_compare(
+					     stored_sha1_hash_string,
+					     calculated_sha1_hash_string,
+					     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
+
+			memory_free(
+			 stored_sha1_hash_string );
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		ewfoutput_hash_values_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle,
+		 _CHARACTER_T_STRING( "" ),
+		 calculate_md5,
+		 calculate_sha1 );
+
+		if( log_file_stream != NULL )
+		{
+			ewfoutput_hash_values_fprint(
+			 log_file_stream,
+			 ewfcommon_libewf_handle,
+			 _CHARACTER_T_STRING( "" ),
+			 calculate_md5,
+			 calculate_sha1 );
+		}
 	}
 	if( libewf_close(
 	     ewfcommon_libewf_handle ) != 0 )
@@ -699,25 +799,7 @@ int main( int argc, char * const argv[] )
 			file_stream_io_fclose(
 			 log_file_stream );
 		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 stored_md5_hash_string );
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 stored_sha1_hash_string );
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
 		return( EXIT_FAILURE );
-	}
-	if( ewfsignal_detach() != 1 )
-	{
-		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
 	if( status != EWFPROCESS_STATUS_COMPLETED )
 	{
@@ -726,101 +808,11 @@ int main( int argc, char * const argv[] )
 			file_stream_io_fclose(
 			 log_file_stream );
 		}
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 stored_md5_hash_string );
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 stored_sha1_hash_string );
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
 		return( EXIT_FAILURE );
 	}
-	if( calculate_md5 == 1 )
+	if( ewfsignal_detach() != 1 )
 	{
-		if( stored_md5_hash_result == 0 )
-		{
-			fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "MD5 hash stored in file:\tN/A\n" );
-			}
-		}
-		else
-		{
-			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs "\n",
-			 stored_md5_hash_string );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs "\n",
-				 stored_md5_hash_string );
-			}
-		}
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs "\n",
-		 calculated_md5_hash_string );
-
-		if( log_file_stream != NULL )
-		{
-			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
-			 calculated_md5_hash_string );
-		}
-		match_md5_hash = ( string_compare(
-		                    stored_md5_hash_string,
-		                    calculated_md5_hash_string,
-		                    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
-
-		memory_free(
-		 stored_md5_hash_string );
-		memory_free(
-		 calculated_md5_hash_string );
-	}
-	if( calculate_sha1 == 1 )
-	{
-		if( stored_sha1_hash_result == 0 )
-		{
-			fprintf( stdout, "SHA1 hash stored in file:\tN/A\n" );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "SHA1 hash stored in file:\tN/A\n" );
-			}
-		}
-		else
-		{
-			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs "\n",
-			 stored_sha1_hash_string );
-
-			if( log_file_stream != NULL )
-			{
-				fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs "\n",
-				 stored_sha1_hash_string );
-			}
-		}
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs "\n",
-		 calculated_sha1_hash_string );
-
-		if( log_file_stream != NULL )
-		{
-			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
-			 calculated_sha1_hash_string );
-		}
-		match_sha1_hash = ( string_compare(
-		                     stored_sha1_hash_string,
-		                     calculated_sha1_hash_string,
-		                     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
-
-		memory_free(
-		 stored_sha1_hash_string );
-		memory_free(
-		 calculated_sha1_hash_string );
+		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
 	if( log_file_stream != NULL )
 	{

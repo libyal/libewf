@@ -24,14 +24,15 @@ To do/think about:
 * all: check for race conditions especially on change of data elements
 * all: allow for multiple language support - what about gettext?
 * ewftools: add getoptlong
-* ewfacquire: restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
-* ewfacquire: warn if values exceed maximum segment count
-* ewfacquire: add native Windows support for accessing devices
-* ewfacquire: read from pipe
-  - what about input size?
-* windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
-* windows port: reduce _s function to pre MVC 2005 variants provides for wider support
-* windows port: improve globbing support ?
+* ewfacquire
+  - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
+  - warn if values exceed maximum segment count
+  - add native Windows support for accessing devices
+  - read from pipe - what about input size?
+* windows port
+  - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
+  - reduce _s function to pre MVC 2005 variants provides for wider support
+  - improve globbing support ?
 
 Recovery and analysis:
 * ewfacquire: detect disk full and ask for new segment file location?
@@ -83,6 +84,7 @@ Error handling
   - store error in handle? or additional parameter?
   - useful to store error/warning string
 * what about setting errno for API set and get function i.e. for size too small
+* use glib based error handling
 
 Python bindings
 * rewrite pyewf to match libewf API
@@ -97,6 +99,7 @@ API
 * LVF
   - libewf_add/remove_file for LVF
 * add function to retrieve the segment file names and amount?
+* add error handling
 
 Something for libsmio/smiotools
 * create iso2ewf tool?
@@ -112,16 +115,18 @@ Known issues:
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
-* MSVS C++ does not allow pre compiler macro in macro definitions
+* MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
 Next release(s):
+
+* update libuca
+* implement error handling
+* separate narrow and wide character fucntions
 
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?
 
 * ewfexport implement more ewfacquire acquiry parameters?
-
-* ewfverify: verify against all available hashes that can be verified, print others
 
 * have segment file number in libewf_raw_read_chunk for warning output?
 
@@ -133,6 +138,10 @@ Next release(s):
   - error in secondary offset table
 * improve offset table correction
   - add error flag ?
+
+* make compilation resilient for missing crypto library
+  - compile on system without libcrypto
+  - remove the cryptographic options if crypto library is missing
 
 * remove error_tollerance, just be error tollerant ?
 
@@ -156,11 +165,9 @@ Next release(s):
 * implement file io pooling?
   - add means to set open file handle limit
 
-* make compilation resilient for missing crypto library
-  - remove the cryptographic options if crypto library is missing
-
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
+  - overwrite alter buffer size with -p option?
 
 * change libewf_system_string_to_(u)int64 to return 1 or -1
 
@@ -180,6 +187,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080908
+* minor changes to configure.ac
 
 Version: 20080907
 * worked on refactoring functions in ewfinput, too large input is now flushed
@@ -201,6 +211,7 @@ Version: 20080907
 * added export sha1 to automated tests (part of alter test cycle)
 * fixed issue where last segment file contained next section when acquired
   with ewfacquirestream
+* ewfverify: print additional available hashes
 
 Version: 20080906
 * refactored section list to use list type
