@@ -1080,7 +1080,7 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_
 		LIBEWF_VERBOSE_PRINT( "%s: creating segment file with segment number: %" PRIu16 ".\n",
 		 function, segment_number );
 
-		write_count = libewf_segment_file_write_open(
+		write_count = libewf_segment_file_write_open_new(
 		               internal_handle,
 		               segment_number,
 		               internal_handle->write->maximum_amount_of_segments );

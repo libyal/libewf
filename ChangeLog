@@ -127,6 +127,7 @@ Version: 20070811
 * merged common code in wide and narrow functions
 * worked on restructuring to improve internal structure
 * worked on improved rewrite using delta segment files
+* removed segment_table_build
 
 Version: 20070809
 * fixed weird progress indiction, changed localtime into gmtime

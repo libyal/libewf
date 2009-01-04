@@ -151,6 +151,13 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	uint32_t iterator                       = 0;
 	int result                              = 0;
 
+	if( filenames == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filenames.\n",
+		 function );
+
+		return( NULL );
+	}
 	if( file_amount < 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
@@ -158,17 +165,33 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 		return( NULL );
 	}
+	if( ( ( flags & LIBEWF_FLAG_READ ) != LIBEWF_FLAG_READ )
+	 && ( ( flags & LIBEWF_FLAG_WRITE ) != LIBEWF_FLAG_WRITE ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
+		 function );
+
+		return( NULL );
+	}
+	internal_handle = libewf_internal_handle_alloc( flags );
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+		 function );
+
+		return( NULL );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
-		/* 1 additional entry required because
-		 * entry [ 0 ] is not used for reading
+		/* Initialize the internal handle for reading
 		 */
-		internal_handle = libewf_internal_handle_alloc( ( file_amount + 1 ), flags );
-
-		if( internal_handle == NULL )
+		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
 			 function );
+
+			libewf_internal_handle_free( internal_handle );
 
 			return( NULL );
 		}
@@ -193,43 +216,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
-		/* TODO: Get the basename of the first segment file and store it in
-		 * the 0'th entry
-		 */
-
-		/* Initialize the internal handle for reading
-		 */
-		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		/* Read the segment table from the segment files
-		 */
-		result = libewf_segment_file_read_segment_table( internal_handle );
-
-		if( result == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: error while trying to read the segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		else if( result != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
 		/* Determine the EWF file format
 		 */
 		if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
@@ -241,25 +227,9 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 		 */
 		internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
 						   * (size64_t) internal_handle->media->bytes_per_sector;
-
-		/* Flag that the segment table was build
-		 */
-		internal_handle->segment_table_build = 1;
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
-		/* Allocate 2 entries
-		 * entry [ 0 ] is used for the base filename
-		 */
-		internal_handle = libewf_internal_handle_alloc( 1, flags );
-
-		if( internal_handle == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
-			 function );
-
-			return( NULL );
-		}
 		if( internal_handle->segment_table == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
@@ -290,13 +260,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
-		 function );
-
-		return( NULL );
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
 	 function );
@@ -365,13 +328,6 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 	if( internal_handle->media == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table_build == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );
@@ -720,13 +676,6 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 	if( length < LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: string too small.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table_build == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );

@@ -196,10 +196,6 @@ struct libewf_internal_handle
 	 */
 	uint8_t ewf_format;
 
-	/* value to indicate if the segment table has been build
-	 */
-	uint8_t segment_table_build;
-
 	/* value to indicate the level of error tollerance
 	 */
 	uint8_t error_tollerance;
@@ -346,7 +342,7 @@ struct libewf_internal_handle_write
 	uint8_t write_finalized;
 };
 
-LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, uint8_t flags );
+LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags );
 void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 LIBEWF_INTERNAL_HANDLE_MEDIA *libewf_internal_handle_media_alloc( void );

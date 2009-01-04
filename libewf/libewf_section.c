@@ -3072,6 +3072,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
  */
 ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
+	return( 0 );
 }
 
 /* Writes a delta chunk section to file

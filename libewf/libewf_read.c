@@ -124,13 +124,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table_build == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( buffer == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
@@ -513,13 +506,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	if( internal_handle->chunk_cache == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table_build == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );

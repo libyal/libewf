@@ -51,7 +51,7 @@
 /* Allocates memory for a new handle struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, uint8_t flags )
+LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_internal_handle_alloc";
@@ -94,10 +94,11 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 	internal_handle->amount_of_header_sections = 0;
 	internal_handle->format                    = LIBEWF_FORMAT_UNKNOWN;
 	internal_handle->ewf_format                = EWF_FORMAT_UNKNOWN;
-	internal_handle->segment_table_build       = 0;
 	internal_handle->error_tollerance          = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 
-	internal_handle->segment_table = libewf_segment_table_alloc( segment_amount );
+	/* The segment table is initially filled with a single entry
+	 */
+	internal_handle->segment_table = libewf_segment_table_alloc( 1 );
 
 	if( internal_handle->segment_table == NULL )
 	{
@@ -108,6 +109,8 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 
 		return( NULL );
 	}
+	/* The delta segment table is initially filled with a single entry
+	 */
 	internal_handle->delta_segment_table = libewf_segment_table_alloc( 1 );
 
 	if( internal_handle->delta_segment_table == NULL )
