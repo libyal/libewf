@@ -23,7 +23,6 @@ To do/think about:
 * all: add LVF support - ltree section
 * all: check for race conditions especially on change of data elements
 * all: allow for multiple language support - what about gettext?
-* libewf_string: enhance UTF16 conversion code
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
   - use io pooling
@@ -99,7 +98,7 @@ Known issues:
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
-* MSVS C++ does not allow pre compiler macro in macro defintions
+* MSVS C++ does not allow pre compiler macro in macro definitions
 
 Code clean up
 * remove internal_handle passing from most functions
@@ -115,6 +114,9 @@ Next release(s):
 
 * implement libuca
   - handle codepage
+
+* rewrite _alloc() functions into _initialize() functions
+  with corresponding _free() functions
 
 * rename length into size, make sure string size contains end of string
   character

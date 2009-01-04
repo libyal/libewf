@@ -1330,6 +1330,7 @@ int libewf_header_values_parse_header(
      libewf_values_table_t **header_values,
      uint8_t *header,
      size_t header_size,
+     int codepage,
      uint8_t date_format )
 {
 	character_t *header_string = NULL;
@@ -1347,7 +1348,7 @@ int libewf_header_values_parse_header(
 	header_string_size = string_size_from_byte_stream(
 	                      header,
 	                      header_size,
-	                      LIBUCA_CODEPAGE_ASCII );
+	                      codepage );
 
 	if( header_string_size < 0 )
 	{
@@ -1371,7 +1372,7 @@ int libewf_header_values_parse_header(
 	     (size_t) header_string_size,
 	     header,
 	     header_size,
-	     LIBUCA_CODEPAGE_ASCII ) != 1 )
+	     codepage ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
@@ -1481,7 +1482,8 @@ int libewf_header_values_convert_header_string_to_header(
      character_t *header_string,
      size_t header_string_size,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	static char *function    = "libewf_header_values_convert_header_string_to_header";
 	ssize_t byte_stream_size = 0;
@@ -1517,7 +1519,7 @@ int libewf_header_values_convert_header_string_to_header(
 	byte_stream_size = byte_stream_size_from_string(
 	                    header_string,
 	                    header_string_size,
-	                    LIBUCA_CODEPAGE_ASCII );
+	                    codepage );
 
 	if( byte_stream_size < 0 )
 	{
@@ -1539,7 +1541,7 @@ int libewf_header_values_convert_header_string_to_header(
 	if( byte_stream_copy_from_string(
 	     *header,
 	     (size_t) byte_stream_size,
-	     LIBUCA_CODEPAGE_ASCII,
+	     codepage,
 	     header_string,
 	     header_string_size ) != 1 )
 	{
@@ -3759,7 +3761,8 @@ int libewf_header_values_generate_header_ewf(
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\nmain\nc\tn\ta\te\tt\tm\tu\tp\tr\n" );
@@ -3786,7 +3789,8 @@ int libewf_header_values_generate_header_ewf(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -3808,7 +3812,8 @@ int libewf_header_values_generate_header_encase1(
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
@@ -3835,7 +3840,8 @@ int libewf_header_values_generate_header_encase1(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -3857,7 +3863,8 @@ int libewf_header_values_generate_header_ftk(
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
@@ -3884,7 +3891,8 @@ int libewf_header_values_generate_header_ftk(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -3906,7 +3914,8 @@ int libewf_header_values_generate_header_encase2(
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
@@ -3933,7 +3942,8 @@ int libewf_header_values_generate_header_encase2(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -3954,7 +3964,8 @@ int libewf_header_values_generate_header_encase4(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
@@ -3980,7 +3991,8 @@ int libewf_header_values_generate_header_encase4(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -4001,7 +4013,8 @@ int libewf_header_values_generate_header_linen5(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
@@ -4027,7 +4040,8 @@ int libewf_header_values_generate_header_linen5(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -4048,7 +4062,8 @@ int libewf_header_values_generate_header_linen6(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
@@ -4074,7 +4089,8 @@ int libewf_header_values_generate_header_linen6(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{
@@ -5212,7 +5228,8 @@ int libewf_header_values_generate_header_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size )
+     size_t *header_size,
+     int codepage )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
@@ -5238,7 +5255,8 @@ int libewf_header_values_generate_header_ewfx(
 	          header_string,
 	          header_string_size,
 	          header,
-	          header_size );
+	          header_size,
+	          codepage );
 
 	if( result != 1 )
 	{

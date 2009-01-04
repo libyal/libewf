@@ -1,4 +1,4 @@
-.Dd September 2, 2008
+.Dd September 3, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -89,6 +89,8 @@
 .Ft int
 .Fn libewf_get_write_amount_of_chunks "libewf_handle_t *handle, uint32_t *amount_of_chunks"
 .Ft int
+.Fn libewf_get_header_codepage "libewf_handle_t *handle, int codepage"
+.Ft int
 .Fn libewf_get_amount_of_header_values "libewf_handle_t *handle, uint32_t *amount_of_values"
 .Ft int
 .Fn libewf_get_amount_of_hash_values "libewf_handle_t *handle, uint32_t *amount_of_values"
@@ -119,6 +121,8 @@
 .Ft int
 .Fn libewf_set_read_wipe_chunk_on_error "libewf_handle_t *handle, uint8_t wipe_on_error"
 .Ft int
+.Fn libewf_set_header_codepage "libewf_handle_t *handle, int codepage"
+.Ft int
 .Fn libewf_parse_header_values "libewf_handle_t *handle, uint8_t date_format"
 .Ft int
 .Fn libewf_parse_hash_values "libewf_handle_t *handle"
@@ -133,7 +137,7 @@
 .Ft void
 .Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
 .Pp
-When the library was compiled with narrow character support (default) the following functions are available
+Functions available for narrow character string support:
 .Ft const char *
 .Fn libewf_get_version "void"
 .Ft int
@@ -209,11 +213,7 @@ When the library was compiled with narrow character support (default) the follow
 .Ft int
 .Fn libewf_set_hash_value_sha1 "libewf_handle_t *handle, char *value, size_t length"
 .Pp
-When the library was compiled with wide character support
-.Ar HAVE_WIDE_CHARACTER_TYPE
-, 
-.Ar LIBEWF_WIDE_CHARACTER_TYPE
- is defined in libewf/types.h and the following functions are available instead of the narrow character functions
+Functions available for wide character string support:
 .Ft const wchar_t *
 .Fn libewf_get_version "void"
 .Ft int
@@ -289,11 +289,7 @@ When the library was compiled with wide character support
 .Ft int
 .Fn libewf_set_hash_value_sha1 "libewf_handle_t *handle, wchar_t *value, size_t length"
 .Pp
-When wide character support functions like wmain and wopen are present and libewf is compiled with
-.Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
-,
-.Ar LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS
- is defined in libewf/types.h and the following functions will replace their narrow character functions.
+Functions available when system has wide character string support:
 .Ft int8_t
 .Fn libewf_check_file_signature "const wchar_t *filename"
 .Ft int
@@ -412,6 +408,36 @@ Most of the functions return NULL or -1 on error, dependent on the return type. 
 None
 .Sh FILES
 None
+.Sh NOTES
+libewf allows to be compiled with either narrow or wide character support.
+To compile libewf with wide character support use
+.Ar ./configure --enable-wide-character-type=yes
+or pass the definition
+.Ar HAVE_WIDE_CHARACTER_TYPE
+ to the compiler (i.e. in case of Microsoft Visual Studio (MSVS) C++).
+
+To have other code to determine if libewf was compiled with wide character support it defines
+.Ar LIBEWF_WIDE_CHARACTER_TYPE
+ in libewf/features.h.
+
+If the system has wide character support functions like wmain and wopen pass the definition
+.Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+
+When wide character support functions like wmain and wopen are present on the system and libewf is compiled with
+.Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+ to the compiler. Currently only MSVS C++ supports this feature. When 
+.Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+ is defined the definition
+.Ar LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS
+ is enabled in libewf/features.h. Make sure that for MSVS C++ the code that includes libewf defines LIBEWF_DLL_IMPORT and these macros if wide character and/or wide character support functions are used.
+
+Libewf uses UTF encoded strings as of version 20080903. The type of UTF is determined by the size of the string character.
+
+The header in a set of EWF files contains an extended ASCII string using the codepage of the system it was created on. The function 
+.Ar libewf_set_header_codepage
+ allows to set the required codepage for reading and writing. The default codepage is ASCII and replaces all extended characters to the Unicode replacement character (U+fffd) when reading and the ASCII substitude character (0x1a) when writing. 
+
+The header2 contains UTF-16 little endian stream and the xheader and xhash contain a UTF-8 stream without or with byte order mark (as of version 20080903).
 .Sh BUGS
 Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
 http://libewf.sourceforge.net/

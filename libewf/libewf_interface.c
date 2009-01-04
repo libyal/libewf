@@ -733,7 +733,7 @@ int libewf_get_delta_segment_filename(
 }
 
 /* Retrieves the amount of acquiry errors
- * Returns 1 if successful, 0 if no header values are present or -1 on error
+ * Returns 1 if successful, 0 if no acquiry errors are present or -1 on error
  */
 int libewf_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
@@ -972,6 +972,44 @@ int libewf_get_write_amount_of_chunks(
 		return( -1 );
 	}
 	*amount_of_chunks = internal_handle->write->amount_of_chunks;
+
+	return( 1 );
+}
+
+/* Retrieves the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_get_header_codepage(
+     libewf_handle_t *handle,
+     int *header_codepage )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_header_codepage";
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->header_sections == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle - missing header sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( header_codepage == NULL )
+	{
+		notify_warning_printf( "%s: invalid header codepage.\n",
+		 function );
+
+		return( -1 );
+	}
+	*header_codepage = internal_handle->header_sections->header_codepage;
 
 	return( 1 );
 }
@@ -1911,6 +1949,51 @@ int libewf_set_read_wipe_chunk_on_error(
 	return( 1 );
 }
 
+/* Sets the header codepage
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_header_codepage(
+     libewf_handle_t *handle,
+     int header_codepage )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_header_codepage";
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->header_sections == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle - missing header sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( header_codepage != LIBEWF_CODEPAGE_ASCII )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1250 )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1251 )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1252 )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1253 )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1254 )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1256 )
+	 || ( header_codepage != LIBEWF_CODEPAGE_WINDOWS_1257 ) )
+	{
+		notify_warning_printf( "%s: unsupported header codepage.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->header_sections->header_codepage = header_codepage;
+
+	return( 1 );
+}
+
 /* Sets the header value specified by the identifier
  * Returns 1 if successful or -1 on error
  */
@@ -2097,6 +2180,7 @@ int libewf_parse_header_values(
 	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->header,
 	       internal_handle->header_sections->header_size,
+	       internal_handle->header_sections->header_codepage,
 	       date_format ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse header.\n",

@@ -186,9 +186,8 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		return( NULL );
 	}
-	internal_handle->header_sections = libewf_header_sections_alloc();
-
-	if( internal_handle->header_sections == NULL )
+	if( libewf_header_sections_initialize(
+	     &( internal_handle->header_sections ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create header sections.\n",
 		 function );
@@ -210,15 +209,14 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		return( NULL );
 	}
-	internal_handle->hash_sections = libewf_hash_sections_alloc();
-
-	if( internal_handle->hash_sections == NULL )
+	if( libewf_hash_sections_initialize(
+	     &( internal_handle->hash_sections ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create hash sections.\n",
 		 function );
 
 		libewf_header_sections_free(
-		 internal_handle->header_sections );
+		 &( internal_handle->header_sections ) );
 		libewf_media_values_free(
 		 internal_handle->media_values );
 		libewf_chunk_cache_free(
@@ -244,9 +242,9 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 function );
 
 		libewf_hash_sections_free(
-		 internal_handle->hash_sections );
+		 &( internal_handle->hash_sections ) );
 		libewf_header_sections_free(
-		 internal_handle->header_sections );
+		 &( internal_handle->header_sections ) );
 		libewf_media_values_free(
 		 internal_handle->media_values );
 		libewf_chunk_cache_free(
@@ -274,9 +272,9 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		libewf_sector_table_free(
 		 internal_handle->sessions );
 		libewf_hash_sections_free(
-		 internal_handle->hash_sections );
+		 &( internal_handle->hash_sections ) );
 		libewf_header_sections_free(
-		 internal_handle->header_sections );
+		 &( internal_handle->header_sections ) );
 		libewf_media_values_free(
 		 internal_handle->media_values );
 		libewf_chunk_cache_free(
@@ -308,9 +306,9 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			libewf_sector_table_free(
 			 internal_handle->sessions );
 			libewf_hash_sections_free(
-			 internal_handle->hash_sections );
+			 &( internal_handle->hash_sections ) );
 			libewf_header_sections_free(
-			 internal_handle->header_sections );
+			 &( internal_handle->header_sections ) );
 			libewf_media_values_free(
 			 internal_handle->media_values );
 			libewf_chunk_cache_free(
@@ -348,9 +346,9 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			libewf_sector_table_free(
 			 internal_handle->sessions );
 			libewf_hash_sections_free(
-			 internal_handle->hash_sections );
+			 &( internal_handle->hash_sections ) );
 			libewf_header_sections_free(
-			 internal_handle->header_sections );
+			 &( internal_handle->header_sections ) );
 			libewf_media_values_free(
 			 internal_handle->media_values );
 			libewf_chunk_cache_free(
@@ -431,15 +429,17 @@ void libewf_internal_handle_free(
 		libewf_sector_table_free(
 		 internal_handle->acquiry_errors );
 	}
-	if( internal_handle->header_sections != NULL )
+	if( libewf_header_sections_free(
+	     &( internal_handle->header_sections ) ) != 1 )
 	{
-		libewf_header_sections_free(
-		 internal_handle->header_sections );
+		notify_warning_printf( "%s: unable to free header sections.\n",
+		 function );
 	}
-	if( internal_handle->hash_sections != NULL )
+	if( libewf_hash_sections_free(
+	     &( internal_handle->hash_sections ) ) != 1 )
 	{
-		libewf_hash_sections_free(
-		 internal_handle->hash_sections );
+		notify_warning_printf( "%s: unable to free hash sections.\n",
+		 function );
 	}
 	if( internal_handle->header_values != NULL )
 	{

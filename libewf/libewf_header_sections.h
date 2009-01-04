@@ -38,6 +38,10 @@ typedef struct libewf_header_sections libewf_header_sections_t;
  */
 struct libewf_header_sections
 {
+	/* The header codepage
+	 */
+	int header_codepage;
+
 	/* The stored header
 	 */
 	uint8_t *header;
@@ -67,11 +71,11 @@ struct libewf_header_sections
 	uint8_t amount_of_header_sections;
 };
 
-libewf_header_sections_t *libewf_header_sections_alloc(
-                            void );
+int libewf_header_sections_initialize(
+     libewf_header_sections_t **header_sections );
 
-void libewf_header_sections_free(
-      libewf_header_sections_t *header_sections );
+int libewf_header_sections_free(
+     libewf_header_sections_t **header_sections );
 
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,

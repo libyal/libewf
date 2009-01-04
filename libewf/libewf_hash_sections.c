@@ -26,45 +26,57 @@
 
 #include "libewf_hash_sections.h"
 
-/* Allocates memory for a new hash sections struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the hash sections
+ * Returns 1 if successful or -1 on error
  */
-libewf_hash_sections_t *libewf_hash_sections_alloc(
-                         void )
+int libewf_hash_sections_initialize(
+     libewf_hash_sections_t **hash_sections )
 {
-	libewf_hash_sections_t *hash_sections = NULL;
-	static char *function                 = "libewf_hash_sections_alloc";
-
-	hash_sections = (libewf_hash_sections_t *) memory_allocate(
-	                                            sizeof( libewf_hash_sections_t ) );
+	static char *function = "libewf_hash_sections_initialize";
 
 	if( hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate hash sections.\n",
+		notify_warning_printf( "%s: invalid hash sections.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( memory_set(
-	     hash_sections,
-	     0,
-	     sizeof( libewf_hash_sections_t ) ) == NULL )
+	if( *hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear hash sections.\n",
-		 function );
+		*hash_sections = (libewf_hash_sections_t *) memory_allocate(
+		                                             sizeof( libewf_hash_sections_t ) );
 
-		memory_free(
-		 hash_sections );
+		if( *hash_sections == NULL )
+		{
+			notify_warning_printf( "%s: unable to create hash sections.\n",
+			 function );
 
-		return( NULL );
+			return( -1 );
+		}
+		if( memory_set(
+		     *hash_sections,
+		     0,
+		     sizeof( libewf_hash_sections_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear hash sections.\n",
+			 function );
+
+			memory_free(
+			 *hash_sections );
+
+			*hash_sections = NULL;
+
+			return( -1 );
+		}
 	}
-	return( hash_sections );
+	return( 1 );
 }
 
-/* Frees memory of a hash sections struct including elements
+/* Frees the hash sections including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_hash_sections_free(
-      libewf_hash_sections_t *hash_sections )
+int libewf_hash_sections_free(
+     libewf_hash_sections_t **hash_sections )
 {
         static char *function = "libewf_hash_sections_free";
 
@@ -73,14 +85,20 @@ void libewf_hash_sections_free(
 		notify_warning_printf( "%s: invalid hash sections.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	if( hash_sections->xhash != NULL )
+	if( *hash_sections != NULL )
 	{
+		if( ( *hash_sections )->xhash != NULL )
+		{
+			memory_free(
+			 ( *hash_sections )->xhash );
+		}
 		memory_free(
-		 hash_sections->xhash );
+		 *hash_sections );
+
+		*hash_sections = NULL;
 	}
-	memory_free(
-	 hash_sections );
+	return( 1 );
 }
 

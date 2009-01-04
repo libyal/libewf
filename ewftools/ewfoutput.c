@@ -51,6 +51,12 @@
 #error No variable argument support available
 #endif
 
+#if defined( HAVE_LIBUCA_H )
+#include <libuca.h>
+#elif defined( HAVE_LOCAL_LIBUCA )
+#include "../libuca/libuca_definitions.h"
+#endif
+
 #if defined( HAVE_ZLIB_H )
 #include <zlib.h>
 #endif
@@ -104,8 +110,8 @@ void ewfoutput_version_fprint(
 
 		return;
 	}
-	fprintf( stream, "%" PRIs " %" PRIs " (libewf %" PRIs "",
-	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING );
+	fprintf( stream, "%" PRIs " %" PRIs " (libewf %" PRIs ", libuca %" PRIs "",
+	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING, LIBUCA_VERSION_STRING );
 
 #if defined( HAVE_LIBZ )
 	fprintf( stream, ", zlib %s", ZLIB_VERSION );

@@ -109,6 +109,7 @@ int libewf_header_values_parse_header(
      libewf_values_table_t **header_values,
      uint8_t *header,
      size_t header_size,
+     int codepage,
      uint8_t date_format );
 
 int libewf_header_values_parse_header2(
@@ -121,7 +122,8 @@ int libewf_header_values_convert_header_string_to_header(
      character_t *header_string,
      size_t header_string_size,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_convert_header_string_to_header2(
      character_t *header_string,
@@ -192,46 +194,53 @@ int libewf_header_values_generate_header_ewf(
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header_encase1(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header_ftk(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header_encase2(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header_encase4(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header_linen5(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header_linen6(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header2_encase4(
      libewf_values_table_t *header_values,
@@ -291,7 +300,8 @@ int libewf_header_values_generate_header_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_size );
+     size_t *header_size,
+     int codepage );
 
 int libewf_header_values_generate_header2_ewfx(
      libewf_values_table_t *header_values,

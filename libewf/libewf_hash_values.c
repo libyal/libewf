@@ -240,10 +240,9 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
-	xml_hash_string_size = string_size_from_byte_stream(
+	xml_hash_string_size = string_size_from_utf8_stream(
 	                        (uint8_t *) xhash,
-	                        xhash_size,
-	                        LIBUCA_CODEPAGE_ASCII );
+	                        xhash_size );
 
 	if( xml_hash_string_size < 0 )
 	{
@@ -262,12 +261,11 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
-	if( string_copy_from_byte_stream(
+	if( string_copy_from_utf8_stream(
 	     xml_hash_string,
 	     (size_t) xml_hash_string_size,
 	     xhash,
-	     xhash_size,
-	     LIBUCA_CODEPAGE_ASCII ) != 1 )
+	     xhash_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to XML set hash string.\n",
 		 function );

@@ -144,6 +144,10 @@ LIBEWF_EXTERN int libewf_get_write_amount_of_chunks(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_chunks );
 
+LIBEWF_EXTERN int libewf_get_header_codepage(
+                   libewf_handle_t *handle,
+                   int *header_codepage );
+
 LIBEWF_EXTERN int libewf_get_amount_of_header_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values );
@@ -240,6 +244,10 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename(
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
                    libewf_handle_t *handle,
                    uint8_t wipe_on_error );
+
+LIBEWF_EXTERN int libewf_set_header_codepage(
+                   libewf_handle_t *handle,
+                   int header_codepage );
 
 LIBEWF_EXTERN int libewf_set_header_value(
                    libewf_handle_t *handle,

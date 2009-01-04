@@ -32,45 +32,58 @@
 
 #include "ewf_definitions.h"
 
-/* Allocates memory for a new header sections struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the header sections
+ * Returns 1 if successful or -1 on error
  */
-libewf_header_sections_t *libewf_header_sections_alloc(
-                           void )
+int libewf_header_sections_initialize(
+     libewf_header_sections_t **header_sections )
 {
-	libewf_header_sections_t *header_sections = NULL;
-	static char *function                     = "libewf_header_sections_alloc";
-
-	header_sections = (libewf_header_sections_t *) memory_allocate(
-	                                                sizeof( libewf_header_sections_t ) );
+	static char *function = "libewf_header_sections_initialize";
 
 	if( header_sections == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate header sections.\n",
+		notify_warning_printf( "%s: invalid header sections.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( memory_set(
-	     header_sections,
-	     0,
-	     sizeof( libewf_header_sections_t ) ) == NULL )
+	if( *header_sections == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear header sections.\n",
-		 function );
+		*header_sections = (libewf_header_sections_t *) memory_allocate(
+		                                                 sizeof( libewf_header_sections_t ) );
 
-		memory_free(
-		 header_sections );
+		if( *header_sections == NULL )
+		{
+			notify_warning_printf( "%s: unable to create header sections.\n",
+			 function );
 
-		return( NULL );
+			return( -1 );
+		}
+		if( memory_set(
+		     *header_sections,
+		     0,
+		     sizeof( libewf_header_sections_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear header sections.\n",
+			 function );
+
+			memory_free(
+			 *header_sections );
+
+			*header_sections = NULL;
+
+			return( -1 );
+		}
+		( *header_sections )->header_codepage = LIBEWF_CODEPAGE_ASCII;
 	}
-	return( header_sections );
+	return( 1 );
 }
 
-/* Frees memory of a header sections struct including elements
+/* Frees the header sections including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_header_sections_free(
-      libewf_header_sections_t *header_sections )
+int libewf_header_sections_free(
+      libewf_header_sections_t **header_sections )
 {
         static char *function = "libewf_header_sections_free";
 
@@ -79,25 +92,31 @@ void libewf_header_sections_free(
 		notify_warning_printf( "%s: invalid header sections.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	if( header_sections->header != NULL )
+	if( *header_sections != NULL )
 	{
+		if( ( *header_sections )->header != NULL )
+		{
+			memory_free(
+			 ( *header_sections )->header );
+		}
+		if( ( *header_sections )->header2 != NULL )
+		{
+			memory_free(
+			 ( *header_sections )->header2 );
+		}
+		if( ( *header_sections )->xheader != NULL )
+		{
+			memory_free(
+			 ( *header_sections )->xheader );
+		}
 		memory_free(
-		 header_sections->header );
+		 *header_sections );
+
+		*header_sections = NULL;
 	}
-	if( header_sections->header2 != NULL )
-	{
-		memory_free(
-		 header_sections->header2 );
-	}
-	if( header_sections->xheader != NULL )
-	{
-		memory_free(
-		 header_sections->xheader );
-	}
-	memory_free(
-	 header_sections );
+	return( 1 );
 }
 
 /* Create the header sections from the header values
@@ -126,7 +145,8 @@ int libewf_header_sections_create(
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -141,7 +161,8 @@ int libewf_header_sections_create(
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -157,7 +178,8 @@ int libewf_header_sections_create(
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -173,7 +195,8 @@ int libewf_header_sections_create(
 		     timestamp,
 		     compression_level,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -187,7 +210,8 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -218,7 +242,8 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -249,7 +274,8 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -280,7 +306,8 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -294,7 +321,8 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
@@ -308,7 +336,8 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header ),
-		     &( header_sections->header_size ) ) != 1 )
+		     &( header_sections->header_size ),
+		     header_sections->header_codepage ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header section.\n",
 			 function );
