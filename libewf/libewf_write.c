@@ -44,6 +44,7 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_common.h"
+#include "libewf_compression.h"
 #include "libewf_endian.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
@@ -58,7 +59,6 @@
 #include "libewf_write.h"
 
 #include "ewf_char.h"
-#include "ewf_compress.h"
 #include "ewf_crc.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
@@ -721,7 +721,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			return( -1 );
 		}
-		result = ewf_compress(
+		result = libewf_compress(
 			  (uint8_t *) compressed_chunk_data,
 			  compressed_chunk_data_size,
 			  (uint8_t *) chunk_data,
@@ -754,7 +754,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 			{
 				chunk_data = internal_handle->chunk_cache->data;
 			}
-			result = ewf_compress(
+			result = libewf_compress(
 				  (uint8_t *) compressed_chunk_data,
 				  compressed_chunk_data_size,
 				  (uint8_t *) chunk_data,

@@ -56,7 +56,6 @@
 #include "libewf_string.h"
 #include "libewf_write.h"
 
-#include "ewf_compress.h"
 #include "ewf_crc.h"
 #include "ewf_definitions.h"
 #include "ewf_digest_hash.h"

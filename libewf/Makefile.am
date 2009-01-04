@@ -4,7 +4,6 @@ lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
 	ewf_char.h \
-	ewf_compress.c ewf_compress.h \
 	ewf_crc.h \
 	ewf_data.h \
 	ewf_definitions.h \
@@ -15,7 +14,7 @@ libewf_la_SOURCES = \
 	ewf_ltree.h \
 	ewf_section.h \
 	ewf_session.h \
-	ewf_string.c ewf_string.h \
+	ewf_string.h \
 	ewf_table.h \
 	ewf_volume.h \
 	ewf_volume_smart.h \

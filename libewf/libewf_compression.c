@@ -43,7 +43,8 @@
 
 #include "libewf_notify.h"
 
-#include "ewf_compress.h"
+#include "libewf_compression.h"
+
 #include "ewf_definitions.h"
 
 /* Compresses data, wraps zlib uncompress function

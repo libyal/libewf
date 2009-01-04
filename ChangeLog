@@ -143,6 +143,8 @@ Next release:
 * remove ewf_compress and ewf_string.c
 * libewf_section_list_append add section_type length parameter
 * pass media values struct to section volume/data functions
+* section make sure read count is returned instead of section_size
+* section remove passing of internal handle
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

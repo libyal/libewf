@@ -36,12 +36,12 @@
 #include <libewf/libewf_definitions.h>
 
 #include "libewf_common.h"
+#include "libewf_compression.h"
 #include "libewf_debug.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 #include "libewf_string.h"
 
-#include "ewf_compress.h"
 #include "ewf_crc.h"
 
 /* Prints a dump of data
@@ -142,7 +142,7 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 		return;
 	}
-	result = ewf_uncompress( uncompressed_data, &uncompressed_size, data, (size_t) size );
+	result = libewf_uncompress( uncompressed_data, &uncompressed_size, data, (size_t) size );
 
 	if( result == 0 )
 	{

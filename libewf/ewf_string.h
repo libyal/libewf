@@ -79,15 +79,6 @@ extern "C" {
 #error Missing string copy function (memcpy, strncpy and strcpy)
 #endif
 
-EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8_t compression_level );
-
-ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, size_t size );
-
-#define ewf_string_write( string, file_descriptor, size ) \
-	ewf_string_write_from_buffer( string, file_descriptor, size )
-
-ssize_t ewf_string_write_compressed( EWF_CHAR *string, int file_descriptor, size_t *size, int8_t compression_level );
-
 #if defined( __cplusplus )
 }
 #endif

@@ -44,7 +44,6 @@
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
-#include "ewf_compress.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
