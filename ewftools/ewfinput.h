@@ -66,19 +66,19 @@ extern character_t *ewfinput_yes_no[ 2 ];
 uint8_t ewfinput_determine_libewf_format(
          const character_t *argument );
 
-uint8_t ewfinput_determine_libewf_format_char_t(
+uint8_t ewfinput_determine_libewf_format_system_character(
          const system_character_t *argument );
 
 uint32_t ewfinput_determine_sectors_per_chunk(
           const character_t *argument );
 
-uint32_t ewfinput_determine_sectors_per_chunk_char_t(
+uint32_t ewfinput_determine_sectors_per_chunk_system_character(
           const system_character_t *argument );
 
 int8_t ewfinput_determine_compression_level(
         const character_t *argument );
 
-int8_t ewfinput_determine_compression_level_char_t(
+int8_t ewfinput_determine_compression_level_system_character(
         const system_character_t *argument );
 
 int8_t ewfinput_determine_media_type(
@@ -94,7 +94,7 @@ character_t *ewfinput_get_variable(
               FILE *stream,
               character_t *request_string );
 
-system_character_t *ewfinput_get_variable_char_t(
+system_character_t *ewfinput_get_variable_system_character(
                      FILE *stream,
                      character_t *request_string );
 

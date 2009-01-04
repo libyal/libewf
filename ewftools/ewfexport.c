@@ -253,12 +253,12 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t(
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_system_character(
 				                     optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
-					fprintf( stderr, "Unsupported amount of sectors per chunk defaulting to 64.\n" );
+					fprintf( stderr, "Unsupported amount of sectors per chunk defaulting to: 64.\n" );
 
 					sectors_per_chunk = 64;
 				}
@@ -283,12 +283,12 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					compression_level = ewfinput_determine_compression_level_char_t(
+					compression_level = ewfinput_determine_compression_level_system_character(
 					                     optarg );
 				
 					if( compression_level <= -1 )
 					{
-						fprintf( stderr, "Unsupported compression type defaulting to none.\n" );
+						fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
 						compression_level = LIBEWF_COMPRESSION_NONE;
 					}
@@ -324,12 +324,12 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					libewf_format = ewfinput_determine_libewf_format_char_t(
+					libewf_format = ewfinput_determine_libewf_format_system_character(
 					                 optarg );
 
 					if( libewf_format == 0 )
 					{
-						fprintf( stderr, "Unsupported file format type defaulting to raw.\n" );
+						fprintf( stderr, "Unsupported file format type defaulting to: raw.\n" );
 					}
 					else
 					{
@@ -366,7 +366,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'S':
-				result = ewfbyte_size_string_convert_char_t(
+				result = ewfbyte_size_string_convert_system_character(
 				          optarg,
 				          system_string_length(
 				           optarg ),
@@ -381,7 +381,7 @@ int main( int argc, char * const argv[] )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 				{
-					fprintf( stderr, "Unsupported segment file size defaulting to %" PRIu32 ".\n",
+					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu32 ".\n",
 					 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 
 					segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
@@ -615,7 +615,7 @@ int main( int argc, char * const argv[] )
 			 */
 			while( target_filename == NULL )
 			{
-				target_filename = ewfinput_get_variable_char_t(
+				target_filename = ewfinput_get_variable_system_character(
 				                   stderr,
 				                   _CHARACTER_T_STRING( "Target path and filename without extension" ) );
 
@@ -727,11 +727,17 @@ int main( int argc, char * const argv[] )
 					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
-				sectors_per_chunk = string_to_int64(
-				                     user_input,
-				                     string_length(
-				                      user_input ) );
+				if( string_to_uint64(
+				     user_input,
+				     string_length(
+				      user_input ),
+				     &sectors_per_chunk ) != 1 )
+				{
+					fprintf( stderr, "Unsupported sectors per chunk on error defaulting to: %d.\n",
+					 EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
+					sectors_per_chunk = EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT;
+				}
 				memory_free(
 				 user_input );
 			}
@@ -742,7 +748,7 @@ int main( int argc, char * const argv[] )
 			 */
 			while( target_filename == NULL )
 			{
-				target_filename = ewfinput_get_variable_char_t(
+				target_filename = ewfinput_get_variable_system_character(
 				                   stderr,
 				                   _CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ) );
 
@@ -781,7 +787,7 @@ int main( int argc, char * const argv[] )
 	{
 		if( target_filename == NULL )
 		{
-			fprintf( stderr, "Missing target filename defaulting to export.\n" );
+			fprintf( stderr, "Missing target filename defaulting to: export.\n" );
 
 			target_filename = system_string_duplicate(
 			                   _SYSTEM_CHARACTER_T_STRING( "export" ),

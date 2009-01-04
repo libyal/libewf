@@ -83,6 +83,8 @@ system_character_t *libewf_system_string_duplicate(
 	return( duplicate );
 }
 
+#if defined( system_string_to_signed_long_long )
+
 /* Returns the value represented by a string, returns 0 error
  */
 int64_t libewf_system_string_to_int64(
@@ -130,6 +132,9 @@ int64_t libewf_system_string_to_int64(
 	}
 	return( value );
 }
+#endif
+
+#if defined( system_string_to_unsigned_long_long )
 
 /* Returns the value represented by a string, returns 0 on error
  */
@@ -178,4 +183,5 @@ uint64_t libewf_system_string_to_uint64(
 	}
 	return( value );
 }
+#endif
 

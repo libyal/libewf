@@ -24,6 +24,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <file_io.h>
+#include <file_stream_io.h>
 #include <memory.h>
 #include <system_string.h>
 #include <types.h>
@@ -498,7 +499,7 @@ int main( int argc, char * const argv[] )
 		 */
 		while( filename == NULL )
 		{
-			filename = ewfinput_get_variable_char_t(
+			filename = ewfinput_get_variable_system_character(
 			            stdout,
 			            _CHARACTER_T_STRING( "Image path and filename without extension" ) );
 
@@ -554,7 +555,7 @@ int main( int argc, char * const argv[] )
 
 		if( media_type <= -1 )
 		{
-			fprintf( stderr, "Unsupported media type defaulting to fixed.\n" );
+			fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
 
 			media_type = LIBEWF_MEDIA_TYPE_FIXED;
 		}
@@ -576,7 +577,7 @@ int main( int argc, char * const argv[] )
 
 		if( volume_type <= -1 )
 		{
-			fprintf( stderr, "Unsupported volume type defaulting to logical.\n" );
+			fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
 
 			volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 		}
@@ -598,7 +599,7 @@ int main( int argc, char * const argv[] )
 
 		if( compression_level <= -1 )
 		{
-			fprintf( stderr, "Unsupported compression type defaulting to none.\n" );
+			fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
 			compression_level = LIBEWF_COMPRESSION_NONE;
 		}
@@ -622,7 +623,7 @@ int main( int argc, char * const argv[] )
 
 			if( compress_empty_block <= -1 )
 			{
-				fprintf( stderr, "Unsupported compress emtpy blocks defaulting to no.\n" );
+				fprintf( stderr, "Unsupported compress emtpy blocks defaulting to: no.\n" );
 
 				compress_empty_block = 0;
 			}
@@ -645,7 +646,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_format == 0 )
 		{
-			fprintf( stderr, "Unsupported EWF file format type defaulting to encase5.\n" );
+			fprintf( stderr, "Unsupported EWF file format type defaulting to: encase5.\n" );
 
 			libewf_format = LIBEWF_FORMAT_ENCASE5;
 		}
@@ -699,10 +700,17 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
-		sectors_per_chunk = string_to_int64(
-		                     user_input,
-		                     string_length( user_input ) );
+		if( string_to_uint64(
+		     user_input,
+		     string_length(
+		      user_input ),
+		     &sectors_per_chunk ) != 1 )
+		{
+			fprintf( stderr, "Unsupported sectors per chunk on error defaulting to: %d.\n",
+			 EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
+			sectors_per_chunk = EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT;
+		}
 		memory_free(
 		 user_input );
 
@@ -741,7 +749,7 @@ int main( int argc, char * const argv[] )
 
 		if( wipe_chunk_on_error <= -1 )
 		{
-			fprintf( stderr, "Unsupported wipe chunk on error defaulting to no.\n" );
+			fprintf( stderr, "Unsupported wipe chunk on error defaulting to: no.\n" );
 
 			wipe_chunk_on_error = 0;
 		}
@@ -1078,7 +1086,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			file_io_fclose(
+			file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1104,7 +1112,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			file_io_fclose(
+			file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1137,7 +1145,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( file_io_fclose(
+		if( file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf( stderr, "Unable to close log file: %s.\n",

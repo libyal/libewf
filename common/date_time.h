@@ -24,6 +24,7 @@
 #define _DATE_TIME_H
 
 #include "common.h"
+#include "types.h"
 
 #include <time.h>
 
@@ -31,55 +32,47 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
+#if defined( HAVE_WCTIME_R )
 #if defined( HAVE_WINDOWS_API )
 #define date_time_wctime( timestamp, string, size ) \
 	( _wctime_s( string, size, timestamp ) != 0 ? NULL : string )
-
-#else
-#error Missing wide character equivalent of function ctime()
+#endif
 #endif
 
-#endif
-
+#if defined( HAVE_LOCALTIME_R )
 #if defined( HAVE_WINDOWS_API )
 #define date_time_localtime_r( timestamp, time_elements ) \
 	localtime_s( time_elements, timestamp )
 
-#elif defined( HAVE_LOCALTIME_R )
+#else
 #define date_time_localtime_r( timestamp, time_elements ) \
 	localtime_r( timestamp, time_elements )
-
-#elif !defined( HAVE_LOCALTIME )
-#error Missing localtime function
+#endif
 #endif
 
+#if defined( HAVE_GMTIME_R )
 #if defined( HAVE_WINDOWS_API )
 #define date_time_gmtime_r( timestamp, time_elements ) \
 	gmtime_s( time_elements, timestamp )
 
-#elif defined( HAVE_GMTIME_R )
+#else
 #define date_time_gmtime_r( timestamp, time_elements ) \
 	gmtime_r( timestamp, time_elements )
-
-#elif !defined( HAVE_GMTIME )
-#error Missing gmtime function
+#endif
 #endif
 
+#if defined( HAVE_CTIME_R )
 #if defined( HAVE_WINDOWS_API )
 #define date_time_ctime( timestamp, string, size ) \
 	( ctime_s( string, size, timestamp ) != 0 ? NULL : string )
 
-#elif defined( HAVE_CTIME_R )
-#if defined( HAVE_CTIME_R_SIZE )
+#elif defined( HAVE_CTIME_R_SIZE )
 #define date_time_ctime( timestamp, string, size ) \
 	ctime_r( timestamp, string, size )
 
 #else
 #define date_time_ctime( timestamp, string, size ) \
 	ctime_r( timestamp, string )
-
 #endif
 
 #elif defined( HAVE_CTIME )
@@ -90,34 +83,34 @@ char *libewf_date_time_ctime(
 
 #define date_time_ctime( timestamp, string, size ) \
 	libewf_date_time_ctime( timestamp, string, size )
-
-#else
-#error Missing ctime function
 #endif
 
+#if defined( HAVE_MKTIME )
 #if defined( HAVE_WINDOWS_API )
 #define date_time_mktime( time_elements ) \
 	mktime( time_elements )
 
-#elif defined( HAVE_MKTIME )
+#else
 #define date_time_mktime( time_elements ) \
 	mktime( time_elements )
-
-#else
-#error Missing mktime function
+#endif
 #endif
 
+#if defined( date_time_localtime_r ) || defined( HAVE_LOCALTIME )
 struct tm *libewf_date_time_localtime(
             const time_t *timestamp );
 
 #define date_time_localtime( timestamp ) \
 	libewf_date_time_localtime( timestamp )
+#endif
 
+#if defined( date_time_gmtime_r ) || defined( HAVE_GMTIME )
 struct tm *libewf_date_time_gmtime(
             const time_t *timestamp );
 
 #define date_time_gmtime( timestamp ) \
 	libewf_date_time_gmtime( timestamp )
+#endif
 
 #if defined( __cplusplus )
 }

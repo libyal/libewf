@@ -23,6 +23,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <file_stream_io.h>
 #include <memory.h>
 #include <system_string.h>
 
@@ -596,7 +597,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			file_io_fclose(
+			file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -626,7 +627,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			file_io_fclose(
+			file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -713,7 +714,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( file_io_fclose(
+		if( file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf( stderr, "Unable to close log file: %s.\n",

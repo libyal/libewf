@@ -207,10 +207,10 @@ uint8_t ewfinput_determine_libewf_format(
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint8_t ewfinput_determine_libewf_format_char_t(
+uint8_t ewfinput_determine_libewf_format_system_character(
          const system_character_t *argument )
 {
-	static char *function = "ewfinput_determine_libewf_format_char_t";
+	static char *function = "ewfinput_determine_libewf_format_system_character";
 
 	if( argument == NULL )
 	{
@@ -399,10 +399,10 @@ uint32_t ewfinput_determine_sectors_per_chunk(
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint32_t ewfinput_determine_sectors_per_chunk_char_t(
+uint32_t ewfinput_determine_sectors_per_chunk_system_character(
           const system_character_t *argument )
 {
-	static char *function = "ewfinput_determine_sectors_per_chunk_char_t";
+	static char *function = "ewfinput_determine_sectors_per_chunk_system_character";
 
 	if( argument == NULL )
 	{
@@ -526,10 +526,10 @@ int8_t ewfinput_determine_compression_level(
 /* Determines the compression level value from an argument string
  * Returns the compression level value, or -1 on error
  */
-int8_t ewfinput_determine_compression_level_char_t(
+int8_t ewfinput_determine_compression_level_system_character(
         const system_character_t *argument )
 {
-	static char *function = "ewfinput_determine_compression_level_char_t";
+	static char *function = "ewfinput_determine_compression_level_system_character";
 
 	if( argument == NULL )
 	{
@@ -777,14 +777,14 @@ character_t *ewfinput_get_variable(
 /* Get variable input from the user
  * with a maximum of 1023 characters
  */
-system_character_t *ewfinput_get_variable_char_t(
+system_character_t *ewfinput_get_variable_system_character(
                      FILE *stream,
                      character_t *request_string )
 {
-	character_t *user_input               = NULL;
-	system_character_t *user_input_char_t = NULL;
-	static char *function                 = "ewfinput_get_variable_char_t";
-	size_t user_input_length              = 0;
+	character_t *user_input                         = NULL;
+	system_character_t *user_input_system_character = NULL;
+	static char *function                           = "ewfinput_get_variable_system_character";
+	size_t user_input_length                        = 0;
 
 	user_input = ewfinput_get_variable(
 	              stream,
@@ -799,10 +799,10 @@ system_character_t *ewfinput_get_variable_char_t(
 		user_input_length = string_length(
 		                     user_input );
 
-		user_input_char_t = memory_allocate(
-		                     sizeof( system_character_t ) * ( user_input_length + 1 ) );
+		user_input_system_character = (system_character_t *) memory_allocate(
+		                                                      sizeof( system_character_t ) * ( user_input_length + 1 ) );
 
-		if( user_input_char_t == NULL )
+		if( user_input_system_character == NULL )
 		{
 			notify_warning_printf( "%s: unable to create conversion string.\n",
 			 function );
@@ -813,7 +813,7 @@ system_character_t *ewfinput_get_variable_char_t(
 			return( NULL );
 		}
 		if( ewfstring_copy_character_string_to_system_string(
-		     user_input_char_t,
+		     user_input_system_character,
 		     user_input,
 		     ( user_input_length + 1 ) ) != 1 )
 		{
@@ -823,14 +823,14 @@ system_character_t *ewfinput_get_variable_char_t(
 			memory_free(
 			 user_input );
 			memory_free(
-			 user_input_char_t );
+			 user_input_system_character );
 
 			return( NULL );
 		}
 		memory_free(
 		 user_input );
 
-		return( user_input_char_t );
+		return( user_input_system_character );
 	}
 	notify_warning_printf( "%s: character conversion unsupported.\n",
 	 function );
@@ -890,12 +890,15 @@ uint64_t ewfinput_get_size_variable(
 			{
 				return( default_value );
 			}
-			size_value = string_to_uint64(
-			              user_input_buffer_ptr,
-			              input_length );
-
-			if( ( size_value >= minimum )
-			 && ( size_value <= maximum ) )
+			if( string_to_uint64(
+			     user_input_buffer_ptr,
+			     input_length,
+			     &size_value ) != 1 )
+			{
+				fprintf( stream, "Unable to convert value into number, please try again or terminate using Ctrl^C.\n" );
+			}
+			else if( ( size_value >= minimum )
+			      && ( size_value <= maximum ) )
 			{
 				break;
 			}

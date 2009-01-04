@@ -358,7 +358,7 @@ int ewfbyte_size_string_convert(
 /* Determines the factor from a factor string
  * Returns the factor if successful or -1 on error
  */
-int8_t ewfbyte_size_string_get_factor_char_t(
+int8_t ewfbyte_size_string_get_factor_system_character(
         system_character_t factor )
 {
 	switch( factor )
@@ -396,12 +396,12 @@ int8_t ewfbyte_size_string_get_factor_char_t(
 /* Converts a human readable byte size string into a value
  * Returns 1 if successful or -1 on error
  */
-int ewfbyte_size_string_convert_char_t(
+int ewfbyte_size_string_convert_system_character(
      system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
-	static char *function            = "ewfbyte_size_string_convert_char_t";
+	static char *function            = "ewfbyte_size_string_convert_system_character";
 	size_t byte_size_string_iterator = 0;
 	uint64_t byte_size               = 0;
 	int8_t factor                    = 0;
@@ -469,7 +469,7 @@ int ewfbyte_size_string_convert_char_t(
 	{
 		byte_size_string_iterator++;
 	}
-	factor = ewfbyte_size_string_get_factor_char_t(
+	factor = ewfbyte_size_string_get_factor_system_character(
 	          byte_size_string[ byte_size_string_iterator ] );
 
 	if( factor < 0 )

@@ -53,10 +53,10 @@ int ewfbyte_size_string_convert(
      size_t byte_size_string_length,
      uint64_t *size );
 
-int8_t ewfbyte_size_string_get_factor_char_t(
+int8_t ewfbyte_size_string_get_factor_system_character(
         system_character_t factor );
 
-int ewfbyte_size_string_convert_char_t(
+int ewfbyte_size_string_convert_system_character(
      system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );

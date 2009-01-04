@@ -23,6 +23,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <file_stream_io.h>
 #include <memory.h>
 #include <system_string.h>
 #include <types.h>
@@ -250,12 +251,12 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t(
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_system_character(
 				                     optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
-					fprintf( stderr, "Unsuported amount of sectors per chunk defaulting to 64.\n" );
+					fprintf( stderr, "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
 
 					sectors_per_chunk = 64;
 				}
@@ -271,12 +272,12 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					compression_level = ewfinput_determine_compression_level_char_t(
+					compression_level = ewfinput_determine_compression_level_system_character(
 					                     optarg );
 				
 					if( compression_level <= -1 )
 					{
-						fprintf( stderr, "Unsupported compression type defaulting to none.\n" );
+						fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
 						compression_level = LIBEWF_COMPRESSION_NONE;
 					}
@@ -318,14 +319,14 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'f':
-				libewf_format = ewfinput_determine_libewf_format_char_t(
+				libewf_format = ewfinput_determine_libewf_format_system_character(
 				                 optarg );
 
 				if( ( libewf_format == 0 )
 				 || ( libewf_format == LIBEWF_FORMAT_EWF )
 				 || ( libewf_format == LIBEWF_FORMAT_SMART ) )
 				{
-					fprintf( stderr, "Unsupported EWF file format type defaulting to encase5.\n" );
+					fprintf( stderr, "Unsupported EWF file format type defaulting to: encase5.\n" );
 
 					libewf_format = LIBEWF_FORMAT_ENCASE5;
 				}
@@ -359,7 +360,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "Unsupported media type defaulting to fixed.\n" );
+					fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
 				}
 				break;
 
@@ -380,7 +381,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "Unsupported volume type defaulting to logical.\n" );
+					fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
 				}
 				break;
 
@@ -402,7 +403,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_char_t(
+				result = ewfbyte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &segment_file_size );
@@ -414,7 +415,7 @@ int main( int argc, char * const argv[] )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 				{
-					fprintf( stderr, "Unsupported segment file size defaulting to %" PRIu32 ".\n",
+					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu32 ".\n",
 					 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 
 					segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
@@ -911,7 +912,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			file_io_fclose(
+			file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -937,7 +938,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			file_io_fclose(
+			file_stream_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -970,7 +971,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( file_io_fclose(
+		if( file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf( stderr, "Unable to close log file: %s.\n",

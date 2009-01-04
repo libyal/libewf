@@ -27,7 +27,7 @@
 #include <character_string.h>
 #include <error_string.h>
 #include <date_time.h>
-#include <file_io.h>
+#include <file_stream_io.h>
 #include <system_string.h>
 
 #include <stdio.h>
@@ -58,7 +58,7 @@ extern "C" {
         error_string_wcserror( error_number )
 
 #define ewfcommon_fopen( filename, mode ) \
-	file_io_wfopen( filename, mode )
+	file_stream_io_wfopen( filename, mode )
 
 #else
 #define ewfcommon_ctime( timestamp, string, length ) \
@@ -68,7 +68,7 @@ extern "C" {
         error_string_strerror( error_number )
 
 #define ewfcommon_fopen( filename, mode ) \
-	file_io_fopen( filename, mode )
+	file_stream_io_fopen( filename, mode )
 
 #endif
 

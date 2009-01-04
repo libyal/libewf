@@ -24,6 +24,8 @@
 #include "file_io.h"
 #include "notify.h"
 
+#if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
+
 /* Function to determine if a file exists
  * Return 1 if file exists, 0 if not or -1 on error
  */
@@ -63,8 +65,9 @@ int libewf_file_io_exists(
 
 	return( 1 );
 }
+#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
 
 /* Function to determine if a file exists
  * Return 1 if file exists, 0 if not or -1 on error
@@ -96,11 +99,11 @@ int libewf_file_io_wexists(
 	 file_descriptor );
 
 	return( 1 );
-#else
-#error missing wopen()
 #endif
 }
 #endif
+
+#if defined( HAVE_OPEN )
 
 /* Function to wrap open()
  */
@@ -143,8 +146,9 @@ int libewf_file_io_open(
 	}
 	return( file_descriptor );
 }
+#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WOPEN )
 
 /* Function to wrap wopen() which is the wide character equivalent of open()
  */
@@ -178,8 +182,6 @@ int libewf_file_io_wopen(
 		return( -1 );
 	}
 	return( file_descriptor );
-#else
-#error missing wopen()
 #endif
 }
 #endif

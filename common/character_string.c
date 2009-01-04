@@ -21,18 +21,19 @@
  */
 
 #include "common.h"
+#include "date_time.h"
 #include "character_string.h"
-#include "endian.h"
 #include "memory.h"
 #include "notify.h"
 #include "types.h"
 
 /* Duplicates a string
+ * Size should include the size of the end of string character
  * Returns the pointer to the duplicate string, or NULL on error
  */
 character_t *libewf_string_duplicate(
               character_t *string,
-              size_t length )
+              size_t size )
 {
 	character_t *duplicate = NULL;
 	static char *function  = "libewf_string_duplicate";
@@ -41,23 +42,19 @@ character_t *libewf_string_duplicate(
 	{
 		return( NULL );
 	}
-	if( length == 0 )
+	if( size == 0 )
 	{
 		return( NULL );
 	}
-	if( length > (size_t) SSIZE_MAX )
+	if( ( sizeof( character_t ) * size ) > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid length value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( NULL );
 	}
-	/* Add an additional character for the end of string
-	 */
-	length += 1;
-
 	duplicate = (character_t *) memory_allocate(
-	                             sizeof( character_t ) * length );
+	                             sizeof( character_t ) * size );
 
 	if( duplicate == NULL )
 	{
@@ -69,7 +66,7 @@ character_t *libewf_string_duplicate(
 	if( string_copy(
 	     duplicate,
 	     string,
-	     length ) == NULL )
+	     size ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set duplicate string.\n",
 		 function );
@@ -79,419 +76,141 @@ character_t *libewf_string_duplicate(
 
 		return( NULL );
 	}
-	duplicate[ length - 1 ] = (character_t) '\0';
+	duplicate[ size ] = (character_t) '\0';
 
 	return( duplicate );
 }
 
-/* Returns the value represented by a string, returns 0 error
+#if defined( string_to_signed_long_long )
+
+/* Determines the 64-bit integer value represented by a string
+ * Size should include the size of the end of string character
+ * Returns 1 if successful or -1 on error
  */
-int64_t libewf_string_to_int64(
-         const character_t *string,
-         size_t length )
+int libewf_string_to_int64(
+     const character_t *string,
+     size_t size,
+     int64_t *value )
 {
 	character_t *end_of_string = NULL;
 	static char *function      = "libewf_string_to_int64";
-	int64_t value              = 0;
 
 	if( string == NULL )
 	{
 		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	if( length == 0 )
+	if( size == 0 )
 	{
 		notify_warning_printf( "%s: string is emtpy.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	if( length > (size_t) SSIZE_MAX )
+	if( ( sizeof( character_t ) * size ) > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid length value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	end_of_string = (character_t *) &string[ length - 1 ];
+	if( value == NULL )
+	{
+		notify_warning_printf( "%s: invalid value.\n",
+		 function );
 
-	value = string_to_signed_long_long(
-	         string,
-	         &end_of_string,
-	         0 );
+		return( -1 );
+	}
+	end_of_string = (character_t *) &string[ size - 1 ];
 
-	if( value == (int64_t) LONG_MAX )
+	*value = string_to_signed_long_long(
+	          string,
+	          &end_of_string,
+	          0 );
+
+	if( *value == (int64_t) LONG_MAX )
 	{
 		notify_warning_printf( "%s: unable to convert string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	return( value );
+	return( 1 );
 }
+#endif
 
-/* Returns the value represented by a string, returns 0 on error
+#if defined( string_to_unsigned_long_long )
+
+/* Determines the 64-bit integer value represented by a string
+ * Size should include the size of the end of string character
+ * Returns 1 if successful or -1 on error
  */
-uint64_t libewf_string_to_uint64(
-          const character_t *string,
-          size_t length )
+int libewf_string_to_uint64(
+     const character_t *string,
+     size_t size,
+     uint64_t *value )
 {
 	character_t *end_of_string = NULL;
 	static char *function      = "libewf_string_to_uint64";
-	uint64_t value             = 0;
 
 	if( string == NULL )
 	{
 		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	if( length == 0 )
+	if( size == 0 )
 	{
 		notify_warning_printf( "%s: string is emtpy.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	if( length > (size_t) SSIZE_MAX )
+	if( ( sizeof( character_t ) * size ) > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid length value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	end_of_string = (character_t *) &string[ length - 1 ];
+	if( value == NULL )
+	{
+		notify_warning_printf( "%s: invalid value.\n",
+		 function );
 
-	value = string_to_unsigned_long_long(
-	         string,
-	         &end_of_string,
-	         0 );
+		return( -1 );
+	}
+	end_of_string = (character_t *) &string[ size - 1 ];
 
-	if( value == (uint64_t) LONG_MAX )
+	*value = string_to_unsigned_long_long(
+	          string,
+	          &end_of_string,
+	          0 );
+
+	if( *value == (int64_t) LONG_MAX )
 	{
 		notify_warning_printf( "%s: unable to convert string.\n",
 		 function );
 
-		return( 0 );
-	}
-	return( value );
-}
-
-/* Copies a multi byte UTF-16 stream to a character string
- * Returns 1 if successful, on -1 on error
- */
-int libewf_string_copy_from_utf16_stream(
-     character_t *string,
-     size_t length_string,
-     uint8_t *utf16_stream,
-     size_t size_utf16_stream,
-     uint8_t byte_order )
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	mbstate_t conversion_state;
-#endif
-	static char *function   = "libewf_string_copy_from_utf16_stream";
-	size_t utf16_iterator   = 0;
-	size_t string_iterator  = 0;
-	size_t zero_byte        = 0;
-	uint8_t read_byte_order = 0;
-
-	if( string == NULL )
-	{
-		notify_warning_printf( "%s: invalid string.\n",
-		 function );
-
 		return( -1 );
 	}
-	if( length_string > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid length value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_stream == NULL )
-	{
-		notify_warning_printf( "%s: invalid UTF-16 stream.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size_utf16_stream > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if UTF-16 stream is in big or little endian
-	 */
-	if( ( (uint8_t) utf16_stream[ 0 ] == 0xff )
-	 && ( (uint8_t) utf16_stream[ 1 ] == 0xfe ) )
-	{
-		read_byte_order = LIBEWF_ENDIAN_LITTLE;
-		utf16_iterator  = 2;
-	}
-	else if( ( (uint8_t) utf16_stream[ 0 ] == 0xfe )
-	      && ( (uint8_t) utf16_stream[ 1 ] == 0xff ) )
-	{
-		read_byte_order = LIBEWF_ENDIAN_BIG;
-		utf16_iterator  = 2;
-	}
-	else
-	{
-		if( ( utf16_stream[ 0 ] == (character_t) '\0' )
-		 && ( utf16_stream[ 1 ] != (character_t) '\0' ) )
-		{
-			read_byte_order = LIBEWF_ENDIAN_BIG;
-		}
-		else if( ( utf16_stream[ 0 ] != (character_t) '\0' )
-		 && ( utf16_stream[ 1 ] == (character_t) '\0' ) )
-		{
-			read_byte_order = LIBEWF_ENDIAN_LITTLE;
-		}
-		else
-		{
-			if( ( byte_order != LIBEWF_ENDIAN_BIG )
-			 && ( byte_order != LIBEWF_ENDIAN_LITTLE ) )
-			{
-				notify_warning_printf( "%s: unsupported byte order.\n",
-				 function );
-
-				return( -1 );
-			}
-			read_byte_order = byte_order;
-		}
-		utf16_iterator = 0;
-	}
-	/* Check if the UTF-16 stream is terminated with zero bytes
-	 */
-	if( ( utf16_stream[ size_utf16_stream - 2 ] != 0 )
-	 || ( utf16_stream[ size_utf16_stream - 1 ] != 0 ) )
-	{
-		zero_byte = 1;
-	}
-	/* The UTF-16 stream contains twice as much bytes needed for the string
-	 * it could contain two additional bytes representing byte order
-	 */
-	if( length_string < ( ( ( size_utf16_stream - utf16_iterator ) / 2 ) + zero_byte ) )
-	{
-		notify_warning_printf( "%s: string too small.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( memory_set(
-	     &conversion_state,
-	     0,
-	     sizeof( mbstate_t ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to clear converion state.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( mbsinit(
-	     &conversion_state ) == 0 )
-	{
-		notify_warning_printf( "%s: unable to initialize converion state.\n",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	/* Convert stream
-	 */
-	while( utf16_iterator < size_utf16_stream )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-		if( mbrtowc(
-		     &( string[ string_iterator ] ),
-		     (const char *) &( utf16_stream[ utf16_iterator ] ),
-		     2,
-		     &conversion_state ) >= (size_t) -2 )
-		{
-			notify_warning_printf( "%s: unable to convert UTF-16 character: %02x %02x.\n",
-			 function, utf16_stream[ utf16_iterator ], utf16_stream[ utf16_iterator + 1 ] );
-		}
-#else
-		if( read_byte_order == LIBEWF_ENDIAN_BIG )
-		{
-			if( utf16_stream[ utf16_iterator ] == (uint8_t) '\0' )
-			{
-				string[ string_iterator ] = utf16_stream[ utf16_iterator + 1 ];
-			}
-			else
-			{
-				/* Add a place holder character
-				 */
-				string[ string_iterator ] = '_';
-			}
-		}
-		else if( read_byte_order == LIBEWF_ENDIAN_LITTLE )
-		{
-			if( utf16_stream[ utf16_iterator + 1 ] == (uint8_t) '\0' )
-			{
-				string[ string_iterator ] = utf16_stream[ utf16_iterator ];
-			}
-			else
-			{
-				/* Add a place holder character
-				 */
-				string[ string_iterator ] = '_';
-			}
-		}
-#endif
-		utf16_iterator  += 2;
-		string_iterator += 1;
-	}
-	string[ string_iterator ] = (character_t) '\0';
-
 	return( 1 );
 }
-
-/* Copies a character string to a multi byte UTF-16 stream
- * Returns 1 if successful, on -1 on error
- */
-int libewf_string_copy_to_utf16_stream(
-     character_t *string,
-     size_t length_string,
-     uint8_t *utf16_stream,
-     size_t size_utf16_stream,
-     uint8_t byte_order )
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	mbstate_t conversion_state;
 #endif
-	static char *function  = "libewf_string_copy_to_utf16_stream";
-	size_t string_iterator = 0;
-	size_t utf16_iterator  = 2;
 
-	if( string == NULL )
-	{
-		notify_warning_printf( "%s: invalid string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( length_string > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid length value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_stream == NULL )
-	{
-		notify_warning_printf( "%s: invalid UTF-16 stream.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size_utf16_stream > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( byte_order != LIBEWF_ENDIAN_BIG )
-	 && ( byte_order != LIBEWF_ENDIAN_LITTLE ) )
-	{
-		notify_warning_printf( "%s: unsupported byte order.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( memory_set(
-	     &conversion_state,
-	     0,
-	     sizeof( mbstate_t ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to clear converion state.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( mbsinit(
-	     &conversion_state ) == 0 )
-	{
-		notify_warning_printf( "%s: unable to initialize converion state.\n",
-		 function );
-
-		return( -1 );
-	}
-#endif
-	/* Two additional bytes required for the byte order indicator
-	 */
-	if( size_utf16_stream < ( ( length_string * 2 ) + 2 ) )
-	{
-		notify_warning_printf( "%s: UTF-16 stream too small.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Add the endian byte order
-	 */
-	if( byte_order == LIBEWF_ENDIAN_LITTLE )
-	{
-		utf16_stream[ 0 ] = 0xff;
-		utf16_stream[ 1 ] = 0xfe;
-	}
-	else if( byte_order == LIBEWF_ENDIAN_BIG )
-	{
-		utf16_stream[ 0 ] = 0xfe;
-		utf16_stream[ 1 ] = 0xff;
-	}
-	/* Convert the string
-	 */
-	while( string_iterator < length_string )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-		if( wcrtomb(
-		     (char *) &( utf16_stream[ utf16_iterator ] ),
-		     string[ string_iterator ],
-		     &conversion_state ) >= (size_t) -1 )
-		{
-			notify_warning_printf( "%s: unable to convert character: %04x.\n",
-			 function, string[ string_iterator ] );
-		}
-#else
-		if( byte_order == LIBEWF_ENDIAN_LITTLE )
-		{
-			utf16_stream[ utf16_iterator     ] = (uint8_t) string[ string_iterator ];
-			utf16_stream[ utf16_iterator + 1 ] = (uint8_t) '\0';
-		}
-		else if( byte_order == LIBEWF_ENDIAN_BIG )
-		{
-			utf16_stream[ utf16_iterator     ] = (uint8_t) '\0';
-			utf16_stream[ utf16_iterator + 1 ] = (uint8_t) string[ string_iterator ];
-		}
-#endif
-		string_iterator += 1;
-		utf16_iterator  += 2;
-	}
-	utf16_stream[ size_utf16_stream - 2 ] = (uint8_t) '\0';
-	utf16_stream[ size_utf16_stream - 1 ] = (uint8_t) '\0';
-
-	return( 1 );
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( date_time_ctime )
 
 /* Sets ctime in the string
- * The string must be at least 32 characters of length
+ * The string must be at least 32 characters of size
  * Returns the pointer to the string if successful or NULL on error
  */
 character_t *libewf_string_ctime(
               const time_t *timestamp,
               character_t *string,
-              size_t length )
+              size_t size )
 {
 	char ctime_string[ 32 ];
 
@@ -511,14 +230,14 @@ character_t *libewf_string_ctime(
 
 		return( NULL );
 	}
-	if( length > (size_t) SSIZE_MAX )
+	if( ( sizeof( character_t ) * size ) > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid length.\n",
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( NULL );
 	}
-	if( length < 32 )
+	if( size < 32 )
 	{
 		notify_warning_printf( "%s: string too small.\n",
 		 function );

@@ -35,8 +35,6 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
 /* String length
  */
 #if defined( HAVE_WCSLEN )
@@ -46,13 +44,13 @@ extern "C" {
 
 /* String compare
  */
-#if defined( HAVE_WMEMCMP ) || defined( HAVE_WINDOWS_API )
-#define wide_string_compare( string1, string2, size ) \
-	wmemcmp( (void *) string1, (void *) string2, size )
-
-#elif defined( HAVE_WCSNCMP )
+#if defined( HAVE_WCSNCMP )
 #define wide_string_compare( string1, string2, size ) \
 	wcsncmp( string1, string2, size )
+
+#elif defined( HAVE_WMEMCMP )
+#define wide_string_compare( string1, string2, size ) \
+	wmemcmp( (void *) string1, (void *) string2, size )
 
 #elif defined( HAVE_WCSCMP )
 #define wide_string_compare( string1, string2, size ) \
@@ -61,13 +59,13 @@ extern "C" {
 
 /* String copy
  */
-#if defined( HAVE_WMEMCPY ) || defined( HAVE_WINDOWS_API )
-#define wide_string_copy( destination, source, size ) \
-	(character_t *) wmemcpy( (void *) destination, (void *) source, size )
-
-#elif defined( HAVE_WCSNCPY )
+#if defined( HAVE_WCSNCPY )
 #define wide_string_copy( destination, source, size ) \
 	wcsncpy( destination, source, size )
+
+#elif defined( HAVE_WMEMCPY )
+#define wide_string_copy( destination, source, size ) \
+	(character_t *) wmemcpy( (void *) destination, (void *) source, size )
 
 #elif defined( HAVE_WCSCPY )
 #define wide_string_copy( destination, source, size ) \
@@ -76,70 +74,66 @@ extern "C" {
 
 /* String search
  */
-#if defined( HAVE_WMEMCHR ) || defined( HAVE_WINDOWS_API )
-#define wide_string_search( string, character, size ) \
-	(character_t *) wmemchr( (void *) string, (wchar_t) character, size )
-
-#elif defined( HAVE_WCSCHR )
+#if defined( HAVE_WCSCHR )
 #define wide_string_search( string, character, size ) \
 	wcschr( string, (wchar_t) character )
+
+#elif defined( HAVE_WMEMCHR )
+#define wide_string_search( string, character, size ) \
+	(character_t *) wmemchr( (void *) string, (wchar_t) character, size )
 #endif
 
 /* String reverse search
  */
-#if defined( HAVE_WINDOWS_API )
+#if defined( HAVE_WCSRCHR )
 #define wide_string_search_reverse( string, character, size ) \
 	wcsrchr( string, (wchar_t) character )
 
 #elif defined( HAVE_WMEMRCHR )
 #define wide_string_search_reverse( string, character, size ) \
 	(character_t *) wmemrchr( (void *) string, (wchar_t) character, size )
-
-#elif defined( HAVE_WCSRCHR )
-#define wide_string_search_reverse( string, character, size ) \
-	wcsrchr( string, (wchar_t) character )
 #endif
 
 /* String formatted print (snprinf)
  */
+#if defined( HAVE_SWPRINTF )
 #if defined( HAVE_WINDOWS_API )
 #define wide_string_snprintf( target, size, format, ... ) \
 	swprintf_s( target, size, format, __VA_ARGS__ )
 
-#elif defined( HAVE_SWPRINTF )
+#else
 #define wide_string_snprintf( target, size, format, ... ) \
 	swprintf( target, size, format, __VA_ARGS__ )
+#endif
 #endif
 
 /* String retrieve form stream (fgets)
  */
-#if defined( HAVE_FGETWS ) || defined( HAVE_WINDOWS_API )
+#if defined( HAVE_FGETWS )
 #define wide_string_get_from_stream( string, size, stream ) \
 	fgetws( string, size, stream )
 #endif
 
-/* String to int64 (singed long long)
+/* String to singed long long (int64)
  */
-#if defined( HAVE_WINDOWS_API )
-#define wide_string_to_int64( string, end_of_string, base ) \
+#if defined( HAVE_WTOI64 )
+#define wide_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) _wtoi64( string )
 
 #elif defined( HAVE_WCSTOLL )
-#define wide_string_to_int64( string, end_of_string, base ) \
+#define wide_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) wcstoll( string, end_of_string, base )
 #endif
 
-/* String to uint64 (unsinged long long)
+/* String to unsinged long long (uint64)
  */
-#if defined( HAVE_WINDOWS_API )
-#define wide_string_to_uint64( string, end_of_string, base ) \
+#if defined( HAVE_WTOI64 )
+#define wide_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) _wtoi64( string )
 
 #elif defined( HAVE_WCSTOULL )
-#define wide_string_to_uint64( string, end_of_string, base ) \
+#define wide_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) wcstoull( string, end_of_string, base )
-#endif
-
 #endif
 
 #if defined( __cplusplus )

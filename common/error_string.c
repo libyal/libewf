@@ -35,6 +35,8 @@
 #include <string.h>
 #endif
 
+#if defined( error_string_strerror_r ) || defined( HAVE_STRERROR )
+
 /* Function to wrap strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
@@ -104,13 +106,11 @@ char *libewf_error_string_strerror(
 		return( NULL );
 	}
 	return( error_string );
-#else
-
-	return( NULL );
 #endif
 }
+#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( error_string_wcserror_r )
 
 /* Function to wrap wide character equivalent of strerror()
  * Returns a new instance to a string containing the error string, NULL on error
@@ -119,7 +119,6 @@ wchar_t *libewf_error_string_wcserror(
           int error_number )
 {
 	static char *function      = "libewf_error_string_wcserror";
-#if defined( error_string_wcserror_r )
 	wchar_t *error_string      = NULL;
 	uint16_t error_string_size = 256;
 
@@ -147,10 +146,6 @@ wchar_t *libewf_error_string_wcserror(
 		return( NULL );
 	}
 	return( error_string );
-#else
-
-	return( NULL );
-#endif
 }
 #endif
 

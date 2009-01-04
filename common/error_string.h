@@ -30,27 +30,23 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
+#if defined( HAVE_WCSERROR_R )
 #if defined( HAVE_WINDOWS_API )
 #define error_string_wcserror_r( error_number, string, size ) \
 	_wcserror_s( string, size, error_number )
 
 #define ERROR_STRING_WCSTRERROR_R_RETURN_ERROR	0
-
-#else
-#error Missing wide character equivalent of strerror()
+#endif
 #endif
 
-#endif
-
+#if defined( HAVE_STRERROR_R )
 #if defined( HAVE_WINDOWS_API )
 #define error_string_strerror_r( error_number, string, size ) \
 	strerror_s( string, size, error_number )
 
 #define ERROR_STRING_STRERROR_R_RETURN_ERROR	0
 
-#elif defined( HAVE_STRERROR_R )
+#else
 #define error_string_strerror_r( error_number, string, size ) \
 	strerror_r( error_number, string, size )
 
@@ -62,14 +58,17 @@ extern "C" {
 #endif
 
 #endif
+#endif
 
+#if defined( error_string_strerror_r ) || defined( HAVE_STRERROR )
 char *libewf_error_string_strerror(
        int error_number );
 
 #define error_string_strerror( error_number ) \
 	libewf_error_string_strerror( error_number )
+#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( error_string_wcserror_r )
 wchar_t *libewf_error_string_wcserror(
           int error_number );
 

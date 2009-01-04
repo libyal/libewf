@@ -30,7 +30,7 @@
 #include <string.h>
 #endif
 
-#if !defined( HAVE_WINDOWS_API ) && !defined( HAVE_CTIME_R )
+#if !defined( HAVE_CTIME_R )
 
 /* Sets ctime in the string
  * The string must be at least 32 characters of length
@@ -97,6 +97,7 @@ char *libewf_date_time_ctime(
 }
 #endif
 
+#if defined( date_time_localtime_r ) || defined( HAVE_LOCALTIME )
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
 struct tm *libewf_date_time_localtime(
@@ -144,7 +145,6 @@ struct tm *libewf_date_time_localtime(
 
 		return( NULL );
 	}
-	return( time_elements );
 #elif defined( HAVE_LOCALTIME )
 	static_time_elements = localtime(
 	                        timestamp );
@@ -173,8 +173,11 @@ struct tm *libewf_date_time_localtime(
 		return( NULL );
 	}
 #endif
+	return( time_elements );
 }
+#endif
 
+#if defined( date_time_gmtime_r ) || defined( HAVE_GMTIME )
 /* Returns a structured representation of a time using UTC (GMT), or NULL on error
  */
 struct tm *libewf_date_time_gmtime(
@@ -252,4 +255,5 @@ struct tm *libewf_date_time_gmtime(
 #endif
 	return( time_elements );
 }
+#endif
 

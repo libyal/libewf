@@ -26,8 +26,11 @@
 #include "common.h"
 #include "system_string.h"
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( HAVE_IO_H )
 #include <io.h>
+#endif
+
+#if defined( HAVE_SHARE_H )
 #include <share.h>
 #endif
 
@@ -46,8 +49,6 @@
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
-
-#include <stdio.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -69,29 +70,32 @@ extern "C" {
 
 #endif
 
+#if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
 int libewf_file_io_exists(
      const char *filename );
 
 #define file_io_exists( filename ) \
 	libewf_file_io_exists( filename )
+#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_existst(
+#if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
+int libewf_file_io_wexists(
      const wchar_t *filename );
 
 #define file_io_wexists( filename, flags ) \
 	libewf_file_io_wexists( filename )
-
 #endif
 
+#if defined( HAVE_OPEN )
 int libewf_file_io_open(
      const char *filename,
      int flags );
 
 #define file_io_open( filename, flags ) \
 	libewf_file_io_open( filename, flags )
+#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WOPEN )
 int libewf_file_io_wopen(
      const wchar_t *filename,
      int flags );
@@ -101,6 +105,7 @@ int libewf_file_io_wopen(
 
 #endif
 
+#if defined( HAVE_READ )
 #if defined( HAVE_WINDOWS_API )
 #define file_io_read( file_descriptor, buffer, size ) \
 	_read( file_descriptor, (void *) buffer, (unsigned int) size )
@@ -109,7 +114,9 @@ int libewf_file_io_wopen(
 #define file_io_read( file_descriptor, buffer, size ) \
 	read( file_descriptor, (void *) buffer, size )
 #endif
+#endif
 
+#if defined( HAVE_LSEEK )
 #if defined( HAVE_WINDOWS_API )
 #define file_io_lseek( file_descriptor, offset, whence ) \
 	_lseeki64( file_descriptor, offset, whence )
@@ -117,9 +124,10 @@ int libewf_file_io_wopen(
 #else
 #define file_io_lseek( file_descriptor, offset, whence ) \
 	lseek( file_descriptor, offset, whence ) 
-
+#endif
 #endif
 
+#if defined( HAVE_WRITE )
 #if defined( HAVE_WINDOWS_API )
 #define file_io_write( file_descriptor, buffer, size ) \
 	_write( file_descriptor, (const void *) buffer, (unsigned int) size )
@@ -127,9 +135,10 @@ int libewf_file_io_wopen(
 #else
 #define file_io_write( file_descriptor, buffer, size ) \
 	write( file_descriptor, (const void *) buffer, size )
-
+#endif
 #endif
 
+#if defined( HAVE_CLOSE )
 #if defined( HAVE_WINDOWS_API )
 #define file_io_close( file_descriptor ) \
 	_close( file_descriptor )
@@ -137,22 +146,8 @@ int libewf_file_io_wopen(
 #else
 #define file_io_close( file_descriptor ) \
 	close( file_descriptor )
-
 #endif
-
-#define file_io_fopen( filename, mode ) \
-	fopen( filename, mode )
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-#define file_io_wfopen( filename, mode ) \
-	_wfopen( filename, mode )
 #endif
-
-#define file_io_fclose( file_stream ) \
-	fclose( file_stream )
-
-#define file_io_fwrite( stream, data, size ) \
-	fwrite( data, 1, size, stream )
 
 #if defined( __cplusplus )
 }

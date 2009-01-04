@@ -537,8 +537,9 @@ int libewf_convert_date_header2_value(
      character_t **date_string,
      size_t *date_string_length )
 {
-	static char *function = "libewf_convert_date_header2_value";
-	time_t timestamp      = 0;
+	static char *function   = "libewf_convert_date_header2_value";
+	int64_t timestamp_value = 0;
+	time_t timestamp        = 0;
 
 	if( header_value == NULL )
 	{
@@ -547,11 +548,24 @@ int libewf_convert_date_header2_value(
 
 		return( -1 );
 	}
-	timestamp = (time_t) string_to_int64(
-	                      header_value,
-	                      header_value_length );
+	if( string_to_int64(
+	     header_value,
+	     header_value_length,
+	     &timestamp_value ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to convert header value to int64.\n",
+		 function );
 
-	/* TODO check for conversion error */
+		return( -1 );
+	}
+	if( timestamp_value > (int64_t) LONG_MAX )
+	{
+		notify_warning_printf( "%s: timestamp value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	timestamp = (time_t) timestamp_value;
 
 	*date_string_length = 32;
 
