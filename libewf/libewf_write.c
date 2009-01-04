@@ -975,7 +975,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		               internal_handle->media_values,
 		               internal_handle->compression_level,
 		               internal_handle->format,
-		               internal_handle->ewf_format );
+		               internal_handle->ewf_format,
+		               &( internal_handle->write->data_section ) );
 
 		if( write_count == -1 )
 		{
@@ -1416,7 +1417,8 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				       internal_handle->media_values,
 				       internal_handle->compression_level,
 				       internal_handle->format,
-				       internal_handle->ewf_format );
+				       internal_handle->ewf_format,
+			               &( internal_handle->write->data_section ) );
 
 			if( write_count == -1 )
 			{
