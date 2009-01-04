@@ -122,6 +122,8 @@ TODO
 * remove libewf_write_process_chunk_data ?
   move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 * have compound reallocation functions return an integer as result
+* remove internal_handle passing from most functions
+  only pass the necessary values
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
@@ -131,6 +133,10 @@ DELTA FILE
 Version: 20070816
 * worked on restructuring to improve internal structure
 * worked on improved rewrite using delta segment files
+* removed internal handle passing from libewf_section_start_read,
+  libewf_section_start_write
+* changed section start allocation in libewf_section_start_read from
+  dynamic to static
 
 Version: 20070815
 * worked on restructuring to improve internal structure

@@ -1817,7 +1817,6 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		/* Write sectors section start
 		 */
 		write_count = libewf_section_start_write(
-		               internal_handle,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               (EWF_CHAR *) "sectors",
 		               section_size,
@@ -2134,7 +2133,6 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		/* Rewrite sectors section start
 		 */
 		write_count = libewf_section_start_write(
-		               internal_handle,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               (EWF_CHAR *) "sectors",
 		               chunks_section_size,
