@@ -139,11 +139,8 @@ Next release:
   need to determine if a chunks is stored in a delta segment file
   what about adding the segment file type to the segment file struct?
 
-* move libewf_section_list_append to section write functions?
-  - for some sections not useful
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
-* pass media values struct to section volume/data functions
 * move libewf_section_read to segment file
 
 * Try to correct the table
@@ -175,7 +172,8 @@ Version: 20071123
 * added section type length to section list entry
 * added length filename in segment file struct
 * fixed error in error2 section regarding debug
-* worked on analyzing session section
+* worked on session section
+* added CD-ROM media type
 
 Version: 20071121
 * worked on refactoring code

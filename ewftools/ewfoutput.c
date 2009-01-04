@@ -210,9 +210,9 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 		}
 		size = new_size;
 	}
-	if( factor > 7 )
+	if( factor > 8 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: a size with a factor larger than 7 currently not supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: a size with a factor larger than 8 currently not supported.\n",
 		 function );
 
 		return( NULL );
@@ -245,7 +245,7 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 	{
 		libewf_string_snprintf(
 		 size_string,
-		 8,
+		 9,
 		 _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 ) _S_LIBEWF_CHAR( ".%" )
 		 _S_LIBEWF_CHAR( PRIu8 ) _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF ),
 		 size,
@@ -256,7 +256,7 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 	{
 		libewf_string_snprintf(
 		 size_string,
-		 8,
+		 9,
 		 _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 ) _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF ),
 		 size,
 		 units_string );

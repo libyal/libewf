@@ -2183,14 +2183,14 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 	EWF_SESSION session;
 	uint8_t stored_crc_buffer[ 4 ];
 
-	EWF_SESSION_DATA *session_data = NULL;
-	static char *function          = "libewf_section_session_read";
-	EWF_CRC calculated_crc         = 0;
-	EWF_CRC stored_crc             = 0;
-	ssize_t section_read_count     = 0;
-	ssize_t read_count             = 0;
-	size_t session_data_size       = 0;
-	uint32_t amount_of_sessions    = 0;
+	EWF_SESSION_ENTRY *sessions = NULL;
+	static char *function       = "libewf_section_session_read";
+	EWF_CRC calculated_crc      = 0;
+	EWF_CRC stored_crc          = 0;
+	ssize_t section_read_count  = 0;
+	ssize_t read_count          = 0;
+	size_t sessions_size        = 0;
+	uint32_t amount_of_sessions = 0;
 
 	if( segment_file == NULL )
 	{
@@ -2228,12 +2228,27 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 
 		return( -1 );
 	}
-	/* The session section contains a single CRC for the entire section
-	 */
-	calculated_crc = ewf_crc_calculate( &session, EWF_SESSION_SIZE, 1 );
+	calculated_crc = ewf_crc_calculate( &session, ( EWF_SESSION_SIZE - EWF_CRC_SIZE ), 1 );
 
+	if( libewf_endian_convert_32bit( &stored_crc, session.crc ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( stored_crc != calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
+
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		{
+			return( -1 );
+		}
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( session.unknown, 24 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( session.unknown1, 28 ); );
 #endif
 
 	if( libewf_endian_convert_32bit( &amount_of_sessions, session.amount_of_sessions ) != 1 )
@@ -2255,10 +2270,10 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 	}
 	else
 	{
-		session_data_size = EWF_SESSION_DATA_SIZE * amount_of_sessions;
-		session_data      = (EWF_SESSION_DATA *) libewf_common_alloc( session_data_size );
+		sessions_size = EWF_SESSION_ENTRY_SIZE * amount_of_sessions;
+		sessions      = (EWF_SESSION_ENTRY *) libewf_common_alloc( sessions_size );
 
-		if( session_data == NULL )
+		if( sessions == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to allocate session data.\n",
 			 function );
@@ -2267,23 +2282,21 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 		}
 		read_count = libewf_segment_file_read(
 		              segment_file,
-		              session_data,
-		              session_data_size );
+		              sessions,
+		              sessions_size );
 	
-		if( read_count != (ssize_t) session_data_size )
+		if( read_count != (ssize_t) sessions_size )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read error2 sectors.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read session data.\n",
 			 function );
 
-			libewf_common_free( session_data );
+			libewf_common_free( sessions );
 
 			return( -1 );
 		}
 		section_read_count += read_count;
 
-		/* The session section contains a single CRC for the entire section
-		 */
-		calculated_crc = ewf_crc_calculate( session_data, session_data_size, calculated_crc );
+		calculated_crc = ewf_crc_calculate( sessions, sessions_size, 1 );
 
 		read_count = libewf_segment_file_read(
 		              segment_file,
@@ -2295,7 +2308,7 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 			 function );
 
-			libewf_common_free( session_data );
+			libewf_common_free( sessions );
 
 			return( -1 );
 		}
@@ -2306,7 +2319,7 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
 			 function );
 
-			libewf_common_free( session_data );
+			libewf_common_free( sessions );
 
 			return( -1 );
 		}
@@ -2317,15 +2330,16 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 
 			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
-				libewf_common_free( session_data );
+				libewf_common_free( sessions );
 
 				return( -1 );
 			}
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) session_data, session_data_size ); );
+		LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) sessions, sessions_size ); );
 #endif
-		libewf_common_free( session_data );
+
+		libewf_common_free( sessions );
 	}
 	return( section_read_count );
 }
