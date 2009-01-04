@@ -1241,6 +1241,13 @@ int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_
 	return( 1 );
 }
 
+/* Retrieves the header value identifier specified by its index
+ * Returns 1 if successful, 0 if value not present, or -1 on error
+ */
+int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
+{
+}
+
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
@@ -1308,6 +1315,26 @@ int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of
 		return( 0 );
 	}
 	*amount_of_values = internal_handle->header_values->amount;
+
+	return( 1 );
+}
+
+/* Retrieves the hash value identifier specified by its index
+ * Returns 1 if successful, 0 if value not present, or -1 on error
+ */
+int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_hash_value_identifier";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
 	return( 1 );
 }

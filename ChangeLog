@@ -131,13 +131,29 @@ TODO
 
 * ewfexport: non interactive mode?
 
-* write api functions to rid ewfcommon of internal_handle
-  - the header values amount
-  - the hash values amount
+* what about setting errno for api set and get function i.e. for size too small
+* what about duplicate code for handling header and hash values
 
 * move wipe on error to ewftools, like in ewfacquire?
   WIPE_ON_ERROR
 * what about the crc errors in read_raw?
+
+* read crc in function libewf_section_delta_chunk_read?
+
+CLOSED
+* use LIBEWF_CHAR internally instead of seperate wide functions?
+  only for none wide support functions
+* what about read+write and compression?
+  solved by delta files
+* move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
+  no, this could be read from the error2 section
+* add basic string functions to API for accessing strings outside the library
+  - does this work with application and library memory space?
+  - if so remove libewf_string include from ewfacquire
+  not needed
+
+CURRENT
+* write api functions to rid ewftools of internal_handle
 
 * remove files from MSVC++ project
   ewf_crc.c
@@ -154,25 +170,12 @@ TODO
   ewf_header.h
   ewf_header2.h
 
-* read crc in function libewf_section_delta_chunk_read?
-
-CLOSED
-* use LIBEWF_CHAR internally instead of seperate wide functions?
-  only for none wide support functions
-* what about read+write and compression?
-  solved by delta files
-* move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
-  no, this could be read from the error2 section
-* add basic string functions to API for accessing strings outside the library
-  - does this work with application and library memory space?
-  - if so remove libewf_string include from ewfacquire
-  not needed
-
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions
 * Cleanup of set/get functions in internal handle
 * Added libewf_get_amount_of_acquiry_errors
-* Wrote api functions to rid ewfcommon of internal_handle for acquiry and CRC errors
+* Wrote api functions to rid ewfcommon of internal_handle for acquiry and
+  CRC errors, header and hash values
 
 Version: 20071016
 * Worked on cleaning up ewf struct read and write functions

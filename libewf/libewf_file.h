@@ -102,8 +102,11 @@ LIBEWF_EXTERN int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, o
 LIBEWF_EXTERN int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks );
 
 LIBEWF_EXTERN int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_of_values );
+LIBEWF_EXTERN int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length );
 LIBEWF_EXTERN int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+
 LIBEWF_EXTERN int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of_values );
+LIBEWF_EXTERN int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length );
 LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 LIBEWF_EXTERN int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk );

@@ -745,6 +745,7 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	LIBEWF_CHAR *stored_md5_hash_string = NULL;
 	static char *function               = "ewfoutput_hash_values_fprint";
 	uint32_t hash_value_length          = 128;
+	uint32_t amount_of_values           = 0;
 	uint32_t iterator                   = 0;
 
 	if( stream == NULL )
@@ -786,28 +787,35 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	{
 		fprintf( stream, "\tMD5 hash in file:\tN/A\n" );
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( ( libewf_parse_hash_values( handle ) == 1 )
-	 && ( internal_handle->hash_values != NULL ) )
+	if( libewf_parse_hash_values( handle ) == 1 )
 	{
-		if( internal_handle->hash_values->amount > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
+		if( libewf_get_amount_of_hash_values( handle, &amount_of_values ) == -1 )
 		{
-			fprintf( stream, "\n\tAdditional hash values:\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to retrieve amount of hash values.\n",
+			 function );
 
-			for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT;
-			 iterator < internal_handle->hash_values->amount;
-			 iterator++ )
+			return;
+		}
+		internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+		if( amount_of_values > 0 )
+		{
+			if( amount_of_values > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
 			{
-				if( libewf_get_hash_value(
-				     handle,
-				     internal_handle->hash_values->identifiers[ iterator ],
-				     hash_value,
-				     hash_value_length ) == 1 )
+				fprintf( stream, "\n\tAdditional hash values:\n" );
+
+				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 				{
-					fprintf( stream, "\t%" PRIs_EWF ":\t%" PRIs_EWF "\n",
-					 internal_handle->hash_values->identifiers[ iterator ],
-					 hash_value );
+					if( libewf_get_hash_value(
+					     handle,
+					     internal_handle->hash_values->identifiers[ iterator ],
+					     hash_value,
+					     hash_value_length ) == 1 )
+					{
+						fprintf( stream, "\t%" PRIs_EWF ":\t%" PRIs_EWF "\n",
+						 internal_handle->hash_values->identifiers[ iterator ],
+						 hash_value );
+					}
 				}
 			}
 		}

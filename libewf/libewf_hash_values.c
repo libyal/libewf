@@ -266,7 +266,7 @@ int32_t libewf_hash_values_get_index( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CH
  * Length should contain the amount of characters in the string
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int8_t libewf_hash_values_get_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_hash_values_get_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	static char *function    = "libewf_hash_values_get_value";
 	size_t hash_value_length = 0;
@@ -332,7 +332,7 @@ int8_t libewf_hash_values_get_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHA
  * Frees the previous hash value if necessary
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_hash_values_set_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_hash_values_set_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	static char *function = "libewf_hash_values_set_value";
 	size_t string_length  = 0;
