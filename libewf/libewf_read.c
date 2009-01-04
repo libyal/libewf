@@ -273,25 +273,8 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	/* Make sure the file offset is in the right place
-	 */
-	if( libewf_segment_file_seek_chunk_offset( internal_handle, chunk ) <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk.\n",
-		 function );
+	segment_file = internal_handle->offset_table->chunk_offset[ chunk ].segment_file;
 
-		return( -1 );
-	}
-	segment_number = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
-	
-	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
-	{
-		segment_file = &( internal_handle->segment_table->segment_file[ segment_number ] );
-	}
-	else
-	{
-		segment_file = &( internal_handle->delta_segment_table->segment_file[ segment_number ] );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file.\n",
@@ -308,11 +291,22 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 		return( -1 );
 	}
 #endif
+	/* Make sure the segment file offset is in the right place
+	 */
+	if( libewf_segment_file_seek_offset(
+	     segment_file,
+	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk.\n",
+		 function );
+
+		return( -1 );
+	}
 	/* Read the chunk data
 	 */
 	chunk_read_count = ewf_string_read_to_buffer(
 			    chunk_buffer,
-			    internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor,
+			    segment_file->file_descriptor,
 			    chunk_data_size );
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
@@ -333,7 +327,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 		if( *read_crc != 0 )
 		{
 			crc_read_count = libewf_common_read(
-					  internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor,
+					  segment_file->file_descriptor,
 					  stored_crc_buffer,
 					  EWF_CRC_SIZE );
 

@@ -56,14 +56,6 @@ struct libewf_chunk_offset
 	 */
 	LIBEWF_SEGMENT_FILE *segment_file;
 
-	/* The number of the segment file
-	 */
-	uint16_t segment_number;
-
-	/* The file descriptor of the segment file
-	 */
-	int file_descriptor;
-
 	/* The file offset of the chunk in the segment file
 	 */
 	off64_t file_offset;

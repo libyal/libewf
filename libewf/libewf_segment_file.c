@@ -103,6 +103,42 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	return( 0 );
 }
 
+/* Used for refactor */
+LIBEWF_SEGMENT_FILE *libewf_segment_file_alloc( void )
+{
+	LIBEWF_SEGMENT_FILE *segment_file = NULL;
+	static char *function             = "libewf_segment_file_alloc";
+
+	segment_file = (LIBEWF_SEGMENT_FILE *) libewf_common_alloc( LIBEWF_SEGMENT_FILE_SIZE );
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create segment file.\n",
+		 function );
+
+		return( NULL );
+	}
+	segment_file->section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
+
+	if( segment_file->section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create section list.\n",
+		 function );
+
+		libewf_common_free( segment_file );
+
+		return( NULL );
+	}
+	segment_file->file_descriptor     = -1;
+	segment_file->filename            = NULL;
+	segment_file->file_offset         = 0;
+	segment_file->amount_of_chunks    = 0;
+	segment_file->section_list->first = NULL;
+	segment_file->section_list->last  = NULL;
+
+	return( segment_file );
+}
+
 /* Creates and opens a segment file
  * Sets the filename and the file descriptor in the segment file struct
  * Returns a pointer to the segment file if successful, or NULL on error
@@ -142,6 +178,7 @@ LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t
 	segment_file->file_descriptor     = -1;
 	segment_file->filename            = NULL;
 	segment_file->file_offset         = 0;
+	segment_file->amount_of_chunks    = 0;
 	segment_file->section_list->first = NULL;
 	segment_file->section_list->last  = NULL;
 
@@ -240,7 +277,7 @@ ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffe
 /* Seeks a certain offset within the a segment file
  * Returns 1 if the seek is successful, or -1 on error
  */
-off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset, int whence )
+off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset )
 {
 	static char *function = "libewf_segment_file_seek_offset";
 
@@ -280,7 +317,7 @@ off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off6
 		if( libewf_common_lseek(
 		     segment_file->file_descriptor,
 		     offset,
-		     whence ) == -1 )
+		     SEEK_SET ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %jd in segment file: %" PRIs_EWF_filename ".\n",
 			 function, offset, segment_file->filename );
@@ -420,7 +457,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	}
 	/* Check if the entry has already been filled
 	 */
-	else if( segment_table->segment_file[ segment_number ].filename != NULL )
+	else if( segment_table->segment_file[ segment_number ]->filename != NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: segment file has already been created.\n",
 		 function );
@@ -433,7 +470,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	            segment_file_type,
 	            ewf_format,
 	            format,
-	            segment_table->segment_file[ 0 ].filename );
+	            segment_table->segment_file[ 0 ]->filename );
 
 	if( filename == NULL )
 	{
@@ -467,8 +504,8 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-	segment_table->segment_file[ segment_number ].filename        = filename;
-	segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
+	segment_table->segment_file[ segment_number ]->filename        = filename;
+	segment_table->segment_file[ segment_number ]->file_descriptor = file_descriptor;
 
 	return( 1 );
 }
@@ -513,7 +550,7 @@ int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
-		          &( internal_handle->segment_table->segment_file[ segment_number ] ),
+		          internal_handle->segment_table->segment_file[ segment_number ],
 		          segment_number,
 		          &last_segment_file );
 
@@ -584,7 +621,7 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
 
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
-		          &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+		          internal_handle->delta_segment_table->segment_file[ segment_number ],
 		          segment_number,
 		          &last_segment_file );
 
@@ -1503,11 +1540,10 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	}
 	/* Set the values in the offset table
 	 */
-	internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
-	internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = segment_file->file_descriptor;
-	internal_handle->offset_table->chunk_offset[ chunk ].file_offset     = segment_file->file_offset;
-	internal_handle->offset_table->chunk_offset[ chunk ].size            = chunk_size;
-	internal_handle->offset_table->chunk_offset[ chunk ].compressed      = is_compressed;
+	internal_handle->offset_table->chunk_offset[ chunk ].segment_file = segment_file;
+	internal_handle->offset_table->chunk_offset[ chunk ].file_offset  = segment_file->file_offset;
+	internal_handle->offset_table->chunk_offset[ chunk ].size         = chunk_size;
+	internal_handle->offset_table->chunk_offset[ chunk ].compressed   = is_compressed;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	/* Print a verbose notification
@@ -2256,7 +2292,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 		return( -1 );
 	}
 	if( libewf_segment_file_set_filename(
-	     &( internal_handle->segment_table->segment_file[ 0 ] ),
+	     internal_handle->segment_table->segment_file[ 0 ],
 	     filenames[ iterator ],
 	     ( filename_length - 4 ) ) != 1 )
 	{
@@ -2266,7 +2302,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 		return( -1 );
 	}
 	if( libewf_segment_file_set_filename(
-	     &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
+	     internal_handle->delta_segment_table->segment_file[ 0 ],
 	     filenames[ iterator ],
 	     ( filename_length - 4 ) ) != 1 )
 	{
@@ -2280,6 +2316,9 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	 */
 	for( iterator = 0; iterator < file_amount; iterator++ )
 	{
+		LIBEWF_VERBOSE_PRINT( "%s: trying to open file: %" PRIs_EWF_filename ".\n",
+		 function, filenames[ iterator ] );
+
 		file_descriptor = libewf_filename_open( filenames[ iterator ], LIBEWF_FLAG_READ );
 
 		if( file_descriptor == -1 )
@@ -2340,7 +2379,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 			}
 
 			if( libewf_segment_file_set_filename(
-			     &( internal_handle->segment_table->segment_file[ segment_number ] ),
+			     internal_handle->segment_table->segment_file[ segment_number ],
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 			{
@@ -2349,8 +2388,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 				return( -1 );
 			}
-			internal_handle->segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
-			internal_handle->segment_table->segment_file[ segment_number ].file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
+			internal_handle->segment_table->segment_file[ segment_number ]->file_descriptor = file_descriptor;
+			internal_handle->segment_table->segment_file[ segment_number ]->file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
 
 			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, filenames[ iterator ], file_descriptor, segment_number );
@@ -2411,7 +2450,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 			}
 
 			if( libewf_segment_file_set_filename(
-			     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+			     internal_handle->delta_segment_table->segment_file[ segment_number ],
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 			{
@@ -2420,8 +2459,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 				return( -1 );
 			}
-			internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
-			internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
+			internal_handle->delta_segment_table->segment_file[ segment_number ]->file_descriptor = file_descriptor;
+			internal_handle->delta_segment_table->segment_file[ segment_number ]->file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
 
 			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, filenames[ iterator ], file_descriptor, segment_number );
@@ -2499,7 +2538,7 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 	}
 
 	if( libewf_segment_file_set_filename(
-	     &( internal_handle->segment_table->segment_file[ 0 ] ),
+	     internal_handle->segment_table->segment_file[ 0 ],
 	     filenames[ 0 ],
 	     filename_length ) != 1 )
 	{
@@ -2575,49 +2614,14 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	segment_number = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
-
-	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
+	if( libewf_segment_file_seek_offset(
+	     internal_handle->offset_table->chunk_offset[ chunk ].segment_file,
+	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
 	{
-		if( ( segment_number == 0 )
-		 || ( segment_number >= internal_handle->segment_table->amount ) )
-		{
-			LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " not in segment table.\n",
-			 function, segment_number );
+		LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
+		 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
 
-			return( -1 );
-		}
-		if( libewf_segment_file_seek_offset(
-		     &( internal_handle->segment_table->segment_file[ segment_number ] ),
-		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
-		     SEEK_SET ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
-			 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		if( ( segment_number == 0 )
-		 || ( segment_number >= internal_handle->delta_segment_table->amount ) )
-		{
-			LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " not in delta segment table.\n",
-			 function, segment_number );
-
-			return( -1 );
-		}
-		if( libewf_segment_file_seek_offset(
-		     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
-		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
-		     SEEK_SET ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
-			 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
-
-			return( -1 );
-		}
+		return( -1 );
 	}
 	internal_handle->current_chunk = chunk;
 
@@ -2670,11 +2674,11 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	}
 	for( iterator = 1; iterator < internal_handle->segment_table->amount; iterator++ )
 	{
-		if( internal_handle->segment_table->segment_file[ iterator ].file_descriptor > 0 )
+		if( internal_handle->segment_table->segment_file[ iterator ]->file_descriptor > 0 )
 		{
-			if( libewf_common_close( internal_handle->segment_table->segment_file[ iterator ].file_descriptor ) != 0 )
+			if( libewf_common_close( internal_handle->segment_table->segment_file[ iterator ]->file_descriptor ) != 0 )
 			{
-				if( internal_handle->segment_table->segment_file[ iterator ].filename == NULL )
+				if( internal_handle->segment_table->segment_file[ iterator ]->filename == NULL )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 ".\n",
 					 function, iterator );
@@ -2682,7 +2686,7 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 				else
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
-					 function, iterator, internal_handle->segment_table->segment_file[ iterator ].filename );
+					 function, iterator, internal_handle->segment_table->segment_file[ iterator ]->filename );
 				}
 				result = 0;
 			}
@@ -2690,11 +2694,11 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	}
 	for( iterator = 1; iterator < internal_handle->delta_segment_table->amount; iterator++ )
 	{
-		if( internal_handle->delta_segment_table->segment_file[ iterator ].file_descriptor > 0 )
+		if( internal_handle->delta_segment_table->segment_file[ iterator ]->file_descriptor > 0 )
 		{
-			if( libewf_common_close( internal_handle->delta_segment_table->segment_file[ iterator ].file_descriptor ) != 0 )
+			if( libewf_common_close( internal_handle->delta_segment_table->segment_file[ iterator ]->file_descriptor ) != 0 )
 			{
-				if( internal_handle->delta_segment_table->segment_file[ iterator ].filename == NULL )
+				if( internal_handle->delta_segment_table->segment_file[ iterator ]->filename == NULL )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 ".\n",
 					 function, iterator );
@@ -2702,7 +2706,7 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 				else
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
-					 function, iterator, internal_handle->delta_segment_table->segment_file[ iterator ].filename );
+					 function, iterator, internal_handle->delta_segment_table->segment_file[ iterator ]->filename );
 				}
 				result = 0;
 			}

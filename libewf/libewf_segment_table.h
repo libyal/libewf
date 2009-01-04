@@ -83,9 +83,9 @@ struct libewf_segment_table
 	 */
 	uint16_t amount;
 
-	/* A dynamic array containting the segment files
+	/* A dynamic array containting references to segment files
 	 */
-	LIBEWF_SEGMENT_FILE *segment_file;
+	LIBEWF_SEGMENT_FILE **segment_file;
 };
 
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );

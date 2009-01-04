@@ -134,11 +134,10 @@ Next release:
 * API function get current chunk size?
 * do not finalize on write error?
 
-* refactor chunk offset segment_number and file_descriptor to
-  reference of segment_file struct
-  - dirty still needed?
+* offset table dirty still needed?
 * store length segment filename in segment file
-* refactor segment table to a table of segment file **
+* move libewf_section_list_append to section write functions?
+  - for some sections not useful
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -156,6 +155,8 @@ CLOSED
 
 Version: 20071118
 * worked on refactoring the offset table to use the segment file struct
+* refactored segment table to a table of segment file **
+* refactored chunk offset segment_number and file_descriptor to reference of segment file
 
 Version: 20071117
 * changed MB to MiB, etc.

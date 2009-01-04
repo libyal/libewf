@@ -73,13 +73,11 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 	}
 	for( iterator = 0; iterator < amount; iterator++ )
 	{
-		offset_table->chunk_offset[ iterator ].segment_file    = NULL;
-		offset_table->chunk_offset[ iterator ].segment_number  = 0;
-		offset_table->chunk_offset[ iterator ].file_descriptor = -1;
-		offset_table->chunk_offset[ iterator ].file_offset     = 0;
-		offset_table->chunk_offset[ iterator ].size            = 0;
-		offset_table->chunk_offset[ iterator ].compressed      = 0;
-		offset_table->chunk_offset[ iterator ].dirty           = 0;
+		offset_table->chunk_offset[ iterator ].segment_file = NULL;
+		offset_table->chunk_offset[ iterator ].file_offset  = 0;
+		offset_table->chunk_offset[ iterator ].size         = 0;
+		offset_table->chunk_offset[ iterator ].compressed   = 0;
+		offset_table->chunk_offset[ iterator ].dirty        = 0;
 	}
 	offset_table->amount = amount;
         offset_table->last   = 0;
@@ -125,13 +123,11 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 
 	for( iterator = offset_table->amount; iterator < amount; iterator++ )
 	{
-		offset_table->chunk_offset[ iterator ].segment_file    = NULL;
-		offset_table->chunk_offset[ iterator ].segment_number  = 0;
-		offset_table->chunk_offset[ iterator ].file_descriptor = -1;
-		offset_table->chunk_offset[ iterator ].file_offset     = 0;
-		offset_table->chunk_offset[ iterator ].size            = 0;
-		offset_table->chunk_offset[ iterator ].compressed      = 0;
-		offset_table->chunk_offset[ iterator ].dirty           = 0;
+		offset_table->chunk_offset[ iterator ].segment_file = NULL;
+		offset_table->chunk_offset[ iterator ].file_offset  = 0;
+		offset_table->chunk_offset[ iterator ].size         = 0;
+		offset_table->chunk_offset[ iterator ].compressed   = 0;
+		offset_table->chunk_offset[ iterator ].dirty        = 0;
 	}
 	offset_table->amount = amount;
 
@@ -295,12 +291,10 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 
 			return( -1 );
 		}
-		offset_table->chunk_offset[ offset_table->last ].segment_file    = segment_file;
-		offset_table->chunk_offset[ offset_table->last ].segment_number  = segment_number;
-		offset_table->chunk_offset[ offset_table->last ].file_descriptor = segment_file->file_descriptor;
-		offset_table->chunk_offset[ offset_table->last ].file_offset     = (off64_t) ( base_offset + current_offset );
-		offset_table->chunk_offset[ offset_table->last ].size            = (size_t) chunk_size;
-		offset_table->chunk_offset[ offset_table->last ].compressed      = compressed;
+		offset_table->chunk_offset[ offset_table->last ].segment_file = segment_file;
+		offset_table->chunk_offset[ offset_table->last ].file_offset  = (off64_t) ( base_offset + current_offset );
+		offset_table->chunk_offset[ offset_table->last ].size         = (size_t) chunk_size;
+		offset_table->chunk_offset[ offset_table->last ].compressed   = compressed;
 
 		offset_table->last++;
 
@@ -346,11 +340,9 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	{
 		current_offset = raw_offset;
 	}
-	offset_table->chunk_offset[ offset_table->last ].segment_file    = segment_file;
-	offset_table->chunk_offset[ offset_table->last ].segment_number  = segment_number;
-	offset_table->chunk_offset[ offset_table->last ].file_descriptor = segment_file->file_descriptor;
-	offset_table->chunk_offset[ offset_table->last ].file_offset     = (off64_t) ( base_offset + current_offset );
-	offset_table->chunk_offset[ offset_table->last ].compressed      = compressed;
+	offset_table->chunk_offset[ offset_table->last ].segment_file = segment_file;
+	offset_table->chunk_offset[ offset_table->last ].file_offset  = (off64_t) ( base_offset + current_offset );
+	offset_table->chunk_offset[ offset_table->last ].compressed   = compressed;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( compressed == 0 )

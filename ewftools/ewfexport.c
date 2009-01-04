@@ -85,7 +85,7 @@ void usage( void )
 	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stderr, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
-	fprintf( stderr, "      stdout is only supported for the raw format\n" );
+	fprintf( stderr, "\t    stdout is only supported for the raw format\n" );
 	fprintf( stderr, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
 	 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 #if defined( SPLIT_EXPORT )
@@ -294,6 +294,8 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	libewf_set_notify_values( stderr, verbose );
+
 #if !defined( HAVE_GLOB_H )
 	glob = ewfglob_alloc();
 
@@ -559,8 +561,6 @@ int main( int argc, char * const argv[] )
 		target_filename = CHAR_T_DUPLICATE( _S_CHAR_T( "export" ) );
 	}
 	fprintf( stderr, "\n" );
-
-	libewf_set_notify_values( stderr, verbose );
 
 	/* Start exporting data
 	 */

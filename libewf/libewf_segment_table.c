@@ -37,6 +37,7 @@
 
 #include "libewf_common.h"
 #include "libewf_notify.h"
+#include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_string.h"
 
@@ -58,8 +59,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->segment_file = (LIBEWF_SEGMENT_FILE *) libewf_common_alloc(
-	                               ( amount * LIBEWF_SEGMENT_FILE_SIZE ) );
+	segment_table->segment_file = (LIBEWF_SEGMENT_FILE **) libewf_common_alloc(
+	                               ( amount * sizeof( LIBEWF_SEGMENT_FILE* ) ) );
 
 	if( segment_table->segment_file == NULL )
 	{
@@ -72,16 +73,11 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 	}
 	for( iterator = 0; iterator < amount; iterator++ )
 	{
-		segment_table->segment_file[ iterator ].filename         = NULL;
-		segment_table->segment_file[ iterator ].file_descriptor  = -1;
-		segment_table->segment_file[ iterator ].file_offset      = 0;
-		segment_table->segment_file[ iterator ].amount_of_chunks = 0;
+		segment_table->segment_file[ iterator ] = libewf_segment_file_alloc();
 
-		segment_table->segment_file[ iterator ].section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
-
-		if( segment_table->segment_file[ iterator ].section_list == NULL )
+		if( segment_table->segment_file[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate segment file.\n",
 			 function );
 
 			/* The current entry does not need to be freed, because it was never allocated
@@ -91,15 +87,14 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 			 */
 			for( ; iterator > 0; iterator-- )
 			{
-				libewf_common_free( segment_table->segment_file[ iterator - 1 ].section_list );
+				libewf_common_free( segment_table->segment_file[ iterator - 1 ]->section_list );
+				libewf_common_free( segment_table->segment_file[ iterator - 1 ] );
 			}
 			libewf_common_free( segment_table->segment_file );
 			libewf_common_free( segment_table );
 
 			return( NULL );
 		}
-		segment_table->segment_file[ iterator ].section_list->first = NULL;
-		segment_table->segment_file[ iterator ].section_list->last  = NULL;
 	}
 	segment_table->amount = amount;
 
@@ -131,7 +126,7 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 	}
 	reallocation = libewf_common_realloc(
 	                segment_table->segment_file,
-	                ( amount * LIBEWF_SEGMENT_FILE_SIZE ) );
+	                ( amount * sizeof( LIBEWF_SEGMENT_FILE* ) ) );
 
 	if( reallocation == NULL )
 	{
@@ -140,26 +135,19 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 		return( -1 );
 	}
-	segment_table->segment_file = (LIBEWF_SEGMENT_FILE *) reallocation;
+	segment_table->segment_file = (LIBEWF_SEGMENT_FILE **) reallocation;
 
 	for( iterator = segment_table->amount; iterator < amount; iterator++ )
 	{
-		segment_table->segment_file[ iterator ].filename         = NULL;
-		segment_table->segment_file[ iterator ].file_descriptor  = -1;
-		segment_table->segment_file[ iterator ].file_offset      = 0;
-		segment_table->segment_file[ iterator ].amount_of_chunks = 0;
+		segment_table->segment_file[ iterator ] = libewf_segment_file_alloc();
 
-		segment_table->segment_file[ iterator ].section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
-
-		if( segment_table->segment_file[ iterator ].section_list == NULL )
+		if( segment_table->segment_file[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate segment file.\n",
 			 function );
 
 			return( -1 );
 		}
-		segment_table->segment_file[ iterator ].section_list->first = NULL;
-		segment_table->segment_file[ iterator ].section_list->last  = NULL;
 	}
 	segment_table->amount = amount;
 
@@ -184,13 +172,13 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 	}
 	for( iterator = 0; iterator < segment_table->amount; iterator++ )
 	{
-		if( segment_table->segment_file[ iterator ].filename != NULL )
+		if( segment_table->segment_file[ iterator ]->filename != NULL )
 		{
-			libewf_common_free( segment_table->segment_file[ iterator ].filename );
+			libewf_common_free( segment_table->segment_file[ iterator ]->filename );
 		}
-		if( segment_table->segment_file[ iterator ].section_list != NULL )
+		if( segment_table->segment_file[ iterator ]->section_list != NULL )
 		{
-			section_list_entry = segment_table->segment_file[ iterator ].section_list->first;
+			section_list_entry = segment_table->segment_file[ iterator ]->section_list->first;
 
 			while( section_list_entry != NULL )
 			{
@@ -199,8 +187,9 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 
 				libewf_common_free( current_section_list_entry );
 			}
-			libewf_common_free( segment_table->segment_file[ iterator ].section_list );
+			libewf_common_free( segment_table->segment_file[ iterator ]->section_list );
 		}
+		libewf_common_free( segment_table->segment_file[ iterator ] );
 	}
 	libewf_common_free( segment_table->segment_file );
 	libewf_common_free( segment_table );

@@ -941,7 +941,7 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 		return( -1 );
 	}
 	return( libewf_segment_file_get_filename(
-	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
+	         internal_handle->delta_segment_table->segment_file[ 0 ],
 	         filename,
 	         length ) );
 }
@@ -1598,7 +1598,7 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 		return( -1 );
 	}
 	return( libewf_segment_file_set_filename(
-	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
+	         internal_handle->delta_segment_table->segment_file[ 0 ],
 	         filename,
 	         length ) );
 }
