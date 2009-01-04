@@ -667,9 +667,11 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 		return( -1 );
 	}
-#endif
+	buffer_size = chunk_size;
+#else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
-	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
+#endif
+	data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
 	if( data == NULL )
 	{
@@ -681,7 +683,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 #if defined( HAVE_RAW_ACCESS )
 	/* The EWF-S01 format uses compression this will add 16 bytes on average
 	 */
-	raw_read_buffer_size = buffer_size + 16;
+	raw_read_buffer_size = buffer_size * 2;
 	raw_read_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_read_data == NULL )
@@ -1009,34 +1011,6 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 		return( -1 );
 	}
-	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( write_size > 0 )
 	{
 		if( libewf_set_write_input_size( handle, write_size ) == -1 )
@@ -1072,12 +1046,39 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		LIBEWF_WARNING_PRINT( "%s: ignoring write offset in a stream mode.\n",
 		 function );
 	}
+	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( bytes_per_sector == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_RAW_ACCESS )
 	buffer_size = chunk_size;
 #else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-fprintf( stderr, "X: %" PRIu32 "\n", buffer_size );
 	data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
 	if( data == NULL )
@@ -1088,7 +1089,7 @@ fprintf( stderr, "X: %" PRIu32 "\n", buffer_size );
 		return( -1 );
 	}
 #if defined( HAVE_RAW_ACCESS )
-	compressed_data = (uint8_t *) libewf_common_alloc( ( buffer_size + 16 ) * sizeof( uint8_t ) );
+	compressed_data = (uint8_t *) libewf_common_alloc( ( buffer_size * 2 ) * sizeof( uint8_t ) );
 
 	if( compressed_data == NULL )
 	{
@@ -1205,7 +1206,7 @@ fprintf( stderr, "X: %" PRIu32 "\n", buffer_size );
 			 read_count );
 		}
 #if defined( HAVE_RAW_ACCESS )
-		compressed_size = buffer_size + 16;
+		compressed_size = buffer_size * 2;
 
 		raw_write_count = libewf_raw_write_prepare_buffer(
 		                   handle,

@@ -115,8 +115,6 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 			return( -1 );
 		}
-		buffer_size = *uncompressed_chunk_data_size;
-
 		if( ewf_uncompress( uncompressed_chunk_data, uncompressed_chunk_data_size, chunk_data, chunk_data_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to uncompressed chunk data.\n",
@@ -124,6 +122,7 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 			return( -1 );
 		}
+		buffer_size = *uncompressed_chunk_data_size;
 	}
 	return( (ssize_t) buffer_size );
 }
