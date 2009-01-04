@@ -1741,11 +1741,11 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	if( libewf_offset_table_set_values(
 	     internal_handle->offset_table,
 	     amount_of_chunks,
+	     segment_number,
 	     internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
-	     is_compressed,
 	     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 	     chunk_size,
-	     segment_number,
+	     is_compressed,
 	     0 ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set offset value in offset table.\n",
@@ -2872,30 +2872,9 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->segment_number == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing segment numbers.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->dirty == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing dirty flags.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -2907,9 +2886,9 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
-	offset          = internal_handle->offset_table->offset[ chunk ];
-	segment_number  = internal_handle->offset_table->segment_number[ chunk ];
+	file_descriptor = internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor;
+	offset          = internal_handle->offset_table->chunk_offset[ chunk ].file_offset;
+	segment_number  = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
 
 	if( offset > (off64_t) INT64_MAX )
 	{
@@ -2918,7 +2897,7 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
+	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
 		if( internal_handle->segment_table->segment_file[ segment_number ].file_offset != offset )
 		{

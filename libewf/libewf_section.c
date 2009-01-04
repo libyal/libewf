@@ -1608,6 +1608,13 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
+	if( offset_table->chunk_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
+		 function );
+
+		return( -1 );
+	}
 	offsets_size = EWF_TABLE_OFFSET_SIZE * amount_of_offsets;
 	write_size   = EWF_TABLE_SIZE + offsets_size + additional_size;
 
@@ -1676,7 +1683,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	for( iterator = 0; iterator < amount_of_offsets; iterator++ )
 	{
-		offset64_value = offset_table->offset[ offset_table_index + iterator ]
+		offset64_value = offset_table->chunk_offset[ offset_table_index + iterator ].file_offset
 		               - base_offset;
 
 		if( ( overflow == 0 )
@@ -1693,7 +1700,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		}
 		offset32_value = (uint32_t) offset64_value;
 
-		if( offset_table->compressed[ offset_table_index + iterator ] != 0 )
+		if( offset_table->chunk_offset[ offset_table_index + iterator ].compressed != 0 )
 		{
 			if( overflow == 0 )
 			{
@@ -1724,7 +1731,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		 * solution in EnCase 6
 		 */
 		if( ( overflow == 0 )
-		 && ( ( offset64_value + offset_table->size[ offset_table_index + iterator ] ) > (off64_t) INT32_MAX ) )
+		 && ( ( offset64_value + offset_table->chunk_offset[ offset_table_index + iterator ].size ) > (off64_t) INT32_MAX ) )
 		{
 			if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
 			 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
@@ -3422,11 +3429,11 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 	if( libewf_offset_table_set_values(
 	     internal_handle->offset_table,
 	     chunk,
+	     segment_number,
 	     file_descriptor,
-	     0,
 	     (off64_t) ( start_offset + EWFX_DELTA_CHUNK_HEADER_SIZE ),
 	     ( size - EWFX_DELTA_CHUNK_HEADER_SIZE ),
-	     segment_number,
+	     0,
 	     1 ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",

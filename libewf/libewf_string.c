@@ -310,11 +310,18 @@ LIBEWF_CHAR **libewf_string_split( LIBEWF_CHAR *string, size_t size, LIBEWF_CHAR
 	while( line_end != NULL );
 
 	*amount = iterator;
-	lines   = (LIBEWF_CHAR **) libewf_common_alloc_cleared( ( sizeof( LIBEWF_CHAR * ) * *amount ), 0 );
+	lines   = (LIBEWF_CHAR **) libewf_common_alloc( ( sizeof( LIBEWF_CHAR * ) * *amount ) );
 
 	if( lines == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic array lines.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( libewf_common_memset( lines, 0, *amount ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic array lines.\n",
 		 function );
 
 		return( NULL );

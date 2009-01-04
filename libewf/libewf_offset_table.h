@@ -44,15 +44,41 @@
 extern "C" {
 #endif
 
+#define LIBEWF_CHUNK_OFFSET libewf_chunk_offset_t
+#define LIBEWF_CHUNK_OFFSET_SIZE sizeof( LIBEWF_CHUNK_OFFSET )
+
+typedef struct libewf_chunk_offset libewf_chunk_offset_t;
+
+struct libewf_chunk_offset
+{
+	/* The number of the segment file
+	 */
+	uint16_t segment_number;
+
+	/* The file descriptor of the segment file
+	 */
+	int file_descriptor;
+
+	/* The file offset of the chunk in the segment file
+	 */
+	off64_t file_offset;
+
+	/* The size of the chunk
+	 */
+	size_t size;
+
+	/* Value to indicate if the chunk is compressed
+	 */
+	uint8_t compressed;
+
+	/* Value to indicate if the chunk is stored in
+	 * a delta segment file
+	 */
+	uint8_t dirty;
+};
+
 #define LIBEWF_OFFSET_TABLE libewf_offset_table_t
 #define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
-#define LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE sizeof( int )
-#define LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE sizeof( uint8_t )
-#define LIBEWF_OFFSET_TABLE_OFFSET_SIZE sizeof( off64_t )
-#define LIBEWF_OFFSET_TABLE_SIZE_SIZE sizeof( size_t )
-#define LIBEWF_OFFSET_TABLE_HASHED_SIZE sizeof( uint8_t )
-#define LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE sizeof( uint16_t )
-#define LIBEWF_OFFSET_TABLE_DIRTY_SIZE sizeof( uint8_t )
 
 typedef struct libewf_offset_table libewf_offset_table_t;
 
@@ -67,38 +93,15 @@ struct libewf_offset_table
 	 */
 	uint32_t last;
 
-	/* Dynamic array of file descriptor into the
-	 * correct file, must already be opened by initialiser
+	/* Dynamic array of chunk offsets
 	 */
-	int *file_descriptor;
-
-	/* Dynamic array of boolean that definines
-	 * if the chunk is compressed
-	 */
-	uint8_t *compressed;
-
-	/* Dynamic array of offsets
-	 */
-	off64_t *offset;
-
-	/* Dynamic array of chunk sizes
-	 */
-	size_t *size;
-
-	/* Dynamic array of the segment numbers
-	 */
-	uint16_t *segment_number;
-
-	/* Dynamic array of boolean that definines
-	 * if the chunk is stored in the delta file
-	 */
-	uint8_t *dirty;
+	LIBEWF_CHUNK_OFFSET *chunk_offset;
 };
 
 LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
 int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
-int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off64_t offset, size_t size, uint16_t segment_number, uint8_t dirty );
+int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, uint16_t segment_number, int file_descriptor, off64_t file_offset, size_t size, uint8_t compressed, uint8_t dirty );
 
 int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance );
 int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance );

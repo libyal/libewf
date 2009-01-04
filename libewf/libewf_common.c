@@ -212,49 +212,6 @@ void *libewf_common_alloc_cleared( size_t size, int clear_value )
 	return( allocated_buffer );
 }
 
-/* Function to reallocated fully wiped memory
- */
-void *libewf_common_realloc_full_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value )
-{
-	static char *function    = "libewf_common_realloc_full_cleared";
-	void *reallocated_buffer = NULL;
-
-	if( ( previous_size > (size_t) SSIZE_MAX )
-	 || ( new_size > (size_t) SSIZE_MAX ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( new_size <= previous_size )
-	{
-		LIBEWF_WARNING_PRINT( "%s: new size must be greater than previous size.\n",
-		 function );
-
-		return( NULL );
-	}
-	reallocated_buffer = libewf_common_realloc( buffer, new_size );
-
-	if( reallocated_buffer == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate buffer.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( libewf_common_memset( reallocated_buffer, clear_value, new_size ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear buffer.\n",
-		 function );
-
-		libewf_common_free( reallocated_buffer );
-
-		return( NULL );
-	}
-	return( reallocated_buffer );
-}
-
 /* Function to reallocated wiped newly allocated memory
  */
 void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value )

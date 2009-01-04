@@ -197,7 +197,6 @@ int libewf_common_wide_open( const wchar_t *filename, uint8_t flags );
 #endif
 
 void *libewf_common_alloc_cleared( size_t size, int clear_value );
-void *libewf_common_realloc_full_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value );
 void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value );
 
 int libewf_common_test_empty_block( uint8_t *block_buffer, size_t size );

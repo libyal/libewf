@@ -170,23 +170,9 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->compressed == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing compressed.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->dirty == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing dirty flags.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->size == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunnk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -258,11 +244,11 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 	/* Determine the size of the chunk including the CRC
 	 */
-	chunk_data_size = internal_handle->offset_table->size[ chunk ];
+	chunk_data_size = internal_handle->offset_table->chunk_offset[ chunk ].size;
 
 	/* Determine if the chunk is not compressed
 	 */
-	if( internal_handle->offset_table->compressed[ chunk ] == 0 )
+	if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 )
 	{
 		if( chunk_size < chunk_data_size )
 		{
@@ -295,9 +281,9 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	segment_number = internal_handle->offset_table->segment_number[ chunk ];
+	segment_number = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
 	
-	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
+	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
 		segment_table = internal_handle->segment_table;
 	}
@@ -310,7 +296,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	 */
 	chunk_read_count = ewf_string_read_to_buffer(
 			    chunk_buffer,
-			    internal_handle->offset_table->file_descriptor[ chunk ],
+			    internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor,
 			    chunk_data_size );
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
@@ -331,7 +317,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 		if( *read_crc != 0 )
 		{
 			crc_read_count = libewf_common_read(
-					  internal_handle->offset_table->file_descriptor[ chunk ],
+					  internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor,
 					  stored_crc_buffer,
 					  EWF_CRC_SIZE );
 
@@ -427,16 +413,9 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->compressed == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing compressed.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->size == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -469,7 +448,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 	{
 		/* Determine the size of the chunk including the CRC
 		 */
-		chunk_data_size = internal_handle->offset_table->size[ chunk ];
+		chunk_data_size = internal_handle->offset_table->chunk_offset[ chunk ].size;
 
 		/* Make sure the chunk cache is large enough
 		 */
@@ -508,7 +487,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 
 			/* The CRC is read seperately for uncompressed chunks
 			 */
-			if( internal_handle->offset_table->compressed[ chunk ] == 0 )
+			if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 )
 			{
 				chunk_data_size -= EWF_CRC_SIZE;
 			}
@@ -518,7 +497,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */
-		if( internal_handle->offset_table->compressed[ chunk ] == 1 )
+		if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 1 )
 		{
 			chunk_read = internal_handle->chunk_cache->compressed;
 		}

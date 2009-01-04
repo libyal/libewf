@@ -49,6 +49,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 {
 	LIBEWF_OFFSET_TABLE *offset_table = NULL;
 	static char *function             = "libewf_offset_table_alloc";
+	uint32_t iterator                 = 0;
 
 	offset_table = (LIBEWF_OFFSET_TABLE *) libewf_common_alloc( LIBEWF_OFFSET_TABLE_SIZE );
 
@@ -59,86 +60,24 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	offset_table->file_descriptor = (int *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE ), -1 );
+	offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) libewf_common_alloc( ( amount * LIBEWF_CHUNK_OFFSET_SIZE ) );
 
-	if( offset_table->file_descriptor == NULL )
+	if( offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate chunk offsets.\n",
 		 function );
 
 		libewf_common_free( offset_table );
 
 		return( NULL );
 	}
-	offset_table->compressed = (uint8_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE ), -1 );
-
-	if( offset_table->compressed == NULL )
+	for( iterator = 0; iterator < amount; iterator++ )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate compressed flags.\n",
-		 function );
-
-		libewf_common_free( offset_table->file_descriptor );
-		libewf_common_free( offset_table );
-
-		return( NULL );
-	}
-	offset_table->offset = (off64_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_OFFSET_SIZE ), 0 );
-
-	if( offset_table->offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate offsets.\n",
-		 function );
-
-		libewf_common_free( offset_table->file_descriptor );
-		libewf_common_free( offset_table->compressed );
-		libewf_common_free( offset_table );
-
-		return( NULL );
-	}
-	offset_table->size = (size_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_SIZE_SIZE ), 0 );
-
-	if( offset_table->size == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate sizes.\n",
-		 function );
-
-		libewf_common_free( offset_table->file_descriptor );
-		libewf_common_free( offset_table->compressed );
-		libewf_common_free( offset_table->offset );
-		libewf_common_free( offset_table );
-
-		return( NULL );
-	}
-	offset_table->segment_number = (uint16_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ), 0 );
-
-	if( offset_table->segment_number == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate segment numbers.\n",
-		 function );
-
-		libewf_common_free( offset_table->size );
-		libewf_common_free( offset_table->file_descriptor );
-		libewf_common_free( offset_table->compressed );
-		libewf_common_free( offset_table->offset );
-		libewf_common_free( offset_table );
-
-		return( NULL );
-	}
-	offset_table->dirty = (uint8_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_DIRTY_SIZE ), 0 );
-
-	if( offset_table->dirty == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate dirty flags.\n",
-		 function );
-
-		libewf_common_free( offset_table->size );
-		libewf_common_free( offset_table->file_descriptor );
-		libewf_common_free( offset_table->compressed );
-		libewf_common_free( offset_table->offset );
-		libewf_common_free( offset_table->segment_number );
-		libewf_common_free( offset_table );
-
-		return( NULL );
+		offset_table->chunk_offset[ iterator ].segment_number  = 0;
+		offset_table->chunk_offset[ iterator ].file_descriptor = -1;
+		offset_table->chunk_offset[ iterator ].file_offset     = 0;
+		offset_table->chunk_offset[ iterator ].compressed      = 0;
+		offset_table->chunk_offset[ iterator ].dirty           = 0;
 	}
 	offset_table->amount = amount;
         offset_table->last   = 0;
@@ -153,6 +92,7 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_offset_table_realloc";
+	uint32_t iterator     = 0;
 
 	if( offset_table == NULL )
 	{
@@ -161,90 +101,34 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 
 		return( -1 );
 	}
-	reallocation = libewf_common_realloc_new_cleared(
-	                offset_table->file_descriptor,
-	                ( offset_table->amount * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE ),
-	                ( amount * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE ),
-	                -1 );
-
-	if( reallocation == NULL )
+	if( offset_table->amount >= amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: new amount must be greater than previous amount.\n",
 		 function );
 
 		return( -1 );
 	}
-	offset_table->file_descriptor = (int *) reallocation;
-	reallocation                  = libewf_common_realloc_new_cleared(
-	                                 offset_table->compressed,
-	                                 ( offset_table->amount * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE ),
-	                                 ( amount * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE ),
-	                                 -1 );
+	reallocation = libewf_common_realloc(
+	                offset_table->chunk_offset,
+	                ( amount * LIBEWF_CHUNK_OFFSET_SIZE ) );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate compressed flags.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk offsets.\n",
 		 function );
 
 		return( -1 );
 	}
-	offset_table->compressed = (uint8_t *) reallocation;
-	reallocation             = libewf_common_realloc_new_cleared(
-	                            offset_table->offset,
-	                            ( offset_table->amount * LIBEWF_OFFSET_TABLE_OFFSET_SIZE ),
-	                            ( amount * LIBEWF_OFFSET_TABLE_OFFSET_SIZE ),
-	                            0 );
+	offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) reallocation;
 
-	if( reallocation == NULL )
+	for( iterator = offset_table->amount; iterator < amount; iterator++ )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate offsets.\n",
-		 function );
-
-		return( -1 );
+		offset_table->chunk_offset[ iterator ].segment_number  = 0;
+		offset_table->chunk_offset[ iterator ].file_descriptor = -1;
+		offset_table->chunk_offset[ iterator ].file_offset     = 0;
+		offset_table->chunk_offset[ iterator ].compressed      = 0;
+		offset_table->chunk_offset[ iterator ].dirty           = 0;
 	}
-	offset_table->offset = (off64_t *) reallocation;
-	reallocation         = libewf_common_realloc_new_cleared(
-	                        offset_table->size,
-	                        ( offset_table->amount * LIBEWF_OFFSET_TABLE_SIZE_SIZE ),
-	                        ( amount * LIBEWF_OFFSET_TABLE_SIZE_SIZE ),
-	                        0 );
-
-	if( reallocation == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate sizes.\n",
-		 function );
-
-		return( -1 );
-	}
-	offset_table->size = (size_t *) reallocation;
-	reallocation       = libewf_common_realloc_new_cleared(
-	                      offset_table->segment_number,
-	                      ( offset_table->amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ),
-	                      ( amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ),
-	                      0 );
-
-	if( reallocation == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate segment numbers.\n",
-		 function );
-
-		return( -1 );
-	}
-	offset_table->segment_number = (uint16_t *) reallocation;
-	reallocation                 = libewf_common_realloc_new_cleared(
-	                                offset_table->dirty,
-	                                ( offset_table->amount * LIBEWF_OFFSET_TABLE_DIRTY_SIZE ),
-	                                ( amount * LIBEWF_OFFSET_TABLE_DIRTY_SIZE ),
-	                                0 );
-
-	if( reallocation == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dirty flags.\n",
-		 function );
-
-		return( -1 );
-	}
-	offset_table->dirty  = (uint8_t *) reallocation;
 	offset_table->amount = amount;
 
 	return( 1 );
@@ -263,19 +147,14 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 
 		return;
 	}
-	libewf_common_free( offset_table->file_descriptor );
-	libewf_common_free( offset_table->compressed );
-	libewf_common_free( offset_table->offset );
-	libewf_common_free( offset_table->size );
-	libewf_common_free( offset_table->segment_number );
-	libewf_common_free( offset_table->dirty );
+	libewf_common_free( offset_table->chunk_offset );
 	libewf_common_free( offset_table );
 }
 
 /* Sets the values for a specific offset
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off64_t offset, size_t size, uint16_t segment_number, uint8_t dirty )
+int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, uint16_t segment_number, int file_descriptor, off64_t file_offset, size_t size, uint8_t compressed, uint8_t dirty )
 {
 	static char *function = "libewf_offset_table_set_values";
 
@@ -286,44 +165,9 @@ int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t 
 
 		return( -1 );
 	}
-	if( offset_table->file_descriptor == NULL )
+	if( offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->compressed == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing compressed values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->size == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing sizes.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->segment_number == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing segment numbers.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->dirty == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing dirty values.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -335,12 +179,12 @@ int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t 
 
 		return( -1 );
 	}
-	offset_table->file_descriptor[ chunk ] = file_descriptor;
-	offset_table->compressed[ chunk ]      = compressed;
-	offset_table->offset[ chunk ]          = offset;
-	offset_table->size[ chunk ]            = size;
-	offset_table->segment_number[ chunk ]  = segment_number;
-	offset_table->dirty[ chunk ]           = dirty;
+	offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
+	offset_table->chunk_offset[ chunk ].file_descriptor = file_descriptor;
+	offset_table->chunk_offset[ chunk ].file_offset     = file_offset;
+	offset_table->chunk_offset[ chunk ].size            = size;
+	offset_table->chunk_offset[ chunk ].compressed      = compressed;
+	offset_table->chunk_offset[ chunk ].dirty           = dirty;
 
 	return( 1 );
 }
@@ -478,11 +322,11 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 		if( libewf_offset_table_set_values(
 		     offset_table,
 		     offset_table->last,
+		     segment_number,
 		     file_descriptor,
-		     compressed,
 		     (off64_t) ( base_offset + current_offset ),
 		     (size_t) chunk_size,
-		     segment_number,
+		     compressed,
 		     0 ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
@@ -516,7 +360,8 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 			LIBEWF_VERBOSE_PRINT( "%s: chunk offset overflow at: %" PRIu32 ".\n",
 			 function, current_offset );
 
-			overflow = 1;
+			overflow   = 1;
+			compressed = 0;
 		}
 		iterator++;
 	}
@@ -540,11 +385,11 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	if( libewf_offset_table_set_values(
 	     offset_table,
 	     offset_table->last,
+	     segment_number,
 	     file_descriptor,
-	     compressed,
 	     (off64_t) ( base_offset + current_offset ),
 	     0,
-	     segment_number,
+	     compressed,
 	     0 ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
@@ -588,6 +433,13 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 
 		return( -1 );
 	}
+	if( offset_table->chunk_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( section_list == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
@@ -601,7 +453,7 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
 	section_list_entry = section_list->first;
-	last_offset        = offset_table->offset[ offset_table->last ];
+	last_offset        = offset_table->chunk_offset[ offset_table->last ].file_offset;
 
 	while( section_list_entry != NULL )
 	{
@@ -642,11 +494,11 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 			if( libewf_offset_table_set_values(
 			     offset_table,
 			     offset_table->last,
+			     segment_number,
 			     file_descriptor,
-			     offset_table->compressed[ offset_table->last ],
 			     last_offset,
 			     (size_t) chunk_size,
-			     segment_number,
+			     offset_table->chunk_offset[ offset_table->last ].compressed,
 			     0 ) == -1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
@@ -683,7 +535,15 @@ int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFS
 
 		return( -1 );
 	}
-	/* Check if table and table2 are the same
+	if( ( offset_table1->chunk_offset == NULL )
+	 || ( offset_table2->chunk_offset == NULL ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if table and table2 have the same amount of chunk offsets
 	 */
 	if( offset_table1->amount != offset_table2->amount )
 	{
@@ -692,17 +552,16 @@ int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFS
 
 		return( 0 );
 	}
-	else
+	/* Check if the file offsets of the chunk offsets are the same
+	 */
+	for( iterator = 0; iterator < offset_table1->amount; iterator++ )
 	{
-		for( iterator = 0; iterator < offset_table1->amount; iterator++ )
+		if( offset_table1->chunk_offset[ iterator ].file_offset != offset_table2->chunk_offset[ iterator ].file_offset )
 		{
-			if( offset_table1->offset[ iterator ] != offset_table2->offset[ iterator ] )
-			{
-				LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n",
-				 function, iterator, offset_table1->offset[ iterator ], offset_table2->offset[ iterator ] );
+			LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n",
+			 function, iterator, offset_table1->chunk_offset[ iterator ].file_offset, offset_table2->chunk_offset[ iterator ].file_offset );
 
-				return( 0 );
-			}
+			return( 0 );
 		}
 	}
 	return( 1 );

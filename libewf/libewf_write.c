@@ -883,15 +883,15 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( ( chunk < internal_handle->offset_table->amount )
-	 && ( internal_handle->offset_table->file_descriptor[ chunk ] != -1 ) )
+	 && ( internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor != -1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk: %" PRIu32 " already exists.\n",
 		 function, chunk );
@@ -1223,23 +1223,9 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->segment_number == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing segment numbers.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->dirty == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing dirty flags.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -1277,7 +1263,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	/* Check if the chunk does not already exists in a delta segment file
 	 */
-	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
+	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
 		/* Write the chunk to the last delta segment file
 		 */
@@ -1407,11 +1393,11 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %jd.\n",
 		 function, internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset );
 
-		internal_handle->offset_table->offset[ chunk ] = internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset;
+		internal_handle->offset_table->chunk_offset[ chunk ].file_offset = internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset;
 	}
 	else
 	{
-		segment_number = internal_handle->offset_table->segment_number[ chunk ];
+		segment_number = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
 
 		if( ( segment_number == 0 )
 		 || ( segment_number >= internal_handle->delta_segment_table->amount ) )
@@ -1450,7 +1436,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	total_write_count += write_count;
 
-	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
+	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
 		/* Write the last section
 		 */
@@ -1471,10 +1457,10 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		total_write_count                                                                += write_count;
 		internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset += write_count;
 
-		internal_handle->offset_table->file_descriptor[ chunk ] = internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor;
-		internal_handle->offset_table->segment_number[ chunk ]  = segment_number;
-		internal_handle->offset_table->compressed[ chunk ]      = 0;
-		internal_handle->offset_table->dirty[ chunk ]           = 1;
+		internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor;
+		internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
+		internal_handle->offset_table->chunk_offset[ chunk ].compressed      = 0;
+		internal_handle->offset_table->chunk_offset[ chunk ].dirty           = 1;
 	}
 	return( total_write_count );
 }
@@ -1746,23 +1732,9 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->segment_number == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing segment numbers.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->dirty == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing dirty flags.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -2032,9 +2004,9 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -2049,7 +2021,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 	/* Check if chunk has already been created within a segment file
 	 */
 	if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
-	 && ( internal_handle->offset_table->file_descriptor[ internal_handle->current_chunk ] != -1 ) )
+	 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].file_descriptor != -1 ) )
 	{
 		write_count = libewf_raw_write_chunk_existing(
 		               internal_handle,
@@ -2131,9 +2103,9 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
+	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
 		 function );
 
 		return( -1 );
@@ -2190,7 +2162,7 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 		/* Check if chunk has already been created within a segment file
 		 */
 		if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
-		 && ( internal_handle->offset_table->file_descriptor[ internal_handle->current_chunk ] != -1 ) )
+		 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].file_descriptor != -1 ) )
 		{
 			write_count = libewf_write_chunk_data_existing(
 			               internal_handle,
