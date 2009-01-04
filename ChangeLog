@@ -47,6 +47,7 @@ To do/think about:
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfdebug: create a tool to analyse a single segment file
 * ewfrecover: create a tool recover ewf files
+# ewfverify: show which files are corrupted
 * windows port: for ewftools integrate certain functions in the library
 * windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
@@ -93,9 +94,14 @@ Next release:
 * check if successive headers match first header
 * write api functions to rid ewfcommon of internal_handle
 * have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
+* change section start to static definition in libewf_section_last_write and libewf_section_start_write
+* do not create human readable byte string if size <= 1024
+* use off_t for size values instead of uint64_t
+* check printf %jd and %zu for Cygwin
 
-TODO:
-- change section start to static definition in libewf_section_last_write and libewf_section_start_write
+Version: 20070512
+* changed default order of physical and logical in ewfacquire - makes more sense this way
+* updated manuals
 
 Version: 20070407
 * minor corrections for Win32 port

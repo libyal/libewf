@@ -1,7 +1,7 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070408], [forensics@hoffmannbv.nl])
-AM_INIT_AUTOMAKE([libewf], [20070408])
+AC_INIT([libewf], [20070512], [forensics@hoffmannbv.nl])
+AM_INIT_AUTOMAKE([libewf], [20070512])
 
 dnl Function to test if the current directory contains spaces
 AC_DEFUN([LIBEWF_TEST_PWD],

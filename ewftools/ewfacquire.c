@@ -476,7 +476,7 @@ int main( int argc, char * const argv[] )
 
 		/* Volume type
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Volume type" ), volume_types, 2, 0 );
+		user_input = ewfcommon_get_user_input_fixed_value( stdout, _S_LIBEWF_CHAR( "Volume type" ), volume_types, 2, 1 );
 
 		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "logical" ), 7 ) == 0 )
 		{
