@@ -33,6 +33,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <endian.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -41,7 +42,6 @@
 
 #include "libewf_compression.h"
 #include "libewf_debug.h"
-#include "libewf_endian.h"
 #include "libewf_segment_file.h"
 #include "libewf_string.h"
 
@@ -111,33 +111,18 @@ void libewf_debug_section_print(
 	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     section->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 section->crc );
 
-		return;
-	}
-	if( libewf_endian_convert_64bit(
-	     &next,
-	     section->next ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert next offset value.\n",
-		 function );
+	endian_little_convert_64bit(
+	 next,
+	 section->next );
 
-		return;
-	}
-	if( libewf_endian_convert_64bit(
-	     &size,
-	     section->size ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert size value.\n",
-		 function );
+	endian_little_convert_64bit(
+	 size,
+	 section->size );
 
-		return;
-	}
 	notify_printf( "Section:\n" );
 	notify_printf( "type: %s\n",
 	 (char *) section->type );

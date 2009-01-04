@@ -99,15 +99,10 @@ ssize_t libewf_section_start_read(
 	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     section->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 section->crc );
 
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -878,18 +873,10 @@ ssize_t libewf_section_volume_s01_read(
 	                  ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     volume->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 volume->crc );
 
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -915,54 +902,22 @@ ssize_t libewf_section_volume_s01_read(
 	 45 );
 #endif
 
-	if( libewf_endian_convert_32bit(
-	     &( media_values->amount_of_chunks ),
-	     volume->amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of chunks value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 media_values->amount_of_chunks,
+	 volume->amount_of_chunks );
 
-		memory_free(
-		 volume );
+	endian_little_convert_32bit(
+	 media_values->sectors_per_chunk,
+	 volume->sectors_per_chunk );
 
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->sectors_per_chunk ),
-	     volume->sectors_per_chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert sectors per chunk value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 media_values->bytes_per_sector,
+	 volume->bytes_per_sector );
 
-		memory_free(
-		 volume );
+	endian_little_convert_32bit(
+	 media_values->amount_of_sectors,
+	 volume->amount_of_sectors );
 
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->bytes_per_sector ),
-	     volume->bytes_per_sector ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert bytes per sector value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->amount_of_sectors ),
-	     volume->amount_of_sectors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of sectors value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 	if( memory_compare(
 	     (void *) volume->signature,
 	     (void *) "SMART",
@@ -1236,18 +1191,10 @@ ssize_t libewf_section_volume_e01_read(
 	                  ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     volume->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 volume->crc );
 
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -1288,66 +1235,26 @@ ssize_t libewf_section_volume_e01_read(
 	 5 );
 #endif
 
-	if( libewf_endian_convert_32bit(
-	     &( media_values->amount_of_chunks ),
-	     volume->amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of chunks value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 media_values->amount_of_chunks,
+	 volume->amount_of_chunks );
 
-		memory_free(
-		 volume );
+	endian_little_convert_32bit(
+	 media_values->sectors_per_chunk,
+	 volume->sectors_per_chunk );
 
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->sectors_per_chunk ),
-	     volume->sectors_per_chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert sectors per chunk value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 media_values->bytes_per_sector,
+	 volume->bytes_per_sector );
 
-		memory_free(
-		 volume );
+	endian_little_convert_32bit(
+	 media_values->amount_of_sectors,
+	 volume->amount_of_sectors );
 
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->bytes_per_sector ),
-	     volume->bytes_per_sector ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert bytes per sector value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 media_values->error_granularity,
+	 volume->error_granularity );
 
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->amount_of_sectors ),
-	     volume->amount_of_sectors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of sectors value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &( media_values->error_granularity ),
-	     volume->error_granularity ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert error granularity value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 	media_values->media_type  = volume->media_type;
 	media_values->media_flags = volume->media_flags;
 	*compression_level        = (int8_t) volume->compression_level;
@@ -1798,15 +1705,15 @@ ssize_t libewf_section_table_read(
 	}
 	/* The table size contains the size of the CRC (4 bytes)
 	 */
-	calculated_crc = ewf_crc_calculate( &table, ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &table,
+	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, table.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 table.crc );
 
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -1817,20 +1724,14 @@ ssize_t libewf_section_table_read(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit( &amount_of_chunks, table.amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of chunks value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 amount_of_chunks,
+	 table.amount_of_chunks );
 
-		return( -1 );
-	}
-	if( libewf_endian_convert_64bit( &base_offset, table.base_offset ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert base offset value.\n",
-		 function );
+	endian_little_convert_64bit(
+	 base_offset,
+	 table.base_offset );
 
-		return( -1 );
-	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	notify_dump_data(
 	 table.padding1,
@@ -1921,16 +1822,10 @@ ssize_t libewf_section_table_read(
 			}
 			section_read_count += read_count;
 
-			if( libewf_endian_convert_32bit( &stored_crc, stored_crc_buffer ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to convert CRC value.\n",
-				 function );
+			endian_little_convert_32bit(
+			 stored_crc,
+			 stored_crc_buffer );
 
-				memory_free(
-				 offsets );
-
-				return( -1 );
-			}
 			if( stored_crc != calculated_crc )
 			{
 				notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -2524,15 +2419,10 @@ ssize_t libewf_section_session_read(
 	                  ( sizeof( ewf_session_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     ewf_session.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 ewf_session.crc );
 
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -2549,18 +2439,13 @@ ssize_t libewf_section_session_read(
 	 28 );
 #endif
 
-	if( libewf_endian_convert_32bit(
-	     &amount_of_ewf_sessions,
-	     ewf_session.amount_of_sessions ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of sessions value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 amount_of_ewf_sessions,
+	 ewf_session.amount_of_sessions );
 
-		return( -1 );
-	}
 	if( amount_of_ewf_sessions == 0 )
 	{
-		notify_warning_printf( "%s: session contains no session data!.\n",
+		notify_warning_printf( "%s: session contains no session data.\n",
 		 function );
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
@@ -2621,18 +2506,10 @@ ssize_t libewf_section_session_read(
 		}
 		section_read_count += read_count;
 
-		if( libewf_endian_convert_32bit(
-		     &stored_crc,
-		     stored_crc_buffer ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to convert CRC value.\n",
-			 function );
+		endian_little_convert_32bit(
+		 stored_crc,
+		 stored_crc_buffer );
 
-			memory_free(
-			 ewf_sessions );
-
-			return( -1 );
-		}
 		if( stored_crc != calculated_crc )
 		{
 			notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -2680,18 +2557,10 @@ ssize_t libewf_section_session_read(
 
 		for( iterator = 0; iterator < amount_of_ewf_sessions; iterator++ )
 		{
-			if( libewf_endian_convert_32bit(
-			     &first_sector,
-			     ewf_sessions[ iterator ].first_sector ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to convert first sector value.\n",
-				 function );
+			endian_little_convert_32bit(
+			 first_sector,
+			 ewf_sessions[ iterator ].first_sector );
 
-				memory_free(
-				 ewf_sessions );
-
-				return( -1 );
-			}
 			sessions->sector[ iterator ].first_sector = (uint64_t) first_sector;
 
 			if( iterator > 0 )
@@ -2976,18 +2845,15 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( data, ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  data,
+	                  ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, data->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 data->crc );
 
-		memory_free(
-		 data );
-
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
@@ -3042,16 +2908,10 @@ ssize_t libewf_section_data_read(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit( &amount_of_chunks, data->amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of chunks value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 amount_of_chunks,
+	 data->amount_of_chunks );
 
-		memory_free(
-		 data );
-
-		return( -1 );
-	}
 	if( media_values->amount_of_chunks != amount_of_chunks )
 	{
 		notify_warning_printf( "%s: amount of chunks does not match in data section.\n",
@@ -3065,16 +2925,10 @@ ssize_t libewf_section_data_read(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit( &sectors_per_chunk, data->sectors_per_chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert sectors per chunk value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 sectors_per_chunk,
+	 data->sectors_per_chunk );
 
-		memory_free(
-		 data );
-
-		return( -1 );
-	}
 	if( media_values->sectors_per_chunk != sectors_per_chunk )
 	{
 		notify_warning_printf( "%s: sectors per chunk does not match in data section.\n",
@@ -3088,16 +2942,10 @@ ssize_t libewf_section_data_read(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit( &bytes_per_sector, data->bytes_per_sector ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert bytes per sector value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 bytes_per_sector,
+	 data->bytes_per_sector );
 
-		memory_free(
-		 data );
-
-		return( -1 );
-	}
 	if( media_values->bytes_per_sector != bytes_per_sector )
 	{
 		notify_warning_printf( "%s: bytes per sector does not match in data section.\n",
@@ -3111,16 +2959,10 @@ ssize_t libewf_section_data_read(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit( &amount_of_sectors, data->amount_of_sectors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of sectors value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 amount_of_sectors,
+	 data->amount_of_sectors );
 
-		memory_free(
-		 data );
-
-		return( -1 );
-	}
 	if( media_values->amount_of_sectors != amount_of_sectors )
 	{
 		notify_warning_printf( "%s: amount of sectors does not match in data section.\n",
@@ -3134,16 +2976,10 @@ ssize_t libewf_section_data_read(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit( &error_granularity, data->error_granularity ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert error granularity value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 error_granularity,
+	 data->error_granularity );
 
-		memory_free(
-		 data );
-
-		return( -1 );
-	}
 	if( media_values->error_granularity != error_granularity )
 	{
 		notify_warning_printf( "%s: error granularity does not match in data section.\n",
@@ -3464,25 +3300,13 @@ ssize_t libewf_section_error2_read(
 	                  ( sizeof( ewf_error2_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     error2.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 error2.crc );
 
-		return( -1 );
-	}
-	if( libewf_endian_convert_32bit(
-	     &amount_of_errors,
-	     error2.amount_of_errors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert amount of errors value.\n",
-		 function );
-
-		return( -1 );
-	}
-	sectors_size = sizeof( ewf_error2_sector_t ) * amount_of_errors;
+	endian_little_convert_32bit(
+	 amount_of_errors,
+	 error2.amount_of_errors );
 
 	if( stored_crc != calculated_crc )
 	{
@@ -3512,6 +3336,8 @@ ssize_t libewf_section_error2_read(
 	}
 	else
 	{
+		sectors_size = sizeof( ewf_error2_sector_t ) * amount_of_errors;
+
 		error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 		                                          sectors_size );
 
@@ -3561,18 +3387,10 @@ ssize_t libewf_section_error2_read(
 		}
 		section_read_count += read_count;
 
-		if( libewf_endian_convert_32bit(
-		     &stored_crc,
-		     stored_crc_buffer ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to convert CRC value.\n",
-			 function );
+		endian_little_convert_32bit(
+		 stored_crc,
+		 stored_crc_buffer );
 
-			memory_free(
-			 error2_sectors );
-
-			return( -1 );
-		}
 		if( stored_crc != calculated_crc )
 		{
 			notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -3620,32 +3438,15 @@ ssize_t libewf_section_error2_read(
 
 		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
-			if( libewf_endian_convert_32bit(
-			     &first_sector,
-			     error2_sectors[ iterator ].first_sector ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to convert first sector value.\n",
-				 function );
+			endian_little_convert_32bit(
+			 first_sector,
+			 error2_sectors[ iterator ].first_sector );
 
-				memory_free(
-				 error2_sectors );
-
-				return( -1 );
-			}
 			acquiry_errors->sector[ iterator ].first_sector = (uint64_t) first_sector;
 
-			if( libewf_endian_convert_32bit(
-			     &( acquiry_errors->sector[ iterator ].amount_of_sectors ),
-			     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to convert amount of sectors value.\n",
-				 function );
-
-				memory_free(
-				 error2_sectors );
-
-				return( -1 );
-			}
+			endian_little_convert_32bit(
+			 acquiry_errors->sector[ iterator ].amount_of_sectors,
+			 error2_sectors[ iterator ].amount_of_sectors );
 		}
 		memory_free(
 		 error2_sectors );
@@ -3897,15 +3698,15 @@ ssize_t libewf_section_hash_read(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &hash, ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &hash,
+	                  ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, hash.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 hash.crc );
 
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -4488,15 +4289,10 @@ ssize_t libewf_section_delta_chunk_read(
 	                  ( sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit(
-	     &stored_crc,
-	     delta_chunk_header.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 stored_crc,
+	 delta_chunk_header.crc );
 
-		return( -1 );
-	}
 	if( stored_crc != calculated_crc )
 	{
 		notify_warning_printf( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
@@ -4509,15 +4305,10 @@ ssize_t libewf_section_delta_chunk_read(
 	}
 	/* The chunk value is stored + 1 count in the file
 	 */
-	if( libewf_endian_convert_32bit(
-	     &chunk,
-	     delta_chunk_header.chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert chunk value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 chunk,
+	 delta_chunk_header.chunk );
 
-		return( -1 );
-	}
 	chunk -= 1;
 
 	if( chunk >= offset_table->amount )
@@ -4527,15 +4318,10 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit(
-	     &chunk_size,
-	     delta_chunk_header.chunk_size ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert chunk size value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 chunk_size,
+	 delta_chunk_header.chunk_size );
 
-		return( -1 );
-	}
 	if( chunk_size != ( section_size - sizeof( ewfx_delta_chunk_header_t ) ) )
 	{
 		notify_warning_printf( "%s: chunk size does not match size of data in section.\n",
@@ -4994,15 +4780,10 @@ int libewf_section_read(
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_64bit(
-	     &size,
-	     section->size ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert size value.\n",
-		 function );
+	endian_little_convert_64bit(
+	 size,
+	 section->size );
 
-		return( -1 );
-	}
 	if( size > (uint64_t) INT64_MAX )
 	{
 		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
@@ -5010,15 +4791,10 @@ int libewf_section_read(
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_64bit(
-	     &next_offset,
-	     section->next ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert next offset value.\n",
-		 function );
+	endian_little_convert_64bit(
+	 next_offset,
+	 section->next );
 
-		return( -1 );
-	}
 	if( next_offset > (uint64_t) INT64_MAX )
 	{
 		notify_warning_printf( "%s: invalid next offset value exceeds maximum.\n",

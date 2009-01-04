@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <notify.h>
 #include <system_string.h>
 #include <types.h>
@@ -39,7 +40,6 @@
 #include <libewf/definitions.h>
 
 #include "libewf_compression.h"
-#include "libewf_endian.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_read.h"
@@ -62,6 +62,7 @@ ssize_t libewf_read_process_chunk_data(
          ewf_crc_t chunk_crc,
          int8_t read_crc )
 {
+	uint8_t *chunk_data_crc  = NULL;
 	static char *function    = "libewf_read_process_chunk_data";
 	ewf_crc_t calculated_crc = 0;
 
@@ -91,16 +92,11 @@ ssize_t libewf_read_process_chunk_data(
 		if( read_crc == 0 )
 		{
 			chunk_data_size -= sizeof( ewf_crc_t );
+			chunk_data_crc   = &( chunk_data[ chunk_data_size ] );
 
-			if( libewf_endian_convert_32bit(
-			     &chunk_crc,
-			     &( chunk_data[ chunk_data_size ] ) ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to convert stored CRC value.\n",
-				 function );
-
-				return( -1 );
-			}
+			endian_little_convert_32bit(
+			 chunk_crc,
+			 chunk_data_crc );
 		}
 		calculated_crc = ewf_crc_calculate(
 		                  chunk_data,
@@ -361,15 +357,9 @@ ssize_t libewf_raw_read_chunk(
 
 			return( -1 );
 		}
-		if( libewf_endian_convert_32bit(
-		     chunk_crc,
-		     stored_crc_buffer ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to convert CRC value.\n",
-			 function );
-
-			return( -1 );
-		}
+		endian_little_convert_32bit(
+		 *chunk_crc,
+		 stored_crc_buffer );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( *is_compressed == 0 )

@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <file_io.h>
 #include <memory.h>
 #include <notify.h>
@@ -184,15 +185,10 @@ ssize_t libewf_segment_file_read_file_header(
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_16bit(
-	     segment_number,
-	     file_header.fields_segment ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert fields segment number value.\n",
-		 function );
+	endian_little_convert_16bit(
+	 *segment_number,
+	 file_header.fields_segment );
 
-		return( -1 );
-	}
 	return( read_count );
 }
 

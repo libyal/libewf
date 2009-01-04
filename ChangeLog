@@ -136,8 +136,9 @@ Next release(s):
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-Next stable:
-* Check EnCase 6.8 offset table overflow behavior
+* change libewf_notify_set_values in libewf_file.c to notify_set_values
+
+* use endian macros
 
 CLOSED
 * what about read+write and compression?
@@ -155,6 +156,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080322
+* implemented endian conversion macros
 
 Version: 20080320
 * performance testing

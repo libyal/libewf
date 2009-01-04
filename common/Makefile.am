@@ -6,6 +6,7 @@ libcommon_la_SOURCES = \
 	character_string.c character_string.h \
 	common.h \
 	date_time.c date_time.h \
+	endian.h \
 	error_string.c error_string.h \
 	file_io.c file_io.h \
 	memory.h \

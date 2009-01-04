@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -244,15 +245,10 @@ int libewf_offset_table_fill(
 			return( -1 );
 		}
 	}
-	if( libewf_endian_convert_32bit(
-	     &raw_offset,
-	     offsets[ iterator ].offset ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert raw offset value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 raw_offset,
+	 offsets[ iterator ].offset );
 
-		return( -1 );
-	}
 	/* The size of the last chunk must be determined differently
 	 */
 	while( iterator < ( amount_of_chunks - 1 ) )
@@ -266,15 +262,10 @@ int libewf_offset_table_fill(
 		{
 			current_offset = raw_offset;
 		}
-		if( libewf_endian_convert_32bit(
-		     &raw_offset,
-		     offsets[ iterator + 1 ].offset ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to convert raw offset value.\n",
-			 function );
+		endian_little_convert_32bit(
+		 raw_offset,
+		 offsets[ iterator + 1 ].offset );
 
-			return( -1 );
-		}
 		if( overflow == 0 )
 		{
 			next_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
@@ -360,15 +351,10 @@ int libewf_offset_table_fill(
 		}
 		iterator++;
 	}
-	if( libewf_endian_convert_32bit(
-	     &raw_offset,
-	     offsets[ iterator ].offset ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to convert raw offset value.\n",
-		 function );
+	endian_little_convert_32bit(
+	 raw_offset,
+	 offsets[ iterator ].offset );
 
-		return( -1 );
-	}
 	if( overflow == 0 )
 	{
 		compressed     = (uint8_t) ( raw_offset >> 31 );

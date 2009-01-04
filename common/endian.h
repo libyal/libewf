@@ -1,5 +1,5 @@
 /*
- * Endian function definition for libewf
+ * Endian functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_ENDIAN_H )
-#define _LIBEWF_ENDIAN_H
+#if !defined( _ENDIAN_H )
+#define _ENDIAN_H
 
 #include <common.h>
 
@@ -42,19 +42,45 @@
 extern "C" {
 #endif
 
-/* Note: do not replace with endian byte swap functions
- */
-int libewf_endian_revert_16bit(
-     uint16_t value,
-     uint8_t *bytes );
+#define endian_big_convert_16bit( value, bytes ) \
+	value = ( (uint16_t) ( bytes[ 0 ] ) << 8 ) \
+	      | (uint16_t) ( bytes[ 1 ] )
 
-int libewf_endian_revert_32bit(
-     uint32_t value,
-     uint8_t *bytes );
+#define endian_big_convert_32bit( value, bytes ) \
+	value = ( (uint32_t) ( bytes[ 0 ] ) << 24 ) \
+	      | ( (uint32_t) ( bytes[ 1 ] ) << 16 ) \
+	      | ( (uint32_t) ( bytes[ 2 ] ) << 8 ) \
+	      | (uint32_t) ( bytes[ 3 ] )
 
-int libewf_endian_revert_64bit(
-     uint64_t value,
-     uint8_t *bytes );
+#define endian_big_convert_64bit( value, bytes ) \
+	value = ( (uint64_t) ( bytes[ 0 ] ) << 56 ) \
+	      | ( (uint64_t) ( bytes[ 1 ] ) << 48 ) \
+	      | ( (uint64_t) ( bytes[ 2 ] ) << 40 ) \
+	      | ( (uint64_t) ( bytes[ 3 ] ) << 32 ) \
+	      | ( (uint64_t) ( bytes[ 4 ] ) << 24 ) \
+	      | ( (uint64_t) ( bytes[ 5 ] ) << 16 ) \
+	      | ( (uint64_t) ( bytes[ 6 ] ) << 8 ) \
+	      | (uint64_t) ( bytes[ 7 ] )
+
+#define endian_little_convert_16bit( value, bytes ) \
+	value = ( (uint16_t) ( bytes[ 1 ] ) << 8 ) \
+	      | (uint16_t) ( bytes[ 0 ] )
+
+#define endian_little_convert_32bit( value, bytes ) \
+	value = ( (uint32_t) ( bytes[ 3 ] ) << 24 ) \
+	      | ( (uint32_t) ( bytes[ 2 ] ) << 16 ) \
+	      | ( (uint32_t) ( bytes[ 1 ] ) << 8 ) \
+	      | (uint32_t) ( bytes[ 0 ] )
+
+#define endian_little_convert_64bit( value, bytes ) \
+	value = ( (uint64_t) ( bytes[ 7 ] ) << 56 ) \
+	      | ( (uint64_t) ( bytes[ 6 ] ) << 48 ) \
+	      | ( (uint64_t) ( bytes[ 5 ] ) << 40 ) \
+	      | ( (uint64_t) ( bytes[ 4 ] ) << 32 ) \
+	      | ( (uint64_t) ( bytes[ 3 ] ) << 24 ) \
+	      | ( (uint64_t) ( bytes[ 2 ] ) << 16 ) \
+	      | ( (uint64_t) ( bytes[ 1 ] ) << 8 ) \
+	      | (uint64_t) ( bytes[ 0 ] )
 
 #if defined( __cplusplus )
 }
