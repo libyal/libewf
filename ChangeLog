@@ -99,7 +99,6 @@ Next release:
 
 * refactor some int64 to size64_t and off_t into off64_t
 * add maximum check to set functions in internal handle
-* rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle
 * move any access to segment table in file, write and read to segment_file
 * move open segment files in file to segment file to read segment table function
@@ -135,10 +134,12 @@ Version: 20070819
   because function does not change pointer of offset table itself
   the same for libewf_fill_offset_table and libewf_offset_table_read
 * completed reading dirty chunks from delta segment files
+* fixed spelling error in unsuported => unsupported in ewftools
+* rewritten #ifdef to #if defined() and #ifndef to #if !defined()
+
 * worked on ewfexport exporting ewf formatted data for delta merge
   ewfexport no longer exports to stdout
   specify '-t -' to write to stdout only for continuous raw output
-* fixed spelling error in unsuported => unsupported in ewftools
 
 Version: 20070818
 * worked on restructuring to improve internal structure

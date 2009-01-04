@@ -176,71 +176,18 @@ int main( int argc, char * const argv[] )
 				{
 					output_raw = 1;
 				}
-				/* This check must before the check for "ewf"
-				 */
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_EWFX;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ewf" ), 3 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_EWF;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "smart" ), 3 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_SMART;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ftk" ), 3 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_FTK;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase1" ), 7 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_ENCASE1;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase2" ), 7 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_ENCASE2;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase3" ), 7 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_ENCASE3;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase4" ), 7 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_ENCASE4;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase5" ), 7 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_ENCASE5;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase6" ), 7 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_ENCASE6;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "linen5" ), 6 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_LINEN5;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "linen6" ), 6 ) == 0 )
-				{
-					output_raw    = 0;
-					libewf_format = LIBEWF_FORMAT_LINEN6;
-				}
 				else
 				{
-					fprintf( stderr, "Unsupported file format type defaulting to raw.\n" );
+					libewf_format = ewfcommon_determine_libewf_format( optarg );
+
+					if( libewf_format == 0 )
+					{
+						fprintf( stderr, "Unsupported file format type defaulting to raw.\n" );
+					}
+					else
+					{
+						output_raw = 0;
+					}
 				}
 				break;
 

@@ -238,45 +238,15 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'f':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ftk" ), 3 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_FTK;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase2" ), 7 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_ENCASE2;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase3" ), 7 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_ENCASE3;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase4" ), 7 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_ENCASE4;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase5" ), 7 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_ENCASE5;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase6" ), 7 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_ENCASE6;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "linen5" ), 6 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_LINEN5;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "linen6" ), 6 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_LINEN6;
-				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
-				{
-					libewf_format = LIBEWF_FORMAT_EWFX;
-				}
-				else
+				libewf_format = ewfcommon_determine_libewf_format( optarg );
+
+				if( ( libewf_format == 0 )
+				 || ( libewf_format == LIBEWF_FORMAT_EWF )
+				 || ( libewf_format == LIBEWF_FORMAT_SMART ) )
 				{
 					fprintf( stderr, "Unsupported EWF file format type defaulting to encase5.\n" );
+
+					libewf_format = LIBEWF_FORMAT_ENCASE5;
 				}
 				break;
 

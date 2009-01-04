@@ -149,7 +149,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
-	int result                              = 0;
 
 	if( filenames == NULL )
 	{

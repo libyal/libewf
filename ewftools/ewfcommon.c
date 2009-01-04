@@ -397,8 +397,13 @@ LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size )
  */
 uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument )
 {
+	static char *function = "ewfcommon_determine_sectors_per_chunk";
+
 	if( argument == NULL )
 	{
+		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		 function );
+
 		return( 0 );
 	}
 	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "32768" ), 5 ) == 0 )
@@ -440,6 +445,73 @@ uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument )
 	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "64" ), 2 ) == 0 )
 	{
 		return( 64 );
+	}
+	return( 0 );
+}
+
+/* Determines the sectors per chunk value from an argument string
+ * Returns the sectors per chunk value, or 0 on error
+ */
+uint8_t ewfcommon_determine_libewf_format( const CHAR_T *argument )
+{
+	static char *function = "ewfcommon_determine_libewf_format";
+
+	if( argument == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid argument string.\n",
+		 function );
+
+		return( 0 );
+	}
+	/* This check must before the check for "ewf"
+	 */
+	if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_EWFX );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewf" ), 3 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_EWF );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "smart" ), 3 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_SMART );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ftk" ), 3 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_FTK );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase1" ), 7 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_ENCASE1 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase2" ), 7 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_ENCASE2 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase3" ), 7 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_ENCASE3 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase4" ), 7 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_ENCASE4 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase5" ), 7 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_ENCASE5 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase6" ), 7 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_ENCASE6 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "linen5" ), 6 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_LINEN5 );
+	}
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "linen6" ), 6 ) == 0 )
+	{
+		return( LIBEWF_FORMAT_LINEN6 );
 	}
 	return( 0 );
 }
