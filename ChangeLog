@@ -139,9 +139,6 @@ Next release(s):
 
 * change libewf_notify_set_values in libewf_file.c to notify_set_values
 
-FIXES
-* update ewfalter to handle more complex RW scenarios
-
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -163,6 +160,8 @@ Version: 20080405
 * Moved basename from segment table entry 0 to segment table
 * The segment filename can now be overwritten during acquiry this allows
   alternative segment filename paths
+* updated manuals
+* improved ewfalter test scenarios
 
 Version: 20080403
 * Fixed macosx installation path

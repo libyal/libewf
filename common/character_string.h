@@ -38,7 +38,7 @@
 #include "date_time.h"
 #include "string_conversion.h"
 
-#if defined( HAVE_SRING_H )
+#if defined( HAVE_STRING_H )
 #include <string.h>
 #endif
 
