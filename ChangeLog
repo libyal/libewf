@@ -52,9 +52,11 @@ To do/think about:
   - make a generic media access solution also useable for revit?
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
+* ewfexport: log hashes to file -l option
 * ewfdebug: create a tool to analyse a single segment file
 * ewfrecover: create a tool recover ewf files
 * ewfverify: detect and show which files are corrupted
+* ewfverify: verify against all available hashes that can be verified
 * windows port: for ewftools integrate certain functions in the library
 * windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
@@ -113,8 +115,6 @@ Next release(s):
 
 * implement session section write
 
-* ewfverify: verify against all available hashes that can be verified
-
 * Try to correct the table
   - add error flag
 
@@ -157,8 +157,6 @@ Next stable:
   what about adding the segment file type to the segment file struct?
   - reduces memory usage
 
-* ewfexport log hashes to file -l option
-
 * implement TODO in ewfexport
 * check TODOs
 
@@ -178,6 +176,7 @@ CLOSED
 
 Version: 20080224
 * Added error output to the log
+* refactored ewfinfo
 
 Version: 20080223
 * worked on logging of digest hashes to log file
