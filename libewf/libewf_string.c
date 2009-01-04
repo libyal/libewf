@@ -536,22 +536,7 @@ int libewf_string_copy_from_ewf_char(
      size_t size_ewf_char_string )
 {
 	static char *function = "libewf_string_copy_from_ewf_char";
-	size_t iterator       = 0;
 
-	if( string == NULL )
-	{
-		notify_warning_printf( "%s: invalid string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ewf_char_string == NULL )
-	{
-		notify_warning_printf( "%s: invalid EWF character string.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
 	{
@@ -567,18 +552,10 @@ int libewf_string_copy_from_ewf_char(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < size_ewf_char_string; iterator++ )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-		string[ iterator ] = btowc(
-		                      (int) ewf_char_string[ iterator ] );
-#else
-		string[ iterator ] = (char) ewf_char_string[ iterator ];
-#endif
-	}
-	string[ size_ewf_char_string - 1 ] = (character_t) '\0';
-
-	return( 1 );
+	return( string_copy_from_char(
+	         string,
+	         (char *) ewf_char_string,
+	         size_ewf_char_string ) );
 }
 
 /* Converts a LIBEWF character string to an EWF character string
@@ -591,22 +568,7 @@ int libewf_string_copy_to_ewf_char(
      size_t size_ewf_char_string )
 {
 	static char *function = "libewf_string_copy_to_ewf_char";
-	size_t iterator       = 0;
 
-	if( string == NULL )
-	{
-		notify_warning_printf( "%s: invalid string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ewf_char_string == NULL )
-	{
-		notify_warning_printf( "%s: invalid EWF character string.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( ( size_string > (size_t) SSIZE_MAX )
 	 || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
 	{
@@ -622,25 +584,10 @@ int libewf_string_copy_to_ewf_char(
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < size_string; iterator++ )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-		ewf_char_string[ iterator ] = (ewf_char_t) wctob(
-		                                            string[ iterator ] );
-
-		/* If character is out of the basic ASCII range use '_' as a place holder
-		 */
-		if( ewf_char_string[ iterator ] == (ewf_char_t) EOF )
-		{
-			ewf_char_string[ iterator ] = (ewf_char_t) '_';
-		}
-#else
-		ewf_char_string[ iterator ] = (ewf_char_t) string[ iterator ];
-#endif
-	}
-	ewf_char_string[ size_string - 1 ] = (ewf_char_t) '\0';
-
-	return( 1 );
+	return( string_copy_to_char(
+	         (char *) ewf_char_string,
+	         string,
+	         size_string ) );
 }
 
 /* Converts an EWF header2 to a string
