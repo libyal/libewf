@@ -101,22 +101,29 @@ Next release:
 
 * refactor function names into static char *
 
+Version: 20070716
+* worked on allowing to write raw buffers as chunks
+* refactored function names into static char *
+
 Version: 20070715
 * worked on libtool DLL support
 * worked on allowing to write raw buffers as chunks
 * fixed reallocation bug in libewf_internal_handle_add_crc_error_chunk
+* refactored function names into static char *
 
 Version: 20070714
 * worked on libtool DLL support
 * worked on allowing to write raw buffers as chunks
+* refactored function names into static char *
 
 Version: 20070713
 * worked on libtool DLL support
   - changed macros in libewf_extern.h into LIBEWF_DLL_EXPORT and _IMPORT without the S
 * made libcrypto EVP interface default, use MD5 and SHA1 as fallback
+* refactored function names into static char *
 
 Version: 20070710
-* worked on function name refactoring
+* refactored function names into static char *
 * removed type from configure.ac
 
 Version: 20070708
