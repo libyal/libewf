@@ -824,8 +824,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header,
 		               header_size,
 		               internal_handle->compression_level );
@@ -837,19 +836,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append header section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 	}
 	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE2 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE3 )
@@ -862,8 +849,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -875,24 +861,11 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append first header section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 
 		write_count = libewf_section_header_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -904,19 +877,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append second header section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 	}
 	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE4 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
@@ -937,8 +898,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header2_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header2,
 		               internal_handle->header2_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -950,24 +910,11 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header2",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append first header2 section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 
 		write_count = libewf_section_header2_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header2,
 		               internal_handle->header2_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -979,27 +926,14 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header2",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append second header2 section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 
 		/* The header should be written once
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -1011,19 +945,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append third header section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 	}
 	/* EWFX uses the header and header2 for backwards compatibility
 	 */
@@ -1086,8 +1008,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header2_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header2,
 		               internal_handle->header2_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -1099,27 +1020,14 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header2",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append second header2 section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 
 		/* The header should be written once
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -1131,19 +1039,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "header",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append third header section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 	}
 	return( total_write_count );
 }
