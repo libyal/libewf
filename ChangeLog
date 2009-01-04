@@ -142,6 +142,8 @@ Next release(s):
 
 * change libewf_notify_set_values in libewf_file.c to notify_set_values
 
+* implement features.h like libsmio
+
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -161,6 +163,7 @@ CLOSED
 
 Version: 20080505
 * Consistency update in API for get and set media and volume type functions
+* Updated configure.ac
 
 Version: 20080501
 * Fixed the package config file (.pc) (Nicolas (kwizart))
