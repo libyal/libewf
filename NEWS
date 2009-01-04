@@ -1,8 +1,26 @@
-libewf supports SMART (EWF-S01) files
-* both read and write
+Source package:
+new source structure
+./libewf   -> library
+./ewftools -> tools
+./include  -> library include files
+./manual   -> man pages
 
-ewfacquire
-* EWF-S01 files are not filled to maximum size by ewfacquire where EWF-E01 files are
-* allows for more than 255 segment files using FTK/EnCase compatible extension naming convention
-* corrected header values sequence for header2 section
+config.h is now include/libewf/libewf_config.h
+
+libtool is now used instead of ranlib
+
+Library:
+wide character support
+streamed write support
+now supports EnCase6, linen5, linen6 and EWFX (expirimental) format
+expirimental read and write support
+
+EWF tools:
+ewfinfo now support date format type and ISO8601
+ewfacquire now allows to set media type (fixed or removable)
+added ewfacquirestream
+added SHA1 calculation, however the SHA1 hash is only stored in the EWF-X format
+
+Platform support:
+compiles under Microsoft Visual Studio 2005 (express)
 

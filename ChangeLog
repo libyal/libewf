@@ -1,95 +1,923 @@
-To do/think about:
-* ewfinfo: add date format in ewfinfo to month in text - no interpretation differences possible
-* ewfinfo: generate CRC list
-* header2: enhance UTF16 conversion code
-* header2: enhance utf conversion routine
-* read: always compare a data section with the volume/disk section for EWF-E01 - TODO add more values
-* read: build in additional constraints
-* read: correct for errors in the table or table2 section for EWF-E01
-* read: add functionality for byte swap in data for endian fix of data - test this
-* read: warn when maximum offsets in table of S01 format is exceeded
-* read: look at libewf_section_volume_read: volume chunk count is 0 - compensating
-* read: add check for next and done segment
-  - realy the last segment in the file
-  - offset pointing at them selves
-  - correct size
-* all: add LVF support - ltree section
-* all: make a more generic libewf_string (use this in libewf_header_values, ewf_header, ewf_ltree) also move ASCII and UTF
-* all: make string functions safe to be char or uint8_t
-* all: check for race conditions especially on change of data elements
-* write: reduce multiple successive error2 entries to a single
-* write: add additional data to file for different EWF formats
-* ewfacquire: make size input and output human friendly (support kM notation etc)
-* ewfacquire: warn before hand if segment file amount exceeds limit
-* ewfacquire: ask for media type
-* ewf_header_compress: is there a better way to determine the size of the uncompressed buffer
-* general: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
-  - can the values in data be used to correct a corrupted volume ?
-* general: redesign handle, refactor certain aspects to sub structs like chunk_cache
+Roadmap:
+* allow MD5 calculation to be disabled
+* read and write mode - currently implemented, still expirimental
+* resume write i.e. system failure (check to which part EWF files ok)
+  - requires (some form of) read and write mode
+  - error resistency
+* lvf support
+* library/tools enhancements (getoptlong)
+* internationalisation (gettext)
+* enhance thread safety
 
-* more integration with autoconf/automake config.h
+To do/think about:
+* all: adjust the advertising clause in the license to be voluntary ?
+* all: add LVF support - ltree section
+* all: check for race conditions especially on change of data elements
+* all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
+  - can the values in data be used to correct a corrupted volume ?
+* all: allow in library message strings to be char and w_char - for language support - what about gettext?
+* all: implement signal handling - cancelation option in library?
+* file: add function/flag to open segments files progressively using only the basename (like write)
+* libewf_string: enhance UTF16 conversion code
+* read: correct for errors in the table or table2 section for EWF-E01
+* read: add check for next and done segment
+  - really the last segment in the file
+  - offset pointing at themselves
+  - correct size
+* read: reduce multiple successive crc error entries to a single
+* write: reduce multiple successive acquiry error (error2) entries to a single
+* write: add additional data to file for different EWF formats
+* look at integrating support for carvefs (libmodewf.c) - EWF specifics only
+  - put it in contrib for now ?
+  - what about xml based media data output like in libmodewf.c ?
+* add basic string functions to API for accessing strings outside the library - does this work with application and library memory space?
+  - if so remove libewf_string include from ewfacquire
+* reduce open file descriptors allows reading a lot of segment files
+  - make sure to detect when a file is closed and when a new segment file needs to be created
+
+* ewftools: add getoptlong
+* ewfacquire: make size input and output human friendly (support kM notation etc)
+* ewfacquire: restrict error granularity and amount per sectors to encase5 and linen5 format ?
+* ewfacquire: warn if values exceed maximum segment count
+* ewfacquire: add native Windows support for accessing devices
+* ewfacquire: read from pipe
+* ewfacquire: non interactive mode - read settings from file?
+* ewfacquire: allow for variable read buffer size, this should allow performance testing
+* ewfexport: non interactive mode?
+* ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
+* ewfdebug: create a tool to analyse a single segment file
+* ewfrecover: create a tool recover ewf files
+* windows port: for ewftools integrate certain functions in the library
+* windows port: build globbing support - basic support in there
+* windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
+* windows port: linux alternative to wmain?
+* windows port: reduce _s function to pre MVC 2005 variants provides for wider support
+
+* test if wide character mode is portable between big and little endian platforms due to conversion functions?
+  - header2 and ltree only affected sections
 
 Further analysis of the EWF format:
-* media type
 * password hash
 * 16 bytes in hash section (EWF-E01)
-* ltree (EWF-L01 LVF)
+* values in EnCase5 header2 (+/-)
+* values in ltree strings (EWF-L01 LVF)
 
 Possible performance improvements:
 * create a offset table per segment file - create it on demand - section list per segment table is done
+  - map offset table start entry from segment table as a pointer or index number ?
 * build offset table while reading ?
+  - only read first and last segment file for index build
+  - add offsets of other segment files when needed
+* remove write_buffer copy to chunk_cache read - chunk cache read really required?
+* tune read and write buffer sizes
+  - read/write block size seems to have little effect for dd on average
+* reduce alloc, realloc and free (this reduces breaks) use strace as analyze - pass through of parameters or usage of handle
+* optimize empty block test
+* what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
+* optimize string functions
 
-Code clean up:
-* all: Enhance error handling - no program exit but a nice return - nicer prints - return error in sector message
-* all: use typedefs instead of defines
-* all: due to 20060505 fix give all value definitions a default value - looks nicer
-* all: wrap basic library calls in preperation of thread safety of library calls
-* all: remove unrequired includes
+Known issues:
+* error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
+  virtualisation could be part of the problem
+* output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
+* The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
 
-Finished:
-  - libewf_chunck_cache (c/h)
-  - libewf_common (c/h)
-  - libewf_endian (c/h)
-  - libewf_handle (c/h)
-  - libewf_header_values (c/h)
-  - libewf_notify (c/h)
-  - libewf_md5 (c/h)
-  - libewf_offset_table (c/h)
-  - libewf_section_list (c/h)
-  - libewf_segment_table (c/h)
-  - libewf_string (c/h)
+Next release:
+* full platform test
+* profile read and write functions
+* add a check to libewf_close to enforce libewf_write_finalize ?
+* what about read+write and compression?
+* add libewf_convert_date_xheader_value function ?
+  - add raw date format to allow to print raw date string
+* change string duplicate function to macro?
+* check if successive headers match first header
+* write api functions to rid ewfcommon of internal_handle
+* have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 
-  - ewf_compress (c/h)
-  - ewf_crc (c/h)
-  - ewf_data (c/h)
-  - ewf_error2 (c/h)
-  - ewf_file_header (c/h)
-  - ewf_hash (c/h)
-  - ewf_header (c/h)
-  - ewf_header2 (c/h)
-  - ewf_ltree (c/h) -  still experimental code
-  - ewf_md5hash (c/h)
-  - ewf_section (c/h)
-  - ewf_sectors (c/h)
-  - ewf_table (c/h)
-  - ewf_volume (c/h)
-  - ewf_volume_smart (c/h)
+TODO:
+- change section start to static definition in libewf_section_last_write and libewf_section_start_write
 
-To do:
+Version: 20070407
+* minor corrections for Win32 port
+* fixed error in passing error retry value in ewftools
+* fixed memory corruption in libewf_internal_handle_set_acquiry_error_sector
 
-  - libewf_file_read (c/h)
-  - libewf_file_write (c/h)
-  - libewf_file (c/h)
+Version: 20070406
+* worked on next stable release
+* added status print to ewfacquirestream
+* change to print of type in notify
 
-  - check all realloc and set values calls at the upper levels that memory is freed
-    perhaps from surrounding code i.e. for the handle
-  - recheck all realloc - do not overwrite in struct allocation pointers until sure
-    memory is successfully reallocated
-    grep [-][\>].\*realloc\( *
-  - do the same check for wipe/memset functions
-    grep [-][\>].\*memcpy\( *
-    grep [-][\>].\*wipe\( *
-    grep [-][\>].\*memset\( *
+Version: 20070317
+* worked on next stable release
+* changed libcrypto back to the MD5_ and SHA1_ interface still allows for EVP and Windows Crypto API
+
+Version: 20070304
+* minor type adjustments
+
+Version: 20070303
+* fixed bug regarding growth of segment file beyond maximum size
+
+Version: 20070225
+* fixed typo in libewf_handle.h
+* fixed cause of segmentation error in libcrypto
+
+Version: 20070218
+* added include of libewf_types to libewf_handle.h
+
+Version: 20070210
+* worked on changing size and offset types
+
+Version: 20070208
+* worked on changing size and offset types
+  - fixed some errors while testing
+
+Version: 20070207
+* worked on changing size and offset types
+
+Version: 20070206
+* worked on changing size and offset types
+  - updated libewf.3
+
+Version: 20070205
+* worked on changing size and offset types
+  - fixed issue in section list after adjustments
+  - reduces storage size and fixed issue in fill table
+
+Version: 20070204
+* worked on changing size and offset types
+
+Version: 20070203
+* worked on changing size and offset types
+  - changed ewf_string_length, ewf_string_copy and ewf_string_compare into macro's
+  - fixed memory leak in ewf_string_write_compressed
+* worked on code clean up
+  - rewrote libewf_common_alloc and _realloc to macro's
+  - rewrote libewf_common_read, _lseek, _write and _close to macro's
+  - rewrote ewf_x alloc funtions to macro's
+  - removed ewf_type specific alloc and free macro's
+  - removed ewf_error2_sectors_realloc, was not used and resizing should be handled by libewf_common_realloc
+  - removed ewf_table_offsets_realloc, was not used and resizing should be handled by libewf_common_realloc
+  - removed ewf_string_realloc replaced by libewf_common_realloc
+  - removed ewf_string_wipe replaced by libewf_common_memset
+  - removed libewf_error_sector.c
+
+Version: 20070131
+* worked on changing size and offset types
+
+Version: 20070130
+* worked on changing size and offset types
+  - file header now allocated statically
+  - rewrote section type tests functions to macro's
+
+Version: 20070129
+* worked on changing size and offset types
+  - added sys/types.h to libewf_types.h
+
+Version: 20070128
+* worked on seperate config header files for library and ewftools to fix installable header issue
+  - removed LIBEWF_CHAR from API, wide functions were added
+* remove quick refences in header values
+  - breaks compatibility with 0.2.1 version of libmodewf.c - was already broken due to new API design
+* moved non portable headers back to library path
+
+Version: 20070127
+* worked on seperate config header files for library and ewftools to fix installable header issue
+  - changed functions containing CHAR_T in library to separate small and wide character functions (for trace-ability)
+  - moved error_string print out of common function
+  - removed open_read and open_write
+  - moved copy from and to char_t functions out of the library into ewfcommon
+  - CHAR_T now removed from library
+* implemented internal_handle to hide handle representation from outside code
+  - added serveral api functions
+* renamed handle where used as internal handle to internal_handle
+
+Version: 20070125
+* worked on seperate config header files for library and ewftools to fix installable header issue
+
+Version: 20070120
+* now using openssl EVP interface instead of directly accessing MD5 functions
+* worked on implementation of xhash section
+  - added hash values to handle
+  - added get and set funtions for hash values
+  - updated libewf.3 manual page
+* created a more generic digest_context and EWF digest hash to support SHA1
+  - replaces md5 context and hash by digest context and hash
+* an option was added to allow for SHA1 calculation from ewfacquire and ewfacquirestream
+  - updated manuals
+* added print of additional hashes to ewfinfo
+* added verification of SHA1 hash to ewfverify
+* seperate generic definitions from libewf_config.h
+
+Version: 20070118
+* worked on reducing the usage of header values quick references in libewf and ewftools
+* using equal definitions for CHAR_T as for LIBEWF_CHAR
+* worked on implementation of xhash section
+* fixed issue EWXF format not setting GUID in data section
+
+Version: 20070117
+* worked on reducing the usage of header values quick references in libewf and ewftools
+
+Version: 20070116
+* added new header values functions to libewf.3 manual
+* added reverse string search function
+* changed forward string search to macro
+* corrected error in split string due to new string search
+* changed string length function to macro
+* changed string compare function to macro (return type change)
+* changed string copy function to macro (return type change)
+  - make sure the string is \0 terminated after copy
+* now using reverse search in parse xheader function for close tag
+* fixed error regarding the examiner_name parameter for ewfacquirestream
+
+Version: 20070115
+* adjusted creation of xheader string
+* added function to add user defined header value
+* added acquiry_software xheader value to ewfacquire and ewfacquirestream
+* changes to spec file to include ewfacquirestream
+* added function to parse xheader
+* added random GUID to EWFX
+* ewfinfo will now print extended header values
+* xheader: give acquiry date human readable timestamp with time zone
+* ewfinfo change Software used into Software version used
+
+Version: 20070114
+* worked on redesign of header values
+* fixed missing data issue in ewfacquirestream for large block sizes in combination with chunk cache passthrough
+* added manual for ewfacquirestrema and updated manuals
+* header values now uses a dynamic array
+  - old pointers left in for compatibility at the moment
+
+Version: 20070113
+* changed free functions for basic types to macro's allows for optimization
+* made adjustments due to splint warnings
+  - fixed error regarding buffer_size of ewf_crc_calculated being a signed interger while it should be an unsigned one
+  - fixed error regarding parameter validation due to optimalizations in ewf_string_copy
+  - fixed possible integer overflow in ewf_volume_calculate_chunk_size and ewf_volume_smart_calculate_chunk_size
+  - fixed not checking the return value of close in libewf_common_close
+  - adjusted compression level in header values from uint8_t to int8_t (for consistency)
+* changed API of libewf_close to return a status value
+  - adjusted ewftools accordingly
+  - most functions return -1 on error (for consistency)
+* removed STREAMED_WRITE sections
+* updated manuals
+
+Version: 20070111
+* fixed issue with unrestricting amount of offsets
+* media flags are written to volume and data section
+
+Version: 20070110
+* changed libewf_set_write_media_type to set volume type
+* added option to set volume type in ewfacquire and ewfacquirestream
+* fixed error in new header types, two value lines do not contain additional tabs
+
+Version: 20070109
+* added information about unknown_md and _sn
+* added libewf_header_value for more generic approach to handling header values
+* the volume media type in EnCase uses 0x00 for a floppy image and 0x01 for a hard disk image
+* adjusted library for fixed/removable media type
+* added error granularity to read and write
+* added function to set and get error granularity
+* adjusted ewfinfo and ewfacquire to handle error granularity
+  - not needed in ewfacquirestream cannot compensate errors in streams
+
+Version: 20070108
+* Fixed error in EWFX format header section should be xheader section
+* Removed setting value of unknown3 in data section
+
+Version: 20070107
+* worked on linen6 support
+* added EnCase6 and linen6 to automated test
+* added get_version function
+* fixed errors for handing a write of less data than chunk size
+* fixed error in EnCase6/linen6 header string creation
+* added 8192, 16384 or 32768 sectors per block size options
+* removed signature from hash section
+* fixed error in strerror for strerror fallback missing return statement
+* fixed error in test statement in configure.ac
+
+Version: 20070104
+* worked on automated acquirestream test
+* fixed error in ewfcommon_read_input for handing a write of less data than chunk size
+
+Version: 20070103
+* adjusted copyright notice
+* worked on EnCase6 support
+* corrected error in writing original EWF, EnCase1 and SMART format
+
+Version: 20061231
+* Fix for ctime_r detection not allowing for ctime fallback in configure script
+* Fix for incorrect handling of user provided strings in ewfacquirestream
+* Added missing sprintf function check and several precompiler definition changes by Christophe Grenier
+* configure and code now handles ctime_r 3rd argument under Solaris
+
+Version: 20061230
+* Fix for precompiler handling for gcc 2.95 in header_values
+* Moved GUID and operating software determination to ewfcommon
+* Changed autoconf detection of operating software fallback string
+* Added some options to ewfacquirestream
+* Fixed error in configure.ac regarding libuuid check
+* Added macros for tol and toul, with atol fallback support
+
+Version: 20061229
+* worked on read and write mode
+* removed chunk size buffer restriction from ewfcommon_read_chunk renamed it to ewfcommon_read_input
+* removed chunk cache wipe
+* several platforms tested
+
+Version: 20061228
+* added write remaining chunk data for streamed write to libewf_write_finalize
+* worked on read and write mode
+  - added amount_of_chunks to segment table, contains the amount of chunks of a segment file
+  - removed segment_file_offset in handle write, overlap with file_offset in segment table
+  - fill offset table while writing - removed handle->write->offset and ->amount_of_offsets
+  - removed handle->write->create_segment_file
+
+Version: 20061227
+* added pkg-config file (still expirimental)
+* added a check to libewf_close to enforce libewf_write_finalize
+* moved libewf header files to include/libewf - should fix missing header problem
+* worked on read and write mode
+  - added seek_offset
+  - added read_buffer - added it to api and libewf man page
+  - added ewfalter (expirimental)
+  - rewrote read_chunk not to do its own offset checking
+  - added write_random
+
+Version: 20061226
+* worked on read and write mode
+  - added seek_chunk
+
+Version: 20061225
+* worked on read and write correction regarding new insight into table sections
+* added macro for sprintf fallback
+* added configure.ac check for Solaris ctime_r
+* rewrite of ewf_string to calculate the byte size for all lengths
+* rewrite of common wrapper functions to macro's (memset, memcpy, memcmp, free)
+  - allow for compiler optimization for functions free, memset, memcpy, memcmp
+* worked on streamed write
+  - added libewf_write_finalize (still expirimental)
+  - created ewfacquirestream
+  - added type to section_list_entry
+  - have write functions set section_list_entries
+  - basic streamed write mode now working - still needs more testing requiring options set by ewfacquirestream
+* corrected error in comment libewf_write_buffer in libewf.h
+
+Version: 20061223
+* test: full read & write on multiple platforms
+* test: different sized buffers for read and write
+* check into small segment files for a DVD image - more file handles than allowed will add support for this in the future
+* added make lib/library for libewf compilation only
+* removed multiple (same) -l<library> from configure
+* added check for snprintf (djgpp seems to be missing this function) - will add fallback support to snprintf in the future
+* corrected file rights on source files
+* added libewf.spec to source package to allow rpmbuild -ta <libewf>
+* fixed bug in reading header string 1 byte too little
+* libewf now warns if file exceeds the maximimum amount of offsets in a table section
+* worked on read and write correction regarding new insight into table sections
+* added support for the original EWF format
+
+Version: 20061219
+* Added have config defaulting to libewf.h required for library include
+* several adjustments thanks to Christophe Grenier
+- manual/libewf.3
+- libewf.spec.in
+- fix for 4Gb support for native Windows compilation _lseek => _lseeki64
+
+Version: 20061218
+* added sys/types for Solaris signal.h include
+
+Version: 20061217
+* worked on testing for stable release
+* fix for NetBSD using zlib 1.1.4 missing compressBound function
+* moved factor 2 buffer size enlargement from ewf_string_uncompress into ewf_uncompress this matches behaviour of ewf_compress
+* added support for missing ctime_r, localtime_r and strerror_r fallback to ctime, localtime, strerror
+* manually added INT64_MAX definition - for platforms missing LLONG_MAX definition
+
+Version: 20061216
+* worked on testing for stable release
+* fixed bug for buffer passthrough exceeding the buffer boundary for compressed chunks
+* fixed bug for chunk cache passthrough
+* fixed reallocation of chunk cache for chunk cache passthrough
+* disabled -Wextra compiler flag for OpenBSD compilation
+* removed wcsftime and strftime for platform compatibility - now using snprintf based solution
+* fixed EnCase1 format error - contains only 1 header section
+* fixed handling of EnCase1 format in strict error mode
+* automatic generation of SPEC file thanks to Christophe Grenier
+
+Version: 20061213
+* worked on testing for stable release
+* fixed bug regarding too small copy of date strings
+* fixed bug regarding over correcting uncompressed string length
+
+Version: 20061212
+* Worked on Windows wide character support
+* adjusted string copy from/to char to char_t
+* finished first version of manpage libewf.3
+
+Version: 20061211
+* fixed typo in ewfacquire man page acquiry -> acquire
+* removed AC_FUNC_MALLOC and AC_FUN_REALLOC from configure.ac
+* fixed typo in libewf_includes.h HAVES_ -> HAVE_
+* adjusted code for warnings in Windows port
+* changed segment number to 16 bit value in read and segment table
+* fixed issue with ewfgetopt
+* moved utf16 to/from ascii converion functions from ewf_string to libewf_string
+* added intermediate macros for wide character support under Windows
+* adjusted static string concats
+  - MVC first executes the macro, after which it tries static string concat
+  - gcc seems to do this in oposite order
+
+Version: 20061209
+* added stdint.h support to libewf_includes.h
+* changed $build to $target in configure.ac
+* added libewf.spec file
+* libewf version numbers will not contain a release number any more - no additional value other than for development
+* fixed bug in \r detection in parse_header_string - when string length is 0
+* adjusted option order in ewfacquire help function - should be alphabetical
+* worked on man pages using input provided by Kees Mastwijk
+* corrected some small output inconsistencies
+
+Version: 20061208
+* worked on ewfinfo man page using input provided by Kees Mastwijk
+
+Version: 20061207
+* worked on calculating a GUID for write
+* added guid get and set functions to libewf
+* added guid check for data section
+* added guid write for encase5 and linen5 format
+* ewfacquire now adds random guid (uuid) for encase5 and time based guid for linen5 - only if libuuid is present
+* ewfacquire added test for block or character device before determining device size
+* ewfcommon created generic version function - added library version information
+* changed version() to ewfcommon_copyright_fprint()
+* worked on ewfacquire man page using input provided by Kees Mastwijk
+
+Version: 20061206
+* added hypens to GUID output in ewfinfo
+* worked on calculating a GUID for write
+
+Version: 20061204
+* changed configure.in to configure.ac
+* moved CFLAGS to configure.ac
+* system dection code is now only used to determine the fallback string for ewfacquire
+  - detection of available functions is now based on header detection
+* moved library code to ./libewf and code for the ewftools to ./ewftools and libewf.h to ./include
+* removed LIBEWF_H_USED_IN_PACKAGE
+* added defines to ewfcommon for different buffer size testing
+
+Version: 20061201
+* added optimalization definitions - for testing
+* implemented chunk cache passthrough
+* added configuration parameters for buffer passthrough and chunk cache passthrough
+  - buffer passthrough does not seem to enhance the performance significantly
+  - chunk cache passthrough does not seem to enhance the performance significantly
+* ewfacquire: ask or determine media type (fixed and removable)
+* added EWFX format (expirimental)
+  - (basically EWF-E01 based format)
+  - allows for section xheader, which contains header information in XML and is stored in an compressed string 
+
+Version: 20061130
+* problem with media size calculation due to change
+  - note: uint32_t * uint32_t = uint32_t and will not upscale to uint64_t
+* ewf_string: better solution for size*16 in ewf_string_uncompress
+  - the length starts out with a factor 2 and keeps increasing by a factor 2 until string can be decompressed
+* moved process status and summary functions to ewfcommon
+* added process summary to ewfexport
+* read: will uncompress chunk directly to chunk sized buffers for non compressed chunks
+* are both the segment table and section list file descriptor value needed - can this be a single value?
+  - the file descriptor in the section list was used as safe guard only - removed
+* Only use the chunk cache when the input buffer size does not suffice for reading or writing an entire chunk
+  - the chunk cache actually reduces performance for sequential reads due to additional memcpy - completed
+* ewfverify: show status indicator
+* ewfverify: when done show time and Mb/s
+
+Version: 20061129
+* Media size is calculated when not set
+* Added -Wextra compile flag for addition warning values
+* fixed: weird floating point exception after recompilation of working versions in callback functions
+  - this was actualy a division by zero in the callback function
+* read: added improved support for EnCase linen 5 format
+  - adjusted libewf_header_values for more flexible header creation
+* write: removed the CRC after the offset table for the SMART format
+* write: added linen5 support
+* header values: removed trailing \r from last header value
+* write: fixed error regarding buffer passthrough
+* read: will read chunk directly to chunk sized buffers for non compressed chunks
+
+Version: 20061128
+* worked on performance enhancements
+* lseek is now only used if section data needs to be skipped
+  - in libewf_sections_read_segment
+  - in libewf_read_chunk - added segment number to offset table and file offset to segment table
+    for basic offset tracking
+* found issues in documentation
+  - EnCase1 (EWF-E01) format stores its chunks in the table sections not in the sectors section
+    it uses an EWF-S01 alike layout
+  - SMART in FTK Imager has a CRC at the end of the offset table
+* fixed read and write regarding issues in documentation
+* read: fixed error in recognizing FTK imager format
+
+Version: 20061127
+* worked on performance enhancements
+* changed ewf_crc_calculate to make use of zlib's adler32 function instead of algorithm derived of CRC algorithm by Andrew Rosen
+  - this improves the performance significantly ;-)
+* changed libewf_endian functions for improved error handling
+* removed memcpy from chunk cache read to data for non compressed data in libewf_read_random
+
+Version: 20061126
+* worked on performance enhancements
+* changed iterator to 32 bit in ewf_crc_calculate saves conversion on a 32-bit platform
+
+Version: 20061125
+* worked on string and char types
+* changed ewf_sectors.[ch] into ewf_chunk.[ch] - chunks do not only reside in sectors sections therefore the name change
+* removed ewf_chunk.c - now uses ewf_string functions, moved necessary functions to libewf_string.[ch]
+* worked on performance enhancements
+* reduced CRC (de)allocations
+
+Version: 20061124
+* worked on performance enhancements
+* added buffer size option to ewfacquire
+
+Version: 20061123
+* worked on string and char types
+* added macros for static char or wchar_t type strings
+* note: fgets and fgetws cannot be used on the same stream after one and other
+* string: wide character support (wchar support) 
+  - Windows also provides tchar, tchar is a wrapper for both char and wchar_t
+* change char* to EWF_CHAR* or LIBEWF_CHAR*
+  - allow for char and w_char interfacing with library
+  - use LIBEWF_CHAR for char/w_char wrapping and EWF_CHAR for byte strings in EWF file format, CHAR_T required for wchar_t support in basic functions
+  - make internal EWF related strings byte strings (EWF_CHAR) - make string functions safe to be char or uint8_t
+  - use string.x for string functions
+* string: added length to libewf_string_search
+* string: added length to libewf_string_split
+* ewfacquire: added wchar_t support for utsname_buffer.sysname
+* ltree: changed ewf_tree_data_read
+* ewfinfo: added stored MD5 hash
+* ewfacquire: added print read errors on exit
+* all: in read and write functions add file_descriptor test - not necessary libewf_common functions do check this
+
+Version: 20061122
+* worked on string and char types
+* windows has: wmain for wide character arguments
+* moved getopt code to ewfgetopt for wmain support
+* moved glob code to ewfglob
+* changed libewf_open to match main and getopt type arguments
+* fixed check enable...=no validation - $withval needed to be $enableval
+* added CHAR_T and INT_T for wrapping character type of support functions like (w)open
+
+Version: 20061121
+* worked on string and char types
+* fixed: missing ewf_char.h, ewf_string.h and libewf_config_windows.h in package
+* changed COPYING and AUTHORS due to license issue
+* removed: libewf_common_string_to_uint64 and libewf_common_string_to_int64
+* fixed: several compilation errors for wide character type support
+* added: strchr to ewfcommon for getopt support
+
+Version: 20061119
+* worked on string and char types
+* changed %s and %c where necessary to PRIs and PRIc
+
+Version: 20061118
+* worked on string and char types
+* string: removed LIBEWF_STRING type definition
+* string: removed string_copy_from/to_char functions
+* string: added wrapper PRIc for c, lc and PRIs for s, ls
+* common: removed strdup - no longer needed - libewf_string_duplicate takes care of this functionality
+* common: removed strchr - no longer needed - libewf_string_search takes care of this functionality
+* common: removed strncmp - no longer needed - libewf_string_compare takes care of this functionality
+* fixed: inconsistency in libewf.h and libewf_file.h
+* common: removed strlen - no longer needed - libewf_string_length takes care of this functionality
+
+Version: 20061115
+* worked on string and char types
+* implement libewf_string_copy_(from/to)_header functions
+* changed utf16/ascii convert to copy functions
+* libewf_string: allow to set multibyte strings from header values - still need to test this
+
+Version: 20061114
+* worked on string and char types
+* implemented non compressed read and write in ewf_string - for ltree tree data
+* fixed bug in compression buffer reallocation in ewf_string
+  - reallocation pointer was not provided backwards
+* delay header and header2 conversion to parse function
+* moved basic ewf_header2 functions to ewf_char - ewf_header2 has become a type wrapper
+* string: make a more generic ewf_string (use this in ewf_header, ewf_header2, ewf_ltree) also move ASCII and UTF
+
+Version: 20061113
+* worked on string and char types
+* ewf_string removed several functions
+* moved basic ewf_header functions to ewf_char - ewf_header has become a type wrapper
+
+Version: 20061112
+* worked on string and char types
+* header_values: rewrite libewf_header_values_set_value to return integer with status code
+* moved md5hash to string function to libewf_string
+* moved ewf_section_fprint and ewf_header_fprint to libewf_debug
+
+Version: 20061111
+* ewfexport: added time estimate
+* moved byte print function to ewfcommon
+* added api functions to retrieve header values
+* string: add string copy
+* string: add string copy to char/w_char types
+
+Version: 20061110
+* Fixed strerror_r char * return type on Ubuntu
+
+Version: 20061109
+* Fixed several logical bugs in write_buffer
+  - incorrect check of chunk cache passthrough
+  - incorrect handling of buffer sizes
+  - incorrect handling of last buffer write
+* Fixed bug in ewfexport adding 128 bytes
+  - due to print output to stdout
+* Fixed output write libewf_write_test_segment_file_full
+* ewfacquire: added time estimate
+* libewf_common_open: added check for return values _sopen_s
+
+Version: 20061029
+* Worked on clean up of includes in libewf.h
+* Created API functions to get and set the header values - this moves the header values dependency out of the ewftools
+* Moved verbose into library, also added notify stream
+  - windows port: allow error output stream redirection (libewf_notify) requires Visual C/C++ /MD compilation flag
+* Fixed a memory leak in ewf_header_read - the compressed header was not freed
+* Added alternative compile time method for platform determination when uname() is missing
+* Fixed error in handling if AES crypt provider is not available
+* Moved the error handling values out of the library - no longer contains read chunk function
+* Added basic globbing code for windows port - should suffice
+* Fixed memory leak of last section in libewf_read_build_index
+* Fixed memory leak in ewfacquire bytes_string was never freed
+
+Version: 20061028
+* Merged the libewf win32 port by George Garner with current working verion
+  - signal handling and memory debug was added to ewfsignal
+  - added libewf.c for MainDLL function
+
+Version: 20061026
+* moved header_values_fprint to ewfcommon
+* created libewf_parse_header_values
+* moved from_ and to_file_descriptor functions out of the library and into ewfcommon
+* rewrite of from_ and to_file_descriptor functions in ewfcommon and related library functions
+* moved swap byte pair functions back into library
+* fixed header value creation is date strings are missing
+* added function to set media type in handle
+
+Version: 20061025
+* made one type (error sector) for crc and acquiry read error sectors
+* Worked on Win32 native port
+  - fix for file open - not using the right parameters for Windows
+  - fix for crypto api calls for md5 context
+  - rewrote some API functions to pass buffers from the application to the library
+    so allocation and de-allocation is handled within the same program space
+
+Version: 20061024
+* minor alterations for BSD licensed getopt
+* added a libewf version of getopt to ewfcommon - it is basically a rewrite of the version
+  by The Regents of the University of California - it should suffice for platforms without getopt
+* prefixed functions in ewfcommon with ewfcommon - this distinguishes them from the libewf functions
+* created acquiry_error to move error2 and endian conversion in ewfcommon into library
+* fixed missing read error retry reset after sector skip
+* fixed 1024 kb human readable size will now become 1.0 Mb
+* default amount of read error retries is now 2 (will result in 3 read attempts)
+* fixed error regarding read error retry one off
+
+Version: 20061023
+* Reduced input_file_size and input_write_size to 1 parameter: input_write_size
+* Renamed ewf_file_size to segment_file_size
+* Looked at generic character/string wrapper - for wide char support
+
+Version: 20061022
+* Fixed media type mismatch in data section in EWF file from ewfacquire for EWF-E01 format
+* Fixed empty section start size in EnCase (EWF-E01) format for read and write - FTK Imager 
+* Fixed error in read with byte swap, the MD5 hash must be calculated over the non swapped data
+* Clean up in libewf.h
+* Worked on Win32 native port
+  - added LIBEWF_EXTERN macro for DLL import/export
+  - changed ctime to libewf_common function using the thread safe variant
+* Added libewf_set_write_input_size function
+* libewf and tools are now compilable natively on Windows
+
+Version: 20061021
+* Worked on Win32 native port
+  - changed libewf_common_strncmp return to signed as it should be
+  - changed strerror to libewf_common function using the thread safe variant
+  - changed localtime to libewf_common function using the thread safe variant
+  - requires some type casts from unsigned to signed - the libewf_common read and write function do the check if the size
+    value exceeds INT32_MAX
+  - rewrote ewf_md5hash_to_string() not to use snprintf
+  - rewrote libewf_md5 to wrap multiple implementations is now libewf_md5_context
+  - added Windows Crypto API support to libewf_md5_context
+* Reduced maximum amount in offset table to 32-bit value
+* Reduced segment values to a 16-bit value
+* Changed libewf_notify to use autoconf/make header check
+
+Version: 20061020
+* Worked on rewriting libewf_write
+  - when header values are empty a default is created
+  - better fill EWF-S01 segment file - recalculate the chunks per segment after the table section is written
+
+Version: 20061019
+* Block is only required to be wiped when offset is 0
+* Worked on rewriting libewf_write
+  - moved header values set and create to libewf_handle
+  - removed set_parameter function
+* Fixed mismatch in segment size and chunks section size calculation for the EWF-S01 format
+* Fixed invalid amount of chunks per segment for 2Gb segment file for the EWF-S01 and EWF-E01 format
+* Added maximum input size check
+* Added a generic set function for enabling byte swap
+* Completed redesign write and parameter functions to fallback to a default
+
+Version: 20061018
+* fixed error catching negative remaining segment size
+* worked on: redesign write and parameter functions to fallback to a default
+* Worked on rewriting libewf_write
+
+Version: 20061017
+* fixed error handling multiple segment files - the write_buffer loop now leaves the segment file in a state
+  of an open chunks section
+* changed space left function into test full functions
+* implemented compressBound() for determing the required size a too small compression buffer 
+* allow for a variable buffer size in write_buffer by using a chunk cache size and offset
+* ewf_header_compress: is there a better way to determine the size of the compressed buffer - compressBound fixes this
+* done: redesign handle, refactor certain aspects to sub structs like chunk_cache
+* worked on: redesign write and parameter functions to fallback to a default
+* Worked on rewriting libewf_write
+
+Version: 20061016
+* at last done rewritting libewf_write_from_file_descriptor to use new function libewf_write_buffer
+* changed handle->write->chunks_per_segment and handle->write->maximum_chunks_per_segment
+* progressive method of amount of chunks per section/segment is required for EWF-E01 fill method
+* calculative method of amount of chunks per section/segment is required for EWF-S01 pre-write offset table size determination
+* Worked on rewriting libewf_write
+
+Version: 20061015
+* corrected typo in src/Makefile.am
+* fixed libewf.h to be used from within the libewf package and outside
+* fixed maximum ewf file size in ewfacquire was 1 byte too large - due to new restriction in libewf
+* Worked on rewriting libewf_write
+* fixed remainder > 9 issue - using a naive solution but adequate
+
+Version: 20061014
+* ewfinfo: move error2 list print code into library - to ewfcommon
+* ewfverify: move crc list print code into library - to ewfcommon
+* write: fixed incorrect implementation of EnCase1 header
+* ewfinfo: move format detection code into library - basic file format detection is now in library
+  a small part still in ewfinfo, this because EnCase2 and EnCase3 format look a lot each other
+* added function to create original header format
+* rewritten function to create headers to 3 more generic functions - for header2 not needed yet
+* Worked on rewriting libewf_handle
+* Worked on rewriting libewf_write
+* Added API get function for certain information
+* Renamed sector_count => amount_of_sectors
+* Renamed chunk_count => amount_of_chunks
+* Renamed error_count => amount_of_errors
+* fixed textual error in ewf_sectors_chunk_compress
+
+Version: 20061012
+* moved EWF definitions to ewf_definitions.h
+* moved PRIx fixes to libewf_includes.h
+
+Version: 20061011
+* ewfinfo: add date format in ewfinfo to month in text - no interpretation differences possible
+  ISO8601 date string support added - based on patches/adjustments by Rob Meijer
+* Rewritten part of header_values for new date format
+* Added date format support to ewfinfo
+* fixed a space in configure output
+* Worked on rewriting libewf_write
+* Worked on rewriting libewf_handle - introduced new read and write specific subhandles
+* removed compression_used from handle - no longer needed
+* added error_granularity_bytes to write subhandle
+
+Version: 20061010
+* Worked on rewriting includes to use libewf_includes.h
+* Removed __attribute__((packed)) from structs for Win32 port - they do not seem neccessary anymore
+* Added the header file installation - based on patches/adjustments by Rob Meijer
+* read: warn when maximum offsets in table of S01 format is exceeded
+* Worked on rewriting libewf_write
+
+Version: 20061009
+* Added libtool support - based on patches/adjustments by Rob Meijer
+* Changed config.h to src/libewf_config.h
+* Added libewf_includes.h to wrap libewf_config.h for beter autoconf/automake integration
+* Worked on rewriting includes to use libewf_includes.h
+
+Version: 20061008
+* Changed program banner and version information
+* Version released
+
+Version: 20061007
+* Fix for missing header definitions for OpenBSD
+* Fix for missing INTx_MAX definitions for OpenBSD
+* Fix for compilation warnings for SunOS - moved libewf_common.h to be first include
+* Bug in reallocating chunk cache - initial reallocation was removed by rewrite
+* change chunk cache allocated_size to 32 bit value - also chunk size in read function
+
+Version: 20061004
+* Tested ewfacquire with disk with 0 sector error - success
+* Bug in MacOS-X reading a floppy with bad block - read with -1 could alter current file offset (determined by lseek)
+  Added lseek check to check and correct for offset drift
+
+Version: 20061003
+* fixed one-too-many read error retry
+* fixed bug not correcting bytes_to_read in read error handling - this surfaced on MacOS-X (Linux read behavior is different)
+* ewfacquire: minor adjustment in output - removed dot
+
+Version: 20061002
+* fixed error in libewf_section.h - this surfaced on MacOS X
+
+Version: 20061001
+* disabled lvf support
+* fixed error in read error handling in write functionality - this surfaced under FreeBSD
+
+Version: 20060929
+* did some refactoring of write function
+
+Version: 20060928
+* did some refactoring of write function
+* ewfacquire: print md5 hash when completed - added
+  removed index build check from libewf_data_md5hash function - this function checks if hash is set ananyway
+
+Version: 20060927
+* minor adjustment to verbose logging configure options - fixed error with variable names containing '-'
+* all: human readable size add .0 for single digit values - implemented
+* fixed bug with missing config.h for sleuthkit integration
+* fixed some formatting issues
+* did some refactoring of write function
+* defaulted handle values to unknowns
+* added function to determine header length instead of strlen - this is more appropiate
+
+Version: 20060926
+* minor adjustment to verbose logging configure options
+* added program version to output
+* did some refactoring of write function - added more checks for write_count returns
+* write: warn before hand if segment file amount exceeds limit - implemented
+* all: human readable size add .[1-9] for single digit values - implemented
+
+Version: 20060922
+* worked on ltree
+* fixed error in verbose output CRC value libewf_read_random - checked if bug resides in other CRC output - could not find any
+* changed values in volume definition
+
+Version: 20060916
+* worked on code clean up and improved error handling
+* ewf_verify now generates CRC error list for sectors (also for compressed chunks)
+* verbose and debug prints are now optional (defaults are off)
+
+Version: 20060912
+* worked on code clean up and improved error handling
+* worked on skip beyond media size in write
+
+Version: 20060911
+* worked on code clean up and improved error handling
+* changed hardcoded max values to predifined macros
+
+Version: 20060910
+* worked on code clean up and improved error handling
+* renamed file_read and file_write to read and write
+* ewfaquire: add offset and size question
+* write: add offset and size support in write function
+* added lseek to common, removed off_t from code
+* ewfacquire: added nice byte print for status
+* ewfexport: added nice byte print for status
+
+Version: 20060908
+* worked on code clean up and improved error handling
+* worked on ltree implementation
+* added simple byte order detection to UTF16 to ASCII conversion
+* added offset and size question to ewfexport
+* added size and offset to read to and write from file descriptor functions
+* read: look at libewf_section_volume_read: volume chunk count is 0 - compensating
+  - check removed no longer required due to LVF support
+
+Version: 20060906
+* worked on code clean up and improved error handling
+* ewf tooling returns the error status no exit
+* worked on improving automated test scripts
+* corrected user input inconsistency in ewfacquire
+* fixed free bug with zlib_crc and calculated_crc in write
+* fixed pointer bug with zlib_crc in write
+
+Version: 20060905
+* worked on code clean up and improved error handling
+* added large file support to configure.in for converting raw images > 4 Gb to EWF files
+* ewfacquire added total acquire time and bytes/second
+
+Version: 20060904
+* worked on code clean up and improved error handling
+* fixed bug regarding setting chunk size in handle from volume - this got somehow removed due to clean up
+* ewfacquire: add start and finish time
+
+Version: 20060903
+* worked on code clean up and improved error handling
+* moved section reading and writing code to libewf_section
+* fixed bug in libewf_read_random when offset is too large
+* wraped basic library calls in preperation of thread safety of library calls
+* added prefix to functions in libewf_common with common_
+* enhanced error handling - no program exit but a nice return
+* using typedefs instead of defines
+* due to 20060505 fix, gave all value definitions a default value
+* removed a large amount of unrequired includes
 
 Version: 20060902
 * worked on code clean up and improved error handling
@@ -107,7 +935,6 @@ Version: 20060831
 Version: 20060830
 * worked on code clean up and improved error handling
 * allow to set clean value in libewf_(re)alloc_cleared functions
-* note: realloc functions do not free the originally allocated memory on error
 
 Version: 20060829
 * worked on code clean up and improved error handling
@@ -186,11 +1013,11 @@ Version: 20060816
 
 Version: 20060812
 * made the amount of read error retries flexible and user adjustable through ewfacquire
-* new file size algorithm to fill up closer to max file size when compressing
-  (write: change algorithm to fill files upto file size - completed)
 * correction of "int result" in file_write to be C89 code compliant
+* new file size algorithm to fill up closer to max file size when compressing
+  write: change algorithm to fill files upto file size - completed
 * added empty block compression
-  (write: always compress empty chunks - completed as an option)
+  write: always compress empty chunks - completed as an option
 
 Version: 20060809
 * fixed size bug for large images on Cygwin - fix of 20060610 not sufficient for Cygwin
@@ -316,8 +1143,7 @@ Version: 20060414
 * fix write crc error in chunk on mac os x
 * ewfacquire add EWF file size input possibility - check upper bound 2Gb, lower bound 1440k
 * fix write bug with small file size 1440k - for floppy image - this has to do if
-  both the filesize and the ewf size are the same - write will adjust with one additional
-  segment file
+  both the filesize and the ewf size are the same - write will adjust with one additional segment file
 
 Version: 20060413
 * Used LIBEWF_VERSION in executables
@@ -329,11 +1155,10 @@ Version: 20060412
 * Created separate file for header value logic - moved code from ewfinfo
 
 Version: 20060411
-Nearing release version, so started logging changes
+* Nearing release of first version, so started logging relevant changes
 * Removed memory leak with duplicate header assignment to handle
 * Renamed ewfmd5sum to ewfverify - still have to enhance functionality
 * Renamed ewfcat to ewfexport - still have to enhance functionality
-* Added time parsing functionality to ewfinfo - date format is currently
-  fixed in MM/DD/YYYY
+* Added time parsing functionality to ewfinfo - date format is currently fixed in MM/DD/YYYY
 * Enhanced password and compression header value output in ewfinfo
 
