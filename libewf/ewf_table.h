@@ -95,11 +95,6 @@ struct ewf_table_offset
 	uint8_t offset[ 4 ];
 };
 
-ssize_t ewf_table_read( EWF_TABLE *table, int file_descriptor );
-ssize_t ewf_table_offsets_read( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount );
-ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor );
-ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount, uint8_t write_crc );
-
 #if defined( __cplusplus )
 }
 #endif

@@ -59,9 +59,6 @@ struct ewf_session
 	uint8_t crc[ 4 ];
 };
 
-ssize_t ewf_session_read( EWF_SESSION *session, int file_descriptor );
-ssize_t ewf_session_write( EWF_SESSION *session, int file_descriptor );
-
 #if defined( __cplusplus )
 }
 #endif

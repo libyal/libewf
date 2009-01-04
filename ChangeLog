@@ -141,7 +141,11 @@ TODO
   WIPE_ON_ERROR
 * what about the crc errors in read_raw?
 
-* remove ewf_data.c from MSVC++ project
+* remove files from MSVC++ project
+  ewf_data.c
+  ewf_hash.c
+  ewf_session.c
+  ewf_table.c
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
