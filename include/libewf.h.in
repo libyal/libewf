@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_H
+#if !defined( _LIBEWF_H )
 #define _LIBEWF_H
 
 #include <libewf/libewf_definitions.h>

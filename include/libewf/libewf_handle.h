@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_HANDLE_H
+#if !defined( _LIBEWF_HANDLE_H )
 #define _LIBEWF_HANDLE_H
 
 #include <libewf/libewf_types.h>

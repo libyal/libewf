@@ -236,7 +236,7 @@
 /* #undef HAVE_VARARGS_H */
 
 /* Defines if verbose output should be used */
-#define HAVE_VERBOSE_OUTPUT 1
+/* #undef HAVE_VERBOSE_OUTPUT */
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
@@ -335,7 +335,7 @@
 #define VERSION "20071201"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS */
+#define _FILE_OFFSET_BITS 64
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */

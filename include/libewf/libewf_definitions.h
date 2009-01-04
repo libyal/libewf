@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_DEFINIONS_H
+#if !defined( _LIBEWF_DEFINIONS_H )
 #define _LIBEWF_DEFINIONS_H
 
 /* The libewf version
@@ -127,7 +127,7 @@
 
 /* Libewf default segment file size
  */
-#define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE	( 650 * 1024 * 1024 )
+#define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE	( 1500 * 1024 * 1024 )
 
 /* Libewf segment file type definitions
  */

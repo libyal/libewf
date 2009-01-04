@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_EXTERN_H
+#if !defined( _LIBEWF_EXTERN_H )
 #define _LIBEWF_EXTERN_H
 
 /* To export functions from the libewf DLL define LIBEWF_DLL_EXPORT
@@ -42,12 +42,13 @@
  */
 #if defined( LIBEWF_DLL_EXPORT )
 #define LIBEWF_EXTERN __declspec(dllexport)
-#else
-#if defined( LIBEWF_DLL_IMPORT )
+
+#elif defined( LIBEWF_DLL_IMPORT )
 #define LIBEWF_EXTERN extern __declspec(dllimport)
+
 #else
 #define LIBEWF_EXTERN extern
-#endif
+
 #endif
 
 #endif

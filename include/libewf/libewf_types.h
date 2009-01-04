@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_TYPES_H
+#if !defined( _LIBEWF_TYPES_H )
 #define _LIBEWF_TYPES_H
 
 #if 1 || defined( HAVE_SYS_TYPES_H )
@@ -45,7 +45,7 @@
 
 /* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict if types are already defined
  */
-#if ! defined( LIBEWF_DEFINITION_INTEGER_TYPES )
+#if !defined( LIBEWF_DEFINITION_INTEGER_TYPES )
 
 #define LIBEWF_DEFINITION_INTEGER_TYPES
 
@@ -91,7 +91,7 @@ typedef __int64			off64_t;
 
 /* __USE_UNIX98 is required to add swprintf definition
  */
-#if ! defined( __USE_UNIX98 )
+#if !defined( __USE_UNIX98 )
 #define __USE_UNIX98
 #define LIBEWF_DEFINITION_UNIX98
 #endif

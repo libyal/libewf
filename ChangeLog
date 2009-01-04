@@ -151,6 +151,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071205
+* minor change in defaults
+
 Version: 20071201
 * worked on refactoring code
 * API changes to get and set functions

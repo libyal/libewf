@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 
+#include <libewf/libewf_definitions.h>
 #include <libewf/libewf_handle.h>
 
 #include "ewfdigest_context.h"
@@ -48,7 +49,7 @@
 
 #include "../libewf/libewf_char.h"
 
-#define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		( 1500 * 1024 * 1024 )
+#define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
 #define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1440 * 1024 )
 #define EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT	INT32_MAX
 #define EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT	INT64_MAX
