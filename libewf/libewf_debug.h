@@ -51,6 +51,10 @@ void libewf_debug_header2_print(
       uint8_t *header2,
       size_t header2_size );
 
+void libewf_debug_xheader_print(
+      uint8_t *xheader,
+      size_t xheader_size );
+
 #if defined( __cplusplus )
 }
 #endif

@@ -1044,7 +1044,7 @@ int libewf_get_amount_of_header_values(
 	{
 		return( 0 );
 	}
-	*amount_of_values = internal_handle->header_values->amount;
+	*amount_of_values = internal_handle->header_values->amount_of_values;
 
 	return( 1 );
 }
@@ -1157,7 +1157,7 @@ int libewf_get_amount_of_hash_values(
 	{
 		return( 0 );
 	}
-	*amount_of_values = internal_handle->hash_values->amount;
+	*amount_of_values = internal_handle->hash_values->amount_of_values;
 
 	return( 1 );
 }
@@ -2033,10 +2033,9 @@ int libewf_set_header_value(
 	}
 	if( internal_handle->header_values == NULL )
 	{
-		internal_handle->header_values = libewf_values_table_alloc(
-		                                  LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
-
-		if( internal_handle->header_values == NULL )
+		if( libewf_values_table_initialize(
+		     &( internal_handle->header_values ),
+		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header values.\n",
 			 function );
@@ -2096,10 +2095,9 @@ int libewf_set_hash_value(
 	}
 	if( internal_handle->hash_values == NULL )
 	{
-		internal_handle->hash_values = libewf_values_table_alloc(
-		                                LIBEWF_HASH_VALUES_DEFAULT_AMOUNT );
-
-		if( internal_handle->hash_values == NULL )
+		if( libewf_values_table_initialize(
+		     &( internal_handle->hash_values ),
+		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create hash values.\n",
 			 function );
@@ -2367,10 +2365,9 @@ int libewf_copy_header_values(
 	}
 	if( internal_destination_handle->header_values == NULL )
 	{
-		internal_destination_handle->header_values = libewf_values_table_alloc(
-		                                              LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
-
-		if( internal_destination_handle->header_values == NULL )
+		if( libewf_values_table_initialize(
+		     &( internal_destination_handle->header_values ),
+		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header values in destination handle.\n",
 			 function );

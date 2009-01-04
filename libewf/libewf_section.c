@@ -3801,7 +3801,7 @@ ssize_t libewf_section_xheader_read(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_print(
+		libewf_debug_xheader_print(
 		 xheader,
 		 xheader_size );
 	}
@@ -3844,7 +3844,7 @@ ssize_t libewf_section_xheader_write(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_print(
+		libewf_debug_xheader_print(
 		 xheader,
 		 xheader_size );
 	}
@@ -3935,7 +3935,7 @@ ssize_t libewf_section_xhash_read(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_print(
+		libewf_debug_xheader_print(
 		 xhash,
 		 xhash_size );
 	}
@@ -3978,7 +3978,7 @@ ssize_t libewf_section_xhash_write(
 
 	if( libewf_notify_verbose != 0 )
 	{
-		libewf_debug_header_print(
+		libewf_debug_xheader_print(
 		 xhash,
 		 xhash_size );
 	}

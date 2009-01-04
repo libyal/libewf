@@ -37,424 +37,443 @@
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
 
-/* Allocates memory for a new handle struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the handle
+ * Returns 1 if successful or -1 on error
  */
-libewf_internal_handle_t *libewf_internal_handle_alloc(
-                           uint8_t flags )
+int libewf_handle_initialize(
+     libewf_handle_t **handle,
+     uint8_t flags )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_internal_handle_alloc";
+	static char *function                     = "libewf_handle_initialize";
 
-	internal_handle = (libewf_internal_handle_t *) memory_allocate(
-	                                                sizeof( libewf_internal_handle_t ) );
-
-	if( internal_handle == NULL )
-	{
-		notify_warning_printf( "%s: unable to allocate handle.\n",
-		 function );
-
-		return( NULL );
-	}
-	internal_handle->read                     = NULL;
-	internal_handle->write                    = NULL;
-	internal_handle->media_values             = NULL;
-	internal_handle->segment_table            = NULL;
-	internal_handle->delta_segment_table      = NULL;
-	internal_handle->offset_table             = NULL;
-	internal_handle->secondary_offset_table   = NULL;
-	internal_handle->chunk_cache              = NULL;
-	internal_handle->header_sections          = NULL;
-	internal_handle->hash_sections            = NULL;
-	internal_handle->header_values            = NULL;
-	internal_handle->hash_values              = NULL;
-	internal_handle->sessions                 = NULL;
-	internal_handle->acquiry_errors           = NULL;
-	internal_handle->current_chunk            = 0;
-	internal_handle->current_chunk_offset     = 0;
-	internal_handle->compression_level        = EWF_COMPRESSION_UNKNOWN;
-	internal_handle->compress_empty_block     = 0;
-	internal_handle->format                   = LIBEWF_FORMAT_UNKNOWN;
-	internal_handle->ewf_format               = EWF_FORMAT_UNKNOWN;
-	internal_handle->error_tollerance         = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
-	internal_handle->abort                    = 0;
-
-	/* The segment table is initially filled with a single entry
-	 */
-	internal_handle->segment_table = libewf_segment_table_alloc( 1 );
-
-	if( internal_handle->segment_table == NULL )
-	{
-		notify_warning_printf( "%s: unable to create segment table.\n",
-		 function );
-
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	/* The delta segment table is initially filled with a single entry
-	 */
-	internal_handle->delta_segment_table = libewf_segment_table_alloc( 1 );
-
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		notify_warning_printf( "%s: unable to create delta segment table.\n",
-		 function );
-
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	internal_handle->offset_table = libewf_offset_table_alloc( 0 );
-
-	if( internal_handle->offset_table == NULL )
-	{
-		notify_warning_printf( "%s: unable to create offset table.\n",
-		 function );
-
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	internal_handle->secondary_offset_table = libewf_offset_table_alloc( 0 );
-
-	if( internal_handle->secondary_offset_table == NULL )
-	{
-		notify_warning_printf( "%s: unable to create secondary offset table.\n",
-		 function );
-
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	internal_handle->chunk_cache = libewf_chunk_cache_alloc(
-	                                EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ) );
-
-	if( internal_handle->chunk_cache == NULL )
-	{
-		notify_warning_printf( "%s: unable to create chunk cache.\n",
-		 function );
-
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	if( libewf_media_values_initialize(
-	     &( internal_handle->media_values ) ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to create media values.\n",
-		 function );
-
-		libewf_chunk_cache_free(
-		 internal_handle->chunk_cache );
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	if( libewf_header_sections_initialize(
-	     &( internal_handle->header_sections ) ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to create header sections.\n",
-		 function );
-
-		libewf_media_values_free(
-		 &( internal_handle->media_values ) );
-		libewf_chunk_cache_free(
-		 internal_handle->chunk_cache );
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	if( libewf_hash_sections_initialize(
-	     &( internal_handle->hash_sections ) ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to create hash sections.\n",
-		 function );
-
-		libewf_header_sections_free(
-		 &( internal_handle->header_sections ) );
-		libewf_media_values_free(
-		 &( internal_handle->media_values ) );
-		libewf_chunk_cache_free(
-		 internal_handle->chunk_cache );
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	internal_handle->sessions = libewf_sector_table_alloc( 0 );
-
-	if( internal_handle->sessions == NULL )
-	{
-		notify_warning_printf( "%s: unable to create sessions.\n",
-		 function );
-
-		libewf_hash_sections_free(
-		 &( internal_handle->hash_sections ) );
-		libewf_header_sections_free(
-		 &( internal_handle->header_sections ) );
-		libewf_media_values_free(
-		 &( internal_handle->media_values ) );
-		libewf_chunk_cache_free(
-		 internal_handle->chunk_cache );
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	internal_handle->acquiry_errors = libewf_sector_table_alloc( 0 );
-
-	if( internal_handle->acquiry_errors == NULL )
-	{
-		notify_warning_printf( "%s: unable to create acquiry errors.\n",
-		 function );
-
-		libewf_sector_table_free(
-		 internal_handle->sessions );
-		libewf_hash_sections_free(
-		 &( internal_handle->hash_sections ) );
-		libewf_header_sections_free(
-		 &( internal_handle->header_sections ) );
-		libewf_media_values_free(
-		 &( internal_handle->media_values ) );
-		libewf_chunk_cache_free(
-		 internal_handle->chunk_cache );
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-		memory_free(
-		 internal_handle );
-
-		return( NULL );
-	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	{
-		if( libewf_internal_handle_subhandle_read_initialize(
-		     &( internal_handle->read ) ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to create subhandle read.\n",
-			 function );
-
-			libewf_sector_table_free(
-			 internal_handle->acquiry_errors );
-			libewf_sector_table_free(
-			 internal_handle->sessions );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ) );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ) );
-			libewf_media_values_free(
-			 &( internal_handle->media_values ) );
-			libewf_chunk_cache_free(
-			 internal_handle->chunk_cache );
-			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
-			libewf_offset_table_free(
-			 internal_handle->offset_table );
-			libewf_segment_table_free(
-			 internal_handle->delta_segment_table );
-			libewf_segment_table_free(
-			 internal_handle->segment_table );
-			memory_free(
-			 internal_handle );
-
-			return( NULL );
-		}
-	}
-	if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-	{
-		if( libewf_internal_handle_subhandle_write_initialize(
-		     &( internal_handle->write ) ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to create subhandle write.\n",
-			 function );
-
-			libewf_internal_handle_subhandle_read_free(
-			 &( internal_handle->read ) );
-			libewf_sector_table_free(
-			 internal_handle->acquiry_errors );
-			libewf_sector_table_free(
-			 internal_handle->sessions );
-			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ) );
-			libewf_header_sections_free(
-			 &( internal_handle->header_sections ) );
-			libewf_media_values_free(
-			 &( internal_handle->media_values ) );
-			libewf_chunk_cache_free(
-			 internal_handle->chunk_cache );
-			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
-			libewf_offset_table_free(
-			 internal_handle->offset_table );
-			libewf_segment_table_free(
-			 internal_handle->delta_segment_table );
-			libewf_segment_table_free(
-			 internal_handle->segment_table );
-			memory_free(
-			 internal_handle );
-
-			return( NULL );
-		}
-	}
-	return( internal_handle );
-}
-
-/* Frees memory of a handle struct including elements
- */
-void libewf_internal_handle_free(
-      libewf_internal_handle_t *internal_handle )
-{
-	static char *function = "libewf_internal_handle_free";
-
-	if( internal_handle == NULL )
+	if( handle == NULL )
 	{
 		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	if( libewf_media_values_free(
-	     &( internal_handle->media_values ) ) != 1 )
+	if( *handle == NULL )
 	{
-		notify_warning_printf( "%s: unable to free media values.\n",
+		internal_handle = (libewf_internal_handle_t *) memory_allocate(
+		                                                sizeof( libewf_internal_handle_t ) );
+
+		if( internal_handle == NULL )
+		{
+			notify_warning_printf( "%s: unable to create internal handle.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     internal_handle,
+		     0,
+		     sizeof( libewf_internal_handle_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear internal handle.\n",
+			 function );
+
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		internal_handle->compression_level = EWF_COMPRESSION_UNKNOWN;
+		internal_handle->format            = LIBEWF_FORMAT_UNKNOWN;
+		internal_handle->ewf_format        = EWF_FORMAT_UNKNOWN;
+		internal_handle->error_tollerance  = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
+
+		/* The segment table is initially filled with a single entry
+		 */
+		internal_handle->segment_table = libewf_segment_table_alloc( 1 );
+
+		if( internal_handle->segment_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create segment table.\n",
+			 function );
+
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		/* The delta segment table is initially filled with a single entry
+		 */
+		internal_handle->delta_segment_table = libewf_segment_table_alloc( 1 );
+
+		if( internal_handle->delta_segment_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create delta segment table.\n",
+			 function );
+
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		internal_handle->offset_table = libewf_offset_table_alloc( 0 );
+
+		if( internal_handle->offset_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create offset table.\n",
+			 function );
+
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		internal_handle->secondary_offset_table = libewf_offset_table_alloc( 0 );
+
+		if( internal_handle->secondary_offset_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create secondary offset table.\n",
+			 function );
+
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		if( libewf_chunk_cache_initialize(
+		     &( internal_handle->chunk_cache ),
+		     EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create chunk cache.\n",
+			 function );
+
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		if( libewf_media_values_initialize(
+		     &( internal_handle->media_values ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create media values.\n",
+			 function );
+
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ) );
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		if( libewf_header_sections_initialize(
+		     &( internal_handle->header_sections ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create header sections.\n",
+			 function );
+
+			libewf_media_values_free(
+			 &( internal_handle->media_values ) );
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ) );
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		if( libewf_hash_sections_initialize(
+		     &( internal_handle->hash_sections ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to create hash sections.\n",
+			 function );
+
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ) );
+			libewf_media_values_free(
+			 &( internal_handle->media_values ) );
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ) );
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		internal_handle->sessions = libewf_sector_table_alloc( 0 );
+
+		if( internal_handle->sessions == NULL )
+		{
+			notify_warning_printf( "%s: unable to create sessions.\n",
+			 function );
+
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ) );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ) );
+			libewf_media_values_free(
+			 &( internal_handle->media_values ) );
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ) );
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		internal_handle->acquiry_errors = libewf_sector_table_alloc( 0 );
+
+		if( internal_handle->acquiry_errors == NULL )
+		{
+			notify_warning_printf( "%s: unable to create acquiry errors.\n",
+			 function );
+
+			libewf_sector_table_free(
+			 internal_handle->sessions );
+			libewf_hash_sections_free(
+			 &( internal_handle->hash_sections ) );
+			libewf_header_sections_free(
+			 &( internal_handle->header_sections ) );
+			libewf_media_values_free(
+			 &( internal_handle->media_values ) );
+			libewf_chunk_cache_free(
+			 &( internal_handle->chunk_cache ) );
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+			memory_free(
+			 internal_handle );
+
+			return( -1 );
+		}
+		if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+		{
+			if( libewf_internal_handle_subhandle_read_initialize(
+			     &( internal_handle->read ) ) != 1 )
+			{
+				notify_warning_printf( "%s: unable to create subhandle read.\n",
+				 function );
+
+				libewf_sector_table_free(
+				 internal_handle->acquiry_errors );
+				libewf_sector_table_free(
+				 internal_handle->sessions );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ) );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ) );
+				libewf_media_values_free(
+				 &( internal_handle->media_values ) );
+				libewf_chunk_cache_free(
+				 &( internal_handle->chunk_cache ) );
+				libewf_offset_table_free(
+				 internal_handle->secondary_offset_table );
+				libewf_offset_table_free(
+				 internal_handle->offset_table );
+				libewf_segment_table_free(
+				 internal_handle->delta_segment_table );
+				libewf_segment_table_free(
+				 internal_handle->segment_table );
+				memory_free(
+				 internal_handle );
+
+				return( -1 );
+			}
+		}
+		if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+		{
+			if( libewf_internal_handle_subhandle_write_initialize(
+			     &( internal_handle->write ) ) != 1 )
+			{
+				notify_warning_printf( "%s: unable to create subhandle write.\n",
+				 function );
+
+				libewf_internal_handle_subhandle_read_free(
+				 &( internal_handle->read ) );
+				libewf_sector_table_free(
+				 internal_handle->acquiry_errors );
+				libewf_sector_table_free(
+				 internal_handle->sessions );
+				libewf_hash_sections_free(
+				 &( internal_handle->hash_sections ) );
+				libewf_header_sections_free(
+				 &( internal_handle->header_sections ) );
+				libewf_media_values_free(
+				 &( internal_handle->media_values ) );
+				libewf_chunk_cache_free(
+				 &( internal_handle->chunk_cache ) );
+				libewf_offset_table_free(
+				 internal_handle->secondary_offset_table );
+				libewf_offset_table_free(
+				 internal_handle->offset_table );
+				libewf_segment_table_free(
+				 internal_handle->delta_segment_table );
+				libewf_segment_table_free(
+				 internal_handle->segment_table );
+				memory_free(
+				 internal_handle );
+
+				return( -1 );
+			}
+		}
+		*handle = (libewf_handle_t *) internal_handle;
+	}
+	return( 1 );
+}
+
+/* Frees the handle including elements
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_free(
+     libewf_handle_t **handle )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_internal_handle_free";
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
 		 function );
+
+		return( -1 );
 	}
-	if( libewf_internal_handle_subhandle_read_free(
-	     &( internal_handle->read ) ) != 1 )
+	if( *handle != NULL )
 	{
-		notify_warning_printf( "%s: unable to free subhandle read.\n",
-		 function );
+		internal_handle = (libewf_internal_handle_t *) *handle;
+
+		if( libewf_media_values_free(
+		     &( internal_handle->media_values ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free media values.\n",
+			 function );
+		}
+		if( libewf_internal_handle_subhandle_read_free(
+		     &( internal_handle->read ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free subhandle read.\n",
+			 function );
+		}
+		if( libewf_internal_handle_subhandle_write_free(
+		     &( internal_handle->write ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free subhandle write.\n",
+			 function );
+		}
+		if( internal_handle->segment_table != NULL )
+		{
+			libewf_segment_table_free(
+			 internal_handle->segment_table );
+		}
+		if( internal_handle->delta_segment_table != NULL )
+		{
+			libewf_segment_table_free(
+			 internal_handle->delta_segment_table );
+		}
+		if( internal_handle->offset_table != NULL )
+		{
+			libewf_offset_table_free(
+			 internal_handle->offset_table );
+		}
+		if( internal_handle->secondary_offset_table != NULL )
+		{
+			libewf_offset_table_free(
+			 internal_handle->secondary_offset_table );
+		}
+		if( internal_handle->sessions != NULL )
+		{
+			libewf_sector_table_free(
+			 internal_handle->sessions );
+		}
+		if( internal_handle->acquiry_errors != NULL )
+		{
+			libewf_sector_table_free(
+			 internal_handle->acquiry_errors );
+		}
+		if( libewf_header_sections_free(
+		     &( internal_handle->header_sections ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free header sections.\n",
+			 function );
+		}
+		if( libewf_hash_sections_free(
+		     &( internal_handle->hash_sections ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free hash sections.\n",
+			 function );
+		}
+		if( libewf_values_table_free(
+		     &( internal_handle->header_values ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free header values.\n",
+			 function );
+		}
+		if( libewf_values_table_free(
+		     &( internal_handle->hash_values ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free hash values.\n",
+			 function );
+		}
+		if( libewf_chunk_cache_free(
+		     &( internal_handle->chunk_cache ) ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free chunk cache.\n",
+			 function );
+		}
+		memory_free(
+		 internal_handle );
+
+		*handle = NULL;
 	}
-	if( libewf_internal_handle_subhandle_write_free(
-	     &( internal_handle->write ) ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to free subhandle write.\n",
-		 function );
-	}
-	if( internal_handle->segment_table != NULL )
-	{
-		libewf_segment_table_free(
-		 internal_handle->segment_table );
-	}
-	if( internal_handle->delta_segment_table != NULL )
-	{
-		libewf_segment_table_free(
-		 internal_handle->delta_segment_table );
-	}
-	if( internal_handle->offset_table != NULL )
-	{
-		libewf_offset_table_free(
-		 internal_handle->offset_table );
-	}
-	if( internal_handle->secondary_offset_table != NULL )
-	{
-		libewf_offset_table_free(
-		 internal_handle->secondary_offset_table );
-	}
-	if( internal_handle->sessions != NULL )
-	{
-		libewf_sector_table_free(
-		 internal_handle->sessions );
-	}
-	if( internal_handle->acquiry_errors != NULL )
-	{
-		libewf_sector_table_free(
-		 internal_handle->acquiry_errors );
-	}
-	if( libewf_header_sections_free(
-	     &( internal_handle->header_sections ) ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to free header sections.\n",
-		 function );
-	}
-	if( libewf_hash_sections_free(
-	     &( internal_handle->hash_sections ) ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to free hash sections.\n",
-		 function );
-	}
-	if( internal_handle->header_values != NULL )
-	{
-		libewf_values_table_free(
-		 internal_handle->header_values );
-	}
-	if( internal_handle->hash_values != NULL )
-	{
-		libewf_values_table_free(
-		 internal_handle->hash_values );
-	}
-	if( internal_handle->chunk_cache != NULL )
-	{
-		libewf_chunk_cache_free(
-		 internal_handle->chunk_cache );
-	}
-	memory_free(
-	 internal_handle );
+	return( 1 );
 }
 
 /* Initialize the subhandle read
@@ -873,18 +892,24 @@ int libewf_internal_handle_create_header_values(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
 	if( internal_handle->header_values != NULL )
 	{
 		notify_warning_printf( "%s: header values already created - cleaning up previous header values.\n",
 		 function );
-
-		libewf_values_table_free(
-		 internal_handle->header_values );
 	}
-	internal_handle->header_values = libewf_values_table_alloc(
-	                                  LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+#endif
+	if( libewf_values_table_free(
+	     &( internal_handle->header_values ) ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free header values.\n",
+		 function );
 
-	if( internal_handle->header_values == NULL )
+		return( -1 );
+	}
+	if( libewf_values_table_initialize(
+	     &( internal_handle->header_values ),
+	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create header values.\n",
 		 function );

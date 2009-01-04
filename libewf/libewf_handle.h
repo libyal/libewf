@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <libewf/handle.h>
+
 #include "libewf_chunk_cache.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
@@ -252,11 +254,12 @@ struct libewf_internal_handle_write
 	uint8_t write_finalized;
 };
 
-libewf_internal_handle_t *libewf_internal_handle_alloc(
-                           uint8_t flags );
+int libewf_handle_initialize(
+     libewf_handle_t **handle,
+     uint8_t flags );
 
-void libewf_internal_handle_free(
-      libewf_internal_handle_t *internal_handle );
+int libewf_handle_free(
+     libewf_handle_t **handle );
 
 int libewf_internal_handle_subhandle_read_initialize(
      libewf_internal_handle_read_t **subhandle_read );

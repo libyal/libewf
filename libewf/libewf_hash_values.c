@@ -34,7 +34,7 @@
 #include "ewf_definitions.h"
 
 /* Initializes the hash values
- * Returns 1 if successful, or -1 otherwise
+ * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_initialize(
      libewf_values_table_t *hash_values )
@@ -80,29 +80,12 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		return( -1 );
 	}
-	if( libewf_string_split(
-	     hash_string_xml,
-	     hash_string_xml_size,
-	     (character_t) '\n',
-	     &lines,
-	     &amount_of_lines ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to split hash string into lines.\n",
-		 function );
-
-		return( -1 );
-	}
-	*hash_values = libewf_values_table_alloc(
-	                LIBEWF_HASH_VALUES_DEFAULT_AMOUNT );
-
-	if( *hash_values == NULL )
+	if( libewf_values_table_initialize(
+	     hash_values,
+	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create hash values.\n",
 		 function );
-
-		libewf_string_split_values_free(
-		 lines,
-		 amount_of_lines );
 
 		return( -1 );
 	}
@@ -112,9 +95,17 @@ int libewf_hash_values_parse_hash_string_xml(
 		notify_warning_printf( "%s: unable to initialize the hash values.\n",
 		 function );
 
-		libewf_string_split_values_free(
-		 lines,
-		 amount_of_lines );
+		return( -1 );
+	}
+	if( libewf_string_split(
+	     hash_string_xml,
+	     hash_string_xml_size,
+	     (character_t) '\n',
+	     &lines,
+	     &amount_of_lines ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to split hash string into lines.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -391,7 +382,7 @@ int libewf_hash_values_generate_hash_string_xml(
      character_t **hash_string,
      size_t *hash_string_size )
 {
-	character_t *xml_head            = _CHARACTER_T_STRING( "<?xml version=\"1.0\"?>" );
+	character_t *xml_head            = _CHARACTER_T_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
 	character_t *xml_open_tag_xhash  = _CHARACTER_T_STRING( "<xhash>" );
 	character_t *xml_close_tag_xhash = _CHARACTER_T_STRING( "</xhash>" );
 	static char *function            = "libewf_hash_values_generate_hash_string_xml";
@@ -438,7 +429,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	*hash_string_size += 1 + string_length(
 	                          xml_close_tag_xhash );
 
-	for( iterator = 0; iterator < hash_values->amount; iterator++ )
+	for( iterator = 0; iterator < hash_values->amount_of_values; iterator++ )
 	{
 		if( hash_values->identifiers[ iterator ] == NULL )
 		{
@@ -499,7 +490,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	string_offset = character_count;
 
-	for( iterator = 0; iterator < hash_values->amount; iterator++ )
+	for( iterator = 0; iterator < hash_values->amount_of_values; iterator++ )
 	{
 		if( hash_values->identifiers[ iterator ] == NULL )
 		{

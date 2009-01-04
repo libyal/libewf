@@ -27,80 +27,14 @@
 
 #include "libewf_chunk_cache.h"
 
-/* Allocates memory for the chunk cache cache
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the chunk cache
+ * Returns 1 if successful or -1 on error
  */
-libewf_chunk_cache_t *libewf_chunk_cache_alloc(
-                       size_t size )
-{
-	libewf_chunk_cache_t *chunk_cache = NULL;
-	static char *function             = "libewf_chunk_cache_alloc";
-
-	chunk_cache = (libewf_chunk_cache_t *) memory_allocate(
-	                                        sizeof( libewf_chunk_cache_t ) );
-
-	if( chunk_cache == NULL )
-	{
-		notify_warning_printf( "%s: unable to allocate chunk cache.\n",
-		 function );
-
-		return( NULL );
-	}
-	size *= sizeof( uint8_t );
-
-	if( size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( NULL );
-	}
-	chunk_cache->compressed = (uint8_t *) memory_allocate(
-	                                       size );
-
-	if( chunk_cache->compressed == NULL )
-	{
-		notify_warning_printf( "%s: unable to create chunk cache compressed.\n",
-		 function );
-
-		memory_free(
-		 chunk_cache );
-
-		return( NULL );
-	}
-	chunk_cache->data = (uint8_t *) memory_allocate(
-	                                 size );
-
-	if( chunk_cache->data == NULL )
-	{
-		notify_warning_printf( "%s: unable to create chunk cache data.\n",
-		 function );
-
-		memory_free(
-		 chunk_cache->compressed );
-		memory_free(
-		 chunk_cache );
-
-		return( NULL );
-	}
-	chunk_cache->allocated_size = size;
-	chunk_cache->chunk          = 0;
-	chunk_cache->amount         = 0;
-	chunk_cache->offset         = 0;
-	chunk_cache->cached         = 0;
-
-	return( chunk_cache );
-}
-
-/* Reallocates and wipes memory for the chunk cache cache
- * Returns 1 if successful, or -1 on error
- */
-int libewf_chunk_cache_realloc(
-     libewf_chunk_cache_t *chunk_cache,
+int libewf_chunk_cache_initialize(
+     libewf_chunk_cache_t **chunk_cache,
      size_t size )
 {
-	uint8_t *reallocation = NULL;
-	static char *function = "libewf_chunk_cache_realloc";
+	static char *function = "libewf_chunk_cache_initialize";
 
 	if( chunk_cache == NULL )
 	{
@@ -109,8 +43,129 @@ int libewf_chunk_cache_realloc(
 
 		return( -1 );
 	}
-	size *= sizeof( uint8_t );
+	if( size > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
+		return( -1 );
+	}
+	if( *chunk_cache == NULL )
+	{
+		*chunk_cache = (libewf_chunk_cache_t *) memory_allocate(
+		                                         sizeof( libewf_chunk_cache_t ) );
+
+		if( *chunk_cache == NULL )
+		{
+			notify_warning_printf( "%s: unable to create chunk cache.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *chunk_cache,
+		     0,
+		     sizeof( libewf_chunk_cache_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear chunk cache.\n",
+			 function );
+
+			memory_free(
+			 *chunk_cache );
+
+			*chunk_cache = NULL;
+
+			return( -1 );
+		}
+		( *chunk_cache )->compressed = (uint8_t *) memory_allocate(
+		                                            sizeof( uint8_t ) * size );
+
+		if( ( *chunk_cache )->compressed == NULL )
+		{
+			notify_warning_printf( "%s: unable to create chunk cache compressed.\n",
+			 function );
+
+			memory_free(
+			 *chunk_cache );
+
+			*chunk_cache = NULL;
+
+			return( -1 );
+		}
+		( *chunk_cache )->data = (uint8_t *) memory_allocate(
+		                                      sizeof( uint8_t ) * size );
+
+		if( ( *chunk_cache )->data == NULL )
+		{
+			notify_warning_printf( "%s: unable to create chunk cache data.\n",
+			 function );
+
+			memory_free(
+			 ( *chunk_cache )->compressed );
+			memory_free(
+			 *chunk_cache );
+
+			*chunk_cache = NULL;
+
+			return( -1 );
+		}
+		( *chunk_cache )->allocated_size = size;
+	}
+	return( 1 );
+}
+
+/* Frees the chunk cache including elements
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_cache_free(
+     libewf_chunk_cache_t **chunk_cache )
+{
+	static char *function = "libewf_chunk_cache_free";
+
+	if( chunk_cache == NULL )
+	{
+		notify_warning_printf( "%s: invalid chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *chunk_cache != NULL )
+	{
+		if( ( *chunk_cache )->compressed != NULL )
+		{
+			memory_free(
+			 ( *chunk_cache )->compressed );
+		}
+		if( ( *chunk_cache )->data != NULL )
+		{
+			memory_free(
+			 ( *chunk_cache )->data );
+		}
+		memory_free(
+		 *chunk_cache );
+
+		*chunk_cache = NULL;
+	}
+	return( 1 );
+}
+
+/* Resizes the chunk cache
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_chunk_cache_resize(
+     libewf_chunk_cache_t *chunk_cache,
+     size_t size )
+{
+	uint8_t *reallocation = NULL;
+	static char *function = "libewf_chunk_cache_resize";
+
+	if( chunk_cache == NULL )
+	{
+		notify_warning_printf( "%s: invalid chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( size > (size_t) SSIZE_MAX )
 	{
 		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
@@ -127,7 +182,7 @@ int libewf_chunk_cache_realloc(
 	}
 	reallocation = (uint8_t *) memory_reallocate(
 	                            chunk_cache->compressed,
-	                            size );
+	                            sizeof( uint8_t) * size );
 
 	if( reallocation == NULL )
 	{
@@ -139,7 +194,7 @@ int libewf_chunk_cache_realloc(
 	chunk_cache->compressed = reallocation;
 	reallocation            = (uint8_t *) memory_reallocate(
 	                                       chunk_cache->data,
-	                                          size );
+	                                       sizeof( uint8_t) * size );
 
 	if( reallocation == NULL )
 	{
@@ -156,27 +211,5 @@ int libewf_chunk_cache_realloc(
 	chunk_cache->cached         = 0;
 
 	return( 1 );
-}
-
-/* Frees memory of a chunk cache struct including elements
- */
-void libewf_chunk_cache_free(
-      libewf_chunk_cache_t *chunk_cache )
-{
-	static char *function = "libewf_chunk_cache_free";
-
-	if( chunk_cache == NULL )
-	{
-		notify_warning_printf( "%s: invalid chunk cache.\n",
-		 function );
-
-		return;
-	}
-	memory_free(
-	 chunk_cache->compressed );
-	memory_free(
-	 chunk_cache->data );
-	memory_free(
-	 chunk_cache );
 }
 

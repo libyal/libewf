@@ -63,9 +63,16 @@ struct libewf_chunk_cache
 	uint8_t *data;
 };
 
-libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size );
-int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size );
-void libewf_chunk_cache_free( libewf_chunk_cache_t *chunk_cache );
+int libewf_chunk_cache_initialize(
+     libewf_chunk_cache_t **chunk_cache,
+     size_t size );
+
+int libewf_chunk_cache_free(
+     libewf_chunk_cache_t **chunk_cache );
+
+int libewf_chunk_cache_resize(
+     libewf_chunk_cache_t *chunk_cache,
+     size_t size );
 
 #if defined( __cplusplus )
 }

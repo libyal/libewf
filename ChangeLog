@@ -46,7 +46,6 @@ To do/think about:
 * windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
-* windows port: linux alternative to wmain?
 
 Recovery and analysis:
 * ewfacquire: detect disk full and ask for new segment file location?
@@ -82,9 +81,9 @@ Possible performance improvements:
   - read/write block size seems to have little effect for dd on average
 * reduce alloc, realloc and free (this reduces breaks) use strace to analyze
   - pass values as parameters or use of handle
-* optimize empty block test
 * what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
-* optimize string functions
+* optimize empty block test
+* optimize string functions - pass size as much as possible
 * remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
   - currently used for verbose output
 
@@ -107,16 +106,9 @@ Code clean up
 * what about setting errno for API set and get function i.e. for size too small
 * have ewftools only use API ?
   - most of the internal library code has been removed
-* change ewf_char/string into byte_char/string
 * merge alloc and realloc blocks
 
 Next release(s):
-
-* fix
-libuca_utf8_string_size_from_utf8_stream: missing UTF-8 stream bytes.
-libewf_header_values_parse_xheader: unable to determine XML header string
-size.
-libewf_parse_header_values: unable to parse xheader.
 
 * implement libuca
   - handle codepage in ewftools use -p option
@@ -124,6 +116,9 @@ libewf_parse_header_values: unable to parse xheader.
 
 * rewrite _alloc() functions into _initialize() functions
   with corresponding _free() functions
+
+* rewrite ewfinput determine functions to pass value as argument
+  and have return value be 1 or -1
 
 * rename length into size, make sure string size contains end of string
   character
@@ -154,17 +149,11 @@ libewf_parse_header_values: unable to parse xheader.
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-* rewrite ewfinput determine functions to pass value as argument
-  and have return value be 1 or -1
-
 * change libewf_system_string_to_(u)int64 to return 1 or -1
 
 WIN32
 * remove win crypto api from libewf_dll release configuration
 * update MSVSCPP files
-
-macosx
-* update package change project website
 
 CLOSED
 * what about read+write and compression?
@@ -187,6 +176,8 @@ Version: 20080904
 * worked on refactoring function in ewfinput
 * combined empty block compression and other compressions in ewftools
 * change empty_block to empty-block the former remains to work
+* fixed error in UTF-8 handling (libuca)
+* updated MacOS-X package changed project website
 
 Version: 20080903
 * worked on integrating libuca and replacing string conversion routines

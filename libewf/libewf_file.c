@@ -292,6 +292,7 @@ libewf_handle_t *libewf_open(
                   uint16_t amount_of_files,
                   uint8_t flags )
 {
+	libewf_handle_t *handle                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_open";
 	size64_t *segment_file_size               = NULL;
@@ -318,16 +319,17 @@ libewf_handle_t *libewf_open(
 
 		return( NULL );
 	}
-	internal_handle = libewf_internal_handle_alloc(
-	                   flags );
-
-	if( internal_handle == NULL )
+	if( libewf_handle_initialize(
+	     &handle,
+	     flags ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create handle.\n",
 		 function );
 
 		return( NULL );
 	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		if( internal_handle->write != NULL )
@@ -357,7 +359,8 @@ libewf_handle_t *libewf_open(
 			notify_warning_printf( "%s: unable to open segment file(s).\n",
 			 function );
 
-			libewf_internal_handle_free( internal_handle );
+			libewf_handle_free(
+			 &handle );
 
 			return( NULL );
 		}
@@ -386,7 +389,8 @@ libewf_handle_t *libewf_open(
 			notify_warning_printf( "%s: unable to open segment file(s).\n",
 			 function );
 
-			libewf_internal_handle_free( internal_handle );
+			libewf_handle_free(
+			 &handle );
 
 			return( NULL );
 		}
@@ -452,9 +456,14 @@ int libewf_close(
 
 		return( -1 );
 	}
-	libewf_internal_handle_free(
-	 internal_handle );
+	if( libewf_handle_free(
+	     &handle ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free handle.\n",
+		 function );
 
+		return( -1 );
+	}
 	return( 0 );
 }
 

@@ -466,11 +466,11 @@ ssize_t libewf_read_chunk_data(
 			 function, chunk_data_size );
 #endif
 
-			if( libewf_chunk_cache_realloc(
+			if( libewf_chunk_cache_resize(
 			     internal_handle->chunk_cache,
 			     chunk_data_size ) != 1 )
 			{
-				notify_warning_printf( "%s: unable to reallocate chunk cache.\n",
+				notify_warning_printf( "%s: unable to resize chunk cache.\n",
 				 function );
 
 				return( -1 );
@@ -855,11 +855,11 @@ ssize_t libewf_read_buffer(
 		 function, chunk_data_size );
 #endif
 
-		if( libewf_chunk_cache_realloc(
+		if( libewf_chunk_cache_resize(
 		     internal_handle->chunk_cache,
 		     chunk_data_size ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate chunk cache.\n",
+			notify_warning_printf( "%s: unable to resize chunk cache.\n",
 			 function );
 
 			return( -1 );

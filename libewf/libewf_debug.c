@@ -246,3 +246,62 @@ void libewf_debug_header2_print(
 	 header_string );
 }
 
+/* Prints the xheader data to the notify stream
+ */
+void libewf_debug_xheader_print(
+      uint8_t *xheader,
+      size_t xheader_size )
+{
+	character_t *header_string = NULL;
+	static char *function      = "libewf_debug_xheader_print";
+	ssize_t header_string_size = 0;
+
+	if( xheader == NULL )
+	{
+		notify_warning_printf( "%s: invalid xheader.\n",
+		 function );
+
+		return;
+	}
+	header_string_size = string_size_from_utf8_stream(
+	                      xheader,
+	                      xheader_size );
+
+	if( header_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header string size.\n",
+		 function );
+
+		return;
+	}
+	header_string = (character_t *) memory_allocate(
+	                                 sizeof( character_t ) * (size_t) header_string_size );
+
+	if( header_string == NULL )
+	{
+		notify_warning_printf( "%s: unable to create header string.\n",
+		 function );
+
+		return;
+	}
+	if( string_copy_from_utf8_stream(
+	     header_string,
+	     (size_t) header_string_size,
+	     xheader,
+	     xheader_size ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set header string.\n",
+		 function );
+
+		memory_free(
+		 header_string );
+
+		return;
+	}
+	notify_printf( "%" PRIs "",
+	 header_string );
+
+	memory_free(
+	 header_string );
+}
+

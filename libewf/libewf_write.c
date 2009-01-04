@@ -55,7 +55,7 @@
 #include "ewfx_delta_chunk.h"
 
 /* Check for empty block, a block that contains the same value for every byte
- * Returns 1 if block is empty, or 0 otherwise
+ * Returns 1 if block is empty or 0 otherwise
  */
 int libewf_write_test_empty_block(
      uint8_t *block_buffer,
@@ -722,11 +722,11 @@ ssize_t libewf_write_process_chunk_data(
 		{
 			chunk_cache_data_used = (int) ( chunk_data == chunk_cache->data );
 
-			if( libewf_chunk_cache_realloc(
+			if( libewf_chunk_cache_resize(
 			     chunk_cache,
 			     *compressed_chunk_data_size ) != 1 )
 			{
-				notify_warning_printf( "%s: unable to reallocate chunk cache.\n",
+				notify_warning_printf( "%s: unable to resize chunk cache.\n",
 				 function );
 
 				return( -1 );
@@ -2386,11 +2386,11 @@ ssize_t libewf_write_buffer(
 		 function, chunk_data_size );
 #endif
 
-		if( libewf_chunk_cache_realloc(
+		if( libewf_chunk_cache_resize(
 		     internal_handle->chunk_cache,
 		     chunk_data_size ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate chunk cache.\n",
+			notify_warning_printf( "%s: unable to resize chunk cache.\n",
 			 function );
 
 			return( -1 );

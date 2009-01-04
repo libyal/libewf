@@ -37,7 +37,7 @@ struct libewf_values_table
 {
 	/* The amount of values
 	 */
-	uint32_t amount;
+	uint32_t amount_of_values;
 
 	/* The value identifiers
 	 */
@@ -48,16 +48,16 @@ struct libewf_values_table
 	character_t **values;
 };
 
-libewf_values_table_t *libewf_values_table_alloc(
-                        uint32_t amount );
+int libewf_values_table_initialize(
+     libewf_values_table_t **values_table,
+     uint32_t amount_of_values );
 
-int libewf_values_table_realloc(
+int libewf_values_table_free(
+     libewf_values_table_t **values_table );
+
+int libewf_values_table_resize(
      libewf_values_table_t *values_table,
-     uint32_t previous_amount,
-     uint32_t new_amount );
-
-void libewf_values_table_free(
-      libewf_values_table_t *values_table );
+     uint32_t amount_of_values );
 
 int32_t libewf_values_table_get_index(
          libewf_values_table_t *values_table,
