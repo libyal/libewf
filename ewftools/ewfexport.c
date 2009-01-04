@@ -694,9 +694,9 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_write_segment_file_size( export_handle, (uint32_t) segment_file_size ) != 1 )
+		if( libewf_set_segment_file_size( export_handle, (uint32_t) segment_file_size ) != 1 )
 		{
-			fprintf( stderr, "Unable to set write segment file size in handle.\n" );
+			fprintf( stderr, "Unable to set segment file size in handle.\n" );
 
 			if( libewf_close( export_handle ) != 0 )
 			{
@@ -708,12 +708,9 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_write_compression_values(
-		     export_handle,
-		     compression_level,
-		     (uint8_t) compress_empty_block ) != 1 )
+		if( libewf_set_compression_values( export_handle, compression_level, (uint8_t) compress_empty_block ) != 1 )
 		{
-			fprintf( stderr, "Unable to set write compression values in handle.\n" );
+			fprintf( stderr, "Unable to set compression values in handle.\n" );
 
 			if( libewf_close( export_handle ) != 0 )
 			{
@@ -725,9 +722,9 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_write_format( export_handle, libewf_format ) != 1 )
+		if( libewf_set_format( export_handle, libewf_format ) != 1 )
 		{
-			fprintf( stderr, "Unable to set write format in handle.\n" );
+			fprintf( stderr, "Unable to set format in handle.\n" );
 
 			if( libewf_close( export_handle ) != 0 )
 			{

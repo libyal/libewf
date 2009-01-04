@@ -153,6 +153,7 @@ CLOSED
 
 Version: 20071201
 * worked on refactoring code
+* API changes to get and set functions
 
 Version: 20071130
 * worked on refactoring code

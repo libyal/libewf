@@ -1161,9 +1161,9 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	}
 	if( write_size > 0 )
 	{
-		if( libewf_set_write_input_size( handle, write_size ) == -1 )
+		if( libewf_set_media_size( handle, write_size ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set input write size in handle.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to set media size in handle.\n",
 			 function );
 
 			return( -1 );
@@ -1828,9 +1828,9 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	if( libewf_set_write_input_size( export_handle, export_size ) != 1 )
+	if( libewf_set_media_size( export_handle, export_size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set write size in export handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to set media size in export handle.\n",
 		 function );
 
 		return( -1 );

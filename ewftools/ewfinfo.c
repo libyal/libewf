@@ -91,30 +91,31 @@ int main( int argc, char * const argv[] )
 {
 	uint8_t guid[ 16 ];
 
-	LIBEWF_CHAR *program       = _S_LIBEWF_CHAR( "ewfinfo" );
+	LIBEWF_CHAR *program         = _S_LIBEWF_CHAR( "ewfinfo" );
 
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob              = NULL;
-	int32_t glob_count         = 0;
+	EWFGLOB *glob                = NULL;
+	int32_t glob_count           = 0;
 #endif
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        CHAR_T *error_string       = NULL;
+        CHAR_T *error_string         = NULL;
 #endif
-	LIBEWF_HANDLE *handle      = NULL;
-	char *file_format_string   = NULL;
-	INT_T option               = 0;
-	size64_t media_size        = 0;
-	uint32_t bytes_per_sector  = 0;
-	uint32_t amount_of_sectors = 0;
-	uint32_t error_granularity = 0;
-	int8_t format              = 0;
-	int8_t compression_level   = 0;
-	int8_t media_type          = 0;
-	int8_t media_flags         = 0;
-	int8_t volume_type         = 0;
-	uint8_t verbose            = 0;
-	uint8_t date_format        = LIBEWF_DATE_FORMAT_CTIME;
-	char info_option           = 'a';
+	LIBEWF_HANDLE *handle        = NULL;
+	char *file_format_string     = NULL;
+	INT_T option                 = 0;
+	size64_t media_size          = 0;
+	uint32_t bytes_per_sector    = 0;
+	uint32_t amount_of_sectors   = 0;
+	uint32_t error_granularity   = 0;
+	int8_t format                = 0;
+	int8_t compression_level     = 0;
+	int8_t media_type            = 0;
+	int8_t media_flags           = 0;
+	int8_t volume_type           = 0;
+	uint8_t compress_empty_block =  0;
+	uint8_t verbose              = 0;
+	uint8_t date_format          = LIBEWF_DATE_FORMAT_CTIME;
+	char info_option             = 'a';
 
 	ewfsignal_initialize();
 
@@ -432,7 +433,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to determine error granularity.\n" );
 			}
-			if( libewf_get_compression_level( handle, &compression_level ) == 1 )
+			if( libewf_get_compression_values( handle, &compression_level, &compress_empty_block ) == 1 )
 			{
 				if( compression_level == LIBEWF_COMPRESSION_NONE )
 				{

@@ -607,13 +607,13 @@ int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granula
 	return( 1 );
 }
 
-/* Retrieves the compression level value
+/* Retrieves the compression values
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_level )
+int libewf_get_compression_values( LIBEWF_HANDLE *handle, int8_t *compression_level, uint8_t *compress_empty_block )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_compression_level";
+	static char *function                   = "libewf_get_compression_values";
 
 	if( handle == NULL )
 	{
@@ -631,14 +631,15 @@ int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_lev
 
 		return( -1 );
 	}
-	if( internal_handle->compression_level <= -1 )
+	if( compress_empty_block == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid compression level only positive values are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid compress empty block.\n",
 		 function );
 
 		return( -1 );
 	}
-	*compression_level = internal_handle->compression_level;
+	*compression_level    = internal_handle->compression_level;
+	*compress_empty_block = internal_handle->compress_empty_block;
 
 	return( 1 );
 }
@@ -1460,6 +1461,329 @@ int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_secto
 	return( 1 );
 }
 
+/* Sets the error granularity
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_error_granularity";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media_values->error_granularity = error_granularity;
+
+	return( 1 );
+}
+
+/* Sets the compression values
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_compression_values";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( compression_level <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid compression level only positive values are supported.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->compression_level = compression_level;
+
+	/* Compress empty block is only useful when no compression is used
+	 */
+	if( compression_level == EWF_COMPRESSION_NONE )
+	{
+		internal_handle->compress_empty_block = compress_empty_block;
+	}
+	return( 1 );
+}
+
+/* Sets the media size
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_media_size( LIBEWF_HANDLE *handle, size64_t media_size )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_media_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_size > (size64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media_values->media_size = media_size;
+
+	return( 1 );
+}
+
+/* Sets the segment file size
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_segment_file_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( segment_file_size == 0 )
+	 || ( segment_file_size > (size64_t) INT64_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid value segment file value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->write->segment_file_size = segment_file_size;
+
+	return( 1 );
+}
+
+/* Sets the media type
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_media_type( LIBEWF_HANDLE *handle, uint8_t media_type )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_media_type";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media_values->media_type = media_type;
+
+	return( 1 );
+}
+
+/* Sets the volume type
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_volume_type( LIBEWF_HANDLE *handle, uint8_t volume_type )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_volume_type";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
+	{
+		/* Uses 1-complement of EWF_MEDIA_FLAGS_IS_PHYSICAL
+		 */
+		internal_handle->media_values->media_flags &= ~EWF_MEDIA_FLAGS_IS_PHYSICAL;
+	}
+	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
+	{
+		internal_handle->media_values->media_flags |= EWF_MEDIA_FLAGS_IS_PHYSICAL;
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported volume type.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets the output format
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_format( LIBEWF_HANDLE *handle, uint8_t format )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_format";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->format = format;
+
+	return( 1 );
+}
+
 /* Sets the GUID
  * Returns 1 if successful, or -1 on error
  */
@@ -1663,233 +1987,6 @@ int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_
 		return( -1 );
 	}
 	internal_handle->read->wipe_on_error = wipe_on_error;
-
-	return( 1 );
-}
-
-/* Sets the write segment file size
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_segment_file_size";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( segment_file_size == 0 )
-	 || ( segment_file_size > (size64_t) INT64_MAX ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value segment file value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->write->segment_file_size = segment_file_size;
-
-	return( 1 );
-}
-
-/* Sets the write error granularity
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_error_granularity";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->write != NULL )
-	 && ( internal_handle->write->values_initialized != 0 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized, therefore media values cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->media_values->error_granularity = error_granularity;
-
-	return( 1 );
-}
-
-/* Sets the write compression values
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_compression_values";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->compression_level = compression_level;
-
-	/* Compress empty block is only useful when no compression is used
-	 */
-	if( compression_level == EWF_COMPRESSION_NONE )
-	{
-		internal_handle->write->compress_empty_block = compress_empty_block;
-	}
-	return( 1 );
-}
-
-/* Sets the media type
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_media_type";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->media_values->media_type = media_type;
-
-	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
-	{
-		/* Uses 1-complement of EWF_MEDIA_FLAGS_IS_PHYSICAL
-		 */
-		internal_handle->media_values->media_flags &= ~EWF_MEDIA_FLAGS_IS_PHYSICAL;
-	}
-	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
-	{
-		internal_handle->media_values->media_flags |= EWF_MEDIA_FLAGS_IS_PHYSICAL;
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported volume type.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Sets the write output format
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_format";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	internal_handle->format = format;
-
-	return( 1 );
-}
-
-/* Sets the write input size
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_input_size";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( input_write_size > (size64_t) INT64_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->write->input_write_size = input_write_size;
 
 	return( 1 );
 }

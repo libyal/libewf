@@ -132,19 +132,24 @@ struct libewf_internal_handle
 	 */
 	uint32_t current_chunk_offset;
 
-	/* value to indicate the compression level used
+	/* Value to indicate the compression level used
 	 */
 	int8_t compression_level;
 
-	/* value to indicate which file format is used
+	/* Value to indicate if empty block should be compressed
+	 * even if no compression is used
+	 */
+	uint8_t compress_empty_block;
+
+	/* Value to indicate which file format is used
 	 */
 	uint8_t format;
 
-	/* value to indicate which ewf format is used
+	/* Value to indicate which ewf format is used
 	 */
 	uint8_t ewf_format;
 
-	/* value to indicate the level of error tollerance
+	/* Value to indicate the level of error tollerance
 	 */
 	uint8_t error_tollerance;
 };
@@ -181,10 +186,6 @@ struct libewf_internal_handle_write
 	/* The total amount of bytes written
 	 */
 	ssize64_t write_count;
-
-	/* The amount of bytes to write
-	 */
-	size64_t input_write_size;
 
 	/* The maximum segment file size
 	 */
@@ -233,11 +234,6 @@ struct libewf_internal_handle_write
 	/* The current chunks section number
 	 */
 	uint8_t chunks_section_number;
-
-	/* Value to indicate if empty block should be compressed
-	 * even if no compression is used
-	 */
-	uint8_t compress_empty_block;
 
 	/* Value to indicate if the offset table should not be restricted
 	 * to the maximum amount of offsets

@@ -68,9 +68,9 @@
 /* Calculates an estimate of the amount of chunks that fit within a segment file
  * Returns the amount of chunks that could fit in the segment file, or -1 on error
  */
-int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle )
+int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t segment_file_size, size64_t maximum_segment_file_size, uint32_t maximum_section_amount_of_chunks, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t ewf_format, uint8_t unrestrict_offset_amount )
 {
-	static char *function                = "libewf_write_calculate_chunks_per_segment";
+	static char *function                = "libewf_write_calculate_chunks_per_segment_file";
 	size64_t available_segment_file_size = 0;
 	int64_t maximum_chunks_per_segment   = 0;
 	int64_t chunks_per_segment           = 0;
@@ -98,20 +98,6 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 
 		return( -1 );
 	}
-	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->maximum_section_amount_of_chunks == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
@@ -119,9 +105,30 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 
 		return( -1 );
 	}
-	if( segment_file_handle->file_offset > (off64_t) internal_handle->write->maximum_segment_file_size )
+	if( segment_file_handle->file_offset > (off64_t) maximum_segment_file_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file offset value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_size > maximum_segment_file_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( maximum_section_amount_of_chunks == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid maximum section amount of chunks value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -134,8 +141,7 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 	}
 	/* Calculate the available segment file size
 	 */
-	available_segment_file_size = internal_handle->write->segment_file_size
-	                            - segment_file_handle->file_offset;
+	available_segment_file_size = segment_file_size - segment_file_handle->file_offset;
 
 	/* Leave space for the done or next section
 	 */
@@ -143,26 +149,26 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 
 	/* Calculate the maximum amount of chunks within this segment file
 	 */
-	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* The EWF-S01 format uses compression this will add 16 bytes on average
 		 */
 		maximum_chunks_per_segment = available_segment_file_size
-		                           / ( internal_handle->media_values->chunk_size + 16 );
+		                           / ( media_values->chunk_size + 16 );
 	}
 	else
 	{
 		maximum_chunks_per_segment = available_segment_file_size
-		                           / ( internal_handle->media_values->chunk_size + EWF_CRC_SIZE );
+		                           / ( media_values->chunk_size + EWF_CRC_SIZE );
 	}
 	/* Determine the amount of required chunk sections
 	 */
-	if( internal_handle->write->unrestrict_offset_amount == 0 )
+	if( unrestrict_offset_amount == 0 )
 	{
 		required_chunk_sections = maximum_chunks_per_segment
-		                        % internal_handle->write->maximum_section_amount_of_chunks;
+		                        % maximum_section_amount_of_chunks;
 	}
-	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* Leave space for the chunk section starts
 		 */
@@ -172,7 +178,7 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 		 */
 		available_segment_file_size -= ( maximum_chunks_per_segment * EWF_TABLE_OFFSET_SIZE );
 	}
-	else if( internal_handle->format == LIBEWF_FORMAT_ENCASE1 )
+	else if( format == LIBEWF_FORMAT_ENCASE1 )
 	{
 		/* Leave space for the chunk section starts and the offset table CRC
 		 */
@@ -194,25 +200,25 @@ int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inter
 	}
 	/* Calculate the amount of chunks within this segment file
 	 */
-	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* The EWF-S01 format uses compression this will add 16 bytes on average
 		 */
 		chunks_per_segment = available_segment_file_size
-		                   / ( internal_handle->media_values->chunk_size + 16 );
+		                   / ( media_values->chunk_size + 16 );
 	}
 	else
 	{
 		chunks_per_segment = available_segment_file_size
-		                   / ( internal_handle->media_values->chunk_size + EWF_CRC_SIZE );
+		                   / ( media_values->chunk_size + EWF_CRC_SIZE );
 	}
 	/* If the input size is known
 	 */
-	if( internal_handle->write->input_write_size > 0 )
+	if( internal_handle->media_values->media_size > 0 )
 	{
 		/* Calculate the amount of chunks that will remain
 		 */
-		remaining_amount_of_chunks = (int64_t) internal_handle->media_values->amount_of_chunks
+		remaining_amount_of_chunks = (int64_t) media_values->amount_of_chunks
 		                           - (int64_t) internal_handle->write->amount_of_chunks;
 
 		/* Check if the less chunks remain than the amount of chunks calculated
@@ -242,13 +248,6 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( 0 );
@@ -316,7 +315,7 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 /* Tests if the current segment file is full
  * Returns 1 if full, 0 if not, -1 on error
  */
-int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset )
+int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, uint32_t current_amount_of_chunks, uint32_t total_amount_of_chunks, size32_t chunk_size )
 {
 	static char *function      = "libewf_write_test_segment_file_full";
 	size64_t segment_file_size = 0;
@@ -367,8 +366,8 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	/* Check if the maximum amount of chunks has been reached
 	 */
-	if( ( internal_handle->media_values->amount_of_chunks != 0 )
-	 && ( internal_handle->media_values->amount_of_chunks == internal_handle->write->amount_of_chunks ) )
+	if( ( total_amount_of_chunks != 0 )
+	 && ( total_amount_of_chunks == current_amount_of_chunks ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: all required chunks have been written.\n",
 		 function );
@@ -377,8 +376,8 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	/* Check if the end of the input has been reached
 	*/
-	if( ( internal_handle->write->input_write_size != 0 )
-	 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->write->input_write_size ) )
+	if( ( internal_handle->media_values->media_size != 0 )
+	 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->media_values->media_size ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: all required data has been written.\n",
 		 function );
@@ -418,8 +417,7 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		/* Leave space for an additional chunk
 		 */
-		segment_file_size += internal_handle->media_values->chunk_size
-		                   + EWF_CRC_SIZE;
+		segment_file_size += chunk_size + EWF_CRC_SIZE;
 
 		/* Determine if a chunk would fit in the segment file
 		 */
@@ -508,8 +506,8 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	/* Check if the end of the input has been reached
 	*/
-	if( ( internal_handle->write->input_write_size != 0 )
-	 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->write->input_write_size ) )
+	if( ( internal_handle->media_values->media_size != 0 )
+	 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->media_values->media_size ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: all required data has been written.\n",
 		 function );
@@ -684,7 +682,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 	/* Compress empty blocks if necessary
 	 */
 	if( ( compression_level == EWF_COMPRESSION_NONE )
-	 && ( internal_handle->write->compress_empty_block == 1 )
+	 && ( internal_handle->compress_empty_block == 1 )
 	 && ( libewf_common_test_empty_block( chunk_data, chunk_data_size ) == 1 ) )
 	{
 		compression_level = EWF_COMPRESSION_DEFAULT;
@@ -910,8 +908,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	}
 	/* Check if the amount of bytes as specified have been written
 	 */
-	if( ( internal_handle->write->input_write_size != 0 )
-	 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->write->input_write_size ) )
+	if( ( internal_handle->media_values->media_size != 0 )
+	 && ( internal_handle->write->input_write_count >= (ssize64_t) internal_handle->media_values->media_size ) )
 	{
 		return( 0 );
 	}
@@ -983,9 +981,16 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		total_write_count                   += write_count;
 		internal_handle->write->write_count += write_count;
 
-		internal_handle->write->chunks_per_segment = libewf_write_calculate_chunks_per_segment(
+		internal_handle->write->chunks_per_segment = libewf_write_calculate_chunks_per_segment_file(
 		                                              internal_handle,
-		                                              internal_handle->segment_table->segment_file_handle[ segment_number ] );
+		                                              internal_handle->segment_table->segment_file_handle[ segment_number ],
+		                                              internal_handle->write->segment_file_size,
+		                                              internal_handle->write->maximum_segment_file_size,
+		                                              internal_handle->write->maximum_section_amount_of_chunks,
+		                                              internal_handle->media_values,
+		                                              internal_handle->format,
+		                                              internal_handle->ewf_format,
+		                                              internal_handle->write->unrestrict_offset_amount );
 
 		if( internal_handle->write->chunks_per_segment <= 0 )
 		{
@@ -1015,9 +1020,16 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 		/* Recalculate the amount of chunks per segment for a better segment file fill when compression is used
 		 */
-		internal_handle->write->chunks_per_segment = libewf_write_calculate_chunks_per_segment(
+		internal_handle->write->chunks_per_segment = libewf_write_calculate_chunks_per_segment_file(
 		                                              internal_handle,
-		                                              internal_handle->segment_table->segment_file_handle[ segment_number ] );
+		                                              internal_handle->segment_table->segment_file_handle[ segment_number ],
+		                                              internal_handle->write->segment_file_size,
+		                                              internal_handle->write->maximum_segment_file_size,
+		                                              internal_handle->write->maximum_section_amount_of_chunks,
+		                                              internal_handle->media_values,
+		                                              internal_handle->format,
+		                                              internal_handle->ewf_format,
+		                                              internal_handle->write->unrestrict_offset_amount );
 
 		if( internal_handle->write->chunks_per_segment <= 0 )
 		{
@@ -1138,7 +1150,10 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	 */
 	result = libewf_write_test_segment_file_full(
 	          internal_handle,
-	          internal_handle->segment_table->segment_file_handle[ segment_number ]->file_offset );
+	          internal_handle->segment_table->segment_file_handle[ segment_number ]->file_offset,
+	          internal_handle->write->amount_of_chunks,
+	          internal_handle->media_values->amount_of_chunks,
+	          internal_handle->media_values->chunk_size );
 
 	if( result == -1 )
 	{
@@ -1151,8 +1166,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	{
 		/* Check if this is not the last segment file
 		 */
-		if( ( internal_handle->write->input_write_size == 0 )
-		 || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->write->input_write_size ) )
+		if( ( internal_handle->media_values->media_size == 0 )
+		 || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->media_values->media_size ) )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: closing segment file with segment number: %" PRIu16 ".\n",
 			 function, segment_number );
@@ -1649,8 +1664,8 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
 		write_size = internal_handle->chunk_cache->amount;
 	}
 	if( ( write_size == internal_handle->media_values->chunk_size )
-	 || ( ( internal_handle->write->input_write_size != 0 )
-	  && ( ( internal_handle->write->input_write_count + (ssize64_t) write_size ) == (ssize64_t) internal_handle->write->input_write_size ) )
+	 || ( ( internal_handle->media_values->media_size != 0 )
+	  && ( ( internal_handle->write->input_write_count + (ssize64_t) write_size ) == (ssize64_t) internal_handle->media_values->media_size ) )
 	 || ( force_write != 0 ) )
 	{
 		chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
@@ -2334,8 +2349,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	if( ( internal_handle->current_chunk_offset != 0 )
 	 && ( internal_handle->chunk_cache->amount != 0 )
 	 && ( internal_handle->chunk_cache->offset != 0 )
-	 && ( ( internal_handle->write->input_write_size == 0 )
-	  || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->write->input_write_size ) ) )
+	 && ( ( internal_handle->media_values->media_size == 0 )
+	  || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->media_values->media_size ) ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: writing chunk remainder at offset: %" PRIu32 " with size: %" PRIu32 "\n",
 		 function, internal_handle->current_chunk_offset, internal_handle->chunk_cache->amount );
@@ -2433,13 +2448,14 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	}
 	/* Correct the media values if streamed write was used
 	 */
-	if( internal_handle->write->input_write_size == 0 )
+	if( internal_handle->media_values->media_size == 0 )
 	{
 		/* Calculate the media values
 		 */
 		internal_handle->media_values->amount_of_chunks  = internal_handle->write->amount_of_chunks;
 		internal_handle->media_values->amount_of_sectors = (uint32_t) ( internal_handle->write->input_write_count
 		                                                 / internal_handle->media_values->bytes_per_sector );
+		internal_handle->media_values->media_size        = (size32_t) internal_handle->write->input_write_count;
 
 		/* Correct the segment files
 		 */

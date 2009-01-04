@@ -525,9 +525,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_segment_file_size( handle, (size64_t) segment_file_size ) != 1 )
+	if( libewf_set_segment_file_size( handle, (size64_t) segment_file_size ) != 1 )
 	{
-		fprintf( stderr, "Unable to set write segment file size in handle.\n" );
+		fprintf( stderr, "Unable to set segment file size in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{
@@ -535,9 +535,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_media_type( handle, media_type, volume_type ) != 1 )
+	if( libewf_set_media_type( handle, media_type ) != 1 )
 	{
-		fprintf( stderr, "Unable to set write media type in handle.\n" );
+		fprintf( stderr, "Unable to set media type in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{
@@ -545,9 +545,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_compression_values( handle, compression_level, compress_empty_block ) != 1 )
+	if( libewf_set_volume_type( handle, volume_type ) != 1 )
 	{
-		fprintf( stderr, "Unable to set write compression values in handle.\n" );
+		fprintf( stderr, "Unable to set volume type in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{
@@ -555,9 +555,19 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_format( handle, libewf_format ) != 1 )
+	if( libewf_set_compression_values( handle, compression_level, compress_empty_block ) != 1 )
 	{
-		fprintf( stderr, "Unable to set write format in handle.\n" );
+		fprintf( stderr, "Unable to set compression values in handle.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		return( EXIT_FAILURE );
+	}
+	if( libewf_set_format( handle, libewf_format ) != 1 )
+	{
+		fprintf( stderr, "Unable to set format in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{

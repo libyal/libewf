@@ -81,6 +81,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->current_chunk            = 0;
 	internal_handle->current_chunk_offset     = 0;
 	internal_handle->compression_level        = EWF_COMPRESSION_UNKNOWN;
+	internal_handle->compress_empty_block     = 0;
 	internal_handle->format                   = LIBEWF_FORMAT_UNKNOWN;
 	internal_handle->ewf_format               = EWF_FORMAT_UNKNOWN;
 	internal_handle->error_tollerance         = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
@@ -416,7 +417,6 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 	handle_write->data_section                     = NULL;
 	handle_write->input_write_count                = 0;
 	handle_write->write_count                      = 0;
-	handle_write->input_write_size                 = 0;
 	handle_write->maximum_segment_file_size        = 0;
 	handle_write->segment_file_size                = 0;
 	handle_write->maximum_amount_of_segments       = 0;
@@ -429,7 +429,6 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 	handle_write->section_amount_of_chunks         = 0;
 	handle_write->chunks_section_offset            = 0;
 	handle_write->chunks_section_number            = 0;
-	handle_write->compress_empty_block             = 0;
 	handle_write->unrestrict_offset_amount         = 0;
 	handle_write->values_initialized               = 0;
 	handle_write->create_chunks_section            = 0;
@@ -909,24 +908,24 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 		LIBEWF_WARNING_PRINT( "%s: unsupported compression level - using default.\n",
 		 function );
 
-		internal_handle->compression_level           = EWF_COMPRESSION_NONE;
-		internal_handle->write->compress_empty_block = 1;
+		internal_handle->compression_level    = EWF_COMPRESSION_NONE;
+		internal_handle->compress_empty_block = 1;
 	}
 	/* Check if the input file size does not exceed the maximum input file size
 	 */
 	maximum_input_file_size = (uint64_t) internal_handle->media_values->chunk_size
 	                        * (uint64_t) UINT32_MAX;
 
-	if( internal_handle->write->input_write_size > maximum_input_file_size )
+	if( internal_handle->media_values->media_size > maximum_input_file_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: input write size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
+		LIBEWF_WARNING_PRINT( "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
 		 function, maximum_input_file_size, internal_handle->media_values->chunk_size );
 
 		return( -1 );
 	}
-	if( internal_handle->write->input_write_size > (uint64_t) INT64_MAX )
+	if( internal_handle->media_values->media_size > (uint64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid input write size value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -1017,7 +1016,7 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	}
 	/* If no input write size was provided check if EWF file format allows for streaming
 	 */
-	if( internal_handle->write->input_write_size == 0 )
+	if( internal_handle->media_values->media_size == 0 )
 	{
 		if( ( internal_handle->format != LIBEWF_FORMAT_ENCASE2 )
 		 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE3 )
@@ -1037,11 +1036,11 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	}
 	/* If an input write size was provided
 	 */
-	else if( internal_handle->write->input_write_size > 0 )
+	else if( internal_handle->media_values->media_size > 0 )
 	{
 		/* Determine the required amount of segments allowed to write
 		 */
-		required_amount_of_segments = (int64_t) internal_handle->write->input_write_size
+		required_amount_of_segments = (int64_t) internal_handle->media_values->media_size
 		                            / (int64_t) internal_handle->write->segment_file_size;
 
 		if( required_amount_of_segments > (int64_t) internal_handle->write->maximum_amount_of_segments )
@@ -1053,10 +1052,10 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 		}
 		/* Determine the amount of chunks to write
 		 */
-		amount_of_chunks = (int64_t) internal_handle->write->input_write_size
+		amount_of_chunks = (int64_t) internal_handle->media_values->media_size
 		                 / (int64_t) internal_handle->media_values->chunk_size;
 
-		if( ( internal_handle->write->input_write_size % internal_handle->media_values->chunk_size ) != 0 )
+		if( ( internal_handle->media_values->media_size % internal_handle->media_values->chunk_size ) != 0 )
 		{
 			amount_of_chunks += 1;
 		}
@@ -1071,7 +1070,7 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		/* Determine the amount of sectors to write
 		 */
-		amount_of_sectors = (int64_t) internal_handle->write->input_write_size
+		amount_of_sectors = (int64_t) internal_handle->media_values->media_size
 		                  / (int64_t) internal_handle->media_values->bytes_per_sector;
 
 		if( amount_of_chunks > (int64_t) UINT32_MAX )
