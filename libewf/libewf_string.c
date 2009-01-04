@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -32,19 +31,19 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_string_split(
-     character_t *string,
+     libewf_character_t *string,
      size_t string_size,
-     character_t delimiter,
-     character_t ***split_values,
+     libewf_character_t delimiter,
+     libewf_character_t ***split_values,
      size_t *amount_of_split_values )
 {
-	character_t *split_value_start = NULL;
-	character_t *split_value_end   = NULL;
-	character_t *string_end        = NULL;
-	static char *function          = "libewf_string_split";
-	size_t remaining_string_size   = 0;
-	size_t split_value_iterator    = 0;
-	ssize_t split_value_size       = 0;
+	libewf_character_t *split_value_start = NULL;
+	libewf_character_t *split_value_end   = NULL;
+	libewf_character_t *string_end        = NULL;
+	static char *function                 = "libewf_string_split";
+	size_t remaining_string_size          = 0;
+	size_t split_value_iterator           = 0;
+	ssize_t split_value_size              = 0;
 
 	if( string == NULL )
 	{
@@ -106,7 +105,7 @@ int libewf_string_split(
 
 	do
 	{
-		split_value_end = string_search(
+		split_value_end = libewf_string_search(
 		                   split_value_start,
 		                   delimiter,
 		                   remaining_string_size );
@@ -144,8 +143,8 @@ int libewf_string_split(
 
 		return( 1 );
 	}
-	*split_values = (character_t **) memory_allocate(
-	                                  ( sizeof( character_t * ) * *amount_of_split_values ) );
+	*split_values = (libewf_character_t **) memory_allocate(
+	                                         ( sizeof( libewf_character_t * ) * *amount_of_split_values ) );
 
 	if( *split_values == NULL )
 	{
@@ -157,7 +156,7 @@ int libewf_string_split(
 	if( memory_set(
 	     *split_values,
 	     0,
-	     sizeof( character_t * ) * *amount_of_split_values ) == NULL )
+	     sizeof( libewf_character_t * ) * *amount_of_split_values ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to clear split values.\n",
 		 function );
@@ -181,7 +180,7 @@ int libewf_string_split(
 		{
 			split_value_start = split_value_end + 1;
 		}
-		split_value_end = string_search(
+		split_value_end = libewf_string_search(
 		                   split_value_start,
 		                   delimiter,
 		                   remaining_string_size );
@@ -202,8 +201,8 @@ int libewf_string_split(
 			 */
 			split_value_size += 1;
 
-			( *split_values )[ split_value_iterator ] = (character_t *) memory_allocate(
-										     sizeof( character_t ) * split_value_size );
+			( *split_values )[ split_value_iterator ] = (libewf_character_t *) memory_allocate(
+										            sizeof( libewf_character_t ) * split_value_size );
 
 			if( ( *split_values )[ split_value_iterator ] == NULL )
 			{
@@ -218,7 +217,7 @@ int libewf_string_split(
 
 				return( -1 );
 			}
-			if( string_copy(
+			if( libewf_string_copy(
 			     ( *split_values )[ split_value_iterator ],
 			     split_value_start,
 			     split_value_size ) == NULL )
@@ -254,7 +253,7 @@ int libewf_string_split(
  * Returns 1 if successful or -1 on error
  */
 int libewf_string_split_values_free(
-     character_t **split_values,
+     libewf_character_t **split_values,
      size_t amount_of_split_values )
 {
 	static char *function       = "libewf_string_split_values_free";

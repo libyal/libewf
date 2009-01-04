@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -929,9 +928,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "case_number" ),
+	     _LIBEWF_CHARACTER_T_STRING( "case_number" ),
 	     11,
-	     _CHARACTER_T_STRING( "Case Number" ),
+	     _LIBEWF_CHARACTER_T_STRING( "Case Number" ),
 	     11 ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set case number.\n",
@@ -941,9 +940,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "description" ),
+	     _LIBEWF_CHARACTER_T_STRING( "description" ),
 	     11,
-	     _CHARACTER_T_STRING( "Description" ),
+	     _LIBEWF_CHARACTER_T_STRING( "Description" ),
 	     11 ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set description.\n",
@@ -953,9 +952,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "evidence_number" ),
+	     _LIBEWF_CHARACTER_T_STRING( "evidence_number" ),
 	     15,
-	     _CHARACTER_T_STRING( "Evidence Number" ),
+	     _LIBEWF_CHARACTER_T_STRING( "Evidence Number" ),
 	     15 ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set evidence number.\n",
@@ -965,9 +964,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "examiner_name" ),
+	     _LIBEWF_CHARACTER_T_STRING( "examiner_name" ),
 	     13,
-	     _CHARACTER_T_STRING( "Examiner Name" ),
+	     _LIBEWF_CHARACTER_T_STRING( "Examiner Name" ),
 	     13 ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set examiner name.\n",
@@ -977,9 +976,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "notes" ),
+	     _LIBEWF_CHARACTER_T_STRING( "notes" ),
 	     5,
-	     _CHARACTER_T_STRING( "Notes" ),
+	     _LIBEWF_CHARACTER_T_STRING( "Notes" ),
 	     5 ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set notes.\n",
@@ -989,9 +988,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "acquiry_operating_system" ),
+	     _LIBEWF_CHARACTER_T_STRING( "acquiry_operating_system" ),
 	     24,
-	     _CHARACTER_T_STRING( "Undetermined" ),
+	     _LIBEWF_CHARACTER_T_STRING( "Undetermined" ),
 	     12 ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to acquiry operating system.\n",
@@ -1001,10 +1000,10 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _CHARACTER_T_STRING( "acquiry_software_version" ),
+	     _LIBEWF_CHARACTER_T_STRING( "acquiry_software_version" ),
 	     24,
 	     LIBEWF_VERSION_STRING,
-	     string_length(
+	     libewf_string_length(
 	      LIBEWF_VERSION_STRING ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to acquiry software version.\n",

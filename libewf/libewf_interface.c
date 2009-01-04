@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -31,6 +30,7 @@
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_interface.h"
+#include "libewf_string.h"
 #include "libewf_segment_file_handle.h"
 
 #include "ewf_definitions.h"
@@ -1068,7 +1068,7 @@ int libewf_get_amount_of_header_values(
 int libewf_get_header_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
-     character_t *value,
+     libewf_character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1099,8 +1099,8 @@ int libewf_get_header_value_identifier(
  */
 int libewf_get_header_value(
      libewf_handle_t *handle,
-     character_t *identifier,
-     character_t *value,
+     libewf_character_t *identifier,
+     libewf_character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1134,7 +1134,7 @@ int libewf_get_header_value(
 	{
 		return( 0 );
 	}
-	identifier_length = string_length(
+	identifier_length = libewf_string_length(
 	                     identifier );
 
 	return( libewf_values_table_get_value(
@@ -1186,7 +1186,7 @@ int libewf_get_amount_of_hash_values(
 int libewf_get_hash_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
-     character_t *value,
+     libewf_character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1217,8 +1217,8 @@ int libewf_get_hash_value_identifier(
  */
 int libewf_get_hash_value(
      libewf_handle_t *handle,
-     character_t *identifier,
-     character_t *value,
+     libewf_character_t *identifier,
+     libewf_character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1248,16 +1248,16 @@ int libewf_get_hash_value(
 
 		return( -1 );
 	}
-	identifier_length = string_length(
+	identifier_length = libewf_string_length(
 	                     identifier );
 
 	if( ( internal_handle->hash_values == NULL )
 	 && ( internal_handle->hash_sections != NULL )
 	 && ( internal_handle->hash_sections->md5_hash_set != 0 )
 	 && ( identifier_length == 3 )
-	 && ( string_compare(
+	 && ( libewf_string_compare(
 	       identifier,
-	       _CHARACTER_T_STRING( "MD5" ),
+	       _LIBEWF_CHARACTER_T_STRING( "MD5" ),
 	       identifier_length ) == 0 ) )
 	{
 		if( libewf_hash_values_parse_md5_hash(
@@ -2052,8 +2052,8 @@ int libewf_set_header_codepage(
  */
 int libewf_set_header_value(
      libewf_handle_t *handle,
-     character_t *identifier,
-     character_t *value,
+     libewf_character_t *identifier,
+     libewf_character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2105,7 +2105,7 @@ int libewf_set_header_value(
 			return( -1 );
 		}
 	}
-	identifier_length = string_length(
+	identifier_length = libewf_string_length(
 	                     identifier );
 
 	return( libewf_values_table_set_value(
@@ -2121,8 +2121,8 @@ int libewf_set_header_value(
  */
 int libewf_set_hash_value(
      libewf_handle_t *handle,
-     character_t *identifier,
-     character_t *value,
+     libewf_character_t *identifier,
+     libewf_character_t *value,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2172,7 +2172,7 @@ int libewf_set_hash_value(
 			return( -1 );
 		}
 	}
-	identifier_length = string_length(
+	identifier_length = libewf_string_length(
 	                     identifier );
 
 	if( libewf_values_table_set_value(
@@ -2189,9 +2189,9 @@ int libewf_set_hash_value(
 	}
 	if( ( internal_handle->hash_sections != NULL )
 	 && ( identifier_length == 3 )
-	 && ( string_compare(
+	 && ( libewf_string_compare(
 	       identifier,
-	       _CHARACTER_T_STRING( "MD5" ),
+	       _LIBEWF_CHARACTER_T_STRING( "MD5" ),
 	       identifier_length ) == 0 ) )
 	{
 		if( libewf_hash_values_generate_md5_hash(

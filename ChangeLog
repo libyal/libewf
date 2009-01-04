@@ -85,21 +85,23 @@ Error handling
   - useful to store error/warning string
 * what about setting errno for API set and get function i.e. for size too small
 * use glib based error handling
+* have wchar error messages?
 
 Python bindings
 * rewrite pyewf to match libewf API
 
-API
+API changes
 * make libewf_handle_initialize and libewf_handle_free available
-* rewrite open and close in correspondence with handle_initialize and handle_free
+  - rewrite open and close in correspondence with handle_initialize and handle_free
 * change compress empty-block into a compression level
+* add error handling
+* add identifier_length to hash_/header_values functions
 * allow for chunk data and CRC alignment (possible performance enhancement)
 * low level API
   - file structure API
 * LVF
   - libewf_add/remove_file for LVF
 * add function to retrieve the segment file names and amount?
-* add error handling
 
 Something for libsmio/smiotools
 * create iso2ewf tool?
@@ -195,6 +197,8 @@ Version: 20080910
 * worked on libuna
 * worked on improved error handling
 * implemted new version of notify dump data
+* fixed check of libewf_string_snprintf should also check for > size
+* removed explicit set end of string after snprintf
 
 Version: 20080909
 * replaced libuca with libuna

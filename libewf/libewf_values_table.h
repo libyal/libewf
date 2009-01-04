@@ -24,8 +24,9 @@
 #define _LIBEWF_VALUES_TABLE_H
 
 #include <common.h>
-#include <character_string.h>
 #include <types.h>
+
+#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -41,7 +42,7 @@ struct libewf_values_table
 
 	/* The value identifiers
 	 */
-	character_t **identifier;
+	libewf_character_t **identifier;
 
 	/* The value identifier lengths
 	 */
@@ -49,7 +50,7 @@ struct libewf_values_table
 
 	/* The values
 	 */
-	character_t **value;
+	libewf_character_t **value;
 
 	/* The value lengths
 	 */
@@ -69,34 +70,34 @@ int libewf_values_table_resize(
 
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
-     character_t *identifier,
+     libewf_character_t *identifier,
      size_t identifier_length,
      int *index );
 
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
-     character_t *identifier,
+     libewf_character_t *identifier,
      size_t identifier_size );
 
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
-     character_t *identifier,
+     libewf_character_t *identifier,
      size_t indentifier_length );
 
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     character_t *identifier,
+     libewf_character_t *identifier,
      size_t identifier_length,
-     character_t *value,
+     libewf_character_t *value,
      size_t value_size );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     character_t *identifier,
+     libewf_character_t *identifier,
      size_t identifier_length,
-     character_t *value,
+     libewf_character_t *value,
      size_t value_length );
 
 #if defined( __cplusplus )

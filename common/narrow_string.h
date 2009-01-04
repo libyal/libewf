@@ -39,9 +39,6 @@ extern "C" {
 #if defined( HAVE_STRLEN )
 #define narrow_string_length( string ) \
 	strlen( string )
-
-#define narrow_string_size( string ) \
-	( string == NULL ) ? 0 : strlen( string ) + 1
 #endif
 
 /* String compare

@@ -24,7 +24,6 @@
 #define _LIBEWF_FILE_H
 
 #include <common.h>
-#include <character_string.h>
 #include <system_string.h>
 
 #include <libewf/handle.h>

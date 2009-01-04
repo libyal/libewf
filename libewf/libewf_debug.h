@@ -24,7 +24,6 @@
 #define _LIBEWF_DEBUG_H
 
 #include <common.h>
-#include <character_string.h>
 #include <types.h>
 
 #include <stdio.h>

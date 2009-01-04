@@ -24,13 +24,13 @@
 #define _LIBEWF_INTERFACE_H
 
 #include <common.h>
-#include <character_string.h>
 #include <system_string.h>
 #include <types.h>
 
 #include <libewf/handle.h>
 
 #include "libewf_extern.h"
+#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -155,13 +155,13 @@ LIBEWF_EXTERN int libewf_get_amount_of_header_values(
 LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   character_t *value,
+                   libewf_character_t *value,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_get_header_value(
                    libewf_handle_t *handle,
-                   character_t *identifier,
-                   character_t *value,
+                   libewf_character_t *identifier,
+                   libewf_character_t *value,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
@@ -171,13 +171,13 @@ LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
 LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   character_t *value,
+                   libewf_character_t *value,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_get_hash_value(
                    libewf_handle_t *handle,
-                   character_t *identifier,
-                   character_t *value,
+                   libewf_character_t *identifier,
+                   libewf_character_t *value,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
@@ -251,14 +251,14 @@ LIBEWF_EXTERN int libewf_set_header_codepage(
 
 LIBEWF_EXTERN int libewf_set_header_value(
                    libewf_handle_t *handle,
-                   character_t *identifier,
-                   character_t *value,
+                   libewf_character_t *identifier,
+                   libewf_character_t *value,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_set_hash_value(
                    libewf_handle_t *handle,
-                   character_t *identifier,
-                   character_t *value,
+                   libewf_character_t *identifier,
+                   libewf_character_t *value,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_parse_header_values(

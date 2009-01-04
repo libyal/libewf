@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <file_io.h>
 #include <memory.h>
 #include <notify.h>
@@ -224,7 +223,7 @@ int libewf_glob(
 		}
 		if( additional_length > 0 )
 		{
-			segment_filename[ length ] = (character_t) '.';
+			segment_filename[ length ] = (system_character_t) '.';
 		}
 		if( libewf_filename_set_extension(
 		     &( segment_filename[ length + additional_length - 3 ] ),

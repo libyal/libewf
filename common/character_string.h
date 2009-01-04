@@ -55,9 +55,6 @@ typedef wchar_t libcommon_character_t;
 #define string_length( string ) \
 	wide_string_length( string )
 
-#define string_size( string ) \
-	wide_string_size( string )
-
 #define string_compare( string1, string2, size ) \
 	wide_string_compare( string1, string2, size )
 
@@ -96,9 +93,6 @@ typedef char libcommon_character_t;
 
 #define string_length( string ) \
 	narrow_string_length( string )
-
-#define string_size( string ) \
-	narrow_string_size( string )
 
 #define string_compare( string1, string2, size ) \
 	narrow_string_compare( string1, string2, size )

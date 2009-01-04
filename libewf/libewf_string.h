@@ -43,6 +43,30 @@ typedef wchar_t libewf_character_t;
 #define PRIc_LIBEWF	"lc"
 #define PRIs_LIBEWF	"ls"
 
+#define libewf_string_compare( string1, string2, size ) \
+	wide_string_compare( string1, string2, size )
+
+#define libewf_string_copy( destination, source, size ) \
+	wide_string_copy( destination, source, size )
+
+#define libewf_string_length( string ) \
+	wide_string_length( string )
+
+#define libewf_string_search( string, character, size ) \
+	wide_string_search( string, character, size )
+
+#define libewf_string_search_reverse( string, character, size ) \
+	wide_string_search_reverse( string, character, size )
+
+#define libewf_string_snprintf( target, size, format, ... ) \
+	wide_string_snprintf( target, size, format, __VA_ARGS__ )
+
+#define libewf_string_to_int64( string, end_of_string, base ) \
+	wide_string_to_signed_long_long( string, end_of_string, base )
+
+#define libewf_string_to_uint64( string, end_of_string, base ) \
+	wide_string_to_unsigned_long_long( string, end_of_string, base )
+
 /* Intermediate version of the macro required
  * for correct evaluation predefined string
  */
@@ -61,42 +85,42 @@ typedef wchar_t libewf_character_t;
 #define libewf_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error ) \
 	libuna_utf32_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error )
 
-#define libewf_string_copy_from_byte_stream( libewf_string, string_size, stream, stream_size, codepage, error ) \
-	libuna_utf32_string_copy_from_byte_stream( (libuna_utf32_character_t *) libewf_string, string_size, stream, stream_size, codepage, error )
+#define libewf_string_copy_from_byte_stream( string, string_size, stream, stream_size, codepage, error ) \
+	libuna_utf32_string_copy_from_byte_stream( (libuna_utf32_character_t *) string, string_size, stream, stream_size, codepage, error )
 
-#define byte_stream_size_from_libewf_string( libewf_string, string_size, codepage, stream_size, error ) \
-	libuna_byte_stream_size_from_utf32( (libuna_utf32_character_t *) libewf_string, string_size, codepage, stream_size, error )
+#define byte_stream_size_from_libewf_string( string, string_size, codepage, stream_size, error ) \
+	libuna_byte_stream_size_from_utf32( (libuna_utf32_character_t *) string, string_size, codepage, stream_size, error )
 
-#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, libewf_string, string_size, error ) \
-	libuna_byte_stream_copy_from_utf32( stream, stream_size, codepage, (libuna_utf32_character_t *) libewf_string, string_size, error )
+#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, string, string_size, error ) \
+	libuna_byte_stream_copy_from_utf32( stream, stream_size, codepage, (libuna_utf32_character_t *) string, string_size, error )
 
 /* UTF-8 stream functions
  */
 #define libewf_string_size_from_utf8_stream( stream, stream_size, string_size, error ) \
 	libuna_utf32_string_size_from_utf8( stream, stream_size, string_size, error )
 
-#define libewf_string_copy_from_utf8_stream( libewf_string, string_size, stream, stream_size, error ) \
-	libuna_utf32_string_copy_from_utf8( (libuna_utf32_character_t *) libewf_string, string_size, stream, stream_size, error )
+#define libewf_string_copy_from_utf8_stream( string, string_size, stream, stream_size, error ) \
+	libuna_utf32_string_copy_from_utf8( (libuna_utf32_character_t *) string, string_size, stream, stream_size, error )
 
-#define utf8_stream_size_from_libewf_string( libewf_string, string_size, stream_size, error ) \
-	libuna_utf8_stream_size_from_utf32( (libuna_utf32_character_t *) libewf_string, string_size, stream_size, error )
+#define utf8_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
+	libuna_utf8_stream_size_from_utf32( (libuna_utf32_character_t *) string, string_size, stream_size, error )
 
-#define utf8_stream_copy_from_libewf_string( stream, stream_size, libewf_string, string_size, error ) \
-	libuna_utf8_stream_copy_from_utf32( stream, stream_size, (libuna_utf32_character_t *) libewf_string, string_size, error )
+#define utf8_stream_copy_from_libewf_string( stream, stream_size, string, string_size, error ) \
+	libuna_utf8_stream_copy_from_utf32( stream, stream_size, (libuna_utf32_character_t *) string, string_size, error )
 
 /* UTF-16 stream functions
  */
 #define libewf_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error ) \
 	libuna_utf32_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error )
 
-#define libewf_string_copy_from_utf16_stream( libewf_string, string_size, stream, stream_size, byte_order, error ) \
-	libuna_utf32_string_copy_from_utf16_stream( (libuna_utf32_character_t *) libewf_string, string_size, stream, stream_size, byte_order, error )
+#define libewf_string_copy_from_utf16_stream( string, string_size, stream, stream_size, byte_order, error ) \
+	libuna_utf32_string_copy_from_utf16_stream( (libuna_utf32_character_t *) string, string_size, stream, stream_size, byte_order, error )
 
-#define utf16_stream_size_from_libewf_string( libewf_string, string_size, stream_size, error ) \
-	libuna_utf16_stream_size_from_utf32( (libuna_utf32_character_t *) libewf_string, string_size, stream_size, error )
+#define utf16_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
+	libuna_utf16_stream_size_from_utf32( (libuna_utf32_character_t *) string, string_size, stream_size, error )
 
-#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, libewf_string, string_size, error ) \
-	libuna_utf16_stream_copy_from_utf32( stream, stream_size, byte_order, (libuna_utf32_character_t *) libewf_string, string_size, error )
+#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
+	libuna_utf16_stream_copy_from_utf32( stream, stream_size, byte_order, (libuna_utf32_character_t *) string, string_size, error )
 
 /* The internal character type contains UTF-16
  */
@@ -107,42 +131,42 @@ typedef wchar_t libewf_character_t;
 #define libewf_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error ) \
 	libuna_utf16_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error )
 
-#define libewf_string_copy_from_byte_stream( libewf_string, string_size, stream, stream_size, codepage, error ) \
-	libuna_utf16_string_copy_from_byte_stream( (libuna_utf16_character_t *) libewf_string, string_size, stream, stream_size, codepage, error )
+#define libewf_string_copy_from_byte_stream( string, string_size, stream, stream_size, codepage, error ) \
+	libuna_utf16_string_copy_from_byte_stream( (libuna_utf16_character_t *) string, string_size, stream, stream_size, codepage, error )
 
-#define byte_stream_size_from_libewf_string( libewf_string, string_size, codepage, stream_size, error ) \
-	libuna_byte_stream_size_from_utf16( (libuna_utf16_character_t *) libewf_string, string_size, codepage, stream_size, error )
+#define byte_stream_size_from_libewf_string( string, string_size, codepage, stream_size, error ) \
+	libuna_byte_stream_size_from_utf16( (libuna_utf16_character_t *) string, string_size, codepage, stream_size, error )
 
-#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, libewf_string, string_size, error ) \
-	libuna_byte_stream_copy_from_utf16( stream, stream_size, codepage, (libuna_utf16_character_t *) libewf_string, string_size, error )
+#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, string, string_size, error ) \
+	libuna_byte_stream_copy_from_utf16( stream, stream_size, codepage, (libuna_utf16_character_t *) string, string_size, error )
 
 /* UTF-8 stream functions
  */
 #define libewf_string_size_from_utf8_stream( stream, stream_size, string_size, error ) \
 	libuna_utf16_string_size_from_utf8( stream, stream_size, string_size, error )
 
-#define libewf_string_copy_from_utf8_stream( libewf_string, string_size, stream, stream_size, error ) \
-	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) libewf_string, string_size, stream, stream_size, error )
+#define libewf_string_copy_from_utf8_stream( string, string_size, stream, stream_size, error ) \
+	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) string, string_size, stream, stream_size, error )
 
-#define utf8_stream_size_from_libewf_string( libewf_string, string_size, stream_size, error ) \
-	libuna_utf8_stream_size_from_utf16( (libuna_utf16_character_t *) libewf_string, string_size, stream_size, error )
+#define utf8_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
+	libuna_utf8_stream_size_from_utf16( (libuna_utf16_character_t *) string, string_size, stream_size, error )
 
-#define utf8_stream_copy_from_libewf_string( stream, stream_size, libewf_string, string_size, error ) \
-	libuna_utf8_stream_copy_from_utf16( stream, stream_size, (libuna_utf16_character_t *) libewf_string, string_size, error )
+#define utf8_stream_copy_from_libewf_string( stream, stream_size, string, string_size, error ) \
+	libuna_utf8_stream_copy_from_utf16( stream, stream_size, (libuna_utf16_character_t *) string, string_size, error )
 
 /* UTF-16 stream functions
  */
 #define libewf_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error ) \
 	libuna_utf16_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error )
 
-#define libewf_string_copy_from_utf16_stream( libewf_string, string_size, stream, stream_size, byte_order, error ) \
-	libuna_utf16_string_copy_from_utf16_stream( (libuna_utf16_character_t *) libewf_string, string_size, stream, stream_size, byte_order, error )
+#define libewf_string_copy_from_utf16_stream( string, string_size, stream, stream_size, byte_order, error ) \
+	libuna_utf16_string_copy_from_utf16_stream( (libuna_utf16_character_t *) string, string_size, stream, stream_size, byte_order, error )
 
-#define utf16_stream_size_from_libewf_string( libewf_string, string_size, stream_size, error ) \
-	libuna_utf16_stream_size_from_utf16( (libuna_utf16_character_t *) libewf_string, string_size, stream_size, error )
+#define utf16_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
+	libuna_utf16_stream_size_from_utf16( (libuna_utf16_character_t *) string, string_size, stream_size, error )
 
-#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, libewf_string, string_size, error ) \
-	libuna_utf16_stream_copy_from_utf16( stream, stream_size, byte_order, (libuna_utf16_character_t *) libewf_string, string_size, error )
+#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
+	libuna_utf16_stream_copy_from_utf16( stream, stream_size, byte_order, (libuna_utf16_character_t *) string, string_size, error )
 
 #else
 #error Unsupported size of wchar_t
@@ -160,47 +184,71 @@ typedef char libewf_character_t;
 #define _LIBEWF_CHARACTER_T_STRING( string ) \
 	string
 
+#define libewf_string_compare( string1, string2, size ) \
+	narrow_string_compare( string1, string2, size )
+
+#define libewf_string_copy( destination, source, size ) \
+	narrow_string_copy( destination, source, size )
+
+#define libewf_string_length( string ) \
+	narrow_string_length( string )
+
+#define libewf_string_search( string, character, size ) \
+	narrow_string_search( string, character, size )
+
+#define libewf_string_search_reverse( string, character, size ) \
+	narrow_string_search_reverse( string, character, size )
+
+#define libewf_string_snprintf( target, size, format, ... ) \
+	narrow_string_snprintf( target, size, format, __VA_ARGS__ )
+
+#define libewf_string_to_int64( string, end_of_string, base ) \
+	narrow_string_to_signed_long_long( string, end_of_string, base )
+
+#define libewf_string_to_uint64( string, end_of_string, base ) \
+	narrow_string_to_unsigned_long_long( string, end_of_string, base )
+
 /* Byte stream functions
  */
 #define libewf_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error ) \
 	libuna_utf8_string_size_from_byte_stream( stream, stream_size, codepage, string_size, error )
 
-#define libewf_string_copy_from_byte_stream( libewf_string, string_size, stream, stream_size, codepage, error ) \
-	libuna_utf8_string_copy_from_byte_stream( (libuna_utf8_character_t *) libewf_string, string_size, stream, stream_size, codepage, error )
+#define libewf_string_copy_from_byte_stream( string, string_size, stream, stream_size, codepage, error ) \
+	libuna_utf8_string_copy_from_byte_stream( (libuna_utf8_character_t *) string, string_size, stream, stream_size, codepage, error )
 
-#define byte_stream_size_from_libewf_string( libewf_string, string_size, codepage, stream_size, error ) \
-	libuna_byte_stream_size_from_utf8( (libuna_utf8_character_t *) libewf_string, string_size, codepage, stream_size, error )
+#define byte_stream_size_from_libewf_string( string, string_size, codepage, stream_size, error ) \
+	libuna_byte_stream_size_from_utf8( (libuna_utf8_character_t *) string, string_size, codepage, stream_size, error )
 
-#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, libewf_string, string_size, error ) \
-	libuna_byte_stream_copy_from_utf8( stream, stream_size, codepage, (libuna_utf8_character_t *) libewf_string, string_size, error )
+#define byte_stream_copy_from_libewf_string( stream, stream_size, codepage, string, string_size, error ) \
+	libuna_byte_stream_copy_from_utf8( stream, stream_size, codepage, (libuna_utf8_character_t *) string, string_size, error )
 
 /* UTF-8 stream functions
  */
 #define libewf_string_size_from_utf8_stream( stream, stream_size, string_size, error ) \
 	libuna_utf8_string_size_from_utf8_stream( stream, stream_size, string_size, error )
 
-#define libewf_string_copy_from_utf8_stream( libewf_string, string_size, stream, stream_size, error ) \
-	libuna_utf8_string_copy_from_utf8_stream( (libuna_utf8_character_t *) libewf_string, string_size, stream, stream_size, error )
+#define libewf_string_copy_from_utf8_stream( string, string_size, stream, stream_size, error ) \
+	libuna_utf8_string_copy_from_utf8_stream( (libuna_utf8_character_t *) string, string_size, stream, stream_size, error )
 
-#define utf8_stream_size_from_libewf_string( libewf_string, string_size, stream_size, error ) \
-	libuna_utf8_stream_size_from_utf8( (libuna_utf8_character_t *) libewf_string, string_size, stream_size, error )
+#define utf8_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
+	libuna_utf8_stream_size_from_utf8( (libuna_utf8_character_t *) string, string_size, stream_size, error )
 
-#define utf8_stream_copy_from_libewf_string( stream, stream_size, libewf_string, string_size, error ) \
-	libuna_utf8_stream_copy_from_utf8( stream, stream_size, (libuna_utf8_character_t *) libewf_string, string_size, error )
+#define utf8_stream_copy_from_libewf_string( stream, stream_size, string, string_size, error ) \
+	libuna_utf8_stream_copy_from_utf8( stream, stream_size, (libuna_utf8_character_t *) string, string_size, error )
 
 /* UTF-16 stream functions
  */
 #define libewf_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error ) \
 	libuna_utf8_string_size_from_utf16_stream( stream, stream_size, byte_order, string_size, error )
 
-#define libewf_string_copy_from_utf16_stream( libewf_string, string_size, stream, stream_size, byte_order, error ) \
-	libuna_utf8_string_copy_from_utf16_stream( (libuna_utf8_character_t *) libewf_string, string_size, stream, stream_size, byte_order, error )
+#define libewf_string_copy_from_utf16_stream( string, string_size, stream, stream_size, byte_order, error ) \
+	libuna_utf8_string_copy_from_utf16_stream( (libuna_utf8_character_t *) string, string_size, stream, stream_size, byte_order, error )
 
-#define utf16_stream_size_from_libewf_string( libewf_string, string_size, stream_size, error ) \
-	libuna_utf16_stream_size_from_utf8( (libuna_utf8_character_t *) libewf_string, string_size, stream_size, error )
+#define utf16_stream_size_from_libewf_string( string, string_size, stream_size, error ) \
+	libuna_utf16_stream_size_from_utf8( (libuna_utf8_character_t *) string, string_size, stream_size, error )
 
-#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, libewf_string, string_size, error ) \
-	libuna_utf16_stream_copy_from_utf8( stream, stream_size, byte_order, (libuna_utf8_character_t *) libewf_string, string_size, error )
+#define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
+	libuna_utf16_stream_copy_from_utf8( stream, stream_size, byte_order, (libuna_utf8_character_t *) string, string_size, error )
 
 #endif
 

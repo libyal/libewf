@@ -21,19 +21,19 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <notify.h>
 
 #include "libewf_definitions.h"
 #include "libewf_handle.h"
+#include "libewf_string.h"
 #include "libewf_support.h"
 
 /* Returns the library version as a string
  */
-const character_t *libewf_get_version(
-                    void )
+const libewf_character_t *libewf_get_version(
+                           void )
 {
-	return( (const character_t *) LIBEWF_VERSION_STRING );
+	return( (const libewf_character_t *) LIBEWF_VERSION_STRING );
 }
 
 /* Signals the libewf handle to abort its current activity

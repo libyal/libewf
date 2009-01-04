@@ -190,7 +190,7 @@ int libcommon_string_to_uint64(
 	          &end_of_string,
 	          0 );
 
-	if( *value == (int64_t) LONG_MAX )
+	if( *value == (uint64_t) LONG_MAX )
 	{
 		notify_warning_printf( "%s: unable to convert string.\n",
 		 function );
