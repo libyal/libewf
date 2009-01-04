@@ -924,27 +924,19 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 	segment_number = internal_handle->segment_table->amount - 1;
 
-	/* Check if a new segment file should be created
+	/* Check if a segment number is valid
 	 */
-	if( segment_number == 0 )
+	if( segment_number > internal_handle->segment_table->amount )
 	{
-		result = 0;
-	}
-	/* Check if a segment file already exists
-	 */
-	else
-	{
-		result = libewf_segment_file_exists( internal_handle->segment_table, segment_number );
-	}
-
-	if( result == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to check if segment file exists.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number value out of range.\n",
 		 function );
 
 		return( -1 );
 	}
-	else if( result == 0 )
+	/* Check if a new segment file should be created
+	 */
+	if( ( segment_number == 0 )
+	 || ( internal_handle->segment_table->segment_file[ segment_number ].file_descriptor == -1 ) )
 	{
 		internal_handle->write->create_chunks_section     = 1;
 		internal_handle->write->chunks_section_number     = 0;
@@ -1074,6 +1066,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 	write_count = libewf_segment_file_write_chunks_data(
 		       internal_handle,
+		       &( internal_handle->segment_table->segment_file[ segment_number ] ),
 		       segment_number,
 		       chunk,
 		       chunk_buffer,
@@ -1120,7 +1113,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		 */
 		write_count = libewf_segment_file_write_chunks_correction(
 		               internal_handle,
-		               segment_number,
+		               &( internal_handle->segment_table->segment_file[ segment_number ] ),
 		               internal_handle->write->chunks_section_offset,
 		               (size_t) internal_handle->write->chunks_section_write_count,
 		               internal_handle->write->amount_of_chunks,
@@ -1165,6 +1158,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 			 */
 			write_count = libewf_segment_file_write_close(
 			               internal_handle,
+			               &( internal_handle->segment_table->segment_file[ segment_number ] ),
 			               segment_number,
 			               internal_handle->write->segment_amount_of_chunks,
 			               0 );
@@ -1269,13 +1263,18 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		 */
 		segment_number = internal_handle->delta_segment_table->amount - 1;
 
+		/* Check if a segment number is valid
+		 */
+		if( segment_number > internal_handle->delta_segment_table->amount )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment number value out of range.\n",
+			 function );
+
+			return( -1 );
+		}
 		/* Check if a new delta segment file should be created
 		 */
-		if( segment_number == 0 )
-		{
-			result = 0;
-		}
-		else
+		if( segment_number != 0 )
 		{
 			/* Make sure the current file offset points to the start of the last section
 			 */
@@ -1334,8 +1333,15 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 */
 			else
 			{
-				result = libewf_segment_file_exists( internal_handle->delta_segment_table, segment_number );
-
+				/* refactor */
+				if( internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor == -1 )
+				{
+					result = 0;
+				}
+				else
+				{
+					result = 1;
+				}
 				if( libewf_section_list_remove_last( internal_handle->delta_segment_table->segment_file[ segment_number ].section_list ) != 1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to remove last section from list.\n",
@@ -1345,15 +1351,12 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				}
 			}
 		}
-
-		if( result == -1 )
+		else
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to check if segment file exists.\n",
-			 function );
-
-			return( -1 );
+			result = 0;
 		}
-		else if( result == 0 )
+
+		if( result == 0 )
 		{
 			segment_number++;
 
@@ -1419,8 +1422,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_segment_file_write_delta_chunk(
-		       internal_handle->delta_segment_table,
-		       segment_number,
+		       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
 		       chunk, 
 		       chunk_buffer, 
 		       chunk_size, 
@@ -2365,7 +2367,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 			write_count = libewf_segment_file_write_chunks_correction(
 				       internal_handle,
-				       segment_number,
+				       &( internal_handle->segment_table->segment_file[ segment_number ] ),
 				       internal_handle->write->chunks_section_offset,
 				       (size_t) internal_handle->write->chunks_section_write_count,
 				       internal_handle->write->amount_of_chunks,
@@ -2389,6 +2391,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 		write_count = libewf_segment_file_write_close(
 		               internal_handle,
+		               &( internal_handle->segment_table->segment_file[ segment_number ] ),
 		               segment_number,
 		               internal_handle->write->segment_amount_of_chunks,
 		               1 );
