@@ -3188,8 +3188,17 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( int file_descriptor, size_t size )
+ssize_t libewf_section_delta_chunk_read( int file_descriptor, size_t size, LIBEWF_OFFSET_TABLE *offset_table )
 {
+	static char *function = "libewf_section_delta_chunk_read";
+
+	if( offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( 0 );
 }
 
@@ -3441,6 +3450,12 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	else if( ewf_section_is_type_sectors( section ) == 1 )
 	{
 		count = libewf_section_sectors_read( internal_handle, file_descriptor, (size_t) size );
+	}
+	/* Read the dtchunk section
+	 */
+	else if( ewf_section_is_type_delta_chunk( section ) == 1 )
+	{
+		count = libewf_section_delta_chunk_read( internal_handle, file_descriptor, (size_t) size );
 	}
 	/* Read the ltree section
 	 */

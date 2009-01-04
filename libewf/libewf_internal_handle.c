@@ -221,14 +221,18 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 		return;
 	}
-	libewf_internal_handle_media_free( internal_handle->media );
-
+	if( internal_handle->media != NULL )
+	{
+		libewf_internal_handle_media_free( internal_handle->media );
+	}
 	if( internal_handle->read != NULL )
 	{
 		libewf_internal_handle_read_free( internal_handle->read );
 	}
-	libewf_internal_handle_write_free( internal_handle->write );
-
+	if( internal_handle->write != NULL )
+	{
+		libewf_internal_handle_write_free( internal_handle->write );
+	}
 	if( internal_handle->segment_table != NULL )
 	{
 		libewf_segment_table_free( internal_handle->segment_table );

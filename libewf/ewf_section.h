@@ -113,6 +113,9 @@ int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );
 #define ewf_section_is_type_xhash( section ) \
 	ewf_section_is_type( section, (EWF_CHAR *) "xhash" )
 
+#define ewf_section_is_type_delta_chunk( section ) \
+	ewf_section_is_type( section, (EWF_CHAR *) "delta_chunk" )
+
 #ifdef __cplusplus
 }
 #endif
