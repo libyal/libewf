@@ -22,12 +22,13 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_filename.h"
 #include "libewf_list_type.h"
+#include "libewf_notify.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file_handle.h"
 
@@ -37,16 +38,16 @@
 int libewf_segment_file_handle_initialize(
      libewf_segment_file_handle_t **segment_file_handle,
      int file_io_pool_entry,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_initialize";
 
 	if( segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
 		 function );
 
@@ -59,10 +60,10 @@ int libewf_segment_file_handle_initialize(
 
 		if( *segment_file_handle == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create segment file handle.",
 			 function );
 
@@ -73,10 +74,10 @@ int libewf_segment_file_handle_initialize(
 		     0,
 		     sizeof( libewf_segment_file_handle_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear segment file handle.",
 			 function );
 
@@ -92,10 +93,10 @@ int libewf_segment_file_handle_initialize(
 
 		if( ( *segment_file_handle )->section_list == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create section list.",
 			 function );
 
@@ -111,10 +112,10 @@ int libewf_segment_file_handle_initialize(
 		     0,
 		     sizeof( libewf_list_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear section list.",
 			 function );
 
@@ -137,16 +138,16 @@ int libewf_segment_file_handle_initialize(
  */
 int libewf_segment_file_handle_free(
      libewf_segment_file_handle_t **segment_file_handle,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_free";
 
 	if( segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
 		 function );
 
@@ -161,10 +162,10 @@ int libewf_segment_file_handle_free(
 			     &libewf_section_list_values_free,
 			     error ) != 1 )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free section list.",
 				 function );
 			}

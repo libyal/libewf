@@ -23,12 +23,13 @@
 #include <common.h>
 #include <endian.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "libewf_definitions.h"
-#include "libewf_error.h"
 #include "libewf_list_type.h"
+#include "libewf_notify.h"
 #include "libewf_offset_table.h"
 #include "libewf_section_list.h"
 
@@ -40,17 +41,17 @@
 int libewf_offset_table_initialize(
      libewf_offset_table_t **offset_table,
      uint32_t amount_of_chunk_offsets,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function    = "libewf_offset_table_initialize";
 	size_t chunk_offset_size = 0;
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -62,10 +63,10 @@ int libewf_offset_table_initialize(
 
 		if( chunk_offset_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid chunk offset size value exceeds maximum.",
 			 function );
 
@@ -76,10 +77,10 @@ int libewf_offset_table_initialize(
 
 		if( *offset_table == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create offset table.",
 			 function );
 
@@ -90,10 +91,10 @@ int libewf_offset_table_initialize(
 		     0,
 		     sizeof( libewf_offset_table_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear offset table.",
 			 function );
 
@@ -111,10 +112,10 @@ int libewf_offset_table_initialize(
 
 			if( ( *offset_table )->chunk_offset == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_MEMORY,
-				 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to create chunk offsets.",
 				 function );
 
@@ -130,10 +131,10 @@ int libewf_offset_table_initialize(
 			     0,
 			     chunk_offset_size ) == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_MEMORY,
-				 LIBEWF_MEMORY_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
 				 "%s: unable to clear chunk offsets.",
 				 function );
 
@@ -157,16 +158,16 @@ int libewf_offset_table_initialize(
  */
 int libewf_offset_table_free(
      libewf_offset_table_t **offset_table,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_offset_table_free";
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -195,7 +196,7 @@ int libewf_offset_table_free(
 int libewf_offset_table_resize(
      libewf_offset_table_t *offset_table,
      uint32_t amount_of_chunk_offsets,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	void *reallocation       = NULL;
 	static char *function    = "libewf_offset_table_resize";
@@ -203,10 +204,10 @@ int libewf_offset_table_resize(
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset_table.",
 		 function );
 
@@ -218,10 +219,10 @@ int libewf_offset_table_resize(
 
 		if( chunk_offset_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid chunk offset size value exceeds maximum.",
 			 function );
 
@@ -233,10 +234,10 @@ int libewf_offset_table_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize chunk offsets.",
 			 function );
 
@@ -249,10 +250,10 @@ int libewf_offset_table_resize(
 		     0,
 		     ( sizeof( libewf_chunk_offset_t ) * ( amount_of_chunk_offsets - offset_table->amount_of_chunk_offsets ) ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear chunk offsets.",
 			 function );
 
@@ -273,7 +274,7 @@ int libewf_offset_table_fill(
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t tainted,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *chunk_type                    = NULL;
@@ -293,10 +294,10 @@ int libewf_offset_table_fill(
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -304,10 +305,10 @@ int libewf_offset_table_fill(
 	}
 	if( base_offset < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
 		 function );
 
@@ -315,10 +316,10 @@ int libewf_offset_table_fill(
 	}
 	if( segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
 		 function );
 
@@ -340,10 +341,10 @@ int libewf_offset_table_fill(
 	       offset_table->last_chunk_offset_filled + amount_of_chunks,
 	       error ) != 1 ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 		 "%s: unable to resize offset table.",
 		 function );
 
@@ -388,7 +389,7 @@ int libewf_offset_table_fill(
 			if( raw_offset < current_offset )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -400,7 +401,7 @@ int libewf_offset_table_fill(
 #if defined( HAVE_VERBOSE_OUTPUT )
 			else
 			{
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -415,7 +416,7 @@ int libewf_offset_table_fill(
 		}
 		if( chunk_size == 0 )
 		{
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: invalid chunk size value is zero.\n",
 			 function );
 
@@ -423,7 +424,7 @@ int libewf_offset_table_fill(
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: invalid chunk size value exceeds maximum.\n",
 			 function );
 
@@ -450,7 +451,7 @@ int libewf_offset_table_fill(
 		{
 			remarks = "";
 		}
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
@@ -485,7 +486,7 @@ int libewf_offset_table_fill(
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: chunk offset overflow at: %" PRIu32 ".\n",
 			 function,
 			 current_offset );
@@ -532,7 +533,7 @@ int libewf_offset_table_fill(
 	{
 		remarks = "";
 	}
-	notify_verbose_printf(
+	libewf_notify_verbose_printf(
 	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
 	 function,
 	 chunk_type,
@@ -566,7 +567,7 @@ int libewf_offset_table_fill_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
      uint8_t tainted,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *remarks                                     = NULL;
@@ -582,10 +583,10 @@ int libewf_offset_table_fill_last_offset(
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -593,10 +594,10 @@ int libewf_offset_table_fill_last_offset(
 	}
 	if( offset_table->chunk_offset == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid offset table - missing chunk offsets.",
 		 function );
 
@@ -604,10 +605,10 @@ int libewf_offset_table_fill_last_offset(
 	}
 	if( section_list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section list.",
 		 function );
 
@@ -627,17 +628,17 @@ int libewf_offset_table_fill_last_offset(
 
 		if( section_list_values == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid section list values.",
 			 function );
 
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
 		 function,
 		 section_list_values->start_offset,
@@ -651,10 +652,10 @@ int libewf_offset_table_fill_last_offset(
 
 			if( last_offset > (off64_t) INT64_MAX )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 				 "%s: invalid last chunk offset value exceeds maximum.",
 				 function );
 
@@ -665,7 +666,7 @@ int libewf_offset_table_fill_last_offset(
 			if( chunk_size == 0 )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: invalid chunk size value is zero.\n",
 				 function );
 #endif
@@ -675,7 +676,7 @@ int libewf_offset_table_fill_last_offset(
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
 #endif
@@ -695,7 +696,7 @@ int libewf_offset_table_fill_last_offset(
 			{
 				remarks = "";
 			}
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
 			 function,
 			 offset_table->last_chunk_offset_filled + 1,
@@ -732,7 +733,7 @@ int libewf_offset_table_fill_offsets(
      off64_t base_offset,
      ewf_table_offset_t *offsets,
      uint32_t amount_of_offsets,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_chunk_offset_t *chunk_offset = NULL;
 	static char *function               = "libewf_offset_table_fill_offsets";
@@ -742,10 +743,10 @@ int libewf_offset_table_fill_offsets(
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -753,10 +754,10 @@ int libewf_offset_table_fill_offsets(
 	}
 	if( offset_table->chunk_offset == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid offset table - missing chunk offsets.",
 		 function );
 
@@ -764,10 +765,10 @@ int libewf_offset_table_fill_offsets(
 	}
 	if( base_offset < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
 		 function );
 
@@ -775,10 +776,10 @@ int libewf_offset_table_fill_offsets(
 	}
 	if( offsets == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid table offsets.",
 		 function );
 
@@ -786,10 +787,10 @@ int libewf_offset_table_fill_offsets(
 	}
 	if( amount_of_offsets < amount_of_chunk_offsets )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: amount of offsets too small.",
 		 function );
 
@@ -803,10 +804,10 @@ int libewf_offset_table_fill_offsets(
 		if( ( offset64_value < 0 )
 		 || ( offset64_value > (off64_t) INT32_MAX ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid chunk offset value.",
 			 function );
 
@@ -835,7 +836,7 @@ int libewf_offset_table_compare(
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t tainted,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *chunk_type                    = NULL;
@@ -856,10 +857,10 @@ int libewf_offset_table_compare(
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -867,10 +868,10 @@ int libewf_offset_table_compare(
 	}
 	if( base_offset < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid base offset.",
 		 function );
 
@@ -878,10 +879,10 @@ int libewf_offset_table_compare(
 	}
 	if( segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
 		 function );
 
@@ -903,10 +904,10 @@ int libewf_offset_table_compare(
 	       offset_table->last_chunk_offset_compared + amount_of_chunks,
 	       error ) != 1 ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 		 "%s: unable to resize offset table.",
 		 function );
 
@@ -951,7 +952,7 @@ int libewf_offset_table_compare(
 			if( raw_offset < current_offset )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -963,7 +964,7 @@ int libewf_offset_table_compare(
 #if defined( HAVE_VERBOSE_OUTPUT )
 			else
 			{
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
 				 function,
 				 current_offset,
@@ -981,7 +982,7 @@ int libewf_offset_table_compare(
 		if( chunk_size == 0 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: invalid chunk size - size is zero.\n",
 			 function );
 #endif
@@ -991,7 +992,7 @@ int libewf_offset_table_compare(
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: invalid chunk size value exceeds maximum.\n",
 			 function );
 #endif
@@ -1003,7 +1004,7 @@ int libewf_offset_table_compare(
 		if( chunk_offset->file_offset != (off64_t) ( base_offset + current_offset ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: file offset mismatch for chunk offset: %" PRIu32 ".\n",
 			 function,
 			 offset_table->last_chunk_offset_compared );
@@ -1014,7 +1015,7 @@ int libewf_offset_table_compare(
 		else if( chunk_offset->size != (size_t) chunk_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: chunk size mismatch for chunk offset: %" PRIu32 ".\n",
 			 function,
 			 offset_table->last_chunk_offset_compared );
@@ -1025,7 +1026,7 @@ int libewf_offset_table_compare(
 		else if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) != compressed )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: compressed mismatch for chunk offset: %" PRIu32 ".\n",
 			 function,
 			 offset_table->last_chunk_offset_compared );
@@ -1062,7 +1063,7 @@ int libewf_offset_table_compare(
 		{
 			remarks = "";
 		}
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
@@ -1092,7 +1093,7 @@ int libewf_offset_table_compare(
 		 && ( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: chunk offset overflow at: %" PRIu32 ".\n",
 			 function,
 			 current_offset );
@@ -1123,7 +1124,7 @@ int libewf_offset_table_compare(
 	if( chunk_offset->file_offset != (off64_t) ( base_offset + current_offset ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: file offset mismatch for chunk offset: %" PRIu32 ".\n",
 		 function,
 		 offset_table->last_chunk_offset_compared );
@@ -1134,7 +1135,7 @@ int libewf_offset_table_compare(
 	else if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) != compressed )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: compressed mismatch for chunk offset: %" PRIu32 ".\n",
 		 function,
 		 offset_table->last_chunk_offset_compared );
@@ -1171,7 +1172,7 @@ int libewf_offset_table_compare(
 	{
 		remarks = "";
 	}
-	notify_verbose_printf(
+	libewf_notify_verbose_printf(
 	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
 	 function,
 	 chunk_type,
@@ -1200,7 +1201,7 @@ int libewf_offset_table_compare_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
      uint8_t tainted,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *remarks                                     = NULL;
@@ -1217,10 +1218,10 @@ int libewf_offset_table_compare_last_offset(
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -1228,10 +1229,10 @@ int libewf_offset_table_compare_last_offset(
 	}
 	if( offset_table->chunk_offset == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid offset table - missing chunk offsets.",
 		 function );
 
@@ -1239,10 +1240,10 @@ int libewf_offset_table_compare_last_offset(
 	}
 	if( section_list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section list.",
 		 function );
 
@@ -1262,17 +1263,17 @@ int libewf_offset_table_compare_last_offset(
 
 		if( section_list_values == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid section list values.",
 			 function );
 
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: start offset: %" PRIi64 " last offset: %" PRIi64 " \n",
 		 function,
 		 section_list_values->start_offset,
@@ -1286,10 +1287,10 @@ int libewf_offset_table_compare_last_offset(
 
 			if( last_offset > (off64_t) INT64_MAX )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 				 "%s: invalid last chunk offset value exceeds maximum.",
 				 function );
 
@@ -1297,7 +1298,7 @@ int libewf_offset_table_compare_last_offset(
 			}
 			if( chunk_size == 0 )
 			{
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: invalid chunk size - size is zero.\n",
 				 function );
 
@@ -1305,7 +1306,7 @@ int libewf_offset_table_compare_last_offset(
 			}
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
 
@@ -1314,7 +1315,7 @@ int libewf_offset_table_compare_last_offset(
 			if( chunk_offset->size != (size_t) chunk_size )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: chunk size mismatch for chunk offset: %" PRIu32 ".\n",
 				 function,
 				 offset_table->last_chunk_offset_compared );
@@ -1343,7 +1344,7 @@ int libewf_offset_table_compare_last_offset(
 			{
 				remarks = "";
 			}
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
 			 function,
 			 offset_table->last_chunk_offset_compared + 1,
@@ -1373,16 +1374,16 @@ off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          libewf_file_io_pool_t *file_io_pool,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	static char *function = "libewf_segment_table_seek_chunk_offset";
 
 	if( offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid offset table.",
 		 function );
 
@@ -1390,10 +1391,10 @@ off64_t libewf_offset_table_seek_chunk_offset(
 	}
 	if( offset_table->chunk_offset == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid offset table - missing chunk offsets.",
 		 function );
 
@@ -1401,10 +1402,10 @@ off64_t libewf_offset_table_seek_chunk_offset(
 	}
 	if( chunk >= offset_table->amount_of_chunk_offsets )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].",
 		 function,
 		 chunk,
@@ -1414,10 +1415,10 @@ off64_t libewf_offset_table_seek_chunk_offset(
 	}
 	if( offset_table->chunk_offset[ chunk ].segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing segment file handle for chunk: %" PRIu32 ".",
 		 function,
 		 chunk );
@@ -1431,10 +1432,10 @@ off64_t libewf_offset_table_seek_chunk_offset(
 	     SEEK_SET,
 	     error ) == -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_SEEK_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to find chunk offset: %" PRIjd ".",
 		 function,
 		 offset_table->chunk_offset[ chunk ].file_offset );

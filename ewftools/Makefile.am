@@ -9,6 +9,7 @@ bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
 ewfacquire_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
+	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfacquire.c \
 	ewfcommon.c ewfcommon.h \
@@ -24,15 +25,17 @@ ewfacquire_SOURCES = \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	notify.c notify.h \
 	process_status.c process_status.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfacquire_LDADD  = ../common/libcommon.la ../libewf/libewf.la
+ewfacquire_LDADD  = ../libewf/libewf.la
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
+	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfacquirestream.c \
 	ewfcommon.c ewfcommon.h \
@@ -48,15 +51,17 @@ ewfacquirestream_SOURCES = \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	notify.c notify.h \
 	process_status.c process_status.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfacquirestream_LDADD  = ../common/libcommon.la ../libewf/libewf.la
+ewfacquirestream_LDADD  = ../libewf/libewf.la
 
 ewfalter_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
+	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfalter.c \
 	ewfcommon.c ewfcommon.h \
@@ -72,15 +77,17 @@ ewfalter_SOURCES = \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	notify.c notify.h \
 	process_status.c process_status.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfalter_LDADD  = ../common/libcommon.la ../libewf/libewf.la
+ewfalter_LDADD  = ../libewf/libewf.la
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
+	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
@@ -95,15 +102,17 @@ ewfexport_SOURCES = \
 	ewfsha1.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
+	notify.c notify.h \
 	process_status.c process_status.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfexport_LDADD  = ../common/libcommon.la ../libewf/libewf.la
+ewfexport_LDADD  = ../libewf/libewf.la
 
 ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
+	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
@@ -118,15 +127,17 @@ ewfinfo_SOURCES = \
 	ewfsha1.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
+	notify.c notify.h \
 	process_status.c process_status.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfinfo_LDADD  = ../common/libcommon.la ../libewf/libewf.la
+ewfinfo_LDADD  = ../libewf/libewf.la
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
 	character_string.c character_string.h \
+	date_time.c date_time.h \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
@@ -141,11 +152,12 @@ ewfverify_SOURCES = \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	notify.c notify.h \
 	process_status.c process_status.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfverify_LDADD  = ../common/libcommon.la ../libewf/libewf.la
+ewfverify_LDADD  = ../libewf/libewf.la
 
 distclean: clean
 	/bin/rm -f Makefile

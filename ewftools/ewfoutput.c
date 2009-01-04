@@ -78,9 +78,6 @@
 
 #include <libewf.h>
 
-#include "../libewf/libewf_hash_values.h"
-#include "../libewf/libewf_header_values.h"
-
 #include "character_string.h"
 #include "byte_size_string.h"
 #include "error_string.h"
@@ -1103,13 +1100,15 @@ void ewfoutput_header_values_fprint(
 		 "\tUnknown value ext:\t%" PRIs "\n",
 		 header_value );
 	}
-	if( amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	/* Currently there are 16 default values
+	 */
+	if( amount_of_values > 16 )
 	{
 		fprintf(
 		 stream,
 		 "\n\tAdditional values:\n" );
 
-		for( iterator = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
+		for( iterator = 16; iterator < amount_of_values; iterator++ )
 		{
 			if( ewfoutput_get_header_value_identifier(
 			     handle,
@@ -1234,9 +1233,11 @@ void ewfoutput_hash_values_fprint(
 		}
 		if( amount_of_values > 0 )
 		{
-			if( amount_of_values > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
+			/* Currently there is 1 default header value
+			 */
+			if( amount_of_values > 1 )
 			{
-				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
+				for( iterator = 1; iterator < amount_of_values; iterator++ )
 				{
 					if( ewfoutput_get_hash_value_identifier(
 					     handle,

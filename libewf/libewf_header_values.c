@@ -21,15 +21,25 @@
  */
 
 #include <common.h>
-#include <date_time.h>
 #include <endian.h>
 #include <memory.h>
-#include <notify.h>
 
+#include <liberror.h>
+
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+
+#include "libewf_date_time.h"
 #include "libewf_definitions.h"
-#include "libewf_error.h"
 #include "libewf_header_values.h"
 #include "libewf_libuna.h"
+#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -39,16 +49,16 @@
  */
 int libewf_header_values_initialize(
      libewf_values_table_t *header_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_header_values_initialize";
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -61,10 +71,10 @@ int libewf_header_values_initialize(
 	     11,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set case_number identifier.",
 		 function );
 
@@ -77,10 +87,10 @@ int libewf_header_values_initialize(
 	     11,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set description identifier.",
 		 function );
 
@@ -93,10 +103,10 @@ int libewf_header_values_initialize(
 	     13,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set examiner_name identifier.",
 		 function );
 
@@ -109,10 +119,10 @@ int libewf_header_values_initialize(
 	     15,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set evidence_number identifier.",
 		 function );
 
@@ -125,10 +135,10 @@ int libewf_header_values_initialize(
 	     5,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set notes identifier.",
 		 function );
 
@@ -141,10 +151,10 @@ int libewf_header_values_initialize(
 	     12,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set acquiry_date identifier.",
 		 function );
 
@@ -157,10 +167,10 @@ int libewf_header_values_initialize(
 	     11,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set system_date identifier.",
 		 function );
 
@@ -173,10 +183,10 @@ int libewf_header_values_initialize(
 	     24,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set acquiry_operating_system identifier.",
 		 function );
 
@@ -189,10 +199,10 @@ int libewf_header_values_initialize(
 	     24,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set acquiry_software_version identifier.",
 		 function );
 
@@ -205,10 +215,10 @@ int libewf_header_values_initialize(
 	     8,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set password identifier.",
 		 function );
 
@@ -221,10 +231,10 @@ int libewf_header_values_initialize(
 	     16,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set compression_type identifier.",
 		 function );
 
@@ -237,10 +247,10 @@ int libewf_header_values_initialize(
 	     5,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set model identifier.",
 		 function );
 
@@ -253,10 +263,10 @@ int libewf_header_values_initialize(
 	     13,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set serial_number identifier.",
 		 function );
 
@@ -269,10 +279,10 @@ int libewf_header_values_initialize(
 	     11,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set unknown_pid identifier.",
 		 function );
 
@@ -285,10 +295,10 @@ int libewf_header_values_initialize(
 	     10,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set unknown_dc identifier.",
 		 function );
 
@@ -301,10 +311,10 @@ int libewf_header_values_initialize(
 	     11,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set unknown_ext identifier.",
 		 function );
 
@@ -322,7 +332,7 @@ int libewf_header_values_date_string_copy_from_timestamp(
      size_t date_string_size,
      time_t timestamp,
      uint8_t date_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	struct tm *time_elements        = NULL;
 	libewf_character_t *day_of_week = NULL;
@@ -332,10 +342,10 @@ int libewf_header_values_date_string_copy_from_timestamp(
 
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -343,10 +353,10 @@ int libewf_header_values_date_string_copy_from_timestamp(
 	}
 	if( date_string_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid date string size.",
 		 function );
 
@@ -354,10 +364,10 @@ int libewf_header_values_date_string_copy_from_timestamp(
 	}
 	if( date_string_size < 32 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: date string too small.",
 		 function );
 
@@ -368,24 +378,25 @@ int libewf_header_values_date_string_copy_from_timestamp(
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date format.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements = date_time_localtime(
-			 &timestamp );
+	time_elements = libewf_date_time_localtime(
+			 &timestamp,
+	                 error );
 
 	if( time_elements == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create time elements.",
 		 function );
 
@@ -418,10 +429,10 @@ int libewf_header_values_date_string_copy_from_timestamp(
 				break;
 
 			default:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported day of the week value.",
 				 function );
 
@@ -470,10 +481,10 @@ int libewf_header_values_date_string_copy_from_timestamp(
 				break;
 
 			default:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: unsupported month value.",
 				 function );
 
@@ -538,10 +549,10 @@ int libewf_header_values_date_string_copy_from_timestamp(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > date_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set date string.",
 		 function );
 
@@ -566,7 +577,7 @@ int libewf_convert_date_header_value(
      uint8_t date_format,
      libewf_character_t **date_string,
      size_t *date_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	struct tm time_elements;
 
@@ -577,10 +588,10 @@ int libewf_convert_date_header_value(
 
 	if( header_value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header value.",
 		 function );
 
@@ -591,10 +602,10 @@ int libewf_convert_date_header_value(
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date format.",
 		 function );
 
@@ -602,10 +613,10 @@ int libewf_convert_date_header_value(
 	}
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -613,10 +624,10 @@ int libewf_convert_date_header_value(
 	}
 	if( date_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string size.",
 		 function );
 
@@ -630,10 +641,10 @@ int libewf_convert_date_header_value(
 	     &amount_of_date_elements,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split header value into date elements.",
 		 function );
 
@@ -641,10 +652,10 @@ int libewf_convert_date_header_value(
 	}
 	if( amount_of_date_elements != 6 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported amount of date elements in header value.",
 		 function );
 
@@ -729,10 +740,10 @@ int libewf_convert_date_header_value(
 	     amount_of_date_elements,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split date elements.",
 		 function );
 
@@ -740,15 +751,15 @@ int libewf_convert_date_header_value(
 	}
 	/* Create a timestamp
 	 */
-	timestamp = date_time_mktime(
+	timestamp = libewf_date_time_mktime(
 	             &time_elements );
 
 	if( timestamp == (time_t) -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create timestamp.",
 		 function );
 
@@ -761,10 +772,10 @@ int libewf_convert_date_header_value(
 
 	if( *date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create date string.",
 		 function );
 
@@ -779,10 +790,10 @@ int libewf_convert_date_header_value(
 	     date_format,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to convert timestamp into date string.",
 		 function );
 
@@ -805,7 +816,7 @@ int libewf_generate_date_header_value(
      time_t timestamp,
      libewf_character_t **date_string,
      size_t *date_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	struct tm *time_elements = NULL;
 	static char *function    = "libewf_generate_date_header_value";
@@ -813,10 +824,10 @@ int libewf_generate_date_header_value(
 
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -824,10 +835,10 @@ int libewf_generate_date_header_value(
 	}
 	if( *date_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: date string already created.",
 		 function );
 
@@ -835,24 +846,25 @@ int libewf_generate_date_header_value(
 	}
 	if( date_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string size.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements = date_time_localtime(
-	                 &timestamp );
+	time_elements = libewf_date_time_localtime(
+	                 &timestamp,
+	                 error );
 
 	if( time_elements == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create time elements.",
 		 function );
 
@@ -865,10 +877,10 @@ int libewf_generate_date_header_value(
 
 	if( *date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create date string.",
 		 function );
 
@@ -893,10 +905,10 @@ int libewf_generate_date_header_value(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *date_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set date string.",
 		 function );
 
@@ -926,7 +938,7 @@ int libewf_convert_date_header2_value(
      uint8_t date_format,
      libewf_character_t **date_string,
      size_t *date_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *end_of_header_value = NULL;
 	static char *function                   = "libewf_convert_date_header2_value";
@@ -935,10 +947,10 @@ int libewf_convert_date_header2_value(
 
 	if( header_value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header value.",
 		 function );
 
@@ -946,10 +958,10 @@ int libewf_convert_date_header2_value(
 	}
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -957,10 +969,10 @@ int libewf_convert_date_header2_value(
 	}
 	if( date_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string size.",
 		 function );
 
@@ -975,10 +987,10 @@ int libewf_convert_date_header2_value(
 
 	if( timestamp_value >= (uint64_t) LONG_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: timestamp value exceeds maximum.",
 		 function );
 
@@ -993,10 +1005,10 @@ int libewf_convert_date_header2_value(
 
 	if( *date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create date string.",
 		 function );
 
@@ -1011,10 +1023,10 @@ int libewf_convert_date_header2_value(
 	     date_format,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to convert timestamp into date string.",
 		 function );
 
@@ -1037,17 +1049,17 @@ int libewf_generate_date_header2_value(
      time_t timestamp,
      libewf_character_t **date_string,
      size_t *date_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_generate_date_header2_value";
 	int print_count       = 0;
 
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -1055,10 +1067,10 @@ int libewf_generate_date_header2_value(
 	}
 	if( *date_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: date string already created.",
 		 function );
 
@@ -1066,10 +1078,10 @@ int libewf_generate_date_header2_value(
 	}
 	if( date_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string size.",
 		 function );
 
@@ -1082,10 +1094,10 @@ int libewf_generate_date_header2_value(
 
 	if( *date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create date string.",
 		 function );
 
@@ -1102,10 +1114,10 @@ int libewf_generate_date_header2_value(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *date_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to create date string.",
 		 function );
 
@@ -1126,17 +1138,17 @@ int libewf_generate_date_header2_value(
 int libewf_header_values_copy(
      libewf_values_table_t *destination_header_values,
      libewf_values_table_t *source_header_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function  = "libewf_header_values_copy";
 	int values_table_index = 0;
 
 	if( destination_header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid destination header values.",
 		 function );
 
@@ -1144,10 +1156,10 @@ int libewf_header_values_copy(
 	}
 	if( source_header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid source header values.",
 		 function );
 
@@ -1155,10 +1167,10 @@ int libewf_header_values_copy(
 	}
 	if( source_header_values->amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid source header values - amount is less than zero.",
 		 function );
 
@@ -1166,10 +1178,10 @@ int libewf_header_values_copy(
 	}
 	if( source_header_values->identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid source header values - missing identifiers.",
 		 function );
 
@@ -1177,10 +1189,10 @@ int libewf_header_values_copy(
 	}
 	if( source_header_values->identifier_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid source header values - missing identifier lengths.",
 		 function );
 
@@ -1188,10 +1200,10 @@ int libewf_header_values_copy(
 	}
 	if( source_header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid source header values - missing values.",
 		 function );
 
@@ -1199,10 +1211,10 @@ int libewf_header_values_copy(
 	}
 	if( source_header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid source header values - missing value lengths.",
 		 function );
 
@@ -1223,7 +1235,7 @@ int libewf_header_values_copy(
 		 || ( source_header_values->identifier_length[ values_table_index ] == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: missing identifier for index: %d.\n",
 			 function, values_table_index );
 #endif
@@ -1236,7 +1248,7 @@ int libewf_header_values_copy(
 		 || ( source_header_values->value_length[ values_table_index ] == 0 ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: missing value for index: %d.\n",
 			 function, values_table_index );
 #endif
@@ -1251,10 +1263,10 @@ int libewf_header_values_copy(
 		     source_header_values->value_length[ values_table_index ],
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set value for index: %d.",
 			 function, values_table_index );
 
@@ -1272,7 +1284,7 @@ int libewf_header_values_parse_header_string(
      libewf_character_t *header_string,
      size_t header_string_size,
      uint8_t date_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t **lines       = NULL;
 	libewf_character_t **types       = NULL;
@@ -1293,10 +1305,10 @@ int libewf_header_values_parse_header_string(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -1304,10 +1316,10 @@ int libewf_header_values_parse_header_string(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -1318,10 +1330,10 @@ int libewf_header_values_parse_header_string(
 	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header values.",
 		 function );
 
@@ -1331,10 +1343,10 @@ int libewf_header_values_parse_header_string(
 	     *header_values,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize the header values.",
 		 function );
 
@@ -1348,10 +1360,10 @@ int libewf_header_values_parse_header_string(
 	     &amount_of_lines,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split header string into lines.",
 		 function );
 
@@ -1370,10 +1382,10 @@ int libewf_header_values_parse_header_string(
 		     &amount_of_types,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to split header string into types.",
 			 function );
 
@@ -1395,10 +1407,10 @@ int libewf_header_values_parse_header_string(
 		    &amount_of_values,
 		    error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to split header string into values.",
 			 function );
 
@@ -1416,7 +1428,7 @@ int libewf_header_values_parse_header_string(
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( amount_of_types != amount_of_values )
 		{
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: mismatch in amount of types and values.\n",
 			 function );
 		}
@@ -1466,10 +1478,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set unknown: ext.",
 						 function );
 
@@ -1498,10 +1510,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set unknown: pid.",
 						 function );
 
@@ -1533,10 +1545,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set acquiry software version.",
 						 function );
 
@@ -1565,10 +1577,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set unknown: dc.",
 						 function );
 
@@ -1597,10 +1609,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set model.",
 						 function );
 
@@ -1629,10 +1641,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set acquiry operating system.",
 						 function );
 
@@ -1661,10 +1673,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set serial_number.",
 						 function );
 
@@ -1721,10 +1733,10 @@ int libewf_header_values_parse_header_string(
 					if( ( value_string_length != 0 )
 					 && ( result != 1 ) )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_CONVERSION,
-						 LIBEWF_CONVERSION_ERROR_GENERIC,
+						 LIBERROR_ERROR_DOMAIN_CONVERSION,
+						 LIBERROR_CONVERSION_ERROR_GENERIC,
 						 "%s: unable to create date string.",
 						 function );
 					}
@@ -1751,10 +1763,10 @@ int libewf_header_values_parse_header_string(
 							     value_string_length,
 							     error ) != 1 )
 							{
-								libewf_error_set(
+								liberror_error_set(
 								 error,
-								 LIBEWF_ERROR_DOMAIN_RUNTIME,
-								 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+								 LIBERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 								 "%s: unable to set acquiry date.",
 								 function );
 
@@ -1783,10 +1795,10 @@ int libewf_header_values_parse_header_string(
 							     value_string_length,
 							     error ) != 1 )
 							{
-								libewf_error_set(
+								liberror_error_set(
 								 error,
-								 LIBEWF_ERROR_DOMAIN_RUNTIME,
-								 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+								 LIBERROR_ERROR_DOMAIN_RUNTIME,
+								 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 								 "%s: unable to set system date.",
 								 function );
 
@@ -1834,10 +1846,10 @@ int libewf_header_values_parse_header_string(
 						     value_string_length,
 						     error ) != 1 )
 						{
-							libewf_error_set(
+							liberror_error_set(
 							 error,
-							 LIBEWF_ERROR_DOMAIN_RUNTIME,
-							 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+							 LIBERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 							 "%s: unable to set password.",
 							 function );
 
@@ -1867,10 +1879,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set description.",
 						 function );
 
@@ -1899,10 +1911,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set case number.",
 						 function );
 
@@ -1931,10 +1943,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set evidence number.",
 						 function );
 
@@ -1963,10 +1975,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set examiner name.",
 						 function );
 
@@ -1995,10 +2007,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set notes.",
 						 function );
 
@@ -2027,10 +2039,10 @@ int libewf_header_values_parse_header_string(
 					     value_string_length,
 					     error ) != 1 )
 					{
-						libewf_error_set(
+						liberror_error_set(
 						 error,
-						 LIBEWF_ERROR_DOMAIN_RUNTIME,
-						 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+						 LIBERROR_ERROR_DOMAIN_RUNTIME,
+						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 						 "%s: unable to set compression type.",
 						 function );
 
@@ -2050,7 +2062,7 @@ int libewf_header_values_parse_header_string(
 #if defined( HAVE_VERBOSE_OUTPUT )
 			else
 			{
-				notify_verbose_printf(
+				libewf_notify_verbose_printf(
 				 "%s: unsupported type: %d with value: %" PRIs_LIBEWF ".\n",
 				 function,
 				 types[ iterator ],
@@ -2063,10 +2075,10 @@ int libewf_header_values_parse_header_string(
 		     amount_of_values,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free split values.",
 			 function );
 
@@ -2086,10 +2098,10 @@ int libewf_header_values_parse_header_string(
 		     amount_of_types,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free split types.",
 			 function );
 
@@ -2106,10 +2118,10 @@ int libewf_header_values_parse_header_string(
 	     amount_of_lines,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split lines.",
 		 function );
 
@@ -2127,7 +2139,7 @@ int libewf_header_values_parse_header(
      size_t header_size,
      int codepage,
      uint8_t date_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string = NULL;
 	static char *function             = "libewf_header_values_parse_header";
@@ -2136,10 +2148,10 @@ int libewf_header_values_parse_header(
 
 	if( header == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header.",
 		 function );
 
@@ -2152,10 +2164,10 @@ int libewf_header_values_parse_header(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine header string size.",
 		 function );
 
@@ -2166,10 +2178,10 @@ int libewf_header_values_parse_header(
 
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -2183,10 +2195,10 @@ int libewf_header_values_parse_header(
 	     codepage,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -2207,10 +2219,10 @@ int libewf_header_values_parse_header(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse header string.",
 		 function );
 	}
@@ -2225,7 +2237,7 @@ int libewf_header_values_parse_header2(
      uint8_t *header2,
      size_t header2_size,
      uint8_t date_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string = NULL;
 	static char *function             = "libewf_header_values_parse_header2";
@@ -2234,10 +2246,10 @@ int libewf_header_values_parse_header2(
 
 	if( header2 == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header2.",
 		 function );
 
@@ -2250,10 +2262,10 @@ int libewf_header_values_parse_header2(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine header string size.",
 		 function );
 
@@ -2264,10 +2276,10 @@ int libewf_header_values_parse_header2(
 
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -2281,10 +2293,10 @@ int libewf_header_values_parse_header2(
 	     LIBUNA_ENDIAN_LITTLE,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -2305,10 +2317,10 @@ int libewf_header_values_parse_header2(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse header string.",
 		 function );
 	}
@@ -2325,16 +2337,16 @@ int libewf_header_values_convert_header_string_to_header(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_header_values_convert_header_string_to_header";
 
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -2342,10 +2354,10 @@ int libewf_header_values_convert_header_string_to_header(
 	}
 	if( header == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header.",
 		 function );
 
@@ -2353,10 +2365,10 @@ int libewf_header_values_convert_header_string_to_header(
 	}
 	if( *header != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header already created.",
 		 function );
 
@@ -2364,10 +2376,10 @@ int libewf_header_values_convert_header_string_to_header(
 	}
 	if( header_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header size.",
 		 function );
 
@@ -2380,10 +2392,10 @@ int libewf_header_values_convert_header_string_to_header(
 	     header_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine header size.",
 		 function );
 
@@ -2394,10 +2406,10 @@ int libewf_header_values_convert_header_string_to_header(
 
 	if( *header == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header.",
 		 function );
 
@@ -2413,10 +2425,10 @@ int libewf_header_values_convert_header_string_to_header(
 	     header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set header.",
 		 function );
 
@@ -2440,16 +2452,16 @@ int libewf_header_values_convert_header_string_to_header2(
      size_t header_string_size,
      uint8_t **header2,
      size_t *header2_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_header_values_convert_header_string_to_header2";
 
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -2457,10 +2469,10 @@ int libewf_header_values_convert_header_string_to_header2(
 	}
 	if( header2 == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header2.",
 		 function );
 
@@ -2468,10 +2480,10 @@ int libewf_header_values_convert_header_string_to_header2(
 	}
 	if( *header2 != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header2 already created.",
 		 function );
 
@@ -2479,10 +2491,10 @@ int libewf_header_values_convert_header_string_to_header2(
 	}
 	if( header2_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header2 size.",
 		 function );
 
@@ -2494,10 +2506,10 @@ int libewf_header_values_convert_header_string_to_header2(
 	     header2_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine header2 size.",
 		 function );
 
@@ -2508,10 +2520,10 @@ int libewf_header_values_convert_header_string_to_header2(
 
 	if( *header2 == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header2.",
 		 function );
 
@@ -2527,10 +2539,10 @@ int libewf_header_values_convert_header_string_to_header2(
 	     header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set header2.",
 		 function );
 
@@ -2557,7 +2569,7 @@ int libewf_header_values_generate_header_string_type1(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *case_number                = _LIBEWF_STRING( "" );
 	libewf_character_t *description                = _LIBEWF_STRING( "" );
@@ -2576,10 +2588,10 @@ int libewf_header_values_generate_header_string_type1(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -2587,10 +2599,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -2598,10 +2610,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -2609,10 +2621,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -2620,10 +2632,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -2631,10 +2643,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -2642,10 +2654,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -2653,10 +2665,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -2664,10 +2676,10 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -2677,10 +2689,10 @@ int libewf_header_values_generate_header_string_type1(
 	 && ( compression_level != EWF_COMPRESSION_FAST )
 	 && ( compression_level != EWF_COMPRESSION_BEST ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: compression level not supported.",
 		 function );
 
@@ -2739,10 +2751,10 @@ int libewf_header_values_generate_header_string_type1(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -2773,10 +2785,10 @@ int libewf_header_values_generate_header_string_type1(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -2841,10 +2853,10 @@ int libewf_header_values_generate_header_string_type1(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -2901,10 +2913,10 @@ int libewf_header_values_generate_header_string_type1(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -2931,7 +2943,7 @@ int libewf_header_values_generate_header_string_type2(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *case_number                = _LIBEWF_STRING( "" );
 	libewf_character_t *description                = _LIBEWF_STRING( "" );
@@ -2952,10 +2964,10 @@ int libewf_header_values_generate_header_string_type2(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -2963,10 +2975,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -2974,10 +2986,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -2985,10 +2997,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -2996,10 +3008,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -3007,10 +3019,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -3018,10 +3030,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -3029,10 +3041,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -3040,10 +3052,10 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -3053,10 +3065,10 @@ int libewf_header_values_generate_header_string_type2(
 	 && ( compression_level != EWF_COMPRESSION_FAST )
 	 && ( compression_level != EWF_COMPRESSION_BEST ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: compression level not supported.",
 		 function );
 
@@ -3115,10 +3127,10 @@ int libewf_header_values_generate_header_string_type2(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -3149,10 +3161,10 @@ int libewf_header_values_generate_header_string_type2(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -3231,10 +3243,10 @@ int libewf_header_values_generate_header_string_type2(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -3293,10 +3305,10 @@ int libewf_header_values_generate_header_string_type2(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -3322,7 +3334,7 @@ int libewf_header_values_generate_header_string_type3(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *case_number                = _LIBEWF_STRING( "" );
 	libewf_character_t *description                = _LIBEWF_STRING( "" );
@@ -3342,10 +3354,10 @@ int libewf_header_values_generate_header_string_type3(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -3353,10 +3365,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -3364,10 +3376,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -3375,10 +3387,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -3386,10 +3398,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -3397,10 +3409,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -3408,10 +3420,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -3419,10 +3431,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -3430,10 +3442,10 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -3492,10 +3504,10 @@ int libewf_header_values_generate_header_string_type3(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -3526,10 +3538,10 @@ int libewf_header_values_generate_header_string_type3(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -3584,10 +3596,10 @@ int libewf_header_values_generate_header_string_type3(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -3645,10 +3657,10 @@ int libewf_header_values_generate_header_string_type3(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -3674,7 +3686,7 @@ int libewf_header_values_generate_header_string_type4(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *case_number                = _LIBEWF_STRING( "" );
 	libewf_character_t *description                = _LIBEWF_STRING( "" );
@@ -3694,10 +3706,10 @@ int libewf_header_values_generate_header_string_type4(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -3705,10 +3717,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -3716,10 +3728,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -3727,10 +3739,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -3738,10 +3750,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -3749,10 +3761,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -3760,10 +3772,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -3771,10 +3783,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -3782,10 +3794,10 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -3844,10 +3856,10 @@ int libewf_header_values_generate_header_string_type4(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -3878,10 +3890,10 @@ int libewf_header_values_generate_header_string_type4(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -3930,10 +3942,10 @@ int libewf_header_values_generate_header_string_type4(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -3991,10 +4003,10 @@ int libewf_header_values_generate_header_string_type4(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -4020,7 +4032,7 @@ int libewf_header_values_generate_header_string_type5(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string_srce         = _LIBEWF_STRING( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
 	libewf_character_t *header_string_sub          = _LIBEWF_STRING( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
@@ -4043,10 +4055,10 @@ int libewf_header_values_generate_header_string_type5(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -4054,10 +4066,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -4065,10 +4077,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -4076,10 +4088,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -4087,10 +4099,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -4098,10 +4110,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -4109,10 +4121,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -4120,10 +4132,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -4131,10 +4143,10 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -4199,10 +4211,10 @@ int libewf_header_values_generate_header_string_type5(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -4233,10 +4245,10 @@ int libewf_header_values_generate_header_string_type5(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -4292,10 +4304,10 @@ int libewf_header_values_generate_header_string_type5(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -4356,10 +4368,10 @@ int libewf_header_values_generate_header_string_type5(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -4385,7 +4397,7 @@ int libewf_header_values_generate_header_string_type6(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string_srce         = _LIBEWF_STRING( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
 	libewf_character_t *header_string_sub          = _LIBEWF_STRING( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
@@ -4410,10 +4422,10 @@ int libewf_header_values_generate_header_string_type6(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -4421,10 +4433,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -4432,10 +4444,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -4443,10 +4455,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -4454,10 +4466,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -4465,10 +4477,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -4476,10 +4488,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -4487,10 +4499,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -4498,10 +4510,10 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -4566,10 +4578,10 @@ int libewf_header_values_generate_header_string_type6(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -4600,10 +4612,10 @@ int libewf_header_values_generate_header_string_type6(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -4673,10 +4685,10 @@ int libewf_header_values_generate_header_string_type6(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -4739,10 +4751,10 @@ int libewf_header_values_generate_header_string_type6(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -4768,7 +4780,7 @@ int libewf_header_values_generate_header_string_type7(
      libewf_character_t *header_string_tail,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string_srce         = _LIBEWF_STRING( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
 	libewf_character_t *header_string_sub          = _LIBEWF_STRING( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
@@ -4790,10 +4802,10 @@ int libewf_header_values_generate_header_string_type7(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -4801,10 +4813,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_values->amount_of_values < LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: missing default header values.",
 		 function );
 
@@ -4812,10 +4824,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -4823,10 +4835,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -4834,10 +4846,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_string_head == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string head.",
 		 function );
 
@@ -4845,10 +4857,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_string_tail == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string tail.",
 		 function );
 
@@ -4856,10 +4868,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -4867,10 +4879,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -4878,10 +4890,10 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string size.",
 		 function );
 
@@ -4946,10 +4958,10 @@ int libewf_header_values_generate_header_string_type7(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -4980,10 +4992,10 @@ int libewf_header_values_generate_header_string_type7(
 		     &system_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate system date header value.",
 			 function );
 
@@ -5032,10 +5044,10 @@ int libewf_header_values_generate_header_string_type7(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5095,10 +5107,10 @@ int libewf_header_values_generate_header_string_type7(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -5124,7 +5136,7 @@ int libewf_header_values_generate_header_ewf(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\nmain\nc\tn\ta\te\tt\tm\tu\tp\tr\n" );
@@ -5143,10 +5155,10 @@ int libewf_header_values_generate_header_ewf(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5162,10 +5174,10 @@ int libewf_header_values_generate_header_ewf(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5186,7 +5198,7 @@ int libewf_header_values_generate_header_encase1(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
@@ -5205,10 +5217,10 @@ int libewf_header_values_generate_header_encase1(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5224,10 +5236,10 @@ int libewf_header_values_generate_header_encase1(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5248,7 +5260,7 @@ int libewf_header_values_generate_header_ftk(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
@@ -5267,10 +5279,10 @@ int libewf_header_values_generate_header_ftk(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5286,10 +5298,10 @@ int libewf_header_values_generate_header_ftk(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5310,7 +5322,7 @@ int libewf_header_values_generate_header_encase2(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
@@ -5329,10 +5341,10 @@ int libewf_header_values_generate_header_encase2(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5348,10 +5360,10 @@ int libewf_header_values_generate_header_encase2(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5371,7 +5383,7 @@ int libewf_header_values_generate_header_encase4(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
@@ -5389,10 +5401,10 @@ int libewf_header_values_generate_header_encase4(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5408,10 +5420,10 @@ int libewf_header_values_generate_header_encase4(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5431,7 +5443,7 @@ int libewf_header_values_generate_header_linen5(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
@@ -5449,10 +5461,10 @@ int libewf_header_values_generate_header_linen5(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5468,10 +5480,10 @@ int libewf_header_values_generate_header_linen5(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5491,7 +5503,7 @@ int libewf_header_values_generate_header_linen6(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
@@ -5509,10 +5521,10 @@ int libewf_header_values_generate_header_linen6(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5528,10 +5540,10 @@ int libewf_header_values_generate_header_linen6(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -5550,7 +5562,7 @@ int libewf_header_values_generate_header2_encase4(
      time_t timestamp,
      uint8_t **header2,
      size_t *header2_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
@@ -5568,10 +5580,10 @@ int libewf_header_values_generate_header2_encase4(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5586,10 +5598,10 @@ int libewf_header_values_generate_header2_encase4(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header2.",
 		 function );
 	}
@@ -5608,7 +5620,7 @@ int libewf_header_values_generate_header2_encase5(
      time_t timestamp,
      uint8_t **header2,
      size_t *header2_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\tdc\n" );
@@ -5626,10 +5638,10 @@ int libewf_header_values_generate_header2_encase5(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5644,10 +5656,10 @@ int libewf_header_values_generate_header2_encase5(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header2.",
 		 function );
 	}
@@ -5666,7 +5678,7 @@ int libewf_header_values_generate_header2_encase6(
      time_t timestamp,
      uint8_t **header2,
      size_t *header2_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
@@ -5684,10 +5696,10 @@ int libewf_header_values_generate_header2_encase6(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -5702,10 +5714,10 @@ int libewf_header_values_generate_header2_encase6(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header2.",
 		 function );
 	}
@@ -5725,7 +5737,7 @@ int libewf_convert_date_xheader_value(
      uint8_t date_format,
      libewf_character_t **date_string,
      size_t *date_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	struct tm time_elements;
 
@@ -5736,10 +5748,10 @@ int libewf_convert_date_xheader_value(
 
 	if( header_value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header value.",
 		 function );
 
@@ -5750,10 +5762,10 @@ int libewf_convert_date_xheader_value(
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported date format.",
 		 function );
 
@@ -5761,10 +5773,10 @@ int libewf_convert_date_xheader_value(
 	}
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -5772,10 +5784,10 @@ int libewf_convert_date_xheader_value(
 	}
 	if( *date_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: date string already created.",
 		 function );
 
@@ -5783,10 +5795,10 @@ int libewf_convert_date_xheader_value(
 	}
 	if( date_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string length.",
 		 function );
 
@@ -5801,10 +5813,10 @@ int libewf_convert_date_xheader_value(
 
 		if( *date_string == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create date string.",
 			 function );
 
@@ -5817,10 +5829,10 @@ int libewf_convert_date_xheader_value(
 		     header_value,
 		     header_value_length ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to set date string.",
 			 function );
 
@@ -5846,10 +5858,10 @@ int libewf_convert_date_xheader_value(
 		     &amount_of_date_elements,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to split header value into date elements.",
 			 function );
 
@@ -5857,10 +5869,10 @@ int libewf_convert_date_xheader_value(
 		}
 		if( amount_of_date_elements != 6 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported amount of date elements in header value.",
 			 function );
 
@@ -6000,10 +6012,10 @@ int libewf_convert_date_xheader_value(
 		     amount_of_date_elements,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 			 "%s: unable to free split date elements.",
 			 function );
 
@@ -6011,15 +6023,15 @@ int libewf_convert_date_xheader_value(
 		}
 		/* Create a timestamp
 		 */
-		timestamp = date_time_mktime(
+		timestamp = libewf_date_time_mktime(
 		             &time_elements );
 
 		if( timestamp == (time_t) -1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to create timestamp.",
 			 function );
 
@@ -6032,10 +6044,10 @@ int libewf_convert_date_xheader_value(
 
 		if( *date_string == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create date string.",
 			 function );
 
@@ -6050,10 +6062,10 @@ int libewf_convert_date_xheader_value(
 		     date_format,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to convert timestamp into date string.",
 			 function );
 
@@ -6077,7 +6089,7 @@ int libewf_generate_date_xheader_value(
      time_t timestamp,
      libewf_character_t **date_string,
      size_t *date_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *day_of_week = NULL;
 	libewf_character_t *month       = NULL;
@@ -6087,10 +6099,10 @@ int libewf_generate_date_xheader_value(
 
 	if( date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string.",
 		 function );
 
@@ -6098,10 +6110,10 @@ int libewf_generate_date_xheader_value(
 	}
 	if( *date_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: date string already created.",
 		 function );
 
@@ -6109,24 +6121,25 @@ int libewf_generate_date_xheader_value(
 	}
 	if( date_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid date string size.",
 		 function );
 
 		return( -1 );
 	}
-	time_elements = date_time_localtime(
-			 &timestamp );
+	time_elements = libewf_date_time_localtime(
+			 &timestamp,
+	                 error );
 
 	if( time_elements == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create time elements.",
 		 function );
 
@@ -6157,10 +6170,10 @@ int libewf_generate_date_xheader_value(
 			break;
 
 		default:
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported day of the week value.",
 			 function );
 
@@ -6209,10 +6222,10 @@ int libewf_generate_date_xheader_value(
 			break;
 
 		default:
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unsupported month value.",
 			 function );
 
@@ -6228,10 +6241,10 @@ int libewf_generate_date_xheader_value(
 
 	if( *date_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create date string.",
 		 function );
 
@@ -6260,10 +6273,10 @@ int libewf_generate_date_xheader_value(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *date_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set date string.",
 		 function );
 
@@ -6286,7 +6299,7 @@ int libewf_header_values_parse_header_string_xml(
      libewf_character_t *header_string_xml,
      size_t header_string_xml_size,
      uint8_t date_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t **lines          = NULL;
 	libewf_character_t *open_tag_start  = NULL;
@@ -6305,10 +6318,10 @@ int libewf_header_values_parse_header_string_xml(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -6316,10 +6329,10 @@ int libewf_header_values_parse_header_string_xml(
 	}
 	if( header_string_xml == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string",
 		 function );
 
@@ -6330,10 +6343,10 @@ int libewf_header_values_parse_header_string_xml(
 	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header values.",
 		 function );
 
@@ -6343,10 +6356,10 @@ int libewf_header_values_parse_header_string_xml(
 	     *header_values,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize the header values.",
 		 function );
 
@@ -6360,10 +6373,10 @@ int libewf_header_values_parse_header_string_xml(
 	     &amount_of_lines,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split header string into lines.",
 		 function );
 
@@ -6468,10 +6481,10 @@ int libewf_header_values_parse_header_string_xml(
 			     &date_string_size,
 			     error ) != 1 )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_CONVERSION,
-				 LIBEWF_CONVERSION_ERROR_GENERIC,
+				 LIBERROR_ERROR_DOMAIN_CONVERSION,
+				 LIBERROR_CONVERSION_ERROR_GENERIC,
 				 "%s: unable to create date string.",
 				 function );
 
@@ -6497,10 +6510,10 @@ int libewf_header_values_parse_header_string_xml(
 				     date_string_length,
 				     error ) != 1 )
 				{
-					libewf_error_set(
+					liberror_error_set(
 					 error,
-					 LIBEWF_ERROR_DOMAIN_RUNTIME,
-					 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 					 "%s: unable to set value with identifier: %" PRIs_LIBEWF ".",
 					 function, &open_tag_start[ 1 ] );
 
@@ -6528,10 +6541,10 @@ int libewf_header_values_parse_header_string_xml(
 			     value_length,
 			     error ) != 1 )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set value with identifier: %" PRIs_LIBEWF ".",
 				 function,
 				 &open_tag_start[ 1 ] );
@@ -6550,10 +6563,10 @@ int libewf_header_values_parse_header_string_xml(
 	     amount_of_lines,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split lines.",
 		 function );
 
@@ -6570,7 +6583,7 @@ int libewf_header_values_parse_xheader(
      uint8_t *xheader,
      size_t xheader_size,
      uint8_t date_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *xml_header_string = NULL;
 	static char *function                 = "libewf_header_values_parse_xheader";
@@ -6579,10 +6592,10 @@ int libewf_header_values_parse_xheader(
 
 	if( xheader == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xheader.",
 		 function );
 
@@ -6594,10 +6607,10 @@ int libewf_header_values_parse_xheader(
 	     &xml_header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine XML header string size.",
 		 function );
 
@@ -6608,10 +6621,10 @@ int libewf_header_values_parse_xheader(
 
 	if( xml_header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create XML header string.",
 		 function );
 
@@ -6624,10 +6637,10 @@ int libewf_header_values_parse_xheader(
              xheader_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set XML header string.",
 		 function );
 
@@ -6645,10 +6658,10 @@ int libewf_header_values_parse_xheader(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse XML header string.",
 		 function );
 	}
@@ -6667,16 +6680,16 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
      size_t header_string_xml_size,
      uint8_t **xheader,
      size_t *xheader_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_header_values_convert_header_string_xml_to_xheader";
 
 	if( header_string_xml == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid XML header string.",
 		 function );
 
@@ -6684,10 +6697,10 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 	}
 	if( xheader == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xheader.",
 		 function );
 
@@ -6695,10 +6708,10 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 	}
 	if( *xheader != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: xheader already created.",
 		 function );
 
@@ -6706,10 +6719,10 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 	}
 	if( xheader_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xheader size.",
 		 function );
 
@@ -6721,10 +6734,10 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 	     xheader_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine xheader size.",
 		 function );
 
@@ -6735,10 +6748,10 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 
 	if( *xheader == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create xheader.",
 		 function );
 
@@ -6753,10 +6766,10 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 	     header_string_xml_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set xheader.",
 		 function );
 
@@ -6779,7 +6792,7 @@ int libewf_header_values_generate_header_string_xml(
      time_t timestamp,
      libewf_character_t **header_string,
      size_t *header_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *xml_head              = _LIBEWF_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
 	libewf_character_t *xml_open_tag_xheader  = _LIBEWF_STRING( "<xheader>" );
@@ -6793,10 +6806,10 @@ int libewf_header_values_generate_header_string_xml(
 
 	if( header_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header values.",
 		 function );
 
@@ -6804,10 +6817,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_values->amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid header values - amount of values less than zero.",
 		 function );
 
@@ -6815,10 +6828,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_values->identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing identifiers.",
 		 function );
 
@@ -6826,10 +6839,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_values->identifier_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing identifier lengths.",
 		 function );
 
@@ -6837,10 +6850,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing values.",
 		 function );
 
@@ -6848,10 +6861,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid header values - missing value lengths.",
 		 function );
 
@@ -6859,10 +6872,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid header string.",
 		 function );
 
@@ -6870,10 +6883,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( *header_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: header string already created.",
 		 function );
 
@@ -6881,10 +6894,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string size.",
 		 function );
 
@@ -6906,10 +6919,10 @@ int libewf_header_values_generate_header_string_xml(
 		if( ( header_values->identifier[ values_table_iterator ] == NULL )
 		 && ( header_values->identifier_length[ values_table_iterator ] == 0 ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid header value - missing identifier.",
 			 function );
 
@@ -6933,10 +6946,10 @@ int libewf_header_values_generate_header_string_xml(
 		     &acquiry_date_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to generate acquiry date header value.",
 			 function );
 
@@ -6960,10 +6973,10 @@ int libewf_header_values_generate_header_string_xml(
 
 	if( *header_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -6988,10 +7001,10 @@ int libewf_header_values_generate_header_string_xml(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *header_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -7016,10 +7029,10 @@ int libewf_header_values_generate_header_string_xml(
 		if( ( header_values->identifier[ values_table_iterator ] == NULL )
 		 && ( header_values->identifier_length[ values_table_iterator ] == 0 ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid header value - missing identifier.",
 			 function );
 
@@ -7041,10 +7054,10 @@ int libewf_header_values_generate_header_string_xml(
 			if( ( print_count <= -1 )
 			 || ( (size_t) print_count > ( *header_string_size - string_offset ) ) )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set header string.",
 				 function );
 
@@ -7081,10 +7094,10 @@ int libewf_header_values_generate_header_string_xml(
 		if( ( print_count <= -1 )
 		 || ( (size_t) print_count > ( *header_string_size - string_offset ) ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set header string.",
 			 function );
 
@@ -7107,10 +7120,10 @@ int libewf_header_values_generate_header_string_xml(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > ( *header_string_size - string_offset ) ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set header string.",
 		 function );
 
@@ -7139,7 +7152,7 @@ int libewf_header_values_generate_header_ewfx(
      uint8_t **header,
      size_t *header_size,
      int codepage,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
@@ -7157,10 +7170,10 @@ int libewf_header_values_generate_header_ewfx(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -7176,10 +7189,10 @@ int libewf_header_values_generate_header_ewfx(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header.",
 		 function );
 	}
@@ -7198,7 +7211,7 @@ int libewf_header_values_generate_header2_ewfx(
      time_t timestamp,
      uint8_t **header2,
      size_t *header2_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string      = NULL;
 	libewf_character_t *header_string_head = _LIBEWF_STRING( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
@@ -7216,10 +7229,10 @@ int libewf_header_values_generate_header2_ewfx(
 	     &header_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header string.",
 		 function );
 
@@ -7234,10 +7247,10 @@ int libewf_header_values_generate_header2_ewfx(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create header2.",
 		 function );
 	}
@@ -7256,7 +7269,7 @@ int libewf_header_values_generate_xheader_ewfx(
      time_t timestamp,
      uint8_t **xheader,
      size_t *xheader_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *header_string_xml = NULL;
 	static char *function                 = "libewf_header_values_generate_xheader_ewfx";
@@ -7270,10 +7283,10 @@ int libewf_header_values_generate_xheader_ewfx(
 	     &header_string_xml_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create xheader string.",
 		 function );
 
@@ -7288,10 +7301,10 @@ int libewf_header_values_generate_xheader_ewfx(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create xheader.",
 		 function );
 	}

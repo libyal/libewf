@@ -22,11 +22,12 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "libewf_chunk_cache.h"
-#include "libewf_error.h"
+#include "libewf_notify.h"
 
 /* Initialize the chunk cache
  * Returns 1 if successful or -1 on error
@@ -34,16 +35,16 @@
 int libewf_chunk_cache_initialize(
      libewf_chunk_cache_t **chunk_cache,
      size_t size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_chunk_cache_initialize";
 
 	if( chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk cache.",
 		 function );
 
@@ -51,10 +52,10 @@ int libewf_chunk_cache_initialize(
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.",
 		 function );
 
@@ -67,10 +68,10 @@ int libewf_chunk_cache_initialize(
 
 		if( *chunk_cache == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create chunk cache.",
 			 function );
 
@@ -81,10 +82,10 @@ int libewf_chunk_cache_initialize(
 		     0,
 		     sizeof( libewf_chunk_cache_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear chunk cache.",
 			 function );
 
@@ -100,10 +101,10 @@ int libewf_chunk_cache_initialize(
 
 		if( ( *chunk_cache )->compressed == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create chunk cache compressed.",
 			 function );
 
@@ -119,10 +120,10 @@ int libewf_chunk_cache_initialize(
 
 		if( ( *chunk_cache )->data == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create chunk cache data.",
 			 function );
 
@@ -145,16 +146,16 @@ int libewf_chunk_cache_initialize(
  */
 int libewf_chunk_cache_free(
      libewf_chunk_cache_t **chunk_cache,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_chunk_cache_free";
 
 	if( chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk cache.",
 		 function );
 
@@ -186,17 +187,17 @@ int libewf_chunk_cache_free(
 int libewf_chunk_cache_resize(
      libewf_chunk_cache_t *chunk_cache,
      size_t size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_chunk_cache_resize";
 	void *reallocation    = NULL;
 
 	if( chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk cache.",
 		 function );
 
@@ -204,10 +205,10 @@ int libewf_chunk_cache_resize(
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.",
 		 function );
 
@@ -221,10 +222,10 @@ int libewf_chunk_cache_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize chunk cache compressed.",
 			 function );
 
@@ -237,10 +238,10 @@ int libewf_chunk_cache_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize chunk cache data.",
 			 function );
 

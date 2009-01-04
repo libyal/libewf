@@ -26,7 +26,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_values_table.h"
 
 #if defined( __cplusplus )
@@ -74,24 +75,24 @@ struct libewf_header_sections
 
 int libewf_header_sections_initialize(
      libewf_header_sections_t **header_sections,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_header_sections_free(
      libewf_header_sections_t **header_sections,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,
      libewf_values_table_t *header_values,
      int8_t compression_level,
      uint8_t format,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_header_sections_determine_format(
      libewf_header_sections_t *header_sections,
      uint8_t ewf_format,
      uint8_t *format,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

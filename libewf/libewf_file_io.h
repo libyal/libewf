@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #if defined( HAVE_IO_H )
 #include <io.h>
 #endif
@@ -46,14 +48,13 @@
 #include <unistd.h>
 #endif
 
-#include "libewf_error.h"
 #include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define LIBEWF_FILE_IO_O_CREAT 		_O_CREAT
 #define LIBEWF_FILE_IO_O_RDONLY		_O_RDONLY
 #define LIBEWF_FILE_IO_O_RDWR		_O_RDWR
@@ -72,16 +73,16 @@ extern "C" {
 int libewf_file_io_open(
      const char *filename,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_file_io_open_wide(
      const wchar_t *filename,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define libewf_file_io_close( file_descriptor ) \
 	_close( file_descriptor )
 
@@ -90,7 +91,7 @@ int libewf_file_io_open_wide(
 	close( file_descriptor )
 #endif
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define libewf_file_io_read( file_descriptor, buffer, size ) \
 	_read( file_descriptor, (void *) buffer, (unsigned int) size )
 
@@ -99,7 +100,7 @@ int libewf_file_io_open_wide(
 	read( file_descriptor, (void *) buffer, size )
 #endif
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define libewf_file_io_lseek( file_descriptor, offset, whence ) \
 	_lseeki64( file_descriptor, offset, whence )
 
@@ -108,7 +109,7 @@ int libewf_file_io_open_wide(
 	lseek( file_descriptor, offset, whence )
 #endif
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define libewf_file_io_write( file_descriptor, buffer, size ) \
 	_write( file_descriptor, (const void *) buffer, (unsigned int) size )
 
@@ -119,12 +120,12 @@ int libewf_file_io_open_wide(
 
 int libewf_file_io_exists(
      const char *filename,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_file_io_exists_wide(
      const wchar_t *filename,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
 #if defined( __cplusplus )

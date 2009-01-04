@@ -1,5 +1,5 @@
 /*
- * Section list functions
+ * Date and time functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,52 +20,41 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SECTION_LIST_H )
-#define _LIBEWF_SECTION_LIST_H
+#if !defined( _LIBEWF_DATE_TIME_H )
+#define _LIBEWF_DATE_TIME_H
 
 #include <common.h>
 #include <types.h>
 
 #include <liberror.h>
 
-#include "libewf_list_type.h"
+#if defined( TIME_WITH_SYS_TIME )
+#include <sys/time.h>
+#include <time.h>
+#elif defined( HAVE_SYS_TIME_H )
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libewf_section_list_values libewf_section_list_values_t;
+#if defined( HAVE_MKTIME )
+#if defined( WINAPI )
+#define libewf_date_time_mktime( time_elements ) \
+	mktime( time_elements )
 
-struct libewf_section_list_values
-{
-        /* The section type string
-         * consists of 16 bytes at the most
-         */
-        uint8_t type[ 16 ];
+#else
+#define libewf_date_time_mktime( time_elements ) \
+	mktime( time_elements )
+#endif
+#endif
 
-	/* The section type string size
-	 */
-	size_t type_size;
-
-	/* The start offset of the section
-	 */
-	off64_t start_offset;
-
-	/* The end offset of the section
-	 */
-	off64_t end_offset;
-};
-
-int libewf_section_list_values_free(
-     intptr_t *value );
-
-int libewf_section_list_append(
-     libewf_list_t *section_list,
-     uint8_t *type,
-     size_t type_length,
-     off64_t start_offset,
-     off64_t end_offset,
-     liberror_error_t **error );
+struct tm *libewf_date_time_localtime(
+            const time_t *timestamp,
+            liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

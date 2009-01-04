@@ -1,5 +1,5 @@
 /*
- * Section list functions
+ * Notification function
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,52 +20,41 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBEWF_SECTION_LIST_H )
-#define _LIBEWF_SECTION_LIST_H
+#if !defined( _LIBEWF_NOTIFY_H )
+#define _LIBEWF_NOTIFY_H
 
 #include <common.h>
 #include <types.h>
 
 #include <liberror.h>
 
-#include "libewf_list_type.h"
+#include <stdio.h>
+
+#include "libewf_extern.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libewf_section_list_values libewf_section_list_values_t;
+extern int libewf_notify_verbose;
 
-struct libewf_section_list_values
-{
-        /* The section type string
-         * consists of 16 bytes at the most
-         */
-        uint8_t type[ 16 ];
+LIBEWF_EXTERN void libewf_set_notify_values(
+                    FILE *stream,
+                    int verbose );
 
-	/* The section type string size
-	 */
-	size_t type_size;
+void libewf_notify_printf(
+      char *format,
+      ... );
 
-	/* The start offset of the section
-	 */
-	off64_t start_offset;
+#define libewf_notify_verbose_printf \
+	if( libewf_notify_verbose != 0 ) libewf_notify_printf
 
-	/* The end offset of the section
-	 */
-	off64_t end_offset;
-};
+void libewf_notify_error_backtrace(
+      liberror_error_t *error );
 
-int libewf_section_list_values_free(
-     intptr_t *value );
-
-int libewf_section_list_append(
-     libewf_list_t *section_list,
-     uint8_t *type,
-     size_t type_length,
-     off64_t start_offset,
-     off64_t end_offset,
-     liberror_error_t **error );
+void libewf_notify_dump_data(
+      void *data,
+      size_t size );
 
 #if defined( __cplusplus )
 }

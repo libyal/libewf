@@ -258,39 +258,39 @@ struct libewf_internal_handle_write
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_handle_initialize(
                    libewf_handle_t **handle,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 int libewf_handle_initialize(
      libewf_handle_t **handle,
      uint8_t flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_handle_free(
                    libewf_handle_t **handle,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 int libewf_handle_free(
      libewf_handle_t **handle,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
 int libewf_internal_handle_subhandle_read_initialize(
      libewf_internal_handle_read_t **subhandle_read,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_subhandle_read_free(
      libewf_internal_handle_read_t **subhandle_read,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_subhandle_write_initialize(
      libewf_internal_handle_write_t **subhandle_write,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_subhandle_write_free(
      libewf_internal_handle_write_t **subhandle_write,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_add_segment_file(
      libewf_internal_handle_t *internal_handle,
@@ -298,32 +298,32 @@ int libewf_internal_handle_add_segment_file(
      int flags,
      uint16_t *segment_number,
      uint8_t *segment_file_type,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_get_write_maximum_amount_of_segments(
      uint8_t ewf_format,
      uint16_t *maximum_amount_of_segments,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_set_media_values(
      libewf_internal_handle_t *internal_handle,
      uint32_t sectors_per_chunk,
      uint32_t bytes_per_sector,
      size64_t media_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_set_format(
      libewf_internal_handle_t *internal_handle,
      uint8_t format,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_create_header_values(
      libewf_internal_handle_t *internal_handle,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_internal_handle_write_initialize(
      libewf_internal_handle_t *internal_handle,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

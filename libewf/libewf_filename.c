@@ -26,8 +26,9 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include <liberror.h>
+
 #include "libewf_definitions.h"
-#include "libewf_error.h"
 #include "libewf_filename.h"
 #include "libewf_system_string.h"
 
@@ -44,7 +45,7 @@ int libewf_filename_set_extension(
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function                = "libewf_filename_set_extension";
 	char extension_first_character       = 0;
@@ -52,10 +53,10 @@ int libewf_filename_set_extension(
 
 	if( extension == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid extension.",
 		 function );
 
@@ -64,10 +65,10 @@ int libewf_filename_set_extension(
 	if( ( segment_number == 0 )
 	 || ( segment_number > maximum_amount_of_segments ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: segment number: %" PRIu16 " is out of range.",
 		 function,
 		 segment_number );
@@ -105,10 +106,10 @@ int libewf_filename_set_extension(
 	}
 	else
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported segment file type.",
 		 function );
 
@@ -131,10 +132,10 @@ int libewf_filename_set_extension(
 
 		if( segment_number >= 26 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unable to support for more segment files.",
 			 function );
 
@@ -148,10 +149,10 @@ int libewf_filename_set_extension(
 	 || ( ( extension[ 0 ] > (char) 'Z' )
 	  && ( extension[ 0 ] < (char) 'a' ) ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unable to support for more segment files.",
 		 function );
 
@@ -175,7 +176,7 @@ int libewf_filename_set_extension_wide(
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function                   = "libewf_filename_set_extension_wide";
 	wchar_t extension_first_character       = 0;
@@ -183,10 +184,10 @@ int libewf_filename_set_extension_wide(
 
 	if( extension == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid extension.",
 		 function );
 
@@ -195,10 +196,10 @@ int libewf_filename_set_extension_wide(
 	if( ( segment_number == 0 )
 	 || ( segment_number > maximum_amount_of_segments ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: segment number: %" PRIu16 " is out of range.",
 		 function,
 		 segment_number );
@@ -236,10 +237,10 @@ int libewf_filename_set_extension_wide(
 	}
 	else
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unsupported segment file type.",
 		 function );
 
@@ -262,10 +263,10 @@ int libewf_filename_set_extension_wide(
 
 		if( segment_number >= 26 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 			 "%s: unable to support for more segment files.",
 			 function );
 
@@ -279,10 +280,10 @@ int libewf_filename_set_extension_wide(
 	 || ( ( extension[ 0 ] > (wchar_t) 'Z' )
 	  && ( extension[ 0 ] < (wchar_t) 'a' ) ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: unable to support for more segment files.",
 		 function );
 
@@ -308,17 +309,17 @@ int libewf_filename_create(
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_system_character_t *new_filename = NULL;
 	static char *function                   = "libewf_filename_create";
 
 	if( filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
@@ -326,10 +327,10 @@ int libewf_filename_create(
 	}
 	if( *filename != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: filename already set.",
 		 function );
 
@@ -337,10 +338,10 @@ int libewf_filename_create(
 	}
 	if( filename_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename size.",
 		 function );
 
@@ -348,10 +349,10 @@ int libewf_filename_create(
 	}
 	if( basename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid basename.",
 		 function );
 
@@ -364,10 +365,10 @@ int libewf_filename_create(
 
 	if( new_filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create filename.",
 		 function );
 
@@ -380,10 +381,10 @@ int libewf_filename_create(
 	     basename,
 	     ( basename_length + 1 ) ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set basename.",
 		 function );
 
@@ -414,10 +415,10 @@ int libewf_filename_create(
 	     error ) != 1 )
 #endif
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set extension.",
 		 function );
 

@@ -30,6 +30,7 @@
 
 #include <libewf/handle.h>
 
+#include "libewf_error.h"
 #include "libewf_extern.h"
 
 #if defined( __cplusplus )
@@ -42,9 +43,16 @@ LIBEWF_EXTERN const char *libewf_get_version(
 LIBEWF_EXTERN int libewf_signal_abort(
                    libewf_handle_t *handle );
 
-LIBEWF_EXTERN void libewf_set_notify_values(
-                    FILE *stream,
-                    uint8_t verbose );
+LIBEWF_EXTERN void liberror_error_free(
+                    liberror_error_t **error );
+
+LIBEWF_EXTERN void libewf_error_fprint(
+                    liberror_error_t *error,
+                    FILE *stream );
+
+LIBEWF_EXTERN void libewf_error_backtrace_fprint(
+                    liberror_error_t *error,
+                    FILE *stream );
 
 #if defined( __cplusplus )
 }

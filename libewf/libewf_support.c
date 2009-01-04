@@ -21,11 +21,16 @@
  */
 
 #include <common.h>
-#include <notify.h>
+#include <types.h>
+
+#include <liberror.h>
+
+#include <stdio.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
 #include "libewf_handle.h"
+#include "libewf_notify.h"
 #include "libewf_support.h"
 
 /* Returns the library version as a string
@@ -42,21 +47,21 @@ const char *libewf_get_version(
 int libewf_signal_abort(
      libewf_handle_t *handle )
 {
-	libewf_error_t *error = NULL;
+	liberror_error_t *error = NULL;
 	static char *function = "libewf_signal_abort";
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -66,14 +71,34 @@ int libewf_signal_abort(
 	return( 1 );
 }
 
-/* Set the notify values
+/* Free an error and its elements
  */
-void libewf_set_notify_values(
-      FILE *stream,
-      uint8_t verbose )
+void libewf_error_free(
+      libewf_error_t **error )
 {
-	notify_set_values(
-	 stream,
-	 verbose );
+	liberror_error_free(
+	 (liberror_error_t **) error );
+}
+
+/* Prints a descriptive string of the error to the stream
+ */
+void libewf_error_fprint(
+     libewf_error_t *error,
+     FILE *stream )
+{
+	liberror_error_fprint(
+	 (liberror_error_t *) error,
+	 stream );
+}
+
+/* Prints a backtrace of the error to the stream
+ */
+void libewf_error_backtrace_fprint(
+     libewf_error_t *error,
+     FILE *stream )
+{
+	liberror_error_backtrace_fprint(
+	 (liberror_error_t *) error,
+	 stream );
 }
 

@@ -22,10 +22,11 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
+#include "libewf_notify.h"
 #include "libewf_string.h"
 
 /* Split a string into elements using a delimiter character
@@ -37,7 +38,7 @@ int libewf_string_split(
      libewf_character_t delimiter,
      libewf_character_t ***split_values,
      size_t *amount_of_split_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *split_value_start = NULL;
 	libewf_character_t *split_value_end   = NULL;
@@ -49,10 +50,10 @@ int libewf_string_split(
 
 	if( string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid string.",
 		 function );
 
@@ -60,10 +61,10 @@ int libewf_string_split(
 	}
 	if( string_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid string size value exceeds maximum.",
 		 function );
 
@@ -71,10 +72,10 @@ int libewf_string_split(
 	}
 	if( split_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid split values.",
 		 function );
 
@@ -82,10 +83,10 @@ int libewf_string_split(
 	}
 	if( *split_values != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: split values already set.",
 		 function );
 
@@ -93,10 +94,10 @@ int libewf_string_split(
 	}
 	if( amount_of_split_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of split values.",
 		 function );
 
@@ -170,10 +171,10 @@ int libewf_string_split(
 
 	if( *split_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: unable to create split values.",
 		 function );
 
@@ -184,10 +185,10 @@ int libewf_string_split(
 	     0,
 	     sizeof( libewf_character_t * ) * *amount_of_split_values ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: unable to clear split values.",
 		 function );
 
@@ -238,10 +239,10 @@ int libewf_string_split(
 
 			if( ( *split_values )[ split_value_iterator ] == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-				 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: unable to create split value: %" PRIzd ".",
 				 function,
 				 split_value_iterator );
@@ -260,10 +261,10 @@ int libewf_string_split(
 			     split_value_start,
 			     split_value_size ) == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-				 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: unable to set split value: %" PRIzd ".",
 				 function,
 				 split_value_iterator );
@@ -299,17 +300,17 @@ int libewf_string_split(
 int libewf_string_split_values_free(
      libewf_character_t **split_values,
      size_t amount_of_split_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function       = "libewf_string_split_values_free";
 	size_t split_value_iterator = 0;
 
 	if( split_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid split values array.",
 		 function );
 
@@ -325,7 +326,7 @@ int libewf_string_split_values_free(
 #if defined( HAVE_VERBOSE_OUTPUT )
 		else
 		{
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: empty split value: %" PRIzd " out of: %" PRIzd ".\n",
 			 function,
 			 split_value_iterator,

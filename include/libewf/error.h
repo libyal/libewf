@@ -23,10 +23,6 @@
 #if !defined( _LIBEWF_ERROR_H )
 #define _LIBEWF_ERROR_H
 
-/* libewf uses the same error codes as libuna
- * this allows libewf to pass libuna directly
- */
-
 /* External error type definition hides internal structure
  */
 typedef intptr_t libewf_error_t;
@@ -155,7 +151,15 @@ enum LIBEWF_IO_ERROR
 
 	/* The resource is invalid i.e. a missing file
 	 */
-	LIBEWF_IO_ERROR_INVALID_RESOURCE             = 7
+	LIBEWF_IO_ERROR_INVALID_RESOURCE             = 7,
+
+	/* The ioctl failed
+	 */
+	LIBEWF_IO_ERROR_IOCTL_FAILED                 = 8,
+
+	/* The unlink failed
+	 */
+	LIBEWF_IO_ERROR_UNLINK_FAILED                = 9
 };
 
 /* The input error codes
@@ -234,9 +238,9 @@ enum LIBEWF_RUNTIME_ERROR
 	 */
 	LIBEWF_RUNTIME_ERROR_RESIZE_FAILED           = 4,
 
-	/* The free of an internal structure failed
+	/* The free and/or finalization of an internal structure failed
 	 */
-	LIBEWF_RUNTIME_ERROR_FREE_FAILED             = 5,
+	LIBEWF_RUNTIME_ERROR_FINALIZE_FAILED         = 5,
 
 	/* The value could not be determined
 	 */

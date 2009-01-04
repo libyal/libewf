@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080917],
+ [20080921],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080917])
+ [20080921])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -120,7 +120,10 @@ AC_CHECK_HEADERS([string.h])
 dnl Headers included in common/memory.h
 AC_CHECK_HEADERS([stdlib.h])
 
-dnl Headers included in common/notify.c
+dnl Headers included in libewf/libewf_date_time.h
+AC_HEADER_TIME
+
+dnl Headers included in libewf/libewf_notify.h
 AC_CHECK_HEADERS([stdarg.h])
 AC_CHECK_HEADERS([varargs.h])
 
@@ -130,8 +133,6 @@ AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([unistd.h])
 
 dnl Other headers
-AC_CHECK_HEADERS([time.h])
-
 AC_CHECK_HEADERS([errno.h])
 AC_CHECK_HEADERS([glob.h])
 AC_CHECK_HEADERS([locale.h])
@@ -250,131 +251,6 @@ AC_CHECK_FUNCS(
   [Missing function: realloc],
   [1]) ])
 
-dnl File input/output functions used in common/notify.h
-AC_CHECK_FUNCS(
- [vfprintf],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: vfprintf],
-  [1]) ])
-
-dnl File input/output functions used in common/file_io.h
-AC_CHECK_FUNCS(
- [close],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: close],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [lseek],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: lseek],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [open],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: open],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [read],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: read],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [write],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: write],
-  [1]) ])
-
-dnl File input/output functions used in common/file_stream_io.h
-AC_CHECK_FUNCS(
- [fclose],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fclose],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [feof],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: feof],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fopen],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fopen],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fread],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fread],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [fwrite],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fwrite],
-  [1]) ])
-
-dnl Directory functions used in common/directory_io.h
-AC_CHECK_FUNCS(
- [mkdir],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: mkdir],
-  [1]) ])
-
-dnl Date and time functions used in common/date_time.h
-LIBEWF_CHECK_FUNC_CTIME
-
-AC_CHECK_FUNCS(
- [gmtime_r],
- [],
- [AC_CHECK_FUNCS(
-  [gmtime],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: gmtime_r and gmtime],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [localtime_r],
- [],
- [AC_CHECK_FUNCS(
-  [localtime],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: localtime_r and localtime],
-   [1]) ]) ])
-
-AC_CHECK_FUNCS(
- [mktime],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: mktime],
-  [1]) ])
-
-AC_CHECK_FUNCS(
- [time],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: time],
-  [1]) ])
-
 dnl Narrow character string functions used in common/narrow_string.h
 AC_CHECK_FUNCS(
  [fgets],
@@ -464,6 +340,124 @@ AC_CHECK_FUNCS(
   [AC_MSG_FAILURE(
    [Missing functions: strtoull and atoll],
    [1]) ]) ])
+
+dnl Date and time functions used in libewf/libewf_date_time.h
+AC_CHECK_FUNCS(
+ [localtime_r],
+ [],
+ [AC_CHECK_FUNCS(
+  [localtime],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: localtime_r and localtime],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [mktime],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: mktime],
+  [1]) ])
+
+dnl File input/output functions used in libewf/libewf_notify.h
+AC_CHECK_FUNCS(
+ [vfprintf],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: vfprintf],
+  [1]) ])
+
+dnl File input/output functions used in libewf/libewf_file_io.h
+AC_CHECK_FUNCS(
+ [close],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: close],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [lseek],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: lseek],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [open],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: open],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [read],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: read],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [write],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: write],
+  [1]) ])
+
+dnl File input/output functions used in libewf/libewf_file_stream_io.h
+AC_CHECK_FUNCS(
+ [fclose],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fclose],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [feof],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: feof],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fopen],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fopen],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fread],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fread],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fwrite],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fwrite],
+  [1]) ])
+
+dnl Date and time functions used in ewftools/date_time.h
+LIBEWF_CHECK_FUNC_CTIME
+
+AC_CHECK_FUNCS(
+ [gmtime_r],
+ [],
+ [AC_CHECK_FUNCS(
+  [gmtime],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: gmtime_r and gmtime],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [time],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: time],
+  [1]) ])
 
 dnl Check for error string functions used in ewftools/error_string.h
 AC_FUNC_STRERROR_R(
@@ -1209,17 +1203,22 @@ dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 dnl Set additional compiler flags
-dnl CFLAGS="$CFLAGS -Wall";
-CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
+CFLAGS="$CFLAGS -Wall";
+dnl CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([include/Makefile])
 AC_CONFIG_FILES([common/Makefile])
+AC_CONFIG_FILES([liberror/Makefile])
 AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
-AC_CONFIG_FILES([manuals/Makefile])
 AC_CONFIG_FILES([pyewf/Makefile])
+AC_CONFIG_FILES([documents/Makefile])
+AC_CONFIG_FILES([manuals/Makefile])
+AC_CONFIG_FILES([macosx/Makefile])
+AC_CONFIG_FILES([msvscpp/Makefile])
 dnl Have configure make the include files
 AC_CONFIG_FILES([include/libewf.h])
 AC_CONFIG_FILES([include/libewf/definitions.h])

@@ -358,8 +358,5 @@
 
 #define LIBEWF_OPERATING_SYSTEM "Microsoft Windows"
 
-/* Some functions are different within the Windows API
- */
-#define HAVE_WINDOWS_API 1
-
 #endif
+

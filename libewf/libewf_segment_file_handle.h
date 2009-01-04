@@ -26,7 +26,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_list_type.h"
 
 #if defined( __cplusplus )
@@ -61,11 +62,11 @@ struct libewf_segment_file_handle
 int libewf_segment_file_handle_initialize(
      libewf_segment_file_handle_t **segment_file_handle,
      int file_io_pool_entry,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_file_handle_free(
      libewf_segment_file_handle_t **segment_file_handle,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

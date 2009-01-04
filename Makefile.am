@@ -1,14 +1,15 @@
 SUBDIRS = \
+	include \
 	common \
+	liberror \
 	libuna \
 	libewf \
 	ewftools \
 	pyewf \
-	manuals
-
-CONFIG_FILES = \
-	common/config.h \
-	common/config_windows.h
+	documents \
+	manuals \
+	macosx \
+	msvscpp
 
 DEBIAN_FILES = \
 	debian/changelog \
@@ -47,61 +48,12 @@ DEBIAN_FILES = \
 	debian/shlibs.local.ex.in \
 	debian/watch.ex
 
-DOCUMENT_FILES = \
-	doc/header.txt \
-	doc/header2.txt \
-	doc/tests.txt
-
-INCLUDE_FILES = \
-	include/libewf.h.in \
-	include/libewf/definitions.h.in \
-	include/libewf/features.h.in \
-	include/libewf/types.h.in
-
-MANUAL_FILES = \
-	manuals/ewfacquire.1 \
-	manuals/ewfacquirestream.1 \
-	manuals/ewfexport.1 \
-	manuals/ewfinfo.1 \
-	manuals/ewfverify.1 \
-	manuals/libewf.3
-
-MSVCPP_FILES = \
-	msvscpp/ewfacquire \
-	msvscpp/ewfacquire/ewfacquire.vcproj \
-	msvscpp/ewfacquirestream \
-	msvscpp/ewfacquirestream/ewfacquirestream.vcproj \
-	msvscpp/ewfalter \
-	msvscpp/ewfalter/ewfalter.vcproj \
-	msvscpp/ewfexport \
-	msvscpp/ewfexport/ewfexport.vcproj \
-	msvscpp/ewfinfo \
-	msvscpp/ewfinfo/ewfinfo.vcproj \
-	msvscpp/ewfverify \
-	msvscpp/ewfverify/ewfverify.vcproj \
-	msvscpp/libewf_dll \
-	msvscpp/libewf_dll/libewf_dll.vcproj \
-	msvscpp/libewf.sln
-
-MACOSX_FILES = \
-	macosx/Introduction.rtf \
-	macosx/Introduction.rtf.in \
-	macosx/libewf.pmproj \
-	macosx/License.rtf \
-	macosx/Readme.rtf
-
 REDHAT_FILES = \
 	libewf.spec \
 	libewf.spec.in
 
 EXTRA_DIST = \
-	$(CONFIG_FILES) \
 	$(DEBIAN_FILES) \
-	$(DOCUMENT_FILES) \
-	$(INCLUDE_FILES) \
-	$(MANUAL_FILES) \
-	$(MSVCPP_FILES) \
-	$(MACOSX_FILES) \
 	$(REDHAT_FILES) \
 	libewf.pc \
 	libewf.pc.in
@@ -111,17 +63,6 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = \
 	libewf.pc
 
-include_HEADERS = \
-	include/libewf.h
-
-pkginclude_HEADERS = \
-	include/libewf/definitions.h \
-	include/libewf/error.h \
-	include/libewf/extern.h \
-	include/libewf/features.h \
-	include/libewf/handle.h \
-	include/libewf/types.h
-
 libtool: @LIBTOOL_DEPS@
 	cd $(srcdir) && $(SHELL) ./config.status --recheck
 
@@ -129,22 +70,19 @@ lib: library
 
 library:
 	cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS)
+	cd $(srcdir)/liberror && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS)
 
 distclean: clean
 	/bin/rm -f Makefile
-	/bin/rm -f config.status config.cache config.log
-	/bin/rm -f common/config.h
-	/bin/rm -f include/libewf.h
-	/bin/rm -f include/libewf/definitions.h
-	/bin/rm -f include/libewf/features.h
-	/bin/rm -f include/libewf/types.h
+	/bin/rm -f config.status
+	/bin/rm -f config.cache
+	/bin/rm -f config.log
 	/bin/rm -f libewf.pc
 	/bin/rm -f libewf.spec
 	/bin/rm -f debian/changelog
 	/bin/rm -f debian/shlibs.local.ex
-	/bin/rm -f macosx/Introduction.rtf
 	@for dir in ${subdirs}; do \
 		(cd $$dir && $(MAKE) distclean) \
 		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \

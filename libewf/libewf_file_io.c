@@ -24,9 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <errno.h>
 
-#include "libewf_error.h"
 #include "libewf_file_io.h"
 #include "libewf_string.h"
 
@@ -36,23 +37,23 @@
 int libewf_file_io_open(
      const char *filename,
      int flags,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_file_io_open";
 	int file_descriptor   = 0;
 
 	if( filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _sopen_s(
 	     &file_descriptor,
 	     filename,
@@ -71,10 +72,10 @@ int libewf_file_io_open(
 		switch( errno )
 		{
 			case EACCES:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_ACCESS_DENIED,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_ACCESS_DENIED,
 				 "%s: access denied to file: %s.",
 				 function,
 				 filename );
@@ -82,10 +83,10 @@ int libewf_file_io_open(
 				break;
 
 			case ENOENT:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_INVALID_RESOURCE,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_INVALID_RESOURCE,
 				 "%s: no such file: %s.",
 				 function,
 				 filename );
@@ -93,10 +94,10 @@ int libewf_file_io_open(
 				break;
 
 			default:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_OPEN_FAILED,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_OPEN_FAILED,
 				 "%s: error opening file: %s.",
 				 function,
 				 filename );
@@ -116,9 +117,9 @@ int libewf_file_io_open(
 int libewf_file_io_open_wide(
      const wchar_t *filename,
      int flags,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WINDOWS_API )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( WINAPI )
 	char *narrow_filename       = NULL;
 	size_t filename_size        = 0;
 	size_t narrow_filename_size = 0;
@@ -129,16 +130,16 @@ int libewf_file_io_open_wide(
 
 	if( filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,
@@ -156,10 +157,10 @@ int libewf_file_io_open_wide(
 	     &narrow_filename_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine narrow character filename size.",
 		 function );
 
@@ -170,10 +171,10 @@ int libewf_file_io_open_wide(
 
 	if( narrow_filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create narrow character filename.",
 		 function );
 
@@ -186,10 +187,10 @@ int libewf_file_io_open_wide(
 	     filename_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set narrow character filename.",
 		 function );
 
@@ -212,10 +213,10 @@ int libewf_file_io_open_wide(
 		switch( errno )
 		{
 			case EACCES:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_ACCESS_DENIED,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_ACCESS_DENIED,
 				 "%s: access denied to file: %ls.",
 				 function,
 				 filename );
@@ -223,10 +224,10 @@ int libewf_file_io_open_wide(
 				break;
 
 			case ENOENT:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_INVALID_RESOURCE,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_INVALID_RESOURCE,
 				 "%s: no such file: %ls.",
 				 function,
 				 filename );
@@ -234,10 +235,10 @@ int libewf_file_io_open_wide(
 				break;
 
 			default:
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_OPEN_FAILED,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_OPEN_FAILED,
 				 "%s: error opening file: %ls.",
 				 function,
 				 filename );
@@ -256,19 +257,19 @@ int libewf_file_io_open_wide(
  */
 int libewf_file_io_exists(
      const char *filename,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
-	libewf_error_t *local_error = NULL;
+	liberror_error_t *local_error = NULL;
 	static char *function       = "libewf_file_io_exists";
 	int file_descriptor         = 0;
 	int result                  = 1;
 
 	if( filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
@@ -285,22 +286,22 @@ int libewf_file_io_exists(
 
 	if( file_descriptor == -1 )
 	{
-		if( libewf_error_matches(
+		if( liberror_error_matches(
 		     *error,
-		     LIBEWF_ERROR_DOMAIN_IO,
-		     LIBEWF_IO_ERROR_ACCESS_DENIED ) != 0 )
+		     LIBERROR_ERROR_DOMAIN_IO,
+		     LIBERROR_IO_ERROR_ACCESS_DENIED ) != 0 )
 		{
-			libewf_error_free(
+			liberror_error_free(
 			 error );
 
 			result = 1;
 		}
-		else if( libewf_error_matches(
+		else if( liberror_error_matches(
 		          *error,
-		          LIBEWF_ERROR_DOMAIN_IO,
-		          LIBEWF_IO_ERROR_INVALID_RESOURCE ) != 0 )
+		          LIBERROR_ERROR_DOMAIN_IO,
+		          LIBERROR_IO_ERROR_INVALID_RESOURCE ) != 0 )
 		{
-			libewf_error_free(
+			liberror_error_free(
 			 error );
 
 			result = 0;
@@ -309,7 +310,7 @@ int libewf_file_io_exists(
 		{
 			if( error == &local_error )
 			{
-				libewf_error_free(
+				liberror_error_free(
 				 error );
 			}
 			result = -1;
@@ -318,10 +319,10 @@ int libewf_file_io_exists(
 	else if( libewf_file_io_close(
 		  file_descriptor ) != 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close file: %s.",
 		 function,
 		 filename );
@@ -338,19 +339,19 @@ int libewf_file_io_exists(
  */
 int libewf_file_io_exists_wide(
      const wchar_t *filename,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
-	libewf_error_t *local_error = NULL;
+	liberror_error_t *local_error = NULL;
 	static char *function       = "libewf_file_io_exists_wide";
 	int file_descriptor         = 0;
 	int result                  = 1;
 
 	if( filename == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid filename.",
 		 function );
 
@@ -367,22 +368,22 @@ int libewf_file_io_exists_wide(
 
 	if( file_descriptor == -1 )
 	{
-		if( libewf_error_matches(
+		if( liberror_error_matches(
 		     *error,
-		     LIBEWF_ERROR_DOMAIN_IO,
-		     LIBEWF_IO_ERROR_ACCESS_DENIED ) != 0 )
+		     LIBERROR_ERROR_DOMAIN_IO,
+		     LIBERROR_IO_ERROR_ACCESS_DENIED ) != 0 )
 		{
-			libewf_error_free(
+			liberror_error_free(
 			 error );
 
 			result = 1;
 		}
-		else if( libewf_error_matches(
+		else if( liberror_error_matches(
 		          *error,
-		          LIBEWF_ERROR_DOMAIN_IO,
-		          LIBEWF_IO_ERROR_INVALID_RESOURCE ) != 0 )
+		          LIBERROR_ERROR_DOMAIN_IO,
+		          LIBERROR_IO_ERROR_INVALID_RESOURCE ) != 0 )
 		{
-			libewf_error_free(
+			liberror_error_free(
 			 error );
 
 			result = 0;
@@ -391,7 +392,7 @@ int libewf_file_io_exists_wide(
 		{
 			if( error == &local_error )
 			{
-				libewf_error_free(
+				liberror_error_free(
 				 error );
 			}
 			result = -1;
@@ -400,10 +401,10 @@ int libewf_file_io_exists_wide(
 	else if( libewf_file_io_close(
 		  file_descriptor ) != 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close file: %ls.",
 		 function,
 		 filename );

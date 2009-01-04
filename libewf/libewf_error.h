@@ -24,72 +24,8 @@
 #define _LIBEWF_INTERNAL_ERROR_H
 
 #include <common.h>
-#include <types.h>
-
-#include <stdio.h>
-
-#if defined( HAVE_STDARG_H )
-#include <stdarg.h>
-#elif defined( HAVE_VARARGS_H )
-#include <varargs.h>
-#else
-#error Missing headers stdarg.h and varargs.h
-#endif
 
 #include <libewf/error.h>
-
-#include "libewf_extern.h"
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-typedef struct libewf_internal_error libewf_internal_error_t;
-
-struct libewf_internal_error
-{
-	/* The error domain
-	 */
-	int domain;
-
-	/* The error code
-	 */
-	int code;
-
-	/* The amount of messages
-	 */
-	int amount_of_messages;
-
-	/* The error messages
-	 */
-	char **message;
-};
-
-void libewf_error_set(
-      libewf_error_t **error,
-      int error_domain,
-      int error_code,
-      const char *format,
-      ... );
-
-LIBEWF_EXTERN void libewf_error_free(
-                    libewf_error_t **error );
-
-LIBEWF_EXTERN int libewf_error_matches(
-                   libewf_error_t *error,
-                   int error_domain,
-                   int error_code );
-
-LIBEWF_EXTERN void libewf_error_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
-
-LIBEWF_EXTERN void libewf_error_backtrace_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
-
-void libewf_error_backtrace_notify(
-      libewf_error_t *error );
 
 #if defined( __cplusplus )
 }

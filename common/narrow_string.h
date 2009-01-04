@@ -96,7 +96,7 @@ extern "C" {
 /* String formatted print (snprinf)
  */
 #if defined( HAVE_SNPRINTF )
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 #define narrow_string_snprintf( target, size, format, ... ) \
 	sprintf_s( target, size, format, __VA_ARGS__ )
 

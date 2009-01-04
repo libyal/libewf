@@ -22,10 +22,11 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_list_type.h"
+#include "libewf_notify.h"
 #include "libewf_section_list.h"
 
 /* Frees the section list values
@@ -51,17 +52,17 @@ int libewf_section_list_append(
      size_t type_size,
      off64_t start_offset,
      off64_t end_offset,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_section_list_values_t *section_list_values = NULL;
 	static char *function                             = "libewf_section_list_append";
 
 	if( section_list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid section list.",
 		 function );
 
@@ -69,10 +70,10 @@ int libewf_section_list_append(
 	}
 	if( type == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid type.",
 		 function );
 
@@ -81,10 +82,10 @@ int libewf_section_list_append(
 	if( ( type_size == 0 )
 	 || ( type_size >= 16 ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid type size value out of range.",
 		 function );
 
@@ -95,10 +96,10 @@ int libewf_section_list_append(
 
 	if( section_list_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create section list values.",
 		 function );
 
@@ -109,10 +110,10 @@ int libewf_section_list_append(
 	     0,
 	     sizeof( libewf_section_list_values_t ) ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear section list values.",
 		 function );
 
@@ -126,10 +127,10 @@ int libewf_section_list_append(
 	     type,
 	     type_size ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set section list values type.",
 		 function );
 
@@ -147,10 +148,10 @@ int libewf_section_list_append(
 	     (intptr_t *) section_list_values,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append section list values.",
 		 function );
 

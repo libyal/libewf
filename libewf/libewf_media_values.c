@@ -22,10 +22,11 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_media_values.h"
+#include "libewf_notify.h"
 
 #include "ewf_definitions.h"
 
@@ -34,16 +35,16 @@
  */
 int libewf_media_values_initialize(
      libewf_media_values_t **media_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_media_values_initialize";
 
 	if( media_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 
@@ -56,10 +57,10 @@ int libewf_media_values_initialize(
 
 		if( *media_values == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create media values.",
 			 function );
 
@@ -70,10 +71,10 @@ int libewf_media_values_initialize(
 		     0,
 		     sizeof( libewf_media_values_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear media values.",
 			 function );
 
@@ -98,16 +99,16 @@ int libewf_media_values_initialize(
  */
 int libewf_media_values_free(
      libewf_media_values_t **media_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
         static char *function = "libewf_media_values_free";
 
 	if( media_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid media values.",
 		 function );
 

@@ -1,20 +1,21 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
-MEMWATCH_FILES = memwatch.c memwatch.h
-
-noinst_LTLIBRARIES = libcommon.la
-
-libcommon_la_SOURCES = \
+EXTRA_DIST = \
 	common.h \
-	date_time.c date_time.h \
+	config.h \
+	config_windows.h \
 	endian.h \
 	memory.h \
 	narrow_string.h \
-	notify.c notify.h \
 	types.h \
-	wide_string.h \
-	$(MEMWATCH_FILES)
+	wide_string.h
+
+# noinst_LTLIBRARIES = libcommon.la
+#
+# libcommon_la_SOURCES = \
+#	memwatch.c memwatch.h
 
 distclean: clean
+	/bin/rm -f common/config.h
 	/bin/rm -f Makefile
 

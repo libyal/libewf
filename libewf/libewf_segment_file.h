@@ -26,7 +26,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_file_io_pool.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
@@ -52,7 +53,7 @@ ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
          uint16_t *segment_number,
          libewf_file_io_pool_t *file_io_pool,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
@@ -68,7 +69,7 @@ int libewf_segment_file_read_sections(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_headers(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -76,7 +77,7 @@ ssize_t libewf_segment_file_write_headers(
          libewf_header_sections_t *header_sections,
          int8_t compression_level,
          uint8_t format,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_last_section(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -84,7 +85,7 @@ ssize_t libewf_segment_file_write_last_section(
          int last_segment_file,
          uint8_t format,
          uint8_t ewf_format,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_start(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -97,7 +98,7 @@ ssize_t libewf_segment_file_write_start(
          uint8_t format,
          uint8_t ewf_format,
          ewf_data_t **cached_data_section,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -110,7 +111,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          uint32_t segment_chunk_amount,
          uint8_t format,
          uint8_t ewf_format,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_chunks_data(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -122,7 +123,7 @@ ssize_t libewf_segment_file_write_chunks_data(
          int8_t is_compressed,
          ewf_crc_t *chunk_crc,
          int8_t write_crc,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_chunks_correction(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -136,7 +137,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
          uint32_t section_amount_of_chunks,
          uint8_t format,
          uint8_t ewf_format,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -148,7 +149,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
          ewf_crc_t *chunk_crc,
          uint8_t write_crc,
 	 uint8_t no_section_append,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -165,7 +166,7 @@ ssize_t libewf_segment_file_write_close(
          uint8_t format,
          uint8_t ewf_format,
          ewf_data_t **cached_data_section,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

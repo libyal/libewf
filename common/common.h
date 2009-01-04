@@ -38,7 +38,7 @@
 #include <config.h>
 #endif
 
-#if defined( HAVE_CONFIG_WINDOWS_H )
+#if defined( WINAPI )
 #include <config_windows.h>
 #endif
 

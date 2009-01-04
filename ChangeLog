@@ -200,6 +200,14 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080921
+* updated libuna
+* updated configure and Makefiles
+* implemented liberror
+* renamed doc into documents
+* removed date_time and notify from common
+* changed HAVE_WINDOWS_API into WINAPI
+
 Version: 20080917
 * Small change in configure.ac
 

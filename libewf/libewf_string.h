@@ -28,7 +28,8 @@
 #include <types.h>
 #include <wide_string.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_libuna.h"
 
 #if defined( _cplusplus )
@@ -340,12 +341,12 @@ int libewf_string_split(
      libewf_character_t delimiter,
      libewf_character_t ***split_values,
      size_t *amount_of_split_values,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_string_split_values_free(
      libewf_character_t **split_values,
      size_t amount_of_split_values,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( _cplusplus )
 }

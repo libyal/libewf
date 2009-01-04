@@ -22,10 +22,11 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_list_type.h"
+#include "libewf_notify.h"
 
 /* Frees a list including the elements
  * Uses the value_free_function to free the element value
@@ -34,17 +35,17 @@
 int libewf_list_free(
      libewf_list_t *list,
      int (*value_free_function)( intptr_t *value ),
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_list_free";
 	int result            = 0;
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -57,10 +58,10 @@ int libewf_list_free(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to empty list.",
 		 function );
 	}
@@ -77,7 +78,7 @@ int libewf_list_free(
 int libewf_list_empty(
      libewf_list_t *list,
      int (*value_free_function)( intptr_t *value ),
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
 	static char *function               = "libewf_list_empty";
@@ -87,10 +88,10 @@ int libewf_list_empty(
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -106,10 +107,10 @@ int libewf_list_empty(
 
 			if( list_element == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected in element: %d.",
 				 function,
 				 iterator + 1 );
@@ -134,10 +135,10 @@ int libewf_list_empty(
 			 && ( value_free_function(
 			       list_element->value ) != 1 ) )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 				 "%s: unable to free value in element: %d.",
 				 function,
 				 iterator + 1 );
@@ -157,16 +158,16 @@ int libewf_list_empty(
 int libewf_list_prepend_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_list_prepend_element";
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -174,10 +175,10 @@ int libewf_list_prepend_element(
 	}
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid element.",
 		 function );
 
@@ -205,17 +206,17 @@ int libewf_list_prepend_element(
 int libewf_list_prepend_value(
      libewf_list_t *list,
      intptr_t *value,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_list_element_t *element = NULL;
 	static char *function          = "libewf_list_prepend_value";
 
 	if( value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value.",
 		 function );
 
@@ -226,10 +227,10 @@ int libewf_list_prepend_value(
 
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create element.",
 		 function );
 
@@ -240,10 +241,10 @@ int libewf_list_prepend_value(
 	     0,
 	     sizeof( libewf_list_element_t ) ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear element.",
 		 function );
 
@@ -259,10 +260,10 @@ int libewf_list_prepend_value(
 	     element,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to prepend element to list.",
 		 function );
 
@@ -280,16 +281,16 @@ int libewf_list_prepend_value(
 int libewf_list_append_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_list_append_element";
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -297,10 +298,10 @@ int libewf_list_append_element(
 	}
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid element.",
 		 function );
 
@@ -328,17 +329,17 @@ int libewf_list_append_element(
 int libewf_list_append_value(
      libewf_list_t *list,
      intptr_t *value,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_list_element_t *element = NULL;
 	static char *function          = "libewf_list_append_value";
 
 	if( value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value.",
 		 function );
 
@@ -349,10 +350,10 @@ int libewf_list_append_value(
 
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create element.",
 		 function );
 
@@ -363,10 +364,10 @@ int libewf_list_append_value(
 	     0,
 	     sizeof( libewf_list_element_t ) ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear element.",
 		 function );
 
@@ -382,10 +383,10 @@ int libewf_list_append_value(
 	     element,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to append element to list.",
 		 function );
 
@@ -405,7 +406,7 @@ int libewf_list_insert_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
      int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value ),
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
 	static char *function               = "libewf_list_insert_element";
@@ -414,10 +415,10 @@ int libewf_list_insert_element(
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -425,10 +426,10 @@ int libewf_list_insert_element(
 	}
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid element.",
 		 function );
 
@@ -437,10 +438,10 @@ int libewf_list_insert_element(
 	if( ( element->previous != NULL )
 	 || ( element->next != NULL ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: element already part of a list.",
 		 function );
 
@@ -448,10 +449,10 @@ int libewf_list_insert_element(
 	}
 	if( value_compare_function == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value compare function.",
 		 function );
 
@@ -461,10 +462,10 @@ int libewf_list_insert_element(
 	{
 		if( list->first != NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - first already set.",
 			 function );
 
@@ -472,10 +473,10 @@ int libewf_list_insert_element(
 		}
 		if( list->last != NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - last already set.",
 			 function );
 
@@ -488,10 +489,10 @@ int libewf_list_insert_element(
 	{
 		if( list->first == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing first.",
 			 function );
 
@@ -499,10 +500,10 @@ int libewf_list_insert_element(
 		}
 		if( list->last == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: corruption detected - missing last.",
 			 function );
 
@@ -531,10 +532,10 @@ int libewf_list_insert_element(
 				}
 				else if( list_element->previous == NULL )
 				{
-					libewf_error_set(
+					liberror_error_set(
 					 error,
-					 LIBEWF_ERROR_DOMAIN_RUNTIME,
-					 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 					 "%s: corruption detected - missing previous in list element: %d.",
 					 function,
 					 iterator + 1 );
@@ -572,17 +573,17 @@ int libewf_list_insert_value(
      libewf_list_t *list,
      intptr_t *value,
      int (*value_compare_function)( intptr_t *first_value, intptr_t *second_value ),
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_list_element_t *element = NULL;
 	static char *function          = "libewf_list_insert_value";
 
 	if( value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value.",
 		 function );
 
@@ -593,10 +594,10 @@ int libewf_list_insert_value(
 
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create element.",
 		 function );
 
@@ -607,10 +608,10 @@ int libewf_list_insert_value(
 	     0,
 	     sizeof( libewf_list_element_t ) ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear element.",
 		 function );
 
@@ -627,10 +628,10 @@ int libewf_list_insert_value(
 	     value_compare_function,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
 		 "%s: unable to insert element to list.",
 		 function );
 
@@ -648,16 +649,16 @@ int libewf_list_insert_value(
 int libewf_list_remove_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_list_remove_element";
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -665,10 +666,10 @@ int libewf_list_remove_element(
 	}
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid element.",
 		 function );
 
@@ -702,16 +703,16 @@ int libewf_list_remove_element(
  */
 int libewf_list_get_amount_of_elements(
      libewf_list_t *list,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_list_get_amount_of_elements";
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -727,7 +728,7 @@ int libewf_list_get_element(
      libewf_list_t *list,
      int element_index,
      libewf_list_element_t **element,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_list_element_t *list_element = NULL;
 	static char *function               = "libewf_list_get_element";
@@ -735,10 +736,10 @@ int libewf_list_get_element(
 
 	if( list == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid list.",
 		 function );
 
@@ -747,10 +748,10 @@ int libewf_list_get_element(
 	if( ( element_index < 0 )
 	 || ( element_index >= list->amount_of_elements ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid element index out of range.",
 		 function );
 
@@ -758,10 +759,10 @@ int libewf_list_get_element(
 	}
 	if( element == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid element.",
 		 function );
 
@@ -775,10 +776,10 @@ int libewf_list_get_element(
 		{
 			if( list_element == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected in element: %d.",
 				 function,
 				 iterator + 1 );
@@ -796,10 +797,10 @@ int libewf_list_get_element(
 		{
 			if( list_element == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: corruption detected in element: %d.",
 				 function,
 				 iterator + 1 );

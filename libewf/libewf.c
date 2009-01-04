@@ -22,7 +22,7 @@
 
 #include <common.h>
 
-#if defined( HAVE_WINDOWS_API )
+#if defined( WINAPI )
 
 #include <windows.h>
 

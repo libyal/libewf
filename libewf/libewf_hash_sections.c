@@ -22,25 +22,25 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 
 #include "libewf_hash_sections.h"
+#include "libewf_notify.h"
 
 /* Initialize the hash sections
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_initialize(
      libewf_hash_sections_t **hash_sections,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_hash_sections_initialize";
 
 	if( hash_sections == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.",
 		 function );
 
@@ -53,10 +53,10 @@ int libewf_hash_sections_initialize(
 
 		if( *hash_sections == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create hash sections.",
 			 function );
 
@@ -67,10 +67,10 @@ int libewf_hash_sections_initialize(
 		     0,
 		     sizeof( libewf_hash_sections_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear hash sections.",
 			 function );
 
@@ -90,16 +90,16 @@ int libewf_hash_sections_initialize(
  */
 int libewf_hash_sections_free(
      libewf_hash_sections_t **hash_sections,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
         static char *function = "libewf_hash_sections_free";
 
 	if( hash_sections == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash sections.",
 		 function );
 

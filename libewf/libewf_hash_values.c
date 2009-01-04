@@ -22,13 +22,14 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "libewf_definitions.h"
-#include "libewf_error.h"
 #include "libewf_hash_values.h"
 #include "libewf_libuna.h"
+#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -39,16 +40,16 @@
  */
 int libewf_hash_values_initialize(
      libewf_values_table_t *hash_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_hash_values_initialize";
 
 	if( hash_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -61,10 +62,10 @@ int libewf_hash_values_initialize(
 	     3,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set MD5 identifier.",
 		 function );
 
@@ -80,7 +81,7 @@ int libewf_hash_values_parse_md5_hash(
      libewf_values_table_t **hash_values,
      uint8_t *md5_hash,
      size_t md5_hash_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t md5_hash_string[ 33 ];
 
@@ -92,10 +93,10 @@ int libewf_hash_values_parse_md5_hash(
 
 	if( hash_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -103,10 +104,10 @@ int libewf_hash_values_parse_md5_hash(
 	}
 	if( md5_hash == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MD5 hash.",
 		 function );
 
@@ -114,10 +115,10 @@ int libewf_hash_values_parse_md5_hash(
 	}
 	if( md5_hash_size < EWF_DIGEST_HASH_SIZE_MD5 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: MD5 hash too small.",
 		 function );
 
@@ -130,10 +131,10 @@ int libewf_hash_values_parse_md5_hash(
 		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to create hash values.",
 			 function );
 
@@ -143,10 +144,10 @@ int libewf_hash_values_parse_md5_hash(
 		     *hash_values,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: unable to initialize the hash values.",
 			 function );
 
@@ -163,10 +164,10 @@ int libewf_hash_values_parse_md5_hash(
 
 	if( result == -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if MD5 hash value was set.",
 		 function );
 
@@ -211,10 +212,10 @@ int libewf_hash_values_parse_md5_hash(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set value with identifier: MD5.",
 		 function );
 	}
@@ -228,7 +229,7 @@ int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t **hash_values,
      libewf_character_t *hash_string_xml,
      size_t hash_string_xml_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t **lines          = NULL;
 	libewf_character_t *open_tag_start  = NULL;
@@ -244,10 +245,10 @@ int libewf_hash_values_parse_hash_string_xml(
 
 	if( hash_string_xml == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash string.",
 		 function );
 
@@ -258,10 +259,10 @@ int libewf_hash_values_parse_hash_string_xml(
 	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create hash values.",
 		 function );
 
@@ -271,10 +272,10 @@ int libewf_hash_values_parse_hash_string_xml(
 	     *hash_values,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to initialize the hash values.",
 		 function );
 
@@ -288,10 +289,10 @@ int libewf_hash_values_parse_hash_string_xml(
 	     &amount_of_lines,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split hash string into lines.",
 		 function );
 
@@ -387,10 +388,10 @@ int libewf_hash_values_parse_hash_string_xml(
 		     value_length,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set value with identifier: %" PRIs_LIBEWF ".",
 			 function,
 			 &open_tag_start[ 1 ] );
@@ -408,10 +409,10 @@ int libewf_hash_values_parse_hash_string_xml(
 	     amount_of_lines,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
 		 "%s: unable to free split lines.",
 		 function );
 
@@ -427,7 +428,7 @@ int libewf_hash_values_parse_xhash(
      libewf_values_table_t **hash_values,
      uint8_t *xhash,
      size_t xhash_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *xml_hash_string = NULL;
 	static char *function               = "libewf_hash_values_parse_xhash";
@@ -436,10 +437,10 @@ int libewf_hash_values_parse_xhash(
 
 	if( xhash == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xhash.",
 		 function );
 
@@ -451,10 +452,10 @@ int libewf_hash_values_parse_xhash(
 	     &xml_hash_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine XML hash string size.",
 		 function );
 
@@ -465,10 +466,10 @@ int libewf_hash_values_parse_xhash(
 
 	if( xml_hash_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: unable to create XML hash string.",
 		 function );
 
@@ -481,10 +482,10 @@ int libewf_hash_values_parse_xhash(
 	     xhash_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to XML set hash string.",
 		 function );
 
@@ -501,10 +502,10 @@ int libewf_hash_values_parse_xhash(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-	         LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+	         LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to parse XML hash string.",
 		 function );
 	}
@@ -523,16 +524,16 @@ int libewf_hash_values_convert_hash_string_to_xhash(
      size_t hash_string_size,
      uint8_t **xhash,
      size_t *xhash_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_hash_values_convert_hash_string_to_xhash";
 
 	if( hash_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash string.",
 		 function );
 
@@ -541,10 +542,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 	if( ( hash_string_size == 0 )
 	 || ( hash_string_size > (size_t) SSIZE_MAX ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash string size.",
 		 function );
 
@@ -552,10 +553,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 	}
 	if( xhash == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xhash.",
 		 function );
 
@@ -563,10 +564,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 	}
 	if( xhash_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid xhash size.",
 		 function );
 
@@ -574,10 +575,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 	}
 	if( *xhash != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: xhash already created.",
 		 function );
 
@@ -589,10 +590,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 	     xhash_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine xhash size.",
 		 function );
 
@@ -603,10 +604,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 
 	if( *xhash == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: unable to create xhash.",
 		 function );
 
@@ -621,10 +622,10 @@ int libewf_hash_values_convert_hash_string_to_xhash(
 	     hash_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set xhash.",
 		 function );
 
@@ -647,7 +648,7 @@ int libewf_hash_values_generate_hash_string_xml(
      libewf_values_table_t *hash_values,
      libewf_character_t **hash_string,
      size_t *hash_string_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *xml_head            = _LIBEWF_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
 	libewf_character_t *xml_open_tag_xhash  = _LIBEWF_STRING( "<xhash>" );
@@ -659,10 +660,10 @@ int libewf_hash_values_generate_hash_string_xml(
 
 	if( hash_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -670,10 +671,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_values->amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid hash values - amount of value less than zero.",
 		 function );
 
@@ -681,10 +682,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_values->identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values - missing identifiers.",
 		 function );
 
@@ -692,10 +693,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_values->identifier_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values - missing identifier lengths.",
 		 function );
 
@@ -703,10 +704,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_values->value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values - missing values.",
 		 function );
 
@@ -714,10 +715,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_values->value_length == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values - missing value lengths.",
 		 function );
 
@@ -725,10 +726,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash string.",
 		 function );
 
@@ -736,10 +737,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( *hash_string != NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: hash string already created.",
 		 function );
 
@@ -747,10 +748,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	if( hash_string_size == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash string size.",
 		 function );
 
@@ -772,10 +773,10 @@ int libewf_hash_values_generate_hash_string_xml(
 		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
 		 || ( hash_values->identifier_length[ values_table_iterator ] == 0 ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid hash value - missing identifier.",
 			 function );
 
@@ -799,10 +800,10 @@ int libewf_hash_values_generate_hash_string_xml(
 
 	if( *hash_string == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: unable to create hash string.",
 		 function );
 
@@ -821,10 +822,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *hash_string_size ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set hash string.",
 		 function );
 
@@ -843,10 +844,10 @@ int libewf_hash_values_generate_hash_string_xml(
 		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
 		 || ( hash_values->identifier_length[ values_table_iterator ] == 0 ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: invalid hash value - missing identifier.",
 			 function );
 
@@ -868,10 +869,10 @@ int libewf_hash_values_generate_hash_string_xml(
 			if( ( print_count <= -1 )
 			 || ( (size_t) print_count > ( *hash_string_size - string_offset ) ) )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set hash string.",
 				 function );
 
@@ -895,10 +896,10 @@ int libewf_hash_values_generate_hash_string_xml(
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > ( *hash_string_size - string_offset ) ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set hash string.",
 		 function );
 
@@ -921,7 +922,7 @@ int libewf_hash_values_generate_md5_hash(
      uint8_t *md5_hash,
      size_t md5_hash_size,
      uint8_t *md5_hash_set,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t md5_hash_string[ 33 ];
 
@@ -933,10 +934,10 @@ int libewf_hash_values_generate_md5_hash(
 
 	if( hash_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hash values.",
 		 function );
 
@@ -944,10 +945,10 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	if( md5_hash == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MD5 hash.",
 		 function );
 
@@ -955,10 +956,10 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	if( md5_hash_size < EWF_DIGEST_HASH_SIZE_MD5 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: MD5 hash too small.",
 		 function );
 
@@ -966,10 +967,10 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	if( md5_hash_set == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid MD5 hash set.",
 		 function );
 
@@ -985,10 +986,10 @@ int libewf_hash_values_generate_md5_hash(
 
 	if( result == -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to determine if MD5 hash value was set.",
 		 function );
 
@@ -1052,7 +1053,7 @@ int libewf_hash_values_generate_xhash_string_ewfx(
      libewf_values_table_t *hash_values,
      uint8_t **xhash,
      size_t *xhash_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	libewf_character_t *xml_hash_string = NULL;
 	static char *function               = "libewf_hash_values_generate_xhash_string_ewfx";
@@ -1065,10 +1066,10 @@ int libewf_hash_values_generate_xhash_string_ewfx(
 	     &xml_hash_string_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to create XML hash string.",
 		 function );
 
@@ -1083,10 +1084,10 @@ int libewf_hash_values_generate_xhash_string_ewfx(
 
 	if( result != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to create xhash.",
 		 function );
 	}

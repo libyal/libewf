@@ -22,16 +22,17 @@
 
 #include <common.h>
 #include <endian.h>
-#include <notify.h>
 #include <types.h>
+
+#include <liberror.h>
 
 #include "libewf_definitions.h"
 #include "libewf_compression.h"
-#include "libewf_error.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_interface.h"
+#include "libewf_notify.h"
 #include "libewf_read.h"
 #include "libewf_segment_file_handle.h"
 
@@ -52,7 +53,7 @@ ssize_t libewf_read_process_chunk_data(
          ewf_crc_t chunk_crc,
          int8_t read_crc,
          uint8_t *crc_mismatch,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	uint8_t *chunk_data_crc  = NULL;
 	static char *function    = "libewf_read_process_chunk_data";
@@ -60,10 +61,10 @@ ssize_t libewf_read_process_chunk_data(
 
 	if( internal_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -71,10 +72,10 @@ ssize_t libewf_read_process_chunk_data(
 	}
 	if( chunk_data == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk data.",
 		 function );
 
@@ -82,10 +83,10 @@ ssize_t libewf_read_process_chunk_data(
 	}
 	if( chunk_data_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk data size value exceeds maximum.",
 		 function );
 
@@ -93,10 +94,10 @@ ssize_t libewf_read_process_chunk_data(
 	}
 	if( crc_mismatch == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid CRC mismatch.",
 		 function );
 
@@ -123,7 +124,7 @@ ssize_t libewf_read_process_chunk_data(
 		if( chunk_crc != calculated_crc )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
 			 function,
 			 chunk_crc,
@@ -138,10 +139,10 @@ ssize_t libewf_read_process_chunk_data(
 	{
 		if( uncompressed_chunk_data == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid uncompressed chunk data.",
 			 function );
 
@@ -149,10 +150,10 @@ ssize_t libewf_read_process_chunk_data(
 		}
 		if( chunk_data == uncompressed_chunk_data )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 			 "%s: invalid uncompressed chunk data is the same as chunk data.",
 			 function );
 
@@ -160,10 +161,10 @@ ssize_t libewf_read_process_chunk_data(
 		}
 		if( *uncompressed_chunk_data_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid uncompressed chunk data size value exceeds maximum.",
 			 function );
 
@@ -176,10 +177,10 @@ ssize_t libewf_read_process_chunk_data(
 		     chunk_data_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_COMPRESSION,
-			 LIBEWF_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
+			 LIBERROR_ERROR_DOMAIN_COMPRESSION,
+			 LIBERROR_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
 			 "%s: unable to uncompressed chunk data.",
 			 function );
 
@@ -203,7 +204,7 @@ ssize_t libewf_raw_read_chunk(
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
          int8_t *read_crc,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
@@ -218,10 +219,10 @@ ssize_t libewf_raw_read_chunk(
 
 	if( internal_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -229,10 +230,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( internal_handle->offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing offset table.",
 		 function );
 
@@ -240,10 +241,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid offset table - missing chunk offsets.",
 		 function );
 
@@ -251,10 +252,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( internal_handle->segment_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing segment table.",
 		 function );
 
@@ -262,10 +263,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( internal_handle->segment_table->segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid segment table - missing segment file handles.",
 		 function );
 
@@ -273,10 +274,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
@@ -284,10 +285,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( chunk_buffer == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk buffer.",
 		 function );
 
@@ -295,10 +296,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( chunk_size == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid chunk size value is zero.",
 		 function );
 
@@ -306,10 +307,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( chunk_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
@@ -317,10 +318,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( is_compressed == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid is compressed.",
 		 function );
 
@@ -328,10 +329,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( chunk_crc == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid chunk crc.",
 		 function );
 
@@ -339,10 +340,10 @@ ssize_t libewf_raw_read_chunk(
 	}
 	if( read_crc == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid read crc.",
 		 function );
 
@@ -380,10 +381,10 @@ ssize_t libewf_raw_read_chunk(
 	 */
 	if( chunk_size < chunk_data_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: invalid chunk size too small.",
 		 function );
 
@@ -393,10 +394,10 @@ ssize_t libewf_raw_read_chunk(
 
 	if( segment_file_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
 		 function );
 
@@ -411,17 +412,17 @@ ssize_t libewf_raw_read_chunk(
 	     SEEK_SET,
 	     error ) <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_SEEK_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek chunk in segment file.",
 		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
+	libewf_notify_verbose_printf(
 	 "%s: reading chunk at offset: %" PRIjd ".\n",
 	 function,
 	 internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
@@ -438,10 +439,10 @@ ssize_t libewf_raw_read_chunk(
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read chunk in segment file.",
 		 function );
 
@@ -460,10 +461,10 @@ ssize_t libewf_raw_read_chunk(
 
 		if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_IO,
-			 LIBEWF_IO_ERROR_READ_FAILED,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
 			 "%s: error reading CRC of chunk: %" PRIu32 " from segment file.",
 			 function,
 			 chunk );
@@ -483,7 +484,7 @@ ssize_t libewf_raw_read_chunk(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	notify_verbose_printf(
+	libewf_notify_verbose_printf(
 	 "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
 	 function,
 	 chunk + 1,
@@ -504,7 +505,7 @@ ssize_t libewf_read_chunk_data(
          uint32_t chunk_offset,
          uint8_t *buffer,
          size_t size,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	uint8_t *chunk_data        = NULL;
 	uint8_t *chunk_read        = NULL;
@@ -522,10 +523,10 @@ ssize_t libewf_read_chunk_data(
 
 	if( internal_handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -533,10 +534,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( internal_handle->read == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing subhandle read.",
 		 function );
 
@@ -544,10 +545,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( internal_handle->media_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -555,10 +556,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( internal_handle->offset_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing offset table.",
 		 function );
 
@@ -566,10 +567,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( internal_handle->offset_table->chunk_offset == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - invalid offset table - missing chunk offsets.",
 		 function );
 
@@ -577,10 +578,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
@@ -588,10 +589,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( buffer == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -599,10 +600,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( buffer == internal_handle->chunk_cache->compressed )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache compressed.",
 		 function );
 
@@ -624,7 +625,7 @@ ssize_t libewf_read_chunk_data(
 		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_notify_verbose_printf(
 			 "%s: reallocating chunk data size: %" PRIzu ".\n",
 			 function,
 			 chunk_data_size );
@@ -635,10 +636,10 @@ ssize_t libewf_read_chunk_data(
 			     chunk_data_size,
 			     error ) != 1 )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 				 "%s: unable to resize chunk cache.",
 				 function );
 
@@ -704,10 +705,10 @@ ssize_t libewf_read_chunk_data(
 
 		if( chunk_read_count <= -1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_IO,
-			 LIBEWF_IO_ERROR_READ_FAILED,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read chunk.",
 			 function );
 
@@ -730,10 +731,10 @@ ssize_t libewf_read_chunk_data(
 		     &crc_mismatch,
 		     error ) == -1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to process chunk data.",
 			 function );
 
@@ -749,10 +750,10 @@ ssize_t libewf_read_chunk_data(
 			       0,
 			       size ) == NULL ) )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_MEMORY,
-				 LIBEWF_MEMORY_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
 				 "%s: unable to wipe chunk data.",
 				 function );
 
@@ -772,10 +773,10 @@ ssize_t libewf_read_chunk_data(
 			     sector,
 			     amount_of_sectors ) != 1 )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 				 "%s: unable to set CRC error.",
 				 function );
 
@@ -802,10 +803,10 @@ ssize_t libewf_read_chunk_data(
 	 */
 	if( chunk_offset > chunk_data_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: chunk offset exceeds amount of bytes available in chunk.",
 		 function );
 
@@ -821,10 +822,10 @@ ssize_t libewf_read_chunk_data(
 	}
 	if( bytes_available > (size_t) INT32_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid available amount of bytes value exceeds maximum.",
 		 function );
 
@@ -844,10 +845,10 @@ ssize_t libewf_read_chunk_data(
 		       &( chunk_data[ chunk_offset ] ),
 		       bytes_available ) == NULL ) )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to set chunk data in buffer.",
 			 function );
 
@@ -872,7 +873,7 @@ ssize_t libewf_raw_read_prepare_buffer(
          int8_t is_compressed,
          uint32_t chunk_crc,
          int8_t read_crc,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_raw_read_prepare_buffer";
@@ -881,10 +882,10 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -894,10 +895,10 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
@@ -906,10 +907,10 @@ ssize_t libewf_raw_read_prepare_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
@@ -918,10 +919,10 @@ ssize_t libewf_raw_read_prepare_buffer(
 	if( ( uncompressed_buffer == internal_handle->chunk_cache->data )
 	 || ( uncompressed_buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed buffer - same as chunk cache.",
 		 function );
 
@@ -941,10 +942,10 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( chunk_data_size <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_INPUT_FAILED,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_INPUT_FAILED,
 		 "%s: unable to prepare chunk data.",
 		 function );
 
@@ -952,10 +953,10 @@ ssize_t libewf_raw_read_prepare_buffer(
 	}
 	if( crc_mismatch != 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
+		 LIBERROR_ERROR_DOMAIN_INPUT,
+		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
 		 "%s: CRC mismatch for chunk data.",
 		 function );
 
@@ -974,7 +975,7 @@ ssize_t libewf_raw_read_prepare_buffer(
          uint32_t chunk_crc,
          int8_t read_crc )
 {
-	libewf_error_t *error                     = NULL;
+	liberror_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_raw_read_prepare_buffer";
 	ssize_t chunk_data_size                   = 0;
@@ -982,16 +983,16 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1000,16 +1001,16 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1017,16 +1018,16 @@ ssize_t libewf_raw_read_prepare_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1034,16 +1035,16 @@ ssize_t libewf_raw_read_prepare_buffer(
 	if( ( uncompressed_buffer == internal_handle->chunk_cache->data )
 	 || ( uncompressed_buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid uncompressed buffer - same as chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1062,32 +1063,32 @@ ssize_t libewf_raw_read_prepare_buffer(
 
 	if( chunk_data_size <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_INPUT_FAILED,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_INPUT_FAILED,
 		 "%s: unable to prepare chunk data.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 	if( crc_mismatch != 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
+		 LIBERROR_ERROR_DOMAIN_INPUT,
+		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
 		 "%s: CRC mismatch for chunk data.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1109,7 +1110,7 @@ ssize_t libewf_raw_read_buffer(
          int8_t *is_compressed,
          uint32_t *chunk_crc,
          int8_t *read_crc,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_raw_read_buffer";
@@ -1117,10 +1118,10 @@ ssize_t libewf_raw_read_buffer(
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -1130,10 +1131,10 @@ ssize_t libewf_raw_read_buffer(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
@@ -1142,10 +1143,10 @@ ssize_t libewf_raw_read_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
@@ -1163,10 +1164,10 @@ ssize_t libewf_raw_read_buffer(
 
 	if( read_count <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read chunk data.",
 		 function );
 	}
@@ -1184,23 +1185,23 @@ ssize_t libewf_raw_read_buffer(
          uint32_t *chunk_crc,
          int8_t *read_crc )
 {
-	libewf_error_t *error                     = NULL;
+	liberror_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_raw_read_buffer";
 	ssize_t read_count                        = 0;
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1209,16 +1210,16 @@ ssize_t libewf_raw_read_buffer(
 
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1226,16 +1227,16 @@ ssize_t libewf_raw_read_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1252,16 +1253,16 @@ ssize_t libewf_raw_read_buffer(
 
 	if( read_count <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read chunk data.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 	}
 	/* TODO check if this is needed on error */
@@ -1279,7 +1280,7 @@ ssize_t libewf_read_buffer(
          libewf_handle_t *handle,
          void *buffer,
          size_t size,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_read_buffer";
@@ -1289,10 +1290,10 @@ ssize_t libewf_read_buffer(
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
@@ -1302,10 +1303,10 @@ ssize_t libewf_read_buffer(
 
 	if( internal_handle->media_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
@@ -1313,10 +1314,10 @@ ssize_t libewf_read_buffer(
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
@@ -1324,10 +1325,10 @@ ssize_t libewf_read_buffer(
 	}
 	if( buffer == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
@@ -1336,10 +1337,10 @@ ssize_t libewf_read_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
@@ -1347,17 +1348,17 @@ ssize_t libewf_read_buffer(
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
+	libewf_notify_verbose_printf(
 	 "%s: reading size: %" PRIzu ".\n",
 	 function,
 	 size );
@@ -1371,7 +1372,7 @@ ssize_t libewf_read_buffer(
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function,
 		 chunk_data_size );
@@ -1382,10 +1383,10 @@ ssize_t libewf_read_buffer(
 		     chunk_data_size,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize chunk cache.",
 			 function );
 
@@ -1404,10 +1405,10 @@ ssize_t libewf_read_buffer(
 
 		if( chunk_read_count <= -1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_IO,
-			 LIBEWF_IO_ERROR_READ_FAILED,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read data from chunk.",
 			 function );
 
@@ -1429,10 +1430,10 @@ ssize_t libewf_read_buffer(
 		}
 		else if( internal_handle->current_chunk_offset > internal_handle->media_values->chunk_size )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
 			 "%s: invalid current chunk offset.",
 			 function );
 
@@ -1451,7 +1452,7 @@ ssize_t libewf_read_buffer(
          void *buffer,
          size_t size )
 {
-	libewf_error_t *error                     = NULL;
+	liberror_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_read_buffer";
 	ssize_t chunk_read_count                  = 0;
@@ -1460,16 +1461,16 @@ ssize_t libewf_read_buffer(
 
 	if( handle == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid handle.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1478,48 +1479,48 @@ ssize_t libewf_read_buffer(
 
 	if( internal_handle->media_values == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing media values.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1527,38 +1528,38 @@ ssize_t libewf_read_buffer(
 	if( ( buffer == internal_handle->chunk_cache->data )
 	 || ( buffer == internal_handle->chunk_cache->compressed ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid size value exceeds maximum.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
+	libewf_notify_verbose_printf(
 	 "%s: reading size: %" PRIzu ".\n",
 	 function,
 	 size );
@@ -1572,7 +1573,7 @@ ssize_t libewf_read_buffer(
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
+		libewf_notify_verbose_printf(
 		 "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function,
 		 chunk_data_size );
@@ -1583,16 +1584,16 @@ ssize_t libewf_read_buffer(
 		     chunk_data_size,
 		     &error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize chunk cache.",
 			 function );
 
-			libewf_error_backtrace_notify(
+			libewf_notify_error_backtrace(
 			 error );
-			libewf_error_free(
+			liberror_error_free(
 			 &error );
 
 			return( -1 );
@@ -1610,16 +1611,16 @@ ssize_t libewf_read_buffer(
 
 		if( chunk_read_count <= -1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_IO,
-			 LIBEWF_IO_ERROR_READ_FAILED,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read data from chunk.",
 			 function );
 
-			libewf_error_backtrace_notify(
+			libewf_notify_error_backtrace(
 			 error );
-			libewf_error_free(
+			liberror_error_free(
 			 &error );
 
 			return( -1 );
@@ -1640,16 +1641,16 @@ ssize_t libewf_read_buffer(
 		}
 		else if( internal_handle->current_chunk_offset > internal_handle->media_values->chunk_size )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
 			 "%s: invalid current chunk offset.",
 			 function );
 
-			libewf_error_backtrace_notify(
+			libewf_notify_error_backtrace(
 			 error );
-			libewf_error_free(
+			liberror_error_free(
 			 &error );
 
 			return( -1 );
@@ -1672,7 +1673,7 @@ ssize_t libewf_read_random(
          void *buffer,
          size_t size,
          off64_t offset,
-         libewf_error_t **error )
+         liberror_error_t **error )
 {
 	static char *function = "libewf_read_random";
 	ssize_t read_count    = 0;
@@ -1682,10 +1683,10 @@ ssize_t libewf_read_random(
 	     offset,
 	     error ) == -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_SEEK_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.",
 		 function );
 
@@ -1699,10 +1700,10 @@ ssize_t libewf_read_random(
 
 	if( read_count <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read buffer.",
 		 function );
 
@@ -1717,7 +1718,7 @@ ssize_t libewf_read_random(
          size_t size,
          off64_t offset )
 {
-	libewf_error_t *error = NULL;
+	liberror_error_t *error = NULL;
 	static char *function = "libewf_read_random";
 	ssize_t read_count    = 0;
 
@@ -1725,16 +1726,16 @@ ssize_t libewf_read_random(
 	     handle,
 	     offset ) == -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_SEEK_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek offset.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );
@@ -1746,16 +1747,16 @@ ssize_t libewf_read_random(
 
 	if( read_count <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 &error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read buffer.",
 		 function );
 
-		libewf_error_backtrace_notify(
+		libewf_notify_error_backtrace(
 		 error );
-		libewf_error_free(
+		liberror_error_free(
 		 &error );
 
 		return( -1 );

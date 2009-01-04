@@ -64,16 +64,16 @@ struct libewf_segment_table
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
      uint16_t amount,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_table_free(
      libewf_segment_table_t **segment_table,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_table_resize(
      libewf_segment_table_t *segment_table,
      uint16_t amount,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
@@ -89,32 +89,32 @@ int libewf_segment_table_build(
      uint8_t *ewf_format,
      size64_t *segment_file_size,
      int *abort,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
      char *basename,
      size_t basename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      const char *basename,
      size_t basename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_segment_table_get_basename_wide(
      libewf_segment_table_t *segment_table,
      wchar_t *basename,
      size_t basename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_segment_table_set_basename_wide(
      libewf_segment_table_t *segment_table,
      const wchar_t *basename,
      size_t basename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
 int libewf_segment_table_create_segment_file(
@@ -125,7 +125,7 @@ int libewf_segment_table_create_segment_file(
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

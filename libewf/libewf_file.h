@@ -25,9 +25,10 @@
 
 #include <common.h>
 
+#include <liberror.h>
+
 #include <libewf/handle.h>
 
-#include "libewf_error.h"
 #include "libewf_extern.h"
 
 #if defined( __cplusplus )
@@ -37,7 +38,7 @@ extern "C" {
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename );
@@ -47,7 +48,7 @@ LIBEWF_EXTERN int libewf_check_file_signature(
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_check_file_signature_wide(
                    const wchar_t *filename,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN int libewf_check_file_signature_wide(
                    const wchar_t *filename );
@@ -60,7 +61,7 @@ LIBEWF_EXTERN int libewf_glob(
                    size_t length,
                    uint8_t format,
                    char **filenames[],
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN int libewf_glob(
                    const char *filename,
@@ -76,7 +77,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
                    size_t length,
                    uint8_t format,
                    wchar_t **filenames[],
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN int libewf_glob_wide(
                    const wchar_t *filename,
@@ -92,7 +93,7 @@ LIBEWF_EXTERN int libewf_open(
                    char * const filenames[],
                    int amount_of_files,
                    uint8_t flags,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN libewf_handle_t *libewf_open(
                                 char * const filenames[],
@@ -107,7 +108,7 @@ LIBEWF_EXTERN int libewf_open_wide(
                    wchar_t * const filenames[],
                    int amount_of_files,
                    uint8_t flags,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
                                 wchar_t * const filenames[],
@@ -119,7 +120,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_close(
                    libewf_handle_t *handle,
-                   libewf_error_t **error );
+                   liberror_error_t **error );
 #else
 LIBEWF_EXTERN int libewf_close(
                    libewf_handle_t *handle );
@@ -129,7 +130,7 @@ LIBEWF_EXTERN int libewf_close(
 LIBEWF_EXTERN off64_t libewf_seek_offset(
                        libewf_handle_t *handle,
                        off64_t offset,
-                       libewf_error_t **error );
+                       liberror_error_t **error );
 #else
 LIBEWF_EXTERN off64_t libewf_seek_offset(
                        libewf_handle_t *handle,
@@ -139,7 +140,7 @@ LIBEWF_EXTERN off64_t libewf_seek_offset(
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN off64_t libewf_get_offset(
                        libewf_handle_t *handle,
-                       libewf_error_t **error );
+                       liberror_error_t **error );
 #else
 LIBEWF_EXTERN off64_t libewf_get_offset(
                        libewf_handle_t *handle );

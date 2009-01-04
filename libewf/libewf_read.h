@@ -26,9 +26,10 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <libewf/handle.h>
 
-#include "libewf_error.h"
 #include "libewf_extern.h"
 #include "libewf_handle.h"
 
@@ -48,7 +49,7 @@ ssize_t libewf_read_process_chunk_data(
          ewf_crc_t chunk_crc,
          int8_t read_crc,
          uint8_t *crc_mismatch,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_raw_read_chunk(
          libewf_internal_handle_t *internal_handle,
@@ -58,7 +59,7 @@ ssize_t libewf_raw_read_chunk(
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
          int8_t *read_crc,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_read_chunk_data(
          libewf_internal_handle_t *internal_handle,
@@ -66,7 +67,7 @@ ssize_t libewf_read_chunk_data(
          uint32_t chunk_offset,
          uint8_t *buffer,
          size_t size,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 #if defined( HAVE_V2_API )
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
@@ -78,7 +79,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        int8_t is_compressed,
                        uint32_t chunk_crc,
                        int8_t read_crc,
-                       libewf_error_t **error );
+                       liberror_error_t **error );
 #else
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        libewf_handle_t *handle,
@@ -99,7 +100,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        int8_t *is_compressed,
                        uint32_t *chunk_crc,
                        int8_t *read_crc,
-                       libewf_error_t **error );
+                       liberror_error_t **error );
 #else
 LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        libewf_handle_t *handle,
@@ -115,7 +116,7 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
-                       libewf_error_t **error );
+                       liberror_error_t **error );
 #else
 LIBEWF_EXTERN ssize_t libewf_read_buffer(
                        libewf_handle_t *handle,
@@ -129,7 +130,7 @@ LIBEWF_EXTERN ssize_t libewf_read_random(
                        void *buffer,
                        size_t size,
                        off64_t offset,
-                       libewf_error_t **error );
+                       liberror_error_t **error );
 #else
 LIBEWF_EXTERN ssize_t libewf_read_random(
                        libewf_handle_t *handle,

@@ -23,7 +23,7 @@
 #if !defined( _NOTIFY_H )
 #define _NOTIFY_H
 
-#include "common.h"
+#include <common.h>
 
 #include <stdio.h>
 
@@ -31,34 +31,24 @@
 extern "C" {
 #endif
 
-extern int libewf_notify_verbose;
+extern int notify_verbose;
 
-void libewf_notify_set_values(
+void notify_set_values(
       FILE *stream,
       int verbose );
 
 #define notify_set_values \
-	libewf_notify_set_values
+	notify_set_values
 
-void libewf_notify_printf(
+void notify_printf(
       char *format,
       ... );
 
-#define notify_printf \
-	libewf_notify_printf
-
 #define notify_verbose_printf \
-	if( libewf_notify_verbose != 0 ) libewf_notify_printf
+	if( notify_verbose != 0 ) notify_printf
 
 #define notify_warning_printf \
-	if( libewf_notify_verbose != 0 ) libewf_notify_printf
-
-void libewf_notify_dump_data(
-      void *data,
-      size_t size );
-
-#define notify_dump_data( data, size ) \
-	if( libewf_notify_verbose != 0 ) libewf_notify_dump_data( data, size )
+	if( notify_verbose != 0 ) notify_printf
 
 #if defined( __cplusplus )
 }

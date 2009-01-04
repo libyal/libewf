@@ -28,7 +28,8 @@
 #include <types.h>
 #include <wide_string.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_file_io_handle.h"
 #include "libewf_list_type.h"
 
@@ -73,35 +74,35 @@ int libewf_file_io_pool_initialize(
      libewf_file_io_pool_t **file_io_pool,
      int amount_of_files_io_handles,
      int maximum_amount_of_open_files,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_free(
      libewf_file_io_pool_t **file_io_pool,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_resize(
      libewf_file_io_pool_t *file_io_pool,
      int amount_of_files_io_handles,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_create_file_io_handle(
      libewf_file_io_pool_t *file_io_pool,
      libewf_file_io_handle_t **file_io_handle,
      int *entry,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_open_file_io_handle(
      libewf_file_io_pool_t *file_io_pool,
      libewf_file_io_handle_t *file_io_handle,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_add_file(
      libewf_file_io_pool_t *file_io_pool,
      char *filename,
      int flags,
      int *entry,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_file_io_pool_add_file_wide(
@@ -109,56 +110,56 @@ int libewf_file_io_pool_add_file_wide(
      wchar_t *filename,
      int flags,
      int *entry,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_reopen(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_close(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_pool_close_all(
      libewf_file_io_pool_t *file_io_pool,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 ssize_t libewf_file_io_pool_read(
          libewf_file_io_pool_t *file_io_pool,
          int entry,
          uint8_t *buffer,
          size_t size,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_file_io_pool_write(
          libewf_file_io_pool_t *file_io_pool,
          int entry,
          uint8_t *buffer,
          size_t size,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 off64_t libewf_file_io_pool_seek_offset(
          libewf_file_io_pool_t *file_io_pool,
          int entry,
          off64_t offset,
          int whence,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 int libewf_file_io_pool_get_offset(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
      off64_t *offset,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

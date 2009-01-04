@@ -28,7 +28,8 @@
 #include <types.h>
 #include <wide_string.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
 #include "libewf_system_string.h"
 
 #if defined( __cplusplus )
@@ -64,64 +65,64 @@ int libewf_file_io_handle_get_filename(
      libewf_file_io_handle_t *file_io_handle,
      char *filename,
      size_t filename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_handle_set_filename(
      libewf_file_io_handle_t *file_io_handle,
      const char *filename,
      size_t filename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_file_io_handle_get_filename_wide(
      libewf_file_io_handle_t *file_io_handle,
      wchar_t *filename,
      size_t filename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_handle_set_filename_wide(
      libewf_file_io_handle_t *file_io_handle,
      const wchar_t *filename,
      size_t filename_size,
-     libewf_error_t **error );
+     liberror_error_t **error );
 #endif
 
 int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_handle_reopen(
      libewf_file_io_handle_t *file_io_handle,
      int flags,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 int libewf_file_io_handle_close(
      libewf_file_io_handle_t *file_io_handle,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 ssize_t libewf_file_io_handle_read(
          libewf_file_io_handle_t *file_io_handle,
          uint8_t *buffer,
          size_t size,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 ssize_t libewf_file_io_handle_write(
          libewf_file_io_handle_t *file_io_handle,
          uint8_t *buffer,
          size_t size,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,
          off64_t offset,
          int whence,
-         libewf_error_t **error );
+         liberror_error_t **error );
 
 int libewf_file_io_handle_get_offset(
      libewf_file_io_handle_t *file_io_handle,
      off64_t *offset,
-     libewf_error_t **error );
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

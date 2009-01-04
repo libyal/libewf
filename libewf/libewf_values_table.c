@@ -36,7 +36,7 @@
 int libewf_values_table_initialize(
      libewf_values_table_t **values_table,
      int amount_of_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function           = "libewf_values_table_initialize";
 	size_t values_table_size        = 0;
@@ -44,10 +44,10 @@ int libewf_values_table_initialize(
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -55,10 +55,10 @@ int libewf_values_table_initialize(
 	}
 	if( amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid amount of values less than zero.",
 		 function );
 
@@ -70,10 +70,10 @@ int libewf_values_table_initialize(
 
 		if( values_table_string_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid values table string size value exceeds maximum.",
 			 function );
 
@@ -83,10 +83,10 @@ int libewf_values_table_initialize(
 
 		if( values_table_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid values table size value exceeds maximum.",
 			 function );
 
@@ -97,10 +97,10 @@ int libewf_values_table_initialize(
 
 		if( *values_table == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create values table.",
 			 function );
 
@@ -111,10 +111,10 @@ int libewf_values_table_initialize(
 
 		if( ( *values_table )->identifier == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create identifiers.",
 			 function );
 
@@ -128,10 +128,10 @@ int libewf_values_table_initialize(
 		     0,
 		     values_table_string_size ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear identifiers.",
 			 function );
 
@@ -147,10 +147,10 @@ int libewf_values_table_initialize(
 
 		if( ( *values_table )->identifier_length == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create identifier lengths.",
 			 function );
 
@@ -166,10 +166,10 @@ int libewf_values_table_initialize(
 		     0,
 		     values_table_size ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear identifier lengths.",
 			 function );
 
@@ -187,10 +187,10 @@ int libewf_values_table_initialize(
 
 		if( ( *values_table )->value == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create values.",
 			 function );
 
@@ -208,10 +208,10 @@ int libewf_values_table_initialize(
 		     0,
 		     values_table_string_size ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear values.",
 			 function );
 
@@ -231,10 +231,10 @@ int libewf_values_table_initialize(
 
 		if( ( *values_table )->value_length == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create value lengths.",
 			 function );
 
@@ -254,10 +254,10 @@ int libewf_values_table_initialize(
 		     0,
 		     values_table_size ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear value lengths.",
 			 function );
 
@@ -284,17 +284,17 @@ int libewf_values_table_initialize(
  */
 int libewf_values_table_free(
      libewf_values_table_t **values_table,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function     = "libewf_values_table_free";
 	int values_table_iterator = 0;
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -349,7 +349,7 @@ int libewf_values_table_free(
 int libewf_values_table_resize(
      libewf_values_table_t *values_table,
      int amount_of_values,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function           = "libewf_values_table_resize";
 	void *reallocation              = NULL;
@@ -358,10 +358,10 @@ int libewf_values_table_resize(
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -369,10 +369,10 @@ int libewf_values_table_resize(
 	}
 	if( amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid amount of values less than zero.",
 		 function );
 
@@ -384,10 +384,10 @@ int libewf_values_table_resize(
 
 		if( values_table_string_size > (ssize_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid values table string size value exceeds maximum.",
 			 function );
 
@@ -397,10 +397,10 @@ int libewf_values_table_resize(
 
 		if( values_table_size > (ssize_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid values table size value exceeds maximum.",
 			 function );
 
@@ -412,10 +412,10 @@ int libewf_values_table_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize identifiers.",
 			 function );
 
@@ -428,10 +428,10 @@ int libewf_values_table_resize(
 		     0,
 		     sizeof( libewf_character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear identifiers.",
 			 function );
 
@@ -443,10 +443,10 @@ int libewf_values_table_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize identifier lengths.",
 			 function );
 
@@ -459,10 +459,10 @@ int libewf_values_table_resize(
 		     0,
 		     sizeof( size_t ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear identifier lengths.",
 			 function );
 
@@ -474,10 +474,10 @@ int libewf_values_table_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize values.",
 			 function );
 
@@ -490,10 +490,10 @@ int libewf_values_table_resize(
 		     0,
 		     sizeof( libewf_character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear values.",
 			 function );
 
@@ -505,10 +505,10 @@ int libewf_values_table_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize value lengths.",
 			 function );
 
@@ -521,10 +521,10 @@ int libewf_values_table_resize(
 		     0,
 		     sizeof( size_t ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear value sizes.",
 			 function );
 
@@ -543,17 +543,17 @@ int libewf_values_table_get_index(
      const char *identifier,
      size_t identifier_length,
      int *index,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function     = "libewf_values_table_get_index";
 	int values_table_iterator = 0;
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -561,10 +561,10 @@ int libewf_values_table_get_index(
 	}
 	if( values_table->amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid values table amount value less than zero.",
 		 function );
 
@@ -572,10 +572,10 @@ int libewf_values_table_get_index(
 	}
 	if( identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
@@ -583,10 +583,10 @@ int libewf_values_table_get_index(
 	}
 	if( identifier_length == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid identifier length value is zero.",
 		 function );
 
@@ -594,10 +594,10 @@ int libewf_values_table_get_index(
 	}
 	if( identifier_length > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid identifier length value exceeds maximum.",
 		 function );
 
@@ -605,10 +605,10 @@ int libewf_values_table_get_index(
 	}
 	if( index == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid index.",
 		 function );
 
@@ -618,10 +618,10 @@ int libewf_values_table_get_index(
 	{
 		if( values_table->identifier[ values_table_iterator ] == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing identifier for index: %d.",
 			 function,
 			 values_table_iterator );
@@ -630,10 +630,10 @@ int libewf_values_table_get_index(
 		}
 		if( values_table->identifier_length[ values_table_iterator ] == 0 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing identifier length for index: %d.",
 			 function,
 			 values_table_iterator );
@@ -681,17 +681,17 @@ int libewf_values_table_get_index_wide(
      const wchar_t *identifier,
      size_t identifier_length,
      int *index,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function     = "libewf_values_table_get_index_wide";
 	int values_table_iterator = 0;
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -699,10 +699,10 @@ int libewf_values_table_get_index_wide(
 	}
 	if( values_table->amount_of_values < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid values table amount value less than zero.",
 		 function );
 
@@ -710,10 +710,10 @@ int libewf_values_table_get_index_wide(
 	}
 	if( identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
@@ -721,10 +721,10 @@ int libewf_values_table_get_index_wide(
 	}
 	if( identifier_length == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid identifier length value is zero.",
 		 function );
 
@@ -732,10 +732,10 @@ int libewf_values_table_get_index_wide(
 	}
 	if( identifier_length > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid identifier length value exceeds maximum.",
 		 function );
 
@@ -743,10 +743,10 @@ int libewf_values_table_get_index_wide(
 	}
 	if( index == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid index.",
 		 function );
 
@@ -756,10 +756,10 @@ int libewf_values_table_get_index_wide(
 	{
 		if( values_table->identifier[ values_table_iterator ] == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing identifier for index: %d.",
 			 function,
 			 values_table_iterator );
@@ -768,10 +768,10 @@ int libewf_values_table_get_index_wide(
 		}
 		if( values_table->identifier_length[ values_table_iterator ] == 0 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 			 "%s: missing identifier length for index: %d.",
 			 function,
 			 values_table_iterator );
@@ -819,17 +819,17 @@ int libewf_values_table_get_identifier(
      int index,
      char *identifier,
      size_t identifier_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function         = "libewf_values_table_get_identifier";
 	size_t narrow_identifier_size = 0;
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -837,10 +837,10 @@ int libewf_values_table_get_identifier(
 	}
 	if( identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
@@ -848,10 +848,10 @@ int libewf_values_table_get_identifier(
 	}
 	if( identifier_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid identifier size value exceeds maximum.",
 		 function );
 
@@ -868,10 +868,10 @@ int libewf_values_table_get_identifier(
 	}
 	if( values_table->identifier[ index ] == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing identifier for index: %d.",
 		 function,
 		 index );
@@ -880,10 +880,10 @@ int libewf_values_table_get_identifier(
 	}
 	if( values_table->identifier_length[ index ] == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing identifier size for length: %d.",
 		 function,
 		 index );
@@ -897,10 +897,10 @@ int libewf_values_table_get_identifier(
 	     &narrow_identifier_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine identifier size.",
 		 function );
 
@@ -911,10 +911,10 @@ int libewf_values_table_get_identifier(
 #endif
 	if( identifier_size < narrow_identifier_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: identifier too small.",
 		 function );
 
@@ -928,10 +928,10 @@ int libewf_values_table_get_identifier(
 	     values_table->identifier_length[ index ] + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -943,10 +943,10 @@ int libewf_values_table_get_identifier(
 	     values_table->identifier[ index ],
 	     values_table->identifier_length[ index ] ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -966,16 +966,16 @@ int libewf_values_table_set_identifier(
      int index,
      const char *identifier,
      size_t identifier_length,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_values_table_set_identifier";
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -983,10 +983,10 @@ int libewf_values_table_set_identifier(
 	}
 	if( identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
@@ -994,10 +994,10 @@ int libewf_values_table_set_identifier(
 	}
 	if( identifier_length == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid identifier length value is zero.",
 		 function );
 
@@ -1005,10 +1005,10 @@ int libewf_values_table_set_identifier(
 	}
 	if( identifier_length > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid identifier length value exceeds maximum.",
 		 function );
 
@@ -1018,10 +1018,10 @@ int libewf_values_table_set_identifier(
 	 || ( index < 0 )
 	 || ( index >= values_table->amount_of_values ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid index out of range.",
 		 function );
 
@@ -1049,10 +1049,10 @@ int libewf_values_table_set_identifier(
 	     &( values_table->identifier_length[ index ] ),
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine identifier size.",
 		 function );
 
@@ -1067,10 +1067,10 @@ int libewf_values_table_set_identifier(
 
 	if( values_table->identifier[ index ] == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create identifier.",
 		 function );
 
@@ -1084,10 +1084,10 @@ int libewf_values_table_set_identifier(
 	     identifier_length + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -1105,10 +1105,10 @@ int libewf_values_table_set_identifier(
 	     identifier,
 	     identifier_length ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -1135,17 +1135,17 @@ int libewf_values_table_get_identifier_wide(
      int index,
      wchar_t *identifier,
      size_t identifier_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function       = "libewf_values_table_get_identifier_wide";
 	size_t wide_identifier_size = 0;
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -1153,10 +1153,10 @@ int libewf_values_table_get_identifier_wide(
 	}
 	if( identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
@@ -1164,10 +1164,10 @@ int libewf_values_table_get_identifier_wide(
 	}
 	if( identifier_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid identifier size value exceeds maximum.",
 		 function );
 
@@ -1184,10 +1184,10 @@ int libewf_values_table_get_identifier_wide(
 	}
 	if( values_table->identifier[ index ] == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing identifier for index: %d.",
 		 function,
 		 index );
@@ -1196,10 +1196,10 @@ int libewf_values_table_get_identifier_wide(
 	}
 	if( values_table->identifier_length[ index ] == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: missing identifier size for length: %d.",
 		 function,
 		 index );
@@ -1215,10 +1215,10 @@ int libewf_values_table_get_identifier_wide(
 	     &wide_identifier_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine identifier size.",
 		 function );
 
@@ -1227,10 +1227,10 @@ int libewf_values_table_get_identifier_wide(
 #endif
 	if( identifier_size < wide_identifier_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: identifier too small.",
 		 function );
 
@@ -1242,10 +1242,10 @@ int libewf_values_table_get_identifier_wide(
 	     values_table->identifier[ index ],
 	     values_table->identifier_length[ index ] ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -1260,10 +1260,10 @@ int libewf_values_table_get_identifier_wide(
 	     values_table->identifier_length[ index ] + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -1282,16 +1282,16 @@ int libewf_values_table_set_identifier_wide(
      int index,
      const wchar_t *identifier,
      size_t identifier_length,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_values_table_set_identifier_wide";
 
 	if( values_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid values table.",
 		 function );
 
@@ -1299,10 +1299,10 @@ int libewf_values_table_set_identifier_wide(
 	}
 	if( identifier == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid identifier.",
 		 function );
 
@@ -1310,10 +1310,10 @@ int libewf_values_table_set_identifier_wide(
 	}
 	if( identifier_length == 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid identifier length value is zero.",
 		 function );
 
@@ -1321,10 +1321,10 @@ int libewf_values_table_set_identifier_wide(
 	}
 	if( identifier_length > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid identifier length value exceeds maximum.",
 		 function );
 
@@ -1334,10 +1334,10 @@ int libewf_values_table_set_identifier_wide(
 	 || ( index < 0 )
 	 || ( index >= values_table->amount_of_values ) )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid index out of range.",
 		 function );
 
@@ -1367,10 +1367,10 @@ int libewf_values_table_set_identifier_wide(
 	     &( values_table->identifier_length[ index ] ),
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine identifier size.",
 		 function );
 
@@ -1383,10 +1383,10 @@ int libewf_values_table_set_identifier_wide(
 
 	if( values_table->identifier[ index ] == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 		 "%s: unable to create identifier.",
 		 function );
 
@@ -1398,10 +1398,10 @@ int libewf_values_table_set_identifier_wide(
 	     identifier,
 	     identifier_length ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -1422,10 +1422,10 @@ int libewf_values_table_set_identifier_wide(
 	     identifier_length + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set identifier.",
 		 function );
 
@@ -1452,7 +1452,7 @@ int libewf_values_table_get_value(
      size_t identifier_length,
      char *value,
      size_t value_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function    = "libewf_values_table_get_value";
 	size_t narrow_value_size = 0;
@@ -1461,10 +1461,10 @@ int libewf_values_table_get_value(
 
 	if( value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value.",
 		 function );
 
@@ -1472,10 +1472,10 @@ int libewf_values_table_get_value(
 	}
 	if( value_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid value size value exceeds maximum.",
 		 function );
 
@@ -1490,10 +1490,10 @@ int libewf_values_table_get_value(
 
 	if( result <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
 		 function,
 		 identifier );
@@ -1516,10 +1516,10 @@ int libewf_values_table_get_value(
 	     &narrow_value_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine value size.",
 		 function );
 
@@ -1530,10 +1530,10 @@ int libewf_values_table_get_value(
 #endif
 	if( value_size < narrow_value_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: value too small.",
 		 function );
 
@@ -1547,10 +1547,10 @@ int libewf_values_table_get_value(
 	     values_table->value_length[ index ] + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set value.",
 		 function );
 
@@ -1562,10 +1562,10 @@ int libewf_values_table_get_value(
 	     values_table->value[ index ],
 	     values_table->value_length[ index ] ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set value.",
 		 function );
 
@@ -1586,7 +1586,7 @@ int libewf_values_table_set_value(
      size_t identifier_length,
      const char *value,
      size_t value_length,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_values_table_set_value";
 	int index             = 0;
@@ -1601,10 +1601,10 @@ int libewf_values_table_set_value(
 
 	if( result <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
 		 function,
 		 identifier );
@@ -1620,10 +1620,10 @@ int libewf_values_table_set_value(
 		     index + 1,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize values table.",
 			 function );
 
@@ -1636,10 +1636,10 @@ int libewf_values_table_set_value(
 		     identifier_length,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set identifier.",
 			 function );
 
@@ -1672,10 +1672,10 @@ int libewf_values_table_set_value(
 		     &( values_table->value_length[ index ] ),
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to determine value size.",
 			 function );
 
@@ -1690,10 +1690,10 @@ int libewf_values_table_set_value(
 
 		if( values_table->value[ index ] == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create value.",
 			 function );
 
@@ -1707,10 +1707,10 @@ int libewf_values_table_set_value(
 		     value_length + 1,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to set value.",
 			 function );
 
@@ -1728,10 +1728,10 @@ int libewf_values_table_set_value(
 		     value,
 		     value_length ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to set value.",
 			 function );
 
@@ -1760,7 +1760,7 @@ int libewf_values_table_get_value_wide(
      size_t identifier_length,
      wchar_t *value,
      size_t value_size,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function  = "libewf_values_table_get_value_wide";
 	size_t wide_value_size = 0;
@@ -1769,10 +1769,10 @@ int libewf_values_table_get_value_wide(
 
 	if( value == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid value.",
 		 function );
 
@@ -1780,10 +1780,10 @@ int libewf_values_table_get_value_wide(
 	}
 	if( value_size > (size_t) SSIZE_MAX )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid value size value exceeds maximum.",
 		 function );
 
@@ -1798,10 +1798,10 @@ int libewf_values_table_get_value_wide(
 
 	if( result <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
 		 function,
 		 identifier );
@@ -1826,10 +1826,10 @@ int libewf_values_table_get_value_wide(
 	     &wide_value_size,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to determine value size.",
 		 function );
 
@@ -1838,10 +1838,10 @@ int libewf_values_table_get_value_wide(
 #endif
 	if( value_size < wide_value_size )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
 		 "%s: value too small.",
 		 function );
 
@@ -1853,10 +1853,10 @@ int libewf_values_table_get_value_wide(
 	     values_table->value[ index ],
 	     values_table->value_length[ index ] ) == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_MEMORY,
-		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to set value.",
 		 function );
 
@@ -1871,10 +1871,10 @@ int libewf_values_table_get_value_wide(
 	     values_table->value_length[ index ] + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set value.",
 		 function );
 
@@ -1894,7 +1894,7 @@ int libewf_values_table_set_value_wide(
      size_t identifier_length,
      const wchar_t *value,
      size_t value_length,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_values_table_set_value_wide";
 	int index             = 0;
@@ -1909,10 +1909,10 @@ int libewf_values_table_set_value_wide(
 
 	if( result <= -1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
 		 function,
 		 identifier );
@@ -1928,10 +1928,10 @@ int libewf_values_table_set_value_wide(
 		     index + 1,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize values table.",
 			 function );
 
@@ -1944,10 +1944,10 @@ int libewf_values_table_set_value_wide(
 		     identifier_length,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 			 "%s: unable to set identifier.",
 			 function );
 
@@ -1982,10 +1982,10 @@ int libewf_values_table_set_value_wide(
 		     &( values_table->value_length[ index ] ),
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to determine value size.",
 			 function );
 
@@ -1998,10 +1998,10 @@ int libewf_values_table_set_value_wide(
 
 		if( values_table->value[ index ] == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create value.",
 			 function );
 
@@ -2013,10 +2013,10 @@ int libewf_values_table_set_value_wide(
 		     value,
 		     value_length ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to set value.",
 			 function );
 
@@ -2037,10 +2037,10 @@ int libewf_values_table_set_value_wide(
 		     value_length + 1,
 		     error ) != 1 )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
 			 "%s: unable to set value.",
 			 function );
 

@@ -22,9 +22,10 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 
-#include "libewf_error.h"
+#include <liberror.h>
+
+#include "libewf_notify.h"
 #include "libewf_sector_table.h"
 
 /* Initialize the sector table
@@ -33,17 +34,17 @@
 int libewf_sector_table_initialize(
      libewf_sector_table_t **sector_table,
      uint32_t amount,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function    = "libewf_sector_table_initialize";
 	size_t sector_table_size = 0;
 
 	if( sector_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.",
 		 function );
 
@@ -55,10 +56,10 @@ int libewf_sector_table_initialize(
 
 		if( sector_table_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid sector table size value exceeds maximum.",
 			 function );
 
@@ -69,10 +70,10 @@ int libewf_sector_table_initialize(
 
 		if( *sector_table == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create sector table.",
 			 function );
 
@@ -83,10 +84,10 @@ int libewf_sector_table_initialize(
 		     0,
 		     sizeof( libewf_sector_table_t ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear sector table.",
 			 function );
 
@@ -104,10 +105,10 @@ int libewf_sector_table_initialize(
 
 			if( ( *sector_table )->sector == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_MEMORY,
-				 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 				 "%s: unable to create sector array.",
 				 function );
 
@@ -123,10 +124,10 @@ int libewf_sector_table_initialize(
 			     0,
 			     sector_table_size ) == NULL )
 			{
-				libewf_error_set(
+				liberror_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_MEMORY,
-				 LIBEWF_MEMORY_ERROR_SET_FAILED,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_SET_FAILED,
 				 "%s: unable to clear sector array.",
 				 function );
 
@@ -150,16 +151,16 @@ int libewf_sector_table_initialize(
  */
 int libewf_sector_table_free(
      libewf_sector_table_t **sector_table,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_sector_table_free";
 
 	if( sector_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.",
 		 function );
 
@@ -184,7 +185,7 @@ int libewf_sector_table_free(
 int libewf_sector_table_resize(
      libewf_sector_table_t *sector_table,
      uint32_t amount,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	void *reallocation       = NULL;
 	static char *function    = "libewf_sector_table_resize";
@@ -192,10 +193,10 @@ int libewf_sector_table_resize(
 
 	if( sector_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.",
 		 function );
 
@@ -207,10 +208,10 @@ int libewf_sector_table_resize(
 
 		if( sector_table_size > (size_t) SSIZE_MAX )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid sector table size value exceeds maximum.",
 			 function );
 
@@ -222,10 +223,10 @@ int libewf_sector_table_resize(
 
 		if( reallocation == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to resize sector array.",
 			 function );
 
@@ -238,10 +239,10 @@ int libewf_sector_table_resize(
 		     0,
 		     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
 		{
-			libewf_error_set(
+			liberror_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
 			 "%s: unable to clear sector array.",
 			 function );
 
@@ -260,16 +261,16 @@ int libewf_sector_table_get_sector(
      uint32_t index,
      off64_t *first_sector,
      uint32_t *amount_of_sectors,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function = "libewf_sector_table_get_sector";
 
 	if( sector_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.",
 		 function );
 
@@ -281,10 +282,10 @@ int libewf_sector_table_get_sector(
 	}
 	if( sector_table->sector == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid sector table - missing sectors.",
 		 function );
 
@@ -292,10 +293,10 @@ int libewf_sector_table_get_sector(
 	}
 	if( first_sector == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid first sector.",
 		 function );
 
@@ -303,10 +304,10 @@ int libewf_sector_table_get_sector(
 	}
 	if( amount_of_sectors == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid amount of sectors.",
 		 function );
 
@@ -314,10 +315,10 @@ int libewf_sector_table_get_sector(
 	}
 	if( index >= sector_table->amount )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: invalid index out of range.",
 		 function );
 
@@ -337,7 +338,7 @@ int libewf_sector_table_add_sector(
      off64_t first_sector,
      uint32_t amount_of_sectors,
      int merge_continious_entries,
-     libewf_error_t **error )
+     liberror_error_t **error )
 {
 	static char *function     = "libewf_sector_table_add_sector";
 	off64_t last_sector       = 0;
@@ -346,10 +347,10 @@ int libewf_sector_table_add_sector(
 
 	if( sector_table == NULL )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid sector table.",
 		 function );
 
@@ -357,10 +358,10 @@ int libewf_sector_table_add_sector(
 	}
 	if( first_sector < 0 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
 		 "%s: invalid first sector value is less than zero.",
 		 function );
 
@@ -398,10 +399,10 @@ int libewf_sector_table_add_sector(
 	     sector_table->amount + 1,
 	     error ) != 1 )
 	{
-		libewf_error_set(
+		liberror_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
 		 "%s: unable to resize sector table.",
 		 function );
 

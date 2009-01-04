@@ -20,9 +20,10 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "notify.h"
-#include "types.h"
+#include <common.h>
+#include <types.h>
+
+#include <liberror.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -38,12 +39,14 @@
 #error Missing headers stdarg.h and varargs.h
 #endif
 
+#include "libewf_notify.h"
+
 FILE *libewf_notify_stream = NULL;
 int libewf_notify_verbose  = 0;
 
 /* Set the notify values
  */
-void libewf_notify_set_values(
+void libewf_set_notify_values(
       FILE *stream,
       int verbose )
 {
@@ -98,6 +101,19 @@ void VARARGS(
 #undef VARARGS
 #undef VASTART
 #undef VAEND
+
+/* Prints a backtrace of the error using notify_printf
+ */
+void libewf_notify_error_backtrace(
+      liberror_error_t *error )
+{
+	if( libewf_notify_stream != NULL )
+	{
+		liberror_error_backtrace_fprint(
+		 error,
+		 libewf_notify_stream );
+	}
+}
 
 /* Prints a dump of data
  */
