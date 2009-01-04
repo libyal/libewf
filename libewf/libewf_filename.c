@@ -23,12 +23,12 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
 #include "libewf_filename.h"
+#include "libewf_system_string.h"
 
 #include "ewf_definitions.h"
 
@@ -37,7 +37,7 @@
  * Returns 1 on success or -1 on error
  */
 int libewf_filename_set_extension(
-     system_character_t *extension,
+     libewf_system_character_t *extension,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
@@ -45,9 +45,9 @@ int libewf_filename_set_extension(
      uint8_t ewf_format,
      libewf_error_t **error )
 {
-	static char *function                              = "libewf_filename_set_extension";
-	system_character_t extension_first_character       = 0;
-	system_character_t extension_additional_characters = 0;
+	static char *function                                     = "libewf_filename_set_extension";
+	libewf_system_character_t extension_first_character       = 0;
+	libewf_system_character_t extension_additional_characters = 0;
 
 	if( extension == NULL )
 	{
@@ -78,29 +78,29 @@ int libewf_filename_set_extension(
 		if( ( format == LIBEWF_FORMAT_EWF )
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
-			extension_first_character       = (system_character_t) 'e';
-			extension_additional_characters = (system_character_t) 'a';
+			extension_first_character       = (libewf_system_character_t) 'e';
+			extension_additional_characters = (libewf_system_character_t) 'a';
 		}
 		else if( ewf_format == EWF_FORMAT_S01 )
 		{
-			extension_first_character       = (system_character_t) 's';
-			extension_additional_characters = (system_character_t) 'a';
+			extension_first_character       = (libewf_system_character_t) 's';
+			extension_additional_characters = (libewf_system_character_t) 'a';
 		}
 		else
 		{
-			extension_first_character       = (system_character_t) 'E';
-			extension_additional_characters = (system_character_t) 'A';
+			extension_first_character       = (libewf_system_character_t) 'E';
+			extension_additional_characters = (libewf_system_character_t) 'A';
 		}
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
 	{
-		extension_first_character       = (system_character_t) 'L';
-		extension_additional_characters = (system_character_t) 'A';
+		extension_first_character       = (libewf_system_character_t) 'L';
+		extension_additional_characters = (libewf_system_character_t) 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
-		extension_first_character       = (system_character_t) 'd';
-		extension_additional_characters = (system_character_t) 'a';
+		extension_first_character       = (libewf_system_character_t) 'd';
+		extension_additional_characters = (libewf_system_character_t) 'a';
 	}
 	else
 	{
@@ -117,15 +117,15 @@ int libewf_filename_set_extension(
 
 	if( segment_number <= 99 )
 	{
-		extension[ 2 ] = (system_character_t) '0' + (system_character_t) ( segment_number % 10 );
-		extension[ 1 ] = (system_character_t) '0' + (system_character_t) ( segment_number / 10 );
+		extension[ 2 ] = (libewf_system_character_t) '0' + (libewf_system_character_t) ( segment_number % 10 );
+		extension[ 1 ] = (libewf_system_character_t) '0' + (libewf_system_character_t) ( segment_number / 10 );
 	}
 	else if( segment_number >= 100 )
 	{
 		segment_number -= 100;
-		extension[ 2 ]  = extension_additional_characters + (system_character_t) ( segment_number % 26 );
+		extension[ 2 ]  = extension_additional_characters + (libewf_system_character_t) ( segment_number % 26 );
 		segment_number /= 26;
-		extension[ 1 ]  = extension_additional_characters + (system_character_t) ( segment_number % 26 );
+		extension[ 1 ]  = extension_additional_characters + (libewf_system_character_t) ( segment_number % 26 );
 		segment_number /= 26;
 
 		if( segment_number >= 26 )
@@ -139,13 +139,13 @@ int libewf_filename_set_extension(
 
 			return( -1 );
 		}
-		extension[ 0 ] = extension_first_character + (system_character_t) segment_number;
+		extension[ 0 ] = extension_first_character + (libewf_system_character_t) segment_number;
 	}
 	/* Safety check
 	 */
-	if( ( extension[ 0 ] > (system_character_t) 'z' )
-	 || ( ( extension[ 0 ] > (system_character_t) 'Z' )
-	  && ( extension[ 0 ] < (system_character_t) 'a' ) ) )
+	if( ( extension[ 0 ] > (libewf_system_character_t) 'z' )
+	 || ( ( extension[ 0 ] > (libewf_system_character_t) 'Z' )
+	  && ( extension[ 0 ] < (libewf_system_character_t) 'a' ) ) )
 	{
 		libewf_error_set(
 		 error,
@@ -165,9 +165,9 @@ int libewf_filename_set_extension(
  * Returns 1 if successful or -1 on error
  */
 int libewf_filename_create(
-     system_character_t **filename,
+     libewf_system_character_t **filename,
      size_t *filename_size,
-     system_character_t *basename,
+     libewf_system_character_t *basename,
      size_t basename_length,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
@@ -176,8 +176,8 @@ int libewf_filename_create(
      uint8_t ewf_format,
      libewf_error_t **error )
 {
-	system_character_t *new_filename = NULL;
-	static char *function            = "libewf_filename_create";
+	libewf_system_character_t *new_filename = NULL;
+	static char *function                   = "libewf_filename_create";
 
 	if( filename == NULL )
 	{
@@ -226,7 +226,7 @@ int libewf_filename_create(
 	/* The actual filename also contains a '.', 3 character extension and a end of string byte
 	 */
 	new_filename = memory_allocate(
-	                sizeof( system_character_t ) * ( basename_length + 5 ) );
+	                sizeof( libewf_system_character_t ) * ( basename_length + 5 ) );
 
 	if( new_filename == NULL )
 	{
@@ -241,7 +241,7 @@ int libewf_filename_create(
 	}
 	/* Add one additional character for the end of line
 	 */
-	if( system_string_copy(
+	if( libewf_system_string_copy(
 	     new_filename,
 	     basename,
 	     ( basename_length + 1 ) ) == NULL )
@@ -258,7 +258,7 @@ int libewf_filename_create(
 
 		return( -1 );
 	}
-	new_filename[ basename_length ] = (system_character_t) '.';
+	new_filename[ basename_length ] = (libewf_system_character_t) '.';
 
 	if( libewf_filename_set_extension(
 	     &( new_filename[ basename_length + 1 ] ),

@@ -1293,9 +1293,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "case_number" ),
+	     _LIBEWF_STRING( "case_number" ),
 	     11,
-	     _LIBEWF_CHARACTER_T_STRING( "Case Number" ),
+	     _LIBEWF_STRING( "Case Number" ),
 	     11,
 	     error ) != 1 )
 	{
@@ -1310,9 +1310,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "description" ),
+	     _LIBEWF_STRING( "description" ),
 	     11,
-	     _LIBEWF_CHARACTER_T_STRING( "Description" ),
+	     _LIBEWF_STRING( "Description" ),
 	     11,
 	     error ) != 1 )
 	{
@@ -1327,9 +1327,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "evidence_number" ),
+	     _LIBEWF_STRING( "evidence_number" ),
 	     15,
-	     _LIBEWF_CHARACTER_T_STRING( "Evidence Number" ),
+	     _LIBEWF_STRING( "Evidence Number" ),
 	     15,
 	     error ) != 1 )
 	{
@@ -1344,9 +1344,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "examiner_name" ),
+	     _LIBEWF_STRING( "examiner_name" ),
 	     13,
-	     _LIBEWF_CHARACTER_T_STRING( "Examiner Name" ),
+	     _LIBEWF_STRING( "Examiner Name" ),
 	     13,
 	     error ) != 1 )
 	{
@@ -1361,9 +1361,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "notes" ),
+	     _LIBEWF_STRING( "notes" ),
 	     5,
-	     _LIBEWF_CHARACTER_T_STRING( "Notes" ),
+	     _LIBEWF_STRING( "Notes" ),
 	     5,
 	     error ) != 1 )
 	{
@@ -1378,9 +1378,9 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "acquiry_operating_system" ),
+	     _LIBEWF_STRING( "acquiry_operating_system" ),
 	     24,
-	     _LIBEWF_CHARACTER_T_STRING( "Undetermined" ),
+	     _LIBEWF_STRING( "Undetermined" ),
 	     12,
 	     error ) != 1 )
 	{
@@ -1395,7 +1395,7 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     _LIBEWF_CHARACTER_T_STRING( "acquiry_software_version" ),
+	     _LIBEWF_STRING( "acquiry_software_version" ),
 	     24,
 	     LIBEWF_VERSION_STRING,
 	     libewf_string_length(

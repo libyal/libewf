@@ -68,37 +68,37 @@ extern "C" {
 #endif
 
 #if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
-int libewf_file_io_exists(
+int libcommon_file_io_exists(
      const char *filename );
 
 #define file_io_exists( filename ) \
-	libewf_file_io_exists( filename )
+	libcommon_file_io_exists( filename )
 #endif
 
 #if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
-int libewf_file_io_wexists(
+int libcommon_file_io_wexists(
      const wchar_t *filename );
 
 #define file_io_wexists( filename, flags ) \
-	libewf_file_io_wexists( filename )
+	libcommon_file_io_wexists( filename )
 #endif
 
 #if defined( HAVE_OPEN )
-int libewf_file_io_open(
+int libcommon_file_io_open(
      const char *filename,
      int flags );
 
 #define file_io_open( filename, flags ) \
-	libewf_file_io_open( filename, flags )
+	libcommon_file_io_open( filename, flags )
 #endif
 
 #if defined( HAVE_WOPEN )
-int libewf_file_io_wopen(
+int libcommon_file_io_wopen(
      const wchar_t *filename,
      int flags );
 
 #define file_io_wopen( filename, flags ) \
-	libewf_file_io_wopen( filename, flags )
+	libcommon_file_io_wopen( filename, flags )
 
 #endif
 

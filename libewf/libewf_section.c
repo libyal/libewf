@@ -846,7 +846,7 @@ ssize_t libewf_section_header_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_byte_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "Header" ),
+	       _LIBEWF_STRING( "Header" ),
 	       header,
 	       header_size,
 	       error ) != 1 ) )
@@ -922,7 +922,7 @@ ssize_t libewf_section_header_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_byte_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "Header" ),
+	       _LIBEWF_STRING( "Header" ),
 	       header,
 	       header_size,
 	       error ) != 1 ) )
@@ -1056,7 +1056,7 @@ ssize_t libewf_section_header2_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf16_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "Header2" ),
+	       _LIBEWF_STRING( "Header2" ),
 	       header2,
 	       header2_size,
 	       error ) != 1 ) )
@@ -1131,7 +1131,7 @@ ssize_t libewf_section_header2_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf16_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "Header2" ),
+	       _LIBEWF_STRING( "Header2" ),
 	       header2,
 	       header2_size,
 	       error ) != 1 ) )
@@ -3354,7 +3354,7 @@ ssize_t libewf_section_ltree_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf16_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "ltree data" ),
+	       _LIBEWF_STRING( "ltree data" ),
 	       ltree_data,
 	       ltree_data_size,
 	       error ) != 1 ) )
@@ -5430,7 +5430,7 @@ ssize_t libewf_section_xheader_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "XHeader" ),
+	       _LIBEWF_STRING( "XHeader" ),
 	       xheader,
 	       xheader_size,
 	       error ) != 1 ) )
@@ -5505,7 +5505,7 @@ ssize_t libewf_section_xheader_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "XHeader" ),
+	       _LIBEWF_STRING( "XHeader" ),
 	       xheader,
 	       xheader_size,
 	       error ) != 1 ) )
@@ -5638,7 +5638,7 @@ ssize_t libewf_section_xhash_read(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "XHash" ),
+	       _LIBEWF_STRING( "XHash" ),
 	       xhash,
 	       xhash_size,
 	       error ) != 1 ) )
@@ -5713,7 +5713,7 @@ ssize_t libewf_section_xhash_write(
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( ( libewf_notify_verbose != 0 )
 	 && ( libewf_debug_utf8_stream_print(
-	       _LIBEWF_CHARACTER_T_STRING( "XHash" ),
+	       _LIBEWF_STRING( "XHash" ),
 	       xhash,
 	       xhash_size,
 	       error ) != 1 ) )
@@ -6257,7 +6257,7 @@ ssize_t libewf_section_debug_read(
 	if( result == 0 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBEWF_CHARACTER_T_STRING( "COMPRESSED data" ),
+		          _LIBEWF_STRING( "COMPRESSED data" ),
 		          data,
 		          (size_t) section_size,
 	                  error );
@@ -6265,7 +6265,7 @@ ssize_t libewf_section_debug_read(
 	else if( result == 1 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBEWF_CHARACTER_T_STRING( "UNCOMPRESSED data" ),
+		          _LIBEWF_STRING( "UNCOMPRESSED data" ),
 		          uncompressed_data,
 		          uncompressed_size,
 	                  error );

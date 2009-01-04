@@ -22,22 +22,16 @@
 
 #include <common.h>
 #include <endian.h>
-#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
-
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
 
 #include "libewf_definitions.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_compression.h"
 #include "libewf_error.h"
 #include "libewf_file.h"
-#include "libewf_filename.h"
+#include "libewf_file_io.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_hash_values.h"
 #include "libewf_list_type.h"
@@ -3803,7 +3797,7 @@ ssize_t libewf_write_finalize(
 			if( libewf_file_io_pool_open(
 			     internal_handle->file_io_pool,
 			     segment_file_handle->file_io_pool_entry,
-			     FILE_IO_O_RDWR,
+			     LIBEWF_FILE_IO_O_RDWR,
 			     &error ) != 1 )
 			{
 				libewf_error_set(

@@ -2234,7 +2234,7 @@ int libewf_get_hash_value(
 	 && ( identifier_length == 3 )
 	 && ( libewf_string_compare(
 	       identifier,
-	       _LIBEWF_CHARACTER_T_STRING( "MD5" ),
+	       _LIBEWF_STRING( "MD5" ),
 	       identifier_length ) == 0 ) )
 	{
 		if( libewf_hash_values_parse_md5_hash(
@@ -3906,7 +3906,7 @@ int libewf_set_hash_value(
 	 && ( identifier_length == 3 )
 	 && ( libewf_string_compare(
 	       identifier,
-	       _LIBEWF_CHARACTER_T_STRING( "MD5" ),
+	       _LIBEWF_STRING( "MD5" ),
 	       identifier_length ) == 0 ) )
 	{
 		if( libewf_hash_values_generate_md5_hash(

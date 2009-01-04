@@ -31,6 +31,7 @@ libewf_la_SOURCES = \
 	libewf_extern.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \
+	libewf_file_io.c libewf_file_io.h \
 	libewf_file_io_handle.c libewf_file_io_handle.h \
 	libewf_file_io_pool.c libewf_file_io_pool.h \
 	libewf_handle.c libewf_handle.h \
@@ -52,6 +53,7 @@ libewf_la_SOURCES = \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \
 	libewf_support.c libewf_support.h \
+	libewf_system_string.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 

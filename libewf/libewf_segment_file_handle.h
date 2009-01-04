@@ -24,7 +24,6 @@
 #define _LIBEWF_SEGMENT_FILE_HANDLE_H
 
 #include <common.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_error.h"

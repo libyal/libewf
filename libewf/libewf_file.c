@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -30,6 +29,7 @@
 #include "libewf_error.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
+#include "libewf_file_io.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
 #include "libewf_section_list.h"
@@ -44,7 +44,7 @@
  * Returns 1 if true, 0 if not or -1 on error
  */
 int libewf_check_file_signature(
-     const system_character_t *filename )
+     const char *filename )
 {
 	libewf_error_t *error = NULL;
 	static char *function = "libewf_check_file_signature";
@@ -67,9 +67,10 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	file_descriptor = libewf_filename_open(
+	file_descriptor = libewf_file_io_open(
 	                   filename,
-	                   FILE_IO_O_RDONLY );
+	                   LIBEWF_FILE_IO_O_RDONLY,
+	                   &error );
 
 	if( file_descriptor == -1 )
 	{
@@ -77,9 +78,8 @@ int libewf_check_file_signature(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file: %" PRIs_SYSTEM ".\n",
-		 function,
-		 filename );
+		 "%s: unable to open file.\n",
+		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
@@ -92,16 +92,17 @@ int libewf_check_file_signature(
 	          file_descriptor,
 	          &error );
 
-	if( file_io_close(
-	     file_descriptor ) != 0 )
+	if( result <= -1 )
 	{
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file: %" PRIs_SYSTEM ".\n",
-		 function,
-		 filename );
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to check file signature.\n",
+		 function );
+
+		libewf_file_io_close(
+		 file_descriptor );
 
 		libewf_error_backtrace_notify(
 		 error );
@@ -110,15 +111,15 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	if( result <= -1 )
+	if( libewf_file_io_close(
+	     file_descriptor ) != 0 )
 	{
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read signature from file: %" PRIs_SYSTEM ".\n",
-		 function,
-		 filename );
+		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file.\n",
+		 function );
 
 		libewf_error_backtrace_notify(
 		 error );
@@ -129,6 +130,99 @@ int libewf_check_file_signature(
 	}
 	return( result );
 }
+
+/* Detects if a file is an EWF file (check for the EWF file signature)
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+int libewf_check_file_signature_wide(
+     const wchar_t *filename )
+{
+	libewf_error_t *error = NULL;
+	static char *function = "libewf_check_file_signature_wide";
+	int file_descriptor   = 0;
+	int result            = 0;
+
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	file_descriptor = libewf_file_io_open(
+	                   filename,
+	                   LIBEWF_FILE_IO_O_RDONLY,
+	                   &error );
+
+	if( file_descriptor == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	result = libewf_segment_file_check_file_signature(
+	          file_descriptor,
+	          &error );
+
+	if( result <= -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to check file signature.\n",
+		 function );
+
+		libewf_file_io_close(
+		 file_descriptor );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( libewf_file_io_close(
+	     file_descriptor ) != 0 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( result );
+}
+#endif
 
 /* Globs the segment files according to the EWF naming schema
  * if format is known the filename should contain the base of the filename
@@ -360,9 +454,10 @@ int libewf_glob(
 		}
 		segment_filename[ length + additional_length ] = 0;
 
-		file_descriptor = libewf_filename_open(
+		file_descriptor = libewf_file_io_open(
 		                   segment_filename,
-		                   FILE_IO_O_RDONLY );
+		                   LIBEWF_FILE_IO_O_RDONLY,
+		                   &error );
 
 		if( file_descriptor == -1 )
 		{
@@ -373,7 +468,7 @@ int libewf_glob(
 		}
 		amount_of_files++;
 
-		file_io_close(
+		libewf_file_io_close(
 		 file_descriptor );
 
 		reallocation = memory_reallocate(

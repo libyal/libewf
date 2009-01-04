@@ -33,6 +33,7 @@ To do/think about:
   - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
   - reduce _s function to pre MVC 2005 variants provides for wider support
   - improve globbing support ?
+* add daylight savings correction to ewfx date/time string?
 
 Recovery and analysis:
 * ewfacquire: detect disk full and ask for new segment file location?
@@ -111,6 +112,8 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+Next release(s):
+
 Code clean up
 * rewrite ewfglob marcros to function macros (including arguments)
 * remove file io pool from lower levels and pass file io handle ?
@@ -120,8 +123,6 @@ Code clean up
 Testing
 * add export unattended to automated tests
 
-Next release(s):
-
 check for notify_verbose_printf( "
   - library done
 check for funtion,[ ]
@@ -129,7 +130,7 @@ check for funtion,[ ]
 check error tollerance
 check TODO
 
-* add daylight savings correction to ewfx date/time string?
+remove "\n" from error strings add them to the error string print functions
 
 * use internal format of date/time string convert them in interface
 * what about header values parsing with preservation of timestamps?
@@ -141,7 +142,8 @@ check TODO
   - add error parameter
 
 * separate narrow and wide character library functions
-  - Linux can change wide character into UTF8, but what about Windows ASCII with codepage?
+  - Linux can change wide character into UTF8
+  - Windows uses an ASCII codepage
 
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?
@@ -197,6 +199,8 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080913
 
 Version: 20080912
 * worked on improved error handling

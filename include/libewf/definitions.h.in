@@ -29,11 +29,7 @@
 
 /* The libewf version string
  */
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-#define LIBEWF_VERSION_STRING			L"@VERSION@"
-#else
 #define LIBEWF_VERSION_STRING			"@VERSION@"
-#endif
 
 /* The libewf file access
  * bit 1	set to 1 for read access
@@ -51,51 +47,65 @@
 
 /* Libewf file formats
  */
-#define LIBEWF_FORMAT_UNKNOWN			0x00
-#define LIBEWF_FORMAT_ENCASE1			0x01
-#define LIBEWF_FORMAT_ENCASE2			0x02
-#define LIBEWF_FORMAT_ENCASE3			0x03
-#define LIBEWF_FORMAT_ENCASE4			0x04
-#define LIBEWF_FORMAT_ENCASE5			0x05
-#define LIBEWF_FORMAT_ENCASE6			0x06
-#define LIBEWF_FORMAT_SMART			0x0E
-#define LIBEWF_FORMAT_FTK			0x0F
-#define LIBEWF_FORMAT_LVF			0x10
-#define LIBEWF_FORMAT_LINEN5			0x25
-#define LIBEWF_FORMAT_LINEN6			0x26
+enum LIBEWF_FORMAT
+{
+	LIBEWF_FORMAT_UNKNOWN			= 0x00,
+	LIBEWF_FORMAT_ENCASE1			= 0x01,
+	LIBEWF_FORMAT_ENCASE2			= 0x02,
+	LIBEWF_FORMAT_ENCASE3			= 0x03,
+	LIBEWF_FORMAT_ENCASE4			= 0x04,
+	LIBEWF_FORMAT_ENCASE5			= 0x05,
+	LIBEWF_FORMAT_ENCASE6			= 0x06,
+	LIBEWF_FORMAT_SMART			= 0x0E,
+	LIBEWF_FORMAT_FTK			= 0x0F,
+	LIBEWF_FORMAT_LVF			= 0x10,
+	LIBEWF_FORMAT_LINEN5			= 0x25,
+	LIBEWF_FORMAT_LINEN6			= 0x26,
 
-/* The format as specified by Andrew Rosen
- */
-#define LIBEWF_FORMAT_EWF			0x70
+	/* The format as specified by Andrew Rosen
+	 */
+	LIBEWF_FORMAT_EWF			= 0x70,
 
-/* Libewf eXtended EWF format
- */
-#define LIBEWF_FORMAT_EWFX			0x71
+	/* Libewf eXtended EWF format
+	 */
+	LIBEWF_FORMAT_EWFX			= 0x71
+};
 
 /* Libewf compression level definitions
  */
-#define LIBEWF_COMPRESSION_NONE			0
-#define LIBEWF_COMPRESSION_FAST			1
-#define LIBEWF_COMPRESSION_BEST			2
+enum LIBEWF_COMPRESSION_LEVELS
+{
+	LIBEWF_COMPRESSION_NONE			= 0,
+	LIBEWF_COMPRESSION_FAST			= 1,
+	LIBEWF_COMPRESSION_BEST			= 2,
+};
 
 /* Libewf media type definitions
  */
-#define LIBEWF_MEDIA_TYPE_REMOVABLE		0x00
-#define LIBEWF_MEDIA_TYPE_FIXED			0x01
-
-#define LIBEWF_MEDIA_TYPE_CD			0x03
+enum LIBEWF_MEDIA_TYPES
+{
+	LIBEWF_MEDIA_TYPE_REMOVABLE		= 0x00,
+	LIBEWF_MEDIA_TYPE_FIXED			= 0x01,
+	LIBEWF_MEDIA_TYPE_CD			= 0x03
+};
 
 /* Libewf volume type definitions
  */
-#define LIBEWF_VOLUME_TYPE_LOGICAL		0x00
-#define LIBEWF_VOLUME_TYPE_PHYSICAL		0x01
+enum LIBEWF_VOLUME_TYPES
+{
+	LIBEWF_VOLUME_TYPE_LOGICAL		= 0x00,
+	LIBEWF_VOLUME_TYPE_PHYSICAL		= 0x01
+};
 
 /* Libwef date representation format
  */
-#define LIBEWF_DATE_FORMAT_DAYMONTH		0x01
-#define LIBEWF_DATE_FORMAT_MONTHDAY		0x02
-#define LIBEWF_DATE_FORMAT_ISO8601		0x03
-#define LIBEWF_DATE_FORMAT_CTIME		0x04
+enum LIBEWF_DATE_FORMATS
+{
+	LIBEWF_DATE_FORMAT_DAYMONTH		= 0x01,
+	LIBEWF_DATE_FORMAT_MONTHDAY		= 0x02,
+	LIBEWF_DATE_FORMAT_ISO8601		= 0x03,
+	LIBEWF_DATE_FORMAT_CTIME		= 0x04
+};
 
 /* Libewf compression types
  */
@@ -115,9 +125,12 @@
 
 /* Libewf segment file type definitions
  */
-#define LIBEWF_SEGMENT_FILE_TYPE_DWF		(uint8_t) 'd'
-#define LIBEWF_SEGMENT_FILE_TYPE_EWF		(uint8_t) 'E'
-#define LIBEWF_SEGMENT_FILE_TYPE_LWF		(uint8_t) 'L'
+enum LIBEWF_SEGMENT_FILE_TYPES
+{
+	LIBEWF_SEGMENT_FILE_TYPE_DWF		= (uint8_t) 'd',
+	LIBEWF_SEGMENT_FILE_TYPE_EWF		= (uint8_t) 'E',
+	LIBEWF_SEGMENT_FILE_TYPE_LWF		= (uint8_t) 'L'
+};
 
 /* The codepage definitions
  */

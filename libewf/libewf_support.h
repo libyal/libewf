@@ -31,14 +31,13 @@
 #include <libewf/handle.h>
 
 #include "libewf_extern.h"
-#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-LIBEWF_EXTERN const libewf_character_t *libewf_get_version(
-                                         void );
+LIBEWF_EXTERN const char *libewf_get_version(
+                           void );
 
 LIBEWF_EXTERN int libewf_signal_abort(
                    libewf_handle_t *handle );

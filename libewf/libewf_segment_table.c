@@ -21,18 +21,18 @@
  */
 
 #include <common.h>
-#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
+#include "libewf_file_io.h"
 #include "libewf_file_io_handle.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
+#include "libewf_system_string.h"
 
 /* Initialize the hash sections
  * Returns 1 if successful or -1 on error
@@ -409,7 +409,7 @@ int libewf_segment_table_build(
  */
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
-     system_character_t *basename,
+     libewf_system_character_t *basename,
      size_t length,
      libewf_error_t **error )
 {
@@ -476,7 +476,7 @@ int libewf_segment_table_get_basename(
  */
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
-     system_character_t *basename,
+     libewf_system_character_t *basename,
      size_t basename_length,
      libewf_error_t **error )
 {
@@ -512,8 +512,8 @@ int libewf_segment_table_set_basename(
 		segment_table->basename        = NULL;
 		segment_table->basename_length = 0;
 	}
-	segment_table->basename = (system_character_t *) memory_allocate(
-	                                                  sizeof( system_character_t ) * (basename_length + 1 ) );
+	segment_table->basename = (libewf_system_character_t *) memory_allocate(
+	                                                         sizeof( libewf_system_character_t ) * ( basename_length + 1 ) );
 
 	if( segment_table->basename == NULL )
 	{
@@ -555,7 +555,7 @@ int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
      libewf_segment_table_t *delta_segment_table,
      libewf_file_io_pool_t *file_io_pool,
-     system_character_t * const filenames[],
+     libewf_system_character_t * const filenames[],
      uint16_t file_amount, uint8_t flags,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
@@ -744,7 +744,7 @@ int libewf_segment_table_read_open(
 		if( libewf_file_io_pool_open(
 		     file_io_pool,
 		     file_io_pool_entry,
-		     FILE_IO_O_RDONLY,
+		     LIBEWF_FILE_IO_O_RDONLY,
 		     error ) != 1 )
 		{
 			libewf_error_set(
@@ -861,7 +861,7 @@ int libewf_segment_table_read_open(
 				if( libewf_file_io_pool_reopen(
 				     file_io_pool,
 				     file_io_pool_entry,
-				     FILE_IO_O_RDWR,
+				     LIBEWF_FILE_IO_O_RDWR,
 				     error ) != 1 )
 				{
 					libewf_error_set(
@@ -976,7 +976,7 @@ int libewf_segment_table_read_open(
  */
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
-     system_character_t * const filenames[],
+     libewf_system_character_t * const filenames[],
      uint16_t file_amount,
      libewf_error_t **error )
 {
@@ -1204,11 +1204,11 @@ int libewf_segment_table_create_segment_file(
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
-		flags = FILE_IO_O_RDWR | FILE_IO_O_CREAT | FILE_IO_O_TRUNC;
+		flags = LIBEWF_FILE_IO_O_RDWR | LIBEWF_FILE_IO_O_CREAT | LIBEWF_FILE_IO_O_TRUNC;
 	}
 	else
 	{
-		flags = FILE_IO_O_WRONLY | FILE_IO_O_CREAT | FILE_IO_O_TRUNC;
+		flags = LIBEWF_FILE_IO_O_WRONLY | LIBEWF_FILE_IO_O_CREAT | LIBEWF_FILE_IO_O_TRUNC;
 	}
 	if( libewf_file_io_pool_open(
 	     file_io_pool,

@@ -21,11 +21,9 @@
  */
 
 #include <common.h>
-#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
-#include <system_string.h>
 
 #include "libewf_error.h"
 #include "libewf_filename.h"

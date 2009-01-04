@@ -21,22 +21,22 @@
  */
 
 #include <common.h>
-#include <file_io.h>
+#include <memory.h>
 #include <notify.h>
 #include <types.h>
-#include <system_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
+#include "libewf_file_io.h"
 #include "libewf_file_io_handle.h"
-#include "libewf_filename.h"
+#include "libewf_system_string.h"
 
 /* Retrieves a filename of a certain file io handle
  * Returns 1 if succesful or -1 on error
  */
 int libewf_file_io_handle_get_filename(
      libewf_file_io_handle_t *file_io_handle,
-     system_character_t *filename,
+     libewf_system_character_t *filename,
      size_t filename_size,
      libewf_error_t **error )
 {
@@ -86,7 +86,7 @@ int libewf_file_io_handle_get_filename(
 
 		return( -1 );
 	}
-	if( system_string_copy(
+	if( libewf_system_string_copy(
 	     filename,
 	     file_io_handle->filename,
 	     file_io_handle->filename_size ) == NULL )
@@ -113,7 +113,7 @@ int libewf_file_io_handle_get_filename(
  */
 int libewf_file_io_handle_set_filename(
      libewf_file_io_handle_t *file_io_handle,
-     const system_character_t *filename,
+     const libewf_system_character_t *filename,
      size_t filename_size,
      libewf_error_t **error )
 {
@@ -147,7 +147,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: filename already set: %" PRIs_SYSTEM ".\n",
+		 "%s: filename already set: %" PRIs_LIBEWF_SYSTEM ".\n",
 		 function,
 		 file_io_handle->filename );
 
@@ -175,8 +175,8 @@ int libewf_file_io_handle_set_filename(
 
 		return( -1 );
 	}
-	file_io_handle->filename = (system_character_t *) memory_allocate(
-	                                                   sizeof( system_character_t ) * filename_size );
+	file_io_handle->filename = (libewf_system_character_t *) memory_allocate(
+	                                                          sizeof( libewf_system_character_t ) * filename_size );
 
 	if( file_io_handle->filename == NULL )
 	{
@@ -189,7 +189,7 @@ int libewf_file_io_handle_set_filename(
 
 		return( -1 );
 	}
-	if( system_string_copy(
+	if( libewf_system_string_copy(
 	     file_io_handle->filename,
 	     filename,
 	     filename_size ) == NULL )
@@ -252,9 +252,10 @@ int libewf_file_io_handle_open(
 	}
 	if( file_io_handle->file_descriptor == -1 )
 	{
-		file_io_handle->file_descriptor = libewf_filename_open(
+		file_io_handle->file_descriptor = libewf_file_io_open(
 						   file_io_handle->filename,
-						   flags );
+						   flags,
+		                                   error );
 
 		if( file_io_handle->file_descriptor == -1 )
 		{
@@ -262,7 +263,7 @@ int libewf_file_io_handle_open(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open file: %" PRIs_SYSTEM ".\n",
+			 "%s: unable to open file: %" PRIs_LIBEWF_SYSTEM ".\n",
 			 function,
 			 file_io_handle->filename );
 
@@ -315,23 +316,24 @@ int libewf_file_io_handle_reopen(
 	}
 	if( file_io_handle->file_descriptor >= 0 )
 	{
-		if( file_io_close(
+		if( libewf_file_io_close(
 		     file_io_handle->file_descriptor ) != 0 )
 		{
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file: %" PRIs_SYSTEM ".\n",
+			 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".\n",
 			 function,
 			 file_io_handle->filename );
 
 			return( -1 );
 		}
 	}
-	file_io_handle->file_descriptor = libewf_filename_open(
+	file_io_handle->file_descriptor = libewf_file_io_open(
 					   file_io_handle->filename,
-					   flags );
+					   flags,
+	                                   error );
 
 	if( file_io_handle->file_descriptor == -1 )
 	{
@@ -339,7 +341,7 @@ int libewf_file_io_handle_reopen(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file: %" PRIs_SYSTEM ".\n",
+		 "%s: unable to open file: %" PRIs_LIBEWF_SYSTEM ".\n",
 		 function,
 		 file_io_handle->filename );
 
@@ -349,7 +351,7 @@ int libewf_file_io_handle_reopen(
 
 	/* Seek the previous file offset
 	 */
-	if( file_io_lseek(
+	if( libewf_file_io_lseek(
 	     file_io_handle->file_descriptor,
 	     file_io_handle->file_offset,
 	     SEEK_CUR ) == -1 )
@@ -358,7 +360,7 @@ int libewf_file_io_handle_reopen(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in file: %" PRIs_SYSTEM ".\n",
+		 "%s: unable to seek offset in file: %" PRIs_LIBEWF_SYSTEM ".\n",
 		 function,
 		 file_io_handle->filename );
 
@@ -400,14 +402,14 @@ int libewf_file_io_handle_close(
 	}
 	if( file_io_handle->file_descriptor >= 0 )
 	{
-		if( file_io_close(
+		if( libewf_file_io_close(
 		     file_io_handle->file_descriptor ) != 0 )
 		{
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file: %" PRIs_SYSTEM ".\n",
+			 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".\n",
 			 function,
 			 file_io_handle->filename );
 
@@ -486,7 +488,7 @@ ssize_t libewf_file_io_handle_read(
 
 		return( -1 );
 	}
-	read_count = file_io_read(
+	read_count = libewf_file_io_read(
 	              file_io_handle->file_descriptor,
 	              buffer,
 	              size );
@@ -501,7 +503,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read from file: %" PRIs_SYSTEM ".\n",
+		 "%s: unable to read from file: %" PRIs_LIBEWF_SYSTEM ".\n",
 		 function,
 		 file_io_handle->filename );
 	}
@@ -576,7 +578,7 @@ ssize_t libewf_file_io_handle_write(
 
 		return( -1 );
 	}
-	write_count = file_io_write(
+	write_count = libewf_file_io_write(
 	               file_io_handle->file_descriptor,
 	               buffer,
 	               size );
@@ -591,7 +593,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write to file: %" PRIs_SYSTEM ".\n",
+		 "%s: unable to write to file: %" PRIs_LIBEWF_SYSTEM ".\n",
 		 function,
 		 file_io_handle->filename );
 	}
@@ -671,7 +673,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		if( whence == SEEK_CUR )
 		{	
 			notify_verbose_printf(
-			 "%s: seeking offset: %" PRIjd " in file: %" PRIs_SYSTEM " with file descriptor: %d.\n",
+			 "%s: seeking offset: %" PRIjd " in file: %" PRIs_LIBEWF_SYSTEM " with file descriptor: %d.\n",
 			 function,
 			 ( file_io_handle->file_offset + offset ),
 			 file_io_handle->filename,
@@ -680,7 +682,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		else if( whence == SEEK_SET )
 		{
 			notify_verbose_printf(
-			 "%s: seeking offset: %" PRIjd " in file: %" PRIs_SYSTEM " with file descriptor: %d.\n",
+			 "%s: seeking offset: %" PRIjd " in file: %" PRIs_LIBEWF_SYSTEM " with file descriptor: %d.\n",
 			 function,
 			 offset,
 			 file_io_handle->filename,
@@ -688,7 +690,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		}
 #endif
 
-		if( file_io_lseek(
+		if( libewf_file_io_lseek(
 		     file_io_handle->file_descriptor,
 		     offset,
 		     whence ) == -1 )
@@ -697,7 +699,7 @@ off64_t libewf_file_io_handle_seek_offset(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to find offset: %" PRIjd " in file: %" PRIs_SYSTEM ".\n",
+			 "%s: unable to find offset: %" PRIjd " in file: %" PRIs_LIBEWF_SYSTEM ".\n",
 			 function,
 			 offset,
 			 file_io_handle->filename );

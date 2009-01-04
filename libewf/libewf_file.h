@@ -24,10 +24,10 @@
 #define _LIBEWF_FILE_H
 
 #include <common.h>
-#include <system_string.h>
 
 #include <libewf/handle.h>
 
+#include "libewf_error.h"
 #include "libewf_extern.h"
 
 #if defined( __cplusplus )
@@ -35,18 +35,38 @@ extern "C" {
 #endif
 
 LIBEWF_EXTERN int libewf_check_file_signature(
-                   const system_character_t *filename );
+                   const char *filename );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_check_file_signature_wide(
+                   const wchar_t *filename );
+#endif
 
 LIBEWF_EXTERN int libewf_glob(
-                   const system_character_t *filename,
+                   const char *filename,
                    size_t length,
                    uint8_t format,
-                   system_character_t **filenames[] );
+                   char **filenames[] );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_glob_wide(
+                   const wchar_t *filename,
+                   size_t length,
+                   uint8_t format,
+                   wchar_t **filenames[] );
+#endif
 
 LIBEWF_EXTERN libewf_handle_t *libewf_open(
-                              system_character_t * const filenames[],
-                              uint16_t amount_of_files,
-                              uint8_t flags );
+                                char * const filenames[],
+                                uint16_t amount_of_files,
+                                uint8_t flags );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
+                                wcahr_T * const filenames[],
+                                uint16_t amount_of_files,
+                                uint8_t flags );
+#endif
 
 LIBEWF_EXTERN int libewf_close(
                    libewf_handle_t *handle );

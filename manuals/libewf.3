@@ -1,4 +1,4 @@
-.Dd September 6, 2008
+.Dd September 13, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -8,6 +8,8 @@
 .Lb libewf
 .Sh SYNOPSIS
 .In libewf.h
+.Ft const char *
+.Fn libewf_get_version "void"
 .Ft uint8_t
 .Fn libewf_get_flags_read
 .Ft uint8_t
@@ -138,8 +140,6 @@
 .Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
 .Pp
 Functions available for narrow character string support:
-.Ft const char *
-.Fn libewf_get_version "void"
 .Ft int
 .Fn libewf_get_segment_filename "libewf_handle_t *handle, char *filename, size_t size"
 .Ft int
@@ -214,8 +214,12 @@ Functions available for narrow character string support:
 .Fn libewf_set_hash_value_sha1 "libewf_handle_t *handle, char *value, size_t length"
 .Pp
 Functions available for wide character string support:
-.Ft const wchar_t *
-.Fn libewf_get_version "void"
+.Ft int
+.Fn libewf_check_file_signature_wide "const wchar_t *filename"
+.Ft int
+.Fn libewf_glob_wide "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
+.Ft libewf_handle_t *
+.Fn libewf_open_wide "wchar_t * const filenames[], uint16_t amount_of_files, uint8_t flags"
 .Ft int
 .Fn libewf_get_segment_filename "libewf_handle_t *handle, wchar_t *filename, size_t size"
 .Ft int
@@ -290,12 +294,6 @@ Functions available for wide character string support:
 .Fn libewf_set_hash_value_sha1 "libewf_handle_t *handle, wchar_t *value, size_t length"
 .Pp
 Functions available when system has wide character string support:
-.Ft int8_t
-.Fn libewf_check_file_signature "const wchar_t *filename"
-.Ft int
-.Fn libewf_glob "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
-.Ft libewf_handle_t *
-.Fn libewf_open "wchar_t * const filenames[], uint16_t amount_of_files, uint8_t flags"
 .Sh DESCRIPTION
 The
 .Fn libewf_get_version
@@ -307,7 +305,9 @@ functions are used to get the values of the flags for read and/or write.
 .Pp
 The
 .Fn libewf_check_file_signature
-function is used to test if the EWF file signature is present within a certain
+and
+.Fn libewf_check_file_signature_wide
+functions are used to test if the EWF file signature is present within a certain
 .Ar filename.
 .Pp
 The
@@ -316,7 +316,9 @@ function signals the handle to aborts it current activity.
 .Pp
 The
 .Fn libewf_glob
-function globs
+and
+.Fn libewf_glob_wide
+functions glob
 .Ar filenames
 using the
 .Ar filename
@@ -329,6 +331,7 @@ is known the filename should contain the base of the filename otherwise the func
 .Pp
 The
 .Fn libewf_open ,
+.Fn libewf_open_wide ,
 .Fn libewf_seek_offset ,
 .Fn libewf_read_buffer ,
 .Fn libewf_read_random ,
@@ -359,6 +362,8 @@ functions can be used to retrieve information from the
 .Ar handle.
 This information is read from a set of EWF files when
 .Fn libewf_open
+or
+.Fn libewf_open_wide
 is used. The
 .Fn libewf_parse_header_values,
 .Fn libewf_parse_hash_values

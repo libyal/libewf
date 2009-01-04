@@ -57,7 +57,7 @@ int libewf_hash_values_initialize(
 	if( libewf_values_table_set_identifier(
 	     hash_values,
 	     LIBEWF_HASH_VALUES_INDEX_MD5,
-	     _LIBEWF_CHARACTER_T_STRING( "MD5" ),
+	     _LIBEWF_STRING( "MD5" ),
 	     3,
 	     error ) != 1 )
 	{
@@ -155,7 +155,7 @@ int libewf_hash_values_parse_md5_hash(
 	}
 	result = libewf_values_table_get_value(
 	          *hash_values,
-	          _LIBEWF_CHARACTER_T_STRING( "MD5" ),
+	          _LIBEWF_STRING( "MD5" ),
 	          3,
 	          md5_hash_string,
 	          33,
@@ -203,7 +203,7 @@ int libewf_hash_values_parse_md5_hash(
 	}
 	result = libewf_values_table_set_value(
 		  *hash_values,
-		  _LIBEWF_CHARACTER_T_STRING( "MD5" ),
+		  _LIBEWF_STRING( "MD5" ),
 		  3,
 		  md5_hash_string,
 		  32,
@@ -300,7 +300,7 @@ int libewf_hash_values_parse_hash_string_xml(
 	for( line_iterator = 0; line_iterator < amount_of_lines; line_iterator++ )
 	{
 		if( ( lines[ line_iterator ] == NULL )
-		 || ( lines[ line_iterator ] == (libewf_character_t *) _LIBEWF_CHARACTER_T_STRING( "" ) ) )
+		 || ( lines[ line_iterator ] == (libewf_character_t *) _LIBEWF_STRING( "" ) ) )
 		{
 			continue;
 		}
@@ -649,9 +649,9 @@ int libewf_hash_values_generate_hash_string_xml(
      size_t *hash_string_size,
      libewf_error_t **error )
 {
-	libewf_character_t *xml_head            = _LIBEWF_CHARACTER_T_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
-	libewf_character_t *xml_open_tag_xhash  = _LIBEWF_CHARACTER_T_STRING( "<xhash>" );
-	libewf_character_t *xml_close_tag_xhash = _LIBEWF_CHARACTER_T_STRING( "</xhash>" );
+	libewf_character_t *xml_head            = _LIBEWF_STRING( "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" );
+	libewf_character_t *xml_open_tag_xhash  = _LIBEWF_STRING( "<xhash>" );
+	libewf_character_t *xml_close_tag_xhash = _LIBEWF_STRING( "</xhash>" );
 	static char *function                   = "libewf_hash_values_generate_hash_string_xml";
 	int print_count                         = 0;
 	int string_offset                       = 0;
@@ -813,8 +813,8 @@ int libewf_hash_values_generate_hash_string_xml(
 	print_count = libewf_string_snprintf(
 	               *hash_string,
 	               *hash_string_size,
-	               _LIBEWF_CHARACTER_T_STRING( "%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF ) _LIBEWF_CHARACTER_T_STRING( "\n%" )
-	               _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF ) _LIBEWF_CHARACTER_T_STRING( "\n" ),
+	               _LIBEWF_STRING( "%" ) _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "\n%" )
+	               _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "\n" ),
 	               xml_head,
 	               xml_open_tag_xhash );
 
@@ -858,9 +858,9 @@ int libewf_hash_values_generate_hash_string_xml(
 			print_count = libewf_string_snprintf(
 			               &( ( *hash_string) [ string_offset ] ),
 			               ( *hash_string_size - string_offset ),
-			               _LIBEWF_CHARACTER_T_STRING( "\t<%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF ) _LIBEWF_CHARACTER_T_STRING( ">%" )
-			               _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF ) _LIBEWF_CHARACTER_T_STRING( "</%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF )
-			               _LIBEWF_CHARACTER_T_STRING( ">\n" ),
+			               _LIBEWF_STRING( "\t<%" ) _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( ">%" )
+			               _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "</%" ) _LIBEWF_STRING( PRIs_LIBEWF )
+			               _LIBEWF_STRING( ">\n" ),
 			               hash_values->identifier[ values_table_iterator ],
 			               hash_values->value[ values_table_iterator ],
 			               hash_values->identifier[ values_table_iterator ] );
@@ -889,7 +889,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	print_count = libewf_string_snprintf(
 	               &( ( *hash_string )[ string_offset ] ),
 	               ( *hash_string_size - string_offset ),
-	               _LIBEWF_CHARACTER_T_STRING( "%" ) _LIBEWF_CHARACTER_T_STRING( PRIs_LIBEWF ) _LIBEWF_CHARACTER_T_STRING( "\n\n" ),
+	               _LIBEWF_STRING( "%" ) _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "\n\n" ),
 	               xml_close_tag_xhash );
 
 	if( ( print_count <= -1 )
@@ -977,7 +977,7 @@ int libewf_hash_values_generate_md5_hash(
 	}
 	result = libewf_values_table_get_value(
 	          hash_values,
-	          _LIBEWF_CHARACTER_T_STRING( "MD5" ),
+	          _LIBEWF_STRING( "MD5" ),
 	          3,
 	          md5_hash_string,
 	          33,

@@ -26,15 +26,14 @@
 #include "libewf_definitions.h"
 #include "libewf_error.h"
 #include "libewf_handle.h"
-#include "libewf_string.h"
 #include "libewf_support.h"
 
 /* Returns the library version as a string
  */
-const libewf_character_t *libewf_get_version(
-                           void )
+const char *libewf_get_version(
+             void )
 {
-	return( (const libewf_character_t *) LIBEWF_VERSION_STRING );
+	return( (const char *) LIBEWF_VERSION_STRING );
 }
 
 /* Signals the libewf handle to abort its current activity

@@ -38,13 +38,8 @@ extern "C" {
 
 /* Returns the library version
  */
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN const wchar_t *libewf_get_version(
-                              void );
-#else
 LIBEWF_EXTERN const char *libewf_get_version(
                            void );
-#endif
 
 /* Returns the flags for reading
  */
@@ -64,12 +59,15 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_write(
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
-LIBEWF_EXTERN int libewf_check_file_signature(
-                   const wchar_t *filename );
-#else
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename );
+
+/* Detects if a file is an EWF file (check for the EWF file signature)
+ * Returns 1 if true, 0 if not or -1 on error
+ */
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_check_file_signature_wide(
+                   const wchar_t *filename );
 #endif
 
 /* Globs the segment files according to the EWF naming schema
@@ -77,18 +75,23 @@ LIBEWF_EXTERN int libewf_check_file_signature(
  * otherwise the function will try to determine the format based on the extension
  * Returns the amount of filenames if successful or -1 on error
  */
-#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
-LIBEWF_EXTERN int libewf_glob(
-                   const wchar_t *filename,
-                   size_t length,
-                   uint8_t format,
-                   wchar_t **filenames[] );
-#else
 LIBEWF_EXTERN int libewf_glob(
                    const char *filename,
                    size_t length,
                    uint8_t format,
                    char **filenames[] );
+
+/* Globs the segment files according to the EWF naming schema
+ * if the format is known the filename should contain the base of the filename
+ * otherwise the function will try to determine the format based on the extension
+ * Returns the amount of filenames if successful or -1 on error
+ */
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_glob_wide(
+                   const wchar_t *filename,
+                   size_t length,
+                   uint8_t format,
+                   wchar_t **filenames[] );
 #endif
 
 /* Signals the libewf handle to abort its current activity
@@ -102,14 +105,19 @@ LIBEWF_EXTERN int libewf_signal_abort(
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
  * Returns a pointer to the new instance of handle, NULL on error
  */
-#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
-LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
-                              wchar_t * const filenames[],
-                              uint16_t amount_of_files,
-                              uint8_t flags );
-#else
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               char * const filenames[],
+                              uint16_t amount_of_files,
+                              uint8_t flags );
+
+/* Opens a set of EWF file(s)
+ * For reading files should contain all filenames that make up an EWF image
+ * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
+ * Returns a pointer to the new instance of handle, NULL on error
+ */
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open_wide(
+                              wchar_t * const filenames[],
                               uint16_t amount_of_files,
                               uint8_t flags );
 #endif

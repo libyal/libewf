@@ -24,19 +24,18 @@
 #define _LIBEWF_FILENAME_H
 
 #include <common.h>
-#include <file_io.h>
 #include <memory.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_error.h"
+#include "libewf_system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 int libewf_filename_set_extension(
-     system_character_t *extension,
+     libewf_system_character_t *extension,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
@@ -45,9 +44,9 @@ int libewf_filename_set_extension(
      libewf_error_t **error );
 
 int libewf_filename_create(
-     system_character_t **filename,
+     libewf_system_character_t **filename,
      size_t *filename_size,
-     system_character_t *basename,
+     libewf_system_character_t *basename,
      size_t basename_length,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
@@ -55,16 +54,6 @@ int libewf_filename_create(
      uint8_t format,
      uint8_t ewf_format,
      libewf_error_t **error );
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define libewf_filename_open( filename, flags ) \
-	file_io_wopen( filename, flags )
-
-#else
-#define libewf_filename_open( filename, flags ) \
-	file_io_open( filename, flags )
-
-#endif
 
 #if defined( __cplusplus )
 }

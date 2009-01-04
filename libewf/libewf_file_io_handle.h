@@ -24,10 +24,10 @@
 #define _LIBEWF_FILE_IO_HANDLE_H
 
 #include <common.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_error.h"
+#include "libewf_system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -39,7 +39,7 @@ struct libewf_file_io_handle
 {
 	/* The filename
 	 */
-	system_character_t *filename;
+	libewf_system_character_t *filename;
 
 	/* The size of the filename
 	 */
@@ -60,13 +60,13 @@ struct libewf_file_io_handle
 
 int libewf_file_io_handle_get_filename(
      libewf_file_io_handle_t *file_io_handle,
-     system_character_t *filename,
+     libewf_system_character_t *filename,
      size_t filename_size,
      libewf_error_t **error );
 
 int libewf_file_io_handle_set_filename(
      libewf_file_io_handle_t *file_io_handle,
-     const system_character_t *filename,
+     const libewf_system_character_t *filename,
      size_t filename_size,
      libewf_error_t **error );
 

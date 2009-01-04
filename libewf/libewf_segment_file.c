@@ -22,13 +22,13 @@
 
 #include <common.h>
 #include <endian.h>
-#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
+#include "libewf_file_io.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_hash_values.h"
 #include "libewf_section.h"
@@ -67,7 +67,7 @@ int libewf_segment_file_check_file_signature(
 
 		return( -1 );
 	}
-	read_count = file_io_read(
+	read_count = libewf_file_io_read(
 	              file_descriptor,
 	              signature,
 	              8 );
@@ -78,7 +78,7 @@ int libewf_segment_file_check_file_signature(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read signature from file.\n",
+		 "%s: unable to read signature.\n",
 		 function );
 
 		return( -1 );

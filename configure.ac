@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080912],
+ [20080913],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080912])
+ [20080913])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -162,6 +162,7 @@ AC_CHECK_HEADERS([varargs.h])
 
 dnl Other headers
 AC_CHECK_HEADERS([glob.h])
+AC_CHECK_HEADERS([locale.h])
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
 AC_CHECK_HEADERS([sys/utsname.h])
@@ -492,7 +493,7 @@ AC_CHECK_FUNCS(
    [Missing functions: strtoull and atoll],
    [1]) ]) ])
 
-dnl Check for error string functions used in common/error_string.h
+dnl Check for error string functions used in ewftools/error_string.h
 AC_FUNC_STRERROR_R(
  [],
  [AC_CHECK_FUNCS(
@@ -502,19 +503,23 @@ AC_FUNC_STRERROR_R(
    [Missing functions: strerror_r and strerror],
    [1]) ]) ])
 
-dnl Commandline argument/option parsing functions
+dnl Check for error string functions used in ewftools/ewfgetopt.h
 AC_CHECK_FUNCS([getopt])
 
 dnl System functions
 AC_CHECK_FUNCS(
  [fstat],
  [],
- [AC_CHECK_FUNCS(
-  [strerror],
-  [],
-  [AC_MSG_FAILURE(
-   [Missing functions: strerror_r and strerror],
-   [1]) ]) ])
+ [AC_MSG_FAILURE(
+  [Missing function: fstat],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [setlocale],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: setlocale],
+  [1]) ])
 
 AC_CHECK_FUNCS([uname])
 
@@ -532,194 +537,216 @@ AS_IF(
 	[test "x$ac_libewf_have_libuna" != xno],
 	[ac_libewf_have_libuna=yes
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_get_version,
 	 [],
 	 [ac_libewf_have_libuna=no])
 
 	dnl Byte stream functions
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_string_size_from_byte_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_string_copy_from_byte_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_byte_stream_size_from_utf8,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_byte_stream_copy_from_utf8,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_string_size_from_byte_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_string_copy_from_byte_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_byte_stream_size_from_utf16,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_byte_stream_copy_from_utf16,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf32_string_size_from_byte_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf32_string_copy_from_byte_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_byte_stream_size_from_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_byte_stream_copy_from_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 
 	dnl UTF-8 stream functions
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_string_size_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_string_copy_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_stream_size_from_utf8,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_stream_copy_from_utf8,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_string_size_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_string_copy_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_stream_size_from_utf16,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_stream_copy_from_utf16,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf32_string_size_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf32_string_copy_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_stream_size_from_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_stream_copy_from_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 
 	dnl UTF-16 stream functions
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_string_size_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf8_string_copy_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_stream_size_from_utf8,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_stream_copy_from_utf8,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_string_size_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_string_copy_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_stream_size_from_utf16,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_stream_copy_from_utf16,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf32_string_size_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf32_string_copy_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_stream_size_from_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
-	 uca,
+	 una,
 	 libuna_utf16_stream_copy_from_utf32,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+
+	dnl UTF-8 string functions
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf8_string_size_from_utf16,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf8_string_copy_from_utf16,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf8_string_size_from_utf32,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf8_string_copy_from_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	])
@@ -728,7 +755,7 @@ AS_IF(
 	[test "x$ac_libewf_have_libuna" = xyes],
 	[AC_SUBST(
 	  [libewf_pc_libs_private_libuna],
-	  [-luca])
+	  [-luna])
 	 AC_SUBST(
 	  [libewf_spec_requires_libuna],
 	  [libuna])

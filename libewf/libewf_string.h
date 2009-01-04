@@ -42,6 +42,15 @@ typedef wchar_t libewf_character_t;
 #define PRIc_LIBEWF	"lc"
 #define PRIs_LIBEWF	"ls"
 
+/* Intermediate version of the macro required
+ * for correct evaluation predefined string
+ */
+#define _LIBEWF_STRING_INTERMEDIATE( string ) \
+	L ## string
+
+#define _LIBEWF_STRING( string ) \
+	_LIBEWF_STRING_INTERMEDIATE( string )
+
 #define libewf_string_compare( string1, string2, size ) \
 	wide_string_compare( string1, string2, size )
 
@@ -66,16 +75,7 @@ typedef wchar_t libewf_character_t;
 #define libewf_string_to_uint64( string, end_of_string, base ) \
 	wide_string_to_unsigned_long_long( string, end_of_string, base )
 
-/* Intermediate version of the macro required
- * for correct evaluation predefined string
- */
-#define _LIBEWF_CHARACTER_T_STRING_INTERMEDIATE( string ) \
-	L ## string
-
-#define _LIBEWF_CHARACTER_T_STRING( string ) \
-	_LIBEWF_CHARACTER_T_STRING_INTERMEDIATE( string )
-
-/* The internal character type contains UTF-32
+/* The internal string type contains UTF-32
  */
 #if SIZEOF_WCHAR_T == 4
 
@@ -121,7 +121,7 @@ typedef wchar_t libewf_character_t;
 #define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
 	libuna_utf16_stream_copy_from_utf32( stream, stream_size, byte_order, (libuna_utf32_character_t *) string, string_size, error )
 
-/* The internal character type contains UTF-16
+/* The internal string type contains UTF-16
  */
 #elif SIZEOF_WCHAR_T == 2
 
@@ -171,7 +171,7 @@ typedef wchar_t libewf_character_t;
 #error Unsupported size of wchar_t
 #endif
 
-/* The internal character type contains UTF-8
+/* The internal string type contains UTF-8
  */
 #else
 
@@ -180,7 +180,7 @@ typedef char libewf_character_t;
 #define PRIc_LIBEWF	"c"
 #define PRIs_LIBEWF	"s"
 
-#define _LIBEWF_CHARACTER_T_STRING( string ) \
+#define _LIBEWF_STRING( string ) \
 	string
 
 #define libewf_string_compare( string1, string2, size ) \

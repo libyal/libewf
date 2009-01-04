@@ -24,7 +24,6 @@
 #define _LIBEWF_SEGMENT_TABLE_H
 
 #include <common.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_file_io_pool.h"
@@ -35,6 +34,7 @@
 #include "libewf_section_list.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -54,7 +54,7 @@ struct libewf_segment_table
 
 	/* The basename
 	 */
-	system_character_t *basename;
+	libewf_system_character_t *basename;
 
 	/* The basename length
 	 */
@@ -93,13 +93,13 @@ int libewf_segment_table_build(
 
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
-     system_character_t *basename,
+     libewf_system_character_t *basename,
      size_t length,
      libewf_error_t **error );
 
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
-     system_character_t *basename,
+     libewf_system_character_t *basename,
      size_t basename_length,
      libewf_error_t **error );
 
@@ -107,7 +107,7 @@ int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
      libewf_segment_table_t *delta_segment_table,
      libewf_file_io_pool_t *file_io_pool,
-     system_character_t * const filenames[],
+     libewf_system_character_t * const filenames[],
      uint16_t file_amount,
      uint8_t flags,
      libewf_header_sections_t *header_sections,
@@ -125,7 +125,7 @@ int libewf_segment_table_read_open(
 
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
-     system_character_t * const filenames[],
+     libewf_system_character_t * const filenames[],
      uint16_t file_amount,
      libewf_error_t **error );
 

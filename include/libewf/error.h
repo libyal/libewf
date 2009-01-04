@@ -148,6 +148,14 @@ enum LIBEWF_IO_ERROR
 	/* The write failed
 	 */
 	LIBEWF_IO_ERROR_WRITE_FAILED                 = 5,
+
+	/* Access denied
+	 */
+	LIBEWF_IO_ERROR_ACCESS_DENIED                = 6,
+
+	/* The resource is invalid i.e. a missing file
+	 */
+	LIBEWF_IO_ERROR_INVALID_RESOURCE             = 7
 };
 
 /* The input error codes
