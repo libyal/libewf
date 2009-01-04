@@ -151,6 +151,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071222
+* small changes
+
 Version: 20071209
 * minor changes to debian package files
 * fixes for the MS Visual C++ build
