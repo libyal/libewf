@@ -131,6 +131,7 @@ Version: 20070827
   using memcpy instead
 * changed some int8_t return values into int return values
 * worked on changing libewf_get functions for api consistency
+* removed unused macros from internal handle
 
 Version: 20070822
 * worked on allowing the internal MD5 calculation to be disabled

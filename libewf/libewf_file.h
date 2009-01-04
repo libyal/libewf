@@ -82,8 +82,8 @@ LIBEWF_EXTERN int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, si
 LIBEWF_EXTERN int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector );
 LIBEWF_EXTERN int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors );
 LIBEWF_EXTERN int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size );
+LIBEWF_EXTERN int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity );
 
-LIBEWF_EXTERN int32_t libewf_get_error_granularity( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN int8_t libewf_get_compression_level( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN ssize64_t libewf_get_media_size( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN int8_t libewf_get_media_type( LIBEWF_HANDLE *handle );

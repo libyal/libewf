@@ -100,6 +100,7 @@ int main( int argc, char * const argv[] )
 	INT_T option               = 0;
 	uint32_t bytes_per_sector  = 0;
 	uint32_t amount_of_sectors = 0;
+	uint32_t error_granularity = 0;
 	int8_t format              = 0;
 	int8_t compression_level   = 0;
 	int8_t media_type          = 0;
@@ -382,7 +383,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "Unable to get amount of sectors.\n" );
+			fprintf( stderr, "Unable to determine amount of sectors.\n" );
 		}
 		if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) == 1 )
 		{
@@ -390,7 +391,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "Unable to get bytes per sector.\n" );
+			fprintf( stderr, "Unable to determine bytes per sector.\n" );
 		}
 		fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n", libewf_get_media_size( handle ) );
 
@@ -400,8 +401,14 @@ int main( int argc, char * const argv[] )
 		 || ( format == LIBEWF_FORMAT_LINEN6 )
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
-			fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n", libewf_get_error_granularity( handle ) );
-
+			if( libewf_get_error_granularity( handle, &error_granularity ) == 1 )
+			{
+				fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n", error_granularity );
+			}
+			else
+			{
+				fprintf( stderr, "Unable to determine error granularity.\n" );
+			}
 			compression_level = libewf_get_compression_level( handle );
 
 			if( compression_level == LIBEWF_COMPRESSION_NONE )

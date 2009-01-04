@@ -171,9 +171,10 @@ LIBEWF_EXTERN int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t 
  */
 LIBEWF_EXTERN int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size );
 
-/* Returns the error granularity from the media information, 0 if not set, -1 on error
+/* Returns the error granularity from the media information
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int32_t libewf_get_error_granularity( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity );
 
 /* Returns the compression level value, or -1 on error
  */

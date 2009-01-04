@@ -374,7 +374,6 @@ int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_han
 
 int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int32_t libewf_internal_handle_get_media_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_compression_level( LIBEWF_INTERNAL_HANDLE *internal_handle );
 ssize64_t libewf_internal_handle_get_media_size( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
@@ -389,34 +388,6 @@ int64_t libewf_internal_handle_get_write_amount_of_chunks( LIBEWF_INTERNAL_HANDL
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 int libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-
-#define libewf_internal_handle_get_header_value_case_number( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "case_number" ), value, length )
-#define libewf_internal_handle_get_header_value_description( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "description" ), value, length )
-#define libewf_internal_handle_get_header_value_examiner_name( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "examiner_name" ), value, length )
-#define libewf_internal_handle_get_header_value_evidence_number( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "evidence_number" ), value, length )
-#define libewf_internal_handle_get_header_value_notes( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "notes" ), value, length )
-#define libewf_internal_handle_get_header_value_acquiry_date( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "acquiry_date" ), value, length )
-#define libewf_internal_handle_get_header_value_system_date( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "system_date" ), value, length )
-#define libewf_internal_handle_get_header_value_acquiry_operating_system( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "acquiry_operating_system" ), value, length )
-#define libewf_internal_handle_get_header_value_acquiry_software_version( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "acquiry_software_version" ), value, length )
-#define libewf_internal_handle_get_header_value_password( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "password" ), value, length )
-#define libewf_internal_handle_get_header_value_compression_type( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "compression_type" ), value, length )
-#define libewf_internal_handle_get_header_value_model( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "model" ), value, length )
-#define libewf_internal_handle_get_header_value_serial_number( handle, value, length ) \
-        libewf_internal_handle_get_header_value( handle, _S_LIBEWF_CHAR( "serial_number" ), value, length )
-
 int libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size );
@@ -439,34 +410,6 @@ int libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 int libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size );
 
 int libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-
-#define libewf_internal_handle_set_header_value_case_number( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "case_number" ), value, length )
-#define libewf_internal_handle_set_header_value_description( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "description" ), value, length )
-#define libewf_internal_handle_set_header_value_examiner_name( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "examiner_name" ), value, length )
-#define libewf_internal_handle_set_header_value_evidence_number( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "evidence_number" ), value, length )
-#define libewf_internal_handle_set_header_value_notes( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "notes" ), value, length )
-#define libewf_internal_handle_set_header_value_acquiry_date( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "acquiry_date" ), value, length )
-#define libewf_internal_handle_set_header_value_system_date( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "system_date" ), value, length )
-#define libewf_internal_handle_set_header_value_acquiry_operating_system( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "acquiry_operating_system" ), value, length )
-#define libewf_internal_handle_set_header_value_acquiry_software_version( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "acquiry_software_version" ), value, length )
-#define libewf_internal_handle_set_header_value_password( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "password" ), value, length )
-#define libewf_internal_handle_set_header_value_compression_type( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "compression_type" ), value, length )
-#define libewf_internal_handle_set_header_value_model( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "model" ), value, length )
-#define libewf_internal_handle_set_header_value_serial_number( handle, value, length ) \
-        libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "serial_number" ), value, length )
-
 int libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );

@@ -540,12 +540,47 @@ int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 	return( 1 );
 }
 
-/* Returns the error granularity from the media information, 0 if not set, -1 on error
+/* Returns the error granularity from the media information
+ * Returns 1 if successful, -1 on error
  */
-int32_t libewf_get_error_granularity( LIBEWF_HANDLE *handle )
+int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity )
 {
-	return( libewf_internal_handle_get_media_error_granularity(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_error_granularity";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( error_granularity == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid error granularity.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media->error_granularity > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid error granularity value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	*error_granularity = internal_handle->media->error_granularity;
+
+	return( 1 );
 }
 
 /* Returns the compression level value, or -1 on error
