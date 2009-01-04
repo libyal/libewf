@@ -896,7 +896,10 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	if( libewf_common_memcmp( (void *) volume->signature, (void *) "SMART", 5 ) == 0 )
+	if( libewf_common_memcmp(
+	     (void *) volume->signature,
+	     (void *) "SMART",
+	     5 ) == 0 )
 	{
 		*format = LIBEWF_FORMAT_SMART;
 	}

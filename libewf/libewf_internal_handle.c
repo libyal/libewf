@@ -463,30 +463,33 @@ void libewf_internal_handle_write_free( libewf_internal_handle_write_t *handle_w
 	libewf_common_free( handle_write );
 }
 
-/* Returns the maximum amount of supported segment files to write, or -1 on error
+/* Retrieves the maximum amount of supported segment files to write
+ * Returns 1 if successful, or -1 on error
  */
-int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( libewf_internal_handle_t *internal_handle )
+int libewf_internal_handle_get_write_maximum_amount_of_segments(
+     uint8_t ewf_format,
+     uint16_t *maximum_amount_of_segments )
 {
 	static char *function = "libewf_internal_handle_get_write_maximum_amount_of_segments";
 
-	if( internal_handle == NULL )
+	if( maximum_amount_of_segments == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid maximum amount of segments.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* = 4831
 		 */
-		return( (int16_t) ( ( (int) ( 'z' - 's' ) * 26 * 26 ) + 99 ) );
+		*maximum_amount_of_segments = (uint16_t) ( ( (int) ( 'z' - 's' ) * 26 * 26 ) + 99 );
 	}
-	else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
+	else if( ewf_format == EWF_FORMAT_E01 )
 	{
 		/* = 14295
 		 */
-		return( (int16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 ) );
+		*maximum_amount_of_segments = (uint16_t) ( ( (int) ( 'Z' - 'E' ) * 26 * 26 ) + 99 );
 	}
 	else
 	{
@@ -495,24 +498,19 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( libewf_inte
 
 		return( -1 );
 	}
+	return( 1 );
 }
 
 /* Determines the EWF file format based on known characteristics
  * Returns 1 if the format was determined, -1 on errror
  */
 int libewf_internal_handle_determine_format(
-     libewf_internal_handle_t *internal_handle,
-     libewf_header_sections_t *header_sections )
+     libewf_header_sections_t *header_sections,
+     uint8_t ewf_format,
+     uint8_t *format )
 {
 	static char *function = "libewf_internal_handle_determine_format";
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( header_sections == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid header sections.\n",
@@ -520,17 +518,24 @@ int libewf_internal_handle_determine_format(
 
 		return( -1 );
 	}
-	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+	if( format == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid format.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* The format identifier for the EWF-S01 format was already set
 		 * while reading the volume section
 		 */
 	}
-	else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
+	else if( ewf_format == EWF_FORMAT_E01 )
 	{
 		if( header_sections->xheader != NULL )
 		{
-			internal_handle->format = LIBEWF_FORMAT_EWFX;
+			*format = LIBEWF_FORMAT_EWFX;
 		}
 		/* The header2 in raw format starts with 0xff 0xfe <number>
 		 */
@@ -544,12 +549,12 @@ int libewf_internal_handle_determine_format(
 				if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'a' )
 				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'v' ) )
 				{
-					internal_handle->format = LIBEWF_FORMAT_ENCASE5;
+					*format = LIBEWF_FORMAT_ENCASE5;
 				}
 				else if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'm' )
 				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'd' ) )
 				{
-					internal_handle->format = LIBEWF_FORMAT_ENCASE6;
+					*format = LIBEWF_FORMAT_ENCASE6;
 				}
 				else
 				{
@@ -562,7 +567,7 @@ int libewf_internal_handle_determine_format(
 			}
 			else if( header_sections->header2[ 2 ] == (ewf_char_t) '1' )
 			{
-				internal_handle->format = LIBEWF_FORMAT_ENCASE4;
+				*format = LIBEWF_FORMAT_ENCASE4;
 			}
 			else
 			{
@@ -582,12 +587,12 @@ int libewf_internal_handle_determine_format(
 				if( ( header_sections->header[ 17 ] == (ewf_char_t) 'a' )
 				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'v' ) )
 				{
-					internal_handle->format = LIBEWF_FORMAT_LINEN5;
+					*format = LIBEWF_FORMAT_LINEN5;
 				}
 				else if( ( header_sections->header[ 17 ] == (ewf_char_t) 'm' )
 				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'd' ) )
 				{
-					internal_handle->format = LIBEWF_FORMAT_LINEN6;
+					*format = LIBEWF_FORMAT_LINEN6;
 				}
 				else
 				{
@@ -606,7 +611,7 @@ int libewf_internal_handle_determine_format(
 				{
 					if( header_sections->header[ 25 ] == (ewf_char_t) 'r' )
 					{
-						internal_handle->format = LIBEWF_FORMAT_ENCASE1;
+						*format = LIBEWF_FORMAT_ENCASE1;
 
 						if( header_sections->amount_of_header_sections != 1 )
 						{
@@ -616,7 +621,7 @@ int libewf_internal_handle_determine_format(
 					}
 					else if( header_sections->header[ 31 ] == (ewf_char_t) 'r' )
 					{
-						internal_handle->format = LIBEWF_FORMAT_ENCASE2;
+						*format = LIBEWF_FORMAT_ENCASE2;
 					}
 					else
 					{
@@ -632,7 +637,7 @@ int libewf_internal_handle_determine_format(
 				{
 					if( header_sections->header[ 29 ] == (ewf_char_t) 'r' )
 					{
-						internal_handle->format = LIBEWF_FORMAT_FTK;
+						*format = LIBEWF_FORMAT_FTK;
 					}
 					else
 					{
@@ -666,9 +671,9 @@ int libewf_internal_handle_determine_format(
 			return( -1 );
 		}
 	}
-	else if( internal_handle->ewf_format == EWF_FORMAT_L01 )
+	else if( ewf_format == EWF_FORMAT_L01 )
 	{
-		internal_handle->format = LIBEWF_FORMAT_LVF;
+		*format = LIBEWF_FORMAT_LVF;
 	}
 	else
 	{
@@ -728,10 +733,9 @@ int libewf_internal_handle_initialize_format(
 		}
 		/* Determine the maximum amount of segments allowed to write
 		 */
-		internal_handle->write->maximum_amount_of_segments = libewf_internal_handle_get_write_maximum_amount_of_segments(
-		                                                      internal_handle );
-
-		if( internal_handle->write->maximum_amount_of_segments <= -1 )
+		if( libewf_internal_handle_get_write_maximum_amount_of_segments(
+		     internal_handle->ewf_format,
+		     &( internal_handle->write->maximum_amount_of_segments ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to determine the maximum amount of allowed segment files.\n",
 			 function );

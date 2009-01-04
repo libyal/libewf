@@ -210,8 +210,9 @@ LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file
 		/* Determine the EWF format
 		 */
 		if( libewf_internal_handle_determine_format(
-		     internal_handle,
-		     internal_handle->header_sections ) != 1 )
+		     internal_handle->header_sections,
+		     internal_handle->ewf_format,
+		     &( internal_handle->format ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to determine format.\n",
 			 function );

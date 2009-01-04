@@ -146,6 +146,8 @@ TODO
 * refactor write initialize into seperate functions
 * write function for format specific write values
 * write function for chunk size specific write values
+* rename/move libewf_internal_handle_determine_format and 
+  libewf_internal_handle_get_write_maximum_amount_of_segments
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -161,12 +163,16 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080115
+* worked on refactoring write initialize
+
 Version: 20080114
 * removed initialize write in libewf_raw_write_prepare_buffer
   messes up multi threaded compression aproach
 * removed write initialize from libewf_get_chunk_size
   chunk_size is calculated on set of sectors_per_chunk and bytes_per_sector
 * removed libewf_internal_handle_read_initialize
+* worked on refactoring write initialize
 
 Version: 20080112
 * removed errno from library

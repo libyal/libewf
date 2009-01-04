@@ -262,12 +262,14 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc(
 void libewf_internal_handle_write_free(
       libewf_internal_handle_write_t *handle_write );
 
-int16_t libewf_internal_handle_get_write_maximum_amount_of_segments(
-         libewf_internal_handle_t *internal_handle );
+int libewf_internal_handle_get_write_maximum_amount_of_segments(
+     uint8_t ewf_format,
+     uint16_t *maximum_amount_of_segments );
 
 int libewf_internal_handle_determine_format(
-     libewf_internal_handle_t *internal_handle,
-     libewf_header_sections_t *header_sections );
+     libewf_header_sections_t *header_sections,
+     uint8_t ewf_format,
+     uint8_t *format );
 
 int libewf_internal_handle_initialize_format(
      libewf_internal_handle_t *internal_handle );
