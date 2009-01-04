@@ -49,22 +49,27 @@ extern "C" {
 /* Returns the library version
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN const wchar_t *libewf_get_version( void );
+LIBEWF_EXTERN const wchar_t *libewf_get_version(
+                              void );
 #else
-LIBEWF_EXTERN const char *libewf_get_version( void );
+LIBEWF_EXTERN const char *libewf_get_version(
+                           void );
 #endif
 
 /* Returns the flags for reading
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_read( void );
+LIBEWF_EXTERN uint8_t libewf_get_flags_read(
+                       void );
 
 /* Returns the flags for reading and writing
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_read_write( void );
+LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
+                       void );
 
 /* Returns the flags for writing
  */
-LIBEWF_EXTERN uint8_t libewf_get_flags_write( void );
+LIBEWF_EXTERN uint8_t libewf_get_flags_write(
+                       void );
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
@@ -75,6 +80,21 @@ LIBEWF_EXTERN int libewf_check_file_signature(
 #else
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename );
+#endif
+
+/* Globs the segment files according to the EWF naming schema using the first segment filename
+ * Returns the amount of filenames if successful or -1 on error
+ */
+#if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+LIBEWF_EXTERN int libewf_glob(
+                   const wchar_t *first_segment_filename,
+                   size_t length_first_segment_filename,
+                   wchar_t **filenames[] );
+#else
+LIBEWF_EXTERN int libewf_glob(
+                   const char *first_segment_filename,
+                   size_t length_first_segment_filename,
+                   char **filenames[] );
 #endif
 
 /* Opens a set of EWF file(s)

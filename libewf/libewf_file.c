@@ -108,7 +108,9 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	file_descriptor = libewf_filename_open( filename, LIBEWF_OPEN_READ );
+	file_descriptor = libewf_filename_open(
+	                   filename,
+	                   LIBEWF_OPEN_READ );
 
 	if( file_descriptor < 0 )
 	{
@@ -116,9 +118,11 @@ int libewf_check_file_signature(
 		 function, filename );
 		return( -1 );
 	}
-	result = libewf_segment_file_check_file_signature( file_descriptor );
+	result = libewf_segment_file_check_file_signature(
+	          file_descriptor );
 
-	if( libewf_common_close( file_descriptor ) != 0 )
+	if( libewf_common_close(
+	     file_descriptor ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to close file: %" PRIs_EWF_filename ".\n",
 		 function, filename );
@@ -133,6 +137,168 @@ int libewf_check_file_signature(
 		return( -1 );
 	}
 	return( result );
+}
+
+/* Globs the segment files according to the EWF naming schema using the first segment filename
+ * Returns the amount of filenames if successful or -1 on error
+ */
+int libewf_glob(
+     const libewf_filename_t *first_segment_filename,
+     size_t length_first_segment_filename,
+     libewf_filename_t **filenames[] )
+{
+	libewf_filename_t *filename = NULL;
+	void *reallocation          = NULL;
+	static char *function       = "libewf_glob";
+	int file_amount             = 0;
+	int file_descriptor         = 0;
+	uint8_t segment_file_type   = 0;
+	uint8_t format              = 0;
+	uint8_t ewf_format          = 0;
+
+	if( first_segment_filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid first segment filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( length_first_segment_filename == 0 )
+	 || ( length_first_segment_filename > (size_t) SSIZE_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid first segment filename length.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* The actual format defintions do not matter
+	 * only if they produce the required behavior of the
+	 * libewf_filename_set_extension function
+	 */
+	if( first_segment_filename[ length_first_segment_filename - 3 ] == 'E' )
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+		format            = LIBEWF_FORMAT_ENCASE5;
+		ewf_format        = EWF_FORMAT_E01;
+	}
+	else if( first_segment_filename[ length_first_segment_filename - 3 ] == 'e' )
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+		format            = LIBEWF_FORMAT_EWF;
+		ewf_format        = EWF_FORMAT_E01;
+	}
+	else if( first_segment_filename[ length_first_segment_filename - 3 ] == 'L' )
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
+		format            = LIBEWF_FORMAT_ENCASE5;
+		ewf_format        = EWF_FORMAT_L01;
+	}
+	else if( first_segment_filename[ length_first_segment_filename - 3 ] == 's' )
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+		format            = LIBEWF_FORMAT_SMART;
+		ewf_format        = EWF_FORMAT_S01;
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported extension: %s.\n",
+		 function, &( first_segment_filename[ length_first_segment_filename - 3 ] ) );
+
+		return( -1 );
+	}
+	if( ( first_segment_filename[ length_first_segment_filename - 2 ] != '0' )
+	 && ( first_segment_filename[ length_first_segment_filename - 1 ] != '1' ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid first segment filename extension: %s.\n",
+		 function, &( first_segment_filename[ length_first_segment_filename - 3 ] ) );
+
+		return( -1 );
+	}
+
+	while( file_amount < (int) UINT16_MAX )
+	{
+		filename = libewf_common_alloc(
+			    sizeof( libewf_filename_t ) * ( length_first_segment_filename + 1 ) );
+
+		if( filename == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create filename.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_common_memcpy(
+		     filename,
+		     first_segment_filename,
+		     ( length_first_segment_filename + 1 ) ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to copy filename.\n",
+			 function );
+
+			libewf_common_free(
+			 filename );
+
+			return( -1 );
+		}
+		if( ( file_amount > 0 )
+		 && ( libewf_filename_set_extension(
+		       &( filename[ length_first_segment_filename - 3 ] ),
+		       ( file_amount + 1 ),
+		       UINT16_MAX,
+		       segment_file_type,
+		       format,
+		       ewf_format ) != 1 ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set extension.\n",
+			 function );
+
+			libewf_common_free(
+			 filename );
+
+			return( -1 );
+		}
+		file_descriptor = libewf_common_open(
+		                   filename,
+		                   LIBEWF_OPEN_READ );
+
+		if( file_descriptor == -1 )
+		{
+			libewf_common_free(
+			 filename );
+
+			break;
+		}
+		file_amount++;
+
+		libewf_common_close(
+		 file_descriptor );
+
+		reallocation = libewf_common_realloc(
+		                *filenames,
+		                sizeof( libewf_filename_t * ) * file_amount );
+
+		if( reallocation == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate filenames.\n",
+			 function );
+
+			libewf_common_free(
+			 filename );
+
+			return( -1 );
+		}
+		*filenames = (libewf_filename_t **) reallocation;
+
+		( *filenames )[ file_amount - 1 ] = filename;
+	}
+	return( file_amount );
 }
 
 /* Opens a set of EWF file(s)

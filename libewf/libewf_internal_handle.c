@@ -51,7 +51,8 @@
 /* Allocates memory for a new handle struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_internal_handle_t *libewf_internal_handle_alloc( uint8_t flags )
+libewf_internal_handle_t *libewf_internal_handle_alloc(
+                           uint8_t flags )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_internal_handle_alloc";
@@ -281,7 +282,8 @@ libewf_internal_handle_t *libewf_internal_handle_alloc( uint8_t flags )
 
 /* Frees memory of a handle struct including elements
  */
-void libewf_internal_handle_free( libewf_internal_handle_t *internal_handle )
+void libewf_internal_handle_free(
+      libewf_internal_handle_t *internal_handle )
 {
 	static char *function = "libewf_internal_handle_free";
 
@@ -350,7 +352,8 @@ void libewf_internal_handle_free( libewf_internal_handle_t *internal_handle )
 /* Allocates memory for a new handle read struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_internal_handle_read_t *libewf_internal_handle_read_alloc( void )
+libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
+                                void )
 {
 	libewf_internal_handle_read_t *handle_read = NULL;
 	static char *function                      = "libewf_internal_handle_read_alloc";
@@ -384,7 +387,8 @@ libewf_internal_handle_read_t *libewf_internal_handle_read_alloc( void )
 
 /* Frees memory of a handle read struct including elements
  */
-void libewf_internal_handle_read_free( libewf_internal_handle_read_t *handle_read )
+void libewf_internal_handle_read_free(
+      libewf_internal_handle_read_t *handle_read )
 {
 	static char *function = "libewf_internal_handle_read_free";
 
@@ -445,7 +449,8 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 
 /* Frees memory of a handle write struct including elements
  */
-void libewf_internal_handle_write_free( libewf_internal_handle_write_t *handle_write )
+void libewf_internal_handle_write_free(
+      libewf_internal_handle_write_t *handle_write )
 {
 	static char *function = "libewf_internal_handle_write_free";
 
@@ -867,7 +872,8 @@ int libewf_internal_handle_initialize_format(
 /* Create the default header values
  * Returns 1 on success, -1 on error
  */
-int libewf_internal_handle_create_header_values( libewf_internal_handle_t *internal_handle )
+int libewf_internal_handle_create_header_values(
+     libewf_internal_handle_t *internal_handle )
 {
 	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "Case Number" );
 	libewf_char_t *description              = _S_LIBEWF_CHAR( "Description" );
@@ -890,9 +896,11 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 		LIBEWF_WARNING_PRINT( "%s: header values already created - cleaning up previous header values.\n",
 		 function );
 
-		libewf_values_table_free( internal_handle->header_values );
+		libewf_values_table_free(
+		 internal_handle->header_values );
 	}
-	internal_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+	internal_handle->header_values = libewf_values_table_alloc(
+	                                  LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 	if( internal_handle->header_values == NULL )
 	{
@@ -901,7 +909,8 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 
 		return( -1 );
 	}
-	if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
+	if( libewf_header_values_initialize(
+	     internal_handle->header_values ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
 		 function );

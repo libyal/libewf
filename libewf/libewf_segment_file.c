@@ -54,7 +54,8 @@ const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF,
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
  */
-int libewf_segment_file_check_file_signature( int file_descriptor )
+int libewf_segment_file_check_file_signature(
+     int file_descriptor )
 {
 	uint8_t signature[ 8 ];
 
@@ -68,7 +69,10 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 
 		return( -1 );
 	}
-	read_count = libewf_common_read( file_descriptor, signature, 8 );
+	read_count = libewf_common_read(
+	              file_descriptor,
+	              signature,
+	              8 );
 
 	if( read_count <= -1 )
 	{
@@ -86,15 +90,24 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( libewf_common_memcmp( evf_file_signature, signature, sizeof( evf_file_signature ) ) == 0 )
+	if( libewf_common_memcmp(
+	     evf_file_signature,
+	     signature,
+	     8 ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( libewf_common_memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 )
+	else if( libewf_common_memcmp(
+	          lvf_file_signature,
+	          signature,
+	          8 ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( libewf_common_memcmp( dvf_file_signature, signature, sizeof( dvf_file_signature ) ) == 0 )
+	else if( libewf_common_memcmp(
+	          dvf_file_signature,
+	          signature,
+	          8 ) == 0 )
 	{
 		return( 1 );
 	}
@@ -104,7 +117,10 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror
  */
-ssize_t libewf_segment_file_read_file_header( libewf_segment_file_handle_t *segment_file_handle, uint16_t *segment_number, uint8_t *segment_file_type )
+ssize_t libewf_segment_file_read_file_header(
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint16_t *segment_number,
+         uint8_t *segment_file_type )
 {
 	ewf_file_header_t file_header;
 
@@ -149,21 +165,21 @@ ssize_t libewf_segment_file_read_file_header( libewf_segment_file_handle_t *segm
 	if( libewf_common_memcmp(
 	     evf_file_signature,
 	     file_header.signature,
-	     sizeof( evf_file_signature ) ) == 0 )
+	     8 ) == 0 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 	}
 	else if( libewf_common_memcmp(
 	          lvf_file_signature,
 	          file_header.signature,
-	          sizeof( lvf_file_signature ) ) == 0 )
+	          8 ) == 0 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
 	}
 	else if( libewf_common_memcmp(
 	          dvf_file_signature,
 	          file_header.signature,
-	          sizeof( dvf_file_signature ) ) == 0 )
+	          8 ) == 0 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_DWF;
 	}
@@ -190,7 +206,20 @@ ssize_t libewf_segment_file_read_file_header( libewf_segment_file_handle_t *segm
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_sections( libewf_segment_file_handle_t *segment_file_handle, int *last_segment_file, libewf_header_sections_t *header_sections, libewf_hash_sections_t *hash_sections, libewf_media_values_t *media_values, libewf_offset_table_t *offset_table, libewf_offset_table_t *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance  )
+int libewf_segment_file_read_sections(
+     libewf_segment_file_handle_t *segment_file_handle,
+     int *last_segment_file,
+     libewf_header_sections_t *header_sections,
+     libewf_hash_sections_t *hash_sections,
+     libewf_media_values_t *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_offset_table_t *secondary_offset_table,
+     libewf_sector_table_t *acquiry_errors,
+     int8_t *compression_level,
+     uint8_t *format,
+     uint8_t *ewf_format,
+     size64_t *segment_file_size,
+     uint8_t error_tollerance  )
 {
 	ewf_section_t section;
 
@@ -520,7 +549,11 @@ ssize_t libewf_segment_file_write_headers(
 /* Write the last section at the end of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_last_section( libewf_segment_file_handle_t *segment_file_handle, int last_segment_file, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_last_section(
+         libewf_segment_file_handle_t *segment_file_handle,
+         int last_segment_file,
+         uint8_t format,
+         uint8_t ewf_format )
 {
 	ewf_char_t *last_section_type = NULL;
 	static char *function         = "libewf_segment_file_write_last_section";
@@ -763,7 +796,14 @@ ssize_t libewf_segment_file_write_start(
 /* Write the necessary sections before the actual data chunks to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_section_start( libewf_segment_file_handle_t *segment_file_handle, libewf_offset_table_t *offset_table, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_chunks_section_start(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_offset_table_t *offset_table,
+         size32_t chunk_size,
+         uint32_t total_chunk_amount,
+         uint32_t segment_chunk_amount,
+         uint8_t format,
+         uint8_t ewf_format )
 {
 	static char *function = "libewf_segment_file_write_chunks_section_start";
 	ssize_t write_count   = 0;
@@ -851,7 +891,15 @@ ssize_t libewf_segment_file_write_chunks_section_start( libewf_segment_file_hand
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_data( libewf_segment_file_handle_t *segment_file_handle, libewf_offset_table_t *offset_table, uint32_t chunk, ewf_char_t *chunk_data, size_t size, int8_t is_compressed, ewf_crc_t *chunk_crc, int8_t write_crc )
+ssize_t libewf_segment_file_write_chunks_data(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_offset_table_t *offset_table,
+         uint32_t chunk,
+         ewf_char_t *chunk_data,
+         size_t size,
+         int8_t is_compressed,
+         ewf_crc_t *chunk_crc,
+         int8_t write_crc )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 
@@ -993,7 +1041,15 @@ ssize_t libewf_segment_file_write_chunks_data( libewf_segment_file_handle_t *seg
  * Also write the necessary sections after the actual data chunks to file (like table and table2 sections for EWF-E01 format)
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_correction( libewf_segment_file_handle_t *segment_file_handle, libewf_offset_table_t *offset_table, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_chunks_correction(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_offset_table_t *offset_table,
+         off64_t chunks_section_offset,
+         size64_t chunks_section_size,
+         uint32_t amount_of_chunks,
+         uint32_t section_amount_of_chunks,
+         uint8_t format,
+         uint8_t ewf_format )
 {
 	ewf_char_t *table_section_string = NULL;
 	static char *function            = "libewf_segment_file_write_chunks_correction";
@@ -1167,7 +1223,13 @@ ssize_t libewf_segment_file_write_chunks_correction( libewf_segment_file_handle_
 /* Write a delta chunk of data to a segment file and update the offset table
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_delta_chunk( libewf_segment_file_handle_t *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, ewf_crc_t *chunk_crc, uint8_t write_crc )
+ssize_t libewf_segment_file_write_delta_chunk(
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint32_t chunk,
+         ewf_char_t *chunk_data,
+         size_t chunk_size,
+         ewf_crc_t *chunk_crc,
+         uint8_t write_crc )
 {
 	static char *function = "libewf_segment_file_write_delta_chunk";
 	ssize_t write_count   = 0;
@@ -1390,7 +1452,8 @@ ssize_t libewf_segment_file_write_close(
 
 	segment_file_handle->amount_of_chunks = segment_amount_of_chunks;
 
-	if( libewf_segment_file_handle_close( segment_file_handle ) != 0 )
+	if( libewf_segment_file_handle_close(
+	     segment_file_handle ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to close segment file handle.\n",
 		 function );

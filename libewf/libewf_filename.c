@@ -158,7 +158,8 @@ int libewf_filename_set(
 		LIBEWF_WARNING_PRINT( "%s: unable to set internal filename.\n",
 		 function );
 
-		libewf_common_free( *internal_filename );
+		libewf_common_free(
+		 *internal_filename );
 
 		*internal_filename = NULL;
 
@@ -173,7 +174,7 @@ int libewf_filename_set(
 #endif
 
 /* Creates the filename extension for a certain segment file
- * For EWF-E01, EWF-S01 segment file extension naming scheme
+ * For EWF-E01, EWF-S01 segment file extension naming schema
  * Returns 1 on success, -1 on error
  */
 int libewf_filename_set_extension(
@@ -300,7 +301,7 @@ int libewf_filename_create(
      uint8_t ewf_format )
 {
 	libewf_filename_t *new_filename = NULL;
-	static char *function         = "libewf_filename_create";
+	static char *function           = "libewf_filename_create";
 
 	if( filename == NULL )
 	{

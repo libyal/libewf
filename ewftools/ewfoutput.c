@@ -892,7 +892,8 @@ void ewfoutput_timestamp_fprint(
 	{
 		return;
 	}
-	time_elements = ewfoutput_gmtime( &timestamp );
+	time_elements = ewfoutput_gmtime(
+	                 &timestamp );
 
 	if( time_elements != NULL )
 	{
@@ -905,23 +906,35 @@ void ewfoutput_timestamp_fprint(
 		}
 		if( time_elements->tm_yday > 0 )
 		{
-			fprintf( stream, " %i day(s), %i hour(s), %i minute(s) and",
-			 time_elements->tm_yday, time_elements->tm_hour, time_elements->tm_min );
+			fprintf(
+			 stream,
+			 " %i day(s), %i hour(s), %i minute(s) and",
+			 time_elements->tm_yday,
+			 time_elements->tm_hour,
+			 time_elements->tm_min );
 		}
 		else if( time_elements->tm_hour > 0 )
 		{
-			fprintf( stream, " %i hour(s), %i minute(s) and",
-			 time_elements->tm_hour, time_elements->tm_min );
+			fprintf(
+			 stream,
+			 " %i hour(s), %i minute(s) and",
+			 time_elements->tm_hour,
+			 time_elements->tm_min );
 		}
 		else if( time_elements->tm_min > 0 )
 		{
-			fprintf( stream, " %i minute(s) and",
+			fprintf(
+			 stream,
+			 " %i minute(s) and",
 			 time_elements->tm_min );
 		}
-		fprintf( stream, " %i second(s)",
+		fprintf(
+		 stream,
+		 " %i second(s)",
 		 time_elements->tm_sec );
 
-		libewf_common_free( time_elements );
+		libewf_common_free(
+		 time_elements );
 	}
 }
 
@@ -945,20 +958,28 @@ void ewfoutput_bytes_per_second_fprint(
 
 		if( bytes_per_second > 1024 )
 		{
-			bytes_per_second_string = ewfoutput_determine_human_readable_size_string( bytes_per_second );
+			bytes_per_second_string = ewfoutput_determine_human_readable_size_string(
+			                           bytes_per_second );
 		}
-		fprintf( stream, " with" );
+		fprintf(
+		 stream,
+		 " with" );
 
 		if( bytes_per_second_string != NULL )
 		{
-			fprintf( stream, " %" PRIs_EWF "/s (%" PRIu64 " bytes/second)",
+			fprintf(
+			 stream,
+			 " %" PRIs_EWF "/s (%" PRIu64 " bytes/second)",
 			 bytes_per_second_string, bytes_per_second );
 
-			libewf_common_free( bytes_per_second_string );
+			libewf_common_free(
+			 bytes_per_second_string );
 		}
 		else
 		{
-			fprintf( stream, " %" PRIu64 " bytes/second",
+			fprintf(
+			 stream,
+			 " %" PRIu64 " bytes/second",
 			 bytes_per_second );
 		}
 	}
@@ -979,17 +1000,25 @@ void ewfoutput_bytes_fprint(
 	}
 	if( bytes > 1024 )
 	{
-		bytes_string = ewfoutput_determine_human_readable_size_string( bytes );
+		bytes_string = ewfoutput_determine_human_readable_size_string(
+		                bytes );
 	}
 	if( bytes_string != NULL )
 	{
-		fprintf( stream, " %" PRIs_EWF " (%" PRIi64 " bytes)", bytes_string, bytes );
+		fprintf(
+		 stream,
+		 " %" PRIs_EWF " (%" PRIi64 " bytes)",
+		 bytes_string, bytes );
 
-		libewf_common_free( bytes_string );
+		libewf_common_free(
+		 bytes_string );
 	}
 	else
 	{
-		fprintf( stream, " %" PRIi64 " bytes", bytes );
+		fprintf(
+		 stream,
+		 " %" PRIi64 " bytes",
+		 bytes );
 	}
 }
 
@@ -1049,16 +1078,31 @@ void ewfoutput_process_status_fprint(
 	{
 		ewfoutput_process_status_last_percentage = new_percentage;
 
-		fprintf( ewfoutput_process_status_stream, "Status: at %" PRIu8 "%%.\n", new_percentage );
-		fprintf( ewfoutput_process_status_stream, "        %" PRIs_EWF "", ewfoutput_process_status_string );
+		fprintf(
+		 ewfoutput_process_status_stream,
+		 "Status: at %" PRIu8 "%%.\n",
+		 new_percentage );
 
-		ewfoutput_bytes_fprint( ewfoutput_process_status_stream, bytes_read );
+		fprintf(
+		 ewfoutput_process_status_stream,
+		 "        %" PRIs_EWF "",
+		 ewfoutput_process_status_string );
 
-		fprintf( ewfoutput_process_status_stream, " of total" );
+		ewfoutput_bytes_fprint(
+		 ewfoutput_process_status_stream,
+		 bytes_read );
 
-		ewfoutput_bytes_fprint( ewfoutput_process_status_stream, bytes_total );
+		fprintf(
+		 ewfoutput_process_status_stream,
+		 " of total" );
 
-		fprintf( ewfoutput_process_status_stream, ".\n" );
+		ewfoutput_bytes_fprint(
+		 ewfoutput_process_status_stream,
+		 bytes_total );
+
+		fprintf(
+		 ewfoutput_process_status_stream,
+		 ".\n" );
 
 		if( ( timestamp_current > ewfoutput_process_status_timestamp_start )
 		 && ( new_percentage > 0 ) )
@@ -1075,14 +1119,26 @@ void ewfoutput_process_status_fprint(
 			{
 				seconds_remaining = 0;
 			}
-			fprintf( ewfoutput_process_status_stream, "        completion" );
+			fprintf(
+			 ewfoutput_process_status_stream,
+			 "        completion" );
 
-			ewfoutput_timestamp_fprint( ewfoutput_process_status_stream, seconds_remaining );
-			ewfoutput_bytes_per_second_fprint( ewfoutput_process_status_stream, bytes_total, seconds_total );
+			ewfoutput_timestamp_fprint(
+			 ewfoutput_process_status_stream,
+			 seconds_remaining );
 
-			fprintf( ewfoutput_process_status_stream, ".\n" );
+			ewfoutput_bytes_per_second_fprint(
+			 ewfoutput_process_status_stream,
+			 bytes_total,
+			 seconds_total );
+
+			fprintf(
+			 ewfoutput_process_status_stream,
+			 ".\n" );
 		}
-		fprintf( ewfoutput_process_status_stream, "\n" );
+		fprintf(
+		 ewfoutput_process_status_stream,
+		 "\n" );
 	}
 }
 
@@ -1119,20 +1175,37 @@ void ewfoutput_stream_process_status_fprint(
 			ewfoutput_process_status_timestamp_last   = timestamp_current;
 			ewfoutput_process_status_last_bytes_total = bytes_read;
 
-			fprintf( ewfoutput_process_status_stream, "Status: %" PRIs_EWF "", ewfoutput_process_status_string );
+			fprintf(
+			 ewfoutput_process_status_stream,
+			 "Status: %" PRIs_EWF "",
+			 ewfoutput_process_status_string );
 
-			ewfoutput_bytes_fprint( ewfoutput_process_status_stream, bytes_read );
+			ewfoutput_bytes_fprint(
+			 ewfoutput_process_status_stream,
+			 bytes_read );
 
-			fprintf( ewfoutput_process_status_stream, "\n" );
+			fprintf(
+			 ewfoutput_process_status_stream,
+			 "\n" );
 
 			seconds_current = timestamp_current - ewfoutput_process_status_timestamp_start;
 
-			fprintf( ewfoutput_process_status_stream, "       " );
+			fprintf(
+			 ewfoutput_process_status_stream,
+			 "       " );
 
-			ewfoutput_timestamp_fprint( ewfoutput_process_status_stream, seconds_current );
-			ewfoutput_bytes_per_second_fprint( ewfoutput_process_status_stream, bytes_read, seconds_current );
+			ewfoutput_timestamp_fprint(
+			 ewfoutput_process_status_stream,
+			 seconds_current );
 
-			fprintf( ewfoutput_process_status_stream, ".\n\n" );
+			ewfoutput_bytes_per_second_fprint(
+			 ewfoutput_process_status_stream,
+			 bytes_read,
+			 seconds_current );
+
+			fprintf(
+			 ewfoutput_process_status_stream,
+			 ".\n\n" );
 		}
 	}
 }
@@ -1158,12 +1231,26 @@ void ewfoutput_process_summary_fprint(
 	}
 	timestamp_acquiry = timestamp_end - timestamp_start;
 
-	fprintf( stream, "%" PRIs_EWF ":", string );
+	fprintf(
+	 stream,
+	 "%" PRIs_EWF ":",
+	 string );
 
-	ewfoutput_bytes_fprint( stream, byte_count );
-	ewfoutput_timestamp_fprint( stream, timestamp_acquiry );
-	ewfoutput_bytes_per_second_fprint( stream, byte_count, timestamp_acquiry );
+	ewfoutput_bytes_fprint(
+	 stream,
+	 byte_count );
 
-	fprintf( stream, ".\n" );
+	ewfoutput_timestamp_fprint(
+	 stream,
+	 timestamp_acquiry );
+
+	ewfoutput_bytes_per_second_fprint(
+	 stream,
+	 byte_count,
+	 timestamp_acquiry );
+
+	fprintf(
+	 stream,
+	 ".\n" );
 }
 

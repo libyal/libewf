@@ -1,4 +1,4 @@
-.Dd December 28, 2007
+.Dd January 26, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -14,8 +14,10 @@
 .Fn libewf_get_flags_read_write
 .Ft uint8_t
 .Fn libewf_get_flags_write
-.Ft int8_t
+.Ft int
 .Fn libewf_check_file_signature "const char *filename"
+.Ft int
+.Fn libewf_glob "const char *first_segment_filename, size_t first_segment_filename_length, char ** filenames[]"
 .Ft LIBEWF_HANDLE *
 .Fn libewf_open "char * const filenames[], uint16_t file_amount, uint8_t flags"
 .Ft off64_t
@@ -260,6 +262,8 @@ When wide character support functions like wmain and wopen are present and libew
 the following functions will replace their narrow character functions.
 .Ft int8_t
 .Fn libewf_check_file_signature "const wchar_t *filename"
+.Ft int
+.Fn libewf_glob "const wchar_t *first_segment_filename, size_t first_segment_filename_length, wchar_t ** filenames[]"
 .Ft LIBEWF_HANDLE *
 .Fn libewf_open "wchar_t * const filenames[], uint16_t file_amount, uint8_t flags"
 .Sh DESCRIPTION
@@ -275,6 +279,14 @@ The
 .Fn libewf_check_file_signature
 function is used to test if the EWF file signature is present within a certain
 .Ar filename.
+.Pp
+The
+.Fn libewf_glob
+function globs
+.Ar filenames
+using the
+.Ar first_segment_filename
+according to the EWF segment file naming schema.
 .Pp
 The
 .Fn libewf_open ,

@@ -36,6 +36,7 @@ To do/think about:
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing
 * implement raw split support in ewfexport and ewfacquire?
+* add function to retrieve the segment file names and amount?
 
 * ewftools: add getoptlong
 * ewfacquire: make size input and output human friendly (support kM notation etc)
@@ -160,6 +161,10 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20080126
+* code clean up
+* implemented libewf_glob function
 
 Version: 20080119
 * worked on basic multi threaded safety
