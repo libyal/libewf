@@ -255,21 +255,21 @@ void ewfcommon_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfcommon_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfcommon_timestamp_fprint( FILE *stream, time_t timestamp );
-void ewfcommon_bytes_per_second_fprint( FILE *stream, uint64_t bytes, uint64_t seconds );
-void ewfcommon_bytes_fprint( FILE *stream, uint64_t bytes );
+void ewfcommon_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t seconds );
+void ewfcommon_bytes_fprint( FILE *stream, size64_t bytes );
 
 void ewfcommon_process_status_initialize( FILE *stream, LIBEWF_CHAR *string, time_t timestamp_start );
-void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total );
-void ewfcommon_stream_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total );
+void ewfcommon_process_status_fprint( size64_t bytes_read, size64_t bytes_total );
+void ewfcommon_stream_process_status_fprint( size64_t bytes_read, size64_t bytes_total );
 
-void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, int64_t byte_count, time_t timestamp_start, time_t timestamp_end );
+void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end );
 
-int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, uint64_t size, int64_t total_read_count, uint64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error );
+ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error );
 
-int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) );
-int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_descriptor, uint64_t read_size, uint64_t read_offset, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) );
+ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_descriptor, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
-int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, uint64_t write_size, uint64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_sha1, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) );
+ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_sha1, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
 #ifdef __cplusplus
 }

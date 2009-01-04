@@ -1527,10 +1527,10 @@ void ewfcommon_timestamp_fprint( FILE *stream, time_t timestamp )
 
 /* Prints the amount of bytes per second (with a leading space) to a stream
  */
-void ewfcommon_bytes_per_second_fprint( FILE *stream, uint64_t bytes, uint64_t seconds )
+void ewfcommon_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t seconds )
 {
 	LIBEWF_CHAR *bytes_per_second_string = NULL;
-	uint64_t bytes_per_second            = 0;
+	size64_t bytes_per_second            = 0;
 
 	if( stream == NULL )
 	{
@@ -1561,7 +1561,7 @@ void ewfcommon_bytes_per_second_fprint( FILE *stream, uint64_t bytes, uint64_t s
 /* Prints the amount of bytes (with a leading space) to a stream
  * Creates a human readable version of the amount of bytes if possible
  */
-void ewfcommon_bytes_fprint( FILE *stream, uint64_t bytes )
+void ewfcommon_bytes_fprint( FILE *stream, size64_t bytes )
 {
 	LIBEWF_CHAR *bytes_string = NULL;
 
@@ -1604,7 +1604,7 @@ void ewfcommon_process_status_initialize( FILE *stream, LIBEWF_CHAR *string, tim
 
 /* Prints status information of the process
  */
-void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total )
+void ewfcommon_process_status_fprint( size64_t bytes_read, size64_t bytes_total )
 {
 	time_t seconds_current   = 0;
 	time_t seconds_total     = 0;
@@ -1622,7 +1622,7 @@ void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total 
 	}
 	if( ( bytes_total > 0 ) && ( bytes_read > 0 ) )
 	{
-		new_percentage = (int8_t) ( (uint64_t) ( bytes_read * 100 ) / bytes_total );
+		new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
 	}
 	/* Estimate the remaining acquiry time
 	 */
@@ -1672,7 +1672,7 @@ void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total 
 
 /* Prints status information of the stream process
  */
-void ewfcommon_stream_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total )
+void ewfcommon_stream_process_status_fprint( size64_t bytes_read, size64_t bytes_total )
 {
 	time_t seconds_current   = 0;
 	time_t timestamp_current = 0;
@@ -1721,7 +1721,7 @@ void ewfcommon_stream_process_status_fprint( uint64_t bytes_read, uint64_t bytes
 
 /* Prints summary information of the process
  */
-void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, int64_t byte_count, time_t timestamp_start, time_t timestamp_end )
+void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end )
 {
 	time_t timestamp_acquiry = 0;
 
@@ -1747,9 +1747,9 @@ void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, int64_
 /* Reads data from a file descriptor into the chunk cache
  * Returns the amount of bytes read, 0 if at end of input, or -1 on error
  */
-int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, uint64_t size, int64_t total_read_count, uint64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
+ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
 {
-#if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	CHAR_T *error_string              = NULL;
 #endif
 	static char *function             = "ewfcommon_read_input";
@@ -1758,7 +1758,6 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 	off64_t error2_sector             = 0;
 	ssize_t read_count                = 0;
 	ssize_t buffer_offset             = 0;
-	size32_t chunk_size               = 0;
 	size_t read_size                  = 0;
 	size_t bytes_to_read              = 0;
 	size_t read_remaining_bytes       = 0;
@@ -1786,18 +1785,16 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 		return( -1 );
 	}
-	chunk_size = libewf_get_chunk_size( handle );
-
 	if( chunk_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( size > (uint64_t) INT64_MAX )
+	if( buffer_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -1827,21 +1824,22 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 	}
 	chunk_amount = libewf_get_write_amount_of_chunks( handle );
 
-	if( ( chunk_amount <= -1 ) || ( chunk_amount > (int64_t) UINT32_MAX ) )
+	if( ( chunk_amount <= -1 )
+	 || ( chunk_amount > (int64_t) UINT32_MAX ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks written.\n",
 		 function );
 
 		return( -1 );
 	}
-	while( size > 0 )
+	while( buffer_size > 0 )
 	{
 		/* Determine the amount of bytes to read from the input
 		 * Read as much as possible in chunk sizes
 		 */
-		if( size < (uint64_t) chunk_size )
+		if( buffer_size < (size_t) chunk_size )
 		{
-			read_size = (uint32_t) size;
+			read_size = buffer_size;
 		}
 		else
 		{
@@ -1851,7 +1849,10 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 		while( read_amount_of_errors <= read_error_retry )
 		{
-			read_count = libewf_common_read( file_descriptor, &buffer[ buffer_offset + read_error_offset ], bytes_to_read );
+			read_count = libewf_common_read(
+			              file_descriptor,
+			              &buffer[ buffer_offset + read_error_offset ],
+			              bytes_to_read );
 
 			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi64 " with size: %zi.\n",
 			 function, ( chunk_amount + 1 ), read_count );
@@ -1860,8 +1861,11 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 			if( read_count <= -1 )
 			{
-#if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
-				if( ( errno == ESPIPE ) || ( errno == EPERM ) || ( errno == ENXIO ) || ( errno == ENODEV ) )
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+				if( ( errno == ESPIPE )
+				 || ( errno == EPERM )
+				 || ( errno == ENXIO )
+				 || ( errno == ENODEV ) )
 				{
 					error_string = ewfcommon_strerror( errno );
 
@@ -2100,7 +2104,7 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 				}
 			}
 		}
-		size          -= read_count;
+		buffer_size   -= read_count;
 		buffer_offset += read_count;
 
 		/* At the end of the input
@@ -2118,20 +2122,20 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
  * This processes the entire file for the MD5 calculation with status information
  * Returns a -1 on error, the amount of bytes read on success
  */
-int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFSHA1_CONTEXT sha1_context;
 
-	LIBEWF_CHAR *sha1_hash_string       = NULL;
-	static char *function               = "ewfcommon_read";
-	uint8_t *data                       = NULL;
-	off64_t read_offset                 = 0;
-	ssize_t read_count                  = 0;
-	size_t size                         = 0;
-	size_t buffer_size                  = 0;
-	int64_t total_read_count            = 0;
-	uint64_t media_size                 = 0;
-	uint32_t chunk_size                 = 0;
+	LIBEWF_CHAR *sha1_hash_string = NULL;
+	uint8_t *data                 = NULL;
+	static char *function         = "ewfcommon_read";
+	off64_t read_offset           = 0;
+	size32_t chunk_size           = 0;
+	size_t buffer_size            = 0;
+	size_t read_size              = 0;
+	ssize64_t media_size          = 0;
+	ssize64_t total_read_count    = 0;
+	ssize_t read_count            = 0;
 
 	if( handle == NULL )
 	{
@@ -2142,7 +2146,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 	}
 	media_size = libewf_get_media_size( handle );
 
-	if( media_size == 0 )
+	if( media_size <= 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
@@ -2185,15 +2189,15 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 			return( -1 );
 		}
 	}
-	while( total_read_count < (int64_t) media_size )
+	while( total_read_count < media_size )
 	{
-		size = buffer_size;
+		read_size = buffer_size;
 
-		if( ( media_size - total_read_count ) < (uint64_t) size )
+		if( ( media_size - total_read_count ) < (ssize64_t) read_size )
 		{
-			size = (size_t) ( media_size - total_read_count );
+			read_size = (size_t) ( media_size - total_read_count );
 		}
-		read_count = libewf_read_random( handle, (void *) data, size, read_offset );
+		read_count = libewf_read_random( handle, (void *) data, read_size, read_offset );
 
 		if( read_count <= -1 )
 		{
@@ -2213,7 +2217,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 			return( -1 );
 		}
-		if( read_count > (ssize_t) size )
+		if( read_count > (ssize_t) read_size )
 		{
 			LIBEWF_WARNING_PRINT( "%s: more bytes read than requested.\n",
 			 function );
@@ -2226,12 +2230,12 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		{
 			ewfsha1_update( &sha1_context, data, read_count );
 		}
-		read_offset      += (off64_t) size;
-		total_read_count += (int64_t) read_count;
+		read_offset      += (off64_t) read_size;
+		total_read_count += (ssize64_t) read_count;
 
 		if( callback != NULL )
 		{
-			callback( total_read_count, media_size );
+			callback( (size64_t) total_read_count, (size64_t) media_size );
 		}
   	}
 	libewf_common_free( data );
@@ -2280,18 +2284,18 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 /* Reads the data to a file descriptor
  * Returns a -1 on error, the amount of bytes read on success
  */
-int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_descriptor, uint64_t read_size, uint64_t read_offset, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_descriptor, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
-	uint8_t *data            = NULL;
-	static char *function    = "ewfcommon_read_to_file_descriptor";
-	ssize_t read_count       = 0;
-	ssize_t write_count      = 0;
-	size_t size              = 0;
-	size_t buffer_size       = 0;
-	int64_t total_read_count = 0;
-	uint64_t media_size      = 0;
-	uint32_t chunk_size      = 0;
-	uint8_t read_all         = 0;
+	uint8_t *data              = NULL;
+	static char *function      = "ewfcommon_read_to_file_descriptor";
+	size32_t chunk_size        = 0;
+	size_t size                = 0;
+	size_t buffer_size         = 0;
+	ssize64_t media_size       = 0;
+	ssize64_t total_read_count = 0;
+	ssize_t read_count         = 0;
+	ssize_t write_count        = 0;
+	uint8_t read_all           = 0;
 
 	if( handle == NULL )
 	{
@@ -2302,7 +2306,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 	}
 	media_size = libewf_get_media_size( handle );
 
-	if( media_size == 0 )
+	if( media_size <= 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
 		 function );
@@ -2319,28 +2323,29 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		return( -1 );
 	}
 	if( ( read_size == 0 )
-	 || ( read_size > media_size ) || ( read_size > (uint64_t) INT64_MAX ) )
+	 || ( read_size > (size64_t) media_size )
+	 || ( read_size > (ssize64_t) INT64_MAX ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( read_offset >= media_size )
+	if( read_offset >= (off64_t) media_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid offset.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( read_size + read_offset ) > media_size )
+	if( ( read_size + read_offset ) > (size64_t) media_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to export beyond size of media.\n",
 		 function );
 
 		return( -1 );
 	}
-	read_all    = (uint8_t) ( ( read_size == media_size ) && ( read_offset == 0 ) );
+	read_all    = (uint8_t) ( ( read_size == (size64_t) media_size ) && ( read_offset == 0 ) );
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
@@ -2355,7 +2360,7 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 	{
 		size = buffer_size;
 
-		if( ( media_size - total_read_count ) < (uint64_t) size )
+		if( ( media_size - total_read_count ) < (ssize64_t) size )
 		{
 			size = (size_t) ( media_size - total_read_count );
 		}
@@ -2416,18 +2421,18 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 /* Writes data in EWF format from a file descriptor
  * Returns the amount of bytes written, or -1 on error
  */
-int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, uint64_t write_size, uint64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_sha1, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_sha1, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	EWFSHA1_CONTEXT sha1_context;
 
 	LIBEWF_CHAR *sha1_hash_string = NULL;
 	uint8_t *data                 = NULL;
 	static char *function         = "ewfcommon_write_from_file_descriptor";
+	size32_t chunk_size           = 0;
+	size_t buffer_size            = 0;
 	ssize64_t total_write_count   = 0;
 	ssize64_t write_count         = 0;
-	size_t buffer_size            = 0;
-	ssize_t read_count            = 0;
-	uint32_t chunk_size           = 0;
+	ssize32_t read_count          = 0;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *compressed_data      = NULL;
 	uint8_t *raw_write_data       = NULL;
@@ -2472,7 +2477,7 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 		}
 		if( write_offset > 0 )
 		{
-			if( write_offset >= write_size )
+			if( write_offset >= (off64_t) write_size )
 			{
 				LIBEWF_WARNING_PRINT( "%s: invalid offset to write.\n",
 				 function );
@@ -2482,7 +2487,7 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			if( libewf_common_lseek(
 			     input_file_descriptor,
 			     write_offset,
-			     SEEK_SET ) != (int64_t) write_offset )
+			     SEEK_SET ) != (off_t) write_offset )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to find write offset.\n",
 				 function );
@@ -2534,7 +2539,8 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			return( -1 );
 		}
 	}
-	while( ( write_size == 0 ) || ( total_write_count < (int64_t) write_size ) )
+	while( ( write_size == 0 )
+	 || ( total_write_count < (int64_t) write_size ) )
 	{
 		/* Read a chunk from the file descriptor
 		 */
@@ -2543,6 +2549,7 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 		              input_file_descriptor,
 		              data,
 		              buffer_size,
+		              chunk_size,
 		              total_write_count,
 		              write_size,
 		              read_error_retry,
@@ -2724,7 +2731,7 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 		 */
 		if( callback != NULL )
 		{
-			callback( (uint64_t) total_write_count, write_size );
+			callback( (size64_t) total_write_count, write_size );
 		}
 	}
 	libewf_common_free( data );

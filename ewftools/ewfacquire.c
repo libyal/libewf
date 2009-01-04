@@ -263,10 +263,10 @@ int main( int argc, char * const argv[] )
 	void *callback                            = &ewfcommon_process_status_fprint;
 
 	INT_T option                              = 0;
+	ssize64_t write_count                     = 0;
 	size_t string_length                      = 0;
 	time_t timestamp_start                    = 0;
 	time_t timestamp_end                      = 0;
-	int64_t count                             = 0;
 	int64_t segment_file_size                 = 0;
 	uint64_t input_size                       = 0;
 	uint64_t acquiry_offset                   = 0;
@@ -1083,21 +1083,21 @@ int main( int argc, char * const argv[] )
 	}
 	fprintf( stderr, "This could take a while.\n\n" );
 
-	count = ewfcommon_write_from_file_descriptor(
-	         handle,
-	         file_descriptor,
-	         acquiry_size,
-	         acquiry_offset,
-	         read_error_retry,
-	         sector_error_granularity,
-	         wipe_block_on_read_error,
-	         seek_on_error,
-	         calculate_sha1,
-	         callback );
+	write_count = ewfcommon_write_from_file_descriptor(
+	               handle,
+	               file_descriptor,
+	               acquiry_size,
+	               acquiry_offset,
+	               read_error_retry,
+	               sector_error_granularity,
+	               wipe_block_on_read_error,
+	               seek_on_error,
+	               calculate_sha1,
+	               callback );
 
 	/* Done acquiring data
 	 */
-	if( count > -1 )
+	if( write_count > -1 )
 	{
 		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
@@ -1166,7 +1166,7 @@ int main( int argc, char * const argv[] )
 	timestamp_end = time( NULL );
 	time_string   = libewf_common_ctime( &timestamp_end );
 
-	if( count <= -1 )
+	if( write_count <= -1 )
 	{
 		if( time_string != NULL )
 		{
@@ -1200,7 +1200,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Acquiry completed.\n" );
 	}
-	ewfcommon_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), count, timestamp_start, timestamp_end );
+	ewfcommon_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
 
 	fprintf( stderr, "\n" );
 

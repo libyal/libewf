@@ -136,7 +136,9 @@ Version: 20070818
 * completed refactoring of PRINT( "libewf and PRINT( "ewf
   function names
 * changed warning strings with 2^ values to value exceeds maximum
-* added write optimalisation: the data section is cached
+* write optimalisation:
+  - the data section is cached for multiple writes
+  - refactored libewf_get_chunk_size out of ewfcommon_read_input
 
 Version: 20070816
 * worked on restructuring to improve internal structure
