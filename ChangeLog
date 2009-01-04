@@ -159,6 +159,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080403
+* Fixed macosx installation path
+
 Version: 20080330
 * Fixed multiple bugs in read write mode, delta files were initiallity opened without read access
 * Worked on ewfalter to handle more complex RW scenarios
