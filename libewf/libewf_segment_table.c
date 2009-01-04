@@ -280,6 +280,56 @@ int libewf_segment_table_build(
 	return( 1 );
 }
 
+/* retrieves the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename(
+     libewf_segment_table_t *segment_table,
+     system_character_t *basename,
+     size_t length )
+{
+	static char *function = "libewf_segment_table_get_basename";
+
+	if( segment_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		notify_warning_printf( "%s: invalid basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+	/* Make sure to include the end of string character
+	 */
+	if( length < ( segment_table->basename_length + 1 ) )
+	{
+		notify_warning_printf( "%s: basename too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_copy(
+	     basename,
+	     segment_table->basename,
+	     ( segment_table->basename_length + 1 ) ) == NULL )
+	{
+		notify_warning_printf( "%s: unable to set basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Sets the basename in the segment table
  * Returns 1 if successful or -1 on error
  */

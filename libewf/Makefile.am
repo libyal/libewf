@@ -51,7 +51,7 @@ IGNORE = \
 	libewf_file_io_pool.c libewf_file_io_pool.h
 
 libewf_la_LIBADD  = ../common/libcommon.la
-libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0
+libewf_la_LDFLAGS = -no-undefined -version-info 1:2:1
 
 distclean: clean
 	/bin/rm -f Makefile

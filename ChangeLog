@@ -48,7 +48,7 @@ To do/think about:
 
 Recovery and analysis:
 * ewfacquire: detect disk full and ask for new segment file location?
-  - have libewf allow to set the segment file path during write
+  - have libewf allow to set the segment file path during write (done)
   - like alternative segment file path in EnCase
     however EnCase seems to fully test if the segment file upfront by
     allocating the necessary disk space
@@ -95,6 +95,7 @@ Known issues:
 * check chunk size for > 2 GiB table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
+  This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MSVS C++ does not allow pre compiler macro in macro defintions
 
 Code clean up
@@ -139,7 +140,6 @@ Next release(s):
 * change libewf_notify_set_values in libewf_file.c to notify_set_values
 
 FIXES
-* MacOS-X package should install in /usr/
 * update ewfalter to handle more complex RW scenarios
 
 CLOSED
@@ -160,7 +160,9 @@ CLOSED
   checks out ok
 
 Version: 20080405
-* Worked on moving basename from segment table entry 0
+* Moved basename from segment table entry 0 to segment table
+* The segment filename can now be overwritten during acquiry this allows
+  alternative segment filename paths
 
 Version: 20080403
 * Fixed macosx installation path

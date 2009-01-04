@@ -98,6 +98,11 @@ int libewf_segment_table_build(
      uint8_t error_tollerance,
      int *abort );
 
+int libewf_segment_table_get_basename(
+     libewf_segment_table_t *segment_table,
+     system_character_t *basename,
+     size_t length );
+
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      system_character_t *basename,

@@ -677,6 +677,39 @@ int libewf_get_md5_hash(
 	return( 1 );
 }
 
+/* Retrieves the segment filename
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_segment_filename(
+     libewf_handle_t *handle,
+     system_character_t *filename,
+     size_t length )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_segment_filename";
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->segment_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( libewf_segment_table_get_basename(
+	         internal_handle->segment_table,
+	         filename,
+	         length ) );
+}
+
 /* Retrieves the delta segment filename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -699,13 +732,13 @@ int libewf_get_delta_segment_filename(
 
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle - missing delta_segment_table.\n",
+		notify_warning_printf( "%s: invalid handle - missing delta segment table.\n",
 		 function );
 
 		return( -1 );
 	}
-	return( libewf_segment_file_handle_get_filename(
-	         internal_handle->delta_segment_table->segment_file_handle[ 0 ],
+	return( libewf_segment_table_get_basename(
+	         internal_handle->delta_segment_table,
 	         filename,
 	         length ) );
 }
@@ -1776,6 +1809,47 @@ int libewf_set_md5_hash(
 	return( 1 );
 }
 
+/* Sets the segment file
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_segment_filename(
+     libewf_handle_t *handle,
+     system_character_t *filename,
+     size_t length )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_segment_filename";
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		notify_warning_printf( "%s: segment filename cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( libewf_segment_table_set_basename(
+	         internal_handle->segment_table,
+	         filename,
+	         length ) );
+}
+
+
 /* Sets the delta segment file
  * Returns 1 if successful or -1 on error
  */
@@ -1796,8 +1870,7 @@ int libewf_set_delta_segment_filename(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( ( internal_handle->write == NULL )
-	 && ( internal_handle->write->values_initialized != 0 ) )
+	if( internal_handle->write == NULL )
 	{
 		notify_warning_printf( "%s: delta segment filename cannot be changed.\n",
 		 function );
@@ -1811,23 +1884,8 @@ int libewf_set_delta_segment_filename(
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->segment_file_handle[ 0 ] == NULL )
-	{
-		notify_warning_printf( "%s: invalid handle - invalid delta segment table - missing first segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename != NULL )
-	{
-		memory_free(
-		 internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename );
-
-		internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename        = NULL;
-		internal_handle->delta_segment_table->segment_file_handle[ 0 ]->length_filename = 0;
-	}
-	return( libewf_segment_file_handle_set_filename(
-	         internal_handle->delta_segment_table->segment_file_handle[ 0 ],
+	return( libewf_segment_table_set_basename(
+	         internal_handle->delta_segment_table,
 	         filename,
 	         length ) );
 }

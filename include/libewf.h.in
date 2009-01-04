@@ -337,6 +337,21 @@ LIBEWF_EXTERN int libewf_get_md5_hash(
                    uint8_t *md5_hash,
                    size_t size );
 
+/* Retrieves the segment filename
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
+LIBEWF_EXTERN int libewf_get_segment_filename(
+                   LIBEWF_HANDLE *handle,
+                   wchar_t *filename,
+                   size_t length );
+#else
+LIBEWF_EXTERN int libewf_get_segment_filename(
+                   LIBEWF_HANDLE *handle,
+                   char *filename,
+                   size_t length );
+#endif
+
 /* Retrieves the delta segment filename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
@@ -741,7 +756,22 @@ LIBEWF_EXTERN int libewf_set_md5_hash(
                    uint8_t *md5_hash,
                    size_t size );
 
-/* Sets the delta segment file
+/* Sets the segment filename
+ * Returns 1 if successful or -1 on error
+ */
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
+LIBEWF_EXTERN int libewf_set_segment_filename(
+                   LIBEWF_HANDLE *handle,
+                   wchar_t *filename,
+                   size_t length );
+#else
+LIBEWF_EXTERN int libewf_set_segment_filename(
+                   LIBEWF_HANDLE *handle,
+                   char *filename,
+                   size_t length );
+#endif
+
+/* Sets the delta segment filename
  * Returns 1 if successful or -1 on error
  */
 #if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )

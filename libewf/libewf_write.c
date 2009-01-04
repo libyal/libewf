@@ -1385,7 +1385,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	ssize_t write_count                               = 0;
 	uint16_t segment_number                           = 0;
 	uint8_t segment_file_type                         = 0;
-	int no_section_append                             = 0;
+	uint8_t no_section_append                         = 0;
 	int result                                        = 0;
 
 	if( internal_handle == NULL )

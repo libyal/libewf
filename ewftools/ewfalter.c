@@ -366,7 +366,7 @@ int main( int argc, char * const argv[] )
 
 		while( alter_count > 0 )
 		{
-			if( alter_count > alter_buffer_size )
+			if( alter_count > (int64_t) alter_buffer_size )
 			{
 				write_size = (ssize_t) alter_buffer_size;
 			}
@@ -412,7 +412,7 @@ int main( int argc, char * const argv[] )
 
 		while( alter_count > 0 )
 		{
-			if( alter_count > alter_buffer_size )
+			if( alter_count > (int64_t) alter_buffer_size )
 			{
 				write_size = (ssize_t) alter_buffer_size;
 			}
