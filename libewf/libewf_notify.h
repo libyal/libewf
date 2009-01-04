@@ -52,9 +52,9 @@ extern "C" {
 
 #endif
 
-#define LIBEWF_VERBOSE_PRINT		libewf_verbose_print
-#define LIBEWF_WARNING_PRINT		libewf_warning_print
-#define LIBEWF_FATAL_PRINT		libewf_fatal_print
+#define LIBEWF_VERBOSE_PRINT	libewf_verbose_print
+#define LIBEWF_WARNING_PRINT	libewf_warning_print
+#define LIBEWF_FATAL_PRINT	libewf_fatal_print
 
 extern uint8_t libewf_notify_verbose;
 

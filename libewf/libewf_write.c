@@ -330,8 +330,8 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
  */
 int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, int raw_access )
 {
-	static char *function               = "libewf_write_test_segment_file_full";
-	int64_t remaining_segment_file_size = 0;
+	static char *function      = "libewf_write_test_segment_file_full";
+	size64_t segment_file_size = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -415,27 +415,28 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 	{
 		/* Calculate the remaining segment file size
 		 */
-		remaining_segment_file_size = (int64_t) internal_handle->write->segment_file_size
-		                            - (int64_t) segment_file_offset;
+		segment_file_size = segment_file_offset;
 
 		/* Leave space for the done or next section
 		 */
-		remaining_segment_file_size -= EWF_SECTION_SIZE;
+		segment_file_size += EWF_SECTION_SIZE;
 
 		/* Leave space for the table and table2 sections
 		 */
-		remaining_segment_file_size -= 2
-		                             * ( EWF_SECTION_SIZE
-		                               + ( internal_handle->write->section_amount_of_chunks
-		                                 * EWF_TABLE_OFFSET_SIZE )
-		                               + EWF_CRC_SIZE );
+		segment_file_size += 2
+		                   * ( EWF_SECTION_SIZE
+		                     + ( internal_handle->write->section_amount_of_chunks
+		                       * EWF_TABLE_OFFSET_SIZE )
+		                     + EWF_CRC_SIZE );
+
+		/* Leave space for an additional chunk
+		 */
+		segment_file_size += internal_handle->media->chunk_size
+		                   + EWF_CRC_SIZE;
 
 		/* Determine if a chunk would fit in the segment file
 		 */
-		remaining_segment_file_size -= internal_handle->media->chunk_size
-		                             + EWF_CRC_SIZE;
-
-		if( remaining_segment_file_size <= 0 )
+		if( segment_file_size > internal_handle->write->segment_file_size )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: no space left for additional chunk.\n",
 			 function );
@@ -454,8 +455,8 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
  */
 int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, int raw_access )
 {
-	static char *function               = "libewf_write_test_chunks_section_full";
-	int64_t remaining_segment_file_size = 0;
+	static char *function      = "libewf_write_test_chunks_section_full";
+	size64_t segment_file_size = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -544,29 +545,30 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	else
 	{
-		remaining_segment_file_size = (int64_t) internal_handle->write->segment_file_size;
-
 		/* Calculate the remaining segment file size
 		 */
-		remaining_segment_file_size -= (int64_t) segment_file_offset;
+		segment_file_size = segment_file_offset;
 
 		/* Leave space for the done or next section
 		 */
-		remaining_segment_file_size -= EWF_SECTION_SIZE;
+		segment_file_size += EWF_SECTION_SIZE;
 
 		/* Leave space for the table and table2 sections
 		 */
-		remaining_segment_file_size -= 2
-		                             * ( EWF_SECTION_SIZE
-		                               + ( (int64_t) internal_handle->write->section_amount_of_chunks
-		                                 * EWF_TABLE_OFFSET_SIZE )
-		                               + EWF_CRC_SIZE );
+		segment_file_size += 2
+		                   * ( EWF_SECTION_SIZE
+		                     + ( internal_handle->write->section_amount_of_chunks
+		                       * EWF_TABLE_OFFSET_SIZE )
+		                     + EWF_CRC_SIZE );
+
+		/* Leave space for an additional chunk
+		 */
+		segment_file_size += internal_handle->media->chunk_size
+		                   + EWF_CRC_SIZE;
 
 		/* Determine if a chunk would fit in the segment file
 		 */
-		remaining_segment_file_size -= internal_handle->media->chunk_size + EWF_CRC_SIZE;
-
-		if( remaining_segment_file_size <= 0 )
+		if( segment_file_size > internal_handle->write->segment_file_size )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: no space left for additional chunk.\n",
 			 function );

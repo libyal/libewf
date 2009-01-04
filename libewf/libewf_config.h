@@ -125,7 +125,7 @@
 
 /* Defines if libewf's read and write raw functionality should be used in the
    ewf tools */
-#define HAVE_RAW_ACCESS 1
+/* #undef HAVE_RAW_ACCESS */
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
