@@ -2012,7 +2012,8 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	     is_compressed,
 	     internal_handle->segment_table->file_offset[ segment_number ],
 	     chunk_size,
-	     segment_number ) == -1 )
+	     segment_number,
+	     0 ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set offset value in offset table.\n",
 		 function );

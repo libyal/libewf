@@ -1212,7 +1212,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 		     compressed,
 		     (off_t) current_offset,
 		     (size_t) chunk_size,
-		     segment_number ) == -1 )
+		     segment_number,
+		     0 ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
 			 function );
@@ -1262,7 +1263,8 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	     compressed,
 	     current_offset,
 	     0,
-	     segment_number ) == -1 )
+	     segment_number,
+	     0 ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
 		 function );
@@ -1359,7 +1361,8 @@ int8_t libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_S
 			     offset_table->compressed[ offset_table->last ],
 			     last_offset,
 			     (size_t) chunk_size,
-			     segment_number ) == -1 )
+			     segment_number,
+			     0 ) == -1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
 				 function );

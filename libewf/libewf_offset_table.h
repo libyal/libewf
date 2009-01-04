@@ -50,6 +50,7 @@ extern "C" {
 #define LIBEWF_OFFSET_TABLE_SIZE_SIZE sizeof( size_t )
 #define LIBEWF_OFFSET_TABLE_HASHED_SIZE sizeof( uint8_t )
 #define LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE sizeof( uint16_t )
+#define LIBEWF_OFFSET_TABLE_DIRTY_SIZE sizeof( uint8_t )
 
 typedef struct libewf_offset_table libewf_offset_table_t;
 
@@ -100,7 +101,7 @@ struct libewf_offset_table
 LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
 LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
-int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off_t offset, size_t size, uint16_t segment_number );
+int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off_t offset, size_t size, uint16_t segment_number, uint8_t dirty );
 
 #ifdef __cplusplus
 }
