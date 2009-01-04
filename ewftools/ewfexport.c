@@ -45,6 +45,8 @@
 #include <stdlib.h>
 #endif
 
+#include <stdio.h>
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
@@ -66,41 +68,46 @@
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
-/* Prints the executable usage information
+/* Prints the executable usage information to the stream
  */
-void usage( void )
+void usage_fprint(
+      FILE *stream )
 {
-	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -d digest_type ] [ -f format ]\n" );
-	fprintf( stderr, "                 [ -o offset ] [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
+	if( stream == NULL )
+	{
+		return;
+	}
+	fprintf( stream, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -d digest_type ] [ -f format ]\n" );
+	fprintf( stream, "                 [ -o offset ] [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
 
-	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
-	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stdout, "\t    (not used for raw format)\n" );
-	fprintf( stderr, "\t-B: specify the amount of bytes to export (default is all bytes)\n" );
-	fprintf( stderr, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
-	fprintf( stdout, "\t    (not used for raw format)\n" );
-	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stdout, "\t    (not used for raw format)\n" );
-	fprintf( stderr, "\t-f: specify the file format to write to, options: raw (default), ewf, smart,\n" );
-	fprintf( stderr, "\t    encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx\n" );
-	fprintf( stderr, "\t-h: shows this help\n" );
-	fprintf( stderr, "\t-q: quiet shows no status information\n" );
-	fprintf( stderr, "\t-o: specify the offset to start the export (default is 0)\n" );
-	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
-	fprintf( stderr, "\t    stdout is only supported for the raw format\n" );
-	fprintf( stdout, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
+	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
+	fprintf( stream, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stream, "\t    (not used for raw format)\n" );
+	fprintf( stream, "\t-B: specify the amount of bytes to export (default is all bytes)\n" );
+	fprintf( stream, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stream, "\t    (not used for raw format)\n" );
+	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stream, "\t    (not used for raw format)\n" );
+	fprintf( stream, "\t-f: specify the file format to write to, options: raw (default), ewf, smart,\n" );
+	fprintf( stream, "\t    encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx\n" );
+	fprintf( stream, "\t-h: shows this help\n" );
+	fprintf( stream, "\t-q: quiet shows no status information\n" );
+	fprintf( stream, "\t-o: specify the offset to start the export (default is 0)\n" );
+	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stream, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
+	fprintf( stream, "\t    stdout is only supported for the raw format\n" );
+	fprintf( stream, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
 	 (uint32_t) ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
-	fprintf( stdout, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other EWF formats)\n",
+	fprintf( stream, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other EWF formats)\n",
 	 (uint32_t) ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
 	 (uint64_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT / 1024 ),
 	 (uint32_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT / 1024 ) );
-	fprintf( stdout, "\t    (not used for raw format)\n" );
-	fprintf( stderr, "\t-u: unattended mode (disables user interaction)\n" );
-	fprintf( stderr, "\t-v: verbose output to stderr\n" );
-	fprintf( stderr, "\t-V: print version\n" );
-	fprintf( stdout, "\t-w: wipe sectors on CRC error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t    (not used for raw format)\n" );
+	fprintf( stream, "\t-u: unattended mode (disables user interaction)\n" );
+	fprintf( stream, "\t-v: verbose output to stderr\n" );
+	fprintf( stream, "\t-V: print version\n" );
+	fprintf( stream, "\t-w: wipe sectors on CRC error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -175,22 +182,30 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfoutput_version_fprint( stderr, program );
+	ewfoutput_version_fprint(
+	 stderr,
+	 program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:d:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt(
+	                   argc,
+	                   argv,
+	                   _S_CHAR_T( "b:B:c:d:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
 			case (INT_T) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs ".\n", argv[ optind ] );
+				fprintf( stderr, "Invalid argument: %" PRIs ".\n",
+				 argv[ optind ] );
 
-				usage();
+				usage_fprint(
+				 stderr );
 
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t( optarg );
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t(
+				                     optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
@@ -201,21 +216,31 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'B':
-				string_length = CHAR_T_LENGTH( optarg );
+				string_length = CHAR_T_LENGTH(
+				                 optarg );
+
 				end_of_string = &optarg[ string_length - 1 ];
-				export_size   = CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+
+				export_size = CHAR_T_TOLONG(
+				               optarg,
+				               &end_of_string,
+				               0 );
 
 				break;
 
 			case (INT_T) 'c':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "empty_block" ), 11 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "empty_block" ),
+				     11 ) == 0 )
 				{
 					compress_empty_block     = 1;
 					argument_set_compression = 1;
 				}
 				else
 				{
-					compression_level = ewfinput_determine_compression_level_char_t( optarg );
+					compression_level = ewfinput_determine_compression_level_char_t(
+					                     optarg );
 				
 					if( compression_level <= -1 )
 					{
@@ -231,7 +256,10 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'd':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "sha1" ), 4 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "sha1" ),
+				     4 ) == 0 )
 				{
 					calculate_sha1 = 1;
 				}
@@ -242,14 +270,18 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'f':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "raw" ), 3 ) == 0 )
+				if( CHAR_T_COMPARE(
+				     optarg,
+				     _S_CHAR_T( "raw" ),
+				     3 ) == 0 )
 				{
 					output_raw          = 1;
 					argument_set_format = 1;
 				}
 				else
 				{
-					libewf_format = ewfinput_determine_libewf_format_char_t( optarg );
+					libewf_format = ewfinput_determine_libewf_format_char_t(
+					                 optarg );
 
 					if( libewf_format == 0 )
 					{
@@ -264,14 +296,22 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'h':
-				usage();
+				usage_fprint(
+				 stderr );
 
 				return( EXIT_SUCCESS );
 
 			case (INT_T) 'o':
-				string_length       = CHAR_T_LENGTH( optarg );
-				end_of_string       = &optarg[ string_length - 1 ];
-				export_offset       = CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+				string_length = CHAR_T_LENGTH(
+				                 optarg );
+
+				end_of_string = &optarg[ string_length - 1 ];
+
+				export_offset = CHAR_T_TOLONG(
+				                 optarg,
+				                 &end_of_string,
+				                 0 );
+
 				argument_set_offset = 1;
 
 				break;
@@ -287,9 +327,16 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'S':
-				string_length      = CHAR_T_LENGTH( optarg );
-				end_of_string      = &optarg[ string_length - 1 ];
-				segment_file_size  = (uint64_t) CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+				string_length = CHAR_T_LENGTH(
+				                 optarg );
+
+				end_of_string = &optarg[ string_length - 1 ];
+
+				segment_file_size  = (uint64_t) CHAR_T_TOLONG(
+				                                 optarg,
+				                                 &end_of_string,
+				                                 0 );
+
 				argument_set_size  = 1;
 				segment_file_size *= 1024;
 
@@ -307,7 +354,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 't':
-				target_filename = CHAR_T_DUPLICATE( optarg );
+				target_filename = CHAR_T_DUPLICATE(
+				                   optarg );
 
 				break;
 
@@ -322,7 +370,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfoutput_copyright_fprint( stderr );
+				ewfoutput_copyright_fprint(
+				 stderr );
 
 				return( EXIT_SUCCESS );
 
@@ -336,13 +385,17 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Missing EWF image file(s).\n" );
 
-		usage();
+		usage_fprint(
+		 stderr );
 
-		libewf_common_free( target_filename );
+		libewf_common_free(
+		 target_filename );
 
 		return( EXIT_FAILURE );
 	}
-	libewf_set_notify_values( stderr, verbose );
+	libewf_set_notify_values(
+	 stderr,
+	 verbose );
 
 #if !defined( HAVE_GLOB_H )
 	glob = ewfglob_alloc();
@@ -351,26 +404,39 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to create glob.\n" );
 
-		libewf_common_free( target_filename );
+		libewf_common_free(
+		 target_filename );
 
 		return( EXIT_FAILURE );
 	}
-	glob_count = ewfglob_resolve( glob, &argv[ optind ], ( argc - optind ) );
+	glob_count = ewfglob_resolve(
+	              glob,
+	              &argv[ optind ],
+	              ( argc - optind ) );
 
 	if( glob_count <= 0 )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free( glob );
-		libewf_common_free( target_filename );
+		ewfglob_free(
+		 glob );
+		libewf_common_free(
+		 target_filename );
 
 		return( EXIT_FAILURE );
 	}
-	handle = libewf_open( glob->results, glob->amount, LIBEWF_OPEN_READ );
+	handle = libewf_open(
+	          glob->results,
+	          glob->amount,
+	          LIBEWF_OPEN_READ );
 
-	ewfglob_free( glob );
+	ewfglob_free(
+	 glob );
 #else
-	handle = libewf_open( &argv[ optind ], ( argc - optind ), LIBEWF_OPEN_READ );
+	handle = libewf_open(
+	          &argv[ optind ],
+	          ( argc - optind ),
+	          LIBEWF_OPEN_READ );
 #endif
 
 	if( handle == NULL )
@@ -378,14 +444,16 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
 		{
-			error_string = ewfstring_strerror( errno );
+			error_string = ewfstring_strerror(
+			                errno );
 		}
 		if( error_string != NULL )
 		{
 			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
 			 error_string );
 
-			libewf_common_free( error_string );
+			libewf_common_free(
+			 error_string );
 		}
 		else
 		{
@@ -395,19 +463,24 @@ int main( int argc, char * const argv[] )
 		fprintf( stderr, "Unable to open EWF file(s).\n" );
 #endif
 
-		libewf_common_free( target_filename );
+		libewf_common_free(
+		 target_filename );
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_get_media_size( handle, &media_size ) != 1 )
+	if( libewf_get_media_size(
+	     handle,
+	     &media_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to determine media size.\n" );
 
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
-		libewf_common_free( target_filename );
+		libewf_common_free(
+		 target_filename );
 
 		return( EXIT_FAILURE );
 	}
@@ -432,13 +505,17 @@ int main( int argc, char * const argv[] )
 				      13,
 				      0 );
 
-			if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "raw" ), 3 ) == 0 )
+			if( libewf_string_compare(
+			     user_input,
+			     _S_LIBEWF_CHAR( "raw" ),
+			     3 ) == 0 )
 			{
 				output_raw = 1;
 			}
 			else
 			{
-				libewf_format = ewfinput_determine_libewf_format( user_input );
+				libewf_format = ewfinput_determine_libewf_format(
+				                 user_input );
 
 				if( libewf_format == 0 )
 				{
@@ -448,8 +525,10 @@ int main( int argc, char * const argv[] )
 					{
 						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
-					libewf_common_free( target_filename );
-					libewf_common_free( user_input );
+					libewf_common_free(
+					 target_filename );
+					libewf_common_free(
+					 user_input );
 
 					exit( EXIT_FAILURE );
 				}
@@ -458,7 +537,8 @@ int main( int argc, char * const argv[] )
 					output_raw = 0;
 				}
 			}
-			libewf_common_free( user_input );
+			libewf_common_free(
+			 user_input );
 		}
 		if( output_raw == 0 )
 		{
@@ -486,21 +566,25 @@ int main( int argc, char * const argv[] )
 					      EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 					      EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
 
-				compression_level = ewfinput_determine_compression_level( user_input );
+				compression_level = ewfinput_determine_compression_level(
+				                     user_input );
 
 				if( compression_level <= -1 )
 				{
 					fprintf( stderr, "Unsupported compression type.\n" );
 
-					if( libewf_close( handle ) != 0 )
+					if( libewf_close(
+					     handle ) != 0 )
 					{
 						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
-					libewf_common_free( target_filename );
+					libewf_common_free(
+					 target_filename );
 
 					return( EXIT_FAILURE );
 				}
-				libewf_common_free( user_input );
+				libewf_common_free(
+				 user_input );
 
 				/* Empty block compression
 				 */
@@ -513,19 +597,23 @@ int main( int argc, char * const argv[] )
 						      2,
 						      1 );
 
-					compress_empty_block = ewfinput_determine_yes_no( user_input );
+					compress_empty_block = ewfinput_determine_yes_no(
+					                        user_input );
 
-					libewf_common_free( user_input );
+					libewf_common_free(
+					 user_input );
 
 					if( compress_empty_block <= -1 )
 					{
 						fprintf( stderr, "Unsupported answer.\n" );
 
-						if( libewf_close( handle ) != 0 )
+						if( libewf_close(
+						     handle ) != 0 )
 						{
 							fprintf( stderr, "Unable to close EWF file(s).\n" );
 						}
-						libewf_common_free( target_filename );
+						libewf_common_free(
+						 target_filename );
 
 						return( EXIT_FAILURE );
 					}
@@ -572,9 +660,13 @@ int main( int argc, char * const argv[] )
 					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
-				sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
+				sectors_per_chunk = libewf_string_to_int64(
+				                     user_input,
+				                     libewf_string_length(
+				                      user_input ) );
 
-				libewf_common_free( user_input );
+				libewf_common_free(
+				 user_input );
 			}
 		}
 		else
@@ -617,20 +709,24 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Missing target filename defaulting to export.\n" );
 
-		target_filename = CHAR_T_DUPLICATE( _S_CHAR_T( "export" ) );
+		target_filename = CHAR_T_DUPLICATE(
+		                   _S_CHAR_T( "export" ) );
 	}
 	fprintf( stderr, "\n" );
 
 	/* Start exporting data
 	 */
 	timestamp_start = time( NULL );
-	time_string     = libewf_common_ctime( &timestamp_start );
+	time_string     = libewf_common_ctime(
+	                   &timestamp_start );
 
 	if( time_string != NULL )
 	{
-		fprintf( stderr, "Export started at: %" PRIs "\n", time_string );
+		fprintf( stderr, "Export started at: %" PRIs "\n",
+		 time_string );
 
-		libewf_common_free( time_string );
+		libewf_common_free(
+		 time_string );
 	}
 	else
 	{
@@ -638,7 +734,10 @@ int main( int argc, char * const argv[] )
 	}
 	if( callback != NULL )
 	{
-		ewfoutput_process_status_initialize( stderr, _S_LIBEWF_CHAR( "exported" ), timestamp_start );
+		ewfoutput_process_status_initialize(
+		 stderr,
+		 _S_LIBEWF_CHAR( "exported" ),
+		 timestamp_start );
 	}
 	fprintf( stderr, "This could take a while.\n\n" );
 
@@ -651,21 +750,24 @@ int main( int argc, char * const argv[] )
 		                 1,
 		                 LIBEWF_OPEN_WRITE );
 
-		libewf_common_free( target_filename );
+		libewf_common_free(
+		 target_filename );
 
 		if( export_handle == NULL )
 		{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 			if( errno != 0 )
 			{
-				error_string = ewfstring_strerror( errno );
+				error_string = ewfstring_strerror(
+				                errno );
 			}
 			if( error_string != NULL )
 			{
 				fprintf( stderr, "Unable to open export EWF file(s) with failure: %" PRIs ".\n",
 				 error_string );
 
-				libewf_common_free( error_string );
+				libewf_common_free(
+				 error_string );
 			}
 			else
 			{
@@ -675,63 +777,81 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to open export EWF file(s).\n" );
 #endif
 
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_sectors_per_chunk( export_handle, (uint32_t) sectors_per_chunk ) != 1 )
+		if( libewf_set_sectors_per_chunk(
+		     export_handle,
+		     (uint32_t) sectors_per_chunk ) != 1 )
 		{
 			fprintf( stderr, "Unable to set sectors per chunk in handle.\n" );
 
-			if( libewf_close( export_handle ) != 0 )
+			if( libewf_close(
+			     export_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_segment_file_size( export_handle, (uint32_t) segment_file_size ) != 1 )
+		if( libewf_set_segment_file_size(
+		     export_handle,
+		     (uint32_t) segment_file_size ) != 1 )
 		{
 			fprintf( stderr, "Unable to set segment file size in handle.\n" );
 
-			if( libewf_close( export_handle ) != 0 )
+			if( libewf_close(
+			     export_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_compression_values( export_handle, compression_level, (uint8_t) compress_empty_block ) != 1 )
+		if( libewf_set_compression_values(
+		     export_handle,
+		     compression_level,
+		     (uint8_t) compress_empty_block ) != 1 )
 		{
 			fprintf( stderr, "Unable to set compression values in handle.\n" );
 
-			if( libewf_close( export_handle ) != 0 )
+			if( libewf_close(
+			     export_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_format( export_handle, libewf_format ) != 1 )
+		if( libewf_set_format(
+		     export_handle,
+		     libewf_format ) != 1 )
 		{
 			fprintf( stderr, "Unable to set format in handle.\n" );
 
-			if( libewf_close( export_handle ) != 0 )
+			if( libewf_close(
+			     export_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
@@ -750,7 +870,8 @@ int main( int argc, char * const argv[] )
 		         wipe_chunk_on_error,
 		         callback );
 
-		if( libewf_close( export_handle ) != 0 )
+		if( libewf_close(
+		     export_handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close export EWF file handle.\n" );
 
@@ -768,24 +889,29 @@ int main( int argc, char * const argv[] )
 		         wipe_chunk_on_error,
 		         callback );
 
-		libewf_common_free( target_filename );
+		libewf_common_free(
+		 target_filename );
 	}
 	timestamp_end = time( NULL );
-	time_string   = libewf_common_ctime( &timestamp_end );
+	time_string   = libewf_common_ctime(
+	                 &timestamp_end );
 
 	if( count <= -1 )
 	{
 		if( time_string != NULL )
 		{
-			fprintf( stderr, "Export failed at: %" PRIs "\n", time_string );
+			fprintf( stderr, "Export failed at: %" PRIs "\n",
+			 time_string );
 
-			libewf_common_free( time_string );
+			libewf_common_free(
+			 time_string );
 		}
 		else
 		{
 			fprintf( stderr, "Export failed.\n" );
 		}
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
@@ -793,9 +919,11 @@ int main( int argc, char * const argv[] )
 	}
 	if( time_string != NULL )
 	{
-		fprintf( stderr, "Export completed at: %" PRIs "\n", time_string );
+		fprintf( stderr, "Export completed at: %" PRIs "\n",
+		 time_string );
 
-		libewf_common_free( time_string );
+		libewf_common_free(
+		 time_string );
 	}
 	else
 	{
@@ -815,7 +943,8 @@ int main( int argc, char * const argv[] )
 	 handle,
 	 &amount_of_crc_errors );
 
-	if( libewf_close( handle ) != 0 )
+	if( libewf_close(
+	     handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 

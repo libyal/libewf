@@ -158,7 +158,10 @@ Next stable:
   what about adding the segment file type to the segment file struct?
   - reduces memory usage
 
-* ewfexport, ewfverify log hashes to file -l option
+* ewfexport log hashes to file -l option
+
+* implement TODO in ewfexport
+* check TODOs
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -176,7 +179,7 @@ CLOSED
 
 Version: 20080223
 * worked on logging of digest hashes to log file
-* refactored ewfacquire and ewfacquirestream
+* refactored ewfacquire, ewfacquirestream, ewfexport, ewfverify
 * updated manuals
 
 Version: 20080221
