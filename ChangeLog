@@ -151,6 +151,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071208
+* pkgconfig added to spec file
+
 Version: 20071205
 * minor change in defaults
 
