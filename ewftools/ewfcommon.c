@@ -553,20 +553,23 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 	return( (int32_t) buffer_offset );
 }
 
+#if defined( HAVE_RAW_ACCESS )
+
 /* Reads the data from an EWF file
  * using the raw access functions
  * buffer will be set to the buffer containing the uncompressed data
  * Returns the amount of bytes read, 0 if no more data can be read, or -1 on error
  */
-ssize_t ewfcommon_raw_read_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t **buffer, size_t buffer_size, size_t read_size )
+ssize_t ewfcommon_raw_read_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t **buffer, size_t buffer_size, size_t read_size, off64_t read_offset, size64_t media_size, uint32_t sectors_per_chunk, uint32_t bytes_per_sector, uint8_t wipe_chunk_on_error )
 {
-	static char *function    = "ewfcommon_raw_read_ewf";
-	uint8_t *raw_read_buffer = NULL;
-	ssize_t raw_read_count   = 0;
-	ssize_t read_count       = 0;
-	uint32_t chunk_crc       = 0;
-	int8_t is_compressed     = 0;
-	int8_t read_crc          = 0;
+	static char *function      = "ewfcommon_raw_read_ewf";
+	ssize_t raw_read_count     = 0;
+	ssize_t read_count         = 0;
+	off64_t sector             = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t chunk_crc         = 0;
+	int8_t is_compressed       = 0;
+	int8_t read_crc            = 0;
 
 	if( handle == NULL )
 	{
@@ -625,31 +628,58 @@ ssize_t ewfcommon_raw_read_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size
 
 		return( -1 );
 	}
-	buffer_size = read_size;
-	read_count  = libewf_raw_read_prepare_buffer(
-		       handle,
-		       (void *) raw_read_buffer,
-		       (size_t) raw_read_count,
-		       (void *) *buffer,
-		       &buffer_size,
-		       is_compressed,
-		       chunk_crc,
-		       read_crc );
+	read_count = libewf_raw_read_prepare_buffer(
+		      handle,
+		      (void *) raw_buffer,
+		      (size_t) raw_read_count,
+		      (void *) *buffer,
+		      &buffer_size,
+		      is_compressed,
+		      chunk_crc,
+		      read_crc );
 
 	if( read_count <= -1 )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: unable to prepare buffer after raw read.\n",
 		 function );
 
-		return( -1 );
+		/* Wipe the chunk if nescessary
+		 */
+		if( wipe_chunk_on_error != 0 )
+		{
+			if( libewf_common_memset( buffer, 0, read_size ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to wipe buffer.\n",
+				 function );
+
+				return( -1 );
+			}
+		}
+		/* Add a CRC error
+		 */
+		sector            = read_offset / bytes_per_sector;
+		amount_of_sectors = sectors_per_chunk;
+
+		if( ( sector + amount_of_sectors ) > (off64_t) ( media_size / bytes_per_sector ) )
+		{
+			amount_of_sectors = ( media_size / bytes_per_sector ) - sector;
+		}
+		if( libewf_add_crc_error( handle, sector, amount_of_sectors ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
+			 function );
+
+			return( -1 );
+		}
+		return( read_size );
 	}
 	if( is_compressed == 0 )
 	{
-		*buffer = raw_read_buffer;
+		*buffer = raw_buffer;
 	}
 	if( read_size != buffer_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: mismatch in read and uncompressed buffer size.\n",
+		LIBEWF_WARNING_PRINT( "%s: mismatch in read and buffer size.\n",
 		 function );
 
 		return( -1 );
@@ -750,6 +780,8 @@ ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, siz
 	return( write_size );
 }
 
+#endif
+
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
  * Returns the amount of bytes read if successful, or -1 on error
  */
@@ -775,16 +807,9 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	ssize_t read_count          = 0;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *raw_read_data      = NULL;
-	off64_t sector              = 0;
-	ssize_t raw_read_count      = 0;
-	size_t uncompressed_size    = 0;
 	size_t raw_read_buffer_size = 0;
-	uint32_t chunk_crc          = 0;
-	uint32_t amount_of_sectors  = 0;
 	uint32_t sectors_per_chunk  = 0;
 	uint32_t bytes_per_sector   = 0;
-	int8_t is_compressed        = 0;
-	int8_t read_crc             = 0;
 #endif
 
 	if( handle == NULL )
@@ -924,113 +949,40 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		{
 			read_size = (size_t) ( media_size - total_read_count );
 		}
+		uncompressed_data = data;
+
 #if defined( HAVE_RAW_ACCESS )
-		raw_read_count = libewf_raw_read_buffer(
-		                  handle,
-		                  (void *) raw_read_data,
-		                  (size_t) raw_read_buffer_size,
-		                  &is_compressed,
-		                  &chunk_crc,
-		                  &read_crc );
-
-		if( raw_read_count <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
-
-			return( -1 );
-		}
-		uncompressed_size = buffer_size;
-
-		read_count = libewf_raw_read_prepare_buffer(
+		read_count = ewfcommon_raw_read_ewf(
 		              handle,
-		              (void *) raw_read_data,
-		              (size_t) raw_read_count,
-		              (void *) data,
-		              &uncompressed_size,
-		              is_compressed,
-		              chunk_crc,
-		              read_crc );
-
-		if( read_count <= -1 )
-		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to prepare read raw buffer.\n",
-			 function );
-
-			/* Wipe the chunk if nescessary
-			 */
-			if( wipe_chunk_on_error != 0 )
-			{
-				if( libewf_common_memset( raw_read_data, 0, (size_t) raw_read_count ) == NULL )
-				{
-					 LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
-					 function );
-
-					libewf_common_free( data );
-					libewf_common_free( raw_read_data );
-
-					return( -1 );
-				}
-			}
-			/* Add a CRC error
-			 */
-			sector            = read_offset / bytes_per_sector;
-			amount_of_sectors = sectors_per_chunk;
-
-			if( ( sector + amount_of_sectors ) > (off64_t) ( media_size / bytes_per_sector ) )
-			{
-				amount_of_sectors = ( media_size / bytes_per_sector ) - sector;
-			}
-			if( libewf_add_crc_error( handle, sector, amount_of_sectors ) != 1 )
-			{
-				 LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
-				 function );
-
-				libewf_common_free( data );
-				libewf_common_free( raw_read_data );
-
-				return( -1 );
-			}
-			is_compressed     = 0;
-			uncompressed_size = amount_of_sectors * bytes_per_sector;
-			read_count        = read_size;
-		}
-		if( is_compressed == 1 )
-		{
-			uncompressed_data = data;
-		}
-		else
-		{
-			uncompressed_data = raw_read_data;
-			uncompressed_size = read_count;
-		}
-		if( read_size != uncompressed_size )
-		{
-			LIBEWF_WARNING_PRINT( "%s: mismatch in read and uncompressed buffer size.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
-
-			return( -1 );
-		}
+		              raw_read_data,
+		              raw_read_buffer_size,
+		              &uncompressed_data,
+		              buffer_size,
+		              read_size,
+		              read_offset,
+		              sectors_per_chunk,
+		              bytes_per_sector,
+		              media_size,
+		              wipe_chunk_on_error );
 #else
-		read_count = libewf_read_random( handle, (void *) data, read_size, read_offset );
-
+		read_count = libewf_read_random(
+		              handle,
+		              (void *) uncompressed_data,
+		              read_size,
+		              read_offset );
+#endif
 		if( read_count <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
-		uncompressed_data = data;
-#endif
 		if( read_count == 0 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
@@ -1532,16 +1484,9 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 	int file_descriptor         = -1;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *raw_read_data      = NULL;
-	off64_t sector              = 0;
-	ssize_t raw_read_count      = 0;
-	size_t uncompressed_size    = 0;
 	size_t raw_read_buffer_size = 0;
-	uint32_t chunk_crc          = 0;
-	uint32_t amount_of_sectors  = 0;
 	uint32_t sectors_per_chunk  = 0;
 	uint32_t bytes_per_sector   = 0;
-	int8_t is_compressed        = 0;
-	int8_t read_crc             = 0;
 #endif
 
 	if( handle == NULL )
@@ -1679,101 +1624,28 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 		{
 			read_size = (size_t) ( media_size - total_read_count );
 		}
+		uncompressed_data = data;
+
 #if defined( HAVE_RAW_ACCESS )
-		raw_read_count = libewf_raw_read_buffer(
-		                  handle,
-		                  (void *) raw_read_data,
-		                  (size_t) raw_read_buffer_size,
-		                  &is_compressed,
-		                  &chunk_crc,
-		                  &read_crc );
-
-		if( raw_read_count <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
-
-			return( -1 );
-		}
-		uncompressed_size = buffer_size;
-
-		read_count = libewf_raw_read_prepare_buffer(
+		read_count = ewfcommon_raw_read_ewf(
 		              handle,
-		              (void *) raw_read_data,
-		              (size_t) raw_read_count,
-		              (void *) data,
-		              &uncompressed_size,
-		              is_compressed,
-		              chunk_crc,
-		              read_crc );
-
-		if( read_count <= -1 )
-		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to prepare read raw buffer.\n",
-			 function );
-
-			/* Wipe the chunk if nescessary
-			 */
-			if( wipe_chunk_on_error != 0 )
-			{
-				if( libewf_common_memset( raw_read_data, 0, (size_t) raw_read_count ) == NULL )
-				{
-					 LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
-					 function );
-
-					libewf_common_free( data );
-					libewf_common_free( raw_read_data );
-
-					return( -1 );
-				}
-			}
-			/* Add a CRC error
-			 */
-			sector            = read_offset / bytes_per_sector;
-			amount_of_sectors = sectors_per_chunk;
-
-			if( ( sector + amount_of_sectors ) > (off64_t) ( media_size / bytes_per_sector ) )
-			{
-				amount_of_sectors = ( media_size / bytes_per_sector ) - sector;
-			}
-			if( libewf_add_crc_error( handle, sector, amount_of_sectors ) != 1 )
-			{
-				 LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
-				 function );
-
-				libewf_common_free( data );
-				libewf_common_free( raw_read_data );
-
-				return( -1 );
-			}
-			is_compressed     = 0;
-			uncompressed_size = amount_of_sectors * bytes_per_sector;
-			read_count        = read_size;
-		}
-		if( is_compressed == 1 )
-		{
-			uncompressed_data = data;
-		}
-		else
-		{
-			uncompressed_data = raw_read_data;
-			uncompressed_size = read_count;
-		}
-		if( read_size != uncompressed_size )
-		{
-			LIBEWF_WARNING_PRINT( "%s: mismatch in read and uncompressed buffer size.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
-
-			return( -1 );
-		}
+		              raw_read_data,
+		              raw_read_buffer_size,
+		              &uncompressed_data,
+		              buffer_size,
+		              read_size,
+		              read_offset,
+		              sectors_per_chunk,
+		              bytes_per_sector,
+		              media_size,
+		              wipe_chunk_on_error );
 #else
-		read_count = libewf_read_random( handle, (void *) data, read_size, read_offset );
+		read_count = libewf_read_random(
+		              handle,
+		              (void *) uncompressed_data,
+		              read_size,
+		              read_offset );
+#endif
 
 		if( read_count <= -1 )
 		{
@@ -1781,11 +1653,12 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 			 function );
 
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
-		uncompressed_data = data;
-#endif
 		if( read_count == 0 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
@@ -1876,16 +1749,9 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	uint8_t read_all            = 0;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *raw_read_data      = NULL;
-	off64_t sector              = 0;
-	ssize_t raw_read_count      = 0;
-	size_t uncompressed_size    = 0;
 	size_t raw_read_buffer_size = 0;
-	uint32_t chunk_crc          = 0;
-	uint32_t amount_of_sectors  = 0;
 	uint32_t sectors_per_chunk  = 0;
 	uint32_t bytes_per_sector   = 0;
-	int8_t is_compressed        = 0;
-	int8_t read_crc             = 0;
 #endif
 
 	if( handle == NULL )
@@ -2028,101 +1894,28 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		{
 			read_size = (size_t) ( media_size - total_read_count );
 		}
+		uncompressed_data = data;
+
 #if defined( HAVE_RAW_ACCESS )
-		raw_read_count = libewf_raw_read_buffer(
-		                  handle,
-		                  (void *) raw_read_data,
-		                  (size_t) raw_read_buffer_size,
-		                  &is_compressed,
-		                  &chunk_crc,
-		                  &read_crc );
-
-		if( raw_read_count <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
-
-			return( -1 );
-		}
-		uncompressed_size = buffer_size;
-
-		read_count = libewf_raw_read_prepare_buffer(
+		read_count = ewfcommon_raw_read_ewf(
 		              handle,
-		              (void *) raw_read_data,
-		              (size_t) raw_read_count,
-		              (void *) data,
-		              &uncompressed_size,
-		              is_compressed,
-		              chunk_crc,
-		              read_crc );
-
-		if( read_count <= -1 )
-		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to prepare read raw buffer.\n",
-			 function );
-
-			/* Wipe the chunk if nescessary
-			 */
-			if( wipe_chunk_on_error != 0 )
-			{
-				if( libewf_common_memset( raw_read_data, 0, (size_t) raw_read_count ) == NULL )
-				{
-					 LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
-					 function );
-
-					libewf_common_free( data );
-					libewf_common_free( raw_read_data );
-
-					return( -1 );
-				}
-			}
-			/* Add a CRC error
-			 */
-			sector            = read_offset / bytes_per_sector;
-			amount_of_sectors = sectors_per_chunk;
-
-			if( ( sector + amount_of_sectors ) > (off64_t) ( media_size / bytes_per_sector ) )
-			{
-				amount_of_sectors = ( media_size / bytes_per_sector ) - sector;
-			}
-			if( libewf_add_crc_error( handle, sector, amount_of_sectors ) != 1 )
-			{
-				 LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
-				 function );
-
-				libewf_common_free( data );
-				libewf_common_free( raw_read_data );
-
-				return( -1 );
-			}
-			is_compressed     = 0;
-			uncompressed_size = amount_of_sectors * bytes_per_sector;
-			read_count        = read_size;
-		}
-		if( is_compressed == 1 )
-		{
-			uncompressed_data = data;
-		}
-		else
-		{
-			uncompressed_data = raw_read_data;
-			uncompressed_size = read_count;
-		}
-		if( read_size != uncompressed_size )
-		{
-			LIBEWF_WARNING_PRINT( "%s: mismatch in read and uncompressed buffer size.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( raw_read_data );
-
-			return( -1 );
-		}
+		              raw_read_data,
+		              raw_read_buffer_size,
+		              &uncompressed_data,
+		              buffer_size,
+		              read_size,
+		              read_offset,
+		              sectors_per_chunk,
+		              bytes_per_sector,
+		              media_size,
+		              wipe_chunk_on_error );
 #else
-		read_count = libewf_read_random( handle, (void *) data, read_size, read_offset );
+		read_count = libewf_read_random(
+		              handle,
+		              (void *) uncompressed_data,
+		              read_size,
+		              read_offset );
+#endif
 
 		if( read_count <= -1 )
 		{
@@ -2130,11 +1923,12 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			 function );
 
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
-		uncompressed_data = data;
-#endif
 		if( read_count == 0 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",

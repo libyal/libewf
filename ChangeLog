@@ -144,11 +144,11 @@ WORKING
 * check unused parameters gcc -Wextra
 * API function get current chunk size?
 * do not finalize on write error?
-* ewfexport_ewf - add raw access write support
+* ewfcommon_export_ewf - add raw access write support
 * change default wipe behavior for ewfacquire(stream)
 
 Version: 20071105
-* worked on raw access support in ewfexport
+* refactored raw access support in ewfexport
 
 Version: 20071104
 * refactored write functions
