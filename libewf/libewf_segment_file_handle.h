@@ -35,10 +35,10 @@
 #define _LIBEWF_SEGMENT_FILE_HANDLE_H
 
 #include <common.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
 
-#include "libewf_filename.h"
 #include "libewf_section_list.h"
 
 #if defined( __cplusplus )
@@ -51,7 +51,7 @@ struct libewf_segment_file_handle
 {
 	/* The filename
 	 */
-	libewf_filename_t *filename;
+	system_character_t *filename;
 
 	/* The filename length
 	 */
@@ -86,12 +86,12 @@ void libewf_segment_file_handle_free(
 
 int libewf_segment_file_handle_get_filename(
      libewf_segment_file_handle_t *segment_file_handle,
-     libewf_filename_t *filename,
+     system_character_t *filename,
      size_t length_filename );
 
 int libewf_segment_file_handle_set_filename(
      libewf_segment_file_handle_t *segment_file_handle,
-     const libewf_filename_t *filename,
+     const system_character_t *filename,
      size_t length_filename );
 
 int libewf_segment_file_handle_open(

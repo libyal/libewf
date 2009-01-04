@@ -36,49 +36,16 @@
 
 #include <common.h>
 #include <memory.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
-
-#include "libewf_common.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-typedef wchar_t libewf_filename_t;
-
-#define PRIs_EWF_filename	"ls"
-
-#define libewf_filename_length( filename ) \
-	libewf_common_wide_string_length( filename )
-
-#define libewf_filename_copy( destination, source, length ) \
-	libewf_common_wide_memcpy( destination, source, length )
-
-#define libewf_filename_open( filename, flags ) \
-	libewf_common_wide_open( filename, flags )
-
-#else
-
-typedef char libewf_filename_t;
-
-#define PRIs_EWF_filename	"s"
-
-#define libewf_filename_length( filename ) \
-	libewf_common_string_length( filename )
-
-#define libewf_filename_copy( destination, source, length ) \
-	memory_copy( destination, source, length )
-
-#define libewf_filename_open( filename, flags ) \
-	libewf_common_open( filename, flags )
-
-#endif
-
 int libewf_filename_set_extension(
-     libewf_filename_t *extension,
+     system_character_t *extension,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
@@ -86,9 +53,9 @@ int libewf_filename_set_extension(
      uint8_t ewf_format );
 
 int libewf_filename_create(
-     libewf_filename_t **filename,
+     system_character_t **filename,
      size_t *length_filename,
-     libewf_filename_t *basename,
+     system_character_t *basename,
      size_t length_basename,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
@@ -96,6 +63,9 @@ int libewf_filename_create(
      uint8_t format,
      uint8_t ewf_format );
 
+int libewf_filename_open(
+     const system_character_t *filename,
+     uint8_t flags );
 
 #if defined( __cplusplus )
 }

@@ -34,13 +34,13 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
+#include <system_string.h>
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
+#include "libewf_filename.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
-#include "libewf_string.h"
 
 /* Allocates memory for a segment table struct
  * Returns a pointer to the new instance, NULL on error
@@ -281,7 +281,7 @@ int libewf_segment_table_build(
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
      libewf_segment_table_t *delta_segment_table,
-     libewf_filename_t * const filenames[],
+     system_character_t * const filenames[],
      uint16_t file_amount, uint8_t flags,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
@@ -349,7 +349,8 @@ int libewf_segment_table_read_open(
 	/* Get the basename of the first segment file and store it in
 	 * the 0'th entry
 	 */
-	filename_length = libewf_filename_length( filenames[ 0 ] );
+	filename_length = system_string_length(
+	                   filenames[ 0 ] );
 
 	if( filename_length <= 4 )
 	{
@@ -404,7 +405,7 @@ int libewf_segment_table_read_open(
 	 */
 	for( iterator = 0; iterator < file_amount; iterator++ )
 	{
-		notify_verbose_printf( "%s: trying to open file: %" PRIs_EWF_filename ".\n",
+		notify_verbose_printf( "%s: trying to open file: %" PRIs_SYSTEM ".\n",
 		 function, filenames[ iterator ] );
 
 		segment_file_handle = libewf_segment_file_handle_alloc();
@@ -422,7 +423,8 @@ int libewf_segment_table_read_open(
 		if( libewf_segment_file_handle_set_filename(
 		     segment_file_handle,
 		     filenames[ iterator ],
-		     libewf_filename_length( filenames[ iterator ] ) ) != 1 )
+		     system_string_length(
+		      filenames[ iterator ] ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set filename in segment file handle.\n",
 			 function );
@@ -436,7 +438,7 @@ int libewf_segment_table_read_open(
 		     segment_file_handle,
 		     LIBEWF_FLAG_READ ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
+			notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
 
 			libewf_segment_file_handle_free(
@@ -448,7 +450,7 @@ int libewf_segment_table_read_open(
 		     segment_file_handle,
 		     &segment_number ) <= -1 )
 		{
-			notify_warning_printf( "%s: unable to read file header in: %" PRIs_EWF_filename ".\n",
+			notify_warning_printf( "%s: unable to read file header in: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
 
 			libewf_segment_file_handle_free(
@@ -491,7 +493,7 @@ int libewf_segment_table_read_open(
 					return( -1 );
 				}
 			}
-			notify_verbose_printf( "%s: added segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			notify_verbose_printf( "%s: added segment file: %" PRIs_SYSTEM " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
 
 			segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
@@ -507,7 +509,7 @@ int libewf_segment_table_read_open(
 				     segment_file_handle,
 				     ( LIBEWF_FLAG_READ & LIBEWF_FLAG_WRITE ) ) != 1 )
 				{
-					notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_EWF_filename ".\n",
+					notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
 					 function, filenames[ iterator ] );
 
 					return( -1 );
@@ -525,7 +527,7 @@ int libewf_segment_table_read_open(
 					return( -1 );
 				}
 			}
-			notify_verbose_printf( "%s: added delta segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			notify_verbose_printf( "%s: added delta segment file: %" PRIs_SYSTEM " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
 
 			delta_segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
@@ -620,7 +622,7 @@ int libewf_segment_table_read_open(
  */
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
-     libewf_filename_t * const filenames[],
+     system_character_t * const filenames[],
      uint16_t file_amount )
 {
 	static char *function  = "libewf_segment_table_write_open";
@@ -647,7 +649,8 @@ int libewf_segment_table_write_open(
 
 		return( -1 );
 	}
-	filename_length = libewf_filename_length( filenames[ 0 ] );
+	filename_length = system_string_length(
+	                   filenames[ 0 ] );
 
 	if( filename_length == 0 )
 	{
@@ -717,7 +720,7 @@ int libewf_segment_table_close_all(
 				}
 				else
 				{
-					notify_warning_printf( "%s: unable to close segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
+					notify_warning_printf( "%s: unable to close segment file: %" PRIu16 " (%" PRIs_SYSTEM ").\n",
 					 function, iterator, segment_table->segment_file_handle[ iterator ]->filename );
 				}
 				result = 0;
@@ -829,14 +832,14 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-	notify_verbose_printf( "%s: segment file created: %" PRIu32 " with name: %" PRIs_EWF_filename ".\n",
+	notify_verbose_printf( "%s: segment file created: %" PRIu32 " with name: %" PRIs_SYSTEM ".\n",
 	 function, segment_number, segment_file_handle->filename );
 
 	if( libewf_segment_file_handle_open(
 	     segment_file_handle,
 	     LIBEWF_OPEN_WRITE ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );

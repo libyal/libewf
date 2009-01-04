@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 
 typedef wchar_t system_character_t;
 typedef wint_t system_integer_t;

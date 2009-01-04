@@ -32,13 +32,13 @@
  */
 
 #include <common.h>
+#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_hash_values.h"
 #include "libewf_section.h"
@@ -71,7 +71,7 @@ int libewf_segment_file_check_file_signature(
 
 		return( -1 );
 	}
-	read_count = libewf_common_read(
+	read_count = file_io_read(
 	              file_descriptor,
 	              signature,
 	              8 );

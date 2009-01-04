@@ -34,6 +34,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -73,8 +74,6 @@
 #endif
 
 #include <libewf.h>
-
-#include "../libewf/libewf_common.h"
 
 #include "../libewf/ewf_digest_hash.h"
 
@@ -598,7 +597,7 @@ ssize32_t ewfcommon_read_input(
 
 		while( read_amount_of_errors <= read_error_retry )
 		{
-			read_count = libewf_common_read(
+			read_count = file_io_read(
 			              file_descriptor,
 			              &( buffer[ buffer_offset + read_error_offset ] ),
 			              bytes_to_read );
@@ -660,7 +659,10 @@ ssize32_t ewfcommon_read_input(
 #endif
 				if( seek_on_error == 1 )
 				{
-					current_read_offset = libewf_common_lseek( file_descriptor, 0, SEEK_CUR );
+					current_read_offset = file_io_lseek(
+					                       file_descriptor,
+					                       0,
+					                       SEEK_CUR );
 
 					if( current_read_offset != current_calculated_offset )
 					{
@@ -831,7 +833,10 @@ ssize32_t ewfcommon_read_input(
 
 					break;
 				}
-				if( libewf_common_lseek( file_descriptor, error_skip_bytes, SEEK_CUR ) == -1 )
+				if( file_io_lseek(
+				     file_descriptor,
+				     error_skip_bytes,
+				     SEEK_CUR ) == -1 )
 				{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 					error_string = ewfstring_strerror( errno );
@@ -1600,7 +1605,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 				return( -1 );
 			}
-			if( libewf_common_lseek(
+			if( file_io_lseek(
 			     input_file_descriptor,
 			     write_offset,
 			     SEEK_SET ) != (off64_t) write_offset )
@@ -1959,14 +1964,20 @@ ssize64_t ewfcommon_export_raw(
 	}
 	else
 	{
-		file_descriptor = libewf_common_open(
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		file_descriptor = file_io_wopen(
 		                   target_filename,
-		                   LIBEWF_OPEN_WRITE );
+		                   FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+#else
+		file_descriptor = file_io_open(
+		                   target_filename,
+		                   FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC );
+#endif
 
 		if( file_descriptor == -1 )
 		{
-			notify_warning_printf( "%s: unable to open filename.\n",
-			 function );
+			notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
+			 function, target_filename );
 
 			return( -1 );
 		}
@@ -2175,7 +2186,7 @@ ssize64_t ewfcommon_export_raw(
 
 			return( -1 );
 		}
-		write_count = libewf_common_write(
+		write_count = file_io_write(
 		               file_descriptor,
 		               uncompressed_data,
 		               (size_t) read_count );

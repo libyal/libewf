@@ -34,6 +34,7 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
+#include <system_string.h>
 #include <types.h>
 
 #if defined( HAVE_STRING_H )
@@ -55,7 +56,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
-#include "libewf_string.h"
 #include "libewf_write.h"
 
 #include "ewf_char.h"
@@ -2696,11 +2696,11 @@ ssize_t libewf_write_finalize(
 				     segment_file_handle,
 				     LIBEWF_OPEN_READ_WRITE ) != 1 )
 				{
-					notify_warning_printf( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
+					notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
 					 function, segment_file_handle->filename );
 					return( -1 );
 				}
-				notify_verbose_printf( "%s: correcting segment file: %" PRIs_EWF_filename ".\n",
+				notify_verbose_printf( "%s: correcting segment file: %" PRIs_SYSTEM ".\n",
 				 function, segment_file_handle->filename );
 			}
 			list_entry_iterator = segment_file_handle->section_list->first;

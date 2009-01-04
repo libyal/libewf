@@ -35,10 +35,10 @@
 #define _LIBEWF_FILE_IO_POOL_H
 
 #include <common.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
 
-#include "libewf_filename.h"
 #include "libewf_file_io_handle.h"
 
 #if defined( __cplusplus )
@@ -74,7 +74,7 @@ void libewf_file_io_pool_free(
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
-     libewf_filename_t *filename,
+     system_character_t *filename,
      int flags );
 
 ssize_t libewf_file_io_pool_read(

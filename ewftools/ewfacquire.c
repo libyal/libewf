@@ -34,6 +34,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <file_io.h>
 #include <memory.h>
 #include <system_string.h>
 
@@ -422,9 +423,15 @@ int main( int argc, char * const argv[] )
 	}
 	/* Open the input file or device size
 	 */
-	file_descriptor = libewf_common_open(
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+	file_descriptor = file_io_wopen(
 	                   argv[ optind ],
-	                   LIBEWF_OPEN_READ );
+	                   FILE_IO_O_RDONLY );
+#else
+	file_descriptor = file_io_open(
+	                   argv[ optind ],
+	                   FILE_IO_O_RDONLY );
+#endif
 
 	if( file_descriptor == -1 )
 	{
@@ -901,7 +908,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
-		if( libewf_common_close(
+		if( file_io_close(
 		     file_descriptor ) != 0 )
 		{
 			fprintf( stderr, "Unable to close input.\n" );
@@ -922,7 +929,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			if( libewf_common_close(
+			if( file_io_close(
 			     file_descriptor ) != 0 )
 			{
 				fprintf( stderr, "Unable to close input.\n" );
@@ -947,7 +954,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			if( libewf_common_close(
+			if( file_io_close(
 			     file_descriptor ) != 0 )
 			{
 				fprintf( stderr, "Unable to close input.\n" );
@@ -1006,7 +1013,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* Done acquiring data
 	 */
-	if( libewf_common_close(
+	if( file_io_close(
 	     file_descriptor ) != 0 )
 	{
 		fprintf( stderr, "Unable to close input.\n" );

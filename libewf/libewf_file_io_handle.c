@@ -32,13 +32,15 @@
  */
 
 #include <common.h>
+#include <file_io.h>
 #include <notify.h>
 #include <types.h>
+#include <system_string.h>
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_file_io_handle.h"
+#include "libewf_filename.h"
 
 /* Opens a file io handle
  * Sets the filename and the file descriptor in the file io handle struct
@@ -70,7 +72,7 @@ int libewf_file_io_handle_open(
 
 	if( file_io_handle->file_descriptor == -1 )
 	{
-		notify_warning_printf( "%s: unable to open file io handle: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open file io handle: %" PRIs_SYSTEM ".\n",
 		 function, file_io_handle->filename );
 
 		return( -1 );
@@ -127,7 +129,7 @@ ssize_t libewf_file_io_handle_read(
 
 		return( -1 );
 	}
-	read_count = libewf_common_read(
+	read_count = file_io_read(
 	              file_io_handle->file_descriptor,
 	              buffer,
 	              size );
@@ -138,7 +140,7 @@ ssize_t libewf_file_io_handle_read(
 	}
 	if( read_count != (ssize_t) size )
 	{
-		notify_warning_printf( "%s: unable to read from file io handle: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to read from file io handle: %" PRIs_SYSTEM ".\n",
 		 function, file_io_handle->filename );
 	}
 	return( read_count );
@@ -191,7 +193,7 @@ ssize_t libewf_file_io_handle_write(
 
 		return( -1 );
 	}
-	write_count = libewf_common_write(
+	write_count = file_io_write(
 	               file_io_handle->file_descriptor,
 	               buffer,
 	               size );
@@ -202,7 +204,7 @@ ssize_t libewf_file_io_handle_write(
 	}
 	if( write_count != (ssize_t) size )
 	{
-		notify_warning_printf( "%s: unable to write to file io handle: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to write to file io handle: %" PRIs_SYSTEM ".\n",
 		 function, file_io_handle->filename );
 	}
 	return( write_count );
@@ -247,15 +249,15 @@ off64_t libewf_file_io_handle_seek_offset(
 	}
 	if( file_io_handle->file_offset != offset )
 	{
-		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in file io handle: %" PRIs_SYSTEM " with file descriptor: %d.\n",
 		 function, offset, file_io_handle->filename, file_io_handle->file_descriptor );
 
-		if( libewf_common_lseek(
+		if( file_io_lseek(
 		     file_io_handle->file_descriptor,
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename ".\n",
+			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in file io handle: %" PRIs_SYSTEM ".\n",
 			 function, offset, file_io_handle->filename );
 
 			return( -1 );

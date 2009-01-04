@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libcommon.la
 libcommon_la_SOURCES = \
 	character_string.c character_string.h \
 	common.h \
-	file_io.h \
+	file_io.c file_io.h \
 	memory.h \
 	notify.c notify.h \
 	system_string.c system_string.h \

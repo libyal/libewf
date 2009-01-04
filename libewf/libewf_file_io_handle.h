@@ -35,10 +35,9 @@
 #define _LIBEWF_FILE_IO_HANDLE_H
 
 #include <common.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
-
-#include "libewf_filename.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -50,7 +49,7 @@ struct libewf_file_io_handle
 {
 	/* The filename
 	 */
-	libewf_filename_t *filename;
+	system_character_t *filename;
 
 	/* The file descriptor
 	 */
@@ -65,10 +64,23 @@ struct libewf_file_io_handle
 	int flags;
 };
 
-int libewf_file_io_handle_open( libewf_file_io_handle_t *file_io_handle, uint8_t flags );
-ssize_t libewf_file_io_handle_read( libewf_file_io_handle_t *file_io_handle, void *buffer, size_t size );
-ssize_t libewf_file_io_handle_write( libewf_file_io_handle_t *file_io_handle, void *buffer, size_t size );
-off64_t libewf_file_io_handle_seek_offset( libewf_file_io_handle_t *file_io_handle, off64_t offset );
+int libewf_file_io_handle_open(
+     libewf_file_io_handle_t *file_io_handle,
+     uint8_t flags );
+
+ssize_t libewf_file_io_handle_read(
+         libewf_file_io_handle_t *file_io_handle,
+         void *buffer,
+         size_t size );
+
+ssize_t libewf_file_io_handle_write(
+         libewf_file_io_handle_t *file_io_handle,
+         void *buffer,
+         size_t size );
+
+off64_t libewf_file_io_handle_seek_offset(
+         libewf_file_io_handle_t *file_io_handle,
+         off64_t offset );
 
 #if defined( __cplusplus )
 }

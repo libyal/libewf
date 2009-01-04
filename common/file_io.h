@@ -35,6 +35,7 @@
 #define _FILE_IO_H
 
 #include "common.h"
+#include "system_string.h"
 
 #if defined( HAVE_WINDOWS_API )
 #include <io.h>
@@ -64,18 +65,18 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define FILE_IO_CREAT   _O_CREAT
-#define FILE_IO_RDONLY	_O_RDONLY
-#define FILE_IO_RDWR	_O_RDWR
-#define FILE_IO_WRONLY	_O_WRONLY
-#define FILE_IO_TRUNC   _O_TRUNC
+#define FILE_IO_O_CREAT 	_O_CREAT
+#define FILE_IO_O_RDONLY	_O_RDONLY
+#define FILE_IO_O_RDWR		_O_RDWR
+#define FILE_IO_O_WRONLY	_O_WRONLY
+#define FILE_IO_O_TRUNC   	_O_TRUNC
 
 #else
-#define FILE_IO_CREAT   O_CREAT
-#define FILE_IO_RDONLY	O_RDONLY
-#define FILE_IO_RDWR	O_RDWR
-#define FILE_IO_WRONLY	O_WRONLY
-#define FILE_IO_TRUNC   O_TRUNC
+#define FILE_IO_O_CREAT   	O_CREAT
+#define FILE_IO_O_RDONLY	O_RDONLY
+#define FILE_IO_O_RDWR		O_RDWR
+#define FILE_IO_O_WRONLY	O_WRONLY
+#define FILE_IO_O_TRUNC		O_TRUNC
 
 #endif
 
@@ -86,7 +87,7 @@ int libewf_file_io_open(
 #define file_io_open( filename, flags ) \
 	libewf_file_io_open( filename, flags )
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 int libewf_file_io_wopen(
      const wchar_t *filename,
      int flags );

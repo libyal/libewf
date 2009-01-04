@@ -33,6 +33,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -102,7 +103,7 @@ uint8_t libewf_get_flags_write(
  * Returns 1 if true, 0 if not or -1 on error
  */
 int libewf_check_file_signature(
-     const libewf_filename_t *filename )
+     const system_character_t *filename )
 {
 	static char *function = "libewf_check_file_signature";
 	int file_descriptor   = 0;
@@ -119,9 +120,9 @@ int libewf_check_file_signature(
 	                   filename,
 	                   LIBEWF_OPEN_READ );
 
-	if( file_descriptor < 0 )
+	if( file_descriptor == -1 )
 	{
-		notify_warning_printf( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
 		 function, filename );
 
 		return( -1 );
@@ -129,17 +130,17 @@ int libewf_check_file_signature(
 	result = libewf_segment_file_check_file_signature(
 	          file_descriptor );
 
-	if( libewf_common_close(
+	if( file_io_close(
 	     file_descriptor ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to close file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to close file: %" PRIs_SYSTEM ".\n",
 		 function, filename );
 
 		return( -1 );
 	}
 	if( result <= -1 )
 	{
-		notify_warning_printf( "%s: unable to read signature from file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to read signature from file: %" PRIs_SYSTEM ".\n",
 		 function, filename );
 
 		return( -1 );
@@ -153,12 +154,12 @@ int libewf_check_file_signature(
  * Returns the amount of filenames if successful or -1 on error
  */
 int libewf_glob(
-     const libewf_filename_t *filename,
+     const system_character_t *filename,
      size_t length,
      uint8_t format,
-     libewf_filename_t **filenames[] )
+     system_character_t **filenames[] )
 {
-	libewf_filename_t *segment_filename = NULL;
+	system_character_t *segment_filename = NULL;
 	void *reallocation                  = NULL;
 	static char *function               = "libewf_glob";
 	size_t additional_length            = 4;
@@ -207,7 +208,7 @@ int libewf_glob(
 	}
 	if( format == LIBEWF_FORMAT_UNKNOWN )
 	{
-		if( filename[ length - 4 ] != (libewf_filename_t) '.' )
+		if( filename[ length - 4 ] != (system_character_t) '.' )
 		{
 			notify_warning_printf( "%s: invalid filename - missing extension.\n",
 			 function );
@@ -216,19 +217,19 @@ int libewf_glob(
 		}
 		additional_length = 0;
 
-		if( filename[ length - 3 ] != (libewf_filename_t) 'E' )
+		if( filename[ length - 3 ] != (system_character_t) 'E' )
 		{
 			format = LIBEWF_FORMAT_ENCASE5;
 		}
-		else if( filename[ length - 3 ] != (libewf_filename_t) 'e' )
+		else if( filename[ length - 3 ] != (system_character_t) 'e' )
 		{
 			format = LIBEWF_FORMAT_EWF;
 		}
-		else if( filename[ length - 3 ] != (libewf_filename_t) 'L' )
+		else if( filename[ length - 3 ] != (system_character_t) 'L' )
 		{
 			format = LIBEWF_FORMAT_LVF;
 		}
-		else if( filename[ length - 3 ] != (libewf_filename_t) 's' )
+		else if( filename[ length - 3 ] != (system_character_t) 's' )
 		{
 			format = LIBEWF_FORMAT_SMART;
 		}
@@ -258,7 +259,7 @@ int libewf_glob(
 	while( amount_of_files < (int) UINT16_MAX )
 	{
 		segment_filename = memory_allocate(
-			            sizeof( libewf_filename_t ) * ( length + additional_length + 1 ) );
+			            sizeof( system_character_t ) * ( length + additional_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -302,8 +303,8 @@ int libewf_glob(
 		}
 		segment_filename[ length + additional_length ] = (character_t) '\0';
 
-		file_descriptor = libewf_common_open(
-		                   segment_filename,
+		file_descriptor = libewf_filename_open(
+		                   filename,
 		                   LIBEWF_OPEN_READ );
 
 		if( file_descriptor == -1 )
@@ -315,12 +316,12 @@ int libewf_glob(
 		}
 		amount_of_files++;
 
-		libewf_common_close(
+		file_io_close(
 		 file_descriptor );
 
 		reallocation = memory_reallocate(
 		                *filenames,
-		                sizeof( libewf_filename_t * ) * amount_of_files );
+		                sizeof( system_character_t * ) * amount_of_files );
 
 		if( reallocation == NULL )
 		{
@@ -332,7 +333,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		*filenames = (libewf_filename_t **) reallocation;
+		*filenames = (system_character_t **) reallocation;
 
 		( *filenames )[ amount_of_files - 1 ] = segment_filename;
 	}
@@ -365,7 +366,7 @@ int libewf_signal_abort(
  * Returns a pointer to the new instance of handle, NULL on error
  */
 LIBEWF_HANDLE *libewf_open(
-                libewf_filename_t * const filenames[],
+                system_character_t * const filenames[],
                 uint16_t amount_of_files,
                 uint8_t flags )
 {
@@ -395,7 +396,8 @@ LIBEWF_HANDLE *libewf_open(
 
 		return( NULL );
 	}
-	internal_handle = libewf_internal_handle_alloc( flags );
+	internal_handle = libewf_internal_handle_alloc(
+	                   flags );
 
 	if( internal_handle == NULL )
 	{
@@ -1220,7 +1222,7 @@ int libewf_get_md5_hash(
  */
 int libewf_get_delta_segment_filename(
      LIBEWF_HANDLE *handle,
-     libewf_filename_t *filename,
+     system_character_t *filename,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2319,7 +2321,7 @@ int libewf_set_md5_hash(
  */
 int libewf_set_delta_segment_filename(
      LIBEWF_HANDLE *handle,
-     libewf_filename_t *filename,
+     system_character_t *filename,
      size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;

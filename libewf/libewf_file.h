@@ -36,6 +36,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <system_string.h>
 
 #include <stdio.h>
 
@@ -49,7 +50,6 @@
 #include <libewf/extern.h>
 #include <libewf/handle.h>
 
-#include "libewf_filename.h"
 #include "libewf_internal_handle.h"
 
 #if defined( __cplusplus )
@@ -69,19 +69,19 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_write(
                        void );
 
 LIBEWF_EXTERN int libewf_check_file_signature(
-                   const libewf_filename_t *filename );
+                   const system_character_t *filename );
 
 LIBEWF_EXTERN int libewf_glob(
-                   const libewf_filename_t *filename,
+                   const system_character_t *filename,
                    size_t length,
                    uint8_t format,
-                   libewf_filename_t **filenames[] );
+                   system_character_t **filenames[] );
 
 LIBEWF_EXTERN int libewf_signal_abort(
                    LIBEWF_HANDLE *handle );
 
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
-                              libewf_filename_t * const filenames[],
+                              system_character_t * const filenames[],
                               uint16_t amount_of_files,
                               uint8_t flags );
 
@@ -148,7 +148,7 @@ LIBEWF_EXTERN int libewf_get_md5_hash(
 
 LIBEWF_EXTERN int libewf_get_delta_segment_filename(
                    LIBEWF_HANDLE *handle,
-                   libewf_filename_t *filename,
+                   system_character_t *filename,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
@@ -270,7 +270,7 @@ LIBEWF_EXTERN int libewf_set_md5_hash(
 
 LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    LIBEWF_HANDLE *handle,
-                   libewf_filename_t *filename,
+                   system_character_t *filename,
                    size_t length );
 
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(

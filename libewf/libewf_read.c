@@ -33,6 +33,7 @@
 
 #include <common.h>
 #include <notify.h>
+#include <system_string.h>
 #include <types.h>
 
 #include <libewf/definitions.h>
@@ -356,7 +357,7 @@ ssize_t libewf_raw_read_chunk(
 
 		if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
-			notify_warning_printf( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
+			notify_warning_printf( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_SYSTEM ").\n",
 			 function, chunk, segment_number, segment_file_handle->filename );
 
 			return( -1 );

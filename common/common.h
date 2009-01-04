@@ -42,5 +42,13 @@
 #include <config_windows.h>
 #endif
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#define HAVE_WIDE_CHARACTER_T 1
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#define HAVE_WIDE_SYSTEM_CHARACTER_T 1
+#endif
+
 #endif
 

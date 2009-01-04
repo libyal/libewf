@@ -34,12 +34,11 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
+#include <system_string.h>
 
 #include <libewf/definitions.h>
 
-#include "libewf_common.h"
 #include "libewf_file_io_pool.h"
-#include "libewf_string.h"
 
 /* Allocates memory for a file io pool struct
  * Returns a pointer to the new instance, NULL on error
@@ -168,7 +167,7 @@ void libewf_file_io_pool_free(
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
-     libewf_filename_t *filename,
+     system_character_t *filename,
      int flags );
 
 ssize_t libewf_file_io_pool_read(

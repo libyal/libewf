@@ -75,7 +75,7 @@ int libewf_file_io_open(
 	return( file_descriptor );
 }
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 
 /* Function to wrap wopen() which is the wide character equivalent of open()
  */

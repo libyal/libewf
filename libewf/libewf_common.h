@@ -94,56 +94,6 @@ extern "C" {
 
 #endif
 
-int libewf_common_open(
-     const char *filename,
-     uint8_t flags );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_common_wide_open(
-     const wchar_t *filename,
-     uint8_t flags );
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_read( file_descriptor, buffer, size ) \
-	_read( file_descriptor, (void *) buffer, (unsigned int) size )
-#else
-
-#define libewf_common_read( file_descriptor, buffer, size ) \
-	read( file_descriptor, (void *) buffer, size )
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_lseek( file_descriptor, offset, whence ) \
-	_lseeki64( file_descriptor, offset, whence )
-#else
-
-#define libewf_common_lseek( file_descriptor, offset, whence ) \
-	lseek( file_descriptor, offset, whence ) 
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_write( file_descriptor, buffer, size ) \
-	_write( file_descriptor, (const void *) buffer, (unsigned int) size )
-#else
-
-#define libewf_common_write( file_descriptor, buffer, size ) \
-	write( file_descriptor, (const void *) buffer, size )
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-
-#define libewf_common_close( file_descriptor ) \
-	_close( file_descriptor )
-#else
-
-#define libewf_common_close( file_descriptor ) \
-	close( file_descriptor )
-#endif
-
 int libewf_common_test_empty_block(
      uint8_t *block_buffer,
      size_t size );

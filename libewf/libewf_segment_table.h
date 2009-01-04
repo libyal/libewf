@@ -35,10 +35,10 @@
 #define _LIBEWF_SEGMENT_TABLE_H
 
 #include <common.h>
+#include <system_string.h>
 
 #include <libewf/types.h>
 
-#include "libewf_filename.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_media_values.h"
@@ -93,7 +93,7 @@ int libewf_segment_table_build(
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
      libewf_segment_table_t *delta_segment_table,
-     libewf_filename_t * const filenames[],
+     system_character_t * const filenames[],
      uint16_t file_amount,
      uint8_t flags,
      libewf_header_sections_t *header_sections,
@@ -112,7 +112,7 @@ int libewf_segment_table_read_open(
 
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
-     libewf_filename_t * const filenames[],
+     system_character_t * const filenames[],
      uint16_t file_amount );
 
 int libewf_segment_table_close_all(

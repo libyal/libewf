@@ -32,13 +32,14 @@
  */
 
 #include <common.h>
+#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
+#include <system_string.h>
 
-#include "libewf_common.h"
+#include "libewf_filename.h"
 #include "libewf_segment_file_handle.h"
-#include "libewf_string.h"
 
 /* Allocates memory for a segment file handle struct
  * Returns a pointer to the new instance, NULL on error
@@ -129,7 +130,7 @@ void libewf_segment_file_handle_free(
  */
 int libewf_segment_file_handle_get_filename(
      libewf_segment_file_handle_t *segment_file_handle,
-     libewf_filename_t *filename,
+     system_character_t *filename,
      size_t length_filename )
 {
 	static char *function  = "libewf_segment_file_handle_get_filename";
@@ -169,7 +170,7 @@ int libewf_segment_file_handle_get_filename(
 
 		return( -1 );
 	}
-	if( libewf_filename_copy(
+	if( system_string_copy(
 	     filename,
 	     segment_file_handle->filename,
 	     filename_length ) == NULL )
@@ -188,7 +189,7 @@ int libewf_segment_file_handle_get_filename(
  */
 int libewf_segment_file_handle_set_filename(
      libewf_segment_file_handle_t *segment_file_handle,
-     const libewf_filename_t *filename,
+     const system_character_t *filename,
      size_t length_filename )
 {
 	static char *function = "libewf_segment_file_handle_set_filename";
@@ -209,7 +210,7 @@ int libewf_segment_file_handle_set_filename(
 	}
 	if( segment_file_handle->filename != NULL )
 	{
-		notify_warning_printf( "%s: filename already set: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: filename already set: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
@@ -230,8 +231,8 @@ int libewf_segment_file_handle_set_filename(
 	}
 	/* One additional byte for the end of string character is needed
 	 */
-	segment_file_handle->filename = (libewf_filename_t *) memory_allocate(
-	                                                       sizeof( libewf_filename_t ) * ( length_filename + 1 ) );
+	segment_file_handle->filename = (system_character_t *) memory_allocate(
+	                                                        sizeof( system_character_t ) * ( length_filename + 1 ) );
 
 	if( segment_file_handle->filename == NULL )
 	{
@@ -240,7 +241,7 @@ int libewf_segment_file_handle_set_filename(
 
 		return( -1 );
 	}
-	if( libewf_filename_copy(
+	if( system_string_copy(
 	     segment_file_handle->filename,
 	     filename,
 	     length_filename ) == NULL )
@@ -293,7 +294,7 @@ int libewf_segment_file_handle_open(
 
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		notify_warning_printf( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
@@ -324,9 +325,10 @@ int libewf_segment_file_handle_reopen(
 
 		return( -1 );
 	}
-	if( libewf_common_close( segment_file_handle->file_descriptor ) != 0 )
+	if( file_io_close(
+	     segment_file_handle->file_descriptor ) != 0 )
 	{
-		notify_verbose_printf( "%s: unable to close segment file: %" PRIs_EWF_filename ".\n",
+		notify_verbose_printf( "%s: unable to close segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 	}
 	segment_file_handle->file_descriptor = libewf_filename_open(
@@ -335,19 +337,19 @@ int libewf_segment_file_handle_reopen(
 
 	if( segment_file_handle->file_descriptor == -1 )
 	{
-		notify_warning_printf( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
 	}
 	/* Seek the previous file offset
 	 */
-	if( libewf_common_lseek(
+	if( file_io_lseek(
 	     segment_file_handle->file_descriptor,
 	     segment_file_handle->file_offset,
 	     SEEK_CUR ) == -1 )
 	{
-		notify_warning_printf( "%s: unable to seek in file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to seek in file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
@@ -402,7 +404,7 @@ ssize_t libewf_segment_file_handle_read(
 
 		return( -1 );
 	}
-	read_count = libewf_common_read(
+	read_count = file_io_read(
 	              segment_file_handle->file_descriptor,
 	              buffer,
 	              size );
@@ -413,7 +415,7 @@ ssize_t libewf_segment_file_handle_read(
 	}
 	if( read_count != (ssize_t) size )
 	{
-		notify_warning_printf( "%s: unable to read from segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to read from segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 	}
 	return( read_count );
@@ -466,7 +468,7 @@ ssize_t libewf_segment_file_handle_write(
 
 		return( -1 );
 	}
-	write_count = libewf_common_write(
+	write_count = file_io_write(
 	               segment_file_handle->file_descriptor,
 	               buffer,
 	               size );
@@ -477,7 +479,7 @@ ssize_t libewf_segment_file_handle_write(
 	}
 	if( write_count != (ssize_t) size )
 	{
-		notify_warning_printf( "%s: unable to write to segment file: %" PRIs_EWF_filename ".\n",
+		notify_warning_printf( "%s: unable to write to segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 	}
 	return( write_count );
@@ -522,15 +524,15 @@ off64_t libewf_segment_file_handle_seek_offset(
 	}
 	if( segment_file_handle->file_offset != offset )
 	{
-		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in segment file: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		notify_verbose_printf( "%s: seeking offset: %" PRIjd " in segment file: %" PRIs_SYSTEM " with file descriptor: %d.\n",
 		 function, offset, segment_file_handle->filename, segment_file_handle->file_descriptor );
 
-		if( libewf_common_lseek(
+		if( file_io_lseek(
 		     segment_file_handle->file_descriptor,
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in segment file: %" PRIs_EWF_filename ".\n",
+			notify_warning_printf( "%s: unable to find offset: %" PRIjd " in segment file: %" PRIs_SYSTEM ".\n",
 			 function, offset, segment_file_handle->filename );
 
 			return( -1 );
@@ -562,7 +564,8 @@ int libewf_segment_file_handle_close(
 
 		return( -1 );
 	}
-	if( libewf_common_close( segment_file_handle->file_descriptor ) != 0 )
+	if( file_io_close(
+	     segment_file_handle->file_descriptor ) != 0 )
 	{
 		notify_warning_printf( "%s: unable to close segment file handle.\n",
 		 function );
