@@ -1102,7 +1102,7 @@ int main( int argc, char * const argv[] )
 		 ewfcommon_libewf_handle,
 		 &amount_of_acquiry_errors );
 
-		if( log_file_stream == NULL )
+		if( log_file_stream != NULL )
 		{
 			ewfoutput_acquiry_errors_fprint(
 			 log_file_stream,

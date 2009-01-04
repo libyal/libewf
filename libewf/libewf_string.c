@@ -992,7 +992,7 @@ int libewf_string_ctime(
 
 		return( -1 );
 	}
-	if( ctime_string != NULL )
+	if( *ctime_string != NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: ctime string already created.\n",
 		 function );

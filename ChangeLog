@@ -172,6 +172,7 @@ CLOSED
 
 Version: 20080305
 * worked on signal handling
+* fixed issues with date string in header
 
 Version: 20080304
 * worked on signal handling

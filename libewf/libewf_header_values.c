@@ -1461,8 +1461,8 @@ int libewf_header_values_generate_header_string_type1(
 	libewf_char_t *examiner_name    = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number  = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes            = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date      = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date     = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date      = NULL;
+	libewf_char_t *acquiry_date     = NULL;
 	libewf_char_t *password_hash    = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *compression_type = _S_LIBEWF_CHAR( "" );
 	static char *function           = "libewf_header_values_generate_header_string_type1";
@@ -1762,8 +1762,8 @@ int libewf_header_values_generate_header_string_type2(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = NULL;
+	libewf_char_t *acquiry_date             = NULL;
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
@@ -2082,8 +2082,8 @@ int libewf_header_values_generate_header_string_type3(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = NULL;
+	libewf_char_t *acquiry_date             = NULL;
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
@@ -2366,8 +2366,8 @@ int libewf_header_values_generate_header_string_type4(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = NULL;
+	libewf_char_t *acquiry_date             = NULL;
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
@@ -2646,8 +2646,8 @@ int libewf_header_values_generate_header_string_type5(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = NULL;
+	libewf_char_t *acquiry_date             = NULL;
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
@@ -2946,8 +2946,8 @@ int libewf_header_values_generate_header_string_type6(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = NULL;
+	libewf_char_t *acquiry_date             = NULL;
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
@@ -3266,8 +3266,8 @@ int libewf_header_values_generate_header_string_type7(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
-	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = NULL;
+	libewf_char_t *acquiry_date             = NULL;
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
