@@ -368,13 +368,13 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 			{
 				/* The last read is OK, correct read_count
 				 */
-				if( read_count == (int32_t) bytes_to_read )
+				if( read_count == (ssize_t) bytes_to_read )
 				{
 					read_count = read_error_offset + bytes_to_read;
 				}
 				/* The entire read is OK
 				 */
-				if( read_count == (int32_t) read_size )
+				if( read_count == (ssize_t) read_size )
 				{
 					break;
 				}
@@ -386,14 +386,14 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 					 */
 					if( read_count > 0 )
 					{
-						return( (int32_t) ( buffer_offset + read_count ) );
+						return( (ssize32_t) ( buffer_offset + read_count ) );
 					}
 				}
 				else
 				{
 					/* Check if the end of the input was reached
 					 */
-					if( ( total_read_count + buffer_offset + read_count ) >= (int64_t) total_input_size )
+					if( ( total_read_count + buffer_offset + read_count ) >= (ssize64_t) total_input_size )
 					{
 						break;
 					}
@@ -535,7 +535,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 					read_error_offset     += error_skip_bytes;
 					read_amount_of_errors  = 0;
 
-					LIBEWF_VERBOSE_PRINT( "%s: remaining to read from chunk %" PRIu32 " bytes.\n",
+					LIBEWF_VERBOSE_PRINT( "%s: remaining to read from chunk %zd bytes.\n",
 					 function, bytes_to_read );
 				}
 				else
