@@ -113,6 +113,11 @@ TODO
   write raw only checks for the raw access mode like prepare function
 * remove raw access value in handle and RAW flag
 * ewfacquire check if last segment file is closed before telling acquiry was completed
+* check if segment table entry 0 is used in read mode make sure to use consistent
+  usage of the segment table for read/write
+
+Version: 20070725
+* worked on restructuring to improve internal structure
 
 Version: 20070723
 * worked on allowing to read raw buffers as chunks
