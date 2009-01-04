@@ -293,7 +293,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
 	if( segment_file->filename == NULL )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - missing filename.\n",
@@ -301,7 +300,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-#endif
 	/* Make sure the segment file offset is in the right place
 	 */
 	if( libewf_segment_file_seek_offset(
@@ -365,8 +363,9 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	{
 		chunk_type = "COMPRESSED";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s.\n",
-	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
+	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %zd.\n",
+	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type,
+	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
 	return( chunk_read_count + crc_read_count );
 }

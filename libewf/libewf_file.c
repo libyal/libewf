@@ -2092,6 +2092,8 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 	LIBEWF_INTERNAL_HANDLE *internal_handle    = NULL;
 	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
 	static char *function                      = "libewf_add_acquiry_error";
+	off64_t last_sector                        = 0;
+	off64_t last_range_sector                  = 0;
 	uint32_t iterator                          = 0;
 
 	if( handle == NULL )
@@ -2127,8 +2129,18 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 		 */
 		for( iterator = 0; iterator < internal_handle->amount_of_acquiry_errors; iterator++ )
 		{
-			if( internal_handle->acquiry_error_sectors[ iterator ].sector == sector )
+			last_range_sector = internal_handle->acquiry_error_sectors[ iterator ].sector
+			                  + internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors;
+
+			if( ( sector >= internal_handle->acquiry_error_sectors[ iterator ].sector )
+			 && ( sector <= last_range_sector ) )
 			{
+				last_sector = sector + amount_of_sectors;
+
+				if( last_sector > last_range_sector )
+				{
+					internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors += last_sector - last_range_sector;
+				}
 				return( 1 );
 			}
 		}
@@ -2161,6 +2173,8 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	LIBEWF_ERROR_SECTOR *crc_error_sectors  = NULL;
 	static char *function                   = "libewf_add_crc_error";
+	off64_t last_sector                     = 0;
+	off64_t last_range_sector               = 0;
 	uint32_t iterator                       = 0;
 
 	if( handle == NULL )
@@ -2196,8 +2210,18 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 		 */
 		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
 		{
-			if( internal_handle->read->crc_error_sectors[ iterator ].sector == sector )
+			last_range_sector = internal_handle->read->crc_error_sectors[ iterator ].sector
+			                  + internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors;
+
+			if( ( sector >= internal_handle->read->crc_error_sectors[ iterator ].sector )
+			 && ( sector <= last_range_sector ) )
 			{
+				last_sector = sector + amount_of_sectors;
+
+				if( last_sector > last_range_sector )
+				{
+					internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors += last_sector - last_range_sector;
+				}
 				return( 1 );
 			}
 		}
