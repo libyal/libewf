@@ -1764,21 +1764,24 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	                      table,
 	                      EWF_TABLE_SIZE );
 
-	table_offsets_write_count = libewf_common_write(
-	                             file_descriptor,
-	                             offsets,
-	                             offsets_size );
-
 	libewf_common_free( table );
-	libewf_common_free( offsets );
 
 	if( table_write_count != (ssize_t) EWF_TABLE_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write table to file.\n",
 		 function );
 
+		libewf_common_free( offsets );
+
 		return( -1 );
 	}
+	table_offsets_write_count = libewf_common_write(
+	                             file_descriptor,
+	                             offsets,
+	                             offsets_size );
+
+	libewf_common_free( offsets );
+
 	if( table_offsets_write_count != (ssize_t) offsets_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write table offsets to file.\n",
@@ -1801,7 +1804,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		}
 	}
 	return( section_write_count + table_write_count
-	        + table_offsets_write_count + table_offsets_crc_write_count );
+	 + table_offsets_write_count + table_offsets_crc_write_count );
 }
 
 /* Reads a table2 section from file
@@ -1989,7 +1992,7 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	libewf_common_free( ltree );
 
-	tree_data = ewf_tree_data_read( file_descriptor, ( size - EWF_LTREE_SIZE ) );
+	tree_data = ewf_string_read( file_descriptor, ( size - EWF_LTREE_SIZE ) );
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, tree_data, size ); );
 
@@ -2546,6 +2549,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	static char *function             = "libewf_section_error2_read";
 	EWF_CRC calculated_crc            = 0;
 	EWF_CRC stored_crc                = 0;
+	ssize_t read_count                = 0;
+	size_t sectors_size               = 0;
 	uint32_t amount_of_errors         = 0;
 	uint32_t iterator                 = 0;
 	uint32_t sector                   = 0;
@@ -2553,6 +2558,13 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
@@ -2576,7 +2588,9 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-	if( ewf_error2_read( error2, file_descriptor ) <= -1 )
+	read_count = libewf_common_read( file_descriptor, error2, EWF_ERROR2_SIZE );
+	
+	if( read_count != (ssize_t) EWF_ERROR2_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read error2.\n",
 		 function );
@@ -2585,9 +2599,11 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
+	sectors_size = EWF_ERROR2_SECTOR_SIZE * amount_of_errors;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( error2->unknown, 200 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, ( EWF_ERROR2_SECTOR_SIZE * amount_of_errors ) ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
 #endif
 
 	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
@@ -2641,7 +2657,7 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	else
 	{
-		error2_sectors = (EWF_ERROR2_SECTOR *) libewf_common_alloc( EWF_ERROR2_SECTOR_SIZE * amount_of_errors );
+		error2_sectors = (EWF_ERROR2_SECTOR *) libewf_common_alloc( sectors_size );
 
 		if( error2_sectors == NULL )
 		{
@@ -2650,7 +2666,9 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 			return( -1 );
 		}
-		if( ewf_error2_sectors_read( error2_sectors, file_descriptor, amount_of_errors ) <= -1 )
+		read_count = libewf_common_read( file_descriptor, error2_sectors, sectors_size );
+	
+		if( read_count != (ssize_t) sectors_size )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read error2 sectors.\n",
 			 function );
@@ -2659,10 +2677,7 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 			return( -1 );
 		}
-		if( ewf_crc_calculate(
-		     &calculated_crc,
-		     (uint8_t *) error2_sectors,
-		     ( EWF_ERROR2_SECTOR_SIZE * amount_of_errors ), 1 ) != 1 )
+		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2_sectors, sectors_size, 1 ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
 			 function );
@@ -2747,18 +2762,28 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
  */
 ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors )
 {
-	EWF_ERROR2 *error2                 = NULL;
-	EWF_ERROR2_SECTOR *error2_sectors  = NULL;
-	static char *function              = "libewf_section_error2_write";
-	ssize_t section_write_count        = 0;
-	ssize_t error2_write_count         = 0;
-	ssize_t error2_sectors_write_count = 0;
-	size_t size                        = 0;
-	uint32_t iterator                  = 0;
+	EWF_ERROR2 *error2                     = NULL;
+	EWF_ERROR2_SECTOR *error2_sectors      = NULL;
+	static char *function                  = "libewf_section_error2_write";
+	EWF_CRC calculated_crc                 = 0;
+	ssize_t section_write_count            = 0;
+	ssize_t error2_write_count             = 0;
+	ssize_t error2_sectors_write_count     = 0;
+	ssize_t error2_sectors_crc_write_count = 0;
+	size_t size                            = 0;
+	size_t sectors_size                    = 0;
+	uint32_t iterator                      = 0;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
@@ -2770,8 +2795,9 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	size   = EWF_ERROR2_SIZE + ( EWF_ERROR2_SECTOR_SIZE * amount_of_errors ) + EWF_CRC_SIZE;
-	error2 = (EWF_ERROR2 *) libewf_common_alloc( EWF_ERROR2_SIZE );
+	sectors_size = EWF_ERROR2_SECTOR_SIZE * amount_of_errors;
+	size         = EWF_ERROR2_SIZE + sectors_size + EWF_CRC_SIZE;
+	error2       = (EWF_ERROR2 *) libewf_common_alloc( EWF_ERROR2_SIZE );
 
 	if( error2 == NULL )
 	{
@@ -2798,7 +2824,25 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	error2_sectors = (EWF_ERROR2_SECTOR *) libewf_common_alloc( EWF_ERROR2_SECTOR_SIZE * amount_of_errors );
+	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
+
+		libewf_common_free( error2 );
+
+		return( -1 );
+	}
+	if( libewf_endian_revert_32bit( calculated_crc, error2->crc ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
+
+		libewf_common_free( error2 );
+
+		return( -1 );
+	}
+	error2_sectors = (EWF_ERROR2_SECTOR *) libewf_common_alloc( sectors_size );
 
 	if( error2_sectors == NULL )
 	{
@@ -2836,6 +2880,16 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 			return( -1 );
 		}
 	}
+	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2_sectors, sectors_size, 1 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
+
+		libewf_common_free( error2 );
+		libewf_common_free( error2_sectors );
+
+		return( -1 );
+	}
 	section_write_count = libewf_section_start_write(
 	                       file_descriptor,
 	                       (EWF_CHAR *) "error2",
@@ -2853,19 +2907,29 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	error2_write_count         = ewf_error2_write( error2, file_descriptor );
-	error2_sectors_write_count = ewf_error2_sectors_write( error2_sectors, file_descriptor, amount_of_errors );
+	error2_write_count = libewf_common_write(
+	                      file_descriptor,
+	                      error2,
+	                      EWF_ERROR2_SIZE );
 
 	libewf_common_free( error2 );
-	libewf_common_free( error2_sectors );
 
 	if( error2_write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write error2 to file.\n",
 		 function );
 
+		libewf_common_free( error2_sectors );
+
 		return( -1 );
 	}
+	error2_sectors_write_count = libewf_common_write(
+	                              file_descriptor,
+	                              error2_sectors,
+	                              sectors_size );
+
+	libewf_common_free( error2_sectors );
+
 	if( error2_sectors_write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write error2 sectors to file.\n",
@@ -2873,7 +2937,19 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	return( section_write_count + error2_write_count + error2_sectors_write_count );
+	error2_sectors_crc_write_count = ewf_crc_write(
+	       	                          &calculated_crc,
+	                                  file_descriptor );
+
+	if( error2_sectors_crc_write_count != (ssize_t) EWF_CRC_SIZE )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write error2 sectors CRC to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( section_write_count + error2_write_count
+	 + error2_sectors_write_count + error2_sectors_crc_write_count );
 }
 
 /* Reads a hash section from file

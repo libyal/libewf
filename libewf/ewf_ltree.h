@@ -80,12 +80,6 @@ struct ewf_ltree
 	uint8_t unknown4[ 20 ];
 };
 
-ssize_t ewf_ltree_read( EWF_LTREE *ltree, int file_descriptor );
-ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor );
-
-#define ewf_tree_data_read( file_descriptor, length ) \
-	ewf_string_read( file_descriptor, length )
-
 #if defined( __cplusplus )
 }
 #endif

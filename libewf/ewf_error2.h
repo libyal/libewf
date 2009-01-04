@@ -90,11 +90,6 @@ struct ewf_error2_sector
 	uint8_t amount_of_sectors[ 4 ];
 };
 
-ssize_t ewf_error2_read( EWF_ERROR2 *error2, int file_descriptor );
-ssize_t ewf_error2_sectors_read( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount );
-ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor );
-ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount );
-
 #if defined( __cplusplus )
 }
 #endif
