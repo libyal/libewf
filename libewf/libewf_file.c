@@ -1290,7 +1290,6 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filen
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_set_delta_segment_filename";
-	size_t filename_length                  = 0;
 
 	if( handle == NULL )
 	{
@@ -1340,21 +1339,11 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filen
 	{
 		libewf_common_free( internal_handle->delta_segment_table->filename[ 0 ] );
 	}
-	internal_handle->delta_segment_table->filename[ 0 ] = libewf_common_alloc( LIBEWF_CHAR_SIZE * length );
+	internal_handle->delta_segment_table->filename[ 0 ] = libewf_string_duplicate( filename, length );
 
 	if( internal_handle->delta_segment_table->filename[ 0 ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create delta segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_string_copy(
-	     internal_handle->delta_segment_table->filename[ 0 ],
-	     filename,
-	     length ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set delta segment filename.\n",
 		 function );
 
 		return( -1 );

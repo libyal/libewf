@@ -1551,7 +1551,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			total_write_count += write_count;
 		}
 	}
-	internal_handle->segment_table->file_offset[ segment_number ] += total_write_count;
+	segment_table->file_offset[ segment_number ] += total_write_count;
 
 	return( total_write_count );
 }

@@ -1390,6 +1390,20 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
+	if( internal_handle->delta_segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing section lists.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_handle->offset_table == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
@@ -1536,36 +1550,66 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		{
 			result = 0;
 		}
-		/* Check if chunk fits in exisiting delta segment file
-		 */
-		else if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
-		    + (off64_t) chunk_data_size + (off64_t) EWF_CRC_SIZE ) > (off64_t) internal_handle->write->segment_file_size )
+		else
 		{
-			result = 0;
-
-			/* Make sure to write a next section in the the previous delta segment file
+			/* Make sure the current file offset points to the start of the last section
 			 */
-			write_count = libewf_segment_file_write_last_section(
-				       internal_handle,
-				       internal_handle->delta_segment_table->file_descriptor[ segment_number ],
-				       internal_handle->delta_segment_table->section_list[ segment_number ],
-				       internal_handle->delta_segment_table->file_offset[ segment_number ],
-				       0 );
-
-			if( write_count == -1 )
+			if( internal_handle->delta_segment_table->section_list[ segment_number ]->last == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+				LIBEWF_VERBOSE_PRINT( "%s: missing last section.\n",
 				 function );
 
 				return( -1 );
 			}
-			internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
-		}
-		/* Check if a delta segment already exists
-		 */
-		else
-		{
-			result = libewf_segment_file_exists( internal_handle->segment_table, segment_number );
+			if( internal_handle->delta_segment_table->file_offset[ segment_number ] !=
+			     internal_handle->delta_segment_table->section_list[ segment_number ]->last->start_offset )
+			{
+				if( libewf_common_lseek(
+				     internal_handle->delta_segment_table->file_descriptor[ segment_number ],
+				     internal_handle->delta_segment_table->section_list[ segment_number ]->last->start_offset,
+				     SEEK_SET ) == -1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
+					 function, internal_handle->delta_segment_table->section_list[ segment_number ]->last->start_offset );
+
+					return( -1 );
+				}
+				internal_handle->delta_segment_table->file_offset[ segment_number ] =
+				 internal_handle->delta_segment_table->section_list[ segment_number ]->last->start_offset;
+			}
+
+			/* Check if chunk fits in exisiting delta segment file
+			 */
+			if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
+			    + (off64_t) chunk_data_size + (off64_t) EWF_CRC_SIZE + (off64_t) EWF_SECTION_SIZE )
+			    > (off64_t) internal_handle->write->segment_file_size )
+			{
+				result = 0;
+
+				/* Make sure to write a next section in the the previous delta segment file
+				 */
+				write_count = libewf_segment_file_write_last_section(
+					       internal_handle,
+					       internal_handle->delta_segment_table->file_descriptor[ segment_number ],
+					       internal_handle->delta_segment_table->section_list[ segment_number ],
+					       internal_handle->delta_segment_table->file_offset[ segment_number ],
+					       0 );
+
+				if( write_count == -1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+					 function );
+
+					return( -1 );
+				}
+				internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
+			}
+			/* Check if a delta segment already exists
+			 */
+			else
+			{
+				result = libewf_segment_file_exists( internal_handle->segment_table, segment_number );
+			}
 		}
 
 		if( result == -1 )
@@ -1635,6 +1679,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 			return( -1 );
 		}
 	}
+
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_segment_file_write_delta_chunk(
@@ -1652,6 +1697,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
+
 	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
 	{
 		/* Write the last section

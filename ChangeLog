@@ -141,6 +141,10 @@ TODO
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
 
+* fix rogue next sections in delta segment file section list
+* fix write finalize after ewfalter
+* fix error in 2 concessive writes to delta file
+
 * change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
@@ -156,6 +160,8 @@ CLOSED
 
 Version: 20070910
 * worked to allow to set the delta file path
+* fixed error in delta file header offset handing
+* worked on error regarding delta file end
 
 Version: 20070908
 * worked on remove of MD5 calculation from library

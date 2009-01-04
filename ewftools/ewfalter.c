@@ -256,7 +256,9 @@ int main( int argc, char * const argv[] )
 	fprintf( stderr, "\n" );
 
 	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
+/*
 	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
+*/
 
 	libewf_common_free( buffer );
 
