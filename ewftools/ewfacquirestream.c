@@ -149,8 +149,8 @@ int main( int argc, char * const argv[] )
 	size_t string_length                     = 0;
 	time_t timestamp_start                   = 0;
 	time_t timestamp_end                     = 0;
-	int64_t segment_file_size                = ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 );
 	int64_t write_count                      = 0;
+	uint64_t segment_file_size               = ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 );
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;
 	uint64_t sectors_per_chunk               = 64;
@@ -307,10 +307,22 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'S':
-				string_length     = CHAR_T_LENGTH( optarg );
-				end_of_string     = &optarg[ string_length - 1 ];
-				segment_file_size = CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+				string_length      = CHAR_T_LENGTH( optarg );
+				end_of_string      = &optarg[ string_length - 1 ];
+				segment_file_size  = (uint64_t) CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+				segment_file_size *= 1024;
 
+				if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
+				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+				{
+					fprintf( stderr, "Unsupported segment file size defaulting to %" PRIu32 ".\n",
+					 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+
+					segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+				}
 				break;
 
 			case (INT_T) 't':
@@ -336,19 +348,6 @@ int main( int argc, char * const argv[] )
 	}
 	libewf_set_notify_values( stderr, verbose );
 
-	segment_file_size *= 1024;
-
-	if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-	 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-	  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-	 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
-	  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-	{
-		fprintf( stderr, "Unsupported segment file size defaulting to %" PRIu32 ".\n",
-		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
-
-		segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-	}
 	if( option_case_number != NULL )
 	{
 		string_length = CHAR_T_LENGTH( option_case_number );
