@@ -1,4 +1,4 @@
-.Dd August 22, 2007
+.Dd August 27, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -38,14 +38,14 @@
 .Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
 .Ft ssize_t
 .Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
-.Ft int8_t
+.Ft int
 .Fn libewf_close "LIBEWF_HANDLE *handle"
-.Ft int32_t
-.Fn libewf_get_bytes_per_sector "LIBEWF_HANDLE *handle"
-.Ft int32_t
-.Fn libewf_get_amount_of_sectors "LIBEWF_HANDLE *handle"
-.Ft ssize32_t
-.Fn libewf_get_chunk_size "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_get_bytes_per_sector "LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector"
+.Ft int
+.Fn libewf_get_amount_of_sectors "LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors"
+.Ft int
+.Fn libewf_get_chunk_size "LIBEWF_HANDLE *handle, size32_t *chunk_size"
 .Ft int32_t
 .Fn libewf_get_error_granularity "LIBEWF_HANDLE *handle"
 .Ft int8_t
@@ -98,31 +98,31 @@ When the library was compiled with narrow character support (default) the follow
 .Fn libewf_get_version "void"
 .Ft int
 .Fn libewf_is_dll "void"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_case_number "LIBEWF_HANDLE *handle, char *case_number, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_description "LIBEWF_HANDLE *handle, char *description, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_examiner_name "LIBEWF_HANDLE *handle, char *examiner_name, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_evidence_number "LIBEWF_HANDLE *handle, char *evidence_number, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_notes "LIBEWF_HANDLE *handle, char *notes, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_acquiry_date "LIBEWF_HANDLE *handle, char *acquiry_date, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_system_date "LIBEWF_HANDLE *handle, char *system_date, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_acquiry_operating_system "LIBEWF_HANDLE *handle, char *acquiry_operating_system, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_acquiry_software_version "LIBEWF_HANDLE *handle, char *acquiry_software_version, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_password "LIBEWF_HANDLE *handle, char *password, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_compression_type "LIBEWF_HANDLE *handle, char *compression_type, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
 .Fn libewf_set_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
@@ -160,31 +160,31 @@ When the library was compiled with narrow character support (default) the follow
 When the library was compiled with wide character support the following functions are available instead of the narrow character functions
 .Ft const wchar_t *
 .Fn libewf_get_version "void"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_case_number "LIBEWF_HANDLE *handle, wchar_t *case_number, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_description "LIBEWF_HANDLE *handle, wchar_t *description, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_examiner_name "LIBEWF_HANDLE *handle, wchar_t *examiner_name, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_evidence_number "LIBEWF_HANDLE *handle, wchar_t *evidence_number, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_notes "LIBEWF_HANDLE *handle, wchar_t *notes, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_acquiry_date "LIBEWF_HANDLE *handle, wchar_t *acquiry_date, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_system_date "LIBEWF_HANDLE *handle, wchar_t *system_date, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_acquiry_operating_system "LIBEWF_HANDLE *handle, wchar_t *acquiry_operating_system, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_acquiry_software_version "LIBEWF_HANDLE *handle, wchar_t *acquiry_software_version, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_password "LIBEWF_HANDLE *handle, wchar_t *password, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_header_value_compression_type "LIBEWF_HANDLE *handle, wchar_t *compression_type, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
 .Ft int
 .Fn libewf_set_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"

@@ -567,96 +567,6 @@ int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HAND
 	return( internal_handle->media->sectors_per_chunk );
 }
 
-/* Returns the amount of bytes per sector from the media information, 0 if not set, -1 on error
- */
-int32_t libewf_internal_handle_get_media_bytes_per_sector( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_media_bytes_per_sector";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( internal_handle->media->bytes_per_sector );
-}
-
-/* Returns the amount of sectors from the media information, 0 if not set, -1 on error
- */
-int32_t libewf_internal_handle_get_media_amount_of_sectors( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_media_amount_of_sectors";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media->amount_of_sectors > (uint32_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( internal_handle->media->amount_of_sectors );
-}
-
-/* Returns the chunk size from the media information, 0 if not set, -1 on error
- */
-ssize32_t libewf_internal_handle_get_media_chunk_size( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_media_chunk_size";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media->chunk_size > (size32_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( internal_handle->media->chunk_size );
-}
-
 /* Returns the error granularity from the media information, 0 if not set, -1 on error
  */
 int32_t libewf_internal_handle_get_media_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle )
@@ -966,7 +876,7 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 /* Retrieves the header value specified by identifier
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int8_t libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	static char *function = "libewf_internal_handle_get_header_value";
 
@@ -1001,7 +911,7 @@ int8_t libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal
 /* Retrieves the hash value specified by identifier
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int8_t libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	static char *function = "libewf_internal_handle_get_hash_value";
 

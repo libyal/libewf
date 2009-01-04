@@ -199,7 +199,7 @@ char *ewfcommon_strerror( int error_number )
 
 		return( NULL );
 	}
-	if( libewf_common_string_copy(
+	if( libewf_common_memcpy(
 	     error_string,
 	     static_error_string,
 	     error_string_size ) == NULL )
@@ -2418,11 +2418,16 @@ ssize64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*
 
 		return( -1 );
 	}
-	chunk_size = libewf_get_chunk_size( handle );
-
-	if( chunk_size == 0 )
+	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
 		 function );
 
 		return( -1 );
@@ -2586,17 +2591,27 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 		return( -1 );
 	}
-	chunk_size = libewf_get_chunk_size( handle );
-
-	if( chunk_size == 0 )
+	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk media.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
 		 function );
 
 		return( -1 );
 	}
-	bytes_per_sector = libewf_get_bytes_per_sector( handle );
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		 function );
 
+		return( -1 );
+	}
+	if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( bytes_per_sector == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
@@ -2990,11 +3005,16 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 
 		return( -1 );
 	}
-	chunk_size = libewf_get_chunk_size( handle );
-
-	if( chunk_size == 0 )
+	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
 		 function );
 
 		return( -1 );
@@ -3137,11 +3157,16 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
-	chunk_size = libewf_get_chunk_size( handle );
-
-	if( chunk_size == 0 )
+	if( libewf_get_chunk_size( handle, &chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
 		 function );
 
 		return( -1 );

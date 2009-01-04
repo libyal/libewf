@@ -290,7 +290,7 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 0 if successful, or -1 on error
  */
-int8_t libewf_close( LIBEWF_HANDLE *handle )
+int libewf_close( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_close";
@@ -411,28 +411,133 @@ int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	         size ) );
 }
 
-/* Returns the amount of bytes per sector from the media information, 0 if not set, -1 on error
+/* Returns the amount of bytes per sector from the media information
+ * Returns 1 if successful, -1 on error
  */
-int32_t libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle )
+int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector )
 {
-	return( libewf_internal_handle_get_media_bytes_per_sector(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_bytes_per_sector";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( bytes_per_sector == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	*bytes_per_sector = internal_handle->media->bytes_per_sector;
+
+	return( 1 );
 }
 
-/* Returns the amount of sectors from the media information, 0 if not set, -1 on error
+/* Returns the amount of sectors from the media information
+ * Returns 1 if successful, -1 on error
  */
-int32_t libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle )
+int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors )
 {
-	return( libewf_internal_handle_get_media_amount_of_sectors(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_amount_of_sectors";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_sectors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media->amount_of_sectors > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	*amount_of_sectors = internal_handle->media->amount_of_sectors;
+
+	return( 1 );
 }
 
-/* Returns the chunk size from the media information, 0 if not set, -1 on error
+/* Returns the chunk size from the media information
+ * Returns 1 if successful, -1 on error
  */
-ssize32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle )
+int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 {
-	return( libewf_internal_handle_get_media_chunk_size(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_chunk_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media->chunk_size > (size32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	*chunk_size = internal_handle->media->chunk_size;
+
+	return( 1 );
 }
 
 /* Returns the error granularity from the media information, 0 if not set, -1 on error
@@ -512,7 +617,7 @@ int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle )
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	return( libewf_internal_handle_get_header_value(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -524,7 +629,7 @@ int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, 
 /* Retrieves the hash value specified by the identifier
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	return( libewf_internal_handle_get_hash_value(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,

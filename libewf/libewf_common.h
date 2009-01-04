@@ -132,19 +132,6 @@ extern "C" {
 #error Missing string length function (strlen)
 #endif
 
-#if defined( HAVE_MEMCPY )
-#define libewf_common_string_copy( destination, source, length ) \
-	(char *) memcpy( (void *) destination, (void *) source, length )
-#elif defined( HAVE_STRNCPY )
-#define libewf_common_string_copy( destination, source, length ) \
-	strncpy( destination, source, length )
-#elif defined( HAVE_STRCPY )
-#define libewf_common_string_copy( destination, source, length ) \
-	strcpy( destination, source )
-#else
-#error Missing string copy function (memcpy, strncpy and strcpy)
-#endif
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
 #if defined( HAVE_WCSLEN )
@@ -152,19 +139,6 @@ extern "C" {
 	wcslen( string )
 #else
 #error Missing wide character string length function (wcslen)
-#endif
-
-#if defined( HAVE_WMEMCPY )
-#define libewf_common_wide_string_copy( destination, source, length ) \
-	(wchar_t *) wmemcpy( (void *) destination, (void *) source, length )
-#elif defined( HAVE_WCSNCPY )
-#define libewf_common_wide_string_copy( destination, source, length ) \
-	wcsncpy( destination, source, length )
-#elif defined( HAVE_WCSCPY )
-#define libewf_common_wide_string_copy( destination, source, length ) \
-	wcscpy( destination, source )
-#else
-#error Missing wide character string copy function (wmemcpy, wcsncpy and wcscpy)
 #endif
 
 #if defined( HAVE_WMEMCPY )

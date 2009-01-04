@@ -73,15 +73,16 @@ LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t 
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags );
 #endif
 
-LIBEWF_EXTERN int8_t libewf_close( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_close( LIBEWF_HANDLE *handle );
 
 LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
 
 LIBEWF_EXTERN int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 
-LIBEWF_EXTERN int32_t libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle );
-LIBEWF_EXTERN int32_t libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle );
-LIBEWF_EXTERN ssize32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector );
+LIBEWF_EXTERN int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors );
+LIBEWF_EXTERN int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size );
+
 LIBEWF_EXTERN int32_t libewf_get_error_granularity( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN int8_t libewf_get_compression_level( LIBEWF_HANDLE *handle );
 LIBEWF_EXTERN ssize64_t libewf_get_media_size( LIBEWF_HANDLE *handle );
@@ -94,8 +95,8 @@ LIBEWF_EXTERN int8_t libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size
 
 LIBEWF_EXTERN int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle );
 
-LIBEWF_EXTERN int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-LIBEWF_EXTERN int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+LIBEWF_EXTERN int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 LIBEWF_EXTERN int libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
 

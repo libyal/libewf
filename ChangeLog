@@ -40,6 +40,8 @@ To do/think about:
 * ewfacquire: read from pipe
 * ewfacquire: non interactive mode - read settings from file?
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
+* ewfacquire: allow for multiple raw files as input
+  (make a generic media access solution also useable for revit)
 * ewfexport: non interactive mode?
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfdebug: create a tool to analyse a single segment file
@@ -108,10 +110,8 @@ TODO
 * check if segment table entry 0 is used in read mode make sure to use consistent
   usage of the segment table for read/write
 * remove write_finalized
-* make buffer passthroug default behavior
-* remove libewf_common_string_copy and libewf_common_wide_string_copy ?
-  use memcpy instead
-  move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
+* make buffer passthrough default behavior
+* move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 * have compound reallocation functions return an integer as result
 * remove internal_handle passing from most functions
   only pass the necessary values
@@ -124,6 +124,13 @@ TODO
 * change int8_t return values into int return values
 * update ewfexport man page
 * what about header values parsing with preservation of timestamps?
+* change libewf_get functions for api consistency
+
+Version: 20070827
+* removed libewf_common_string_copy and libewf_common_wide_string_copy
+  using memcpy instead
+* changed some int8_t return values into int return values
+* worked on changing libewf_get functions for api consistency
 
 Version: 20070822
 * worked on allowing the internal MD5 calculation to be disabled

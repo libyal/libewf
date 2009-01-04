@@ -154,19 +154,22 @@ LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 0 if successful, or -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_close( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_close( LIBEWF_HANDLE *handle );
 
-/* Returns the amount of bytes per sector from the media information, 0 if not set, -1 on error
+/* Returns the amount of bytes per sector from the media information
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int32_t libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector );
 
-/* Returns the amount of sectors from the media information, 0 if not set, -1 on error
+/* Returns the amount of sectors from the media information
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int32_t libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors );
 
-/* Returns the chunk size from the media information, 0 if not set, -1 on error
+/* Returns the chunk size from the media information
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN ssize32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size );
 
 /* Returns the error granularity from the media information, 0 if not set, -1 on error
  */
@@ -208,9 +211,9 @@ LIBEWF_EXTERN int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle )
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length );
+LIBEWF_EXTERN int libewf_get_header_value( LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length );
 #else
-LIBEWF_EXTERN int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length );
+LIBEWF_EXTERN int libewf_get_header_value( LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length );
 #endif
 
 /* Retrieves the header value case number
@@ -360,9 +363,9 @@ LIBEWF_EXTERN int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, char *ident
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length );
+LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length );
 #else
-LIBEWF_EXTERN int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length );
+LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length );
 #endif
 
 /* Sets the media values

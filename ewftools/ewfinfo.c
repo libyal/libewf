@@ -90,22 +90,24 @@ int main( int argc, char * const argv[] )
 	uint8_t guid[ 16 ];
 
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob            = NULL;
-	int32_t glob_count       = 0;
+	EWFGLOB *glob              = NULL;
+	int32_t glob_count         = 0;
 #endif
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        CHAR_T *error_string     = NULL;
+        CHAR_T *error_string       = NULL;
 #endif
-	LIBEWF_HANDLE *handle    = NULL;
-	INT_T option             = 0;
-	int8_t format            = 0;
-	int8_t compression_level = 0;
-	int8_t media_type        = 0;
-	int8_t media_flags       = 0;
-	int8_t volume_type       = 0;
-	uint8_t verbose          = 0;
-	uint8_t date_format      = LIBEWF_DATE_FORMAT_DAYMONTH;
-	char info_option         = 'a';
+	LIBEWF_HANDLE *handle      = NULL;
+	INT_T option               = 0;
+	uint32_t bytes_per_sector  = 0;
+	uint32_t amount_of_sectors = 0;
+	int8_t format              = 0;
+	int8_t compression_level   = 0;
+	int8_t media_type          = 0;
+	int8_t media_flags         = 0;
+	int8_t volume_type         = 0;
+	uint8_t verbose            = 0;
+	uint8_t date_format        = LIBEWF_DATE_FORMAT_DAYMONTH;
+	char info_option           = 'a';
 
 	ewfsignal_initialize();
 
@@ -373,8 +375,23 @@ int main( int argc, char * const argv[] )
 				fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n", volume_type );
 			}
 		}
-		fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n", libewf_get_amount_of_sectors( handle ) );
-		fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n", libewf_get_bytes_per_sector( handle ) );
+
+		if( libewf_get_amount_of_sectors( handle, &amount_of_sectors ) == 1 )
+		{
+			fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n", amount_of_sectors );
+		}
+		else
+		{
+			fprintf( stderr, "Unable to get amount of sectors.\n" );
+		}
+		if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) == 1 )
+		{
+			fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n", bytes_per_sector );
+		}
+		else
+		{
+			fprintf( stderr, "Unable to get bytes per sector.\n" );
+		}
 		fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n", libewf_get_media_size( handle ) );
 
 		if( ( format == LIBEWF_FORMAT_ENCASE5 )
