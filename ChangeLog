@@ -137,6 +137,9 @@ TODO
   - the header values amount
   - the hash values amount
 
+* move wipe on error to ewftools, like in ewfacquire?
+  WIPE_ON_ERROR
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -148,6 +151,9 @@ CLOSED
   - does this work with application and library memory space?
   - if so remove libewf_string include from ewfacquire
   not needed
+
+Version: 20070918
+* Worked on implementing raw read in ewftools
 
 Version: 20070916
 * Fixed bug in libewf_section_hash_read introduced by MD5 calculation removal

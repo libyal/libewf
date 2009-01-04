@@ -377,7 +377,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				}
 				chunk_data_size -= (uint32_t) EWF_CRC_SIZE;
 			}
-			chunk_type = "UNCOMPRESSED";
+			chunk_type     = "UNCOMPRESSED";
+			*is_compressed = 0;
 		}
 		/* Determine if the chunk is compressed
 		 */
@@ -385,7 +386,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		{
 			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
 
-			chunk_type = "COMPRESSED";
+			chunk_type     = "COMPRESSED";
+			*is_compressed = 1;
 		}
 		else
 		{
