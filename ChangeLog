@@ -138,6 +138,9 @@ Next release(s):
 
 * change libewf_notify_set_values in libewf_file.c to notify_set_values
 
+FIX
+* MacOS-X package should install in /usr/
+
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -154,6 +157,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080324
+* Fixed wrong license in MacOS-X package
 
 Version: 20080323
 * Moved functions in libewf_file to libewf_interface and libewf_support
