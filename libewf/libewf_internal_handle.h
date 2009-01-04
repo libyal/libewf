@@ -84,6 +84,14 @@ struct libewf_internal_handle
 	libewf_internal_handle_write_t *write;
 
 /* TODO refactor */
+	/* The segment filename without extension
+	 */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	wchar_t *segment_filename;
+#else
+	char *segment_filename;
+#endif
+
 	/* A dynamic array of segment files
 	 */
 	LIBEWF_SEGMENT_FILE *segment_files;
@@ -91,6 +99,14 @@ struct libewf_internal_handle
 	/* The amount of segment files in the dynamic array
 	 */
 	uint32_t amount_of_segment_files;
+
+	/* The delta segment filename without extension
+	 */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	wchar_t *delta_segment_filename;
+#else
+	char *delta_segment_filename;
+#endif
 
 	/* A dynamic array of delta segment files
 	 */

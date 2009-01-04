@@ -1311,12 +1311,11 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				result = 0;
 
 				/* Make sure to write a next section in the the previous delta segment file
+				 * The segment file offset is updated by the function
 				 */
 				write_count = libewf_segment_file_write_last_section(
 					       internal_handle,
-					       internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor,
-					       internal_handle->delta_segment_table->segment_file[ segment_number ].section_list,
-					       internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset,
+					       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
 					       0 );
 
 				if( write_count == -1 )
@@ -1326,8 +1325,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 					return( -1 );
 				}
-				total_write_count                                                                += write_count;
-				internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset += write_count;
+				total_write_count += write_count;
 			}
 			/* Check if a delta segment already exists
 			 */
@@ -1441,12 +1439,11 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
 		/* Write the last section
+		 * The segment file offset is updated by the function
 		 */
 		write_count = libewf_segment_file_write_last_section(
 			       internal_handle,
-			       internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor,
-			       internal_handle->delta_segment_table->segment_file[ segment_number ].section_list,
-			       internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset,
+			       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
 			       1 );
 
 		if( write_count == -1 )
@@ -1456,8 +1453,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			return( -1 );
 		}
-		total_write_count                                                                += write_count;
-		internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset += write_count;
+		total_write_count += write_count;
 
 		internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor;
 		internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
