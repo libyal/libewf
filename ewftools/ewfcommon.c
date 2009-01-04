@@ -1289,11 +1289,11 @@ void ewfcommon_process_status_initialize( FILE *stream, LIBEWF_CHAR *string, tim
  */
 void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total )
 {
-	time_t timestamp_current  = 0;
-	int64_t seconds_remaining = 0;
-	uint64_t seconds_current  = 0;
-	uint64_t seconds_total    = 0;
-	int8_t new_percentage     = 0;
+	time_t seconds_current   = 0;
+	time_t seconds_total     = 0;
+	time_t seconds_remaining = 0;
+	time_t timestamp_current = 0;
+	int8_t new_percentage    = 0;
 
 	if( ewfcommon_process_status_stream == NULL )
 	{
@@ -1331,8 +1331,8 @@ void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total 
 		{
 			ewfcommon_process_status_timestamp_last = timestamp_current;
 
-			seconds_current   = (uint64_t) difftime( timestamp_current, ewfcommon_process_status_timestamp_start );
-			seconds_total     = ( (uint64_t) ( seconds_current * 100 ) / new_percentage );
+			seconds_current   = timestamp_current - ewfcommon_process_status_timestamp_start;
+			seconds_total     = ( ( seconds_current * 100 ) / new_percentage );
 			seconds_remaining = seconds_total - seconds_current;
 
 			/* Negative time means nearly finished
@@ -1343,7 +1343,7 @@ void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total 
 			}
 			fprintf( ewfcommon_process_status_stream, "        completion" );
 
-			ewfcommon_timestamp_fprint( ewfcommon_process_status_stream, (time_t) seconds_remaining );
+			ewfcommon_timestamp_fprint( ewfcommon_process_status_stream, seconds_remaining );
 			ewfcommon_bytes_per_second_fprint( ewfcommon_process_status_stream, bytes_total, seconds_total );
 
 			fprintf( ewfcommon_process_status_stream, ".\n" );
@@ -1356,8 +1356,8 @@ void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total 
  */
 void ewfcommon_stream_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total )
 {
+	time_t seconds_current   = 0;
 	time_t timestamp_current = 0;
-	uint64_t seconds_current = 0;
 
 	if( ewfcommon_process_status_stream == NULL )
 	{
@@ -1389,11 +1389,11 @@ void ewfcommon_stream_process_status_fprint( uint64_t bytes_read, uint64_t bytes
 
 			fprintf( ewfcommon_process_status_stream, "\n" );
 
-			seconds_current = (uint64_t) difftime( timestamp_current, ewfcommon_process_status_timestamp_start );
+			seconds_current = timestamp_current - ewfcommon_process_status_timestamp_start;
 
 			fprintf( ewfcommon_process_status_stream, "       " );
 
-			ewfcommon_timestamp_fprint( ewfcommon_process_status_stream, (time_t) seconds_current );
+			ewfcommon_timestamp_fprint( ewfcommon_process_status_stream, seconds_current );
 			ewfcommon_bytes_per_second_fprint( ewfcommon_process_status_stream, bytes_read, seconds_current );
 
 			fprintf( ewfcommon_process_status_stream, ".\n\n" );
@@ -1406,7 +1406,6 @@ void ewfcommon_stream_process_status_fprint( uint64_t bytes_read, uint64_t bytes
 void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, int64_t byte_count, time_t timestamp_start, time_t timestamp_end )
 {
 	time_t timestamp_acquiry = 0;
-	uint64_t seconds_acquiry = 0;
 
 	if( stream == NULL )
 	{
@@ -1417,13 +1416,12 @@ void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, int64_
 		return;
 	}
 	timestamp_acquiry = timestamp_end - timestamp_start;
-	seconds_acquiry   = (uint64_t) difftime( timestamp_end, timestamp_start );
 
 	fprintf( stream, "%" PRIs_EWF ":", string );
 
 	ewfcommon_bytes_fprint( stream, byte_count );
 	ewfcommon_timestamp_fprint( stream, timestamp_acquiry );
-	ewfcommon_bytes_per_second_fprint( stream, byte_count, seconds_acquiry );
+	ewfcommon_bytes_per_second_fprint( stream, byte_count, timestamp_acquiry );
 
 	fprintf( stream, ".\n" );
 }
@@ -1709,7 +1707,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 				/* At the end of the input
 				 */
-				if( ( total_input_size != 0 ) && ( ( current_calculated_offset + read_remaining_bytes ) >= (int64_t) total_input_size ) )
+				if( ( total_input_size != 0 )
+				 && ( ( current_calculated_offset + (int64_t) read_remaining_bytes ) >= (int64_t) total_input_size ) )
 				{
 					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: at end of input no remaining bytes to read from chunk.\n" );
 

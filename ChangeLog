@@ -101,6 +101,8 @@ Next release:
 
 Version: 20070707
 * added fix for missing type definition u64 in linux/fs.h on some platforms
+* worked on issue with progress indicator, removed usage of difftime
+  time_t B - time_t A should equal difftime without conversion to double
 
 Version: 20070526
 * removed the advertisement clause from the license

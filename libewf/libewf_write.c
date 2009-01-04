@@ -2551,7 +2551,8 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t ch
 		write_size = internal_handle->chunk_cache->amount;
 	}
 	if( ( write_size == internal_handle->media->chunk_size )
-	 || ( ( internal_handle->write->input_write_size != 0 ) && ( ( internal_handle->write->input_write_count + write_size ) == (int64_t) internal_handle->write->input_write_size ) )
+	 || ( ( internal_handle->write->input_write_size != 0 )
+	  && ( ( internal_handle->write->input_write_count + (int64_t) write_size ) == (int64_t) internal_handle->write->input_write_size ) )
 	 || ( force_write != 0 ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "libewf_write_chunk: writing %zu bytes to file.\n", write_size );
