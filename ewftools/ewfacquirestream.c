@@ -66,6 +66,7 @@
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfinput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -177,7 +178,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'b':
-				sectors_per_chunk = ewfcommon_determine_sectors_per_chunk( optarg );
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk( optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
@@ -194,7 +195,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					compression_level = ewfcommon_determine_compression_level( optarg );
+					compression_level = ewfinput_determine_compression_level( optarg );
 				
 					if( compression_level <= -1 )
 					{
@@ -237,7 +238,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'f':
-				libewf_format = ewfcommon_determine_libewf_format( optarg );
+				libewf_format = ewfinput_determine_libewf_format( optarg );
 
 				if( ( libewf_format == 0 )
 				 || ( libewf_format == LIBEWF_FORMAT_EWF )
@@ -684,7 +685,10 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_header_value_acquiry_software_version( handle, acquiry_software_version, libewf_string_length( acquiry_software_version ) ) != 1 )
+	if( libewf_set_header_value_acquiry_software_version(
+	     handle,
+	     acquiry_software_version,
+	     libewf_string_length( acquiry_software_version ) ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value acquiry software version number in handle.\n" );
 

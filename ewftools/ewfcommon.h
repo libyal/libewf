@@ -55,46 +55,12 @@
 extern "C" {
 #endif
 
-extern LIBEWF_CHAR *ewfcommon_compression_levels[ 3 ];
-extern LIBEWF_CHAR *ewfcommon_format_types[ 12 ];
-extern LIBEWF_CHAR *ewfcommon_media_types[ 2 ];
-extern LIBEWF_CHAR *ewfcommon_volume_types[ 2 ];
-extern LIBEWF_CHAR *ewfcommon_sector_per_block_sizes[ 10 ];
-extern LIBEWF_CHAR *ewfcommon_yes_no[ 2 ];
-
-#define EWFCOMMON_COMPRESSION_LEVELS_AMOUNT		3
-#define EWFCOMMON_COMPRESSION_LEVELS_DEFAULT		0
-
-#define EWFCOMMON_FORMAT_TYPES_AMOUNT			12
-#define EWFCOMMON_FORMAT_TYPES_DEFAULT			7
-
-#define EWFCOMMON_MEDIA_TYPES_AMOUNT			2
-#define EWFCOMMON_MEDIA_TYPES_DEFAULT			0
-
-#define EWFCOMMON_VOLUME_TYPES_AMOUNT			2
-#define EWFCOMMON_VOLUME_TYPES_DEFAULT			1
-
-#define EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
-#define EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT	0
-
 int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size );
 
 LIBEWF_CHAR *ewfcommon_determine_operating_system( void );
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format );
 LIBEWF_CHAR *ewfcommon_determine_units_string( int factor );
 LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size );
-
-uint8_t ewfcommon_determine_libewf_format( const CHAR_T *argument );
-uint32_t ewfcommon_determine_sectors_per_chunk( const CHAR_T *argument );
-int8_t ewfcommon_determine_compression_level( const CHAR_T *argument );
-int8_t ewfcommon_determine_media_type( const CHAR_T *argument );
-int8_t ewfcommon_determine_volume_type( const CHAR_T *argument );
-int8_t ewfcommon_determine_yes_no( const CHAR_T *argument );
-
-LIBEWF_CHAR *ewfcommon_get_user_input_variable( FILE *stream, LIBEWF_CHAR *request_string );
-CHAR_T *ewfcommon_get_user_input_variable_char_t( FILE *stream, LIBEWF_CHAR *request_string );
-uint64_t ewfcommon_get_user_input_size_variable( FILE *stream, LIBEWF_CHAR *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value );
-LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *request_string, LIBEWF_CHAR **values, uint8_t amount, uint8_t default_value );
 
 struct tm *ewfcommon_gmtime( const time_t *timestamp );
 

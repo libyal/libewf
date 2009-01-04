@@ -59,6 +59,7 @@
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfinput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -216,14 +217,14 @@ int main( int argc, char * const argv[] )
 	 */
 	fprintf( stdout, "Information for alter required, please provide the necessary input\n" );
 
-	alter_offset = ewfcommon_get_user_input_size_variable(
+	alter_offset = ewfinput_get_size_variable(
 	                stdout,
 	                _S_LIBEWF_CHAR( "Start altering at offset" ),
 	                0,
 	                media_size,
 	                0 );
 
-	alter_size = ewfcommon_get_user_input_size_variable(
+	alter_size = ewfinput_get_size_variable(
 	              stdout,
 	              _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
 	              0,

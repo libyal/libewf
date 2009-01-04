@@ -8,6 +8,7 @@ ewfacquire_SOURCES = \
 	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
+	ewfinput.c ewfinput.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -22,6 +23,7 @@ ewfacquirestream_SOURCES = \
 	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
+	ewfinput.c ewfinput.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -36,6 +38,7 @@ ewfalter_SOURCES = \
 	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
+	ewfinput.c ewfinput.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -50,6 +53,7 @@ ewfexport_SOURCES = \
 	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
+	ewfinput.c ewfinput.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \

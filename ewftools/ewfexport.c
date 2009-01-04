@@ -61,6 +61,7 @@
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfinput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -168,7 +169,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'b':
-				sectors_per_chunk = ewfcommon_determine_sectors_per_chunk( optarg );
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk( optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
@@ -192,7 +193,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					compression_level = ewfcommon_determine_compression_level( optarg );
+					compression_level = ewfinput_determine_compression_level( optarg );
 				
 					if( compression_level <= -1 )
 					{
@@ -210,7 +211,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					libewf_format = ewfcommon_determine_libewf_format( optarg );
+					libewf_format = ewfinput_determine_libewf_format( optarg );
 
 					if( libewf_format == 0 )
 					{
@@ -362,7 +363,7 @@ int main( int argc, char * const argv[] )
 
 		/* File format
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stderr,
 		              _S_LIBEWF_CHAR( "Export to file format" ),
 		              ewfexport_format_types,
@@ -375,7 +376,7 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			libewf_format = ewfcommon_determine_libewf_format( user_input );
+			libewf_format = ewfinput_determine_libewf_format( user_input );
 
 			if( libewf_format == 0 )
 			{
@@ -403,7 +404,7 @@ int main( int argc, char * const argv[] )
 			 */
 			while( target_filename == NULL )
 			{
-				target_filename = ewfcommon_get_user_input_variable_char_t(
+				target_filename = ewfinput_get_variable_char_t(
 				                   stderr,
 				                   _S_LIBEWF_CHAR( "Target path and filename without extension" ) );
 
@@ -414,14 +415,14 @@ int main( int argc, char * const argv[] )
 			}
 			/* Compression
 			 */
-			user_input = ewfcommon_get_user_input_fixed_value(
+			user_input = ewfinput_get_fixed_value(
 				      stderr,
 				      _S_LIBEWF_CHAR( "Use compression" ),
-				      ewfcommon_compression_levels,
-				      EWFCOMMON_COMPRESSION_LEVELS_AMOUNT,
-				      EWFCOMMON_COMPRESSION_LEVELS_DEFAULT );
+				      ewfinput_compression_levels,
+				      EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+				      EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
 
-			compression_level = ewfcommon_determine_compression_level( user_input );
+			compression_level = ewfinput_determine_compression_level( user_input );
 
 			if( compression_level <= -1 )
 			{
@@ -441,14 +442,14 @@ int main( int argc, char * const argv[] )
 			 */
 			if( compression_level == LIBEWF_COMPRESSION_NONE )
 			{
-				user_input = ewfcommon_get_user_input_fixed_value(
+				user_input = ewfinput_get_fixed_value(
 					      stderr,
 					      _S_LIBEWF_CHAR( "Compress empty blocks" ),
-					      ewfcommon_yes_no,
+					      ewfinput_yes_no,
 					      2,
 					      1 );
 
-				compress_empty_block = ewfcommon_determine_yes_no( user_input );
+				compress_empty_block = ewfinput_determine_yes_no( user_input );
 
 				libewf_common_free( user_input );
 
@@ -468,7 +469,7 @@ int main( int argc, char * const argv[] )
 
 			/* Segment file size
 			 */
-			segment_file_size = ewfcommon_get_user_input_size_variable(
+			segment_file_size = ewfinput_get_size_variable(
 					     stderr,
 					     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
 					     1440,
@@ -485,11 +486,12 @@ int main( int argc, char * const argv[] )
 			}
 			/* Chunk size (sectors per block)
 			 */
-			user_input = ewfcommon_get_user_input_fixed_value( stderr,
+			user_input = ewfinput_get_fixed_value(
+			              stderr,
 				      _S_LIBEWF_CHAR( "The amount of sectors to read at once" ),
-				      ewfcommon_sector_per_block_sizes,
-				      EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-				      EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+				      ewfinput_sector_per_block_sizes,
+				      EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+				      EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
 			sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
 
@@ -501,7 +503,7 @@ int main( int argc, char * const argv[] )
 			 */
 			while( target_filename == NULL )
 			{
-				target_filename = ewfcommon_get_user_input_variable_char_t(
+				target_filename = ewfinput_get_variable_char_t(
 				                   stderr,
 				                   _S_LIBEWF_CHAR( "Target path and filename without extension or - for stderr" ) );
 
@@ -515,7 +517,7 @@ int main( int argc, char * const argv[] )
 			{
 				/* Segment file size
 				 */
-				segment_file_size = ewfcommon_get_user_input_size_variable(
+				segment_file_size = ewfinput_get_size_variable(
 						     stderr,
 						     _S_LIBEWF_CHAR( "Maximum export file size in kbytes (2^10) or 0 for no limit" ),
 						     0,
@@ -526,14 +528,14 @@ int main( int argc, char * const argv[] )
 			}
 #endif
 		}
-		export_offset = ewfcommon_get_user_input_size_variable(
+		export_offset = ewfinput_get_size_variable(
 		                 stderr,
 		                 _S_LIBEWF_CHAR( "Start export at offset" ),
 		                 0,
 		                 media_size,
 		                 export_offset );
 
-		export_size = ewfcommon_get_user_input_size_variable(
+		export_size = ewfinput_get_size_variable(
 		               stderr,
 		               _S_LIBEWF_CHAR( "Amount of bytes to export" ),
 		               0,

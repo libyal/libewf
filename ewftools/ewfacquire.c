@@ -90,6 +90,7 @@ typedef size_t u64;
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfinput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -146,14 +147,14 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 	 */
 	while( input_confirmed == -1 )
 	{
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Continue acquiry with these values" ),
-		              ewfcommon_yes_no,
+		              ewfinput_yes_no,
 		              2,
 		              0 );
 
-		input_confirmed = ewfcommon_determine_yes_no( user_input );
+		input_confirmed = ewfinput_determine_yes_no( user_input );
 
 		libewf_common_free( user_input );
 
@@ -428,7 +429,7 @@ int main( int argc, char * const argv[] )
 		 */
 		while( filename == NULL )
 		{
-			filename = ewfcommon_get_user_input_variable_char_t(
+			filename = ewfinput_get_variable_char_t(
 			            stdout,
 			            _S_LIBEWF_CHAR( "Image path and filename without extension" ) );
 
@@ -439,44 +440,44 @@ int main( int argc, char * const argv[] )
 		}
 		/* Case number
 		 */
-		case_number = ewfcommon_get_user_input_variable(
+		case_number = ewfinput_get_variable(
 		               stdout,
 		               _S_LIBEWF_CHAR( "Case number" ) );
 
 		/* Description
 		 */
-		description = ewfcommon_get_user_input_variable(
+		description = ewfinput_get_variable(
 		               stdout,
 		               _S_LIBEWF_CHAR( "Description" ) );
 
 		/* Evidence number
 		 */
-		evidence_number = ewfcommon_get_user_input_variable(
+		evidence_number = ewfinput_get_variable(
 		                   stdout,
 		                   _S_LIBEWF_CHAR( "Evidence number" ) );
 
 		/* Examiner name
 		 */
-		examiner_name = ewfcommon_get_user_input_variable(
+		examiner_name = ewfinput_get_variable(
 		                 stdout,
 		                 _S_LIBEWF_CHAR( "Examiner name" ) );
 
 		/* Notes
 		 */
-		notes = ewfcommon_get_user_input_variable(
+		notes = ewfinput_get_variable(
 		         stdout,
 		         _S_LIBEWF_CHAR( "Notes" ) );
 
 		/* Media type
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Media type" ),
-		              ewfcommon_media_types,
-		              EWFCOMMON_MEDIA_TYPES_AMOUNT,
-		              EWFCOMMON_MEDIA_TYPES_DEFAULT );
+		              ewfinput_media_types,
+		              EWFINPUT_MEDIA_TYPES_AMOUNT,
+		              EWFINPUT_MEDIA_TYPES_DEFAULT );
 
-		media_type = ewfcommon_determine_media_type( user_input );
+		media_type = ewfinput_determine_media_type( user_input );
 
 		libewf_common_free( user_input );
 
@@ -489,14 +490,14 @@ int main( int argc, char * const argv[] )
 
 		/* Volume type
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Volume type" ),
-		              ewfcommon_volume_types,
-		              EWFCOMMON_VOLUME_TYPES_AMOUNT,
-		              EWFCOMMON_VOLUME_TYPES_DEFAULT );
+		              ewfinput_volume_types,
+		              EWFINPUT_VOLUME_TYPES_AMOUNT,
+		              EWFINPUT_VOLUME_TYPES_DEFAULT );
 
-		volume_type = ewfcommon_determine_volume_type( user_input );
+		volume_type = ewfinput_determine_volume_type( user_input );
 
 		libewf_common_free( user_input );
 
@@ -509,14 +510,14 @@ int main( int argc, char * const argv[] )
 
 		/* Compression
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Use compression" ),
-		              ewfcommon_compression_levels,
-		              EWFCOMMON_COMPRESSION_LEVELS_AMOUNT,
-		              EWFCOMMON_COMPRESSION_LEVELS_DEFAULT );
+		              ewfinput_compression_levels,
+		              EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+		              EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
 
-		compression_level = ewfcommon_determine_compression_level( user_input );
+		compression_level = ewfinput_determine_compression_level( user_input );
 
 		libewf_common_free( user_input );
 
@@ -531,14 +532,14 @@ int main( int argc, char * const argv[] )
 		 */
 		if( compression_level == LIBEWF_COMPRESSION_NONE )
 		{
-			user_input = ewfcommon_get_user_input_fixed_value(
+			user_input = ewfinput_get_fixed_value(
 			              stdout,
 			              _S_LIBEWF_CHAR( "Compress empty blocks" ),
-			              ewfcommon_yes_no,
+			              ewfinput_yes_no,
 			              2,
 			              1 );
 
-			compress_empty_block = ewfcommon_determine_yes_no( user_input );
+			compress_empty_block = ewfinput_determine_yes_no( user_input );
 
 			libewf_common_free( user_input );
 
@@ -552,14 +553,14 @@ int main( int argc, char * const argv[] )
 
 		/* File format
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Use EWF file format" ),
-		              ewfcommon_format_types,
-		              EWFCOMMON_FORMAT_TYPES_AMOUNT,
-		              EWFCOMMON_FORMAT_TYPES_DEFAULT );
+		              ewfinput_format_types,
+		              EWFINPUT_FORMAT_TYPES_AMOUNT,
+		              EWFINPUT_FORMAT_TYPES_DEFAULT );
 
-		libewf_format = ewfcommon_determine_libewf_format( user_input );
+		libewf_format = ewfinput_determine_libewf_format( user_input );
 
 		libewf_common_free( user_input );
 
@@ -572,14 +573,14 @@ int main( int argc, char * const argv[] )
 
 		/* Size and offset of data to acquire
 		 */
-		acquiry_offset = ewfcommon_get_user_input_size_variable(
+		acquiry_offset = ewfinput_get_size_variable(
 		                  stdout,
 		                  _S_LIBEWF_CHAR( "Start to acquire at offset" ),
 		                  0,
 		                  input_size,
 		                  0 );
 
-		acquiry_size = ewfcommon_get_user_input_size_variable(
+		acquiry_size = ewfinput_get_size_variable(
 		                stdout,
 		                _S_LIBEWF_CHAR( "Amount of bytes to acquire" ),
 		                0,
@@ -597,7 +598,7 @@ int main( int argc, char * const argv[] )
 			maximum_segment_file_size = INT32_MAX;
 		}
 
-		segment_file_size = ewfcommon_get_user_input_size_variable(
+		segment_file_size = ewfinput_get_size_variable(
 		                     stdout,
 		                     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
 		                     1440,
@@ -615,12 +616,12 @@ int main( int argc, char * const argv[] )
 
 		/* Chunk size (sectors per block)
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "The amount of sectors to read at once" ),
-		              ewfcommon_sector_per_block_sizes,
-		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+		              ewfinput_sector_per_block_sizes,
+		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
 		sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
 
@@ -628,7 +629,7 @@ int main( int argc, char * const argv[] )
 
 		/* Error granularity
 		 */
-		sector_error_granularity = ewfcommon_get_user_input_size_variable(
+		sector_error_granularity = ewfinput_get_size_variable(
 		                            stdout,
 		                            _S_LIBEWF_CHAR( "The amount of sectors to be used as error granularity" ),
 		                            1,
@@ -637,7 +638,7 @@ int main( int argc, char * const argv[] )
 
 		/* The amount of read error retry
 		 */
-		read_error_retry = (uint8_t) ewfcommon_get_user_input_size_variable(
+		read_error_retry = (uint8_t) ewfinput_get_size_variable(
 		                              stdout,
 		                              _S_LIBEWF_CHAR( "The amount of retries when a read error occurs" ),
 		                              0,
@@ -646,14 +647,14 @@ int main( int argc, char * const argv[] )
 
 		/* Wipe the sector on error
 		 */
-		user_input = ewfcommon_get_user_input_fixed_value(
+		user_input = ewfinput_get_fixed_value(
 		              stdout,
 		              _S_LIBEWF_CHAR( "Wipe sectors on read error (mimic EnCase like behavior)" ),
-		              ewfcommon_yes_no,
+		              ewfinput_yes_no,
 		              2,
 		              0 );
 
-		wipe_block_on_read_error = ewfcommon_determine_yes_no( user_input );
+		wipe_block_on_read_error = ewfinput_determine_yes_no( user_input );
 
 		libewf_common_free( user_input );
 
