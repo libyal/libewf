@@ -547,6 +547,8 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
+		/* TODO copy the necessary metadata
+		 */
 		count = ewfcommon_export_ewf(
 		         handle,
 		         export_handle,
