@@ -147,15 +147,15 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
-	LIBEWF_SEGMENT_TABLE *segment_table = NULL;
+	LIBEWF_SEGMENT_FILE *segment_file = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
-        char *chunk_type                    = NULL;
+        char *chunk_type                  = NULL;
 #endif
-	static char *function               = "libewf_raw_read_chunk";
-	ssize_t chunk_read_count            = 0;
-	ssize_t crc_read_count              = 0;
-	size_t chunk_data_size              = 0;
-	uint16_t segment_number             = 0;
+	static char *function             = "libewf_raw_read_chunk";
+	ssize_t chunk_read_count          = 0;
+	ssize_t crc_read_count            = 0;
+	size_t chunk_data_size            = 0;
+	uint16_t segment_number           = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -286,13 +286,28 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	
 	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
-		segment_table = internal_handle->segment_table;
+		segment_file = &( internal_handle->segment_table->segment_file[ segment_number ] );
 	}
 	else
 	{
-		segment_table = internal_handle->delta_segment_table;
+		segment_file = &( internal_handle->delta_segment_table->segment_file[ segment_number ] );
 	}
+	if( segment_file == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file.\n",
+		 function );
 
+		return( -1 );
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	/* Read the chunk data
 	 */
 	chunk_read_count = ewf_string_read_to_buffer(
@@ -307,7 +322,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	segment_table->segment_file[ segment_number ].file_offset += (off64_t) chunk_read_count;
+	segment_file->file_offset += (off64_t) chunk_read_count;
 
 	/* Determine if the chunk is not compressed
 	 */
@@ -324,19 +339,12 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 			if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
 			{
-				if( segment_table->segment_file[ segment_number ].filename == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 ".\n",
-					 function, chunk, segment_number );
-				}
-				else
-				{
-					LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
-					 function, chunk, segment_number, segment_table->segment_file[ segment_number ].filename );
-				}
+				LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
+				 function, chunk, segment_number, segment_file->filename );
+
 				return( -1 );
 			}
-			segment_table->segment_file[ segment_number ].file_offset += (off64_t) crc_read_count;
+			segment_file->file_offset += (off64_t) crc_read_count;
 
 			if( libewf_endian_convert_32bit( chunk_crc, stored_crc_buffer ) != 1 )
 			{

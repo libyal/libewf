@@ -1281,7 +1281,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			if( segment_file == NULL )
 			{
-				LIBEWF_VERBOSE_PRINT( "%s: invalid segment file .\n",
+				LIBEWF_VERBOSE_PRINT( "%s: invalid segment file.\n",
 				 function );
 
 				return( -1 );

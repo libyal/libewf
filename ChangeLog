@@ -152,6 +152,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071118
+* worked on refactoring the offset table to use the segment file struct
+
 Version: 20071117
 * changed MB to MiB, etc.
 * worked on refactoring offset table to table of chunk offsets
@@ -160,6 +163,7 @@ Version: 20071117
 * libewf_segment_file_write_open is now used by libewf_open
 * removed libewf_offset_table_set_values
 * implemented libewf_filename to reduce code duplication for wide character type
+* worked on refactoring the offset table to use the segment file struct
 
 Version: 20071114
 * worked on refactoring segment files functions
