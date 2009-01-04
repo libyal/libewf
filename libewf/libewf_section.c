@@ -2178,14 +2178,19 @@ ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE *segment_file, size_t sec
 /* Reads a session section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_SESSION session;
+	uint8_t stored_crc_buffer[ 4 ];
 
-	static char *function  = "libewf_section_session_read";
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
-	ssize_t read_count     = 0;
+	EWF_SESSION_DATA *session_data = NULL;
+	static char *function          = "libewf_section_session_read";
+	EWF_CRC calculated_crc         = 0;
+	EWF_CRC stored_crc             = 0;
+	ssize_t section_read_count     = 0;
+	ssize_t read_count             = 0;
+	size_t session_data_size       = 0;
+	uint32_t amount_of_sessions    = 0;
 
 	if( segment_file == NULL )
 	{
@@ -2194,9 +2199,9 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 
 		return( -1 );
 	}
-	if( size != EWF_SESSION_SIZE )
+	if( section_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: mismatch in section session size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -2211,42 +2216,118 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 			return( -1 );
 		}
 	}
-	read_count = libewf_segment_file_read(
-	              segment_file,
-	              &session,
-	              EWF_SESSION_SIZE );
+	section_read_count = libewf_segment_file_read(
+	                      segment_file,
+	                      &session,
+	                      EWF_SESSION_SIZE );
 
-	if( read_count != (ssize_t) EWF_SESSION_SIZE )
+	if( section_read_count != (ssize_t) EWF_SESSION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read session.\n",
 		 function );
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &session, ( EWF_SESSION_SIZE - EWF_CRC_SIZE ), 1 );
+	/* The session section contains a single CRC for the entire section
+	 */
+	calculated_crc = ewf_crc_calculate( &session, EWF_SESSION_SIZE, 1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, session.crc ) != 1 )
+#if defined( HAVE_DEBUG_OUTPUT )
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( session.unknown, 24 ); );
+#endif
+
+	if( libewf_endian_convert_32bit( &amount_of_sessions, session.amount_of_sessions ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sessions value.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( stored_crc != calculated_crc )
+	if( amount_of_sessions == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-		 function, stored_crc, calculated_crc );
+		LIBEWF_WARNING_PRINT( "%s: session contains no session data!.\n",
+		 function );
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			return( -1 );
 		}
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( session.unknown, 68 ); );
-#endif
+	else
+	{
+		session_data_size = EWF_SESSION_DATA_SIZE * amount_of_sessions;
+		session_data      = (EWF_SESSION_DATA *) libewf_common_alloc( session_data_size );
 
-	return( (ssize_t) size );
+		if( session_data == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate session data.\n",
+			 function );
+
+			return( -1 );
+		}
+		read_count = libewf_segment_file_read(
+		              segment_file,
+		              session_data,
+		              session_data_size );
+	
+		if( read_count != (ssize_t) session_data_size )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read error2 sectors.\n",
+			 function );
+
+			libewf_common_free( session_data );
+
+			return( -1 );
+		}
+		section_read_count += read_count;
+
+		/* The session section contains a single CRC for the entire section
+		 */
+		calculated_crc = ewf_crc_calculate( session_data, session_data_size, calculated_crc );
+
+		read_count = libewf_segment_file_read(
+		              segment_file,
+		              stored_crc_buffer,
+		              EWF_CRC_SIZE );
+
+		if( read_count != (ssize_t) EWF_CRC_SIZE )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
+			 function );
+
+			libewf_common_free( session_data );
+
+			return( -1 );
+		}
+		section_read_count += read_count;
+
+		if( libewf_endian_convert_32bit( &stored_crc, stored_crc_buffer ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
+			 function );
+
+			libewf_common_free( session_data );
+
+			return( -1 );
+		}
+		if( stored_crc != calculated_crc )
+		{
+			LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+			 function, stored_crc, calculated_crc );
+
+			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+			{
+				libewf_common_free( session_data );
+
+				return( -1 );
+			}
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) session_data, session_data_size ); );
+#endif
+		libewf_common_free( session_data );
+	}
+	return( section_read_count );
 }
 
 /* Reads a data section from file
@@ -2776,7 +2857,6 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( error2.unknown, 200 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
 #endif
 
 	if( amount_of_errors == 0 )
@@ -2855,6 +2935,9 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 				return( -1 );
 			}
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
+#endif
 		if( *acquiry_error_sectors != NULL )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: acquiry error sectors already set in handle - removing previous one.\n",
