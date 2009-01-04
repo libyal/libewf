@@ -1,19 +1,10 @@
 /*
- * EWF table section specification
+ * EWF table section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFTABLE_H
-#define _EWFTABLE_H
+#ifndef _EWF_TABLE_H
+#define _EWF_TABLE_H
 
 #include <inttypes.h>
 
@@ -104,13 +95,13 @@ struct ewf_table_offset
 
 EWF_TABLE *ewf_table_alloc( void );
 EWF_TABLE_OFFSET *ewf_table_offsets_alloc( uint32_t amount );
-EWF_TABLE_OFFSET *ewf_table_offsets_realloc( EWF_TABLE_OFFSET *offsets, uint32_t amount );
+EWF_TABLE_OFFSET *ewf_table_offsets_realloc( EWF_TABLE_OFFSET *offsets, uint32_t previous_amount, uint32_t new_amount );
 void ewf_table_free( EWF_TABLE *table );
 void ewf_table_offsets_free( EWF_TABLE_OFFSET *offsets );
 EWF_TABLE *ewf_table_read( int file_descriptor );
 EWF_TABLE_OFFSET *ewf_table_offsets_read( int file_descriptor, uint32_t amount );
-ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount );
-ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor );
+int32_t ewf_table_write( EWF_TABLE *table, int file_descriptor );
+int32_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount );
 
 #ifdef __cplusplus
 }

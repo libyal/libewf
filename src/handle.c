@@ -4,16 +4,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -47,6 +38,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libewf_definitions.h"
+#include "libewf_header_values.h"
 #include "libewf_notify.h"
 
 #include "ewf_compress.h"
@@ -56,7 +49,6 @@
 #include "ewf_md5hash.h"
 #include "ewf_sectors.h"
 #include "handle.h"
-#include "header_values.h"
 #include "offset_table.h"
 #include "segment_table.h"
 
@@ -117,8 +109,18 @@ LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: invalid handle.\n" );
 	}
-	handle->raw_data                  = ewf_sectors_chunk_alloc( size - EWF_CRC_SIZE );
-	handle->chunk_data                = ewf_sectors_chunk_alloc( size );
+	handle->raw_data = ewf_sectors_chunk_alloc( size - EWF_CRC_SIZE );
+
+	if( handle->raw_data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: unable to create sectors chunk (raw data).\n" );
+	}
+	handle->chunk_data = ewf_sectors_chunk_alloc( size );
+
+	if( handle->chunk_data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: unable to create sectors chunk (chunk data).\n" );
+	}
 	handle->allocated_chunk_data_size = size;
 	handle->cached_chunk              = -1;
 
@@ -133,8 +135,18 @@ LIBEWF_HANDLE *libewf_handle_cache_realloc( LIBEWF_HANDLE *handle, uint32_t size
 	{
 		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: invalid handle.\n" );
 	}
-	handle->raw_data                  = ewf_sectors_chunk_realloc( handle->raw_data, ( size - EWF_CRC_SIZE ) );
-	handle->chunk_data                = ewf_sectors_chunk_realloc( handle->chunk_data, size );
+	handle->raw_data = ewf_sectors_chunk_realloc( handle->raw_data, handle->allocated_chunk_data_size, ( size - EWF_CRC_SIZE ) );
+
+	if( handle->raw_data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to realloc sectors chunk (raw data).\n" );
+	}
+	handle->chunk_data = ewf_sectors_chunk_realloc( handle->chunk_data, handle->allocated_chunk_data_size, size );
+
+	if( handle->chunk_data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to realloc sectors chunk (chunk data).\n" );
+	}
 	handle->allocated_chunk_data_size = size;
 	handle->cached_chunk              = -1;
 
@@ -149,8 +161,18 @@ LIBEWF_HANDLE *libewf_handle_cache_wipe( LIBEWF_HANDLE *handle )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_handle_cache_wipe: invalid handle.\n" );
 	}
-	handle->raw_data     = ewf_sectors_chunk_wipe( handle->raw_data, ( handle->allocated_chunk_data_size - EWF_CRC_SIZE ) );
-	handle->chunk_data   = ewf_sectors_chunk_wipe( handle->chunk_data, handle->allocated_chunk_data_size );
+	handle->raw_data = ewf_sectors_chunk_wipe( handle->raw_data, ( handle->allocated_chunk_data_size - EWF_CRC_SIZE ) );
+
+	if( handle->raw_data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to wipe sectors chunk (raw data).\n" );
+	}
+	handle->chunk_data = ewf_sectors_chunk_wipe( handle->chunk_data, handle->allocated_chunk_data_size );
+
+	if( handle->chunk_data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to wipe sectors chunk (chunk data).\n" );
+	}
 	handle->cached_chunk = -1;
 
 	return( handle );
@@ -240,12 +262,23 @@ void libewf_handle_set_header2( LIBEWF_HANDLE *handle, EWF_HEADER *header2 )
  */
 void libewf_handle_set_md5hash( LIBEWF_HANDLE *handle, EWF_MD5HASH *md5hash )
 {
+	EWF_MD5HASH *data_set = NULL;
+
 	if( handle == NULL )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: invalid handle.\n" );
 	}
 	handle->md5hash = ewf_md5hash_alloc();
 
-	memcpy( (uint8_t *) handle->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
+	if( handle->md5hash == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: unable to create MD5 hash.\n" );
+	}
+	data_set = (EWF_MD5HASH *) libewf_memcpy( (uint8_t *) handle->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
+
+	if( data_set == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: unable to set MD5 hash.\n" );
+	}
 }
 

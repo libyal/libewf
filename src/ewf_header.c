@@ -233,6 +233,8 @@ int32_t ewf_header_write( EWF_HEADER *header, int file_descriptor, uint32_t size
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_header_write: unable to write header.\n" );
+
 		return( -1 );
 	}
 	return( count );

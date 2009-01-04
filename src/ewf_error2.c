@@ -1,19 +1,10 @@
 /*
- * EWF error2 section specification
+ * EWF error2 section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,11 +33,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 
@@ -54,51 +43,64 @@
 #include "ewf_error2.h"
 
 /* Allocates memory for a new ewf error2 struct
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_ERROR2 *ewf_error2_alloc( void )
 {
-	EWF_ERROR2 *error2 = (EWF_ERROR2 *) malloc( EWF_ERROR2_SIZE );
+	EWF_ERROR2 *error2 = NULL;
+
+	error2 = (EWF_ERROR2 *) libewf_alloc_cleared( EWF_ERROR2_SIZE );
 
 	if( error2 == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_error2_alloc: unable to allocate ewf_error2.\n" );
-	}
-	memset( error2, 0, EWF_ERROR2_SIZE );
+		LIBEWF_WARNING_PRINT( "ewf_error2_alloc: unable to allocate ewf_error2.\n" );
 
+		return( NULL );
+	}
 	return( error2 );
 }
 
 /* Allocates memory for a buffer of ewf error2 sectors 
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_ERROR2_SECTOR *ewf_error2_sectors_alloc( uint32_t amount )
 {
-	size_t size               = EWF_ERROR2_SECTOR_SIZE * amount;
-	EWF_ERROR2_SECTOR *sectors = (EWF_ERROR2_SECTOR *) malloc( size );
+	EWF_ERROR2_SECTOR *sectors = NULL;
+	uint32_t size              = 0;
+
+	size    = EWF_ERROR2_SECTOR_SIZE * amount;
+	sectors = (EWF_ERROR2_SECTOR *) libewf_alloc_cleared( size );
 
 	if( sectors == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_error2_sectors_alloc: unable to allocate sectors.\n" );
-	}
-	memset( sectors, 0, size );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_alloc: unable to allocate sectors.\n" );
 
+		return( NULL );
+	}
 	return( sectors );
 }
 
 /* Reallocates memory for a buffer of ewf error2 sectors 
+ * Return a pointer to the instance, NULL on error
  */
-EWF_ERROR2_SECTOR *ewf_error2_sectors_realloc( EWF_ERROR2_SECTOR *sectors, uint32_t amount )
+EWF_ERROR2_SECTOR *ewf_error2_sectors_realloc( EWF_ERROR2_SECTOR *sectors, uint32_t previous_amount, uint32_t new_amount )
 {
-	size_t size = EWF_ERROR2_SECTOR_SIZE * amount;
+	uint32_t previous_size = previous_amount * EWF_ERROR2_SECTOR_SIZE;
+	uint32_t new_size      = new_amount * EWF_ERROR2_SECTOR_SIZE;
 
 	if( sectors == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_error2_sectors_realloc: invalid sectors.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_realloc: invalid sectors.\n" );
+
+		return( NULL );
 	}
-	sectors = (EWF_ERROR2_SECTOR *) realloc( sectors, size );
+	sectors = (EWF_ERROR2_SECTOR *) libewf_realloc_new_cleared( sectors, previous_size, new_size );
 
 	if( sectors == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_error2_sectors_realloc: unable to allocate sectors.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_realloc: unable to reallocate sectors.\n" );
+
+		return( NULL );
 	}
 	return( sectors );
 }
@@ -109,9 +111,11 @@ void ewf_error2_free( EWF_ERROR2 *error2 )
 {
 	if( error2 == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_error2_free: invalid error2.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_free: invalid error2.\n" );
+
+		return;
 	}
-	free( error2 );
+	libewf_free( error2 );
 }
 
 /* Frees memory of a buffer of ewf error2 sectors
@@ -120,42 +124,69 @@ void ewf_error2_sectors_free( EWF_ERROR2_SECTOR *sectors )
 {
 	if( sectors == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_error2_sectors_free: invalid sectors.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_free: invalid sectors.\n" );
+
+		return;
 	}
-	free( sectors );
+	libewf_free( sectors );
 }
 
 /* Reads the error2 from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_ERROR2 *ewf_error2_read( int file_descriptor )
 {
-	EWF_ERROR2 *error2 = ewf_error2_alloc();
+	EWF_ERROR2 *error2 = NULL;
+	uint32_t size      = EWF_ERROR2_SIZE;
+	int32_t count      = 0;
 
-	ssize_t count = read( file_descriptor, error2, EWF_ERROR2_SIZE );
+	error2 = ewf_error2_alloc();
 
-	if( count < EWF_ERROR2_SIZE )
+	if( error2 == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_error2_read: unable to create error2.\n" );
+
+		return( NULL );
+	}
+	count = libewf_read( file_descriptor, error2, size );
+
+	if( count < size )
 	{
 		ewf_error2_free( error2 );
 
-		LIBEWF_FATAL_PRINT( "ewf_error2_read: unable to read ewf_error2.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_read: unable to read ewf_error2.\n" );
+
+		return( NULL );
 	}
 	return( error2 );
 }
 
 /* Reads the ewf error2 sectors from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_ERROR2_SECTOR *ewf_error2_sectors_read( int file_descriptor, uint32_t amount )
 {
-	EWF_ERROR2_SECTOR *sectors = ewf_error2_sectors_alloc( amount );
+	EWF_ERROR2_SECTOR *sectors = NULL;
+	uint32_t size              = amount * EWF_ERROR2_SECTOR_SIZE;
+	int32_t count              = 0;
 
-	size_t size   = EWF_ERROR2_SECTOR_SIZE * amount;
-	ssize_t count = read( file_descriptor, sectors, size );
+	sectors = ewf_error2_sectors_alloc( amount );
+
+	if( sectors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_read: unable to create error2 sectors.\n" );
+
+		return( NULL );
+	}
+	count = libewf_read( file_descriptor, sectors, size );
 
 	if( count < size )
 	{
 		ewf_error2_sectors_free( sectors );
 
-		LIBEWF_FATAL_PRINT( "ewf_error2_sectors_read: unable to read sectors.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_read: unable to read error2 sectors.\n" );
+
+		return( NULL );
 	}
 	return( sectors );
 }
@@ -164,15 +195,15 @@ EWF_ERROR2_SECTOR *ewf_error2_sectors_read( int file_descriptor, uint32_t amount
  * this should be written by the sectors write function
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
+int32_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 {
 	EWF_CRC *crc  = NULL;
-	ssize_t count = 0;
-	size_t size   = EWF_ERROR2_SIZE;
+	uint32_t size = EWF_ERROR2_SIZE;
+	int32_t count = 0;
 
 	if( error2 == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_error2_write: invalid error2.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_write: invalid error2.\n" );
 
 		return( -1 );
 	}
@@ -180,7 +211,7 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 
 	if( crc == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_error2_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_write: unable to calculate CRC.\n" );
 
 		return( -1 );
 	}
@@ -188,10 +219,12 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 
 	ewf_crc_free( crc );
 
-	count = write( file_descriptor, error2, size );
+	count = libewf_write( file_descriptor, error2, size );
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_error2_write: unable to write error2.\n" );
+
 		return( -1 );
 	}
 	return( count );
@@ -200,30 +233,32 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 /* Writes the sectors to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount )
+int32_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount )
 {
 	EWF_CRC *crc      = NULL;
-	ssize_t count     = 0;
-	ssize_t crc_count = 0;
-	size_t size       = EWF_ERROR2_SECTOR_SIZE * amount;
+	uint32_t size     = EWF_ERROR2_SECTOR_SIZE * amount;
+	int32_t count     = 0;
+	int32_t crc_count = 0;
 
 	if( sectors == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_error2_sectors_write: invalid sectors.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: invalid sectors.\n" );
 
 		return( -1 );
 	}
-	count = write( file_descriptor, sectors, size );
+	count = libewf_write( file_descriptor, sectors, size );
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: unable write error2 sectors.\n" );
+
 		return( -1 );
 	}
 	crc = ewf_crc_calculate( sectors, size, 1 );
 
 	if( crc == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_error2_sectors_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: unable to calculate CRC.\n" );
 
 		return( -1 );
 	}
@@ -233,7 +268,7 @@ ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descripto
 
 	if( crc_count == -1 )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_error2_sectors_write: unable to write CRC.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_error2_sectors_write: unable to write CRC.\n" );
 
 		return( -1 );
 	}

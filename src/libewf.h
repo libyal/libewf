@@ -5,16 +5,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -28,7 +19,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -50,16 +41,17 @@
 #include <config.h>
 #endif
 
-#include "definitions.h"
-
+#include "libewf_common.h"
+#include "libewf_definitions.h"
+#include "libewf_endian.h"
 #include "libewf_notify.h"
 
 #include "ewf_compress.h"
-#include "file.h"
+#include "libewf_file.h"
+#include "libewf_header_values.h"
 #include "file_read.h"
 #include "file_write.h"
 #include "handle.h"
-#include "header_values.h"
 
 #ifdef __cplusplus
 extern "C" {

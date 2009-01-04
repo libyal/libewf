@@ -1,19 +1,10 @@
 /*
- * EWF hash section specification
+ * EWF hash section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFHASH_H
-#define _EWFHASH_H
+#ifndef _EWF_HASH_H
+#define _EWF_HASH_H
 
 #include <inttypes.h>
 
@@ -95,7 +86,7 @@ struct ewf_hash
 EWF_HASH *ewf_hash_alloc( void );
 void ewf_hash_free( EWF_HASH *hash );
 EWF_HASH *ewf_hash_read( int file_descriptor );
-ssize_t ewf_hash_write( EWF_HASH *hash, int file_descriptor );
+int32_t ewf_hash_write( EWF_HASH *hash, int file_descriptor );
 
 #ifdef __cplusplus
 }

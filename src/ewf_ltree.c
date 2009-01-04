@@ -1,19 +1,10 @@
 /*
- * EWF ltree section specification
+ * EWF ltree section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,11 +33,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 
@@ -55,17 +44,20 @@
 #include "ewf_ltree.h"
 
 /* Allocates memory for a new ewf ltree struct
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_LTREE *ewf_ltree_alloc( void )
 {
-	EWF_LTREE *ltree = (EWF_LTREE *) malloc( EWF_LTREE_SIZE );
+	EWF_LTREE *ltree = NULL;
+
+	ltree = (EWF_LTREE *) libewf_alloc_cleared( EWF_LTREE_SIZE );
 
 	if( ltree == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_ltree_alloc: unable to allocate ewf_ltree.\n" );
-	}
-	memset( ltree, 0, EWF_LTREE_SIZE );
+		LIBEWF_WARNING_PRINT( "ewf_ltree_alloc: unable to allocate ewf_ltree.\n" );
 
+		return( NULL );
+	}
 	return( ltree );
 }
 
@@ -75,23 +67,39 @@ void ewf_ltree_free( EWF_LTREE *ltree )
 {
 	if( ltree == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_ltree_free: invalid ltree.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_ltree_free: invalid ltree.\n" );
+
+		return;
 	}
-	free( ltree );
+	libewf_free( ltree );
 }
 
 /* Reads the ltree from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_LTREE *ewf_ltree_read( int file_descriptor )
 {
-	EWF_LTREE *ltree = ewf_ltree_alloc();
-	ssize_t count    = read( file_descriptor, ltree, EWF_LTREE_SIZE );
+	EWF_LTREE *ltree = NULL;
+	uint32_t size    = EWF_LTREE_SIZE;
+	int32_t count    = 0;
 
-	if( count < EWF_LTREE_SIZE )
+	ltree = ewf_ltree_alloc();
+
+	if( ltree == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_ltree_read: unable to read ewf_ltree.\n" );
+
+		return( NULL );
+	}
+	count = libewf_read( file_descriptor, ltree, size );
+
+	if( count < size )
 	{
 		ewf_ltree_free( ltree );
 
-		LIBEWF_FATAL_PRINT( "ewf_ltree_read: unable to read ewf_ltree.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_ltree_read: unable to read ewf_ltree.\n" );
+
+		return( NULL );
 	}
 	return( ltree );
 }
@@ -99,11 +107,11 @@ EWF_LTREE *ewf_ltree_read( int file_descriptor )
 /* Writes the ltree to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
+int32_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 {
 	EWF_CRC *crc  = NULL;
-	ssize_t count = 0;
-	size_t size   = EWF_LTREE_SIZE;
+	uint32_t size = EWF_LTREE_SIZE;
+	int32_t count = 0;
 
 	if( ltree == NULL )
 	{
@@ -125,7 +133,7 @@ ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 	ewf_crc_free( crc );
 */
 
-	count = write( file_descriptor, ltree, size );
+	count = libewf_write( file_descriptor, ltree, size );
 
 	if( count < size )
 	{
@@ -136,26 +144,31 @@ ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 
 /* Reads the tree data from a file descriptor
  * Test function
+ * Return a pointer to the new instance, NULL on error
  */
-EWF_HEADER *ewf_tree_data_read( int file_descriptor, size_t size )
+EWF_HEADER *ewf_tree_data_read( int file_descriptor, uint32_t size )
 {
 	EWF_HEADER *ascii_header        = NULL;
 	EWF_HEADER *uncompressed_header = NULL;
-	ssize_t count                   = 0;
+	int32_t count                   = 0;
 
 	uncompressed_header = ewf_header_alloc( size );
 
 	if( uncompressed_header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_ltree_data_read: invalid uncompressed header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_ltree_data_read: invalid uncompressed header.\n" );
+
+		return( NULL );
 	}
-	count = read( file_descriptor, uncompressed_header, size );
+	count = libewf_read( file_descriptor, uncompressed_header, size );
 
 	if( count < size )
 	{
-		free( uncompressed_header );
+		ewf_header_free( uncompressed_header );
 
-		LIBEWF_FATAL_PRINT( "ewf_tree_data_read: unable to read tree_data.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_tree_data_read: unable to read tree_data.\n" );
+
+		return( NULL );
 	}
 	ascii_header = ewf_header2_convert_utf16_to_ascii( uncompressed_header, size );
 

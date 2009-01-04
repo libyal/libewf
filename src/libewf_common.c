@@ -53,6 +53,25 @@ void *libewf_alloc( uint32_t size )
 	return( malloc( (size_t) size ) );
 }
 
+/* Function to wrap realloc
+ */
+void *libewf_realloc( void *buffer, uint32_t size )
+{
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc: invalid buffer.\n" );
+
+		return( NULL );
+	}
+	if( size > 0x80000000 )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc: invalid size only values below 2^32 are supported.\n" );
+
+		return( NULL );
+	}
+	return( realloc( buffer, (size_t) size ) );
+}
+
 /* Function to wrap free
  */
 void libewf_free( void *buffer )
@@ -108,11 +127,24 @@ int32_t libewf_memcmp( const void *buffer1, const void *buffer2, uint32_t size )
 {
 	if( ( buffer1 == NULL ) || ( buffer2 == NULL ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_strlen: invalid buffer.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_memcmp: invalid buffer.\n" );
 
 		return( -1 );
 	}
 	return( (int32_t) memcmp( buffer1, buffer2, (size_t) size ) );
+}
+
+/* Function to wrap strdup
+ */
+char *libewf_strdup( const char *string )
+{
+	if( string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_strdup: invalid string.\n" );
+
+		return( NULL );
+	}
+	return( strdup( string ) );
 }
 
 /* Function to wrap strlen
@@ -126,6 +158,19 @@ uint32_t libewf_strlen( const char *string )
 		return( 0 );
 	}
 	return( (int32_t) strlen( string ) );
+}
+
+/* Function to wrap strchr
+ */
+char *libewf_strchr( const char *string, int character )
+{
+	if( string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_strchr: invalid string.\n" );
+
+		return( NULL );
+	}
+	return( strchr( string, character ) );
 }
 
 /* Function to wrap read
@@ -200,6 +245,86 @@ void *libewf_alloc_cleared( uint32_t size )
 		LIBEWF_WARNING_PRINT( "libewf_alloc_cleared: unable to clear buffer.\n" );
 
 		libewf_free( allocated_buffer );
+
+		return( NULL );
+	}
+	return( cleared_buffer );
+}
+
+/* Function to reallocated fully wiped memory
+ */
+void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_t new_size )
+{
+	void *reallocated_buffer = NULL;
+	void *cleared_buffer     = NULL;
+
+	if( previous_size > 0x80000000 )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_full_cleared: invalid size only values below 2^32 are supported.\n" );
+
+		return( NULL );
+	}
+	if( new_size <= previous_size )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_full_cleared: new size must be greater than previous size.\n" );
+
+		return( NULL );
+	}
+	reallocated_buffer = libewf_realloc( buffer, (size_t) new_size );
+
+	if( reallocated_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_full_cleared: unable to reallocate buffer.\n" );
+
+		return( NULL );
+	}
+	cleared_buffer = libewf_memset( reallocated_buffer, 0, new_size );
+
+	if( cleared_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_full_cleared: unable to clear buffer.\n" );
+
+		libewf_free( reallocated_buffer );
+
+		return( NULL );
+	}
+	return( cleared_buffer );
+}
+
+/* Function to reallocated wiped newly allocated memory
+ */
+void *libewf_realloc_new_cleared( void *buffer, uint32_t previous_size, uint32_t new_size )
+{
+	void *reallocated_buffer = NULL;
+	void *cleared_buffer     = NULL;
+
+	if( previous_size > 0x80000000 )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_new_cleared: invalid size only values below 2^32 are supported.\n" );
+
+		return( NULL );
+	}
+	if( new_size <= previous_size )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_new_cleared: new size must be greater than previous size.\n" );
+
+		return( NULL );
+	}
+	reallocated_buffer = libewf_realloc( buffer, (size_t) new_size );
+
+	if( reallocated_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_new_cleared: unable to reallocate buffer.\n" );
+
+		return( NULL );
+	}
+	cleared_buffer = libewf_memset( ( reallocated_buffer + previous_size ), 0, ( new_size - previous_size ) );
+
+	if( cleared_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc_new_cleared: unable to clear buffer.\n" );
+
+		libewf_free( reallocated_buffer );
 
 		return( NULL );
 	}

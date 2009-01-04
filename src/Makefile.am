@@ -2,10 +2,6 @@ lib_LIBRARIES = libewf.a
 bin_PROGRAMS = ewfacquire ewfexport ewfinfo ewfverify
 
 libewf_a_SOURCES = \
-	definitions.h \
-	libewf_common.c libewf_common.h \
-	libewf_notify.c libewf_notify.h \
-	libewf_endian.c libewf_endian.h \
 	ewf_compress.c ewf_compress.h \
 	ewf_crc.c ewf_crc.h \
 	ewf_data.c ewf_data.h \
@@ -21,12 +17,17 @@ libewf_a_SOURCES = \
 	ewf_table.c ewf_table.h \
 	ewf_volume.c ewf_volume.h \
 	ewf_volume_smart.c ewf_volume_smart.h \
+	libewf_common.c libewf_common.h \
+	libewf_definitions.h \
+	libewf_endian.c libewf_endian.h \
+	libewf_file.c libewf_file.h \
+	libewf_header_values.c libewf_header_values.h \
+	libewf_md5.h \
+	libewf_notify.c libewf_notify.h \
+	\
 	handle.c handle.h \
-	header_values.c header_values.h \
-	file.c file.h \
 	file_read.c file_read.h \
 	file_write.c file_write.h \
-	md5.h \
 	offset_table.c offset_table.h \
 	section_list.c section_list.h \
 	segment_table.c segment_table.h

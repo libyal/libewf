@@ -63,7 +63,7 @@ void ewf_crc_free( EWF_CRC *crc )
 {
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_free: invalid crc.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_crc_free: invalid CRC.\n" );
 
 		return;
 	}
@@ -85,7 +85,7 @@ EWF_CRC *ewf_crc_read( int file_descriptor )
 
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_read: unable to create crc.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_crc_read: unable to create CRC.\n" );
 
 		return( NULL );
 	}
@@ -94,7 +94,7 @@ EWF_CRC *ewf_crc_read( int file_descriptor )
 
 	if( count < size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_read: unable to read crc.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_crc_read: unable to read CRC.\n" );
 
 		ewf_crc_free( crc );
 
@@ -117,7 +117,7 @@ int32_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
 
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_write: invalid crc.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_crc_write: invalid CRC.\n" );
 
 		return( -1 );
 	}
@@ -128,6 +128,8 @@ int32_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_crc_write: error writing CRC.\n" );
+
 		return( -1 );
 	}
 	return( count );
@@ -158,7 +160,7 @@ EWF_CRC *ewf_crc_calculate( void *buffer, int32_t buffer_size, uint32_t previous
 
 	if( crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_crc_calculate: unable to create crc.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_crc_calculate: unable to create CRC.\n" );
 
 		return( NULL );
 	}

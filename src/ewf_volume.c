@@ -142,6 +142,8 @@ int32_t ewf_volume_write( EWF_VOLUME *volume, int file_descriptor )
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_volume_write: unable to write volume.\n" );
+
 		return( -1 );
 	}
 	return( count );

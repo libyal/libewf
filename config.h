@@ -42,6 +42,9 @@
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
 
+/* Define to 1 if you have the `strdup' function. */
+#define HAVE_STRDUP 1
+
 /* Define to 1 if you have the `strftime' function. */
 #define HAVE_STRFTIME 1
 
@@ -82,13 +85,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20060824-1"
+#define PACKAGE_STRING "libewf 20060826-1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20060824-1"
+#define PACKAGE_VERSION "20060826-1"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -97,7 +100,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20060824-1"
+#define VERSION "20060826-1"
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

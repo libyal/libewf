@@ -1,19 +1,10 @@
 /*
- * EWF file header specification
+ * EWF file header
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFFILEHEADER_H
-#define _EWFFILEHEADER_H
+#ifndef _EWF_FILE_HEADER_H
+#define _EWF_FILE_HEADER_H
 
 #include <inttypes.h>
 
@@ -89,7 +80,7 @@ EWF_FILE_HEADER *ewf_file_header_alloc( void );
 void ewf_file_header_free( EWF_FILE_HEADER *file_header );
 uint8_t ewf_file_header_check_signature( uint8_t *signature );
 EWF_FILE_HEADER *ewf_file_header_read( int file_descriptor );
-ssize_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor );
+int32_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor );
 
 #ifdef __cplusplus
 }

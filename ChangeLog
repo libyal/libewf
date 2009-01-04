@@ -39,24 +39,41 @@ Code clean up:
 * all: remove unrequired includes
 
 Finished:
-  - libewf_notify (c/h)
   - libewf_common (c/h)
+  - libewf_endian (c/h)
+  - libewf_notify (c/h)
+  - libewf_md5 (c/h)
   - ewf_compress (c/h)
   - ewf_crc (c/h)
   - ewf_data (c/h)
+  - ewf_error2 (c/h)
+  - ewf_file_header (c/h)
+  - ewf_hash (c/h)
   - ewf_header (c/h)
   - ewf_header2 (c/h)
+  - ewf_ltree (c/h) -  still experimental code
+  - ewf_md5hash (c/h)
   - ewf_section (c/h)
+  - ewf_sectors (c/h)
+  - ewf_table (c/h)
   - ewf_volume (c/h)
   - ewf_volume_smart (c/h)
 
 To do:
-  - ewf_table (c/h)
-  - ewf_file_header (c/h)
-  - ewf_sectors (c/h)
-  - ewf_md5hash (c/h)
-  - ewf_hash (c/h)
-  - ewf_error2 (c/h)
+  - libewf_header_values (c/h)
+  - libewf_offset_table (c/h)
+  - libewf_section_list (c/h)
+  - libewf_segment_table (c/h)
+  - libewf_handle (c/h)
+  - libewf_file_read (c/h)
+  - libewf_file_write (c/h)
+  - libewf_file (c/h)
+
+Version: 20060826
+* worked on code clean up and improved error handling
+* fixed realloc calculation bug in file_read
+* moved definitions from .h files
+* changed headers in all files
 
 Version: 20060824
 * worked on code clean up and improved error handling

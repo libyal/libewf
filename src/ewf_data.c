@@ -142,6 +142,8 @@ int32_t ewf_data_write( EWF_DATA *data, int file_descriptor )
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_data_write: unable to write data.\n" );
+
 		return( -1 );
 	}
 	return( count );

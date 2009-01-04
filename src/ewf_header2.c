@@ -208,7 +208,9 @@ EWF_HEADER *ewf_header2_read( int file_descriptor, uint32_t size )
 
 	if( uncompressed_header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header2_read: unable to read uncompressed header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_header2_read: unable to read uncompressed header.\n" );
+
+		return( NULL );
 	}
 	ascii_header = ewf_header2_convert_utf16_to_ascii( uncompressed_header, size );
 

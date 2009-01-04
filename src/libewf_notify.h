@@ -50,18 +50,12 @@ extern "C" {
 #define LIBEWF_FATAL_PRINT libewf_fatal_print
 #define LIBEWF_THROW_EXCEPTION libewf_throw_exception
 
-#define LIBEWF_EXCEPTION_GENERIC	(void *) -1
-#define LIBEWF_EXCEPTION_MEMORY		(void *) -2
-#define LIBEWF_EXCEPTION_IO		(void *) -3
-#define LIBEWF_EXCEPTION_PARAMETER	(void *) -4
-
 extern uint8_t libewf_verbose;
 extern uint8_t libewf_warning_non_fatal;
 
 extern void libewf_verbose_print( char *, ... );
 extern void libewf_warning_print( char *, ... );
 extern void libewf_fatal_print( char *, ... );
-extern void libewf_throw_exception( void *exception, char *, ... );
 
 void libewf_dump_data( uint8_t *data, size_t size );
 

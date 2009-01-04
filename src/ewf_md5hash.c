@@ -1,19 +1,10 @@
 /*
- * EWF MD5 hash specification
+ * EWF MD5 hash
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,27 +33,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_notify.h"
 
 #include "ewf_md5hash.h"
 
 /* Allocates memory for a new ewf md5 hash
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_MD5HASH *ewf_md5hash_alloc( void )
 {
-	EWF_MD5HASH *md5hash = (EWF_MD5HASH *) malloc( EWF_MD5HASH_SIZE );
+	EWF_MD5HASH *md5hash = NULL;
+
+	md5hash = (EWF_MD5HASH *) libewf_alloc_cleared( EWF_MD5HASH_SIZE );
 
 	if( md5hash == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_md5hash_alloc: unable to allocate ewf_md5hash.\n" );
-	}
-	memset( md5hash, 0, EWF_MD5HASH_SIZE );
+		LIBEWF_WARNING_PRINT( "ewf_md5hash_alloc: unable to allocate ewf_md5hash.\n" );
 
+		return( NULL );
+	}
 	return( md5hash );
 }
 
@@ -72,48 +64,58 @@ void ewf_md5hash_free( EWF_MD5HASH *md5hash )
 {
 	if( md5hash == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_md5hash_free: invalid md5hash.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_md5hash_free: invalid md5hash.\n" );
+
+		return;
 	}
-	free( md5hash );
+	libewf_free( md5hash );
 }
 
 /* Writes the MD5 hash to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_md5hash_write( EWF_MD5HASH *md5hash, int file_descriptor )
+int32_t ewf_md5hash_write( EWF_MD5HASH *md5hash, int file_descriptor )
 {
-	ssize_t count;
+	uint32_t size = EWF_MD5HASH_SIZE;
+	int32_t count = 0;
 
 	if( md5hash == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_md5hash_write: invalid md5hash.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_md5hash_write: invalid md5hash.\n" );
 
 		return( -1 );
 	}
-	count = write( file_descriptor, md5hash, EWF_MD5HASH_SIZE );
+	count = libewf_write( file_descriptor, md5hash, size );
 
-	if( count < EWF_MD5HASH_SIZE )
+	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_md5hash_write: unable to write md5hash.\n" );
+
 		return( -1 );
 	}
 	return( count );
 }
 
 /* Converts the md5 hash to a printable string
+ * Return a pointer to the new instance, NULL on error
  */
 char *ewf_md5hash_to_string( EWF_MD5HASH *md5hash )
 {
-	/* an md5 hash consists of 32 characters */
-	char *string       = (char *) malloc( 33 * sizeof( char ) );
-	uint64_t iterator = 0;
+	/* An md5 hash consists of 32 characters + 1 end of string
+	 */
+	char *string          = (char *) libewf_alloc( 33 * sizeof( char ) );
+	unsigned char md5char = 0;
+	uint64_t iterator     = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "evf_md5hash_to_string: unable to allocate string.\n" );
+		LIBEWF_WARNING_PRINT( "evf_md5hash_to_string: unable to allocate string.\n" );
+
+		return( NULL );
 	}
 	for( iterator = 0; iterator < 16; iterator++ )
 	{
-		unsigned char md5char = *( md5hash + iterator );
+		md5char = *( md5hash + iterator );
 
 		snprintf( &string[ iterator * 2 ], 3, "%02x", md5char );
 	}

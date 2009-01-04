@@ -4,16 +4,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -50,9 +41,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
-#include "md5.h"
+#include "libewf_md5.h"
 
 #include "ewf_compress.h"
 #include "ewf_crc.h"
@@ -69,7 +61,7 @@
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
 #include "ewf_table.h"
-#include "file.h"
+#include "libewf_file.h"
 #include "handle.h"
 #include "section_list.h"
 #include "offset_table.h"
@@ -104,7 +96,7 @@ void libewf_section_read_data( LIBEWF_HANDLE *handle, int file_descriptor, size_
 	uint8_t *data              = NULL;
 	uint8_t *uncompressed_data = NULL;
 	uint32_t uncompressed_size = 0;
-	ssize_t read_count         = 0;
+	int32_t read_count         = 0;
 	int result                 = 0;
 
 	if( handle == NULL )
@@ -112,7 +104,7 @@ void libewf_section_read_data( LIBEWF_HANDLE *handle, int file_descriptor, size_
 		LIBEWF_FATAL_PRINT( "libewf_section_read_data: incorrect handle.\n" );
 	}
 	data       = (uint8_t *) malloc( sizeof( uint8_t ) * size );
-	read_count = read( file_descriptor, data, size );
+	read_count = libewf_read( file_descriptor, data, size );
 
 	if( read_count < size )
 	{
@@ -312,7 +304,7 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_volume_read: mismatch in section data size.\n" );
 	}
-	if( ( bytes_per_chunk + EWF_CRC_SIZE ) > handle->chunk_size )
+	if( ( bytes_per_chunk + EWF_CRC_SIZE ) > handle->allocated_chunk_data_size )
 	{
 		handle = libewf_handle_cache_realloc( handle, (uint32_t) ( bytes_per_chunk + EWF_CRC_SIZE ) );
 
@@ -454,6 +446,10 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	table = ewf_table_read( file_descriptor );
 
+	if( table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_table_read: unable to read table.\n" );
+	}
 #ifdef _LIBEWF_DEBUG_
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding, 16 ); );
 #endif
@@ -484,6 +480,10 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	}
 	offsets = ewf_table_offsets_read( file_descriptor, chunk_count );
 
+	if( offsets == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_offset_table_read: unable to read table offsets.\n" );
+	}
 	if( ewf_format == EWF_FORMAT_E01 )
 	{
 		calculated_crc = ewf_crc_calculate( offsets, ( EWF_TABLE_OFFSET_SIZE * chunk_count ), 1 );
@@ -699,7 +699,12 @@ void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: incorrect handle.\n" );
 	}
-	error2         = ewf_error2_read( file_descriptor );
+	error2 = ewf_error2_read( file_descriptor );
+
+	if( error2 == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: unable to read error2.\n" );
+	}
 	calculated_crc = ewf_crc_calculate( (void *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
 
 	if( calculated_crc == NULL )
@@ -721,6 +726,10 @@ void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	}
 	sectors = ewf_error2_sectors_read( file_descriptor, error_count );
 
+	if( sectors == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: unable to read error2 sectors.\n" );
+	}
 #ifdef _LIBEWF_DEBUG_
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( error2->unknown, 200 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) sectors, ( EWF_ERROR2_SECTOR_SIZE * error_count ) ); );
@@ -766,7 +775,12 @@ void libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, size_
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_hash_read: mismatch in section data size.\n" );
 	}
-	hash           = ewf_hash_read( file_descriptor );
+	hash = ewf_hash_read( file_descriptor );
+
+	if( hash == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_hash_read: unable to read hash.\n" );
+	}
 	calculated_crc = ewf_crc_calculate( (void *) hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
 
 	if( calculated_crc == NULL )
@@ -1087,9 +1101,8 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 
 			if( chunk_data_size > handle->allocated_chunk_data_size )
 			{
-				libewf_handle_cache_realloc( handle, chunk_data_size );
+				handle = libewf_handle_cache_realloc( handle, chunk_data_size );
 			}
-
 			/* Prevent data contamination, wipe the cache buffers clean
 			 */
 			handle = libewf_handle_cache_wipe( handle );
@@ -1205,9 +1218,9 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 
 		LIBEWF_MD5_UPDATE( &md5, data, count );
 
-		if( write( output_file_descriptor, data, count ) < count )
+		if( libewf_write( output_file_descriptor, data, count ) < count )
 		{
-			free( data );
+			libewf_free( data );
 
 			LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: error writing data.\n" );
 		}
@@ -1222,10 +1235,18 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 
 	calculated_md5hash = ewf_md5hash_alloc();
 
+	if( calculated_md5hash == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: unable to create MD5 hash.\n" );
+	}
   	LIBEWF_MD5_FINAL( calculated_md5hash, &md5 );
 
 	calculated_md5hash_string = ewf_md5hash_to_string( calculated_md5hash );
 
+	if( calculated_md5hash_string == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: unable to create MD5 hash string.\n" );
+	}
 	/* If MD5 hash is NULL no hash section was found in the file
 	 */
 	if( handle->md5hash != NULL )

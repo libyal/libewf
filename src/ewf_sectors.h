@@ -1,19 +1,10 @@
 /*
- * EWF sectors section specification
+ * EWF sectors section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFSECTORS_H
-#define _EWFSECTORS_H
+#ifndef _EWF_SECTORS_H
+#define _EWF_SECTORS_H
 
 #include <unistd.h>
 #include <stdio.h>
@@ -52,16 +43,18 @@
 extern "C" {
 #endif
 
-#define EWF_SECTORS_CHUNK uint8_t
+#define EWF_SECTORS_CHUNK ewf_sectors_chunk_t
 
-EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( size_t size );
-EWF_SECTORS_CHUNK *ewf_sectors_chunk_realloc( EWF_SECTORS_CHUNK *sectors_chunk, size_t size );
-EWF_SECTORS_CHUNK *ewf_sectors_chunk_wipe( EWF_SECTORS_CHUNK *sectors_chunk, size_t size );
+typedef uint8_t ewf_sectors_chunk_t;
+
+EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( uint32_t size );
+EWF_SECTORS_CHUNK *ewf_sectors_chunk_realloc( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t previous_size, uint32_t new_size );
+EWF_SECTORS_CHUNK *ewf_sectors_chunk_wipe( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t size );
 void ewf_sectors_chunk_free( EWF_SECTORS_CHUNK *sectors_chunk );
-int ewf_sectors_chunk_uncompress( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t *size, EWF_SECTORS_CHUNK *compressed_sectors_chunk, uint32_t compressed_size );
-int ewf_sectors_chunk_compress( EWF_SECTORS_CHUNK *compressed_sectors_chunk, uint32_t *compressed_size, EWF_SECTORS_CHUNK *sectors_chunk, uint32_t size, int8_t compression_level );
-ssize_t ewf_sectors_chunk_read( EWF_SECTORS_CHUNK *sectors_chunk, int file_descriptor, off_t offset, size_t size );
-ssize_t ewf_sectors_chunk_write( EWF_SECTORS_CHUNK *sectors_chunk, int file_descriptor, size_t size );
+int8_t ewf_sectors_chunk_uncompress( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t *size, EWF_SECTORS_CHUNK *compressed_sectors_chunk, uint32_t compressed_size );
+int8_t ewf_sectors_chunk_compress( EWF_SECTORS_CHUNK *compressed_sectors_chunk, uint32_t *compressed_size, EWF_SECTORS_CHUNK *sectors_chunk, uint32_t size, int8_t compression_level );
+int32_t ewf_sectors_chunk_read( EWF_SECTORS_CHUNK *sectors_chunk, int file_descriptor, off_t offset, uint32_t size );
+int32_t ewf_sectors_chunk_write( EWF_SECTORS_CHUNK *sectors_chunk, int file_descriptor, uint32_t size );
 void ewf_sectors_chunk_fprint( FILE *stream, EWF_SECTORS_CHUNK *sectors_chunk );
 
 #ifdef __cplusplus

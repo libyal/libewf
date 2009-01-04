@@ -5,16 +5,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -28,7 +19,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -52,8 +43,6 @@
 #include <string.h>
 #include <time.h>
 
-#include "libewf_endian.h"
-#include "header_values.h"
 #include "libewf.h"
 
 /* Prints the executable usage information
@@ -92,6 +81,8 @@ int main( int argc, const char **argv )
 	int option                           = 0;
 	int date_format                      = LIBEWF_DATEFORMAT_DAYMONTH;
 	uint32_t iterator                    = 0;
+	uint32_t sector                      = 0;
+	uint32_t sector_count                = 0;
 	char info_option                     = 'a';
 
 	while( ( option = getopt( argc, (char **) argv, "dhimvV" ) ) > 0 )
@@ -324,8 +315,8 @@ int main( int argc, const char **argv )
 			
 			for( iterator = 0; iterator < handle->error2_error_count; iterator++ )
 			{
-				uint32_t sector       = convert_32bit( handle->error2_sectors[ iterator ].sector );
-				uint32_t sector_count = convert_32bit( handle->error2_sectors[ iterator ].sector_count );
+				sector       = convert_32bit( handle->error2_sectors[ iterator ].sector );
+				sector_count = convert_32bit( handle->error2_sectors[ iterator ].sector_count );
 
 				fprintf( stdout, "\tin sector(s): %" PRIu32 " - %" PRIu32 " amount: %" PRIu32 "\n", sector, ( sector + sector_count ), sector_count );
 			}

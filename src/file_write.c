@@ -4,16 +4,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -54,9 +45,10 @@
 #include <zlib.h>
 #include <errno.h>
 
+#include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
-#include "md5.h"
+#include "libewf_md5.h"
 
 #include "ewf_compress.h"
 #include "ewf_crc.h"
@@ -396,6 +388,10 @@ int64_t libewf_section_table_write( LIBEWF_HANDLE *handle, int file_descriptor, 
 	}
 	table = ewf_table_alloc();
 
+	if( table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_table_write: unable to create table.\n" );
+	}
 	revert_32bit( offsets_amount, table->chunk_count );
 
 	section_write_count = libewf_section_write( handle, file_descriptor, section_header, size, start_offset );
@@ -481,6 +477,10 @@ int64_t libewf_section_error2_write( LIBEWF_HANDLE *handle, int file_descriptor,
 	}
 	error2 = ewf_error2_alloc();
 
+	if( error2 == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_write: unable to create error2.\n" );
+	}
 	revert_32bit( sectors_amount, error2->error_count );
 
 	section_write_count = libewf_section_write( handle, file_descriptor, "error2", size, start_offset );
@@ -520,6 +520,10 @@ int64_t libewf_section_hash_write( LIBEWF_HANDLE *handle, int file_descriptor, u
 	}
 	hash = ewf_hash_alloc();
 
+	if( hash == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_hash_write: unable to create hash.\n" );
+	}
 	memcpy( (uint8_t *) hash->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
 
 	section_write_count = libewf_section_write( handle, file_descriptor, "hash", size, start_offset );
@@ -687,7 +691,7 @@ LIBEWF_HANDLE *libewf_set_write_parameters( LIBEWF_HANDLE *handle, uint64_t inpu
 
 	handle->chunk_count = handle->input_file_size / handle->chunk_size;
 
-	if ( handle->input_file_size % handle->chunk_size != 0 )
+	if( handle->input_file_size % handle->chunk_size != 0 )
 	{
 		handle->chunk_count += 1;
 	}
@@ -705,13 +709,13 @@ LIBEWF_HANDLE *libewf_set_write_parameters( LIBEWF_HANDLE *handle, uint64_t inpu
  */
 int64_t libewf_read_chunk_data( int input_file_descriptor, uint8_t *buffer, uint32_t bytes_to_read )
 {
-	int64_t read_count = 0;
+	int32_t read_count = 0;
 
 	if( buffer == NULL )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_read_chunk: incorrect buffer.\n" );
 	}
-	read_count = read( input_file_descriptor, buffer, bytes_to_read );
+	read_count = libewf_read( input_file_descriptor, buffer, bytes_to_read );
 
 	if( read_count <= -1 )
 	{
@@ -810,7 +814,12 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 		LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to allocate filename.\n" );
 	}
 	file_header = ewf_file_header_alloc();
-	crc         = ewf_crc_alloc();
+
+	if( file_header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to create file header.\n" );
+	}
+	crc = ewf_crc_alloc();
 
 	if( crc == NULL )
 	{
@@ -863,7 +872,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 		segment_file_offset = 0;
 		write_count         = ewf_file_header_write( file_header, handle->segment_table->file_descriptor[ segment ] );
 
-		if( write_count == 0 )
+		if( write_count == -1 )
 		{
 			LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to write file header to file.\n" );
 		}
@@ -950,7 +959,12 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 			LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: calculated sectors size: %" PRIu64 ".\n", sectors_size );
 
-			offsets            = ewf_table_offsets_alloc( sectors_chunk_amount );
+			offsets = ewf_table_offsets_alloc( sectors_chunk_amount );
+
+			if( offsets == NULL )
+			{
+				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to create table offsets.\n" );
+			}
 			data_chunks_offset = segment_file_offset;
 
 			if( handle->ewf_format == EWF_FORMAT_E01 )
@@ -1083,16 +1097,20 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 					if( read_error_count >= handle->read_error_retry )
 					{
-						total_read_error_count++;
-
 						if( handle->error2_sectors == NULL )
 						{
-							 handle->error2_sectors = ewf_error2_sectors_alloc( total_read_error_count );
+							 handle->error2_sectors = ewf_error2_sectors_alloc( ( total_read_error_count + 1 ) );
 						}
 						else
 						{
-							 handle->error2_sectors = ewf_error2_sectors_realloc( handle->error2_sectors, total_read_error_count );
+							 handle->error2_sectors = ewf_error2_sectors_realloc( handle->error2_sectors, total_read_error_count, ( total_read_error_count + 1 ) );
 						}
+						if( handle->error2_sectors == NULL )
+						{
+							LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: unable to create error2 sectors.\n" );
+						}
+						total_read_error_count++;
+
 						/* Check if last chunk is smaller than the chunk size and take corrective measures
 						 */
 						if( ( total_read_count + handle->chunk_size ) > handle->input_file_size )
@@ -1200,7 +1218,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 					{
 						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: enlarging offsets size: %" PRIu32 ", required: %" PRIu32 ".\n", sectors_chunk_amount, chunk_amount );
 
-						offsets = ewf_table_offsets_realloc( offsets, ( chunk_amount + 1 ) );
+						offsets = ewf_table_offsets_realloc( offsets, sectors_chunk_amount, ( chunk_amount + 1 ) );
 
 						sectors_chunk_amount = chunk_amount + 1;
 					}
@@ -1226,7 +1244,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 					{
 						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: enlarging offsets size: %" PRIu32 ", required: %" PRIu32 ".\n", sectors_chunk_amount, chunk_amount );
 
-						offsets = ewf_table_offsets_realloc( offsets, ( chunk_amount + 1 ) );
+						offsets = ewf_table_offsets_realloc( offsets, sectors_chunk_amount, ( chunk_amount + 1 ) );
 
 						sectors_chunk_amount = chunk_amount + 1;
 					}
@@ -1364,6 +1382,10 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 	}
 	calculated_md5hash = ewf_md5hash_alloc();
 
+	if( calculated_md5hash == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to create MD5 hash.\n" );
+	}
   	LIBEWF_MD5_FINAL( calculated_md5hash, &md5 );
 
 	/* Write the hash section
@@ -1374,6 +1396,10 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 	calculated_md5hash_string = ewf_md5hash_to_string( calculated_md5hash );
 
+	if( calculated_md5hash_string == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: unable to create MD5 hash string.\n" );
+	}
 	LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: MD5 calculated: %s.\n", calculated_md5hash_string );
 
 	ewf_md5hash_free( calculated_md5hash );

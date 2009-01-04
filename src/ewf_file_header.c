@@ -1,19 +1,10 @@
 /*
- * EWF file header specification
+ * EWF file header
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,11 +33,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_notify.h"
 
 #include "ewf_file_header.h"
@@ -55,19 +44,31 @@ uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 
 uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
 /* Allocates memory for a new ewf file header struct
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_FILE_HEADER *ewf_file_header_alloc( void )
 {
-	EWF_FILE_HEADER *file_header = (EWF_FILE_HEADER *) malloc( EWF_FILE_HEADER_SIZE );
+	EWF_FILE_HEADER *file_header = NULL;
+	EWF_FILE_HEADER *data_set    = NULL;
+
+	file_header = (EWF_FILE_HEADER *) libewf_alloc_cleared( EWF_FILE_HEADER_SIZE );
 
 	if( file_header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_file_header_alloc: unable to allocate ewf_file_header\n" );
+		LIBEWF_WARNING_PRINT( "ewf_file_header_alloc: unable to allocate ewf_file_header.\n" );
+
+		return( NULL );
 	}
-	memset( file_header, 0, EWF_FILE_HEADER_SIZE );
+	data_set = (void *) libewf_memcpy( (uint8_t *) file_header, (uint8_t *) evf_file_signature, 8 );
 
-	memcpy( (uint8_t *) file_header, (uint8_t *) evf_file_signature, 8 );
+	if( data_set == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_file_header_alloc: unable to set data.\n" );
 
+		libewf_free( file_header );
+
+		return( NULL );
+	}
 	file_header->fields_start = 1;
 
 	return( file_header );
@@ -79,38 +80,52 @@ void ewf_file_header_free( EWF_FILE_HEADER *file_header )
 {
 	if( file_header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_file_header_free: invalid file_header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_file_header_free: invalid file_header.\n" );
+
+		return;
 	}
-	free( file_header );
+	libewf_free( file_header );
 }
 
-/* Validates the EWF file signature
+/* Validates the EWF file signature (EWF-E01, EWF-S01, EWF-L01)
  * Returns 1 if the signature matches, 0 otherwise
  */
 uint8_t ewf_file_header_check_signature( uint8_t *signature )
 {
 	if( signature == NULL )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_file_header_check_signature: invalid signature.\n" );
+
 		return( 0 );
 	}
-	return( ( memcmp( evf_file_signature, signature, sizeof( evf_file_signature ) ) == 0 )
-	|| ( memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 ) );
+	return( ( libewf_memcmp( evf_file_signature, signature, sizeof( evf_file_signature ) ) == 0 )
+	|| ( libewf_memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 ) );
 }
 
 /* Reads the file header from a file descriptor
- * Returns NULL on error
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_FILE_HEADER *ewf_file_header_read( int file_descriptor )
 {
-	EWF_FILE_HEADER *file_header = ewf_file_header_alloc();
+	EWF_FILE_HEADER *file_header = NULL;
+	uint32_t size                = EWF_FILE_HEADER_SIZE;
+	int32_t count                = 0;
 
-	ssize_t count = read( file_descriptor, file_header, EWF_FILE_HEADER_SIZE );
+	file_header = ewf_file_header_alloc();
 
-	if ( count < EWF_FILE_HEADER_SIZE )
+	if( file_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_file_header_read: unable create file header.\n" );
+
+		return( NULL );
+	}
+	count = libewf_read( file_descriptor, file_header, size );
+
+	if( count < size )
 	{
 		ewf_file_header_free( file_header );
 
-		LIBEWF_VERBOSE_PRINT( "ewf_file_header_read: unable to read ewf_file_header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_file_header_read: unable to read file header.\n" );
 
 		return( NULL );
 	}
@@ -118,7 +133,7 @@ EWF_FILE_HEADER *ewf_file_header_read( int file_descriptor )
 	{
 		ewf_file_header_free( file_header );
 
-		LIBEWF_VERBOSE_PRINT( "ewf_file_header_read: file signature does not match.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_file_header_read: file signature does not match.\n" );
 
 		return( NULL );
 	}
@@ -128,20 +143,23 @@ EWF_FILE_HEADER *ewf_file_header_read( int file_descriptor )
 /* Writes the file header to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor )
+int32_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor )
 {
-	ssize_t count;
+	uint32_t size = 0;
+	int32_t count = 0;
 
 	if( file_header == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_file_header_write: invalid file header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_file_header_write: invalid file header.\n" );
 
 		return( -1 );
 	}
-	count = write( file_descriptor, file_header, EWF_FILE_HEADER_SIZE );
+	count = libewf_write( file_descriptor, file_header, size );
 
-	if( count < EWF_FILE_HEADER_SIZE )
+	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_file_header_write: error writing file header.\n" );
+
 		return( -1 );
 	}
 	return( count );

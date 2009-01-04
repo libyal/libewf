@@ -35,8 +35,8 @@
 
 #include <stdlib.h>
 
-#include "definitions.h"
 #include "libewf_common.h"
+#include "libewf_definitions.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 
@@ -91,7 +91,7 @@ EWF_SECTION *ewf_section_read( int file_descriptor )
 
 		return( NULL );
 	}
-	count = read( file_descriptor, section, size );
+	count = libewf_read( file_descriptor, section, size );
 
 	if( count < size )
 	{
@@ -115,7 +115,7 @@ int32_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 
 	if( section == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_section_write: invalid section.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_section_write: invalid section.\n" );
 
 		return( -1 );
 	}
@@ -123,7 +123,7 @@ int32_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 
 	if( crc == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_section_write: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_section_write: unable to calculate CRC.\n" );
 
 		return( -1 );
 	}
@@ -131,10 +131,12 @@ int32_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 
 	ewf_crc_free( crc );
 
-	count = write( file_descriptor, section, size );
+	count = libewf_write( file_descriptor, section, size );
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_section_write: unable to write section.\n" );
+
 		return( -1 );
 	}
 	return( count );

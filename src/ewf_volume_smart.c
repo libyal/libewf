@@ -141,6 +141,8 @@ int32_t ewf_volume_smart_write( EWF_VOLUME_SMART *volume, int file_descriptor )
 
 	if( count < size )
 	{
+		LIBEWF_WARNING_PRINT( "ewf_volume_smart_write: unable to write volume.\n" );
+
 		return( -1 );
 	}
 	return( count );

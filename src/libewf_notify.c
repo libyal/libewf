@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "definitions.h"
+#include "libewf_definitions.h"
 #include "libewf_notify.h"
 
 #ifdef __STDC__
@@ -44,7 +44,6 @@
 #include <stdarg.h>
 
 #define VARARGS( function, type, argument )		function( type argument, ... )
-#define VARARGS_EXCEPTION( function, type, argument )	function( void *exception, type argument, ... )
 #define VASTART( argument_list, type, name )		va_start( argument_list, name )
 #define VAEND( argument_list )				va_end( argument_list )
 
@@ -53,7 +52,6 @@
 #include <varargs.h>
 
 #define VARARGS( function, type, argument )		function( va_alist ) va_dcl
-#define VARARGS_EXCEPTION( function, type, argument )	function( void *exception, va_alist ) va_dcl
 #define VASTART( argument_list, type, name )		{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
 #define VAEND( argument_list )				va_end( argument_list ); }
 
@@ -103,22 +101,6 @@ void VARARGS( libewf_fatal_print, char *, format )
 	VAEND( argument_list );
 
 	exit( EXIT_FAILURE );
-}
-
-/* Throws an exception
- */
-void VARARGS_EXCEPTION( libewf_throw_exception, char *, format )
-{
-	va_list argument_list;
-
-	if( libewf_verbose != 0 )
-	{
-		VASTART( argument_list, char *, format );
-
-		vfprintf( stderr, format, argument_list );
-
-		VAEND( argument_list );
-	}
 }
 
 /* Prints a dump of data
