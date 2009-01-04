@@ -72,11 +72,6 @@ void libewf_error_set(
       const char *format,
       ... );
 
-void libewf_error_add_message(
-      libewf_error_t *error,
-      const char *format,
-      va_list argument_list );
-
 LIBEWF_EXTERN void libewf_error_free(
                     libewf_error_t **error );
 

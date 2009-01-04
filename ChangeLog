@@ -196,6 +196,10 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080916
+* Fixed issue in error
+* Updated libuna
+
 Version: 20080915
 * worked on experimental version 2 API currently requires additional configure flag
   - made libewf_handle_initialize and libewf_handle_free available

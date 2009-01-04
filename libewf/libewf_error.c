@@ -70,6 +70,10 @@ void VARARGS(
 {
 	va_list argument_list;
 
+	void *reallocation  = NULL;
+	size_t message_size = 64;
+	int print_count     = 0;
+
 	if( error == NULL )
 	{
 		return;
@@ -88,85 +92,55 @@ void VARARGS(
 		( (libewf_internal_error_t *) *error )->domain             = error_domain;
 		( (libewf_internal_error_t *) *error )->code               = error_code;
 	}
-	VASTART(
-	 argument_list,
-	 const char *,
-	 format );
-
-	libewf_error_add_message(
-	 *error,
-	 format,
-	 argument_list );
-
-	VAEND(
-	 argument_list );
-}
-
-#undef VARARGS
-#undef VASTART
-#undef VAEND
-
-/* Adds a message to an error
- */
-void libewf_error_add_message(
-      libewf_error_t *error,
-      const char *format,
-      va_list argument_list )
-{
-	void *reallocation  = NULL;
-	size_t message_size = 64;
-	int print_count     = 0;
-
-	if( error == NULL )
-	{
-		return;
-	}
 	reallocation = memory_reallocate(
-	                ( (libewf_internal_error_t *) error )->message,
-	                sizeof( char * ) * ( ( (libewf_internal_error_t *) error )->amount_of_messages + 1 ) );
+	                ( (libewf_internal_error_t *) *error )->message,
+	                sizeof( char * ) * ( ( (libewf_internal_error_t *) *error )->amount_of_messages + 1 ) );
 
 	if( reallocation == NULL )
 	{
 		return;
 	}
-	( (libewf_internal_error_t *) error )->amount_of_messages                                                      += 1;
-	( (libewf_internal_error_t *) error )->message                                                                  = (char **) reallocation;
-	( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ] = NULL;
-
-#if defined( HAVE_VERBOSE_OUTPUT ) && defined( TODO )
-	vfprintf(
-	 libewf_notify_stream,
-	 format,
-	 argument_list );
-#endif
+	( (libewf_internal_error_t *) *error )->amount_of_messages                                                       += 1;
+	( (libewf_internal_error_t *) *error )->message                                                                   = (char **) reallocation;
+	( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ] = NULL;
 
 	do
 	{
 		reallocation = memory_reallocate(
-		                ( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ],
+		                ( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ],
 		                sizeof( char ) * message_size );
 
 		if( reallocation == NULL )
 		{
 			memory_free(
-			 ( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ] );
+			 ( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ] );
 
-			( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ] = NULL;
+			( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ] = NULL;
+
+			return;
 		}
-		( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ] = reallocation;
+		( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ] = reallocation;
+
+		VASTART(
+		 argument_list,
+		 const char *,
+		 format );
 
 		print_count = vsnprintf(
-		               ( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ],
+		               ( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ],
 		               message_size,
 		               format,
 		               argument_list );
+
+		VAEND(
+		 argument_list );
 
 		if( print_count <= -1 )
 		{
 			message_size += 64;
 		}
-		if( ( (size_t) print_count > message_size )
-		 || ( ( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ][ print_count ] != 0 ) )
+		else if( ( (size_t) print_count > message_size )
+		      || ( ( (libewf_internal_error_t *) *error )->message[ ( (libewf_internal_error_t *) *error )->amount_of_messages - 1 ][ print_count ] != 0 ) )
 		{
 			message_size = (size_t) ( print_count + 1 );
 			print_count  = -1;
@@ -174,6 +148,10 @@ void libewf_error_add_message(
 	}
 	while( print_count <= -1 );
 }
+
+#undef VARARGS
+#undef VASTART
+#undef VAEND
 
 /* Free an error and its elements
  */
