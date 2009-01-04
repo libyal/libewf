@@ -37,9 +37,9 @@
 /* The libewf version
  */
 #if 0
-#define LIBEWF_VERSION				L"20080129"
+#define LIBEWF_VERSION				L"20080202"
 #else
-#define LIBEWF_VERSION				"20080129"
+#define LIBEWF_VERSION				"20080202"
 #endif
 
 /* The libewf file access

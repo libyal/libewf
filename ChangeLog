@@ -165,6 +165,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080202
+* code cleanup
+
 Version: 20080129
 * small adjustment in libewf_get_format function
 
