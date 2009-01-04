@@ -24,10 +24,10 @@
 #define _BYTE_SIZE_STRING_H
 
 #include <common.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "character_string.h"
+#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -49,7 +49,7 @@ int byte_size_string_create(
      int units );
 
 int byte_size_string_convert(
-     character_t *byte_size_string,
+     const character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );
 
@@ -57,7 +57,7 @@ int8_t byte_size_string_get_factor_system_character(
         system_character_t factor );
 
 int byte_size_string_convert_system_character(
-     system_character_t *byte_size_string,
+     const system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );
 

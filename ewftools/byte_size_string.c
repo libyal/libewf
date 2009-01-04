@@ -22,11 +22,11 @@
 
 #include <common.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
-#include "character_string.h"
 #include "byte_size_string.h"
+#include "character_string.h"
+#include "system_string.h"
 
 /* Determines the factor string of a certain factor value
  * Returns the string if successful or NULL on error
@@ -219,7 +219,7 @@ int byte_size_string_create(
  * Returns 1 if successful or -1 on error
  */
 int byte_size_string_convert(
-     character_t *byte_size_string,
+     const character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
@@ -398,7 +398,7 @@ int8_t byte_size_string_get_factor_system_character(
  * Returns 1 if successful or -1 on error
  */
 int byte_size_string_convert_system_character(
-     system_character_t *byte_size_string,
+     const system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
