@@ -43,276 +43,123 @@
 /* Allocates memory for a file io pool struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount )
+LIBEWF_FILE_IO_POOL *libewf_file_io_pool_alloc( size_t amount )
 {
-	libewf_file_io_pool_t *pool = NULL;
-	static char *function       = "libewf_file_io_pool_alloc";
+	LIBEWF_FILE_IO_POOL *file_io_pool = NULL;
+	static char *function             = "libewf_file_io_pool_alloc";
+	size_t iterator                   = 0;
 
-	pool = (libewf_file_io_pool_t *) libewf_common_alloc( sizeof( libewf_file_io_pool_t ) );
+	file_io_pool = (LIBEWF_FILE_IO_POOL *) libewf_common_alloc( LIBEWF_FILE_IO_POOL_SIZE );
 
-	if( pool == NULL )
+	if( file_io_pool == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate file io pool.\n",
 		 function );
 
 		return( NULL );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	pool->filename = (wchar_t **) libewf_common_alloc_cleared(
-	                     ( amount * sizeof( wchar_t ) ),
-	                     0 );
-#else
-	pool->filename = (char **) libewf_common_alloc_cleared(
-	                     ( amount * sizeof( char ) ),
-	                     0 );
-#endif
+	file_io_pool->handle = (LIBEWF_FILE_IO_HANDLE *) libewf_common_alloc( amount * LIBEWF_FILE_IO_HANDLE_SIZE );
 
-	if( pool->filename == NULL )
+	if( file_io_pool->handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate filename array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate file io handles.\n",
 		 function );
 
-		libewf_common_free( pool );
+		libewf_common_free( file_io_pool );
 
 		return( NULL );
 	}
-	pool->descriptor = (int *) libewf_common_alloc_cleared(
-	                       ( amount * sizeof( int ) ),
-	                       -1 );
-
-	if( pool->descriptor == NULL )
+	for( iterator = 0; iterator < amount; iterator++ )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate file descriptor array.\n",
-		 function );
-
-		libewf_common_free( pool->filename );
-		libewf_common_free( pool );
-
-		return( NULL );
+		file_io_pool->handle[ iterator ].filename        = NULL;
+		file_io_pool->handle[ iterator ].file_descriptor = -1;
+		file_io_pool->handle[ iterator ].file_offset     = 0;
+		file_io_pool->handle[ iterator ].flags           = 0;
 	}
-	pool->offset = (off64_t *) libewf_common_alloc_cleared(
-	                   ( amount * sizeof( off64_t ) ),
-	                   0 );
+	file_io_pool->amount     = amount;
+	file_io_pool->open_files = 0;
 
-	if( pool->offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate file offset array.\n",
-		 function );
-
-		libewf_common_free( pool->filename );
-		libewf_common_free( pool->descriptor );
-		libewf_common_free( pool );
-
-		return( NULL );
-	}
-	pool->flags = (int *) libewf_common_alloc_cleared(
-	               ( amount * sizeof( int ) ),
-	               0 );
-
-	if( pool->offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate file offset array.\n",
-		 function );
-
-		libewf_common_free( pool->filename );
-		libewf_common_free( pool->descriptor );
-		libewf_common_free( pool->offset );
-		libewf_common_free( pool );
-
-		return( NULL );
-	}
-	pool->amount     = amount;
-	pool->open_files = 0;
-
-	return( pool );
+	return( file_io_pool );
 }
 
 /* Reallocates memory for the file io pool entries
  * Returns 1 if successful, or -1 on error
  */
-int libewf_file_io_pool_realloc( libewf_file_io_pool_t *pool, size_t amount )
+int libewf_file_io_pool_realloc( LIBEWF_FILE_IO_POOL *file_io_pool, size_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_file_io_pool_realloc";
+	size_t iterator       = 0;
 
-	if( pool == NULL )
+	if( file_io_pool == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	reallocation = libewf_common_realloc_new_cleared(
-	                pool->filename,
-	                ( pool->amount * sizeof( wchar_t ) ),
-	                ( amount * sizeof( wchar_t ) ),
-	                0 );
-#else
-	reallocation = libewf_common_realloc_new_cleared(
-	                pool->filename,
-	                ( pool->amount * sizeof( char ) ),
-	                ( amount * sizeof( char ) ),
-	                0 );
-#endif
-
-	if( reallocation == NULL )
+	if( file_io_pool->amount >= amount )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic filename array.\n",
+		LIBEWF_WARNING_PRINT( "%s: new amount must be greater than previous amount.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	pool->filename = (wchar_t **) reallocation;
-#else
-	pool->filename = (char **) reallocation;
-#endif
-	reallocation      = libewf_common_realloc_new_cleared(
-	                     pool->descriptor,
-	                     ( pool->amount * sizeof( int ) ),
-	                     ( amount * sizeof( int ) ),
-	                     -1 );
+	reallocation = libewf_common_realloc(
+	                file_io_pool->handle,
+	                ( amount * LIBEWF_FILE_IO_HANDLE_SIZE ) );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file descriptor array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file io handles array.\n",
 		 function );
 
 		return( -1 );
 	}
-	pool->descriptor = (int *) reallocation;
-	reallocation        = libewf_common_realloc_new_cleared(
-	                       pool->offset,
-	                       ( pool->amount * sizeof( off64_t ) ),
-	                       ( amount * sizeof( off64_t ) ),
-	                       0 );
+	file_io_pool->handle = (LIBEWF_FILE_IO_HANDLE *) reallocation;
 
-	if( reallocation == NULL )
+	for( iterator = file_io_pool->amount; iterator < amount; iterator++ )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file offset array.\n",
-		 function );
-
-		return( -1 );
+		file_io_pool->handle[ iterator ].filename        = NULL;
+		file_io_pool->handle[ iterator ].file_descriptor = -1;
+		file_io_pool->handle[ iterator ].file_offset     = 0;
+		file_io_pool->handle[ iterator ].flags           = 0;
 	}
-	pool->offset = (off64_t *) reallocation;
-	reallocation    = libewf_common_realloc_new_cleared(
-	                   pool->flags,
-	                   ( pool->amount * sizeof( int ) ),
-	                   ( amount * sizeof( int ) ),
-	                   0 );
-
-	if( reallocation == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file flags array.\n",
-		 function );
-
-		return( -1 );
-	}
-	pool->flags  = (int *) reallocation;
-	pool->amount = amount;
+	file_io_pool->amount = amount;
 
 	return( 1 );
 }
 
 /* Frees memory of a file io pool
  */
-void libewf_file_io_pool_free( libewf_file_io_pool_t *pool )
+void libewf_file_io_pool_free( LIBEWF_FILE_IO_POOL *file_io_pool )
 {
 	static char *function = "libewf_file_io_pool_free";
+	size_t iterator       = 0;
 
-	if( pool == NULL )
+	if( file_io_pool == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file io pool.\n",
 		 function );
 
 		return;
 	}
-	libewf_common_free( pool->filename );
-	libewf_common_free( pool->descriptor );
-	libewf_common_free( pool->offset );
-	libewf_common_free( pool->flags );
-	libewf_common_free( pool );
+	for( iterator = 0; iterator < file_io_pool->amount; iterator++ )
+	{
+		if( file_io_pool->handle[ iterator ].filename != NULL )
+		{
+			libewf_common_free( file_io_pool->handle[ iterator ].filename );
+		}
+	}
+	libewf_common_free( file_io_pool->handle );
+	libewf_common_free( file_io_pool );
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_pool_wide_open( LIBEWF_FILE_IO_POOL *pool, wchar_t *filename, int flags )
+int libewf_file_io_pool_wide_open( LIBEWF_FILE_IO_POOL *file_io_pool, wchar_t *filename, int flags );
 #else
-int libewf_file_io_pool_open( LIBEWF_FILE_IO_POOL *pool, char *filename, int flags )
+int libewf_file_io_pool_open( LIBEWF_FILE_IO_POOL *file_io_pool, char *filename, int flags );
 #endif
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function = "libewf_file_io_pool_wide_open";
-#else
-	static char *function = "libewf_file_io_pool_open";
-#endif
-
-	if( pool == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file io pool.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
-		 function );
-
-		return( -1 );
-	}
-#ifdef TOEDIT
-	if( length_filename == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length is zero.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( length_filename >= (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* One additional byte for the end of string character is needed
-	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	segment_table->filename[ segment ] = (wchar_t *) libewf_common_alloc( sizeof( wchar_t ) * ( length_filename + 1 ) );
-#else
-	segment_table->filename[ segment ] = (char *) libewf_common_alloc( sizeof( char ) * ( length_filename + 1 ) );
-#endif
-
-	if( segment_table->filename[ segment ] == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create filename.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_common_wide_memcpy( segment_table->filename[ segment ], filename, length_filename ) == NULL )
-#else
-	if( libewf_common_memcpy( segment_table->filename[ segment ], filename, length_filename ) == NULL )
-#endif
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
-		 function );
-
-		libewf_common_free( segment_table->filename[ segment ] );
-
-		segment_table->filename[ segment ] = NULL;
-
-		return( -1 );
-	}
-	/* Make sure the string is terminated
-	 */
-	segment_table->filename[ segment ][ length_filename ] = '\0';
-#endif
-
-	return( 1 );
-}
 
 ssize_t libewf_file_io_pool_read( LIBEWF_FILE_IO_POOL *pool, size_t entry, uint8_t *buffer, size_t size );
 ssize_t libewf_file_io_pool_write( LIBEWF_FILE_IO_POOL *pool, size_t entry, uint8_t *buffer, size_t size );

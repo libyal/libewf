@@ -28,6 +28,8 @@ libewf_la_SOURCES = \
 	libewf_endian.c libewf_endian.h \
 	libewf_error_sector.h \
 	libewf_file.c libewf_file.h \
+	libewf_file_io_handle.c libewf_file_io_handle.h \
+	libewf_file_io_pool.c libewf_file_io_pool.h \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_includes.h \
@@ -42,8 +44,6 @@ libewf_la_SOURCES = \
 	libewf_string.c libewf_string.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
-
-#	libewf_file_io_pool.c libewf_file_io_pool.h
 
 libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0
 

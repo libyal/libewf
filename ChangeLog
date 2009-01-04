@@ -138,7 +138,6 @@ Next release:
   reference of segment_file struct
   - dirty still needed?
   - remove libewf_offset_table_set_values?
-* remove common alloc/realloc cleared
 * is libewf_segment_file_write_open used? i.e. by libewf_open?
 
 CLOSED
@@ -157,7 +156,9 @@ CLOSED
 
 Version: 20071117
 * changed MB to MiB, etc.
-* worked on refactoring offset table to table of chunnk offsets
+* worked on refactoring offset table to table of chunk offsets
+* worked on IO pool
+* removed common alloc/realloc cleared functions
 
 Version: 20071114
 * worked on refactoring segment files functions

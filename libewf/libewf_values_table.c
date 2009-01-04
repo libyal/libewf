@@ -52,7 +52,7 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 	static char *function           = "libewf_values_table_alloc";
 	size_t values_table_size         = 0;
 
-	values_table = (LIBEWF_VALUES_TABLE *) libewf_common_alloc_cleared( LIBEWF_VALUES_TABLE_SIZE, 0 );
+	values_table = (LIBEWF_VALUES_TABLE *) libewf_common_alloc( LIBEWF_VALUES_TABLE_SIZE );
 
 	if( values_table == NULL )
 	{
@@ -72,7 +72,7 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	values_table->identifiers = (LIBEWF_CHAR **) libewf_common_alloc_cleared( values_table_size, 0 );
+	values_table->identifiers = (LIBEWF_CHAR **) libewf_common_alloc( values_table_size );
 
 	if( values_table->identifiers == NULL )
 	{
@@ -83,7 +83,17 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	values_table->values = (LIBEWF_CHAR **) libewf_common_alloc_cleared( values_table_size, 0 );
+	if( libewf_common_memset( values_table->identifiers, 0, values_table_size ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear identifiers.\n",
+		 function );
+
+		libewf_common_free( values_table->identifiers );
+		libewf_common_free( values_table );
+
+		return( NULL );
+	}
+	values_table->values = (LIBEWF_CHAR **) libewf_common_alloc( values_table_size );
 
 	if( values_table->values == NULL )
 	{
@@ -91,6 +101,17 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 		 function );
 
 		libewf_common_free( values_table->identifiers );
+		libewf_common_free( values_table );
+
+		return( NULL );
+	}
+	if( libewf_common_memset( values_table->values, 0, values_table_size ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear values.\n",
+		 function );
+
+		libewf_common_free( values_table->identifiers );
+		libewf_common_free( values_table->values );
 		libewf_common_free( values_table );
 
 		return( NULL );
@@ -140,7 +161,7 @@ int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t pre
 
 		return( -1 );
 	}
-	reallocation = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( values_table->identifiers, previous_size, new_size, 0 );
+	reallocation = (LIBEWF_CHAR **) libewf_common_realloc( values_table->identifiers, new_size );
 
 	if( reallocation == NULL )
 	{
@@ -150,7 +171,18 @@ int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t pre
 		return( -1 );
 	}
 	values_table->identifiers = reallocation;
-	reallocation             = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( values_table->values, previous_size, new_size, 0 );
+
+        if( libewf_common_memset(
+             &( values_table->identifiers[ previous_amount ] ),
+             0,
+             ( new_size - previous_size ) ) == NULL )
+        {
+                LIBEWF_WARNING_PRINT( "%s: unable to clear identifiers.\n",
+                 function );
+
+                return( -1 );
+        }
+	reallocation = (LIBEWF_CHAR **) libewf_common_realloc( values_table->values, new_size );
 
 	if( reallocation == NULL )
 	{
@@ -160,6 +192,17 @@ int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t pre
 		return( -1 );
 	}
 	values_table->values = reallocation;
+
+        if( libewf_common_memset(
+             &( values_table->values[ previous_amount ] ),
+             0,
+             ( new_size - previous_size ) ) == NULL )
+        {
+                LIBEWF_WARNING_PRINT( "%s: unable to clear values.\n",
+                 function );
+
+                return( -1 );
+        }
 	values_table->amount = new_amount;
 
 	return( 1 );

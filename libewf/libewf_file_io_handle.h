@@ -1,5 +1,5 @@
 /*
- * libewf file io pool
+ * libewf file io handle
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,51 +31,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_FILE_IO_POOL_H )
-#define _LIBEWF_FILE_IO_POOL_H
+#if !defined( _LIBEWF_FILE_IO_HANDLE_H )
+#define _LIBEWF_FILE_IO_HANDLE_H
 
 #include "libewf_includes.h"
-
-#include "libewf_file_io_handle.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_FILE_IO_POOL		libewf_file_io_pool_t
-#define LIBEWF_FILE_IO_POOL_SIZE	sizeof( LIBEWF_FILE_IO_POOL )
+#define LIBEWF_FILE_IO_HANDLE		libewf_file_io_handle_t
+#define LIBEWF_FILE_IO_HANDLE_SIZE	sizeof( LIBEWF_FILE_IO_HANDLE )
 
-typedef struct libewf_file_io_pool libewf_file_io_pool_t;
+typedef struct libewf_file_io_handle libewf_file_io_handle_t;
 
-struct libewf_file_io_pool
+struct libewf_file_io_handle
 {
-	/* The amount of files in the pool
+	/* The filename
 	 */
-	size_t amount;
-
-	/* The amount of open file descriptors
-	 */
-	size_t open_files;
-
-	/* A dynamic array containting the file io handles
-	 */
-	LIBEWF_FILE_IO_HANDLE *handle;
-};
-
-LIBEWF_FILE_IO_POOL *libewf_file_io_pool_alloc( size_t amount );
-int libewf_file_io_pool_realloc( LIBEWF_FILE_IO_POOL *file_io_pool, size_t amount );
-void libewf_file_io_pool_free( LIBEWF_FILE_IO_POOL *file_io_pool );
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_pool_wide_open( LIBEWF_FILE_IO_POOL *file_io_pool, wchar_t *filename, int flags );
+	wchar_t *filename;
 #else
-int libewf_file_io_pool_open( LIBEWF_FILE_IO_POOL *file_io_pool, char *filename, int flags );
+	char *filename;
 #endif
 
-ssize_t libewf_file_io_pool_read( LIBEWF_FILE_IO_POOL *file_io_pool, size_t entry, uint8_t *buffer, size_t size );
-ssize_t libewf_file_io_pool_write( LIBEWF_FILE_IO_POOL *file_io_pool, size_t entry, uint8_t *buffer, size_t size );
-off64_t libewf_file_io_pool_seek( LIBEWF_FILE_IO_POOL *file_io_pool, size_t entry, off64_t offset, int whence );
-int libewf_file_io_pool_close( LIBEWF_FILE_IO_POOL *file_io_pool, size_t entry );
+	/* The file descriptor
+	 */
+	int file_descriptor;
+
+	/* The current file offsets
+	 */
+	off64_t file_offset;
+
+	/* The file flags
+	 */
+	int flags;
+};
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+int libewf_file_io_handle_get_wide_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, wchar_t *filename, size_t length_filename );
+#else
+int libewf_file_io_handle_get_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, char *filename, size_t length_filename );
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+int libewf_file_io_handle_set_wide_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, const wchar_t *filename, size_t length_filename );
+#else
+int libewf_file_io_handle_set_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, const char *filename, size_t length_filename );
+#endif
 
 #if defined( __cplusplus )
 }
