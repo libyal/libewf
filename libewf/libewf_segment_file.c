@@ -1387,13 +1387,15 @@ ssize_t libewf_segment_file_write_close(
 				LIBEWF_WARNING_PRINT( "%s: xhash already set - cleaning previous defintion.\n",
 				 function );
 
-				libewf_common_free( hash_sections->xhash );
-			}
-			hash_sections->xhash = libewf_hash_values_generate_xhash_string_ewfx(
-			                        hash_values,
-			                        &( hash_sections->xhash_size ) );
+				libewf_common_free(
+				 hash_sections->xhash );
 
-			if( hash_sections->xhash == NULL )
+				hash_sections->xhash = NULL;
+			}
+			if( libewf_hash_values_generate_xhash_string_ewfx(
+			     hash_values,
+			     &( hash_sections->xhash ),
+			     &( hash_sections->xhash_size ) ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to generate xhash.\n",
 				 function );

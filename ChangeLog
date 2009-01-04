@@ -139,9 +139,6 @@ Next stable:
 
 * test abort
 
-* issue with libewf_string_copy_from_header2 under Ubuntu with WC support
-* refactor libewf_hash_values_parse_xhash to pass hash values as argument
-
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -162,6 +159,7 @@ CLOSED
 
 Version: 20080301
 * Code clean up
+* Refactored hash and header value functions
 
 Version: 20080229
 * Code clean up

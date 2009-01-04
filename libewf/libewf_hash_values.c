@@ -283,16 +283,15 @@ int libewf_hash_values_parse_xhash(
 }
 
 /* Converts a hash string into a hash
- * Cleans the hash string
- * Sets hash length
- * Returns a pointer to the new instance, NULL on error
+ * Sets the hash and hash length
+ * Returns 1 if successful or -1 on error
  */
-ewf_char_t *libewf_hash_values_convert_hash_string_to_hash(
-             libewf_char_t *hash_string,
-             size_t string_length,
-             size_t *hash_length )
+int libewf_hash_values_convert_hash_string_to_hash(
+     libewf_char_t *hash_string,
+     size_t hash_string_length,
+     ewf_char_t **hash,
+     size_t *hash_length )
 {
-	ewf_char_t *hash      = NULL;
 	static char *function = "libewf_hash_values_convert_hash_string_to_hash";
 
 	if( hash_string == NULL )
@@ -300,59 +299,80 @@ ewf_char_t *libewf_hash_values_convert_hash_string_to_hash(
 		LIBEWF_WARNING_PRINT( "%s: invalid hash string.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
+	}
+	if( ( hash_string_length == 0 )
+	 || ( hash_string_length > (size_t) SSIZE_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash string length.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash.\n",
+		 function );
+
+		return( -1 );
 	}
 	if( hash_length == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid hash length.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	hash = (ewf_char_t *) libewf_common_alloc(
-	                       sizeof( ewf_char_t ) * string_length );
+	if( *hash != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: hash already created .\n",
+		 function );
 
-	if( hash == NULL )
+		return( -1 );
+	}
+	*hash = (ewf_char_t *) libewf_common_alloc(
+	                        sizeof( ewf_char_t ) * hash_string_length );
+
+	if( *hash == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create hash.\n",
 		 function );
 
-		libewf_common_free( hash_string );
+		*hash_length = 0;
 
-		return( NULL );
+		return( -1 );
 	}
-	*hash_length = string_length;
+	*hash_length = hash_string_length;
 
 	if( libewf_string_copy_to_ewf_char(
 	     hash_string,
-	     string_length,
-	     hash,
+	     hash_string_length,
+	     *hash,
 	     *hash_length ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash.\n",
 		 function );
 
-		libewf_common_free( hash );
-		libewf_common_free( hash_string );
+		libewf_common_free(
+		 *hash );
 
+		*hash        = NULL;
 		*hash_length = 0;
 
-		return( NULL );
+		return( -1 );
 	}
-	libewf_common_free( hash_string );
-
-	return( hash );
+	return( 1 );
 }
 
 /* Generate a hash format in XML
- * Sets string length
- * Returns a pointer to the new instance, NULL on error
+ * Sets hash sting and hash string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_hash_values_generate_hash_string_xml(
-                libewf_values_table_t *hash_values,
-                size_t *string_length )
+int libewf_hash_values_generate_hash_string_xml(
+     libewf_values_table_t *hash_values,
+     libewf_char_t **hash_string,
+     size_t *hash_string_length )
 {
-	libewf_char_t *hash_string         = NULL;
 	libewf_char_t *xml_head            = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
 	libewf_char_t *xml_open_tag_xhash  = _S_LIBEWF_CHAR( "<xhash>" );
 	libewf_char_t *xml_close_tag_xhash = _S_LIBEWF_CHAR( "</xhash>" );
@@ -366,27 +386,41 @@ libewf_char_t *libewf_hash_values_generate_hash_string_xml(
 		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( hash_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( string_length == NULL )
+	if( hash_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string length.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid hash string.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
+	}
+	if( *hash_string != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: hash string already created.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_string_length == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash string length.\n",
+		 function );
+
+		return( -1 );
 	}
 	/* Add space for the xml data and an end of line
 	 */
-	*string_length  = libewf_string_length( xml_head ) + 1;
-	*string_length += libewf_string_length( xml_open_tag_xhash ) + 1;
-	*string_length += libewf_string_length( xml_close_tag_xhash ) + 1;
+	*hash_string_length  = libewf_string_length( xml_head ) + 1;
+	*hash_string_length += libewf_string_length( xml_open_tag_xhash ) + 1;
+	*hash_string_length += libewf_string_length( xml_close_tag_xhash ) + 1;
 
 	for( iterator = 0; iterator < hash_values->amount; iterator++ )
 	{
@@ -401,32 +435,32 @@ libewf_char_t *libewf_hash_values_generate_hash_string_xml(
 		{
 			/* Add space for a leading tab, <identifier></identifier> and an end of line
 			 */
-			*string_length += ( 2 * libewf_string_length( hash_values->identifiers[ iterator ] ) ) + 7;
+			*hash_string_length += ( 2 * libewf_string_length( hash_values->identifiers[ iterator ] ) ) + 7;
 
 			/* Add space for the hash value
 			 */
-			*string_length += libewf_string_length( hash_values->values[ iterator ] );
+			*hash_string_length += libewf_string_length( hash_values->values[ iterator ] );
 		}
 	}
 	/* allow for an empty line and an end of string
 	 */
-	*string_length += 2;
+	*hash_string_length += 2;
 
-	hash_string = (libewf_char_t *) libewf_common_alloc(
-                                         sizeof( libewf_char_t ) * *string_length );
+	*hash_string = (libewf_char_t *) libewf_common_alloc(
+                                         sizeof( libewf_char_t ) * *hash_string_length );
 
-	if( hash_string == NULL )
+	if( *hash_string == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create hash string.\n",
 		 function );
 
-		*string_length = 0;
+		*hash_string_length = 0;
 
-		return( NULL );
+		return( -1 );
 	}
 	character_count = libewf_string_snprintf(
-	                   hash_string,
-	                   *string_length,
+	                   *hash_string,
+	                   *hash_string_length,
 	                   _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "\n%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "\n" ),
 	                   xml_head,
 	                   xml_open_tag_xhash );
@@ -436,11 +470,13 @@ libewf_char_t *libewf_hash_values_generate_hash_string_xml(
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
 		 function );
 
-		libewf_common_free( hash_string );
+		libewf_common_free(
+		 *hash_string );
 
-		*string_length = 0;
+		*hash_string        = NULL;
+		*hash_string_length = 0;
 
-		return( NULL );
+		return( -1 );
 	}
 	string_offset = character_count;
 
@@ -456,8 +492,8 @@ libewf_char_t *libewf_hash_values_generate_hash_string_xml(
 		if( hash_values->values[ iterator ] != NULL )
 		{
 			character_count = libewf_string_snprintf(
-			                   &hash_string[ string_offset ],
-			                   ( *string_length - string_offset ),
+			                   &( ( *hash_string) [ string_offset ] ),
+			                   ( *hash_string_length - string_offset ),
 			                   _S_LIBEWF_CHAR( "\t<%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( ">%" )
 			                   _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "</%" ) _S_LIBEWF_CHAR( PRIs_EWF )
 			                   _S_LIBEWF_CHAR( ">\n" ),
@@ -470,18 +506,20 @@ libewf_char_t *libewf_hash_values_generate_hash_string_xml(
 				LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
 				 function );
 
-				libewf_common_free( hash_string );
+				libewf_common_free(
+				 *hash_string );
 
-				*string_length = 0;
+				*hash_string        = NULL;
+				*hash_string_length = 0;
 
-				return( NULL );
+				return( -1 );
 			}
 			string_offset += character_count;
 		}
 	}
 	character_count = libewf_string_snprintf(
-	                   &hash_string[ string_offset ],
-	                   ( *string_length - string_offset ),
+	                   &( ( *hash_string )[ string_offset ] ),
+	                   ( *hash_string_length - string_offset ),
 	                   _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIs_EWF ) _S_LIBEWF_CHAR( "\n\n" ),
 	                   xml_close_tag_xhash );
 
@@ -490,46 +528,59 @@ libewf_char_t *libewf_hash_values_generate_hash_string_xml(
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
 		 function );
 
-		libewf_common_free( hash_string );
+		libewf_common_free(
+		 *hash_string );
 
-		*string_length = 0;
+		*hash_string        = NULL;
+		*hash_string_length = 0;
 
-		return( NULL );
+		return( -1 );
 	}
 	/* Make sure the string is terminated
 	 */
-	hash_string[ *string_length - 1 ] = (libewf_char_t) '\0';
+	( *hash_string )[ *hash_string_length - 1 ] = (libewf_char_t) '\0';
 
-	return( hash_string );
+	return( 1 );
 }
 
 /* Generate an EWFX xhash
- * Returns a pointer to the new instance, NULL on error
+ * Returns 1 if successful or -1 on error
  */
-ewf_char_t *libewf_hash_values_generate_xhash_string_ewfx(
-             libewf_values_table_t *hash_values,
-             size_t *hash_length )
+int libewf_hash_values_generate_xhash_string_ewfx(
+     libewf_values_table_t *hash_values,
+     ewf_char_t **hash,
+     size_t *hash_length )
 {
-	ewf_char_t *xhash          = NULL;
 	libewf_char_t *hash_string = NULL;
 	static char *function      = "libewf_hash_values_generate_xhash_string_ewfx";
 
-	hash_string = libewf_hash_values_generate_hash_string_xml(
-	               hash_values,
-	               hash_length );
+	if( libewf_hash_values_generate_hash_string_xml(
+	     hash_values,
+	     &hash_string,
+	     hash_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create xhash string.\n",
+		 function );
 
-	xhash = libewf_hash_values_convert_hash_string_to_hash(
-	         hash_string,
-	         *hash_length,
-	         hash_length );
-
-	if( xhash == NULL )
+		return( -1 );
+	}
+	if( libewf_hash_values_convert_hash_string_to_hash(
+	     hash_string,
+	     *hash_length,
+	     hash,
+	     hash_length ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create xhash.\n",
 		 function );
 
-		return( NULL );
+		libewf_common_free(
+		 hash_string );
+
+		return( -1 );
 	}
-	return( xhash );
+	libewf_common_free(
+	 hash_string );
+
+	return( 1 );
 }
 
