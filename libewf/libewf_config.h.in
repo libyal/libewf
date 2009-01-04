@@ -138,9 +138,6 @@
 /* Define to 1 if you have the `sprintf' function. */
 #undef HAVE_SPRINTF
 
-/* Define to 1 if the system has the type `ssize_t'. */
-#undef HAVE_SSIZE_T
-
 /* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H
 
@@ -215,9 +212,6 @@
 
 /* Define to 1 if you have the <sys/utsname.h> header file. */
 #undef HAVE_SYS_UTSNAME_H
-
-/* Define to 1 if the system has the type `u64'. */
-#undef HAVE_U64
 
 /* Define to 1 if you have the `uname' function. */
 #undef HAVE_UNAME

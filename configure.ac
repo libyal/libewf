@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20080229], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20080301], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20080229])
+AM_INIT_AUTOMAKE([libewf], [20080301])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -176,42 +176,154 @@ AC_CHECK_LIB( uuid, uuid_generate_random, [AC_DEFINE( [HAVE_UUID_GENERATE_RANDOM
 AC_CHECK_LIB( uuid, uuid_generate_time, [AC_DEFINE( [HAVE_UUID_GENERATE_TIME], [1], [Defines if uuid_generate_time funtion is present in libuuid.] ) ] )
 
 dnl Check for headers
-AC_CHECK_HEADERS([sys/types.h],
-	[AC_DEFINE([HAVE_SYS_TYPES_H],[1],[Define to 1 if you have the <sys/types.h> header file.])
-	AC_SUBST([HAVE_SYS_TYPES_H],[1])],
-	[AC_SUBST([HAVE_SYS_TYPES_H],[0])])
+AC_CHECK_HEADERS(
+ [sys/types.h],
+ [AC_DEFINE(
+  [HAVE_SYS_TYPES_H],
+  [1],
+  [Define to 1 if you have the <sys/types.h> header file.])
+ AC_SUBST(
+  [HAVE_SYS_TYPES_H],
+  [1])],
+ [AC_SUBST(
+  [HAVE_SYS_TYPES_H],
+  [0])])
 
-AC_CHECK_HEADERS([inttypes.h],
-	[AC_DEFINE([HAVE_INTTYPES_H],[1],[Define to 1 if you have the <inttypes.h> header file.])
-	AC_SUBST([HAVE_INTTYPES_H],[1])],
-	[AC_SUBST([HAVE_INTTYPES_H],[0])])
+AC_CHECK_HEADERS(
+ [inttypes.h],
+ [AC_DEFINE(
+  [HAVE_INTTYPES_H],
+  [1],
+  [Define to 1 if you have the <inttypes.h> header file.])
+ AC_SUBST(
+  [HAVE_INTTYPES_H],
+  [1])],
+ [AC_SUBST(
+  [HAVE_INTTYPES_H],
+  [0])])
 
-AC_CHECK_HEADERS([stdint.h],
-	[AC_DEFINE([HAVE_STDINT_H],[1],[Define to 1 if you have the <stdint.h> header file.])
-	AC_SUBST([HAVE_STDINT_H],[1])],
-	[AC_SUBST([HAVE_STDINT_H],[0])])
+AC_CHECK_HEADERS(
+ [stdint.h],
+ [AC_DEFINE(
+  [HAVE_STDINT_H],
+  [1],
+  [Define to 1 if you have the <stdint.h> header file.])
+ AC_SUBST(
+  [HAVE_STDINT_H],
+  [1])],
+ [AC_SUBST(
+  [HAVE_STDINT_H],
+  [0])])
 
-AC_CHECK_HEADERS( cygwin/fs.h fcntl.h glob.h limits.h linux/fs.h openssl/opensslv.h signal.h stdarg.h stdlib.h string.h sys/disk.h sys/disklabel.h sys/ioctl.h sys/signal.h sys/utsname.h unistd.h varargs.h zlib.h )
+AC_CHECK_HEADERS([cygwin/fs.h])
+AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([glob.h])
+AC_CHECK_HEADERS([limits.h])
+AC_CHECK_HEADERS([linux/fs.h])
+AC_CHECK_HEADERS([openssl/opensslv.h])
+AC_CHECK_HEADERS([signal.h])
+AC_CHECK_HEADERS([stdarg.h])
+AC_CHECK_HEADERS([stdlib.h])
+AC_CHECK_HEADERS([string.h])
+AC_CHECK_HEADERS([sys/disk.h])
+AC_CHECK_HEADERS([sys/disklabel.h])
+AC_CHECK_HEADERS([sys/ioctl.h])
+AC_CHECK_HEADERS([sys/signal.h])
+AC_CHECK_HEADERS([sys/utsname.h])
+AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_HEADERS([varargs.h])
+AC_CHECK_HEADERS([zlib.h])
 
 AC_HEADER_STDC
 
-dnl Check for declarations and type definitions
+dnl Check for declarations
 AC_CHECK_DECLS( memrchr )
 
+dnl Check for type definitions
 AC_STRUCT_TM
 
 AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
-AC_CHECK_TYPE([size32_t],[AC_SUBST([HAVE_SIZE32_T],[1])],[AC_SUBST([HAVE_SIZE32_T],[0])])
-AC_CHECK_TYPE([ssize32_t],[AC_SUBST([HAVE_SSIZE32_T],[1])],[AC_SUBST([HAVE_SSIZE32_T],[0])])
-AC_CHECK_TYPE([size64_t],[AC_SUBST([HAVE_SIZE64_T],[1])],[AC_SUBST([HAVE_SIZE64_T],[0])])
-AC_CHECK_TYPE([ssize64_t],[AC_SUBST([HAVE_SSIZE64_T],[1])],[AC_SUBST([HAVE_SSIZE64_T],[0])])
-AC_CHECK_TYPE([off64_t],[AC_SUBST([HAVE_OFF64_T],[1])],[AC_SUBST([HAVE_OFF64_T],[0])])
-AC_CHECK_TYPES([ssize_t, u64])
+
+AC_CHECK_TYPE(
+ [size32_t],
+ [AC_SUBST(
+  [HAVE_SIZE32_T],
+  [1])],
+ [AC_SUBST(
+  [HAVE_SIZE32_T],
+  [0])])
+
+AC_CHECK_TYPE(
+ [ssize32_t],
+ [AC_SUBST(
+  [HAVE_SSIZE32_T],
+  [1])],
+ [AC_SUBST(
+  [HAVE_SSIZE32_T],
+  [0])])
+
+AC_CHECK_TYPE(
+ [size64_t],
+ [AC_SUBST(
+  [HAVE_SIZE64_T],
+  [1])],
+ [AC_SUBST(
+  [HAVE_SIZE64_T],
+  [0])])
+
+AC_CHECK_TYPE(
+ [ssize64_t],
+ [AC_SUBST(
+  [HAVE_SSIZE64_T],
+  [1])],
+ [AC_SUBST(
+  [HAVE_SSIZE64_T],
+  [0])])
+
+AC_CHECK_TYPE(
+ [off64_t],
+ [AC_SUBST(
+  [HAVE_OFF64_T],
+  [1])],
+ [AC_SUBST(
+  [HAVE_OFF64_T],
+  [0])])
+
+AC_CHECK_TYPE([ssize_t])
+AC_CHECK_TYPE([u64])
 
 dnl Check for functions
-AC_CHECK_FUNCS([atoll ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset mktime snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtoll strtoull uname])
+AC_CHECK_FUNCS([atoll])
+AC_CHECK_FUNCS([ctime])
+AC_CHECK_FUNCS([fgets])
+AC_CHECK_FUNCS([getopt])
+AC_CHECK_FUNCS([gmtime])
+AC_CHECK_FUNCS([gmtime_r])
+AC_CHECK_FUNCS([localtime])
+AC_CHECK_FUNCS([localtime_r])
+AC_CHECK_FUNCS([memchr])
+AC_CHECK_FUNCS([memcmp])
+AC_CHECK_FUNCS([memcpy])
+AC_CHECK_FUNCS([memrchr])
+AC_CHECK_FUNCS([memset])
+AC_CHECK_FUNCS([mktime])
+AC_CHECK_FUNCS([snprintf])
+AC_CHECK_FUNCS([sprintf])
+AC_CHECK_FUNCS([strchr])
+AC_CHECK_FUNCS([strcmp])
+AC_CHECK_FUNCS([strcpy])
+AC_CHECK_FUNCS([strdup])
+AC_CHECK_FUNCS([strerror])
+AC_CHECK_FUNCS([strerror_r])
+AC_CHECK_FUNCS([strlen])
+AC_CHECK_FUNCS([strncmp])
+AC_CHECK_FUNCS([strncpy])
+AC_CHECK_FUNCS([strrchr])
+AC_CHECK_FUNCS([strtoll])
+AC_CHECK_FUNCS([strtoull])
+AC_CHECK_FUNCS([uname])
 
 AC_FUNC_MEMCMP
 AC_FUNC_STRERROR_R

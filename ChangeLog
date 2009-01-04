@@ -160,6 +160,9 @@ CLOSED
   if a write error did occur the library should not make any guesses about if
   this is write or wrong
 
+Version: 20080301
+* Code clean up
+
 Version: 20080229
 * Code clean up
 * safe guarded libewf set functions for read/write

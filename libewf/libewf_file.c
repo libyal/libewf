@@ -2498,10 +2498,10 @@ int libewf_parse_header_values(
 	}
 	if( ( internal_handle->header_sections->xheader != NULL )
 	 && ( libewf_header_values_parse_xheader(
+	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->xheader,
 	       internal_handle->header_sections->xheader_size,
-	       date_format,
-	       &( internal_handle->header_values ) ) != 1 ) )
+	       date_format ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse xheader.\n",
 		 function );
@@ -2509,10 +2509,10 @@ int libewf_parse_header_values(
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header2 != NULL )
 	 && ( libewf_header_values_parse_header2(
+	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->header2,
 	       internal_handle->header_sections->header2_size,
-	       date_format,
-	       &( internal_handle->header_values ) ) != 1 ) )
+	       date_format ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse header2.\n",
 		 function );
@@ -2520,10 +2520,10 @@ int libewf_parse_header_values(
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header != NULL )
 	 && ( libewf_header_values_parse_header(
+	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->header,
 	       internal_handle->header_sections->header_size,
-	       date_format,
-	       &( internal_handle->header_values ) ) != 1 ) )
+	       date_format ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse header.\n",
 		 function );
@@ -2553,7 +2553,6 @@ int libewf_parse_header_values(
 int libewf_parse_hash_values(
      LIBEWF_HANDLE *handle )
 {
-	libewf_values_table_t *hash_values        = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_parse_hash_values";
 
@@ -2573,28 +2572,21 @@ int libewf_parse_hash_values(
 
 		return( -1 );
 	}
-	if( internal_handle->hash_sections->xhash != NULL )
+	if( internal_handle->hash_values != NULL )
 	{
-		hash_values = libewf_hash_values_parse_xhash(
-		               internal_handle->hash_sections->xhash,
-		               internal_handle->hash_sections->xhash_size );
+		return( 0 );
 	}
-	if( hash_values == NULL )
+	if( ( internal_handle->hash_sections->xhash != NULL )
+	 && ( libewf_hash_values_parse_xhash(
+	       &( internal_handle->hash_values ),
+	       internal_handle->hash_sections->xhash,
+	       internal_handle->hash_sections->xhash_size ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse xhash for values.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->hash_values != NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: hash values already set in handle - cleaning up previous ones.\n",
-		 function );
-
-		libewf_values_table_free( internal_handle->hash_values );
-	}
-	internal_handle->hash_values = hash_values;
-
 	return( 1 );
 }
 

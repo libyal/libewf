@@ -46,14 +46,31 @@ extern "C" {
 
 #define LIBEWF_HASH_VALUES_DEFAULT_AMOUNT	1
 
-int libewf_hash_values_initialize( libewf_values_table_t *hash_values );
+int libewf_hash_values_initialize(
+     libewf_values_table_t *hash_values );
 
-libewf_values_table_t *libewf_hash_values_parse_hash_string_xml( libewf_char_t *hash_string_xml, size_t length );
-libewf_values_table_t *libewf_hash_values_parse_xhash( ewf_char_t *xhash, size_t size );
+int libewf_hash_values_parse_hash_string_xml(
+     libewf_values_table_t **hash_values,
+     libewf_char_t *hash_string_xml,
+     size_t length );
 
-ewf_char_t *libewf_hash_values_convert_hash_string_to_hash( libewf_char_t *hash_string, size_t string_length, size_t *hash_length );
-libewf_char_t *libewf_hash_values_generate_hash_string_xml( libewf_values_table_t *hash_values, size_t *string_length );
-ewf_char_t *libewf_hash_values_generate_xhash_string_ewfx( libewf_values_table_t *hash_values, size_t *hash_length );
+int libewf_hash_values_parse_xhash( 
+     libewf_values_table_t **hash_values,
+     ewf_char_t *xhash, 
+     size_t size );
+
+ewf_char_t *libewf_hash_values_convert_hash_string_to_hash(
+             libewf_char_t *hash_string,
+             size_t string_length,
+             size_t *hash_length );
+
+libewf_char_t *libewf_hash_values_generate_hash_string_xml(
+                libewf_values_table_t *hash_values,
+                size_t *string_length );
+
+ewf_char_t *libewf_hash_values_generate_xhash_string_ewfx(
+             libewf_values_table_t *hash_values,
+             size_t *hash_length );
 
 #if defined( __cplusplus )
 }

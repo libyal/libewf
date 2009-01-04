@@ -613,13 +613,13 @@ int libewf_header_values_copy(
 }
 
 /* Parse a header string for the values
- * Returns a pointer to the new instance, NULL on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header_string(
+     libewf_values_table_t **header_values,
      libewf_char_t *header_string,
      size_t length,
-     uint8_t date_format,
-     libewf_values_table_t **header_values )
+     uint8_t date_format )
 {
 	libewf_char_t **lines      = NULL;
 	libewf_char_t **types      = NULL;
@@ -632,16 +632,16 @@ int libewf_header_values_parse_header_string(
 	uint32_t value_count       = 0;
 	uint32_t iterator          = 0;
 
-	if( header_string == NULL )
+	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header string.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( header_values == NULL )
+	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid header string.\n",
 		 function );
 
 		return( -1 );
@@ -1042,13 +1042,13 @@ int libewf_header_values_parse_header_string(
 }
 
 /* Parse an EWF header for the values
- * Returns a pointer to the new instance, NULL on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header(
+     libewf_values_table_t **header_values,
      ewf_char_t *header,
      size_t size,
-     uint8_t date_format,
-     libewf_values_table_t **header_values )
+     uint8_t date_format )
 {
 	libewf_char_t *header_string = NULL;
 	static char *function        = "libewf_header_values_parse_header";
@@ -1086,10 +1086,10 @@ int libewf_header_values_parse_header(
 		return( -1 );
 	}
 	result = libewf_header_values_parse_header_string(
+	          header_values,
 	          header_string,
 	          size,
-	          date_format,
-	          header_values );
+	          date_format );
 
 	libewf_common_free(
 	 header_string );
@@ -1102,14 +1102,14 @@ int libewf_header_values_parse_header(
 	return( result );
 }
 
-/* Parse an EWF header for the values
- * Returns a pointer to the new instance, NULL on error
+/* Parse an EWF header2 for the values
+ * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header2(
+     libewf_values_table_t **header_values,
      ewf_char_t *header2,
      size_t size,
-     uint8_t date_format,
-     libewf_values_table_t **header_values )
+     uint8_t date_format )
 {
 	libewf_char_t *header_string = NULL;
 	static char *function        = "libewf_header_values_parse_header2";
@@ -1149,10 +1149,10 @@ int libewf_header_values_parse_header2(
 		return( -1 );
 	}
 	result = libewf_header_values_parse_header_string(
+	          header_values,
 	          header_string,
 	          header_size,
-	          date_format,
-	          header_values );
+	          date_format );
 
 	libewf_common_free(
 	 header_string );
@@ -3469,13 +3469,13 @@ libewf_char_t *libewf_generate_date_xheader_value(
 }
 
 /* Parse a xml header string for the values
- * Returns 1 if successful, or -1 on errror
+ * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header_string_xml(
+     libewf_values_table_t **header_values,
      libewf_char_t *header_string_xml,
      size_t length,
-     uint8_t date_format,
-     libewf_values_table_t **header_values )
+     uint8_t date_format )
 {
 	libewf_char_t **lines          = NULL;
 	libewf_char_t *open_tag_start  = NULL;
@@ -3488,16 +3488,16 @@ int libewf_header_values_parse_header_string_xml(
 	uint32_t line_count            = 0;
 	uint32_t iterator              = 0;
 
-	if( header_string_xml == NULL )
+	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header string\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( header_values == NULL )
+	if( header_string_xml == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid header string\n",
 		 function );
 
 		return( -1 );
@@ -3664,22 +3664,25 @@ int libewf_header_values_parse_header_string_xml(
 			}
 		}
 	}
-	libewf_string_split_values_free( lines, line_count );
+	libewf_string_split_values_free(
+	 lines,
+	 line_count );
 
 	return( 1 );
 }
 
 /* Parse an EWF xheader for the values
- * Returns 1 if successful, or -1 on errror
+ * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_xheader(
+     libewf_values_table_t **header_values,
      ewf_char_t *xheader,
      size_t size,
-     uint8_t date_format,
-     libewf_values_table_t **header_values )
+     uint8_t date_format )
 {
 	libewf_char_t *xml_header_string = NULL;
 	static char *function            = "libewf_header_values_parse_xheader";
+	int result                       = 0;
 
 	if( xheader == NULL )
 	{
@@ -3707,26 +3710,26 @@ int libewf_header_values_parse_xheader(
 		LIBEWF_WARNING_PRINT( "%s: unable to copy xheader to xml header string.\n",
 		 function );
 
-		libewf_common_free( xml_header_string );
+		libewf_common_free(
+		 xml_header_string );
 
 		return( -1 );
 	}
-	if( libewf_header_values_parse_header_string_xml(
-             xml_header_string,
-             size,
-             date_format,
-             header_values ) != 1 )
+	result = libewf_header_values_parse_header_string_xml(
+                  header_values,
+                  xml_header_string,
+                  size,
+                  date_format );
+
+	if( result != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse xml header string.\n",
 		 function );
-
-		libewf_common_free( xml_header_string );
-
-		return( -1 );
 	}
-	libewf_common_free( xml_header_string );
+	libewf_common_free(
+	 xml_header_string );
 
-	return( 1 );
+	return( result );
 }
 
 /* Generate a header format in XML
