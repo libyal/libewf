@@ -72,7 +72,7 @@ void usage( void )
 {
 	fprintf( stdout, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
 
-	fprintf( stdout, "\t-d: specify the date format, options: dm (day/month is default), md (month/day), iso8601\n" );
+	fprintf( stdout, "\t-d: specify the date format, options: ctime (is default), dm (day/month), md (month/day), iso8601\n" );
 	fprintf( stdout, "\t-e: only show EWF read error information\n" );
 	fprintf( stdout, "\t-h: shows this help\n" );
 	fprintf( stdout, "\t-i: only show EWF acquiry information\n" );
@@ -113,7 +113,7 @@ int main( int argc, char * const argv[] )
 	int8_t media_flags         = 0;
 	int8_t volume_type         = 0;
 	uint8_t verbose            = 0;
-	uint8_t date_format        = LIBEWF_DATE_FORMAT_DAYMONTH;
+	uint8_t date_format        = LIBEWF_DATE_FORMAT_CTIME;
 	char info_option           = 'a';
 
 	ewfsignal_initialize();
@@ -133,7 +133,11 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'd':
-				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "md" ), 3 ) == 0 )
+				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "dm" ), 3 ) == 0 )
+				{
+					date_format = LIBEWF_DATE_FORMAT_DAYMONTH;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "md" ), 3 ) == 0 )
 				{
 					date_format = LIBEWF_DATE_FORMAT_MONTHDAY;
 				}
@@ -141,9 +145,9 @@ int main( int argc, char * const argv[] )
 				{
 					date_format = LIBEWF_DATE_FORMAT_ISO8601;
 				}
-				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "dm" ), 3 ) != 0 )
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ctime" ), 3 ) != 0 )
 				{
-					fprintf( stderr, "Unsupported date format: %" PRIs " using default day/month.\n", optarg );
+					fprintf( stderr, "Unsupported date format: %" PRIs " using default ctime.\n", optarg );
 				}
 				break;
 

@@ -84,9 +84,9 @@ int libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR *
 #define libewf_date_string_set_seconds( date_string, date_elements ) \
 	libewf_date_string_set_2digit_value( date_string, date_elements, 5 )
 
-LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_t date_format );
+LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format );
 LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp );
-LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, uint8_t date_format );
+LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format );
 LIBEWF_CHAR *libewf_generate_date_header2_value( time_t timestamp );
 
 int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, LIBEWF_VALUES_TABLE *source_header_values );
@@ -118,6 +118,7 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TA
 EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length );
 EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length );
 
+LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format );
 LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp );
 
 LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *header_string_xml, size_t length, uint8_t date_format );

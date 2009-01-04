@@ -95,6 +95,7 @@ Known issues:
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
+* MSVS C++ does not allow pre compiler macro in macro defintions
 
 Code clean up
 * remove internal_handle passing from most functions
@@ -109,30 +110,32 @@ Code clean up
 
 Next release:
 * full platform test
-* add libewf_convert_date_xheader_value function ?
-  - add raw date format to allow to print raw date string
 * change string duplicate function to macro?
 
 * add maximum check to set functions in file/internal handle
 * move open segment files in file to segment file to read segment table function
-* update ewfexport man page
 
 * what about header values parsing with preservation of timestamps?
 
-* ewfexport: non interactive mode?
-* ewfacquire: account for backspace in user input
+* ewfexport
+  - non interactive mode?
+  - ewfcommon_export_ewf - add raw access write support
+  - allow to set sha1 and md5 calculation support
+  - update ewfexport man page
+* ewfacquire
+  - account for backspace in user input
+* ewfalter
+  - allow to set delta segment file path/basename
+    test if no delta files were added before change
+  - allow to set maximum delta file size default 4Gb?
 
 * make buffer passthrough default behavior?
 * work on TODO in write
 * API function get current chunk size?
 * do not finalize on write error?
-* ewfcommon_export_ewf - add raw access write support
-* change default wipe behavior for ewfacquire(stream)
-* automate delta file testing
-* ewfalter allow to set delta segment file path/basename
-  test if no delta files were added before change
 
-* allow to set maximum delta file size default 4Gb?
+* change default wipe behavior for ewfacquire(stream)
+  - test behavior first
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -148,6 +151,10 @@ CLOSED
 
 Version: 20071110
 * updated MSVSC++ project files
+* commented out io pool
+* automated delta file testing
+* added libewf_convert_date_xheader_value
+* added ctime date format to ewfinfo which is now default
 
 Version: 20071107
 * worked on delta file

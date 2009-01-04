@@ -1,4 +1,4 @@
-.Dd May 12, 2007
+.Dd November 10, 2007
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -33,7 +33,7 @@ are the EWF file(s) to read the meta data from.
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl d Ar date_format
-specify a date format, options: dm (day/month is default), md (month/day), iso8601
+specify a date format, options: ctime (is default), dm (day/month), md (month/day), iso8601
 .It Fl h
 shows this help
 .It Fl i
@@ -51,7 +51,7 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# ewfinfo floppy.E01
+# ewfinfo -d dm floppy.E01
 ewfinfo 20070512 (libewf 20070512, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Acquiry information

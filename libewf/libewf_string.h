@@ -220,6 +220,8 @@ int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF
 int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *header2, size_t size_header2 );
 int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *header2, size_t size_header2 );
 
+LIBEWF_CHAR *libewf_string_ctime( const time_t *timestamp );
+
 #if defined( __cplusplus )
 }
 #endif

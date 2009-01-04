@@ -168,11 +168,12 @@ int libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR *
 /* Convert date string within a header value
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_t date_format )
+LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format )
 {
 	LIBEWF_CHAR **date_elements  = NULL;
 	LIBEWF_CHAR *date_string     = NULL;
 	static char *function        = "libewf_convert_date_header_value";
+	size_t date_string_length    = 20;
 	uint32_t date_element_count  = 0;
 	uint8_t date_string_iterator = 0;
 
@@ -183,7 +184,8 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 
 		return( NULL );
 	}
-	if( ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
+	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
+	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
@@ -192,7 +194,11 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 
 		return( NULL );
 	}
-	date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 20 );
+	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
+	{
+		date_string_length = 25;
+	}
+	date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * date_string_length );
 
 	if( date_string == NULL )
 	{
@@ -201,240 +207,245 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, uint8_
 
 		return( NULL );
 	}
-	date_elements = libewf_string_split(
-	                 header_value,
-	                 libewf_string_length( header_value ),
-	                 (LIBEWF_CHAR) ' ',
-	                 &date_element_count );
-
-	if( date_elements == NULL )
+	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to split date elements in header value.\n",
-		 function );
-
-		libewf_common_free( date_string );
-
-		return( NULL );
 	}
-	if( date_element_count != 6 )
+	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported amount of date elements in header value.\n",
-		 function );
+		date_elements = libewf_string_split(
+				 header_value,
+				 header_value_length,
+				 (LIBEWF_CHAR) ' ',
+				 &date_element_count );
 
-		libewf_common_free( date_string );
+		if( date_elements == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to split date elements in header value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+
+			return( NULL );
+		}
+		if( date_element_count != 6 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unsupported amount of date elements in header value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+			libewf_string_split_values_free( date_elements, date_element_count );
+
+			return( NULL );
+		}
+		/* Set first value
+		 */
+		if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
+		{
+			if( libewf_date_string_set_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set month value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 2;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		{
+			if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 2;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			if( libewf_date_string_set_year( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set year value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 4;
+		}
+		/* Set first seperator
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
+
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
+
+			date_string_iterator++;
+		}
+		/* Set second value
+		 */
+		if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
+		{
+			if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 2;
+		}
+		else if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
+		{
+			if( libewf_date_string_set_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set month value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 2;
+		}
+		/* Set second seperator
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
+
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
+
+			date_string_iterator++;
+		}
+		/* Set third value
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			if( libewf_date_string_set_year( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set year value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 4;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
+				 function );
+
+				libewf_common_free( date_string );
+				libewf_string_split_values_free( date_elements, date_element_count );
+
+				return( NULL );
+			}
+			date_string_iterator += 2;
+		}
+		/* Set third seperator
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) ' ';
+
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) 'T';
+
+			date_string_iterator++;
+		}
+		/* Set fourth value
+		 */
+		if( libewf_date_string_set_hours( &date_string[ date_string_iterator ], date_elements ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set hours value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+			libewf_string_split_values_free( date_elements, date_element_count );
+
+			return( NULL );
+		}
+		date_string_iterator += 2;
+
+		/* Set fourth seperator
+		 */
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
+
+		date_string_iterator++;
+
+		/* Set fifth value
+		 */
+		if( libewf_date_string_set_minutes( &date_string[ date_string_iterator ], date_elements ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set minutes value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+			libewf_string_split_values_free( date_elements, date_element_count );
+
+			return( NULL );
+		}
+		date_string_iterator += 2;
+
+		/* Set fifth seperator
+		 */
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
+
+		date_string_iterator++;
+
+		/* Set sixth value
+		 */
+		if( libewf_date_string_set_seconds( &date_string[ date_string_iterator ], date_elements ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set seconds value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+			libewf_string_split_values_free( date_elements, date_element_count );
+
+			return( NULL );
+		}
+		date_string_iterator += 2;
+
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '\0';
+
 		libewf_string_split_values_free( date_elements, date_element_count );
-
-		return( NULL );
 	}
-	/* Set first value
-	 */
-	if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-	{
-		if( libewf_date_string_set_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set month value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 2;
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	{
-		if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 2;
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
-	{
-		if( libewf_date_string_set_year( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set year value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 4;
-	}
-	/* Set first seperator
-	 */
-	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
-	{
-		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
-
-		date_string_iterator++;
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
-	{
-		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
-
-		date_string_iterator++;
-	}
-	/* Set second value
-	 */
-	if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-	{
-		if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 2;
-	}
-	else if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	 || ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
-	{
-		if( libewf_date_string_set_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set month value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 2;
-	}
-	/* Set second seperator
-	 */
-	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
-	{
-		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
-
-		date_string_iterator++;
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
-	{
-		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
-
-		date_string_iterator++;
-	}
-	/* Set third value
-	 */
-	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
-	{
-		if( libewf_date_string_set_year( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set year value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 4;
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
-	{
-		if( libewf_date_string_set_day_of_month( &date_string[ date_string_iterator ], date_elements ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set day of the month value.\n",
-			 function );
-
-			libewf_common_free( date_string );
-			libewf_string_split_values_free( date_elements, date_element_count );
-
-			return( NULL );
-		}
-		date_string_iterator += 2;
-	}
-	/* Set third seperator
-	 */
-	if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
-	{
-		date_string[ date_string_iterator ] = (LIBEWF_CHAR) ' ';
-
-		date_string_iterator++;
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
-	{
-		date_string[ date_string_iterator ] = (LIBEWF_CHAR) 'T';
-
-		date_string_iterator++;
-	}
-	/* Set fourth value
-	 */
-	if( libewf_date_string_set_hours( &date_string[ date_string_iterator ], date_elements ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set hours value.\n",
-		 function );
-
-		libewf_common_free( date_string );
-		libewf_string_split_values_free( date_elements, date_element_count );
-
-		return( NULL );
-	}
-	date_string_iterator += 2;
-
-	/* Set fourth seperator
-	 */
-	date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
-
-	date_string_iterator++;
-
-	/* Set fifth value
-	 */
-	if( libewf_date_string_set_minutes( &date_string[ date_string_iterator ], date_elements ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set minutes value.\n",
-		 function );
-
-		libewf_common_free( date_string );
-		libewf_string_split_values_free( date_elements, date_element_count );
-
-		return( NULL );
-	}
-	date_string_iterator += 2;
-
-	/* Set fifth seperator
-	 */
-	date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
-
-	date_string_iterator++;
-
-	/* Set sixth value
-	 */
-	if( libewf_date_string_set_seconds( &date_string[ date_string_iterator ], date_elements ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set seconds value.\n",
-		 function );
-
-		libewf_common_free( date_string );
-		libewf_string_split_values_free( date_elements, date_element_count );
-
-		return( NULL );
-	}
-	date_string_iterator += 2;
-
-	date_string[ date_string_iterator ] = (LIBEWF_CHAR) '\0';
-
-	libewf_string_split_values_free( date_elements, date_element_count );
-
 	return( date_string );
 }
 
@@ -498,12 +509,13 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 /* Convert date string within a header2 value
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, uint8_t date_format )
+LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format )
 {
-	struct tm *time_elements = NULL;
-	LIBEWF_CHAR *date_string = NULL;
-	static char *function    = "libewf_convert_date_header2_value";
-	time_t timestamp         = 0;
+	struct tm *time_elements  = NULL;
+	LIBEWF_CHAR *date_string  = NULL;
+	static char *function     = "libewf_convert_date_header2_value";
+	time_t timestamp          = 0;
+	size_t date_string_length = 20;
 
 	if( header_value == NULL )
 	{
@@ -512,7 +524,8 @@ LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, uint8
 
 		return( NULL );
 	}
-	if( ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
+	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
+	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
 	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
 	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
 	{
@@ -521,95 +534,114 @@ LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, uint8
 
 		return( NULL );
 	}
-	timestamp     = libewf_string_to_int64( header_value, libewf_string_length( header_value ) );
-	time_elements = libewf_common_localtime( &timestamp );
+	timestamp = libewf_string_to_int64( header_value, header_value_length );
 
-	if( time_elements == NULL )
+	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
-		 function );
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		date_string = libewf_common_wide_ctime( &timestamp );
+#else
+		date_string = libewf_common_ctime( &timestamp );
+#endif
 
-		return( NULL );
+		if( date_string == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+			 function );
+
+			return( NULL );
+		}
 	}
-	date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 20 );
-
-	if( date_string == NULL )
+	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
-		 function );
+		time_elements = libewf_common_localtime( &timestamp );
 
+		if( time_elements == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
+			 function );
+
+			return( NULL );
+		}
+		date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * date_string_length );
+
+		if( date_string == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+			 function );
+
+			libewf_common_free( time_elements );
+
+			return( NULL );
+		}
+		if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
+		{
+			if( libewf_string_snprintf(
+			     date_string,
+			     date_string_length,
+			     _S_LIBEWF_CHAR( "%02d/%02d/%04d %02d:%02d:%02d" ),
+			     ( time_elements->tm_mon + 1 ),
+			     time_elements->tm_mday,
+			     ( time_elements->tm_year + 1900 ),
+			     time_elements->tm_hour,
+			     time_elements->tm_min,
+			     time_elements->tm_sec ) <= -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
+				 function );
+
+				libewf_common_free( time_elements );
+				libewf_common_free( date_string );
+
+				return( NULL );
+			}
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		{
+			if( libewf_string_snprintf(
+			     date_string,
+			     date_string_length,
+			     _S_LIBEWF_CHAR( "%02d/%02d/%04d %02d:%02d:%02d" ),
+			     time_elements->tm_mday,
+			     ( time_elements->tm_mon + 1 ),
+			     ( time_elements->tm_year + 1900 ),
+			     time_elements->tm_hour,
+			     time_elements->tm_min,
+			     time_elements->tm_sec ) <= -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
+				 function );
+
+				libewf_common_free( time_elements );
+				libewf_common_free( date_string );
+
+				return( NULL );
+			}
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			if( libewf_string_snprintf(
+			     date_string,
+			     date_string_length,
+			     _S_LIBEWF_CHAR( "%04d-%02d-%02dT%02d:%02d:%02d" ),
+			     ( time_elements->tm_year + 1900 ),
+			     ( time_elements->tm_mon + 1 ),
+			     time_elements->tm_mday,
+			     time_elements->tm_hour,
+			     time_elements->tm_min,
+			     time_elements->tm_sec ) <= -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
+				 function );
+
+				libewf_common_free( time_elements );
+				libewf_common_free( date_string );
+
+				return( NULL );
+			}
+		}
 		libewf_common_free( time_elements );
-
-		return( NULL );
 	}
-	if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
-	{
-		if( libewf_string_snprintf(
-		     date_string,
-		     20,
-		     _S_LIBEWF_CHAR( "%02d/%02d/%04d %02d:%02d:%02d" ),
-		     ( time_elements->tm_mon + 1 ),
-		     time_elements->tm_mday,
-		     ( time_elements->tm_year + 1900 ),
-		     time_elements->tm_hour,
-		     time_elements->tm_min,
-		     time_elements->tm_sec ) <= -1 )
-        	{
-			LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
-			 function );
-
-			libewf_common_free( time_elements );
-			libewf_common_free( date_string );
-
-			return( NULL );
-		}
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
-	{
-		if( libewf_string_snprintf(
-		     date_string,
-		     20,
-		     _S_LIBEWF_CHAR( "%02d/%02d/%04d %02d:%02d:%02d" ),
-		     time_elements->tm_mday,
-		     ( time_elements->tm_mon + 1 ),
-		     ( time_elements->tm_year + 1900 ),
-		     time_elements->tm_hour,
-		     time_elements->tm_min,
-		     time_elements->tm_sec ) <= -1 )
-        	{
-			LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
-			 function );
-
-			libewf_common_free( time_elements );
-			libewf_common_free( date_string );
-
-			return( NULL );
-		}
-	}
-	else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
-	{
-		if( libewf_string_snprintf(
-		     date_string,
-		     20,
-		     _S_LIBEWF_CHAR( "%04d-%02d-%02dT%02d:%02d:%02d" ),
-		     ( time_elements->tm_year + 1900 ),
-		     ( time_elements->tm_mon + 1 ),
-		     time_elements->tm_mday,
-		     time_elements->tm_hour,
-		     time_elements->tm_min,
-		     time_elements->tm_sec ) <= -1 )
-        	{
-			LIBEWF_WARNING_PRINT( "%s: unable to fill date string.\n",
-			 function );
-
-			libewf_common_free( time_elements );
-			libewf_common_free( date_string );
-
-			return( NULL );
-		}
-	}
-	libewf_common_free( time_elements );
-
 	return( date_string );
 }
 
@@ -917,11 +949,11 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 			     (LIBEWF_CHAR) ' ',
 			     string_length ) != NULL )
 			{
-				date_string = libewf_convert_date_header_value( values[ iterator ], date_format );
+				date_string = libewf_convert_date_header_value( values[ iterator ], string_length, date_format );
 			}
 			else
 			{
-				date_string = libewf_convert_date_header2_value( values[ iterator ], date_format );
+				date_string = libewf_convert_date_header2_value( values[ iterator ], string_length, date_format );
 			}
 			if( date_string == NULL )
 			{
@@ -3144,6 +3176,293 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TA
 	return( header2 );
 }
 
+/* Convert date string within an xheader value
+ * Returns a pointer to the new instance, NULL on error
+ */
+LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format )
+{
+	LIBEWF_CHAR month[ 2 ];
+
+	LIBEWF_CHAR **date_elements  = NULL;
+	LIBEWF_CHAR *date_string     = NULL;
+	static char *function        = "libewf_convert_date_xheader_value";
+	size_t date_string_length    = 20;
+	uint32_t date_element_count  = 0;
+	uint8_t date_string_iterator = 0;
+
+	if( header_value == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header value.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
+	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH)
+	 && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY )
+	 && ( date_format != LIBEWF_DATE_FORMAT_ISO8601 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported date format.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
+	{
+		date_string_length = header_value_length;
+	}
+	date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * date_string_length );
+
+	if( date_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
+	{
+		if( libewf_string_copy( date_string, header_value, header_value_length ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to copy header value to date string.\n",
+			 function );
+
+			libewf_common_free( date_string );
+
+			return( NULL );
+		}
+	}
+	else
+	{
+		date_elements = libewf_string_split(
+				 header_value,
+				 header_value_length,
+				 (LIBEWF_CHAR) ' ',
+				 &date_element_count );
+
+		if( date_elements == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to split date elements in header value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+
+			return( NULL );
+		}
+		if( date_element_count != 6 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unsupported amount of date elements in header value.\n",
+			 function );
+
+			libewf_common_free( date_string );
+			libewf_string_split_values_free( date_elements, date_element_count );
+
+			return( NULL );
+		}
+		month[ 0 ] = (LIBEWF_CHAR) '0';
+		month[ 1 ] = (LIBEWF_CHAR) '0';
+
+		if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Jan" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '1';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Feb" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '2';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Mar" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '3';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Apr" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '4';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "May" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '5';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Jun" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '6';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Jul" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '7';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Aug" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '8';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Sep" ), 3 ) == 0 )
+		{
+			month[ 1 ] = (LIBEWF_CHAR) '9';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Oct" ), 3 ) == 0 )
+		{
+			month[ 0 ] = (LIBEWF_CHAR) '1';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Nov" ), 3 ) == 0 )
+		{
+			month[ 0 ] = (LIBEWF_CHAR) '1';
+			month[ 1 ] = (LIBEWF_CHAR) '1';
+		}
+		else if( libewf_string_compare( date_elements[ 1 ], _S_LIBEWF_CHAR( "Dec" ), 3 ) == 0 )
+		{
+			month[ 0 ] = (LIBEWF_CHAR) '1';
+			month[ 1 ] = (LIBEWF_CHAR) '2';
+		}
+
+		/* Set first value
+		 */
+		if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
+		{
+			date_string[ date_string_iterator ] = month[ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = month[ 1 ];
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		{
+			date_string[ date_string_iterator ] = date_elements[ 2 ][ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 2 ][ 1 ];
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 1 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 2 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 3 ];
+			date_string_iterator++;
+		}
+		/* Set first seperator
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
+
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
+
+			date_string_iterator++;
+		}
+		/* Set second value
+		 */
+		if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
+		{
+			date_string[ date_string_iterator ] = date_elements[ 2 ][ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 2 ][ 1 ];
+			date_string_iterator++;
+		}
+		else if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_ISO8601 ) )
+		{
+			date_string[ date_string_iterator ] = month[ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = month[ 1 ];
+			date_string_iterator++;
+		}
+		/* Set second seperator
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '/';
+
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) '-';
+
+			date_string_iterator++;
+		}
+		/* Set third value
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 1 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 2 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 4 ][ 3 ];
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = date_elements[ 2 ][ 0 ];
+			date_string_iterator++;
+			date_string[ date_string_iterator ] = date_elements[ 2 ][ 1 ];
+			date_string_iterator++;
+		}
+		/* Set third seperator
+		 */
+		if( ( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
+		 || ( date_format == LIBEWF_DATE_FORMAT_MONTHDAY ) )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) ' ';
+
+			date_string_iterator++;
+		}
+		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
+		{
+			date_string[ date_string_iterator ] = (LIBEWF_CHAR) 'T';
+
+			date_string_iterator++;
+		}
+		/* Set fourth value
+		 */
+		date_string[ date_string_iterator ] = date_elements[ 3 ][ 0 ];
+		date_string_iterator++;
+		date_string[ date_string_iterator ] = date_elements[ 3 ][ 1 ];
+		date_string_iterator++;
+
+		/* Set fourth seperator
+		 */
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
+
+		date_string_iterator++;
+
+		/* Set fifth value
+		 */
+		date_string[ date_string_iterator ] = date_elements[ 3 ][ 3 ];
+		date_string_iterator++;
+		date_string[ date_string_iterator ] = date_elements[ 3 ][ 4 ];
+		date_string_iterator++;
+
+		/* Set fifth seperator
+		 */
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) ':';
+
+		date_string_iterator++;
+
+		/* Set sixth value
+		 */
+		date_string[ date_string_iterator ] = date_elements[ 3 ][ 6 ];
+		date_string_iterator++;
+		date_string[ date_string_iterator ] = date_elements[ 3 ][ 7 ];
+		date_string_iterator++;
+
+		date_string[ date_string_iterator ] = (LIBEWF_CHAR) '\0';
+
+		libewf_string_split_values_free( date_elements, date_element_count );
+	}
+	return( date_string );
+}
+
 /* Generate date string within a xheader value
  * Returns a pointer to the new instance, NULL on error
  */
@@ -3214,6 +3533,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 	LIBEWF_CHAR *open_tag_end          = NULL;
 	LIBEWF_CHAR *close_tag_start       = NULL;
 	LIBEWF_CHAR *close_tag_end         = NULL;
+	LIBEWF_CHAR *date_string           = NULL;
 	static char *function              = "libewf_header_values_parse_header_string_xml";
 	size_t string_length               = 0;
 	uint32_t line_count                = 0;
@@ -3336,14 +3656,41 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		 */
 		*open_tag_end = (LIBEWF_CHAR) '\0';
 
-		if( libewf_values_table_set_value(
-		     header_values,
-		     &open_tag_start[ 1 ],
-		     &open_tag_end[ 1 ],
-		     string_length ) != 1 )
+		if( ( libewf_string_compare( &open_tag_start[ 1 ], _S_LIBEWF_CHAR( "acquiry_date" ), 12 ) == 0 )
+		 || ( libewf_string_compare( &open_tag_start[ 1 ], _S_LIBEWF_CHAR( "system_date" ), 11 ) == 0 ) )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs_EWF ".\n",
-			 function, &open_tag_start[ 1 ] );
+			date_string = libewf_convert_date_xheader_value( &open_tag_end[ 1 ], string_length, date_format );
+
+			if( date_string == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+				 function );
+			}
+			else
+			{
+				if( libewf_values_table_set_value(
+				     header_values,
+				     &open_tag_start[ 1 ],
+				     date_string,
+				     libewf_string_length( date_string ) ) != 1 )
+				{
+					LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs_EWF ".\n",
+					 function, &open_tag_start[ 1 ] );
+				}
+				libewf_common_free( date_string );
+			}
+		}
+		else
+		{
+			if( libewf_values_table_set_value(
+			     header_values,
+			     &open_tag_start[ 1 ],
+			     &open_tag_end[ 1 ],
+			     string_length ) != 1 )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs_EWF ".\n",
+				 function, &open_tag_start[ 1 ] );
+			}
 		}
 	}
 	libewf_string_split_values_free( lines, line_count );
