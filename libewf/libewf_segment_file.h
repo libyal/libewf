@@ -55,7 +55,6 @@ int libewf_segment_file_read_sections(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_offset_table_t *secondary_offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
      int8_t *compression_level,

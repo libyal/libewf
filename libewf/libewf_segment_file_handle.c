@@ -87,6 +87,23 @@ int libewf_segment_file_handle_initialize(
 
 			return( -1 );
 		}
+		if( memory_set(
+		     ( *segment_file_handle )->section_list,
+		     0,
+		     sizeof( libewf_section_list_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear section list.\n",
+			 function );
+
+			memory_free(
+			 ( *segment_file_handle )->section_list );
+			memory_free(
+			 *segment_file_handle );
+
+			*segment_file_handle = NULL;
+
+			return( -1 );
+		}
 		( *segment_file_handle )->file_descriptor = -1;
 	}
 	return( 1 );

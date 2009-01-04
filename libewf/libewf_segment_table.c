@@ -191,7 +191,6 @@ int libewf_segment_table_build(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_offset_table_t *secondary_offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
      int8_t *compression_level,
@@ -236,7 +235,6 @@ int libewf_segment_table_build(
 		          hash_sections,
 		          media_values,
 		          offset_table,
-		          secondary_offset_table,
 		          sessions,
 		          acquiry_errors,
 		          compression_level,
@@ -387,7 +385,6 @@ int libewf_segment_table_read_open(
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
-     libewf_offset_table_t *secondary_offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
      int8_t *compression_level,
@@ -491,7 +488,6 @@ int libewf_segment_table_read_open(
 		notify_verbose_printf( "%s: trying to open file: %" PRIs_SYSTEM ".\n",
 		 function, filenames[ iterator ] );
 #endif
-
 		if( libewf_segment_file_handle_initialize(
 		     &segment_file_handle ) != 1 )
 		{
@@ -626,6 +622,7 @@ int libewf_segment_table_read_open(
 
 			return( -1 );
 		}
+		segment_file_handle = NULL;
 	}
 	if( libewf_segment_table_build(
 	     segment_table,
@@ -633,7 +630,6 @@ int libewf_segment_table_read_open(
 	     hash_sections,
 	     media_values,
 	     offset_table,
-	     secondary_offset_table,
 	     sessions,
 	     acquiry_errors,
 	     compression_level,
@@ -655,7 +651,6 @@ int libewf_segment_table_read_open(
 	       hash_sections,
 	       media_values,
 	       offset_table,
-	       secondary_offset_table,
 	       sessions,
 	       acquiry_errors,
 	       compression_level,
@@ -669,36 +664,6 @@ int libewf_segment_table_read_open(
 		 function );
 
 		return( -1 );
-	}
-	/* Only compare the primary and secondary offset table
-	 * if the secondary table was created
-	 */
-	if( ( secondary_offset_table != NULL )
-	 && ( secondary_offset_table->chunk_offset != NULL ) )
-	{
-		result = libewf_offset_table_compare(
-			  offset_table,
-			  secondary_offset_table );
-
-		if( result == -1 )
-		{
-			notify_warning_printf( "%s: unable to compare primary and secondary offset table.\n",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == 0 )
-		{
-			notify_warning_printf( "%s: primary and secondary offset table differ.\n",
-			 function );
-
-			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-			/* TODO Try to correct the table
-			 */
-		}
 	}
 	return( 1 );
 }

@@ -130,24 +130,6 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-		if( libewf_offset_table_initialize(
-		     &( internal_handle->secondary_offset_table ),
-		     0 ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to create secondary offset table.\n",
-			 function );
-
-			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
-			libewf_segment_table_free(
-			 internal_handle->delta_segment_table );
-			libewf_segment_table_free(
-			 internal_handle->segment_table );
-			memory_free(
-			 internal_handle );
-
-			return( -1 );
-		}
 		if( libewf_chunk_cache_initialize(
 		     &( internal_handle->chunk_cache ),
 		     EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ) ) != 1 )
@@ -155,8 +137,6 @@ int libewf_handle_initialize(
 			notify_warning_printf( "%s: unable to create chunk cache.\n",
 			 function );
 
-			libewf_offset_table_free(
-			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -176,8 +156,6 @@ int libewf_handle_initialize(
 
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
-			libewf_offset_table_free(
-			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -199,8 +177,6 @@ int libewf_handle_initialize(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
-			libewf_offset_table_free(
-			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -224,8 +200,6 @@ int libewf_handle_initialize(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
-			libewf_offset_table_free(
-			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -252,8 +226,6 @@ int libewf_handle_initialize(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
-			libewf_offset_table_free(
-			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -282,8 +254,6 @@ int libewf_handle_initialize(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
-			libewf_offset_table_free(
-			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -315,8 +285,6 @@ int libewf_handle_initialize(
 				 &( internal_handle->media_values ) );
 				libewf_chunk_cache_free(
 				 &( internal_handle->chunk_cache ) );
-				libewf_offset_table_free(
-				 &( internal_handle->secondary_offset_table ) );
 				libewf_offset_table_free(
 				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
@@ -351,8 +319,6 @@ int libewf_handle_initialize(
 				 &( internal_handle->media_values ) );
 				libewf_chunk_cache_free(
 				 &( internal_handle->chunk_cache ) );
-				libewf_offset_table_free(
-				 &( internal_handle->secondary_offset_table ) );
 				libewf_offset_table_free(
 				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
@@ -422,12 +388,6 @@ int libewf_handle_free(
 		     &( internal_handle->offset_table ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to free offset table.\n",
-			 function );
-		}
-		if( libewf_offset_table_free(
-		     &( internal_handle->secondary_offset_table ) ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to free secondary offset table.\n",
 			 function );
 		}
 		if( internal_handle->sessions != NULL )

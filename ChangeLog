@@ -58,7 +58,6 @@ Recovery and analysis:
   - error resistency
 * all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
-* read: correct for errors in the table or table2 section for EWF-E01
 * ewfdebug: create a tool to analyse a single segment file
 * ewfrecover: create a tool recover ewf files
 * ewfverify: detect and show which files are corrupted
@@ -113,12 +112,19 @@ Python bindings
 
 Next release(s):
 
-* remove secondary offset table from handle
-  but check and mark differences with primary offset table
+* create floppy-table-errors.E01 for testing purpose
+  - error in primary offset table
+  - error in secondary offset table
+
+* remove error_tollerance, just be error tollerant ?
+
+* improve offset table correction
+  - add error flag ?
 
 * implement libuca
   - handle codepage in ewftools use -p option
   - add '-p list' option? to list codepages
+  - what about LC_TYPE setting in ewftools
 
 * rewrite _alloc() functions into _initialize() functions
   with corresponding _free() functions
@@ -132,9 +138,6 @@ Next release(s):
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
-
-* Try to correct the offset table
-  - add error flag
 
 * create libewf_create_handle and libewf_destroy_handle functions?
 
@@ -182,6 +185,8 @@ Version: 20080904
 * updated MacOS-X package changed project website
 * updated MSVSCPP project files
 * fixed multiple ewfglob issues
+* removed secondary offset table from handle
+  libewf now checks and corrects differences with primary offset table
 
 Version: 20080903
 * worked on integrating libuca and replacing string conversion routines

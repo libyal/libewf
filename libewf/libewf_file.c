@@ -346,7 +346,6 @@ libewf_handle_t *libewf_open(
 		     internal_handle->hash_sections,
 		     internal_handle->media_values,
 		     internal_handle->offset_table,
-		     internal_handle->secondary_offset_table,
 		     internal_handle->sessions,
 		     internal_handle->acquiry_errors,
 		     &( internal_handle->compression_level ),

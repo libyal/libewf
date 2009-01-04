@@ -45,9 +45,13 @@ struct libewf_offset_table
 	 */
 	uint32_t amount_of_chunk_offsets;
 
-	/* The last chunk offset that was defined
+	/* The last chunk offset that was filled
 	 */
-	uint32_t last_chunk_offset;
+	uint32_t last_chunk_offset_filled;
+
+	/* The last chunk offset that was compared
+	 */
+	uint32_t last_chunk_offset_compared;
 
 	/* Dynamic array of chunk offsets
 	 */
@@ -73,6 +77,11 @@ int libewf_offset_table_fill(
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t error_tollerance );
 
+int libewf_offset_table_fill_last_offset(
+     libewf_offset_table_t *offset_table,
+     libewf_section_list_t *section_list,
+     uint8_t error_tollerance );
+
 int libewf_offset_table_fill_offsets(
      libewf_offset_table_t *offset_table,
      uint32_t offset_table_index,
@@ -81,14 +90,20 @@ int libewf_offset_table_fill_offsets(
      ewf_table_offset_t *offsets,
      uint32_t amount_of_offsets );
 
-int libewf_offset_table_calculate_last_offset(
+int libewf_offset_table_compare(
      libewf_offset_table_t *offset_table,
-     libewf_section_list_t *section_list,
+     off64_t base_offset,
+     ewf_table_offset_t *offsets,
+     uint32_t amount_of_chunks,
+     libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t correct_errors,
      uint8_t error_tollerance );
 
-int libewf_offset_table_compare(
-     libewf_offset_table_t *offset_table1,
-     libewf_offset_table_t *offset_table2 );
+int libewf_offset_table_compare_last_offset(
+     libewf_offset_table_t *offset_table,
+     libewf_section_list_t *section_list,
+     uint8_t correct_errors,
+     uint8_t error_tollerance );
 
 off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,

@@ -76,10 +76,6 @@ struct libewf_internal_handle
 	 */
 	libewf_offset_table_t *offset_table;
 
-	/* The list of offsets within the segment files within the table2 sections
-	 */
-	libewf_offset_table_t *secondary_offset_table;
-
 	/* A simple cache is implemented here to avoid having to read and decompress the
 	 * same chunk while reading the data.
 	 */
