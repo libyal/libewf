@@ -816,7 +816,7 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 /* Write the headers to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file )
+ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t format )
 {
 	static char *function     = "libewf_segment_file_write_headers";
 	size_t header_size        = 0;
@@ -849,9 +849,9 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	header_size = internal_handle->header_size - 1;
 
-	if( ( internal_handle->format == LIBEWF_FORMAT_EWF )
-	 || ( internal_handle->format == LIBEWF_FORMAT_SMART )
-	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
+	if( ( format == LIBEWF_FORMAT_EWF )
+	 || ( format == LIBEWF_FORMAT_SMART )
+	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 		/* The header should be written only once
 		 * and using the compression used in the file
@@ -873,11 +873,11 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		internal_handle->amount_of_header_sections += 1;
 	}
-	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE2 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE3 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN5 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_FTK ) )
+	else if( ( format == LIBEWF_FORMAT_ENCASE2 )
+	 || ( format == LIBEWF_FORMAT_ENCASE3 )
+	 || ( format == LIBEWF_FORMAT_LINEN5 )
+	 || ( format == LIBEWF_FORMAT_LINEN6 )
+	 || ( format == LIBEWF_FORMAT_FTK ) )
 	{
 		/* The header should be written twice
 		 * the default compression is used
@@ -914,9 +914,9 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		internal_handle->amount_of_header_sections += 2;
 	}
-	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE4 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 ) )
+	else if( ( format == LIBEWF_FORMAT_ENCASE4 )
+	 || ( format == LIBEWF_FORMAT_ENCASE5 )
+	 || ( format == LIBEWF_FORMAT_ENCASE6 ) )
 	{
 		if( ( internal_handle->header2 == NULL )
 		 && ( internal_handle->header2_size == 0 ) )
@@ -983,7 +983,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	/* EWFX uses the header and header2 for backwards compatibility
 	 */
-	else if( internal_handle->format == LIBEWF_FORMAT_EWFX )
+	else if( format == LIBEWF_FORMAT_EWFX )
 	{
 		if( ( internal_handle->xheader == NULL )
 		 && ( internal_handle->xheader_size == 0 ) )
@@ -1110,7 +1110,7 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE *segment_fil
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values )
+ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t ewf_format )
 {
 	EWF_FILE_HEADER file_header;
 
@@ -1183,14 +1183,19 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy( file_header.signature, file_signature, 8 ) == NULL )
+	if( libewf_common_memcpy(
+	     file_header.signature,
+	     file_signature,
+	     8 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set file signature.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_16bit( segment_number, file_header.fields_segment ) != 1 )
+	if( libewf_endian_revert_16bit(
+	     segment_number,
+	     file_header.fields_segment ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert segment number.\n",
 		 function );
@@ -1226,7 +1231,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 */
 			write_count = libewf_segment_file_write_headers(
 				       internal_handle,
-				       segment_file );
+				       segment_file,
+				       internal_handle->format );
 
 			if( write_count == -1 )
 			{
@@ -1237,25 +1243,25 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			}
 			total_write_count += write_count;
 
-			if( internal_handle->ewf_format == EWF_FORMAT_S01 )
+			if( ewf_format == EWF_FORMAT_S01 )
 			{
 				/* Write volume (SMART) section
 				 */
 				write_count = libewf_section_volume_s01_write(
 					       segment_file,
 					       media_values,
-					       internal_handle->format,
+					       format,
 					       0 );
 			}
-			else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
+			else if( ewf_format == EWF_FORMAT_E01 )
 			{
 				/* Write volume section
 				 */
 				write_count = libewf_section_volume_e01_write(
 					       segment_file,
 					       media_values,
-					       internal_handle->format,
-					       internal_handle->compression_level,
+					       compression_level,
+					       format,
 					       0 );
 			}
 			else
@@ -1273,15 +1279,15 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			}
 			total_write_count += write_count;
 		}
-		else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
+		else if( ewf_format == EWF_FORMAT_E01 )
 		{
 			/* Write data section
 			 */
 			write_count = libewf_section_data_write(
 				       segment_file,
 				       media_values,
-				       internal_handle->compression_level,
-				       internal_handle->format,
+				       compression_level,
+				       format,
 				       &( internal_handle->write->data_section ),
 				       0 );
 

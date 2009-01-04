@@ -1194,7 +1194,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEW
 /* Writes an EWF-E01 (EnCase) volume section to file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, int8_t compression_level, uint8_t no_section_append )
+ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t no_section_append )
 {
 	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
 	EWF_VOLUME *volume          = NULL;

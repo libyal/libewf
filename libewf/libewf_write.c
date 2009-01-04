@@ -972,7 +972,10 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		               internal_handle->segment_table->segment_file[ segment_number ],
 		               segment_number,
 		               LIBEWF_SEGMENT_FILE_TYPE_EWF,
-		               internal_handle->media_values );
+		               internal_handle->media_values,
+		               internal_handle->compression_level,
+		               internal_handle->format,
+		               internal_handle->ewf_format );
 
 		if( write_count == -1 )
 		{
@@ -1410,7 +1413,10 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				       segment_file,
 				       segment_number,
 				       LIBEWF_SEGMENT_FILE_TYPE_DWF,
-				       internal_handle->media_values );
+				       internal_handle->media_values,
+				       internal_handle->compression_level,
+				       internal_handle->format,
+				       internal_handle->ewf_format );
 
 			if( write_count == -1 )
 			{
@@ -2521,8 +2527,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						write_count = libewf_section_volume_e01_write(
 							       segment_file,
 							       internal_handle->media_values,
-							       internal_handle->format,
 							       internal_handle->compression_level,
+							       internal_handle->format,
 							       1 );
 					}
 					else
