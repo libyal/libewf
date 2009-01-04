@@ -103,26 +103,6 @@ int libewf_segment_table_set_basename(
      size_t basename_length,
      libewf_error_t **error );
 
-int libewf_segment_table_read_open(
-     libewf_segment_table_t *segment_table,
-     libewf_segment_table_t *delta_segment_table,
-     libewf_file_io_pool_t *file_io_pool,
-     libewf_system_character_t * const filenames[],
-     uint16_t file_amount,
-     uint8_t flags,
-     libewf_header_sections_t *header_sections,
-     libewf_hash_sections_t *hash_sections,
-     libewf_media_values_t *media_values,
-     libewf_offset_table_t *offset_table,
-     libewf_sector_table_t *sessions,
-     libewf_sector_table_t *acquiry_errors,
-     int8_t *compression_level,
-     uint8_t *format,
-     uint8_t *ewf_format,
-     size64_t *segment_file_size,
-     int *abort,
-     libewf_error_t **error );
-
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
      libewf_system_character_t * const filenames[],

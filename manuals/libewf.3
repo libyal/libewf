@@ -23,7 +23,7 @@
 .Ft int
 .Fn libewf_signal_abort "libewf_handle_t *handle"
 .Ft libewf_handle_t *
-.Fn libewf_open "char * const filenames[], uint16_t amount_of_files, uint8_t flags"
+.Fn libewf_open "char * const filenames[], int amount_of_files, uint8_t flags"
 .Ft off64_t
 .Fn libewf_seek_offset "libewf_handle_t *handle, off64_t offset"
 .Ft off64_t
@@ -219,7 +219,7 @@ Functions available for wide character string support:
 .Ft int
 .Fn libewf_glob_wide "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
 .Ft libewf_handle_t *
-.Fn libewf_open_wide "wchar_t * const filenames[], uint16_t amount_of_files, uint8_t flags"
+.Fn libewf_open_wide "wchar_t * const filenames[], int amount_of_files, uint8_t flags"
 .Ft int
 .Fn libewf_get_segment_filename "libewf_handle_t *handle, wchar_t *filename, size_t size"
 .Ft int

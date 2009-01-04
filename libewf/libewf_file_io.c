@@ -191,6 +191,9 @@ int libewf_file_io_open_wide(
 		 "%s: unable to set narrow character filename.\n",
 		 function );
 
+		memory_free(
+		 narrow_filename );
+
 		return( -1 );
 	}
 	file_descriptor = open(
@@ -255,7 +258,7 @@ int libewf_file_io_exists(
 	libewf_error_t *local_error = NULL;
 	static char *function       = "libewf_file_io_exists";
 	int file_descriptor         = 0;
-	int result                  = 0;
+	int result                  = 1;
 
 	if( filename == NULL )
 	{
@@ -284,6 +287,9 @@ int libewf_file_io_exists(
 		     LIBEWF_ERROR_DOMAIN_IO,
 		     LIBEWF_IO_ERROR_ACCESS_DENIED ) != 0 )
 		{
+			libewf_error_free(
+			 error );
+
 			result = 1;
 		}
 		else if( libewf_error_matches(
@@ -291,16 +297,19 @@ int libewf_file_io_exists(
 		          LIBEWF_ERROR_DOMAIN_IO,
 		          LIBEWF_IO_ERROR_INVALID_RESOURCE ) != 0 )
 		{
+			libewf_error_free(
+			 error );
+
 			result = 0;
 		}
 		else
 		{
+			if( error == &local_error )
+			{
+				libewf_error_free(
+				 error );
+			}
 			result = -1;
-		}
-		if( error == &local_error )
-		{
-			libewf_error_free(
-			 error );
 		}
 	}
 	else if( libewf_file_io_close(
@@ -330,7 +339,7 @@ int libewf_file_io_exists_wide(
 	libewf_error_t *local_error = NULL;
 	static char *function       = "libewf_file_io_exists_wide";
 	int file_descriptor         = 0;
-	int result                  = 0;
+	int result                  = 1;
 
 	if( filename == NULL )
 	{
@@ -359,6 +368,9 @@ int libewf_file_io_exists_wide(
 		     LIBEWF_ERROR_DOMAIN_IO,
 		     LIBEWF_IO_ERROR_ACCESS_DENIED ) != 0 )
 		{
+			libewf_error_free(
+			 error );
+
 			result = 1;
 		}
 		else if( libewf_error_matches(
@@ -366,16 +378,19 @@ int libewf_file_io_exists_wide(
 		          LIBEWF_ERROR_DOMAIN_IO,
 		          LIBEWF_IO_ERROR_INVALID_RESOURCE ) != 0 )
 		{
+			libewf_error_free(
+			 error );
+
 			result = 0;
 		}
 		else
 		{
+			if( error == &local_error )
+			{
+				libewf_error_free(
+				 error );
+			}
 			result = -1;
-		}
-		if( error == &local_error )
-		{
-			libewf_error_free(
-			 error );
 		}
 	}
 	else if( libewf_file_io_close(

@@ -107,7 +107,7 @@ LIBEWF_EXTERN int libewf_signal_abort(
  */
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               char * const filenames[],
-                              uint16_t amount_of_files,
+                              int amount_of_files,
                               uint8_t flags );
 
 /* Opens a set of EWF file(s)
@@ -118,7 +118,7 @@ LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open_wide(
                               wchar_t * const filenames[],
-                              uint16_t amount_of_files,
+                              int amount_of_files,
                               uint8_t flags );
 #endif
 

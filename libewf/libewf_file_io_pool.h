@@ -24,8 +24,9 @@
 #define _LIBEWF_FILE_IO_POOL_H
 
 #include <common.h>
-#include <system_string.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_error.h"
 #include "libewf_file_io_handle.h"
@@ -94,6 +95,22 @@ int libewf_file_io_pool_open_file_io_handle(
      libewf_file_io_handle_t *file_io_handle,
      int flags,
      libewf_error_t **error );
+
+int libewf_file_io_pool_add_file(
+     libewf_file_io_pool_t *file_io_pool,
+     char *filename,
+     int flags,
+     int *entry,
+     libewf_error_t **error );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+int libewf_file_io_pool_add_file_wide(
+     libewf_file_io_pool_t *file_io_pool,
+     char *filename,
+     int flags,
+     int *entry,
+     libewf_error_t **error );
+#endif
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,

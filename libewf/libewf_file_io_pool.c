@@ -23,7 +23,6 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
@@ -622,7 +621,269 @@ int libewf_file_io_pool_open_file_io_handle(
 	return( 1 );
 }
 
-/* Adds a file to the file io pool and opens it
+/* Adds a file to the file io pool
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_io_pool_add_file(
+     libewf_file_io_pool_t *file_io_pool,
+     char *filename,
+     int flags,
+     int *entry,
+     libewf_error_t **error )
+{
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	libewf_system_character_t *wide_filename = NULL;
+	size_t wide_filename_size                = 0;
+#endif
+
+	libewf_file_io_handle_t *file_io_handle  = NULL;
+	static char *function                    = "libewf_file_io_pool_add_file";
+	size_t filename_size                     = 0;
+	int result                               = 0;
+
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_io_pool_create_file_io_handle(
+	     file_io_pool,
+	     &file_io_handle,
+	     entry,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file io pool entry.\n",
+		 function );
+
+		return( -1 );
+	}
+	filename_size = 1 + narrow_string_length(
+			     filename );
+
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_size_from_utf8(
+	     filename,
+	     filename_size,
+	     &wide_filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine wide character filename size.\n",
+		 function );
+
+		return( -1 );
+	}
+	wide_filename = (wchar_t *) memory_allocate(
+	                             sizeof( char ) * wide_filename_size );
+
+	if( wide_filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create wide character filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_system_string_copy_from_utf8(
+	     narrow_filename,
+	     narrow_filename_size,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set wide character filename.\n",
+		 function );
+
+		memory_free(
+		 wide_filename );
+
+		return( -1 );
+	}
+	result = libewf_file_io_handle_set_filename(
+	          file_io_handle,
+	          wide_filename
+	          wide_filename_size,
+	          error );
+
+	memory_free(
+	 wide_filename );
+#else
+	result = libewf_file_io_handle_set_filename(
+	          file_io_handle,
+	          filename,
+	          filename_size,
+	          error );
+#endif
+
+	if( result != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file io handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	file_io_handle->flags = flags;
+
+	return( 1 );
+}
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Adds a file to the file io pool
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_io_pool_add_file_wide(
+     libewf_file_io_pool_t *file_io_pool,
+     char *filename,
+     int flags,
+     int *entry,
+     libewf_error_t **error )
+{
+#if !defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	libewf_system_character_t *narrow_filename = NULL;
+	size_t narrow_filename_size                = 0;
+#endif
+
+	libewf_file_io_handle_t *file_io_handle    = NULL;
+	static char *function                      = "libewf_file_io_pool_add_file_wide";
+	size_t filename_size                       = 0;
+	int result                                 = 0;
+
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_io_pool_create_file_io_handle(
+	     file_io_pool,
+	     &file_io_handle,
+	     &file_io_pool_entry,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file io pool entry.\n",
+		 function );
+
+		return( -1 );
+	}
+	filename_size = 1 + wide_string_length(
+			     filename );
+
+#if !defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_size_from_utf8(
+	     filename,
+	     filename_size,
+	     &narrow_filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine narrow character filename size.\n",
+		 function );
+
+		return( -1 );
+	}
+	narrow_filename = (wchar_t *) memory_allocate(
+	                               sizeof( char ) * narrow_filename_size );
+
+	if( narrow_filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create narrow character filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_system_string_copy_from_utf8(
+	     narrow_filename,
+	     narrow_filename_size,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set narrow character filename.\n",
+		 function );
+
+		memory_free(
+		 narrow_filename );
+
+		return( -1 );
+	}
+	result = libewf_file_io_handle_set_filename(
+	          file_io_handle,
+	          narrow_filename
+	          narrow_filename_size,
+	          error );
+
+	memory_free(
+	 narrow_filename );
+#else
+	result = libewf_file_io_handle_set_filename(
+	          file_io_handle,
+	          filename,
+	          filename_size,
+	          error );
+#endif
+
+	if( result != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file io handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	file_io_handle->flags = flags;
+
+	return( 1 );
+}
+#endif
+
+/* Opens a file in the file io pool
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_io_pool_open(

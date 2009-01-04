@@ -24,7 +24,9 @@
 #define _LIBEWF_FILE_IO_HANDLE_H
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_error.h"
 #include "libewf_system_string.h"

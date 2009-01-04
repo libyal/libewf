@@ -276,6 +276,13 @@ int libewf_internal_handle_subhandle_write_free(
      libewf_internal_handle_write_t **subhandle_write,
      libewf_error_t **error );
 
+int libewf_internal_handle_add_segment_file(
+     libewf_internal_handle_t *internal_handle,
+     int file_io_pool_entry,
+     int flags,
+     uint16_t *segment_number,
+     libewf_error_t **error );
+
 int libewf_internal_handle_get_write_maximum_amount_of_segments(
      uint8_t ewf_format,
      uint16_t *maximum_amount_of_segments,

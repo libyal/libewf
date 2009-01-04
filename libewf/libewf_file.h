@@ -58,13 +58,13 @@ LIBEWF_EXTERN int libewf_glob_wide(
 
 LIBEWF_EXTERN libewf_handle_t *libewf_open(
                                 char * const filenames[],
-                                uint16_t amount_of_files,
+                                int amount_of_files,
                                 uint8_t flags );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
-                                wcahr_T * const filenames[],
-                                uint16_t amount_of_files,
+                                wchar_t * const filenames[],
+                                int amount_of_files,
                                 uint8_t flags );
 #endif
 
