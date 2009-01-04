@@ -175,6 +175,7 @@ Version: 20080309
 * fixed ewfcommon_determine_operating_system
 * fixed overflow on compression read error, buffer is no longer passed for
   compressed chunks
+* fixed raw access parameter mix up
 
 Version: 20080308
 * Code clean up

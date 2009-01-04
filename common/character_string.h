@@ -37,6 +37,10 @@
 #include "common.h"
 #include "string_conversion.h"
 
+#if defined( HAVE_SRING_H )
+#include <string.h>
+#endif
+
 #include <libewf/types.h>
 
 #if defined( __cplusplus )

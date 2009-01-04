@@ -1021,16 +1021,19 @@ ssize_t ewfcommon_raw_read_ewf(
 
 		if( ( sector + amount_of_sectors ) > (off64_t) ( media_size / bytes_per_sector ) )
 		{
-			amount_of_sectors = ( media_size / bytes_per_sector ) - sector;
+			amount_of_sectors = (uint32_t) ( ( media_size / bytes_per_sector ) - sector );
 		}
-		if( libewf_add_crc_error( handle, sector, amount_of_sectors ) != 1 )
+		if( libewf_add_crc_error(
+		     handle,
+		     sector,
+		     amount_of_sectors ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set CRC error chunk.\n",
 			 function );
 
 			return( -1 );
 		}
-		return( read_size );
+		return( (ssize_t) read_size );
 	}
 	if( is_compressed == 0 )
 	{
@@ -1043,7 +1046,7 @@ ssize_t ewfcommon_raw_read_ewf(
 
 		return( -1 );
 	}
-	return( read_size );
+	return( (ssize_t) read_size );
 }
 
 /* Writes the data to an EWF file
@@ -1142,7 +1145,7 @@ ssize_t ewfcommon_raw_write_ewf(
 
 		return( -1 );
 	}
-	return( write_size );
+	return( (ssize_t) write_size );
 }
 
 #endif
@@ -1350,9 +1353,9 @@ ssize64_t ewfcommon_read_verify(
 		              buffer_size,
 		              read_size,
 		              read_offset,
+		              media_size,
 		              sectors_per_chunk,
 		              bytes_per_sector,
-		              media_size,
 		              wipe_chunk_on_error );
 #else
 		read_count = libewf_read_random(
@@ -2124,9 +2127,9 @@ ssize64_t ewfcommon_export_raw(
 		              buffer_size,
 		              read_size,
 		              read_offset,
+		              media_size,
 		              sectors_per_chunk,
 		              bytes_per_sector,
-		              media_size,
 		              wipe_chunk_on_error );
 #else
 		read_count = libewf_read_random(
@@ -2572,9 +2575,9 @@ ssize64_t ewfcommon_export_ewf(
 		              buffer_size,
 		              read_size,
 		              read_offset,
+		              media_size,
 		              sectors_per_chunk,
 		              bytes_per_sector,
-		              media_size,
 		              wipe_chunk_on_error );
 #else
 		read_count = libewf_read_random(
