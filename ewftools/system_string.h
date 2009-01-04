@@ -23,14 +23,10 @@
 #if !defined( _SYSTEM_STRING_H )
 #define _SYSTEM_STRING_H
 
-#include "common.h"
-#include "narrow_string.h"
-#include "types.h"
-#include "wide_string.h"
-
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
+#include <common.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( __cplusplus )
 extern "C" {

@@ -20,9 +20,12 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
+#include <common.h>
+#include <narrow_string.h>
+#include <notify.h>
+#include <wide_string.h>
+
 #include "file_io.h"
-#include "notify.h"
 
 #if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
 

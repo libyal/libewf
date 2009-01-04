@@ -20,10 +20,11 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "memory.h"
-#include "notify.h"
-#include "types.h"
+#include <common.h>
+#include <memory.h>
+#include <notify.h>
+#include <types.h>
+
 #include "system_string.h"
 
 /* Duplicates a string

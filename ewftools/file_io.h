@@ -23,9 +23,10 @@
 #if !defined( _FILE_IO_H )
 #define _FILE_IO_H
 
-#include "common.h"
-#include "system_string.h"
-#include "types.h"
+#include <common.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_IO_H )
 #include <io.h>

@@ -23,8 +23,7 @@
 #if !defined( _FILE_STREAM_IO_H )
 #define _FILE_STREAM_IO_H
 
-#include "common.h"
-#include "system_string.h"
+#include <common.h>
 
 #include <stdio.h>
 

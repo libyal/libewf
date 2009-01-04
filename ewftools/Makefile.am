@@ -21,9 +21,12 @@ ewfacquire_SOURCES = \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
 	ewfsha1.h \
+	file_io.c file_io.h \
+	file_stream_io.h \
 	glob.c glob.h \
 	process_status.c process_status.h \
-	string_conversion.c string_conversion.h
+	string_conversion.c string_conversion.h \
+	system_string.c system_string.h
 
 ewfacquire_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
@@ -42,9 +45,12 @@ ewfacquirestream_SOURCES = \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
 	ewfsha1.h \
+	file_io.c file_io.h \
+	file_stream_io.h \
 	glob.c glob.h \
 	process_status.c process_status.h \
-	string_conversion.c string_conversion.h
+	string_conversion.c string_conversion.h \
+	system_string.c system_string.h
 
 ewfacquirestream_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
@@ -63,9 +69,12 @@ ewfalter_SOURCES = \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
 	ewfsha1.h \
+	file_io.c file_io.h \
+	file_stream_io.h \
 	glob.c glob.h \
 	process_status.c process_status.h \
-	string_conversion.c string_conversion.h
+	string_conversion.c string_conversion.h \
+	system_string.c system_string.h
 
 ewfalter_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
@@ -84,9 +93,11 @@ ewfexport_SOURCES = \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
 	ewfsha1.h \
+	file_io.c file_io.h \
 	glob.c glob.h \
 	process_status.c process_status.h \
-	string_conversion.c string_conversion.h
+	string_conversion.c string_conversion.h \
+	system_string.c system_string.h
 
 ewfexport_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
@@ -105,9 +116,11 @@ ewfinfo_SOURCES = \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
 	ewfsha1.h \
+	file_io.c file_io.h \
 	glob.c glob.h \
 	process_status.c process_status.h \
-	string_conversion.c string_conversion.h
+	string_conversion.c string_conversion.h \
+	system_string.c system_string.h
 
 ewfinfo_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
@@ -125,9 +138,12 @@ ewfverify_SOURCES = \
 	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfverify.c \
+	file_io.c file_io.h \
+	file_stream_io.h \
 	glob.c glob.h \
 	process_status.c process_status.h \
-	string_conversion.c string_conversion.h
+	string_conversion.c string_conversion.h \
+	system_string.c system_string.h
 
 ewfverify_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 

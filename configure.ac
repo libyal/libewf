@@ -65,42 +65,8 @@ dnl Check for compiler language support
 AC_C_CONST
 AC_C_VOLATILE
 
-dnl Checks for libraries and library functions
-dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
-AC_CHECK_LIB(
- z,
- adler32,
- [],
- [AC_MSG_FAILURE(
-  [Missing function: adler32 in library: zlib.],
-  [1])])
-
-AC_CHECK_LIB(
- z,
- compress2,
- [ac_libewf_dummy=yes],
- [AC_MSG_FAILURE(
-  [Missing function: compress2 in library: zlib.],
-  [1])])
-
-AC_CHECK_LIB(
- z,
- compressBound,
- [AC_DEFINE(
-  [HAVE_COMPRESS_BOUND],
-  [1],
-  [Defines if compressBound funtion is present in zlib.])])
-
-AC_CHECK_LIB(
- z,
- uncompress,
- [ac_libewf_dummy=yes],
- [AC_MSG_FAILURE(
-  [Missing function: uncompress in library: zlib.],
-  [1])])
-
 dnl Check for headers
-dnl Headers included in libewf/types.h
+dnl Headers included in include/libewf/types.h
 AC_CHECK_HEADER(
  [sys/types.h],
  [AC_DEFINE(
@@ -143,13 +109,6 @@ AC_CHECK_HEADER(
 dnl Headers included in common/types.h
 AC_CHECK_HEADERS([limits.h])
 
-dnl Headers included in common/directory_io.h and common/file_io.h
-AC_CHECK_HEADERS([sys/stat.h])
-
-dnl Headers included in common/file_io.h
-AC_CHECK_HEADERS([fcntl.h])
-AC_CHECK_HEADERS([unistd.h])
-
 dnl Headers included in common/narrow_string.h
 AC_CHECK_HEADERS([string.h])
 
@@ -159,6 +118,11 @@ AC_CHECK_HEADERS([stdlib.h])
 dnl Headers included in common/notify.c
 AC_CHECK_HEADERS([stdarg.h])
 AC_CHECK_HEADERS([varargs.h])
+
+dnl Headers included in and libewf/libewf_file_io.h
+AC_CHECK_HEADERS([sys/stat.h])
+AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([unistd.h])
 
 dnl Other headers
 AC_CHECK_HEADERS([glob.h])
@@ -526,6 +490,40 @@ AC_CHECK_FUNCS([uname])
 dnl Check for printf conversion specifier support
 LIBEWF_CHECK_PRINTF_JD
 LIBEWF_CHECK_PRINTF_ZD
+
+dnl Checks for libraries and library functions
+dnl ac_libewf_dummy is used to prevent AC_CHECK_LIB adding unnecessary -l<library> arguments
+AC_CHECK_LIB(
+ z,
+ adler32,
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: adler32 in library: zlib.],
+  [1])])
+
+AC_CHECK_LIB(
+ z,
+ compress2,
+ [ac_libewf_dummy=yes],
+ [AC_MSG_FAILURE(
+  [Missing function: compress2 in library: zlib.],
+  [1])])
+
+AC_CHECK_LIB(
+ z,
+ compressBound,
+ [AC_DEFINE(
+  [HAVE_COMPRESS_BOUND],
+  [1],
+  [Defines if compressBound funtion is present in zlib.])])
+
+AC_CHECK_LIB(
+ z,
+ uncompress,
+ [ac_libewf_dummy=yes],
+ [AC_MSG_FAILURE(
+  [Missing function: uncompress in library: zlib.],
+  [1])])
 
 dnl Check for enabling libuna for Unicode string support
 AC_CHECK_HEADERS(

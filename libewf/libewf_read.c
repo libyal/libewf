@@ -23,7 +23,6 @@
 #include <common.h>
 #include <endian.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libewf_definitions.h"
