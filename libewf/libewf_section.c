@@ -2039,7 +2039,6 @@ ssize_t libewf_section_table_write(
 	size_t offsets_size         = 0;
 	uint32_t offset32_value     = 0;
 	uint32_t iterator           = 0;
-	uint8_t overflow            = 0;
 	uint8_t write_crc           = 0;
 
 	if( segment_file_handle == NULL )
@@ -2133,9 +2132,8 @@ ssize_t libewf_section_table_write(
 		offset64_value = offset_table->chunk_offset[ offset_table_index + iterator ].file_offset
 		               - base_offset;
 
-		if( ( overflow == 0 )
-		 && ( ( offset64_value < 0 )
-		  || ( offset64_value > (off64_t) INT32_MAX ) ) )
+		if( ( offset64_value < 0 )
+		 || ( offset64_value > (off64_t) INT32_MAX ) )
 		{
 			notify_warning_printf( "%s: invalid chunk offset value.\n",
 			 function );
@@ -2149,20 +2147,7 @@ ssize_t libewf_section_table_write(
 
 		if( offset_table->chunk_offset[ offset_table_index + iterator ].compressed != 0 )
 		{
-			if( overflow == 0 )
-			{
-				offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
-			}
-			else
-			{
-				notify_warning_printf( "%s: unable to write compressed chunks after chunk overflow.\n",
-				 function );
-
-				memory_free(
-				 offsets );
-
-				return( -1 );
-			}
+			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
 		if( libewf_endian_revert_32bit(
 		     offset32_value,
@@ -2175,33 +2160,6 @@ ssize_t libewf_section_table_write(
 			 offsets );
 
 			return( -1 );
-		}
-		/* This is to compensate for the crappy >2Gb segment file
-		 * solution in EnCase 6
-		 */
-		if( ( overflow == 0 )
-		 && ( ( offset64_value + offset_table->chunk_offset[ offset_table_index + iterator ].size ) > (off64_t) INT32_MAX ) )
-		{
-			if( ( format == LIBEWF_FORMAT_ENCASE6 )
-			 || ( format == LIBEWF_FORMAT_LINEN6 ) )
-			{
-#if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf( "%s: compensating for chunk offset overflow at: %" PRIi64 ".\n",
-				 function, offset64_value );
-#endif
-
-				overflow = 1;
-			}
-			else
-			{
-				notify_warning_printf( "%s: chunk offset overflow at: %" PRIi64 ".\n",
-				 function, offset64_value );
-
-				memory_free(
-				 offsets );
-
-				return( -1 );
-			}
 		}
 	}
 	if( write_crc != 0 )

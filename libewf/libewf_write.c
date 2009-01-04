@@ -636,17 +636,15 @@ int libewf_write_test_chunks_section_full(
 			return( 1 );
 		}
 	}
-#if !defined( LIBEWF_ALLOW_OFFSET_OVERFLOW )
 	else if( ( segment_file_offset - internal_handle->write->chunks_section_offset ) > INT32_MAX )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: no space left for additional chunk - preventing offset overflow .\n",
+		notify_verbose_printf( "%s: no space left for additional chunk - preventing offset overflow.\n",
 		 function );
 #endif
 
 		return( 1 );
 	}
-#endif
 	else
 	{
 		/* Calculate the remaining segment file size

@@ -49,6 +49,9 @@ To do/think about:
 Recovery and analysis:
 * ewfacquire: detect disk full and ask for new segment file location?
   - have libewf allow to set the segment file path during write
+  - like alternative segment file path in EnCase
+    however EnCase seems to fully test if the segment file upfront by
+    allocating the necessary disk space
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -152,6 +155,11 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080318
+* removed overflow from write - this seems to be a bug in EnCase 6.7.1
+  behavior is no longer present in EnCase 6.8, read still support overflow
+  this will allow to convert faulty EnCase 6.7.1 EWF files
 
 Version: 20080317
 * fixed typo in configure.ac
