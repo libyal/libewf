@@ -305,7 +305,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				export_size = libewf_system_string_to_uint64(
+				export_size = system_string_to_uint64(
 				               optarg,
 				               string_length );
 
@@ -383,7 +383,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				export_offset = libewf_system_string_to_int64(
+				export_offset = system_string_to_int64(
 				                 optarg,
 				                 string_length );
 

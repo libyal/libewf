@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080914],
+ [20080915],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080914])
+ [20080915])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -48,6 +48,11 @@ LIBEWF_TEST_ENABLE(
  [python],
  [python],
  [build python bindings (pyewf)],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [v2-api],
+ [v2_api],
+ [enable experimental version 2 API],
  [no])
 
 dnl Check for libtool DLL support
@@ -1178,6 +1183,25 @@ AM_CONDITIONAL(
  HAVE_PYTHON,
  [test "x$ac_libewf_enable_python" != xno])
 
+dnl Check if libewf should be build with experimental version 2 API
+AS_IF(
+	[test "x$ac_libewf_enable_v2_api" != xno],
+	[AC_DEFINE(
+	 [HAVE_V2_API],
+	 [1],
+	 [Defines if experimental version 2 API should be used] )
+	AC_SUBST(
+	 [HAVE_V2_API],
+	 [1])
+	ac_libewf_enable_v2_api=yes],
+	[AC_SUBST(
+	 [HAVE_V2_API],
+	 [0]) ])
+
+AM_CONDITIONAL(
+ HAVE_V2_API,
+ [test "x$ac_libewf_enable_v2_api" != xno])
+
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
@@ -1224,5 +1248,6 @@ Features:
    Python (pyewf) support:                  $ac_libewf_enable_python
    Verbose output:                          $ac_libewf_enable_verbose_output
    Debug output:                            $ac_libewf_enable_debug_output
+   Experimental version 2 API:              $ac_libewf_enable_v2_api
 ]);
 

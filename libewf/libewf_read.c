@@ -862,6 +862,108 @@ ssize_t libewf_read_chunk_data(
  * The buffer size cannot be larger than the chunk size
  * Returns the resulting chunk size or -1 on error
  */
+#if defined( HAVE_V2_API )
+ssize_t libewf_raw_read_prepare_buffer(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t buffer_size,
+         void *uncompressed_buffer,
+         size_t *uncompressed_buffer_size,
+         int8_t is_compressed,
+         uint32_t chunk_crc,
+         int8_t read_crc,
+         libewf_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_raw_read_prepare_buffer";
+	ssize_t chunk_data_size                   = 0;
+	uint8_t crc_mismatch                      = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->chunk_cache == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer - same as chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( uncompressed_buffer == internal_handle->chunk_cache->data )
+	 || ( uncompressed_buffer == internal_handle->chunk_cache->compressed ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid uncompressed buffer - same as chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	chunk_data_size = libewf_read_process_chunk_data(
+	                   internal_handle,
+	                   (uint8_t *) buffer,
+	                   buffer_size,
+	                   (uint8_t *) uncompressed_buffer,
+	                   uncompressed_buffer_size,
+	                   is_compressed,
+	                   (ewf_crc_t) chunk_crc,
+	                   read_crc,
+	                   &crc_mismatch,
+	                   error );
+
+	if( chunk_data_size <= -1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_INPUT_FAILED,
+		 "%s: unable to prepare chunk data.",
+		 function );
+
+		return( -1 );
+	}
+	if( crc_mismatch != 0 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_INPUT,
+		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
+		 "%s: CRC mismatch for chunk data.",
+		 function );
+
+		return( -1 );
+	}
+	return( chunk_data_size );
+}
+#else
 ssize_t libewf_raw_read_prepare_buffer(
          libewf_handle_t *handle,
          void *buffer,
@@ -992,12 +1094,88 @@ ssize_t libewf_raw_read_prepare_buffer(
 	}
 	return( chunk_data_size );
 }
+#endif
 
 /* Reads 'raw' data from the curent offset into a buffer
  * size contains the size of the buffer
  * The function sets the chunk crc, is compressed and read crc values
  * Returns the amount of bytes read or -1 on error
  */
+#if defined( HAVE_V2_API )
+ssize_t libewf_raw_read_buffer(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t size,
+         int8_t *is_compressed,
+         uint32_t *chunk_crc,
+         int8_t *read_crc,
+         libewf_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_raw_read_buffer";
+	ssize_t read_count                        = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->chunk_cache == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer - same as chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_raw_read_chunk(
+	              internal_handle,
+	              internal_handle->current_chunk,
+	              buffer,
+	              size,
+	              is_compressed,
+	              (ewf_crc_t *) chunk_crc,
+	              read_crc,
+	              error );
+
+	if( read_count <= -1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to read chunk data.",
+		 function );
+	}
+	/* TODO check if this is needed on error */
+	internal_handle->current_chunk += 1;
+
+	return( read_count );
+}
+#else
 ssize_t libewf_raw_read_buffer(
          libewf_handle_t *handle,
          void *buffer,
@@ -1086,14 +1264,188 @@ ssize_t libewf_raw_read_buffer(
 		libewf_error_free(
 		 &error );
 	}
+	/* TODO check if this is needed on error */
 	internal_handle->current_chunk += 1;
 
 	return( read_count );
 }
+#endif
 
 /* Reads media data from the last current into a buffer
  * Returns the amount of bytes read or -1 on error
  */
+#if defined( HAVE_V2_API )
+ssize_t libewf_read_buffer(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t size,
+         libewf_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_read_buffer";
+	ssize_t chunk_read_count                  = 0;
+	ssize_t total_read_count                  = 0;
+	size_t chunk_data_size                    = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_cache == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer - same as chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	notify_verbose_printf(
+	 "%s: reading size: %" PRIzu ".\n",
+	 function,
+	 size );
+#endif
+
+	/* Reallocate the chunk cache if the chunk size is not the default chunk size
+	 * this prevents some reallocations of the chunk cache
+	 */
+	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( ewf_crc_t );
+
+	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf(
+		 "%s: reallocating chunk data size: %" PRIzu ".\n",
+		 function,
+		 chunk_data_size );
+#endif
+
+		if( libewf_chunk_cache_resize(
+		     internal_handle->chunk_cache,
+		     chunk_data_size,
+		     error ) != 1 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize chunk cache.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	while( size > 0 )
+	{
+		chunk_read_count = libewf_read_chunk_data(
+		                    internal_handle,
+		                    internal_handle->current_chunk,
+		                    internal_handle->current_chunk_offset,
+		                    (uint8_t *) &( (uint8_t *) buffer )[ total_read_count ],
+		                    size,
+		                    error );
+
+		if( chunk_read_count <= -1 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
+			 "%s: unable to read data from chunk.",
+			 function );
+
+			return( -1 );
+		}
+		else if( chunk_read_count == 0 )
+		{
+			break;
+		}
+		size             -= chunk_read_count;
+		total_read_count += chunk_read_count;
+
+		internal_handle->current_chunk_offset += (uint32_t) chunk_read_count;
+
+		if( internal_handle->current_chunk_offset == internal_handle->media_values->chunk_size )
+		{
+			internal_handle->current_chunk_offset = 0;
+			internal_handle->current_chunk       += 1;
+		}
+		else if( internal_handle->current_chunk_offset > internal_handle->media_values->chunk_size )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: invalid current chunk offset.",
+			 function );
+
+			return( -1 );
+		}
+		if( internal_handle->abort == 1 )
+		{
+			break;
+		}
+	}
+	return( total_read_count );
+}
+#else
 ssize_t libewf_read_buffer(
          libewf_handle_t *handle,
          void *buffer,
@@ -1309,10 +1661,56 @@ ssize_t libewf_read_buffer(
 	}
 	return( total_read_count );
 }
+#endif
 
 /* Reads media data from an offset into a buffer
  * Returns the amount of bytes read or -1 on error
  */
+#if defined( HAVE_V2_API )
+ssize_t libewf_read_random(
+         libewf_handle_t *handle,
+         void *buffer,
+         size_t size,
+         off64_t offset,
+         libewf_error_t **error )
+{
+	static char *function = "libewf_read_random";
+	ssize_t read_count    = 0;
+
+	if( libewf_seek_offset(
+	     handle,
+	     offset,
+	     error ) == -1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_read_buffer(
+	              handle,
+	              buffer,
+	              size,
+	              error );
+
+	if( read_count <= -1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to read buffer.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+#else
 ssize_t libewf_read_random(
          libewf_handle_t *handle,
          void *buffer,
@@ -1341,7 +1739,10 @@ ssize_t libewf_read_random(
 
 		return( -1 );
 	}
-	read_count = libewf_read_buffer( handle, buffer, size );
+	read_count = libewf_read_buffer(
+	              handle,
+	              buffer,
+	              size );
 
 	if( read_count <= -1 )
 	{
@@ -1361,4 +1762,5 @@ ssize_t libewf_read_random(
 	}
 	return( read_count );
 }
+#endif
 

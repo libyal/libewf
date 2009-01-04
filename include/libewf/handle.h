@@ -29,6 +29,9 @@
 extern "C" {
 #endif
 
+/* TODO remove definition in v2 of API
+ * HAVE_V2_API
+ */
 #define LIBEWF_HANDLE libewf_handle_t
 
 typedef intptr_t libewf_handle_t;

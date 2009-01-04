@@ -126,31 +126,20 @@ typedef int system_integer_t;
 
 #endif
 
-system_character_t *libewf_system_string_duplicate(
+system_character_t *system_string_duplicate(
                      system_character_t *string,
                      size_t size );
 
-#define system_string_duplicate( string, size ) \
-	libewf_system_string_duplicate( string, size )
-
 #if defined( system_string_to_signed_long_long )
-
-int64_t libewf_system_string_to_int64(
+int64_t system_string_to_int64(
          const system_character_t *string,
          size_t size );
-
-#define system_string_to_int64( string, size ) \
-	 libewf_system_string_to_int64( string, size )
 #endif
 
 #if defined( system_string_to_unsigned_long_long )
-
-uint64_t libewf_system_string_to_uint64(
+uint64_t system_string_to_uint64(
           const system_character_t *string,
           size_t size );
-
-#define system_string_to_uint64( string, size ) \
-	 libewf_system_string_to_uint64( string, size )
 #endif
 
 #if defined( __cplusplus )

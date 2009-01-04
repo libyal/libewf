@@ -30,12 +30,12 @@
 /* Duplicates a string
  * Returns the pointer to the duplicate string, or NULL on error
  */
-system_character_t *libewf_system_string_duplicate(
+system_character_t *system_string_duplicate(
                      system_character_t *string,
                      size_t size )
 {
 	system_character_t *duplicate = NULL;
-	static char *function         = "libewf_system_string_duplicate";
+	static char *function         = "system_string_duplicate";
 
 	if( string == NULL )
 	{
@@ -88,12 +88,12 @@ system_character_t *libewf_system_string_duplicate(
 
 /* Returns the value represented by a string, returns 0 error
  */
-int64_t libewf_system_string_to_int64(
+int64_t system_string_to_int64(
          const system_character_t *string,
          size_t size )
 {
 	system_character_t *end_of_string = NULL;
-	static char *function             = "libewf_system_string_to_int64";
+	static char *function             = "system_string_to_int64";
 	int64_t value                     = 0;
 
 	if( string == NULL )
@@ -139,12 +139,12 @@ int64_t libewf_system_string_to_int64(
 
 /* Returns the value represented by a string, returns 0 on error
  */
-uint64_t libewf_system_string_to_uint64(
+uint64_t system_string_to_uint64(
           const system_character_t *string,
           size_t size )
 {
 	system_character_t *end_of_string = NULL;
-	static char *function             = "libewf_system_string_to_uint64";
+	static char *function             = "system_string_to_uint64";
 	uint64_t value                    = 0;
 
 	if( string == NULL )

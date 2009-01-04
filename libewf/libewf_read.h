@@ -68,6 +68,18 @@ ssize_t libewf_read_chunk_data(
          size_t size,
          libewf_error_t **error );
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       void *uncompressed_buffer,
+                       size_t *uncompressed_buffer_size,
+                       int8_t is_compressed,
+                       uint32_t chunk_crc,
+                       int8_t read_crc,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
@@ -77,7 +89,18 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        int8_t is_compressed,
                        uint32_t chunk_crc,
                        int8_t read_crc );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       int8_t *is_compressed,
+                       uint32_t *chunk_crc,
+                       int8_t *read_crc,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
@@ -85,17 +108,35 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        int8_t *is_compressed,
                        uint32_t *chunk_crc,
                        int8_t *read_crc );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_read_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_read_random(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       off64_t offset,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_read_random(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
                        off64_t offset );
+#endif
 
 #if defined( __cplusplus )
 }

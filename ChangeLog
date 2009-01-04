@@ -135,8 +135,7 @@ check TODO
 
 * API changes
   - add error parameter
-  - make libewf_handle_initialize and libewf_handle_free available
-  - rewrite open and close in correspondence with handle_initialize and handle_free
+  - remove write_finalize in API v2?
 
 * separate narrow and wide character library functions
   - Linux can change wide character into UTF8
@@ -196,6 +195,11 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080915
+* worked on experimental version 2 API currently requires additional configure flag
+  - made libewf_handle_initialize and libewf_handle_free available
+  - rewrote open and close in correspondence with handle_initialize and handle_free
 
 Version: 20080914
 * worked on separation of narrow and wide character string functions

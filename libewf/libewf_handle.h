@@ -28,6 +28,10 @@
 
 #include <libewf/handle.h>
 
+#if defined( HAVE_V2_API )
+#include "libewf_extern.h"
+#endif
+
 #include "libewf_chunk_cache.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_hash_sections.h"
@@ -251,14 +255,26 @@ struct libewf_internal_handle_write
 	uint8_t write_finalized;
 };
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_handle_initialize(
+                   libewf_handle_t **handle,
+                   libewf_error_t **error );
+#else
 int libewf_handle_initialize(
      libewf_handle_t **handle,
      uint8_t flags,
      libewf_error_t **error );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_handle_free(
+                   libewf_handle_t **handle,
+                   libewf_error_t **error );
+#else
 int libewf_handle_free(
      libewf_handle_t **handle,
      libewf_error_t **error );
+#endif
 
 int libewf_internal_handle_subhandle_read_initialize(
      libewf_internal_handle_read_t **subhandle_read,

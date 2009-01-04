@@ -145,6 +145,18 @@ ssize_t libewf_write_chunk_data_existing(
          size_t data_size,
          libewf_error_t **error );
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       void *compressed_buffer,
+                       size_t *compressed_buffer_size,
+                       int8_t *is_compressed,
+                       uint32_t *chunk_crc,
+                       int8_t *write_crc,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
@@ -154,7 +166,19 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        int8_t *is_compressed,
                        uint32_t *chunk_crc,
                        int8_t *write_crc );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       size_t data_size,
+                       int8_t is_compressed,
+                       uint32_t chunk_crc,
+                       int8_t write_crc,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
@@ -163,20 +187,44 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        int8_t is_compressed,
                        uint32_t chunk_crc,
                        int8_t write_crc );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_write_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_write_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_write_random(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       off64_t offset,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_write_random(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
                        off64_t offset );
+#endif
 
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN ssize_t libewf_write_finalize(
+                       libewf_handle_t *handle,
+                       libewf_error_t **error );
+#else
 LIBEWF_EXTERN ssize_t libewf_write_finalize(
                        libewf_handle_t *handle );
+#endif
 
 #if defined( __cplusplus )
 }
