@@ -8,6 +8,9 @@ Roadmap:
 * library/tools enhancements (getoptlong)
 * internationalisation (gettext)
 * enhance thread safety
+  - protect writing to internal data structures
+  - protect reading when writing to internal data structures
+  - thread safe functions
 
 Further analysis of the EWF format:
 * password hash

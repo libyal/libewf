@@ -38,6 +38,7 @@
 
 #include <libewf/libewf_handle.h>
 
+#include "libewf_header_sections.h"
 #include "libewf_internal_handle.h"
 #include "libewf_section_list.h"
 
@@ -65,7 +66,8 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
 
 int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, int *last_segment_file );
 
-ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file,EWF_CHAR *header, size_t header_size, EWF_CHAR *header2, size_t header2_size, EWF_CHAR *xheader, size_t xheader_size, int8_t compression_level, uint8_t format );
+ssize_t libewf_segment_file_write_headers( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format );
+
 ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE *segment_file, int last_segment_file, uint8_t format, uint8_t ewf_format );
 
 ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section );

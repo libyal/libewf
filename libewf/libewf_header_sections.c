@@ -1,5 +1,5 @@
 /*
- * libewf media values
+ * libewf header sections
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,75 +31,60 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_MEDIA_VALUES_H )
-#define _LIBEWF_MEDIA_VALUES_H
-
 #include "libewf_includes.h"
 
 #include "libewf_common.h"
+#include "libewf_header_sections.h"
+#include "libewf_notify.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#define LIBEWF_MEDIA_VALUES	 libewf_media_values_t
-#define LIBEWF_MEDIA_VALUES_SIZE sizeof( LIBEWF_MEDIA_VALUES )
-
-typedef struct libewf_media_values libewf_media_values_t;
-
-/* Additional subhandle for media specific parameters
+/* Allocates memory for a new header sections struct
+ * Returns a pointer to the new instance, NULL on error
  */
-struct libewf_media_values
+LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void )
 {
-	/* The media size
-	 */
-	size64_t media_size;
+	LIBEWF_HEADER_SECTIONS *header_sections = NULL;
+	static char *function                   = "libewf_header_sections_alloc";
 
-	/* The size of an individual chunk
-	 */
-	size32_t chunk_size;
+	header_sections = (LIBEWF_HEADER_SECTIONS *) libewf_common_alloc( LIBEWF_HEADER_SECTIONS_SIZE );
 
-	/* The amount of sectors per chunk
-	 */
-	uint32_t sectors_per_chunk;
+	if( header_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate header sections.\n",
+		 function );
 
-	/* The amount of bytes per sector
-	 */
-	uint32_t bytes_per_sector;
+		return( NULL );
+	}
+	if( libewf_common_memset(
+	     header_sections,
+	     0,
+	     LIBEWF_HEADER_SECTIONS_SIZE ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear media values.\n",
+		 function );
 
-        /* The amount of chunks
-         */
-        uint32_t amount_of_chunks;
+		libewf_common_free( header_sections );
 
-        /* The amount of sectors
-         */
-        uint32_t amount_of_sectors;
-
-        /* The amount of sectors to use as error granularity
-         */
-        uint32_t error_granularity;
-
-	/* The media type
-	 */
-	uint8_t media_type;
-
-	/* The media flags
-	 */
-	uint8_t media_flags;
-
-        /* The GUID of the acquiry system
-         */
-        uint8_t guid[ 16 ];
-};
-
-LIBEWF_MEDIA_VALUES *libewf_media_values_alloc( void );
-
-#define libewf_media_values_free( media_values ) \
-	libewf_common_free( media_values )
-
-#if defined( __cplusplus )
+		return( NULL );
+	}
+	return( header_sections );
 }
-#endif
 
-#endif
+/* Frees memory of a header sections struct including elements
+ */
+void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections )
+{
+        static char *function = "libewf_header_sections_free";
+
+	if( header_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header sections.\n",
+		 function );
+
+		return;
+	}
+	libewf_common_free( header_sections->header );
+	libewf_common_free( header_sections->header2 );
+	libewf_common_free( header_sections->xheader );
+	libewf_common_free( header_sections );
+}
 

@@ -1,5 +1,5 @@
 /*
- * libewf media values
+ * libewf header sections
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,71 +31,58 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_MEDIA_VALUES_H )
-#define _LIBEWF_MEDIA_VALUES_H
+#if !defined( _LIBEWF_HEADER_SECTIONS_H )
+#define _LIBEWF_HEADER_SECTIONS_H
 
 #include "libewf_includes.h"
 
-#include "libewf_common.h"
+#include "ewf_char.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_MEDIA_VALUES	 libewf_media_values_t
-#define LIBEWF_MEDIA_VALUES_SIZE sizeof( LIBEWF_MEDIA_VALUES )
+#define LIBEWF_HEADER_SECTIONS	 	libewf_header_sections_t
+#define LIBEWF_HEADER_SECTIONS_SIZE	sizeof( LIBEWF_HEADER_SECTIONS )
 
-typedef struct libewf_media_values libewf_media_values_t;
+typedef struct libewf_header_sections libewf_header_sections_t;
 
 /* Additional subhandle for media specific parameters
  */
-struct libewf_media_values
+struct libewf_header_sections
 {
-	/* The media size
+	/* The stored header
 	 */
-	size64_t media_size;
+	EWF_CHAR *header;
 
-	/* The size of an individual chunk
+	/* The size of the stored header
 	 */
-	size32_t chunk_size;
+	size_t header_size;
 
-	/* The amount of sectors per chunk
+	/* The stored header2
 	 */
-	uint32_t sectors_per_chunk;
+	EWF_CHAR *header2;
 
-	/* The amount of bytes per sector
+	/* The size of the stored header2
 	 */
-	uint32_t bytes_per_sector;
+	size_t header2_size;
 
-        /* The amount of chunks
-         */
-        uint32_t amount_of_chunks;
-
-        /* The amount of sectors
-         */
-        uint32_t amount_of_sectors;
-
-        /* The amount of sectors to use as error granularity
-         */
-        uint32_t error_granularity;
-
-	/* The media type
+	/* The stored xheader
 	 */
-	uint8_t media_type;
+	EWF_CHAR *xheader;
 
-	/* The media flags
+	/* The size of the stored xheader
 	 */
-	uint8_t media_flags;
+	size_t xheader_size;
 
-        /* The GUID of the acquiry system
-         */
-        uint8_t guid[ 16 ];
+	/* Value to indicate how much header sections were found
+	 */
+	uint8_t amount_of_header_sections;
 };
 
-LIBEWF_MEDIA_VALUES *libewf_media_values_alloc( void );
+LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void );
 
-#define libewf_media_values_free( media_values ) \
-	libewf_common_free( media_values )
+void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections );
 
 #if defined( __cplusplus )
 }

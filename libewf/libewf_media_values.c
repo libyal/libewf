@@ -39,7 +39,7 @@
 
 #include "ewf_definitions.h"
 
-/* Allocates memory for a new handle media struct
+/* Allocates memory for a new media values struct
  * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_MEDIA_VALUES *libewf_media_values_alloc( void )
