@@ -351,11 +351,12 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE *segment_file
 /* Writes a compressed string section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, EWF_CHAR *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
+ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, EWF_CHAR *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
 {
 	EWF_CHAR *compressed_string   = NULL;
 	EWF_CHAR *reallocation        = NULL;
-	static char *function         = "libewf_section_compressed_string_write";
+	static char *function         = "libewf_section_write_compressed_string";
+	off64_t section_offset        = 0;
 	size_t compressed_string_size = 0;
 	ssize_t section_write_count   = 0;
 	ssize_t write_count           = 0;
@@ -382,6 +383,7 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_fil
 
 		return( -1 );
 	}
+	section_offset         = segment_file->file_offset;
 	compressed_string_size = uncompressed_string_size;
 	compressed_string      = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * compressed_string_size );
 
@@ -462,6 +464,17 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_fil
 	}
 	section_write_count += write_count;
 
+	if( libewf_section_list_append(
+	     segment_file->section_list,
+	     section_type,
+	     section_offset,
+	     ( section_offset + section_write_count ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
+		 function, (char *) section_type );
+
+		return( -1 );
+	}
 	return( section_write_count );
 }
 
@@ -538,20 +551,11 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 /* Writes a header section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *header, size_t header_size, int8_t compression_level )
+ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *header, size_t header_size, int8_t compression_level )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "header";
 	static char *function       = "libewf_section_header_write";
-	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -559,16 +563,14 @@ ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 
 		return( -1 );
 	}
-	section_offset = segment_file->file_offset;
-
 	LIBEWF_VERBOSE_PRINT( "%s: Header:\n",
 	 function );
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, header, header_size ); );
 
-	section_write_count = libewf_section_compressed_string_write(
+	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file,
-	                       section_type,
+	                       (EWF_CHAR *) "header",
 	                       6,
 	                       header,
 	                       header_size,
@@ -579,19 +581,6 @@ ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write header to file.\n",
 		 function );
-
-		return( -1 );
-	}
-	internal_handle->amount_of_header_sections++;
-
-	if( libewf_section_list_append(
-	     segment_file->section_list,
-	     section_type,
-	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
-		 function, (char *) section_type );
 
 		return( -1 );
 	}
@@ -671,20 +660,11 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 /* Writes a header2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *header2, size_t header2_size, int8_t compression_level )
+ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *header2, size_t header2_size, int8_t compression_level )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "header2";
 	static char *function       = "libewf_section_header2_write";
-	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -692,16 +672,14 @@ ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, L
 
 		return( -1 );
 	}
-	section_offset = segment_file->file_offset;
-
-	LIBEWF_VERBOSE_PRINT( "%s: Header:\n",
+	LIBEWF_VERBOSE_PRINT( "%s: Header2:\n",
 	 function );
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, header2, header2_size ); );
 
-	section_write_count = libewf_section_compressed_string_write(
+	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file,
-	                       section_type,
+	                       (EWF_CHAR *) "header2",
 	                       7,
 	                       header2,
 	                       header2_size,
@@ -712,19 +690,6 @@ ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, L
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write header2 to file.\n",
 		 function );
-
-		return( -1 );
-	}
-	internal_handle->amount_of_header_sections++;
-
-	if( libewf_section_list_append(
-	     segment_file->section_list,
-	     section_type,
-	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
-		 function, (char *) section_type );
 
 		return( -1 );
 	}
@@ -3660,20 +3625,11 @@ ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 /* Writes a xheader section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *xheader, size_t xheader_size, int8_t compression_level )
+ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *xheader, size_t xheader_size, int8_t compression_level )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "xheader";
 	static char *function       = "libewf_section_xheader_write";
-	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -3681,16 +3637,14 @@ ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, L
 
 		return( -1 );
 	}
-	section_offset = segment_file->file_offset;
-
-	LIBEWF_VERBOSE_PRINT( "%s: Header:\n",
+	LIBEWF_VERBOSE_PRINT( "%s: XHeader:\n",
 	 function );
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, xheader, xheader_size ); );
 
-	section_write_count = libewf_section_compressed_string_write(
+	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file,
-	                       section_type,
+	                       (EWF_CHAR *) "xheader",
 	                       7,
 	                       xheader,
 	                       xheader_size,
@@ -3701,19 +3655,6 @@ ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, L
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write xheader to file.\n",
 		 function );
-
-		return( -1 );
-	}
-	internal_handle->amount_of_header_sections++;
-
-	if( libewf_section_list_append(
-	     segment_file->section_list,
-	     section_type,
-	     section_offset,
-	     ( section_offset + section_write_count ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
-		 function, (char *) section_type );
 
 		return( -1 );
 	}

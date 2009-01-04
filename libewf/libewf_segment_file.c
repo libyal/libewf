@@ -823,7 +823,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * and using the compression used in the file
 		 */
 		write_count = libewf_section_header_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header,
 		               header_size,
@@ -837,6 +836,8 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 			return( -1 );
 		}
 		total_write_count += write_count;
+
+		internal_handle->amount_of_header_sections += 1;
 	}
 	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE2 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE3 )
@@ -848,7 +849,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header,
 		               header_size,
@@ -864,7 +864,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		total_write_count += write_count;
 
 		write_count = libewf_section_header_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header,
 		               header_size,
@@ -878,6 +877,8 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 			return( -1 );
 		}
 		total_write_count += write_count;
+
+		internal_handle->amount_of_header_sections += 2;
 	}
 	else if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE4 )
 	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
@@ -897,7 +898,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header2,
 		               internal_handle->header2_size,
@@ -913,7 +913,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		total_write_count += write_count;
 
 		write_count = libewf_section_header2_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header2,
 		               internal_handle->header2_size,
@@ -932,7 +931,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header,
 		               header_size,
@@ -946,6 +944,8 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 			return( -1 );
 		}
 		total_write_count += write_count;
+
+		internal_handle->amount_of_header_sections += 3;
 	}
 	/* EWFX uses the header and header2 for backwards compatibility
 	 */
@@ -975,7 +975,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * the default compression is used
 		 */
 		write_count = libewf_section_xheader_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->xheader,
 		               xheader_size,
@@ -994,7 +993,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header2,
 		               internal_handle->header2_size,
@@ -1013,7 +1011,6 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
-		               internal_handle,
 		               segment_file,
 		               internal_handle->header,
 		               header_size,
@@ -1027,6 +1024,8 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 			return( -1 );
 		}
 		total_write_count += write_count;
+
+		internal_handle->amount_of_header_sections += 3;
 	}
 	return( total_write_count );
 }
