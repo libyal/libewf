@@ -1220,6 +1220,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
  */
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_offset_table_t *offset_table,
          uint32_t chunk,
          ewf_char_t *chunk_data,
          size_t chunk_size,
@@ -1232,6 +1233,13 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	if( segment_file_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
 		 function );
 
 		return( -1 );
@@ -1250,6 +1258,25 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
+	/* Make sure the chunk is available in the offset table
+	 */
+	if( offset_table->amount < ( chunk + 1 ) )
+	{
+		if( libewf_offset_table_realloc(
+		     offset_table,
+		     ( chunk + 1 ) ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	/* Set the values in the offset table
+	 */
+	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
+	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
+	offset_table->chunk_offset[ chunk ].compressed          = 0;
 
 	/* Write the chunk in the delta segment file
 	 */
@@ -1263,7 +1290,6 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               0 );
 
 	/* refactor
-	 * update the offset table?
 	 */
 
 	if( write_count == -1 )

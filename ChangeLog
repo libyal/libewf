@@ -166,6 +166,9 @@ CLOSED
   if a write error did occur the library should not make any guesses about if
   this is write or wrong
 
+Version: 20080229
+* Code clean up
+
 Version: 20080228
 * Worked on not finalizing on error
 * Refactored libewf_header_values_parse_header and libewf_header_values_parse_header2

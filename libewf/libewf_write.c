@@ -1620,9 +1620,11 @@ ssize_t libewf_raw_write_chunk_existing(
 		LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %jd.\n",
 		 function, segment_file_handle->file_offset );
 
+#ifdef REFACTOR
 		internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 		internal_handle->offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
 		internal_handle->offset_table->chunk_offset[ chunk ].compressed          = 0;
+#endif
 	}
 	else
 	{
@@ -1643,6 +1645,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	 */
 	write_count = libewf_segment_file_write_delta_chunk(
 		       segment_file_handle,
+		       internal_handle->offset_table,
 		       chunk, 
 		       chunk_buffer, 
 		       chunk_size, 

@@ -2565,9 +2565,6 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
-
-	/* refactor code below to other location */
-
 	/* The EnCase2 and EnCase3 format are the same
 	 * only the acquiry software version provides insight in which version of EnCase was used
 	 */

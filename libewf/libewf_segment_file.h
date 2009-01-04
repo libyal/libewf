@@ -127,6 +127,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_offset_table_t *offset_table,
          uint32_t chunk,
          ewf_char_t *chunk_data,
          size_t chunk_size,

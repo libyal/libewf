@@ -1,39 +1,61 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20080228], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20080229], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20080228])
+AM_INIT_AUTOMAKE([libewf], [20080229])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
-	[AC_ARG_ENABLE([$1], [AS_HELP_STRING([--enable-$1], [$3 (default is $4)])], [ac_libewf_enable_$2=$enableval], [ac_libewf_enable_$2=$4])dnl
-	 AC_CACHE_CHECK([whether to enable $3], [ac_libewf_enable_$2], [ac_libewf_enable_$2=$4])dnl
+	[AC_ARG_ENABLE(
+	 [$1],
+	 [AS_HELP_STRING(
+	  [--enable-$1],
+	  [$3 (default is $4)])],
+	 [ac_libewf_enable_$2=$enableval],
+	 [ac_libewf_enable_$2=$4])dnl
+	 AC_CACHE_CHECK(
+	  [whether to enable $3],
+	  [ac_libewf_enable_$2],
+	  [ac_libewf_enable_$2=$4])dnl
 ])
 
 dnl Function to detect if ctime_r is defined according to the POSIX standard
 AC_DEFUN([LIBEWF_FUNC_CTIME_R],
-	[AC_CHECK_FUNC([ctime_r],
-		[AC_DEFINE( [HAVE_CTIME_R], [1], [Define to 1 if you have the ctime_r function.] )
-		AC_LANG_PUSH(C)
-		AC_MSG_CHECKING([if ctime_r is defined according to the POSIX definition])
-		AC_LINK_IFELSE(
-			AC_LANG_PROGRAM( [[#include <time.h>]], [[ctime_r(NULL,NULL,0)]] ),
-			[AC_MSG_RESULT([ctime_r with additional size argument detected])
-			AC_DEFINE( [HAVE_CTIME_R_SIZE], [1], [Define to 1 if you have the ctime_r function with a third size argument.] )],
-			[AC_LINK_IFELSE(
-				AC_LANG_PROGRAM( [[#include <time.h>]], [[ctime_r(NULL,NULL)]] ),
-				[AC_MSG_RESULT(yes)],
-				[ CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
-				AC_LINK_IFELSE(
-					AC_LANG_PROGRAM( [[#include <time.h>]], [[ctime_r(NULL,NULL)]] ),
-					[AC_MSG_RESULT([ctime_r requires additional compile flags])],
-					[AC_MSG_WARN([Unable to determine how to compile ctime_r])]
-				)]
-			)]
-		)
-		AC_LANG_POP(C)
-	])
+	[AC_CHECK_FUNC(
+	 [ctime_r],
+	 [AC_DEFINE(
+	  [HAVE_CTIME_R],
+	  [1],
+	  [Define to 1 if you have the ctime_r function.] )
+	 AC_LANG_PUSH(C)
+	 AC_MSG_CHECKING(
+	  [if ctime_r is defined according to the POSIX definition])
+	 AC_LINK_IFELSE(
+		AC_LANG_PROGRAM(
+		 [[#include <time.h>]],
+		 [[ctime_r(NULL,NULL,0)]]),
+		[AC_MSG_RESULT(
+		 [ctime_r with additional size argument detected])
+		AC_DEFINE(
+		 [HAVE_CTIME_R_SIZE],
+		 [1],
+		 [Define to 1 if you have the ctime_r function with a third size argument.] )],
+		[AC_LINK_IFELSE(
+			AC_LANG_PROGRAM(
+			 [[#include <time.h>]],
+			 [[ctime_r(NULL,NULL)]]),
+			 [AC_MSG_RESULT(yes)],
+			 [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+			 AC_LINK_IFELSE(
+				AC_LANG_PROGRAM(
+				 [[#include <time.h>]],
+				 [[ctime_r(NULL,NULL)]] ),
+				[AC_MSG_RESULT(
+				 [ctime_r requires additional compile flags])],
+				[AC_MSG_WARN(
+				 [Unable to determine how to compile ctime_r])] )] )] )
+	AC_LANG_POP(C) ])
 ])
 
 dnl Function to determine the operating system
@@ -72,7 +94,10 @@ case "$ac_libewf_target_string" in
 		ac_libewf_operating_system="Unknown";
 		;;
 esac
-AC_DEFINE_UNQUOTED( LIBEWF_OPERATING_SYSTEM, "$ac_libewf_operating_system", [Defines the fallback operating system string.] )
+AC_DEFINE_UNQUOTED(
+ LIBEWF_OPERATING_SYSTEM,
+ "$ac_libewf_operating_system",
+ [Defines the fallback operating system string.])
 ])
 
 dnl Check for host type
@@ -82,11 +107,31 @@ dnl Check for large file support
 AC_SYS_LARGEFILE
 
 dnl Check for configure arguments
-LIBEWF_TEST_ENABLE([wide-character-type], [wide_character_type], [enable wide character type support], [no])
-LIBEWF_TEST_ENABLE([raw-access], [raw_access], [use libewf's raw read and write functionality in the ewf tools], [no])
-LIBEWF_TEST_ENABLE([low-memory-usage], [low_memory_usage], [enable low memory usage], [no])
-LIBEWF_TEST_ENABLE([verbose-output], [verbose_output], [enable verbose output], [no])
-LIBEWF_TEST_ENABLE([debug-output], [debug_output], [enable debug output], [no])
+LIBEWF_TEST_ENABLE(
+ [wide-character-type],
+ [wide_character_type],
+ [enable wide character type support],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [raw-access],
+ [raw_access],
+ [use libewf's raw read and write functionality in the ewf tools],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [low-memory-usage],
+ [low_memory_usage],
+ [enable low memory usage],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [verbose-output],
+ [verbose_output],
+ [enable verbose output],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [debug-output],
+ [debug_output],
+ [enable debug output],
+ [no])
 
 dnl Check for libtool DLL support
 AC_LIBTOOL_WIN32_DLL
@@ -175,26 +220,37 @@ AC_FUNC_VPRINTF
 LIBEWF_FUNC_CTIME_R
 
 dnl Check for enabling libcrypto EVP support
-AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
-	[AC_CHECK_HEADERS([openssl/evp.h])
-	AC_MSG_NOTICE([Support for libcrypto EVP will be build.])
-	ac_libewf_have_libcrypto_evp=yes
-	ac_libewf_have_libcrypto_md5=evp
-	ac_libewf_have_libcrypto_sha1=evp ],
+AS_IF(
+	[test "x$ac_libewf_have_libcrypto_evp" != xno],
+	 [AC_CHECK_HEADERS(
+	  [openssl/evp.h])
+	 AC_MSG_NOTICE(
+	  [Support for libcrypto EVP will be build.])
+	 ac_libewf_have_libcrypto_evp=yes
+	 ac_libewf_have_libcrypto_md5=evp
+	 ac_libewf_have_libcrypto_sha1=evp ],
 
-	dnl Check for libcrypto MD5 and SHA1 support
-	[AS_IF([test "x$ac_libewf_have_libcrypto_md5" == xno],
-		[AC_MSG_NOTICE([No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])]
-		[AC_CHECK_HEADERS([openssl/md5.h])
-		AC_MSG_NOTICE([Support for calculating MD5 hashes will be build.])
+	 dnl Check for libcrypto MD5 and SHA1 support
+	 [AS_IF(
+		[test "x$ac_libewf_have_libcrypto_md5" == xno],
+		[AC_MSG_NOTICE(
+		 [No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])]
+		[AC_CHECK_HEADERS(
+		 [openssl/md5.h])
+		AC_MSG_NOTICE(
+		 [Support for calculating MD5 hashes will be build.])
 		ac_libewf_have_libcrypto_md5=yes])
 
-	AS_IF([test "x$ac_libewf_have_libcrypto_sha1" == xno],
-		[AC_MSG_NOTICE([No support for calculating SHA1 hashes, if required install libcrypto with SHA1 support.])]
-		[AC_CHECK_HEADERS([openssl/sha.h])
-		AC_MSG_NOTICE([Support for calculating SHA1 hashes will be build.])
+	AS_IF(
+		[test "x$ac_libewf_have_libcrypto_sha1" == xno],
+		[AC_MSG_NOTICE(
+		 [No support for calculating SHA1 hashes, if required install libcrypto with SHA1 support.])]
+		[AC_CHECK_HEADERS(
+		 [openssl/sha.h])
+		AC_MSG_NOTICE(
+		 [Support for calculating SHA1 hashes will be build.])
 		ac_libewf_have_libcrypto_sha1=yes])
-	])
+])
 
 dnl Check for enabling libuuid support
 AS_IF([test "x$ac_libewf_have_libuuid" != xno],
