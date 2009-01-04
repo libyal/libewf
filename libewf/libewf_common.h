@@ -167,6 +167,13 @@ extern "C" {
 #error Missing wide character string copy function (wmemcpy, wcsncpy and wcscpy)
 #endif
 
+#if defined( HAVE_WMEMCPY )
+#define libewf_common_wide_memcpy( destination, source, length ) \
+	(wchar_t *) wmemcpy( (void *) destination, (void *) source, length )
+#else
+#error Missing wide character memory copy function (wmemcpy)
+#endif
+
 #endif
 
 int libewf_common_open( const char *filename, uint8_t flags );

@@ -344,39 +344,20 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 	libewf_common_free( segment_table );
 }
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Gets a wide character filename of a certain segment
- * Returns the filename pointer, or NULL on error
- */
-wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment )
-{
-	static char *function = "libewf_segment_table_get_wide_filename";
-
-	if( segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( segment > segment_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment out of range.\n",
-		 function );
-
-		return( NULL );
-	}
-	return( segment_table->filename[ segment ] );
-}
-#else
-
 /* Gets a filename of a certain segment
  * Returns the filename pointer, or NULL on error
  */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment )
+#else
 char *libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment )
+#endif
 {
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	static char *function = "libewf_segment_table_get_wide_filename";
+#else
 	static char *function = "libewf_segment_table_get_filename";
+#endif
 
 	if( segment_table == NULL )
 	{
@@ -394,97 +375,22 @@ char *libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, ui
 	}
 	return( segment_table->filename[ segment ] );
 }
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Sets a wide character filename for a specific segment
- * Creates a duplicate of the string
- * Returns 1 if succesful, or -1 on error
- */
-int8_t libewf_segment_table_set_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, const wchar_t *filename, size_t length_filename )
-{
-	static char *funtion = "libewf_segment_table_set_wide_filename";
-
-	if( segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment > segment_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->filename[ segment ] != NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: duplicate segments not supported: segment %d in %ls was already specified as %ls.\n",
-		 function, segment, filename, segment_table->filename[ segment ] );
-
-		return( -1 );
-	}
-	if( length_filename == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to process empty filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( length_filename >= (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length value exceeds maximum.\n",
-		 funcition );
-
-		return( -1 );
-	}
-	/* One additional byte for the end of string character is needed
-	 */
-	segment_table->filename[ segment ] = (wchar_t *) libewf_common_alloc( sizeof( wchar_t ) * ( length_filename + 1 ) );
-
-	if( segment_table->filename[ segment ] == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_common_wide_string_copy( segment_table->filename[ segment ], filename, length_filename ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
-		 function );
-
-		libewf_common_free( segment_table->filename[ segment ] );
-
-		segment_table->filename[ segment ] = NULL;
-
-		return( -1 );
-	}
-	/* Make sure the string is terminated
-	 */
-	segment_table->filename[ segment ][ length_filename ] = '\0';
-
-	return( 1 );
-}
-#else
 
 /* Sets a filename for a specific segment
  * Creates a duplicate of the string
  * Returns 1 if succesful, or -1 on error
  */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+int8_t libewf_segment_table_set_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, const wchar_t *filename, size_t length_filename )
+#else
 int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, const char *filename, size_t length_filename )
+#endif
 {
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	static char *function = "libewf_segment_table_set_wide_filename";
+#else
 	static char *function = "libewf_segment_table_set_filename";
+#endif
 
 	if( segment_table == NULL )
 	{
@@ -509,14 +415,19 @@ int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, u
 	}
 	if( segment_table->filename[ segment ] != NULL )
 	{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		LIBEWF_WARNING_PRINT( "%s: duplicate segments not supported: segment %d in %ls was already specified as %ls.\n",
+		 function, segment, filename, segment_table->filename[ segment ] );
+#else
 		LIBEWF_WARNING_PRINT( "%s: duplicate segments not supported: segment %d in %s was already specified as %s.\n",
 		 function, segment, filename, segment_table->filename[ segment ] );
+#endif
 
 		return( -1 );
 	}
 	if( length_filename == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to process empty filename.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid filename length is zero.\n",
 		 function );
 
 		return( -1 );
@@ -530,7 +441,11 @@ int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, u
 	}
 	/* One additional byte for the end of string character is needed
 	 */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	segment_table->filename[ segment ] = (wchar_t *) libewf_common_alloc( sizeof( wchar_t ) * ( length_filename + 1 ) );
+#else
 	segment_table->filename[ segment ] = (char *) libewf_common_alloc( sizeof( char ) * ( length_filename + 1 ) );
+#endif
 
 	if( segment_table->filename[ segment ] == NULL )
 	{
@@ -539,7 +454,11 @@ int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, u
 
 		return( -1 );
 	}
-	if( libewf_common_string_copy( segment_table->filename[ segment ], filename, length_filename ) == NULL )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	if( libewf_common_wide_memcpy( segment_table->filename[ segment ], filename, length_filename ) == NULL )
+#else
+	if( libewf_common_memcpy( segment_table->filename[ segment ], filename, length_filename ) == NULL )
+#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
 		 function );
@@ -556,5 +475,4 @@ int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, u
 
 	return( 1 );
 }
-#endif
 
