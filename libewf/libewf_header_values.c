@@ -43,6 +43,38 @@
 #include "ewf_compress.h"
 #include "ewf_definitions.h"
 
+/* Initializes the header values
+ * Returns 1 if successful, or -1 otherwise
+ */
+int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values )
+{
+	static char *function = "libewf_header_values_initialize";
+
+	if( header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	header_values->identifiers[ 0 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "case_number" ), 11 );
+	header_values->identifiers[ 1 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "description" ), 11 );
+	header_values->identifiers[ 2 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "examiner_name" ), 13 );
+	header_values->identifiers[ 3 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "evidence_number" ), 15 );
+	header_values->identifiers[ 4 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "notes" ), 5 );
+	header_values->identifiers[ 5 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_date" ), 12 );
+	header_values->identifiers[ 6 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "system_date" ), 11 );
+	header_values->identifiers[ 7 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_operating_system" ), 24 );
+	header_values->identifiers[ 8 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_software_version" ), 24 );
+	header_values->identifiers[ 9 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "password" ), 8 );
+	header_values->identifiers[ 10 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "compression_type" ), 16 );
+	header_values->identifiers[ 11 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "model" ), 5 );
+	header_values->identifiers[ 12 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "serial_number" ), 13 );
+	header_values->identifiers[ 13 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "unknown_dc" ), 10 );
+
+	return( 1 );
+}
+
 /* Sets a 2 digit value for a certain index in the date element at the start of the date string
  * Returns 1 if successful, -1 otherwise
  */
@@ -781,6 +813,16 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 	if( header_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+		 function );
+
+		libewf_string_split_values_free( types, type_count );
+		libewf_string_split_values_free( values, value_count );
+
+		return( NULL );
+	}
+	if( libewf_header_values_initialize( header_values ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
 		 function );
 
 		libewf_string_split_values_free( types, type_count );
@@ -3202,6 +3244,15 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 	if( header_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+		 function );
+
+		libewf_string_split_values_free( lines, line_count );
+
+		return( NULL );
+	}
+	if( libewf_header_values_initialize( header_values ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
 		 function );
 
 		libewf_string_split_values_free( lines, line_count );

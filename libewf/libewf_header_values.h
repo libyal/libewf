@@ -63,7 +63,8 @@ extern "C" {
 #define LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER		12
 #define LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC			13
 
-LIBEWF_VALUES_TABLE *libewf_header_values_alloc( void );
+int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values );
+
 int libewf_header_values_realloc( LIBEWF_VALUES_TABLE *header_values, uint32_t previous_amount, uint32_t new_amount );
 void libewf_header_values_free( LIBEWF_VALUES_TABLE *header_values );
 

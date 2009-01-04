@@ -43,6 +43,25 @@
 #include "ewf_compress.h"
 #include "ewf_definitions.h"
 
+/* Initializes the hash values
+ * Returns 1 if successful, or -1 otherwise
+ */
+int libewf_hash_values_initialize( LIBEWF_VALUES_TABLE *hash_values )
+{
+	static char *function = "libewf_hash_values_initialize";
+
+	if( hash_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
+		 function );
+
+		return( -1 );
+	}
+	hash_values->identifiers[ 0 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "MD5" ), 3 );
+
+	return( 1 );
+}
+
 /* Parse a xml hash string for the values
  * Returns a pointer to the new instance, NULL on error
  */
@@ -80,6 +99,15 @@ LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash
 	if( hash_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create hash values.\n",
+		 function );
+
+		libewf_string_split_values_free( lines, line_count );
+
+		return( NULL );
+	}
+	if( libewf_hash_values_initialize( hash_values ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize the hash values.\n",
 		 function );
 
 		libewf_string_split_values_free( lines, line_count );

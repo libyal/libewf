@@ -1313,11 +1313,11 @@ int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of
 
 		return( -1 );
 	}
-	if( internal_handle->header_values == NULL )
+	if( internal_handle->hash_values == NULL )
 	{
 		return( 0 );
 	}
-	*amount_of_values = internal_handle->header_values->amount;
+	*amount_of_values = internal_handle->hash_values->amount;
 
 	return( 1 );
 }
@@ -1899,20 +1899,13 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 
 			return( -1 );
 		}
-		internal_handle->header_values->identifiers[ 0 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "case_number" ), 11 );
-		internal_handle->header_values->identifiers[ 1 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "description" ), 11 );
-		internal_handle->header_values->identifiers[ 2 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "examiner_name" ), 13 );
-		internal_handle->header_values->identifiers[ 3 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "evidence_number" ), 15 );
-		internal_handle->header_values->identifiers[ 4 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "notes" ), 5 );
-		internal_handle->header_values->identifiers[ 5 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_date" ), 12 );
-		internal_handle->header_values->identifiers[ 6 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "system_date" ), 11 );
-		internal_handle->header_values->identifiers[ 7 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_operating_system" ), 24 );
-		internal_handle->header_values->identifiers[ 8 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_software_version" ), 24 );
-		internal_handle->header_values->identifiers[ 9 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "password" ), 8 ); 
-		internal_handle->header_values->identifiers[ 10 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "compression_type" ), 16 );
-		internal_handle->header_values->identifiers[ 11 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "model" ), 5 ); 
-		internal_handle->header_values->identifiers[ 12 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "serial_number" ), 13 );
-		internal_handle->header_values->identifiers[ 13 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "unknown_dc" ), 10 );
+		if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize header values.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( libewf_values_table_set_value( internal_handle->header_values, identifier, value, length ) );
 }
@@ -1952,7 +1945,13 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 
 			return( -1 );
 		}
-		internal_handle->hash_values->identifiers[ 0 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "MD5" ), 3 );
+		if( libewf_hash_values_initialize( internal_handle->hash_values ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize hash values.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( libewf_values_table_set_value( internal_handle->hash_values, identifier, value, length ) );
 }
@@ -2179,6 +2178,13 @@ int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE 
 		if( internal_destination_handle->header_values == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create header values in destination handle.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_header_values_initialize( internal_destination_handle->header_values ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize header values.\n",
 			 function );
 
 			return( -1 );

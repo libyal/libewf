@@ -46,6 +46,8 @@ extern "C" {
 
 #define LIBEWF_HASH_VALUES_DEFAULT_AMOUNT	1
 
+int libewf_hash_values_initialize( LIBEWF_VALUES_TABLE *hash_values );
+
 LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash_string_xml, size_t length );
 LIBEWF_VALUES_TABLE *libewf_hash_values_parse_xhash( EWF_CHAR *xhash, size_t size );
 

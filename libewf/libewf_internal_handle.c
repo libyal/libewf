@@ -690,6 +690,13 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
+	if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "case_number" ),
