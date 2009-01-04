@@ -53,7 +53,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid string.\n",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -64,7 +64,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.\n",
+		 "%s: invalid string size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -75,7 +75,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid split values.\n",
+		 "%s: invalid split values.",
 		 function );
 
 		return( -1 );
@@ -86,7 +86,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: split values already set.\n",
+		 "%s: split values already set.",
 		 function );
 
 		return( -1 );
@@ -97,7 +97,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid amount of split values.\n",
+		 "%s: invalid amount of split values.",
 		 function );
 
 		return( -1 );
@@ -174,7 +174,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: unable to create split values.\n",
+		 "%s: unable to create split values.",
 		 function );
 
 		return( -1 );
@@ -188,7 +188,7 @@ int libewf_string_split(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: unable to clear split values.\n",
+		 "%s: unable to clear split values.",
 		 function );
 
 		memory_free(
@@ -242,7 +242,7 @@ int libewf_string_split(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 				 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: unable to create split value: %" PRIzd ".\n",
+				 "%s: unable to create split value: %" PRIzd ".",
 				 function,
 				 split_value_iterator );
 
@@ -264,7 +264,7 @@ int libewf_string_split(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 				 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-				 "%s: unable to set split value: %" PRIzd ".\n",
+				 "%s: unable to set split value: %" PRIzd ".",
 				 function,
 				 split_value_iterator );
 
@@ -310,7 +310,7 @@ int libewf_string_split_values_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid split values array.\n",
+		 "%s: invalid split values array.",
 		 function );
 
 		return( -1 );

@@ -61,7 +61,7 @@ int libewf_check_file_signature(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -82,7 +82,7 @@ int libewf_check_file_signature(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file.\n",
+		 "%s: unable to open file.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -103,7 +103,7 @@ int libewf_check_file_signature(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read signature.\n",
+		 "%s: unable to read signature.",
 		 function );
 
 		libewf_file_io_close(
@@ -123,7 +123,7 @@ int libewf_check_file_signature(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file.\n",
+		 "%s: unable to close file.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -179,7 +179,7 @@ int libewf_check_file_signature_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -200,7 +200,7 @@ int libewf_check_file_signature_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file.\n",
+		 "%s: unable to open file.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -221,7 +221,7 @@ int libewf_check_file_signature_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read signature.\n",
+		 "%s: unable to read signature.",
 		 function );
 
 		libewf_file_io_close(
@@ -241,7 +241,7 @@ int libewf_check_file_signature_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file.\n",
+		 "%s: unable to close file.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -305,7 +305,7 @@ int libewf_glob(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -322,7 +322,7 @@ int libewf_glob(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid filename length.\n",
+		 "%s: invalid filename length.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -351,7 +351,7 @@ int libewf_glob(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format.\n",
+		 "%s: unsupported format.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -367,7 +367,7 @@ int libewf_glob(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filenames.\n",
+		 "%s: invalid filenames.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -385,7 +385,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - missing extension.\n",
+			 "%s: invalid filename - missing extension.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -419,7 +419,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - unsupported extension: %s.\n",
+			 "%s: invalid filename - unsupported extension: %s.",
 			 function,
 			 &( filename[ length - 4 ] ) );
 
@@ -457,7 +457,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment filename.\n",
+			 "%s: unable to create segment filename.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -476,7 +476,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy filename.\n",
+			 "%s: unable to copy filename.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -506,7 +506,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set extension.\n",
+			 "%s: unable to set extension.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -531,7 +531,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_GENERIC,
-			 "%s: unable to test if file exists.\n",
+			 "%s: unable to test if file exists.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -563,7 +563,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to resize filenames.\n",
+			 "%s: unable to resize filenames.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -612,7 +612,7 @@ int libewf_glob_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -629,7 +629,7 @@ int libewf_glob_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid filename length.\n",
+		 "%s: invalid filename length.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -658,7 +658,7 @@ int libewf_glob_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format.\n",
+		 "%s: unsupported format.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -674,7 +674,7 @@ int libewf_glob_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filenames.\n",
+		 "%s: invalid filenames.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -692,7 +692,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - missing extension.\n",
+			 "%s: invalid filename - missing extension.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -726,7 +726,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - unsupported extension: %s.\n",
+			 "%s: invalid filename - unsupported extension: %s.",
 			 function,
 			 &( filename[ length - 4 ] ) );
 
@@ -764,7 +764,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment filename.\n",
+			 "%s: unable to create segment filename.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -783,7 +783,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy filename.\n",
+			 "%s: unable to copy filename.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -813,7 +813,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set extension.\n",
+			 "%s: unable to set extension.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -838,7 +838,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_GENERIC,
-			 "%s: unable to test if file exists.\n",
+			 "%s: unable to test if file exists.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -870,7 +870,7 @@ int libewf_glob_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to resize filenames.\n",
+			 "%s: unable to resize filenames.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -921,7 +921,7 @@ libewf_handle_t *libewf_open(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filenames.\n",
+		 "%s: invalid filenames.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -937,7 +937,7 @@ libewf_handle_t *libewf_open(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount of files zero or less.\n",
+		 "%s: invalid amount of files zero or less.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -954,7 +954,7 @@ libewf_handle_t *libewf_open(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported flags.\n",
+		 "%s: unsupported flags.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -973,7 +973,7 @@ libewf_handle_t *libewf_open(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create handle.\n",
+		 "%s: unable to create handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1000,7 +1000,7 @@ libewf_handle_t *libewf_open(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 				 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-				 "%s: filename: %s is too small.\n",
+				 "%s: filename: %s is too small.",
 				 function,
 				 filenames[ filename_iterator ] );
 
@@ -1026,7 +1026,7 @@ libewf_handle_t *libewf_open(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to add file to file io pool.\n",
+				 "%s: unable to add file to file io pool.",
 				 function );
 
 				libewf_error_backtrace_notify(
@@ -1054,7 +1054,7 @@ libewf_handle_t *libewf_open(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add segment file.\n",
+				 "%s: unable to add segment file.",
 				 function );
 
 				libewf_error_backtrace_notify(
@@ -1074,7 +1074,7 @@ libewf_handle_t *libewf_open(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-				 "%s: segment file: %" PRIu16 " already exists.\n",
+				 "%s: segment file: %" PRIu16 " already exists.",
 				 function,
 				 segment_number );
 
@@ -1095,7 +1095,7 @@ libewf_handle_t *libewf_open(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_INPUT,
 				 LIBEWF_INPUT_ERROR_INVALID_DATA,
-				 "%s: invalid segment number: %" PRIu16 " - value out of range or missing segment files.\n",
+				 "%s: invalid segment number: %" PRIu16 " - value out of range or missing segment files.",
 				 function,
 				 segment_number );
 
@@ -1162,7 +1162,7 @@ libewf_handle_t *libewf_open(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.\n",
+			 "%s: unable to set basename in segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1193,7 +1193,7 @@ libewf_handle_t *libewf_open(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in delta segment table.\n",
+			 "%s: unable to set basename in delta segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1227,7 +1227,7 @@ libewf_handle_t *libewf_open(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to build segment table.\n",
+			 "%s: unable to build segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1262,7 +1262,7 @@ libewf_handle_t *libewf_open(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to build delta segment table.\n",
+			 "%s: unable to build delta segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1288,7 +1288,7 @@ libewf_handle_t *libewf_open(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine format.\n",
+			 "%s: unable to determine format.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1326,7 +1326,7 @@ libewf_handle_t *libewf_open(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.\n",
+			 "%s: unable to set basename in segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1353,7 +1353,7 @@ libewf_handle_t *libewf_open(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set format.\n",
+		 "%s: unable to set format.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1408,7 +1408,7 @@ libewf_handle_t *libewf_open_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filenames.\n",
+		 "%s: invalid filenames.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1424,7 +1424,7 @@ libewf_handle_t *libewf_open_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount of files zero or less.\n",
+		 "%s: invalid amount of files zero or less.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1441,7 +1441,7 @@ libewf_handle_t *libewf_open_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported flags.\n",
+		 "%s: unsupported flags.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1460,7 +1460,7 @@ libewf_handle_t *libewf_open_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create handle.\n",
+		 "%s: unable to create handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1487,7 +1487,7 @@ libewf_handle_t *libewf_open_wide(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 				 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-				 "%s: filename: %ls is too small.\n",
+				 "%s: filename: %ls is too small.",
 				 function,
 				 filenames[ filename_iterator ] );
 
@@ -1513,7 +1513,7 @@ libewf_handle_t *libewf_open_wide(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to add file to file io pool.\n",
+				 "%s: unable to add file to file io pool.",
 				 function );
 
 				libewf_error_backtrace_notify(
@@ -1541,7 +1541,7 @@ libewf_handle_t *libewf_open_wide(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to add segment file.\n",
+				 "%s: unable to add segment file.",
 				 function );
 
 				libewf_error_backtrace_notify(
@@ -1561,7 +1561,7 @@ libewf_handle_t *libewf_open_wide(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-				 "%s: segment file: %" PRIu16 " already exists.\n",
+				 "%s: segment file: %" PRIu16 " already exists.",
 				 function,
 				 segment_number );
 
@@ -1582,7 +1582,7 @@ libewf_handle_t *libewf_open_wide(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_INPUT,
 				 LIBEWF_INPUT_ERROR_INVALID_DATA,
-				 "%s: invalid segment number: %" PRIu16 " - value out of range or missing segment files.\n",
+				 "%s: invalid segment number: %" PRIu16 " - value out of range or missing segment files.",
 				 function,
 				 segment_number );
 
@@ -1649,7 +1649,7 @@ libewf_handle_t *libewf_open_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.\n",
+			 "%s: unable to set basename in segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1680,7 +1680,7 @@ libewf_handle_t *libewf_open_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in delta segment table.\n",
+			 "%s: unable to set basename in delta segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1714,7 +1714,7 @@ libewf_handle_t *libewf_open_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to build segment table.\n",
+			 "%s: unable to build segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1749,7 +1749,7 @@ libewf_handle_t *libewf_open_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to build delta segment table.\n",
+			 "%s: unable to build delta segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1775,7 +1775,7 @@ libewf_handle_t *libewf_open_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine format.\n",
+			 "%s: unable to determine format.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1813,7 +1813,7 @@ libewf_handle_t *libewf_open_wide(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set basename in segment table.\n",
+			 "%s: unable to set basename in segment table.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1840,7 +1840,7 @@ libewf_handle_t *libewf_open_wide(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set format.\n",
+		 "%s: unable to set format.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1880,7 +1880,7 @@ int libewf_close(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1912,7 +1912,7 @@ int libewf_close(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close all segment files.\n",
+		 "%s: unable to close all segment files.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1934,7 +1934,7 @@ int libewf_close(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-		 "%s: unable to free handle.\n",
+		 "%s: unable to free handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1967,7 +1967,7 @@ off64_t libewf_seek_offset(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1985,7 +1985,7 @@ off64_t libewf_seek_offset(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2001,7 +2001,7 @@ off64_t libewf_seek_offset(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid offset value cannot be less than zero.\n",
+		 "%s: invalid offset value cannot be less than zero.",
 		 function );
 
 		return( -1 );
@@ -2012,7 +2012,7 @@ off64_t libewf_seek_offset(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: attempting to read past the end of the file.\n",
+		 "%s: attempting to read past the end of the file.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2034,7 +2034,7 @@ off64_t libewf_seek_offset(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk value exceeds maximum.\n",
+			 "%s: invalid chunk value exceeds maximum.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2054,7 +2054,7 @@ off64_t libewf_seek_offset(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek chunk offset.\n",
+			 "%s: unable to seek chunk offset.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2076,7 +2076,7 @@ off64_t libewf_seek_offset(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid chunk offset value exceeds maximum.\n",
+			 "%s: invalid chunk offset value exceeds maximum.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -2113,7 +2113,7 @@ off64_t libewf_get_offset(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2131,7 +2131,7 @@ off64_t libewf_get_offset(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		libewf_error_backtrace_notify(

@@ -81,9 +81,9 @@ LIBEWF_EXTERN void libewf_error_free(
                     libewf_error_t **error );
 
 LIBEWF_EXTERN int libewf_error_matches(
-                    libewf_error_t *error,
-                    int error_domain,
-                    int error_code );
+                   libewf_error_t *error,
+                   int error_domain,
+                   int error_code );
 
 LIBEWF_EXTERN void libewf_error_fprint(
                     libewf_error_t *error,

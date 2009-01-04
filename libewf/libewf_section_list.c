@@ -62,7 +62,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section list.\n",
+		 "%s: invalid section list.",
 		 function );
 
 		return( -1 );
@@ -73,7 +73,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid type.\n",
+		 "%s: invalid type.",
 		 function );
 
 		return( -1 );
@@ -85,7 +85,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid type size value out of range.\n",
+		 "%s: invalid type size value out of range.",
 		 function );
 
 		return( -1 );
@@ -99,7 +99,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create section list values.\n",
+		 "%s: unable to create section list values.",
 		 function );
 
 		return( -1 );
@@ -113,7 +113,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to clear section list values.\n",
+		 "%s: unable to clear section list values.",
 		 function );
 
 		memory_free(
@@ -130,7 +130,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set section list values type.\n",
+		 "%s: unable to set section list values type.",
 		 function );
 
 		memory_free(
@@ -151,7 +151,7 @@ int libewf_section_list_append(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to append section list values.\n",
+		 "%s: unable to append section list values.",
 		 function );
 
 		memory_free(

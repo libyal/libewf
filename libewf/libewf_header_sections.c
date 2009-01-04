@@ -47,7 +47,7 @@ int libewf_header_sections_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.\n",
+		 "%s: invalid header sections.",
 		 function );
 
 		return( -1 );
@@ -63,7 +63,7 @@ int libewf_header_sections_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create header sections.\n",
+			 "%s: unable to create header sections.",
 			 function );
 
 			return( -1 );
@@ -77,7 +77,7 @@ int libewf_header_sections_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear header sections.\n",
+			 "%s: unable to clear header sections.",
 			 function );
 
 			memory_free(
@@ -107,7 +107,7 @@ int libewf_header_sections_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.\n",
+		 "%s: invalid header sections.",
 		 function );
 
 		return( -1 );
@@ -156,7 +156,7 @@ int libewf_header_sections_create(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.\n",
+		 "%s: invalid header sections.",
 		 function );
 
 		return( -1 );
@@ -176,7 +176,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -197,7 +197,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -219,7 +219,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -241,7 +241,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -261,7 +261,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -277,7 +277,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header2 section.\n",
+			 "%s: unable to create header2 section.",
 			 function );
 
 			memory_free(
@@ -303,7 +303,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -319,7 +319,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header2 sections.\n",
+			 "%s: unable to create header2 sections.",
 			 function );
 
 			memory_free(
@@ -345,7 +345,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -361,7 +361,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header2 sections.\n",
+			 "%s: unable to create header2 sections.",
 			 function );
 
 			memory_free(
@@ -387,7 +387,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -407,7 +407,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -427,7 +427,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header section.\n",
+			 "%s: unable to create header section.",
 			 function );
 
 			return( -1 );
@@ -443,7 +443,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header2 section.\n",
+			 "%s: unable to create header2 section.",
 			 function );
 
 			memory_free(
@@ -465,7 +465,7 @@ int libewf_header_sections_create(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create xheader section.\n",
+			 "%s: unable to create xheader section.",
 			 function );
 
 			memory_free(
@@ -502,7 +502,7 @@ int libewf_header_sections_determine_format(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.\n",
+		 "%s: invalid header sections.",
 		 function );
 
 		return( -1 );
@@ -513,7 +513,7 @@ int libewf_header_sections_determine_format(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid format.\n",
+		 "%s: invalid format.",
 		 function );
 
 		return( -1 );

@@ -41,7 +41,7 @@ int libewf_hash_sections_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash sections.\n",
+		 "%s: invalid hash sections.",
 		 function );
 
 		return( -1 );
@@ -57,7 +57,7 @@ int libewf_hash_sections_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create hash sections.\n",
+			 "%s: unable to create hash sections.",
 			 function );
 
 			return( -1 );
@@ -71,7 +71,7 @@ int libewf_hash_sections_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear hash sections.\n",
+			 "%s: unable to clear hash sections.",
 			 function );
 
 			memory_free(
@@ -100,7 +100,7 @@ int libewf_hash_sections_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash sections.\n",
+		 "%s: invalid hash sections.",
 		 function );
 
 		return( -1 );

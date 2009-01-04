@@ -47,7 +47,7 @@ int libewf_file_io_open(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -75,7 +75,7 @@ int libewf_file_io_open(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %s.\n",
+				 "%s: access denied to file: %s.",
 				 function,
 				 filename );
 
@@ -86,7 +86,7 @@ int libewf_file_io_open(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %s.\n",
+				 "%s: no such file: %s.",
 				 function,
 				 filename );
 
@@ -97,7 +97,7 @@ int libewf_file_io_open(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_OPEN_FAILED,
-				 "%s: error opening file: %s.\n",
+				 "%s: error opening file: %s.",
 				 function,
 				 filename );
 
@@ -133,7 +133,7 @@ int libewf_file_io_open_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -160,7 +160,7 @@ int libewf_file_io_open_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine narrow character filename size.\n",
+		 "%s: unable to determine narrow character filename size.",
 		 function );
 
 		return( -1 );
@@ -174,7 +174,7 @@ int libewf_file_io_open_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create narrow character filename.\n",
+		 "%s: unable to create narrow character filename.",
 		 function );
 
 		return( -1 );
@@ -190,7 +190,7 @@ int libewf_file_io_open_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set narrow character filename.\n",
+		 "%s: unable to set narrow character filename.",
 		 function );
 
 		memory_free(
@@ -216,7 +216,7 @@ int libewf_file_io_open_wide(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %ls.\n",
+				 "%s: access denied to file: %ls.",
 				 function,
 				 filename );
 
@@ -227,7 +227,7 @@ int libewf_file_io_open_wide(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %ls.\n",
+				 "%s: no such file: %ls.",
 				 function,
 				 filename );
 
@@ -238,7 +238,7 @@ int libewf_file_io_open_wide(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_OPEN_FAILED,
-				 "%s: error opening file: %ls.\n",
+				 "%s: error opening file: %ls.",
 				 function,
 				 filename );
 
@@ -269,7 +269,7 @@ int libewf_file_io_exists(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -322,7 +322,7 @@ int libewf_file_io_exists(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file: %s.\n",
+		 "%s: unable to close file: %s.",
 		 function,
 		 filename );
 
@@ -351,7 +351,7 @@ int libewf_file_io_exists_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -404,7 +404,7 @@ int libewf_file_io_exists_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file: %ls.\n",
+		 "%s: unable to close file: %ls.",
 		 function,
 		 filename );
 

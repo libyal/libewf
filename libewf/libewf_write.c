@@ -68,7 +68,7 @@ int libewf_write_test_empty_block(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid block buffer.\n",
+		 "%s: invalid block buffer.",
 		 function );
 
 		return( -1 );
@@ -79,7 +79,7 @@ int libewf_write_test_empty_block(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -121,7 +121,7 @@ int libewf_write_calculate_chunks_per_segment(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks per segment.\n",
+		 "%s: invalid chunks per segment.",
 		 function );
 
 		return( -1 );
@@ -132,7 +132,7 @@ int libewf_write_calculate_chunks_per_segment(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum section amount of chunks value.\n",
+		 "%s: invalid maximum section amount of chunks value.",
 		 function );
 
 		return( -1 );
@@ -143,7 +143,7 @@ int libewf_write_calculate_chunks_per_segment(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -274,7 +274,7 @@ int libewf_write_calculate_chunks_per_chunks_section(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunks per chunks section.\n",
+		 "%s: invalid chunks per chunks section.",
 		 function );
 
 		return( -1 );
@@ -285,7 +285,7 @@ int libewf_write_calculate_chunks_per_chunks_section(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum section amount of chunks value.\n",
+		 "%s: invalid maximum section amount of chunks value.",
 		 function );
 
 		return( -1 );
@@ -296,7 +296,7 @@ int libewf_write_calculate_chunks_per_chunks_section(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported section number: %" PRIu8 ".\n",
+		 "%s: unsupported section number: %" PRIu8 ".",
 		 function,
 		 chunks_section_number );
 
@@ -351,7 +351,7 @@ int libewf_write_test_segment_file_full(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -445,7 +445,7 @@ int libewf_write_test_chunks_section_full(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -456,7 +456,7 @@ int libewf_write_test_chunks_section_full(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid segment file offset value exceeds maximum.\n",
+		 "%s: invalid segment file offset value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -467,7 +467,7 @@ int libewf_write_test_chunks_section_full(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum section amount of chunks value.\n",
+		 "%s: invalid maximum section amount of chunks value.",
 		 function );
 
 		return( -1 );
@@ -615,7 +615,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk cache.\n",
+		 "%s: invalid chunk cache.",
 		 function );
 
 		return( -1 );
@@ -626,7 +626,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -637,7 +637,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk data.\n",
+		 "%s: invalid chunk data.",
 		 function );
 
 		return( -1 );
@@ -648,7 +648,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk data buffer - same as chunk cache compressed.\n",
+		 "%s: invalid chunk data buffer - same as chunk cache compressed.",
 		 function );
 
 		return( -1 );
@@ -659,7 +659,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk data size value exceeds maximum.\n",
+		 "%s: invalid chunk data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -670,7 +670,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: invalid chunk data size value exceeds media values chunk size.\n",
+		 "%s: invalid chunk data size value exceeds media values chunk size.",
 		 function );
 
 		return( -1 );
@@ -681,7 +681,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk CRC.\n",
+		 "%s: invalid chunk CRC.",
 		 function );
 
 		return( -1 );
@@ -692,7 +692,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid is compressed.\n",
+		 "%s: invalid is compressed.",
 		 function );
 
 		return( -1 );
@@ -703,7 +703,7 @@ ssize_t libewf_write_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid write CRC.\n",
+		 "%s: invalid write CRC.",
 		 function );
 
 		return( -1 );
@@ -730,7 +730,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if chunk data is empty.\n",
+			 "%s: unable to determine if chunk data is empty.",
 			 function );
 
 			return( -1 );
@@ -751,7 +751,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid compressed chunk data.\n",
+			 "%s: invalid compressed chunk data.",
 			 function );
 
 			return( -1 );
@@ -762,7 +762,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid compressed chunk data is the same as chunk data.\n",
+			 "%s: invalid compressed chunk data is the same as chunk data.",
 			 function );
 
 			return( -1 );
@@ -773,7 +773,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid compressed chunk data size.\n",
+			 "%s: invalid compressed chunk data size.",
 			 function );
 
 			return( -1 );
@@ -784,7 +784,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid compressed chunk data size value exceeds maximum.\n",
+			 "%s: invalid compressed chunk data size value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -816,7 +816,7 @@ ssize_t libewf_write_process_chunk_data(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-				 "%s: unable to resize chunk cache.\n",
+				 "%s: unable to resize chunk cache.",
 				 function );
 
 				return( -1 );
@@ -844,7 +844,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_COMPRESSION,
 			 LIBEWF_COMPRESSION_ERROR_COMPRESS_FAILED,
-			 "%s: unable to compress chunk.\n",
+			 "%s: unable to compress chunk.",
 			 function );
 
 			return( -1 );
@@ -869,7 +869,7 @@ ssize_t libewf_write_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set CRC.\n",
+			 "%s: unable to set CRC.",
 			 function );
 
 			return( -1 );
@@ -934,7 +934,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -945,7 +945,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -956,7 +956,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		return( -1 );
@@ -973,7 +973,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.\n",
+		 "%s: invalid handle - missing segment table.",
 		 function );
 
 		return( -1 );
@@ -984,7 +984,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid segment table - missing segment file handles.\n",
+		 "%s: invalid handle - invalid segment table - missing segment file handles.",
 		 function );
 
 		return( -1 );
@@ -995,7 +995,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		return( -1 );
@@ -1008,7 +1008,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid chunk: %" PRIu32 " already set.\n",
+		 "%s: invalid chunk: %" PRIu32 " already set.",
 		 function,
 		 chunk );
 
@@ -1028,7 +1028,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize offset table.\n",
+			 "%s: unable to resize offset table.",
 			 function );
 
 			return( -1 );
@@ -1040,7 +1040,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.\n",
+		 "%s: invalid chunk buffer.",
 		 function );
 
 		return( -1 );
@@ -1051,7 +1051,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid chunk size value is zero.\n",
+		 "%s: invalid chunk size value is zero.",
 		 function );
 
 		return( -1 );
@@ -1062,7 +1062,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk size value exceeds maximum.\n",
+		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1092,7 +1092,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid segment number value out of range.\n",
+		 "%s: invalid segment number value out of range.",
 		 function );
 
 		return( -1 );
@@ -1110,7 +1110,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid handle - missing header sections.\n",
+			 "%s: invalid handle - missing header sections.",
 			 function );
 
 			return( -1 );
@@ -1135,7 +1135,7 @@ ssize_t libewf_raw_write_chunk_new(
 					 error,
 					 LIBEWF_ERROR_DOMAIN_RUNTIME,
 					 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-					 "%s: unable to create header values.\n",
+					 "%s: unable to create header values.",
 					 function );
 
 					return( -1 );
@@ -1152,7 +1152,7 @@ ssize_t libewf_raw_write_chunk_new(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create header(s).\n",
+				 "%s: unable to create header(s).",
 				 function );
 
 				return( -1 );
@@ -1188,7 +1188,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to create segment file for segment: %" PRIu16 ".\n",
+			 "%s: unable to create segment file for segment: %" PRIu16 ".",
 			 function,
 			 segment_number );
 
@@ -1222,7 +1222,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write segment file start.\n",
+			 "%s: unable to write segment file start.",
 			 function );
 
 			return( -1 );
@@ -1251,7 +1251,7 @@ ssize_t libewf_raw_write_chunk_new(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine the amount of chunks per segment.\n",
+				 "%s: unable to determine the amount of chunks per segment.",
 				 function );
 
 				return( -1 );
@@ -1310,7 +1310,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve current offset in segment file.\n",
+			 "%s: unable to retrieve current offset in segment file.",
 			 function );
 
 			return( -1 );
@@ -1339,7 +1339,7 @@ ssize_t libewf_raw_write_chunk_new(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine the amount of chunks per segment.\n",
+				 "%s: unable to determine the amount of chunks per segment.",
 				 function );
 
 				return( -1 );
@@ -1367,7 +1367,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine the amount of chunks per chunks section.\n",
+			 "%s: unable to determine the amount of chunks per chunks section.",
 			 function );
 
 			return( -1 );
@@ -1391,7 +1391,7 @@ ssize_t libewf_raw_write_chunk_new(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_MEMORY,
 				 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create table offsets.\n",
+				 "%s: unable to create table offsets.",
 				 function );
 
 				return( -1 );
@@ -1456,7 +1456,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write chunk data.\n",
+		 "%s: unable to write chunk data.",
 		 function );
 
 		return( -1 );
@@ -1493,7 +1493,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.\n",
+		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
 		return( -1 );
@@ -1521,7 +1521,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine if chunks section is full.\n",
+		 "%s: unable to determine if chunks section is full.",
 		 function );
 
 		return( -1 );
@@ -1546,7 +1546,7 @@ ssize_t libewf_raw_write_chunk_new(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_MEMORY,
 				 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create table offsets.\n",
+				 "%s: unable to create table offsets.",
 				 function );
 
 				return( -1 );
@@ -1577,7 +1577,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to correct chunks section.\n",
+			 "%s: unable to correct chunks section.",
 			 function );
 
 			return( -1 );
@@ -1606,7 +1606,7 @@ ssize_t libewf_raw_write_chunk_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if segment file is full.\n",
+			 "%s: unable to determine if segment file is full.",
 			 function );
 
 			return( -1 );
@@ -1650,7 +1650,7 @@ ssize_t libewf_raw_write_chunk_new(
 					 error,
 					 LIBEWF_ERROR_DOMAIN_IO,
 					 LIBEWF_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to close segment file.\n",
+					 "%s: unable to close segment file.",
 					 function );
 
 					return( -1 );
@@ -1696,7 +1696,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1707,7 +1707,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing delta segment table.\n",
+		 "%s: invalid handle - missing delta segment table.",
 		 function );
 
 		return( -1 );
@@ -1718,7 +1718,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid delta segment table - missing segment file handles.\n",
+		 "%s: invalid handle - invalid delta segment table - missing segment file handles.",
 		 function );
 
 		return( -1 );
@@ -1729,7 +1729,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		return( -1 );
@@ -1740,7 +1740,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
+		 "%s: invalid handle - invalid offset table - missing chunk offsets.",
 		 function );
 
 		return( -1 );
@@ -1751,7 +1751,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid chunk value out of range.\n",
+		 "%s: invalid chunk value out of range.",
 		 function );
 
 		return( -1 );
@@ -1762,7 +1762,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.\n",
+		 "%s: invalid chunk buffer.",
 		 function );
 
 		return( -1 );
@@ -1773,7 +1773,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid chunk size value is zero.\n",
+		 "%s: invalid chunk size value is zero.",
 		 function );
 
 		return( -1 );
@@ -1784,7 +1784,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk size value exceeds maximum.\n",
+		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1795,7 +1795,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_CONFLICTING_VALUE,
-		 "%s: chunk compression cannot be used.\n",
+		 "%s: chunk compression cannot be used.",
 		 function );
 
 		return( -1 );
@@ -1808,7 +1808,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -1840,7 +1840,7 @@ ssize_t libewf_raw_write_chunk_existing(
 			 error,
 		 	 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid segment number value out of range.\n",
+			 "%s: invalid segment number value out of range.",
 			 function );
 
 			return( -1 );
@@ -1857,7 +1857,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid segment file.\n",
+				 "%s: invalid segment file.",
 				 function );
 
 				return( -1 );
@@ -1868,7 +1868,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid segment file - missing section list.\n",
+				 "%s: invalid segment file - missing section list.",
 				 function );
 
 				return( -1 );
@@ -1881,7 +1881,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: missing last section list element.\n",
+				 "%s: missing last section list element.",
 				 function );
 
 				return( -1 );
@@ -1892,7 +1892,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid last section list element element - missing values.\n",
+				 "%s: invalid last section list element element - missing values.",
 				 function );
 
 				return( -1 );
@@ -1909,7 +1909,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve current offset in segment file.\n",
+				 "%s: unable to retrieve current offset in segment file.",
 				 function );
 
 				return( -1 );
@@ -1928,7 +1928,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_SEEK_FAILED,
-				 "%s: cannot find offset: %" PRIjd ".\n",
+				 "%s: cannot find offset: %" PRIjd ".",
 				 function,
 				 last_section_start_offset );
 
@@ -1957,7 +1957,7 @@ ssize_t libewf_raw_write_chunk_existing(
 					 error,
 					 LIBEWF_ERROR_DOMAIN_IO,
 					 LIBEWF_IO_ERROR_WRITE_FAILED,
-					 "%s: unable to write last section.\n",
+					 "%s: unable to write last section.",
 					 function );
 
 					return( -1 );
@@ -1976,7 +1976,7 @@ ssize_t libewf_raw_write_chunk_existing(
 					 error,
 					 LIBEWF_ERROR_DOMAIN_RUNTIME,
 					 LIBEWF_RUNTIME_ERROR_REMOVE_FAILED,
-					 "%s: unable to remove last section from list.\n",
+					 "%s: unable to remove last section from list.",
 					 function );
 
 					return( -1 );
@@ -1988,7 +1988,7 @@ ssize_t libewf_raw_write_chunk_existing(
 					 error,
 					 LIBEWF_ERROR_DOMAIN_RUNTIME,
 					 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-					 "%s: unable to free last section values.\n",
+					 "%s: unable to free last section values.",
 					 function );
 
 					memory_free(
@@ -2026,7 +2026,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to create delta segment file for segment: %" PRIu16 ".\n",
+				 "%s: unable to create delta segment file for segment: %" PRIu16 ".",
 				 function,
 				 segment_number );
 
@@ -2056,7 +2056,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write segment file start.\n",
+				 "%s: unable to write segment file start.",
 				 function );
 
 				return( -1 );
@@ -2079,7 +2079,7 @@ ssize_t libewf_raw_write_chunk_existing(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek chunk offset.\n",
+			 "%s: unable to seek chunk offset.",
 			 function );
 
 			return( -1 );
@@ -2097,7 +2097,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.\n",
+		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
 		return( -1 );
@@ -2128,7 +2128,7 @@ ssize_t libewf_raw_write_chunk_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write delta chunk.\n",
+		 "%s: unable to write delta chunk.",
 		 function );
 
 		return( -1 );
@@ -2154,7 +2154,7 @@ ssize_t libewf_raw_write_chunk_existing(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write last section.\n",
+			 "%s: unable to write last section.",
 			 function );
 
 			return( -1 );
@@ -2196,7 +2196,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -2207,7 +2207,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		return( -1 );
@@ -2218,7 +2218,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -2229,7 +2229,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		return( -1 );
@@ -2246,7 +2246,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -2257,7 +2257,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache compressed.\n",
+		 "%s: invalid buffer - same as chunk cache compressed.",
 		 function );
 
 		return( -1 );
@@ -2286,7 +2286,7 @@ ssize_t libewf_write_chunk_data_new(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid read size value exceeds maximum.\n",
+		 "%s: invalid read size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -2331,7 +2331,7 @@ ssize_t libewf_write_chunk_data_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to write data to chunk cache.\n",
+			 "%s: unable to write data to chunk cache.",
 			 function );
 
 			return( -1 );
@@ -2355,7 +2355,7 @@ ssize_t libewf_write_chunk_data_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid chunk cache amount value out of range.\n",
+			 "%s: invalid chunk cache amount value out of range.",
 			 function );
 
 			return( -1 );
@@ -2397,7 +2397,7 @@ ssize_t libewf_write_chunk_data_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_CONVERSION,
 			 LIBEWF_CONVERSION_ERROR_OUTPUT_FAILED,
-			 "%s: unable to process chunk data.\n",
+			 "%s: unable to process chunk data.",
 			 function );
 
 			return( -1 );
@@ -2432,7 +2432,7 @@ ssize_t libewf_write_chunk_data_new(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write chunk.\n",
+			 "%s: unable to write chunk.",
 			 function );
 
 			return( -1 );
@@ -2470,7 +2470,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -2481,7 +2481,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		return( -1 );
@@ -2492,7 +2492,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -2503,7 +2503,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		return( -1 );
@@ -2514,7 +2514,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		return( -1 );
@@ -2525,7 +2525,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid chunk value out of range.\n",
+		 "%s: invalid chunk value out of range.",
 		 function );
 
 		return( -1 );
@@ -2536,7 +2536,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -2548,7 +2548,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		return( -1 );
@@ -2559,7 +2559,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.\n",
+		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -2604,7 +2604,7 @@ ssize_t libewf_write_chunk_data_existing(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: unable to read data from chunk.\n",
+			 "%s: unable to read data from chunk.",
 			 function );
 
 			return( -1 );
@@ -2638,7 +2638,7 @@ ssize_t libewf_write_chunk_data_existing(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to update data in chunk: %" PRIu32 ".\n",
+			 "%s: unable to update data in chunk: %" PRIu32 ".",
 			 function,
 			 (chunk + 1 ) );
 
@@ -2671,7 +2671,7 @@ ssize_t libewf_write_chunk_data_existing(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write delta chunk.\n",
+		 "%s: unable to write delta chunk.",
 		 function );
 
 		return( -1 );
@@ -2708,7 +2708,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2726,7 +2726,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2743,7 +2743,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2760,7 +2760,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compressed buffer - same as chunk cache.\n",
+		 "%s: invalid compressed buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2791,7 +2791,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_OUTPUT_FAILED,
-		 "%s: unable to prepare chunk data.\n",
+		 "%s: unable to prepare chunk data.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2831,7 +2831,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2849,7 +2849,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2865,7 +2865,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2884,7 +2884,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write values.\n",
+		 "%s: unable to initialize write values.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2900,7 +2900,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2917,7 +2917,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2933,7 +2933,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2949,7 +2949,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: data size cannot be larger than maximum chunk size.\n",
+		 "%s: data size cannot be larger than maximum chunk size.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -2984,7 +2984,7 @@ ssize_t libewf_raw_write_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: cannot rewrite existing chunk.\n",
+			 "%s: cannot rewrite existing chunk.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -3024,7 +3024,7 @@ ssize_t libewf_raw_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write raw chunk data.\n",
+		 "%s: unable to write raw chunk data.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3062,7 +3062,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3080,7 +3080,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3099,7 +3099,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize write values.\n",
+		 "%s: unable to initialize write values.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3115,7 +3115,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3131,7 +3131,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3148,7 +3148,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3164,7 +3164,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3185,7 +3185,7 @@ ssize_t libewf_write_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: chunk cache compressed cannot be used as buffer.\n",
+		 "%s: chunk cache compressed cannot be used as buffer.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3213,7 +3213,7 @@ ssize_t libewf_write_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize chunk cache.\n",
+			 "%s: unable to resize chunk cache.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -3238,7 +3238,7 @@ ssize_t libewf_write_buffer(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: cannot rewrite existing chunk.\n",
+				 "%s: cannot rewrite existing chunk.",
 				 function );
 
 				libewf_error_backtrace_notify(
@@ -3274,7 +3274,7 @@ ssize_t libewf_write_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write data from buffer.\n",
+			 "%s: unable to write data from buffer.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -3304,7 +3304,7 @@ ssize_t libewf_write_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid current chunk offset: %" PRIu32 " larger than chunk size: %" PRIu32 ".\n",
+			 "%s: invalid current chunk offset: %" PRIu32 " larger than chunk size: %" PRIu32 ".",
 			 function,
 			 internal_handle->current_chunk_offset,
 			 internal_handle->media_values->chunk_size );
@@ -3347,7 +3347,7 @@ ssize_t libewf_write_random(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset.\n",
+		 "%s: unable to seek offset.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3368,7 +3368,7 @@ ssize_t libewf_write_random(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write buffer.\n",
+		 "%s: unable to write buffer.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3406,7 +3406,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3424,7 +3424,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3440,7 +3440,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3456,7 +3456,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3472,7 +3472,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.\n",
+		 "%s: invalid handle - missing segment table.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3488,7 +3488,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid segment table - missing segment file handles\n",
+		 "%s: invalid handle - invalid segment table - missing segment file handles",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -3545,7 +3545,7 @@ ssize_t libewf_write_finalize(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write remaining chunk data.\n",
+			 "%s: unable to write remaining chunk data.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -3573,7 +3573,7 @@ ssize_t libewf_write_finalize(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment file: %" PRIu16 ".\n",
+		 "%s: invalid segment file: %" PRIu16 ".",
 		 function,
 		 segment_number );
 
@@ -3612,7 +3612,7 @@ ssize_t libewf_write_finalize(
 					 &error,
 					 LIBEWF_ERROR_DOMAIN_MEMORY,
 					 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create table offsets.\n",
+					 "%s: unable to create table offsets.",
 					 function );
 
 					libewf_error_backtrace_notify(
@@ -3645,7 +3645,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to correct chunks section.\n",
+				 "%s: unable to correct chunks section.",
 				 function );
 
 				libewf_error_backtrace_notify(
@@ -3689,7 +3689,7 @@ ssize_t libewf_write_finalize(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to close segment file.\n",
+			 "%s: unable to close segment file.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -3732,7 +3732,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid segment file: %" PRIu16 ".\n",
+				 "%s: invalid segment file: %" PRIu16 ".",
 				 function,
 				 segment_table_iterator );
 
@@ -3749,7 +3749,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid segment file: %" PRIu16 " - missing section list.\n",
+				 "%s: invalid segment file: %" PRIu16 " - missing section list.",
 				 function,
 				 segment_table_iterator );
 
@@ -3766,7 +3766,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid segment file: %" PRIu16 " - invalid section list - missing entries.\n",
+				 "%s: invalid segment file: %" PRIu16 " - invalid section list - missing entries.",
 				 function,
 				 segment_table_iterator );
 
@@ -3783,7 +3783,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: invalid file io pool entry for segment file: %" PRIu16 ".\n",
+				 "%s: invalid file io pool entry for segment file: %" PRIu16 ".",
 				 function,
 				 segment_table_iterator );
 
@@ -3804,7 +3804,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_OPEN_FAILED,
-				 "%s: unable to open segment file: %" PRIu16 ".\n",
+				 "%s: unable to open segment file: %" PRIu16 ".",
 				 function,
 				 segment_table_iterator );
 
@@ -3834,7 +3834,7 @@ ssize_t libewf_write_finalize(
 					 &error,
 					 LIBEWF_ERROR_DOMAIN_RUNTIME,
 					 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-					 "%s: missing section list values for segment file: %" PRIu16 ".\n",
+					 "%s: missing section list values for segment file: %" PRIu16 ".",
 					 function,
 					 segment_table_iterator );
 
@@ -3867,7 +3867,7 @@ ssize_t libewf_write_finalize(
 						 &error,
 						 LIBEWF_ERROR_DOMAIN_IO,
 						 LIBEWF_IO_ERROR_SEEK_FAILED,
-						 "%s: unable to find offset to correct volume section.\n",
+						 "%s: unable to find offset to correct volume section.",
 						 function );
 
 						libewf_error_backtrace_notify(
@@ -3912,7 +3912,7 @@ ssize_t libewf_write_finalize(
 						 &error,
 						 LIBEWF_ERROR_DOMAIN_IO,
 						 LIBEWF_IO_ERROR_WRITE_FAILED,
-						 "%s: unable to correct volume section.\n",
+						 "%s: unable to correct volume section.",
 						 function );
 
 						libewf_error_backtrace_notify(
@@ -3945,7 +3945,7 @@ ssize_t libewf_write_finalize(
 						 &error,
 						 LIBEWF_ERROR_DOMAIN_IO,
 						 LIBEWF_IO_ERROR_SEEK_FAILED,
-						 "%s: unable to find offset to data volume section.\n",
+						 "%s: unable to find offset to data volume section.",
 						 function );
 
 						libewf_error_backtrace_notify(
@@ -3973,7 +3973,7 @@ ssize_t libewf_write_finalize(
 						 &error,
 						 LIBEWF_ERROR_DOMAIN_IO,
 						 LIBEWF_IO_ERROR_WRITE_FAILED,
-						 "%s: unable to correct data section.\n",
+						 "%s: unable to correct data section.",
 						 function );
 
 						libewf_error_backtrace_notify(
@@ -4010,7 +4010,7 @@ ssize_t libewf_write_finalize(
 						 &error,
 						 LIBEWF_ERROR_DOMAIN_IO,
 						 LIBEWF_IO_ERROR_SEEK_FAILED,
-						 "%s: unable to find offset to data volume section.\n",
+						 "%s: unable to find offset to data volume section.",
 						 function );
 
 						libewf_error_backtrace_notify(
@@ -4043,7 +4043,7 @@ ssize_t libewf_write_finalize(
 						 &error,
 						 LIBEWF_ERROR_DOMAIN_IO,
 						 LIBEWF_IO_ERROR_WRITE_FAILED,
-						 "%s: unable to close segment file.\n",
+						 "%s: unable to close segment file.",
 						 function );
 
 						libewf_error_backtrace_notify(
@@ -4065,7 +4065,7 @@ ssize_t libewf_write_finalize(
 				 &error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_CLOSE_FAILED,
-				 "%s: unable to close segment file: %" PRIu16 ".\n",
+				 "%s: unable to close segment file: %" PRIu16 ".",
 				 function,
 				 segment_table_iterator );
 

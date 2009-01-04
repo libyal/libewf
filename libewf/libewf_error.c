@@ -254,14 +254,14 @@ void libewf_error_fprint(
 	{
 		fprintf(
 		 stream,
-		 "%s",
+		 "%s\n",
 		 ( (libewf_internal_error_t *) error )->message[ message_iterator ] );
 	}
 	else
 	{
 		fprintf(
 		 stream,
-		 "<missing>\n" );
+		 "<missing error message>\n" );
 	}
 }
 
@@ -291,14 +291,14 @@ void libewf_error_backtrace_fprint(
 		{
 			fprintf(
 			 stream,
-			 "%s",
+			 "%s\n",
 			 ( (libewf_internal_error_t *) error )->message[ message_iterator ] );
 		}
 		else
 		{
 			fprintf(
 			 stream,
-			 "<missing>\n" );
+			 "<missing error message>\n" );
 		}
 	}
 }
@@ -323,13 +323,13 @@ void libewf_error_backtrace_notify(
 		if( ( (libewf_internal_error_t *) error )->message[ message_iterator ] != NULL )
 		{
 			notify_printf(
-			 "%s",
+			 "%s\n",
 			 ( (libewf_internal_error_t *) error )->message[ message_iterator ] );
 		}
 		else
 		{
 			notify_printf(
-			 "<missing>\n" );
+			 "<missing error message>\n" );
 		}
 	}
 }

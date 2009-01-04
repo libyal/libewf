@@ -51,7 +51,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -62,7 +62,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -73,7 +73,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -89,7 +89,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine filename size.\n",
+		 "%s: unable to determine filename size.",
 		 function );
 
 		return( -1 );
@@ -103,7 +103,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: filename too small.\n",
+		 "%s: filename too small.",
 		 function );
 
 		return( -1 );
@@ -120,7 +120,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		return( -1 );
@@ -135,7 +135,7 @@ int libewf_file_io_handle_get_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		return( -1 );
@@ -163,7 +163,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -174,7 +174,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -185,7 +185,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: filename already set: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: filename already set: %" PRIs_LIBEWF_SYSTEM ".",
 		 function,
 		 file_io_handle->filename );
 
@@ -197,7 +197,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid filename size is zero.\n",
+		 "%s: invalid filename size is zero.",
 		 function );
 
 		return( -1 );
@@ -208,7 +208,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid filename size value exceeds maximum.\n",
+		 "%s: invalid filename size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -224,7 +224,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine filename size.\n",
+		 "%s: unable to determine filename size.",
 		 function );
 
 		return( -1 );
@@ -241,7 +241,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create filename.\n",
+		 "%s: unable to create filename.",
 		 function );
 
 		return( -1 );
@@ -258,7 +258,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		memory_free(
@@ -279,7 +279,7 @@ int libewf_file_io_handle_set_filename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		memory_free(
@@ -315,7 +315,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -326,7 +326,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -337,7 +337,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -355,7 +355,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine filename size.\n",
+		 "%s: unable to determine filename size.",
 		 function );
 
 		return( -1 );
@@ -367,7 +367,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: filename too small.\n",
+		 "%s: filename too small.",
 		 function );
 
 		return( -1 );
@@ -382,7 +382,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		return( -1 );
@@ -400,7 +400,7 @@ int libewf_file_io_handle_get_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		return( -1 );
@@ -427,7 +427,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -438,7 +438,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filename.\n",
+		 "%s: invalid filename.",
 		 function );
 
 		return( -1 );
@@ -449,7 +449,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: filename already set: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: filename already set: %" PRIs_LIBEWF_SYSTEM ".",
 		 function,
 		 file_io_handle->filename );
 
@@ -461,7 +461,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid filename size is zero.\n",
+		 "%s: invalid filename size is zero.",
 		 function );
 
 		return( -1 );
@@ -472,7 +472,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid filename size value exceeds maximum.\n",
+		 "%s: invalid filename size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -491,7 +491,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine filename size.\n",
+		 "%s: unable to determine filename size.",
 		 function );
 
 		return( -1 );
@@ -506,7 +506,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create filename.\n",
+		 "%s: unable to create filename.",
 		 function );
 
 		return( -1 );
@@ -521,7 +521,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		memory_free(
@@ -545,7 +545,7 @@ int libewf_file_io_handle_set_filename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set filename.\n",
+		 "%s: unable to set filename.",
 		 function );
 
 		memory_free(
@@ -579,7 +579,7 @@ int libewf_file_io_handle_open(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -590,7 +590,7 @@ int libewf_file_io_handle_open(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -615,7 +615,7 @@ int libewf_file_io_handle_open(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to open file: %" PRIs_LIBEWF_SYSTEM ".\n",
+			 "%s: unable to open file: %" PRIs_LIBEWF_SYSTEM ".",
 			 function,
 			 file_io_handle->filename );
 
@@ -644,7 +644,7 @@ int libewf_file_io_handle_reopen(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -655,7 +655,7 @@ int libewf_file_io_handle_reopen(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -675,7 +675,7 @@ int libewf_file_io_handle_reopen(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".\n",
+			 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".",
 			 function,
 			 file_io_handle->filename );
 
@@ -700,7 +700,7 @@ int libewf_file_io_handle_reopen(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open file: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: unable to open file: %" PRIs_LIBEWF_SYSTEM ".",
 		 function,
 		 file_io_handle->filename );
 
@@ -719,7 +719,7 @@ int libewf_file_io_handle_reopen(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in file: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: unable to seek offset in file: %" PRIs_LIBEWF_SYSTEM ".",
 		 function,
 		 file_io_handle->filename );
 
@@ -743,7 +743,7 @@ int libewf_file_io_handle_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -754,7 +754,7 @@ int libewf_file_io_handle_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -768,7 +768,7 @@ int libewf_file_io_handle_close(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".\n",
+			 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".",
 			 function,
 			 file_io_handle->filename );
 
@@ -798,7 +798,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -809,7 +809,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -820,7 +820,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - invalid file descriptor.\n",
+		 "%s: invalid file io handle - invalid file descriptor.",
 		 function );
 
 		return( -1 );
@@ -831,7 +831,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -842,7 +842,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -862,7 +862,7 @@ ssize_t libewf_file_io_handle_read(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read from file: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: unable to read from file: %" PRIs_LIBEWF_SYSTEM ".",
 		 function,
 		 file_io_handle->filename );
 	}
@@ -888,7 +888,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -899,7 +899,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -910,7 +910,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - invalid file descriptor.\n",
+		 "%s: invalid file io handle - invalid file descriptor.",
 		 function );
 
 		return( -1 );
@@ -921,7 +921,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -932,7 +932,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -952,7 +952,7 @@ ssize_t libewf_file_io_handle_write(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write to file: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: unable to write to file: %" PRIs_LIBEWF_SYSTEM ".",
 		 function,
 		 file_io_handle->filename );
 	}
@@ -976,7 +976,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -987,7 +987,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - invalid file descriptor.\n",
+		 "%s: invalid file io handle - invalid file descriptor.",
 		 function );
 
 		return( -1 );
@@ -998,7 +998,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -1009,7 +1009,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid offset value exceeds maximum.\n",
+		 "%s: invalid offset value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1021,7 +1021,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported whence.\n",
+		 "%s: unsupported whence.",
 		 function );
 
 		return( -1 );
@@ -1058,7 +1058,7 @@ off64_t libewf_file_io_handle_seek_offset(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to find offset: %" PRIjd " in file: %" PRIs_LIBEWF_SYSTEM ".\n",
+			 "%s: unable to find offset: %" PRIjd " in file: %" PRIs_LIBEWF_SYSTEM ".",
 			 function,
 			 offset,
 			 file_io_handle->filename );
@@ -1086,7 +1086,7 @@ int libewf_file_io_handle_get_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file io handle.\n",
+		 "%s: invalid file io handle.",
 		 function );
 
 		return( -1 );
@@ -1097,7 +1097,7 @@ int libewf_file_io_handle_get_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - invalid file descriptor.\n",
+		 "%s: invalid file io handle - invalid file descriptor.",
 		 function );
 
 		return( -1 );
@@ -1108,7 +1108,7 @@ int libewf_file_io_handle_get_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file io handle - missing filename.\n",
+		 "%s: invalid file io handle - missing filename.",
 		 function );
 
 		return( -1 );
@@ -1119,7 +1119,7 @@ int libewf_file_io_handle_get_offset(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset.\n",
+		 "%s: invalid offset.",
 		 function );
 
 		return( -1 );

@@ -85,8 +85,6 @@ Python bindings
 * rewrite pyewf to match libewf API
 
 API changes
-* make libewf_handle_initialize and libewf_handle_free available
-  - rewrite open and close in correspondence with handle_initialize and handle_free
 * change compress empty-block into a compression level
 * add identifier_length to hash_/header_values functions
 * allow for chunk data and CRC alignment (possible performance enhancement)
@@ -131,20 +129,18 @@ check for funtion,[ ]
 check error tollerance
 check TODO
 
-remove "\n" from error strings add them to the error string print functions
-
 * use internal format of date/time string convert them in interface
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
-* why does libewf_get_segment_filename return basename?
-
 * API changes
   - add error parameter
+  - make libewf_handle_initialize and libewf_handle_free available
+  - rewrite open and close in correspondence with handle_initialize and handle_free
 
 * separate narrow and wide character library functions
   - Linux can change wide character into UTF8
-  - Windows uses an ASCII codepage
+  - Windows uses an ASCII codepage as narrow character string
 
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?

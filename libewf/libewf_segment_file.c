@@ -65,7 +65,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -76,7 +76,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment number.\n",
+		 "%s: invalid segment number.",
 		 function );
 
 		return( -1 );
@@ -94,7 +94,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read file header.\n",
+		 "%s: unable to read file header.",
 		 function );
 
 		return( -1 );
@@ -128,7 +128,7 @@ ssize_t libewf_segment_file_read_file_header(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_INPUT,
 		 LIBEWF_INPUT_ERROR_SIGNATURE_MISMATCH,
-		 "%s: file signature does not match.\n",
+		 "%s: file signature does not match.",
 		 function );
 
 		return( -1 );
@@ -172,7 +172,7 @@ int libewf_segment_file_read_sections(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -183,7 +183,7 @@ int libewf_segment_file_read_sections(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid last segment file.\n",
+		 "%s: invalid last segment file.",
 		 function );
 
 		return( -1 );
@@ -219,7 +219,7 @@ int libewf_segment_file_read_sections(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: unable to read section.\n",
+			 "%s: unable to read section.",
 			 function );
 
 			return( -1 );
@@ -269,7 +269,7 @@ ssize_t libewf_segment_file_write_headers(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -280,7 +280,7 @@ ssize_t libewf_segment_file_write_headers(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header sections.\n",
+		 "%s: invalid header sections.",
 		 function );
 
 		return( -1 );
@@ -292,7 +292,7 @@ ssize_t libewf_segment_file_write_headers(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid header.\n",
+		 "%s: invalid header.",
 		 function );
 
 		return( -1 );
@@ -322,7 +322,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write single header section.\n",
+			 "%s: unable to write single header section.",
 			 function );
 
 			return( -1 );
@@ -354,7 +354,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write first header section.\n",
+			 "%s: unable to write first header section.",
 			 function );
 
 			return( -1 );
@@ -375,7 +375,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write second header section.\n",
+			 "%s: unable to write second header section.",
 			 function );
 
 			return( -1 );
@@ -395,7 +395,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid header2.\n",
+			 "%s: invalid header2.",
 			 function );
 
 			return( -1 );
@@ -421,7 +421,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write first header2 section.\n",
+			 "%s: unable to write first header2 section.",
 			 function );
 
 			return( -1 );
@@ -442,7 +442,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write second header2 section.\n",
+			 "%s: unable to write second header2 section.",
 			 function );
 
 			return( -1 );
@@ -466,7 +466,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write third header section.\n",
+			 "%s: unable to write third header section.",
 			 function );
 
 			return( -1 );
@@ -486,7 +486,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid xheader.\n",
+			 "%s: invalid xheader.",
 			 function );
 
 			return( -1 );
@@ -498,7 +498,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: invalid header2.\n",
+			 "%s: invalid header2.",
 			 function );
 
 			return( -1 );
@@ -524,7 +524,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write firts xheader section.\n",
+			 "%s: unable to write firts xheader section.",
 			 function );
 
 			return( -1 );
@@ -548,7 +548,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write second header2 section.\n",
+			 "%s: unable to write second header2 section.",
 			 function );
 
 			return( -1 );
@@ -572,7 +572,7 @@ ssize_t libewf_segment_file_write_headers(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write third header section.\n",
+			 "%s: unable to write third header section.",
 			 function );
 
 			return( -1 );
@@ -605,7 +605,7 @@ ssize_t libewf_segment_file_write_last_section(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -635,7 +635,7 @@ ssize_t libewf_segment_file_write_last_section(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write %s section.\n",
+		 "%s: unable to write %s section.",
 		 function,
 		 (char *) last_section_type );
 
@@ -673,7 +673,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -684,7 +684,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid segment number.\n",
+		 "%s: invalid segment number.",
 		 function );
 
 		return( -1 );
@@ -695,7 +695,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section list.\n",
+		 "%s: invalid section list.",
 		 function );
 
 		return( -1 );
@@ -706,7 +706,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid cached data section.\n",
+		 "%s: invalid cached data section.",
 		 function );
 
 		return( -1 );
@@ -731,7 +731,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported segment file type.\n",
+		 "%s: unsupported segment file type.",
 		 function );
 
 		return( -1 );
@@ -747,7 +747,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set file signature.\n",
+		 "%s: unable to set file signature.",
 		 function );
 
 		return( -1 );
@@ -775,7 +775,7 @@ ssize_t libewf_segment_file_write_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write file header to file.\n",
+		 "%s: unable to write file header to file.",
 		 function );
 
 		return( -1 );
@@ -803,7 +803,7 @@ ssize_t libewf_segment_file_write_start(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write header sections.\n",
+				 "%s: unable to write header sections.",
 				 function );
 
 				return( -1 );
@@ -847,7 +847,7 @@ ssize_t libewf_segment_file_write_start(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write volume section.\n",
+				 "%s: unable to write volume section.",
 				 function );
 
 				return( -1 );
@@ -874,7 +874,7 @@ ssize_t libewf_segment_file_write_start(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write data section.\n",
+				 "%s: unable to write data section.",
 				 function );
 
 				return( -1 );
@@ -911,7 +911,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -922,7 +922,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.\n",
+		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -933,7 +933,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid table offsets.\n",
+		 "%s: invalid table offsets.",
 		 function );
 
 		return( -1 );
@@ -944,7 +944,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: table offsets too small.\n",
+		 "%s: table offsets too small.",
 		 function );
 
 		return( -1 );
@@ -961,7 +961,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.\n",
+		 "%s: unable to resize offset table.",
 		 function );
 
 		return( -1 );
@@ -991,7 +991,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write table section.\n",
+			 "%s: unable to write table section.",
 			 function );
 
 			return( -1 );
@@ -1017,7 +1017,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write sectors section.\n",
+			 "%s: unable to write sectors section.",
 			 function );
 
 			return( -1 );
@@ -1059,7 +1059,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -1070,7 +1070,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.\n",
+		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -1081,7 +1081,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk CRC.\n",
+		 "%s: invalid chunk CRC.",
 		 function );
 
 		return( -1 );
@@ -1092,7 +1092,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk data size value exceeds maximum.\n",
+		 "%s: invalid chunk data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1113,7 +1113,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.\n",
+		 "%s: unable to resize offset table.",
 		 function );
 
 		return( -1 );
@@ -1128,7 +1128,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.\n",
+		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
 		return( -1 );
@@ -1184,7 +1184,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write data.\n",
+		 "%s: unable to write data.",
 		 function );
 
 		return( -1 );
@@ -1212,7 +1212,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write CRC.\n",
+			 "%s: unable to write CRC.",
 			 function );
 
 			return( -1 );
@@ -1253,7 +1253,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -1266,7 +1266,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk section size value exceeds maximum.\n",
+		 "%s: invalid chunk section size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1289,7 +1289,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to fill table offsets.\n",
+		 "%s: unable to fill table offsets.",
 		 function );
 
 		return( -1 );
@@ -1304,7 +1304,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.\n",
+		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
 		return( -1 );
@@ -1329,7 +1329,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to find offset to correct sectors size.\n",
+		 "%s: unable to find offset to correct sectors size.",
 		 function );
 
 		return( -1 );
@@ -1367,7 +1367,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to rewrite %s section.\n",
+			 "%s: unable to rewrite %s section.",
 			 function,
 			 (char *) table_section_string );
 
@@ -1399,7 +1399,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to rewrite sectors section.\n",
+			 "%s: unable to rewrite sectors section.",
 			 function );
 
 			return( -1 );
@@ -1425,7 +1425,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to find offset to continue.\n",
+		 "%s: unable to find offset to continue.",
 		 function );
 
 		return( -1 );
@@ -1455,7 +1455,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to rewrite table section.\n",
+			 "%s: unable to rewrite table section.",
 			 function );
 
 			return( -1 );
@@ -1484,7 +1484,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to rewrite table2 section.\n",
+			 "%s: unable to rewrite table2 section.",
 			 function );
 
 			return( -1 );
@@ -1519,7 +1519,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -1530,7 +1530,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.\n",
+		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
@@ -1543,7 +1543,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].\n",
+		 "%s: chunk: %" PRIu32 " out of range [0,%" PRIu32 "].",
 		 function,
 		 chunk,
 		 offset_table->amount_of_chunk_offsets - 1 );
@@ -1560,7 +1560,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.\n",
+		 "%s: unable to retrieve current offset in segment file.",
 		 function );
 
 		return( -1 );
@@ -1635,7 +1635,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -1646,7 +1646,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hash sections.\n",
+		 "%s: invalid hash sections.",
 		 function );
 
 		return( -1 );
@@ -1657,7 +1657,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -1668,7 +1668,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid sessions.\n",
+		 "%s: invalid sessions.",
 		 function );
 
 		return( -1 );
@@ -1679,7 +1679,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid acquiry errors.\n",
+		 "%s: invalid acquiry errors.",
 		 function );
 
 		return( -1 );
@@ -1707,7 +1707,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write data section.\n",
+				 "%s: unable to write data section.",
 				 function );
 
 				return( -1 );
@@ -1735,7 +1735,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write sessions section.\n",
+				 "%s: unable to write sessions section.",
 				 function );
 
 				return( -1 );
@@ -1765,7 +1765,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write error2 section.\n",
+				 "%s: unable to write error2 section.",
 				 function );
 
 				return( -1 );
@@ -1788,7 +1788,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write hash section.\n",
+				 "%s: unable to write hash section.",
 				 function );
 
 				return( -1 );
@@ -1822,7 +1822,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to generate xhash.\n",
+				 "%s: unable to generate xhash.",
 				 function );
 
 				return( -1 );
@@ -1841,7 +1841,7 @@ ssize_t libewf_segment_file_write_close(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_WRITE_FAILED,
-				 "%s: unable to write xhash section.\n",
+				 "%s: unable to write xhash section.",
 				 function );
 
 				return( -1 );
@@ -1866,7 +1866,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write end of segment file.\n",
+		 "%s: unable to write end of segment file.",
 		 function );
 
 		return( -1 );
@@ -1884,7 +1884,7 @@ ssize_t libewf_segment_file_write_close(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close segment file: %" PRIu16 ".\n",
+		 "%s: unable to close segment file: %" PRIu16 ".",
 		 function,
 		 segment_number );
 

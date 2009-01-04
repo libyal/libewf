@@ -64,7 +64,7 @@ ssize_t libewf_read_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -75,7 +75,7 @@ ssize_t libewf_read_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk data.\n",
+		 "%s: invalid chunk data.",
 		 function );
 
 		return( -1 );
@@ -86,7 +86,7 @@ ssize_t libewf_read_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk data size value exceeds maximum.\n",
+		 "%s: invalid chunk data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -97,7 +97,7 @@ ssize_t libewf_read_process_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid CRC mismatch.\n",
+		 "%s: invalid CRC mismatch.",
 		 function );
 
 		return( -1 );
@@ -142,7 +142,7 @@ ssize_t libewf_read_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid uncompressed chunk data.\n",
+			 "%s: invalid uncompressed chunk data.",
 			 function );
 
 			return( -1 );
@@ -153,7 +153,7 @@ ssize_t libewf_read_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid uncompressed chunk data is the same as chunk data.\n",
+			 "%s: invalid uncompressed chunk data is the same as chunk data.",
 			 function );
 
 			return( -1 );
@@ -164,7 +164,7 @@ ssize_t libewf_read_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid uncompressed chunk data size value exceeds maximum.\n",
+			 "%s: invalid uncompressed chunk data size value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -180,7 +180,7 @@ ssize_t libewf_read_process_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_COMPRESSION,
 			 LIBEWF_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
-			 "%s: unable to uncompressed chunk data.\n",
+			 "%s: unable to uncompressed chunk data.",
 			 function );
 
 			return( -1 );
@@ -222,7 +222,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -233,7 +233,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		return( -1 );
@@ -244,7 +244,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
+		 "%s: invalid handle - invalid offset table - missing chunk offsets.",
 		 function );
 
 		return( -1 );
@@ -255,7 +255,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.\n",
+		 "%s: invalid handle - missing segment table.",
 		 function );
 
 		return( -1 );
@@ -266,7 +266,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid segment table - missing segment file handles.\n",
+		 "%s: invalid handle - invalid segment table - missing segment file handles.",
 		 function );
 
 		return( -1 );
@@ -277,7 +277,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		return( -1 );
@@ -288,7 +288,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk buffer.\n",
+		 "%s: invalid chunk buffer.",
 		 function );
 
 		return( -1 );
@@ -299,7 +299,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid chunk size value is zero.\n",
+		 "%s: invalid chunk size value is zero.",
 		 function );
 
 		return( -1 );
@@ -310,7 +310,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk size value exceeds maximum.\n",
+		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -321,7 +321,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid is compressed.\n",
+		 "%s: invalid is compressed.",
 		 function );
 
 		return( -1 );
@@ -332,7 +332,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk crc.\n",
+		 "%s: invalid chunk crc.",
 		 function );
 
 		return( -1 );
@@ -343,7 +343,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid read crc.\n",
+		 "%s: invalid read crc.",
 		 function );
 
 		return( -1 );
@@ -384,7 +384,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid chunk size too small.\n",
+		 "%s: invalid chunk size too small.",
 		 function );
 
 		return( -1 );
@@ -397,7 +397,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.\n",
+		 "%s: invalid segment file.",
 		 function );
 
 		return( -1 );
@@ -415,7 +415,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek chunk in segment file.\n",
+		 "%s: unable to seek chunk in segment file.",
 		 function );
 
 		return( -1 );
@@ -442,7 +442,7 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk in segment file.\n",
+		 "%s: unable to read chunk in segment file.",
 		 function );
 
 		return( -1 );
@@ -464,7 +464,7 @@ ssize_t libewf_raw_read_chunk(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: error reading CRC of chunk: %" PRIu32 " from segment file.\n",
+			 "%s: error reading CRC of chunk: %" PRIu32 " from segment file.",
 			 function,
 			 chunk );
 
@@ -526,7 +526,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -537,7 +537,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle read.\n",
+		 "%s: invalid handle - missing subhandle read.",
 		 function );
 
 		return( -1 );
@@ -548,7 +548,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -559,7 +559,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.\n",
+		 "%s: invalid handle - missing offset table.",
 		 function );
 
 		return( -1 );
@@ -570,7 +570,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid offset table - missing chunk offsets.\n",
+		 "%s: invalid handle - invalid offset table - missing chunk offsets.",
 		 function );
 
 		return( -1 );
@@ -581,7 +581,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		return( -1 );
@@ -592,7 +592,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -603,7 +603,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache compressed.\n",
+		 "%s: invalid buffer - same as chunk cache compressed.",
 		 function );
 
 		return( -1 );
@@ -639,7 +639,7 @@ ssize_t libewf_read_chunk_data(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-				 "%s: unable to resize chunk cache.\n",
+				 "%s: unable to resize chunk cache.",
 				 function );
 
 				return( -1 );
@@ -708,7 +708,7 @@ ssize_t libewf_read_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: unable to read chunk.\n",
+			 "%s: unable to read chunk.",
 			 function );
 
 			return( -1 );
@@ -734,7 +734,7 @@ ssize_t libewf_read_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to process chunk data.\n",
+			 "%s: unable to process chunk data.",
 			 function );
 
 			return( -1 );
@@ -753,7 +753,7 @@ ssize_t libewf_read_chunk_data(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_MEMORY,
 				 LIBEWF_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe chunk data.\n",
+				 "%s: unable to wipe chunk data.",
 				 function );
 
 				return( -1 );
@@ -776,7 +776,7 @@ ssize_t libewf_read_chunk_data(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set CRC error.\n",
+				 "%s: unable to set CRC error.",
 				 function );
 
 				return( -1 );
@@ -806,7 +806,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: chunk offset exceeds amount of bytes available in chunk.\n",
+		 "%s: chunk offset exceeds amount of bytes available in chunk.",
 		 function );
 
 		return( -1 );
@@ -825,7 +825,7 @@ ssize_t libewf_read_chunk_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid available amount of bytes value exceeds maximum.\n",
+		 "%s: invalid available amount of bytes value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -848,7 +848,7 @@ ssize_t libewf_read_chunk_data(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to set chunk data in buffer.\n",
+			 "%s: unable to set chunk data in buffer.",
 			 function );
 
 			return( -1 );
@@ -884,7 +884,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -902,7 +902,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -919,7 +919,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -936,7 +936,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid uncompressed buffer - same as chunk cache.\n",
+		 "%s: invalid uncompressed buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -964,7 +964,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_INPUT_FAILED,
-		 "%s: unable to prepare chunk data.\n",
+		 "%s: unable to prepare chunk data.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -980,7 +980,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_INPUT,
 		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC mismatch for chunk data.\n",
+		 "%s: CRC mismatch for chunk data.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1017,7 +1017,7 @@ ssize_t libewf_raw_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1035,7 +1035,7 @@ ssize_t libewf_raw_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1052,7 +1052,7 @@ ssize_t libewf_raw_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1078,7 +1078,7 @@ ssize_t libewf_raw_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read chunk data.\n",
+		 "%s: unable to read chunk data.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1112,7 +1112,7 @@ ssize_t libewf_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1130,7 +1130,7 @@ ssize_t libewf_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1146,7 +1146,7 @@ ssize_t libewf_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.\n",
+		 "%s: invalid handle - missing chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1162,7 +1162,7 @@ ssize_t libewf_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1179,7 +1179,7 @@ ssize_t libewf_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer - same as chunk cache.\n",
+		 "%s: invalid buffer - same as chunk cache.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1195,7 +1195,7 @@ ssize_t libewf_read_buffer(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1235,7 +1235,7 @@ ssize_t libewf_read_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize chunk cache.\n",
+			 "%s: unable to resize chunk cache.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1262,7 +1262,7 @@ ssize_t libewf_read_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: unable to read data from chunk.\n",
+			 "%s: unable to read data from chunk.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1292,7 +1292,7 @@ ssize_t libewf_read_buffer(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid current chunk offset.\n",
+			 "%s: invalid current chunk offset.",
 			 function );
 
 			libewf_error_backtrace_notify(
@@ -1331,7 +1331,7 @@ ssize_t libewf_read_random(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset.\n",
+		 "%s: unable to seek offset.",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1349,7 +1349,7 @@ ssize_t libewf_read_random(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read buffer.\n",
+		 "%s: unable to read buffer.",
 		 function );
 
 		libewf_error_backtrace_notify(

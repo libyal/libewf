@@ -44,7 +44,7 @@ int libewf_media_values_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
@@ -60,7 +60,7 @@ int libewf_media_values_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create media values.\n",
+			 "%s: unable to create media values.",
 			 function );
 
 			return( -1 );
@@ -74,7 +74,7 @@ int libewf_media_values_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear media values.\n",
+			 "%s: unable to clear media values.",
 			 function );
 
 			memory_free(
@@ -108,7 +108,7 @@ int libewf_media_values_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid media values.\n",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );

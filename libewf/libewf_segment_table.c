@@ -51,7 +51,7 @@ int libewf_segment_table_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -62,7 +62,7 @@ int libewf_segment_table_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid amount value cannot be zero.\n",
+		 "%s: invalid amount value cannot be zero.",
 		 function );
 
 		return( -1 );
@@ -77,7 +77,7 @@ int libewf_segment_table_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid segment table size value exceeds maximum.\n",
+			 "%s: invalid segment table size value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -91,7 +91,7 @@ int libewf_segment_table_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment table.\n",
+			 "%s: unable to create segment table.",
 			 function );
 
 			return( -1 );
@@ -105,7 +105,7 @@ int libewf_segment_table_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment table.\n",
+			 "%s: unable to clear segment table.",
 			 function );
 
 			memory_free(
@@ -124,7 +124,7 @@ int libewf_segment_table_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment file array.\n",
+			 "%s: unable to create segment file array.",
 			 function );
 
 			memory_free(
@@ -143,7 +143,7 @@ int libewf_segment_table_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment file array.\n",
+			 "%s: unable to clear segment file array.",
 			 function );
 
 			memory_free(
@@ -176,7 +176,7 @@ int libewf_segment_table_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -193,7 +193,7 @@ int libewf_segment_table_free(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-				 "%s: unable to free segment file handle: %" PRIu16 ".\n",
+				 "%s: unable to free segment file handle: %" PRIu16 ".",
 				 function,
 				 iterator + 1 );
 			}
@@ -232,7 +232,7 @@ int libewf_segment_table_resize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -247,7 +247,7 @@ int libewf_segment_table_resize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid segment table size value exceeds maximum.\n",
+			 "%s: invalid segment table size value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -262,7 +262,7 @@ int libewf_segment_table_resize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to resize file handle array.\n",
+			 "%s: unable to resize file handle array.",
 			 function );
 
 			return( -1 );
@@ -278,7 +278,7 @@ int libewf_segment_table_resize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear file handle array.\n",
+			 "%s: unable to clear file handle array.",
 			 function );
 
 			return( 1 );
@@ -318,7 +318,7 @@ int libewf_segment_table_build(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -329,7 +329,7 @@ int libewf_segment_table_build(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment table - missing segment file handles.\n",
+		 "%s: invalid segment table - missing segment file handles.",
 		 function );
 
 		return( -1 );
@@ -367,7 +367,7 @@ int libewf_segment_table_build(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: unable to read sections.\n",
+			 "%s: unable to read sections.",
 			 function );
 
 			return( -1 );
@@ -378,7 +378,7 @@ int libewf_segment_table_build(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_INPUT,
 			 LIBEWF_INPUT_ERROR_MISSING_LAST_SECTION,
-			 "%s: missing next or done section.\n",
+			 "%s: missing next or done section.",
 			 function );
 
 			return( 0 );
@@ -396,7 +396,7 @@ int libewf_segment_table_build(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_INPUT,
 		 LIBEWF_INPUT_ERROR_MISSING_LAST_SEGMENT_FILE,
-		 "%s: unable to find the last segment file.\n",
+		 "%s: unable to find the last segment file.",
 		 function );
 
 		return( 0 );
@@ -422,7 +422,7 @@ int libewf_segment_table_get_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -433,7 +433,7 @@ int libewf_segment_table_get_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.\n",
+		 "%s: invalid basename.",
 		 function );
 
 		return( -1 );
@@ -453,7 +453,7 @@ int libewf_segment_table_get_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.\n",
+		 "%s: unable to determine basename size.",
 		 function );
 
 		return( -1 );
@@ -467,7 +467,7 @@ int libewf_segment_table_get_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: basename too small.\n",
+		 "%s: basename too small.",
 		 function );
 
 		return( -1 );
@@ -484,7 +484,7 @@ int libewf_segment_table_get_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		return( -1 );
@@ -499,7 +499,7 @@ int libewf_segment_table_get_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		return( -1 );
@@ -526,7 +526,7 @@ int libewf_segment_table_set_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -537,7 +537,7 @@ int libewf_segment_table_set_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.\n",
+		 "%s: invalid basename.",
 		 function );
 
 		return( -1 );
@@ -561,7 +561,7 @@ int libewf_segment_table_set_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.\n",
+		 "%s: unable to determine basename size.",
 		 function );
 
 		return( -1 );
@@ -578,7 +578,7 @@ int libewf_segment_table_set_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create basename.\n",
+		 "%s: unable to create basename.",
 		 function );
 
 		segment_table->basename_size = 0;
@@ -597,7 +597,7 @@ int libewf_segment_table_set_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		memory_free(
@@ -618,7 +618,7 @@ int libewf_segment_table_set_basename(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		memory_free(
@@ -653,7 +653,7 @@ int libewf_segment_table_get_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -664,7 +664,7 @@ int libewf_segment_table_get_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.\n",
+		 "%s: invalid basename.",
 		 function );
 
 		return( -1 );
@@ -686,7 +686,7 @@ int libewf_segment_table_get_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.\n",
+		 "%s: unable to determine basename size.",
 		 function );
 
 		return( -1 );
@@ -698,7 +698,7 @@ int libewf_segment_table_get_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: basename too small.\n",
+		 "%s: basename too small.",
 		 function );
 
 		return( -1 );
@@ -713,7 +713,7 @@ int libewf_segment_table_get_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		return( -1 );
@@ -731,7 +731,7 @@ int libewf_segment_table_get_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		return( -1 );
@@ -757,7 +757,7 @@ int libewf_segment_table_set_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -768,7 +768,7 @@ int libewf_segment_table_set_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid basename.\n",
+		 "%s: invalid basename.",
 		 function );
 
 		return( -1 );
@@ -794,7 +794,7 @@ int libewf_segment_table_set_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine basename size.\n",
+		 "%s: unable to determine basename size.",
 		 function );
 
 		return( -1 );
@@ -810,7 +810,7 @@ int libewf_segment_table_set_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create basename.\n",
+		 "%s: unable to create basename.",
 		 function );
 
 		return( -1 );
@@ -825,7 +825,7 @@ int libewf_segment_table_set_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		memory_free(
@@ -849,7 +849,7 @@ int libewf_segment_table_set_basename_wide(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set basename.\n",
+		 "%s: unable to set basename.",
 		 function );
 
 		memory_free(
@@ -890,7 +890,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment table.\n",
+		 "%s: invalid segment table.",
 		 function );
 
 		return( -1 );
@@ -901,7 +901,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid segment table - missing segment file handles.\n",
+		 "%s: invalid segment table - missing segment file handles.",
 		 function );
 
 		return( -1 );
@@ -912,7 +912,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid segment number: 0.\n",
+		 "%s: invalid segment number: 0.",
 		 function );
 
 		return( -1 );
@@ -923,7 +923,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: invalid segment number value out of range.\n",
+		 "%s: invalid segment number value out of range.",
 		 function );
 
 		return( -1 );
@@ -943,7 +943,7 @@ int libewf_segment_table_create_segment_file(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize segment table.\n",
+			 "%s: unable to resize segment table.",
 			 function );
 
 			return( -1 );
@@ -957,7 +957,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: segment file has already been created.\n",
+		 "%s: segment file has already been created.",
 		 function );
 
 		return( -1 );
@@ -972,7 +972,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to create file io pool entry.\n",
+		 "%s: unable to create file io pool entry.",
 		 function );
 
 		return( -1 );
@@ -993,7 +993,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment file filename.\n",
+		 "%s: unable to create segment file filename.",
 		 function );
 
 		return( -1 );
@@ -1004,7 +1004,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: filename is empty.\n",
+		 "%s: filename is empty.",
 		 function );
 
 		return( -1 );
@@ -1035,7 +1035,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open segment file: %" PRIu16 ".\n",
+		 "%s: unable to open segment file: %" PRIu16 ".",
 		 function,
 		 segment_number );
 
@@ -1050,7 +1050,7 @@ int libewf_segment_table_create_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment file handle.\n",
+		 "%s: unable to create segment file handle.",
 		 function );
 
 		return( -1 );

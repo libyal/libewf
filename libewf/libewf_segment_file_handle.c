@@ -47,7 +47,7 @@ int libewf_segment_file_handle_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -63,7 +63,7 @@ int libewf_segment_file_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create segment file handle.\n",
+			 "%s: unable to create segment file handle.",
 			 function );
 
 			return( -1 );
@@ -77,7 +77,7 @@ int libewf_segment_file_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear segment file handle.\n",
+			 "%s: unable to clear segment file handle.",
 			 function );
 
 			memory_free(
@@ -96,7 +96,7 @@ int libewf_segment_file_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create section list.\n",
+			 "%s: unable to create section list.",
 			 function );
 
 			memory_free(
@@ -115,7 +115,7 @@ int libewf_segment_file_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear section list.\n",
+			 "%s: unable to clear section list.",
 			 function );
 
 			memory_free(
@@ -147,7 +147,7 @@ int libewf_segment_file_handle_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.\n",
+		 "%s: invalid segment file handle.",
 		 function );
 
 		return( -1 );
@@ -165,7 +165,7 @@ int libewf_segment_file_handle_free(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-				 "%s: unable to free section list.\n",
+				 "%s: unable to free section list.",
 				 function );
 			}
 		}

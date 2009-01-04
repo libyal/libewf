@@ -56,7 +56,7 @@ int libewf_handle_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -72,7 +72,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create internal handle.\n",
+			 "%s: unable to create internal handle.",
 			 function );
 
 			return( -1 );
@@ -86,7 +86,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear internal handle.\n",
+			 "%s: unable to clear internal handle.",
 			 function );
 
 			memory_free(
@@ -111,7 +111,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create file io pool.\n",
+			 "%s: unable to create file io pool.",
 			 function );
 
 			memory_free(
@@ -130,7 +130,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create segment table.\n",
+			 "%s: unable to create segment table.",
 			 function );
 
 			libewf_file_io_pool_free(
@@ -152,7 +152,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create delta segment table.\n",
+			 "%s: unable to create delta segment table.",
 			 function );
 
 			libewf_segment_table_free(
@@ -175,7 +175,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create offset table.\n",
+			 "%s: unable to create offset table.",
 			 function );
 
 			libewf_segment_table_free(
@@ -201,7 +201,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create chunk cache.\n",
+			 "%s: unable to create chunk cache.",
 			 function );
 
 			libewf_offset_table_free(
@@ -229,7 +229,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create media values.\n",
+			 "%s: unable to create media values.",
 			 function );
 
 			libewf_chunk_cache_free(
@@ -260,7 +260,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header sections.\n",
+			 "%s: unable to create header sections.",
 			 function );
 
 			libewf_media_values_free(
@@ -294,7 +294,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash sections.\n",
+			 "%s: unable to create hash sections.",
 			 function );
 
 			libewf_header_sections_free(
@@ -332,7 +332,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create sessions.\n",
+			 "%s: unable to create sessions.",
 			 function );
 
 			libewf_hash_sections_free(
@@ -373,7 +373,7 @@ int libewf_handle_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create acquiry errors.\n",
+			 "%s: unable to create acquiry errors.",
 			 function );
 
 			libewf_sector_table_free(
@@ -418,7 +418,7 @@ int libewf_handle_initialize(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create subhandle read.\n",
+				 "%s: unable to create subhandle read.",
 				 function );
 
 				libewf_sector_table_free(
@@ -467,7 +467,7 @@ int libewf_handle_initialize(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create subhandle write.\n",
+				 "%s: unable to create subhandle write.",
 				 function );
 
 				libewf_internal_handle_subhandle_read_free(
@@ -530,7 +530,7 @@ int libewf_handle_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -547,7 +547,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free subhandle read.\n",
+			 "%s: unable to free subhandle read.",
 			 function );
 		}
 		if( libewf_internal_handle_subhandle_write_free(
@@ -558,7 +558,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free subhandle write.\n",
+			 "%s: unable to free subhandle write.",
 			 function );
 		}
 		if( libewf_file_io_pool_free(
@@ -569,7 +569,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free file io pool.\n",
+			 "%s: unable to free file io pool.",
 			 function );
 		}
 		if( libewf_segment_table_free(
@@ -580,7 +580,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free segment table.\n",
+			 "%s: unable to free segment table.",
 			 function );
 		}
 		if( libewf_segment_table_free(
@@ -591,7 +591,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free delta segment table.\n",
+			 "%s: unable to free delta segment table.",
 			 function );
 		}
 		if( libewf_offset_table_free(
@@ -602,7 +602,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free offset table.\n",
+			 "%s: unable to free offset table.",
 			 function );
 		}
 		if( libewf_chunk_cache_free(
@@ -613,7 +613,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free chunk cache.\n",
+			 "%s: unable to free chunk cache.",
 			 function );
 		}
 		if( libewf_media_values_free(
@@ -624,7 +624,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free media values.\n",
+			 "%s: unable to free media values.",
 			 function );
 		}
 		if( libewf_header_sections_free(
@@ -635,7 +635,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free header sections.\n",
+			 "%s: unable to free header sections.",
 			 function );
 		}
 		if( libewf_hash_sections_free(
@@ -646,7 +646,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free hash sections.\n",
+			 "%s: unable to free hash sections.",
 			 function );
 		}
 		if( libewf_values_table_free(
@@ -657,7 +657,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free header values.\n",
+			 "%s: unable to free header values.",
 			 function );
 		}
 		if( libewf_values_table_free(
@@ -668,7 +668,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free hash values.\n",
+			 "%s: unable to free hash values.",
 			 function );
 		}
 		if( libewf_sector_table_free(
@@ -679,7 +679,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free sessions.\n",
+			 "%s: unable to free sessions.",
 			 function );
 		}
 		if( libewf_sector_table_free(
@@ -690,7 +690,7 @@ int libewf_handle_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free acquiry errors.\n",
+			 "%s: unable to free acquiry errors.",
 			 function );
 		}
 		memory_free(
@@ -716,7 +716,7 @@ int libewf_internal_handle_subhandle_read_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid subhandle read.\n",
+		 "%s: invalid subhandle read.",
 		 function );
 
 		return( -1 );
@@ -732,7 +732,7 @@ int libewf_internal_handle_subhandle_read_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create subhandle read.\n",
+			 "%s: unable to create subhandle read.",
 			 function );
 
 			return( -1 );
@@ -746,7 +746,7 @@ int libewf_internal_handle_subhandle_read_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear subhandle read.\n",
+			 "%s: unable to clear subhandle read.",
 			 function );
 
 			memory_free(
@@ -765,7 +765,7 @@ int libewf_internal_handle_subhandle_read_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create crc errors.\n",
+			 "%s: unable to create crc errors.",
 			 function );
 
 			memory_free(
@@ -795,7 +795,7 @@ int libewf_internal_handle_subhandle_read_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid subhandle read.\n",
+		 "%s: invalid subhandle read.",
 		 function );
 
 		return( 1 );
@@ -810,7 +810,7 @@ int libewf_internal_handle_subhandle_read_free(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-			 "%s: unable to free crc errors.\n",
+			 "%s: unable to free crc errors.",
 			 function );
 		}
 		memory_free(
@@ -836,7 +836,7 @@ int libewf_internal_handle_subhandle_write_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid subhandle write.\n",
+		 "%s: invalid subhandle write.",
 		 function );
 
 		return( -1 );
@@ -852,7 +852,7 @@ int libewf_internal_handle_subhandle_write_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create subhandle write.\n",
+			 "%s: unable to create subhandle write.",
 			 function );
 
 			return( -1 );
@@ -866,7 +866,7 @@ int libewf_internal_handle_subhandle_write_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_MEMORY,
 			 LIBEWF_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear subhandle write.\n",
+			 "%s: unable to clear subhandle write.",
 			 function );
 
 			memory_free(
@@ -900,7 +900,7 @@ int libewf_internal_handle_subhandle_write_free(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid subhandle write.\n",
+		 "%s: invalid subhandle write.",
 		 function );
 
 		return( 1 );
@@ -945,7 +945,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -956,7 +956,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_LESS_THAN_ZERO,
-		 "%s: invalid file io pool entry value is less than zero.\n",
+		 "%s: invalid file io pool entry value is less than zero.",
 		 function );
 
 		return( -1 );
@@ -967,7 +967,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment number.\n",
+		 "%s: invalid segment number.",
 		 function );
 
 		return( -1 );
@@ -978,7 +978,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file type.\n",
+		 "%s: invalid segment file type.",
 		 function );
 
 		return( -1 );
@@ -992,7 +992,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create segment file handle.\n",
+		 "%s: unable to create segment file handle.",
 		 function );
 
 		return( -1 );
@@ -1007,7 +1007,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read segment file header.\n",
+		 "%s: unable to read segment file header.",
 		 function );
 
 		libewf_segment_file_handle_free(
@@ -1022,7 +1022,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_INPUT,
 		 LIBEWF_INPUT_ERROR_INVALID_DATA,
-		 "%s: invalid segment number: 0.\n",
+		 "%s: invalid segment number: 0.",
 		 function );
 
 		libewf_segment_file_handle_free(
@@ -1044,7 +1044,7 @@ int libewf_internal_handle_add_segment_file(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize the segment table.\n",
+			 "%s: unable to resize the segment table.",
 			 function );
 
 			libewf_segment_file_handle_free(
@@ -1082,7 +1082,7 @@ int libewf_internal_handle_add_segment_file(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to resize the delta segment table.\n",
+			 "%s: unable to resize the delta segment table.",
 			 function );
 
 			return( -1 );
@@ -1117,7 +1117,7 @@ int libewf_internal_handle_add_segment_file(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to reopen segment file: %" PRIu16 ".\n",
+			 "%s: unable to reopen segment file: %" PRIu16 ".",
 			 function,
 			 *segment_number );
 
@@ -1130,7 +1130,7 @@ int libewf_internal_handle_add_segment_file(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported segment file type.\n",
+		 "%s: unsupported segment file type.",
 		 function );
 
 		libewf_segment_file_handle_free(
@@ -1160,7 +1160,7 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid maximum amount of segments.\n",
+		 "%s: invalid maximum amount of segments.",
 		 function );
 
 		return( -1 );
@@ -1183,7 +1183,7 @@ int libewf_internal_handle_get_write_maximum_amount_of_segments(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported EWF format.\n",
+		 "%s: unsupported EWF format.",
 		 function );
 
 		return( -1 );
@@ -1213,7 +1213,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1224,7 +1224,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -1236,7 +1236,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid sectors per chunk.\n",
+		 "%s: invalid sectors per chunk.",
 		 function );
 
 		return( -1 );
@@ -1248,7 +1248,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid bytes per sector.\n",
+		 "%s: invalid bytes per sector.",
 		 function );
 
 		return( -1 );
@@ -1259,7 +1259,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid media size value exceeds maximum.\n",
+		 "%s: invalid media size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -1275,7 +1275,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid chunk size.\n",
+		 "%s: invalid chunk size.",
 		 function );
 
 		return( -1 );
@@ -1291,7 +1291,7 @@ int libewf_internal_handle_set_media_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
+		 "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".",
 		 function,
 		 maximum_input_file_size,
 		 chunk_size );
@@ -1321,7 +1321,7 @@ int libewf_internal_handle_set_media_values(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid amount of chunks value exceeds maximum.\n",
+			 "%s: invalid amount of chunks value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -1338,7 +1338,7 @@ int libewf_internal_handle_set_media_values(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid amount of sectors value exceeds maximum.\n",
+			 "%s: invalid amount of sectors value exceeds maximum.",
 			 function );
 
 			return( -1 );
@@ -1364,7 +1364,7 @@ int libewf_internal_handle_set_format(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1387,7 +1387,7 @@ int libewf_internal_handle_set_format(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported format: %d.\n",
+		 "%s: unsupported format: %d.",
 		 function,
 	         format );
 
@@ -1437,7 +1437,7 @@ int libewf_internal_handle_set_format(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine the maximum amount of allowed segment files.\n",
+			 "%s: unable to determine the maximum amount of allowed segment files.",
 			 function );
 
 			return( -1 );
@@ -1461,7 +1461,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1482,7 +1482,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
-		 "%s: unable to free header values.\n",
+		 "%s: unable to free header values.",
 		 function );
 
 		return( -1 );
@@ -1496,7 +1496,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create header values.\n",
+		 "%s: unable to create header values.",
 		 function );
 
 		return( -1 );
@@ -1509,7 +1509,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize the header values.\n",
+		 "%s: unable to initialize the header values.",
 		 function );
 
 		return( -1 );
@@ -1526,7 +1526,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set case number.\n",
+		 "%s: unable to set case number.",
 		 function );
 
 		return( -1 );
@@ -1543,7 +1543,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set description.\n",
+		 "%s: unable to set description.",
 		 function );
 
 		return( -1 );
@@ -1560,7 +1560,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set evidence number.\n",
+		 "%s: unable to set evidence number.",
 		 function );
 
 		return( -1 );
@@ -1577,7 +1577,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set examiner name.\n",
+		 "%s: unable to set examiner name.",
 		 function );
 
 		return( -1 );
@@ -1594,7 +1594,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set notes.\n",
+		 "%s: unable to set notes.",
 		 function );
 
 		return( -1 );
@@ -1611,7 +1611,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set acquiry operating system.\n",
+		 "%s: unable to set acquiry operating system.",
 		 function );
 
 		return( -1 );
@@ -1629,7 +1629,7 @@ int libewf_internal_handle_create_header_values(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set acquiry software version.\n",
+		 "%s: unable to set acquiry software version.",
 		 function );
 
 		return( -1 );
@@ -1656,7 +1656,7 @@ int libewf_internal_handle_write_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.\n",
+		 "%s: invalid handle.",
 		 function );
 
 		return( -1 );
@@ -1667,7 +1667,7 @@ int libewf_internal_handle_write_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.\n",
+		 "%s: invalid handle - missing media values.",
 		 function );
 
 		return( -1 );
@@ -1678,7 +1678,7 @@ int libewf_internal_handle_write_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing subhandle write.\n",
+		 "%s: invalid handle - missing subhandle write.",
 		 function );
 
 		return( -1 );
@@ -1689,7 +1689,7 @@ int libewf_internal_handle_write_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: write values were initialized and cannot be initialized anymore.\n",
+		 "%s: write values were initialized and cannot be initialized anymore.",
 		 function );
 
 		return( -1 );
@@ -1702,7 +1702,7 @@ int libewf_internal_handle_write_initialize(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: writing format LVF currently not supported.\n",
+		 "%s: writing format LVF currently not supported.",
 		 function );
 
 		return( -1 );
@@ -1725,7 +1725,7 @@ int libewf_internal_handle_write_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: EWF file format does not allow for streaming write.\n",
+			 "%s: EWF file format does not allow for streaming write.",
 			 function );
 
 			return( -1 );
@@ -1746,7 +1746,7 @@ int libewf_internal_handle_write_initialize(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
 			 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: the settings exceed the maximum amount of allowed segment files.\n",
+			 "%s: the settings exceed the maximum amount of allowed segment files.",
 			 function );
 
 			return( -1 );

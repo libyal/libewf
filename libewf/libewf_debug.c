@@ -52,7 +52,7 @@ int libewf_debug_dump_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.\n",
+		 "%s: invalid header.",
 		 function );
 
 		return( -1 );
@@ -63,7 +63,7 @@ int libewf_debug_dump_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.\n",
+		 "%s: invalid data.",
 		 function );
 
 		return( -1 );
@@ -74,7 +74,7 @@ int libewf_debug_dump_data(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.\n",
+		 "%s: invalid data size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -126,7 +126,7 @@ int libewf_debug_section_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid section.\n",
+		 "%s: invalid section.",
 		 function );
 
 		return( -1 );
@@ -183,7 +183,7 @@ int libewf_debug_byte_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.\n",
+		 "%s: invalid header.",
 		 function );
 
 		return( -1 );
@@ -194,7 +194,7 @@ int libewf_debug_byte_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid byte stream.\n",
+		 "%s: invalid byte stream.",
 		 function );
 
 		return( -1 );
@@ -210,7 +210,7 @@ int libewf_debug_byte_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine string size.\n",
+		 "%s: unable to determine string size.",
 		 function );
 
 		return( -1 );
@@ -224,7 +224,7 @@ int libewf_debug_byte_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create string.\n",
+		 "%s: unable to create string.",
 		 function );
 
 		return( -1 );
@@ -241,7 +241,7 @@ int libewf_debug_byte_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.\n",
+		 "%s: unable to set string.",
 		 function );
 
 		memory_free(
@@ -280,7 +280,7 @@ int libewf_debug_utf8_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.\n",
+		 "%s: invalid header.",
 		 function );
 
 		return( -1 );
@@ -291,7 +291,7 @@ int libewf_debug_utf8_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 stream.\n",
+		 "%s: invalid UTF-8 stream.",
 		 function );
 
 		return( -1 );
@@ -306,7 +306,7 @@ int libewf_debug_utf8_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine string size.\n",
+		 "%s: unable to determine string size.",
 		 function );
 
 		return( -1 );
@@ -320,7 +320,7 @@ int libewf_debug_utf8_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create string.\n",
+		 "%s: unable to create string.",
 		 function );
 
 		return( -1 );
@@ -336,7 +336,7 @@ int libewf_debug_utf8_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.\n",
+		 "%s: unable to set string.",
 		 function );
 
 		memory_free(
@@ -375,7 +375,7 @@ int libewf_debug_utf16_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid header.\n",
+		 "%s: invalid header.",
 		 function );
 
 		return( -1 );
@@ -386,7 +386,7 @@ int libewf_debug_utf16_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 stream.\n",
+		 "%s: invalid UTF-16 stream.",
 		 function );
 
 		return( -1 );
@@ -402,7 +402,7 @@ int libewf_debug_utf16_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to determine string size.\n",
+		 "%s: unable to determine string size.",
 		 function );
 
 		return( -1 );
@@ -416,7 +416,7 @@ int libewf_debug_utf16_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_MEMORY,
 		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create string.\n",
+		 "%s: unable to create string.",
 		 function );
 
 		return( -1 );
@@ -433,7 +433,7 @@ int libewf_debug_utf16_stream_print(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set string.\n",
+		 "%s: unable to set string.",
 		 function );
 
 		memory_free(
