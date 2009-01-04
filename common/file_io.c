@@ -81,7 +81,7 @@ int libewf_file_io_open(
  */
 int libewf_file_io_wopen(
      const wchar_t *filename,
-     uint8_t flags )
+     int flags )
 {
 	static char *function = "libewf_file_io_wopen";
 	int file_descriptor   = 0;

@@ -38,7 +38,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\libewf"
+				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common;..\..\libewf"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_EXPORT"
 				SmallerTypeCheck="true"
 				RuntimeLibrary="3"
@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\libewf"
+				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common;..\..\libewf"
 				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
 			/>
@@ -171,15 +171,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\common\character_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\date_time.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\date_time_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\file_io.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_chunk_cache.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_common.c"
 				>
 			</File>
 			<File
@@ -235,10 +247,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_notify.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_offset_table.c"
 				>
 			</File>
@@ -282,12 +290,36 @@
 				RelativePath="..\..\libewf\libewf_write.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\common\notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\system_string.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\common\character_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\common.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\date_time.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\date_time_string.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\libewf\ewf_char.h"
 				>
@@ -353,7 +385,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_char.h"
+				RelativePath="..\..\common\file_io.h"
 				>
 			</File>
 			<File
@@ -362,10 +394,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_chunk_offset.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_common.h"
 				>
 			</File>
 			<File
@@ -437,10 +465,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_notify.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_offset_table.h"
 				>
 			</File>
@@ -482,6 +506,22 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_write.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\memory.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\system_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\common\types.h"
 				>
 			</File>
 		</Filter>

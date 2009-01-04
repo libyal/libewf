@@ -36,6 +36,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <types.h>
 
 #include <libewf/types.h>
 

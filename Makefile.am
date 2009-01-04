@@ -4,7 +4,7 @@ SUBDIRS = \
 	ewftools \
 	manuals
 
-CONFIG_FILE = \
+CONFIG_FILES = \
 	common/config.h \
 	common/config_windows.h
 

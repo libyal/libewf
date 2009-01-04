@@ -286,7 +286,7 @@ int libewf_glob(
 		}
 		if( libewf_filename_set_extension(
 		     &( segment_filename[ length + additional_length - 3 ] ),
-		     ( amount_of_files + 1 ),
+		     (uint16_t) ( amount_of_files + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
 		     format,

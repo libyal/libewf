@@ -158,9 +158,6 @@ Next stable:
 * missing \n in some headers?
 
 * ewfinfo: change session print
-* determine session size
-
-* refactor libewf_debug_header_fprint and libewf_debug_header2_fprint
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -190,6 +187,8 @@ Version: 20080308
 * fixed issue with byte size string and more than 1 digit after the seperator
   will now handle 2 digits and skip remaining
 * fixed issue with minimum segement file size in ewf tools also lowered values to 1.0 MiB
+* implemented determining session size
+* fixed MSVCPP project
 
 Version: 20080306
 * worked on seperating common code

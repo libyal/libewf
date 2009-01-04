@@ -437,7 +437,7 @@ int main( int argc, char * const argv[] )
 			}
 			else if( media_type == LIBEWF_MEDIA_TYPE_CD )
 			{
-				fprintf( stdout, "\tMedia type:\t\tCD\n" );
+				fprintf( stdout, "\tMedia type:\t\tCD/DVD\n" );
 			}
 			else
 			{

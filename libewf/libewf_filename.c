@@ -36,6 +36,7 @@
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
+#include <types.h>
 
 #include <libewf/definitions.h>
 

@@ -40,8 +40,8 @@
 #if defined( HAVE_WINDOWS_API )
 #include <io.h>
 #include <share.h>
+#endif
 
-#else
 #if defined( HAVE_SYS_TYPES_H )
 #include <sys/types.h>
 #endif
@@ -56,8 +56,6 @@
 
 #if defined( HAVE_UNISTD_H )
 #include <unistd.h>
-#endif
-
 #endif
 
 #if defined( __cplusplus )

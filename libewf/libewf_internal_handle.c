@@ -35,8 +35,7 @@
 #include <character_string.h>
 #include <memory.h>
 #include <notify.h>
-
-#include <time.h>
+#include <types.h>
 
 #include <libewf/definitions.h>
 

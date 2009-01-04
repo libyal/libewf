@@ -53,12 +53,16 @@ int ewfsignal_attach(
 int ewfsignal_detach(
      void );
 
+#elif defined( HAVE_WINDOWS_API )
+typedef unsigned long ewfsignal_t;
+
+int WINAPI ewfsignal_handler(
+            ewfsignal_t signal );
+
+void ewfsignal_initialize_memory_debug( void );
+
 void ewfsignal_initialize( void );
 
-#elif defined( HAVE_WINDOWS_API )
-int WINAPI ewfsignal_handler( unsigned long signal );
-void ewfsignal_initialize_memory_debug( void );
-void ewfsignal_initialize( void );
 #else
 
 #error missing signal function

@@ -31,10 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_CONFIG_WINDOWS_H )
-#define _LIBEWF_CONFIG_WINDOWS_H
+#if !defined( _CONFIG_WINDOWS_H )
+#define _CONFIG_WINDOWS_H
 
-#include "libewf_config.h"
+#include "config.h"
 
 /* Windows does not have other platform specific headers
  */
@@ -57,11 +57,6 @@
  */
 #undef HAVE_SYS_IOCTL_H
 #undef HAVE_SYS_UTSNAME_H
-
-/* Windows does not have printf "%jd" and "%zd"
- */
-#undef HAVE_PRINTF_JD
-#undef HAVE_PRINTF_ZD
 
 /* Use Windows crypto API instead of libcrypto or equivalent
  */

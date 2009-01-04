@@ -181,6 +181,7 @@ ssize_t libewf_section_ltree_read(
 
 ssize_t libewf_section_session_read(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_media_values_t *media_values,
          libewf_sector_table_t *sessions,
          size_t section_size,
          uint8_t ewf_format,

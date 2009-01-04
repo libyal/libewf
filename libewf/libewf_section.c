@@ -2540,6 +2540,7 @@ ssize_t libewf_section_ltree_read(
  */
 ssize_t libewf_section_session_read(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_media_values_t *media_values,
          libewf_sector_table_t *sessions,
          size_t section_size,
          uint8_t ewf_format,
@@ -2558,10 +2559,18 @@ ssize_t libewf_section_session_read(
 	uint32_t amount_of_ewf_sessions   = 0;
 	uint32_t iterator                 = 0;
 	uint32_t first_sector             = 0;
+	uint32_t last_first_sector        = 0;
 
 	if( segment_file_handle == NULL )
 	{
 		notify_warning_printf( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -2775,10 +2784,14 @@ ssize_t libewf_section_session_read(
 			}
 			sessions->sector[ iterator ].first_sector = (uint64_t) first_sector;
 
-			/* TODO how to determine the amount of sectors
-			 */
-			sessions->sector[ iterator ].amount_of_sectors = 0;
+			if( iterator > 0 )
+			{
+				sessions->sector[ iterator - 1 ].amount_of_sectors = first_sector - last_first_sector;
+			}
+			last_first_sector = first_sector;
 		}
+		sessions->sector[ iterator - 1 ].amount_of_sectors = media_values->amount_of_sectors - last_first_sector;
+
 		memory_free(
 		 ewf_sessions );
 	}
@@ -5288,6 +5301,7 @@ int libewf_section_read(
 	{
 		read_count = libewf_section_session_read(
 		              segment_file_handle,
+		              media_values,
 		              sessions,
 		              (size_t) size,
 		              *ewf_format,

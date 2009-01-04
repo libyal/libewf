@@ -38,6 +38,7 @@
 #include <file_io.h>
 #include <memory.h>
 #include <system_string.h>
+#include <types.h>
 
 #include <errno.h>
 
