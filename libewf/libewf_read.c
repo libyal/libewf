@@ -569,7 +569,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 
 			if( ( sector + amount_of_sectors ) > internal_handle->media->amount_of_sectors )
 			{
-				amount_of_sectors = internal_handle->media->amount_of_sectors - sector;
+				amount_of_sectors = (uint32_t) ( (off64_t) internal_handle->media->amount_of_sectors - sector );
 			}
 			if( libewf_add_crc_error( (LIBEWF_HANDLE *) internal_handle, sector, amount_of_sectors ) != 1 )
 			{

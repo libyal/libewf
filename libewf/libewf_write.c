@@ -2131,7 +2131,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 	}
 	internal_handle->current_chunk += 1;
 
-	return( size );
+	return( (ssize_t) size );
 }
 
 /* Writes data in EWF format from a buffer at the current offset

@@ -325,6 +325,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\ewfx_delta_chunk.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_char.h"
 				>
 			</File>
