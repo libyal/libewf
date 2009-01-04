@@ -152,6 +152,9 @@ CLOSED
   - if so remove libewf_string include from ewfacquire
   not needed
 
+Version: 20070919
+* Worked on implementing raw read in ewftools
+
 Version: 20070918
 * Worked on implementing raw read in ewftools
 

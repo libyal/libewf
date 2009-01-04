@@ -1,4 +1,4 @@
-.Dd September 10, 2007
+.Dd September 19, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -20,6 +20,8 @@
 .Fn libewf_open "char * const filenames[], uint16_t file_amount, uint8_t flags"
 .Ft off64_t
 .Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off64_t offset"
+.Ft ssize_t
+.Fn libewf_raw_read_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed"
 .Ft ssize_t
 .Fn libewf_raw_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc"
 .Ft ssize_t

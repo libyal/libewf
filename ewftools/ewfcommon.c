@@ -563,6 +563,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data              = NULL;
+	uint8_t *uncompressed_data = NULL;
 	static char *function      = "ewfcommon_read_verify";
 	off64_t read_offset        = 0;
 	size64_t media_size        = 0;
@@ -574,13 +575,12 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	ssize64_t total_read_count = 0;
 	ssize_t read_count         = 0;
 #if defined( HAVE_RAW_ACCESS )
-	uint8_t *compressed_data    = NULL;
-	uint8_t *raw_write_data     = NULL;
-	size_t compressed_size      = 0;
-	ssize_t raw_write_count     = 0;
-	uint32_t chunk_crc          = 0;
-	int8_t is_compressed        = 0;
-	int8_t read_crc             = 0;
+	uint8_t *raw_read_data     = NULL;
+	ssize_t raw_read_count     = 0;
+	size_t uncompressed_size   = 0;
+	uint32_t chunk_crc         = 0;
+	int8_t is_compressed       = 0;
+	int8_t read_crc            = 0;
 #endif
 
 	if( handle == NULL )
@@ -647,13 +647,31 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		 function );
 
 		return( -1 );
+	} 
+#if defined( HAVE_RAW_ACCESS )
+	raw_read_data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
+
+	if( raw_read_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate raw read data.\n",
+		 function );
+
+		libewf_common_free( data );
+
+		return( -1 );
 	}
+#endif
 	if( calculate_md5 == 1 )
 	{
 		if( ewfmd5_initialize( &md5_context ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 digest context.\n",
 			 function );
+
+			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
@@ -664,6 +682,11 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
+
+			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
@@ -678,10 +701,64 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 			read_size = (size_t) ( media_size - total_read_count );
 		}
 #if defined( HAVE_RAW_ACCESS )
-		read_count = libewf_raw_read_buffer( handle, (void *) data, read_size, &is_compressed, &chunk_crc, &read_crc );
+		raw_read_count = libewf_raw_read_buffer(
+		                  handle,
+		                  (void *) raw_read_data,
+		                  (size_t) buffer_size,
+		                  &is_compressed,
+		                  &chunk_crc,
+		                  &read_crc );
+
+		if( raw_read_count <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read raw buffer.\n",
+			 function );
+
+			libewf_common_free( data );
+			libewf_common_free( raw_read_data );
+
+			return( -1 );
+		}
+		uncompressed_size = buffer_size;
+
+		read_count = libewf_raw_read_prepare_buffer(
+		              handle,
+		              raw_read_data,
+		              (size_t) raw_read_count,
+		              data,
+		              &uncompressed_size,
+		              is_compressed );
+
+		if( read_count <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to prepare read raw buffer.\n",
+			 function );
+
+			libewf_common_free( data );
+			libewf_common_free( raw_read_data );
+
+			return( -1 );
+		}
+		if( is_compressed == 1 )
+		{
+			uncompressed_data = data;
+		}
+		else
+		{
+			uncompressed_data = raw_read_data;
+		}
+		if( read_size != uncompressed_size )
+		{
+			LIBEWF_WARNING_PRINT( "%s: mismatch in read and uncompressed buffer size.\n",
+			 function );
+
+			libewf_common_free( data );
+			libewf_common_free( raw_read_data );
+
+			return( -1 );
+		}
 #else
 		read_count = libewf_read_random( handle, (void *) data, read_size, read_offset );
-#endif
 
 		if( read_count <= -1 )
 		{
@@ -692,12 +769,17 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 			return( -1 );
 		}
+		uncompressed_data = data;
+#endif
 		if( read_count == 0 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
 			 function );
 
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
@@ -707,26 +789,33 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 			 function );
 
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}
 		/* Swap byte pairs
 		 */
 		if( ( swap_byte_pairs == 1 )
-		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		 && ( ewfcommon_swap_byte_pairs( uncompressed_data, read_count ) != 1 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 			 function );
 
+			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 			return( -1 );
 		}
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update( &md5_context, data, read_count );
+			ewfmd5_update( &md5_context, uncompressed_data, read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update( &sha1_context, data, read_count );
+			ewfsha1_update( &sha1_context, uncompressed_data, read_count );
 		}
 		read_offset      += (off64_t) read_size;
 		total_read_count += (ssize64_t) read_count;
@@ -737,6 +826,9 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		}
   	}
 	libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+	libewf_common_free( raw_read_data );
+#endif
 
 	if( calculate_md5 == 1 )
 	{

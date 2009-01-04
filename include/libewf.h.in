@@ -92,8 +92,16 @@ LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t fil
  */
 LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
 
+/* Prepares a buffer with chunk data after reading it according to the handle settings
+ * intended for raw read
+ * The buffer size cannot be larger than the chunk size
+ * Returns the resulting chunk size, or -1 on error
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed );
+
 /* Reads 'raw' data from the curent offset into a buffer
  * size contains the size of the buffer
+ * The function sets the chunk crc, is compressed and read crc values
  * Returns the amount of bytes read, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc );
