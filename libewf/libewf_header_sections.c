@@ -25,6 +25,7 @@
 #include <notify.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
 #include "libewf_string.h"
@@ -35,13 +36,18 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_sections_initialize(
-     libewf_header_sections_t **header_sections )
+     libewf_header_sections_t **header_sections,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_header_sections_initialize";
 
 	if( header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid header sections.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid header sections.\n",
 		 function );
 
 		return( -1 );
@@ -53,7 +59,11 @@ int libewf_header_sections_initialize(
 
 		if( *header_sections == NULL )
 		{
-			notify_warning_printf( "%s: unable to create header sections.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create header sections.\n",
 			 function );
 
 			return( -1 );
@@ -63,7 +73,11 @@ int libewf_header_sections_initialize(
 		     0,
 		     sizeof( libewf_header_sections_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear header sections.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear header sections.\n",
 			 function );
 
 			memory_free(
@@ -82,13 +96,18 @@ int libewf_header_sections_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_sections_free(
-      libewf_header_sections_t **header_sections )
+      libewf_header_sections_t **header_sections,
+      libewf_error_t **error )
 {
         static char *function = "libewf_header_sections_free";
 
 	if( header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid header sections.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid header sections.\n",
 		 function );
 
 		return( -1 );
@@ -125,14 +144,19 @@ int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,
      libewf_values_table_t *header_values,
      int8_t compression_level,
-     uint8_t format )
+     uint8_t format,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_header_sections_create";
 	time_t timestamp      = time( NULL );
 
 	if( header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid header sections.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid header sections.\n",
 		 function );
 
 		return( -1 );
@@ -145,9 +169,14 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -161,9 +190,14 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -178,9 +212,14 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -195,9 +234,14 @@ int libewf_header_sections_create(
 		     compression_level,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -210,9 +254,14 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -221,9 +270,14 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header2 ),
-		     &( header_sections->header2_size ) ) != 1 )
+		     &( header_sections->header2_size ),
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header2 section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header2 section.\n",
 			 function );
 
 			memory_free(
@@ -242,9 +296,14 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -253,9 +312,14 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header2 ),
-		     &( header_sections->header2_size ) ) != 1 )
+		     &( header_sections->header2_size ),
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header2 sections.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header2 sections.\n",
 			 function );
 
 			memory_free(
@@ -274,9 +338,14 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -285,9 +354,14 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header2 ),
-		     &( header_sections->header2_size ) ) != 1 )
+		     &( header_sections->header2_size ),
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header2 sections.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header2 sections.\n",
 			 function );
 
 			memory_free(
@@ -306,9 +380,14 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -321,9 +400,14 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -336,9 +420,14 @@ int libewf_header_sections_create(
 		     timestamp,
 		     &( header_sections->header ),
 		     &( header_sections->header_size ),
-		     header_sections->header_codepage ) != 1 )
+		     header_sections->header_codepage,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header section.\n",
 			 function );
 
 			return( -1 );
@@ -347,9 +436,14 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->header2 ),
-		     &( header_sections->header2_size ) ) != 1 )
+		     &( header_sections->header2_size ),
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create header2 section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header2 section.\n",
 			 function );
 
 			memory_free(
@@ -364,9 +458,14 @@ int libewf_header_sections_create(
 		     header_values,
 		     timestamp,
 		     &( header_sections->xheader ),
-		     &( header_sections->xheader_size ) ) != 1 )
+		     &( header_sections->xheader_size ),
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to create xheader section.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create xheader section.\n",
 			 function );
 
 			memory_free(
@@ -386,25 +485,35 @@ int libewf_header_sections_create(
 }
 
 /* Determines the EWF file format based on known characteristics
- * Returns 1 if the format was determined, -1 on errror
+ * Returns 1 if the format was determined, 0 if not or -1 on errror
  */
 int libewf_header_sections_determine_format(
      libewf_header_sections_t *header_sections,
      uint8_t ewf_format,
-     uint8_t *format )
+     uint8_t *format,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_header_sections_determine_format";
+	int result            = 0;
 
 	if( header_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid header sections.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid header sections.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( format == NULL )
 	{
-		notify_warning_printf( "%s: invalid format.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid format.\n",
 		 function );
 
 		return( -1 );
@@ -420,6 +529,7 @@ int libewf_header_sections_determine_format(
 		if( header_sections->xheader != NULL )
 		{
 			*format = LIBEWF_FORMAT_EWFX;
+			result  = 1;
 		}
 		/* The header2 in raw format starts with 0xff 0xfe <number>
 		 */
@@ -434,32 +544,39 @@ int libewf_header_sections_determine_format(
 				 && ( header_sections->header2[ 38 ] == (uint8_t) 'v' ) )
 				{
 					*format = LIBEWF_FORMAT_ENCASE5;
+					result  = 1;
 				}
 				else if( ( header_sections->header2[ 36 ] == (uint8_t) 'm' )
 				 && ( header_sections->header2[ 38 ] == (uint8_t) 'd' ) )
 				{
 					*format = LIBEWF_FORMAT_ENCASE6;
+					result  = 1;
 				}
+#if defined( HAVE_VERBOSE_OUTPUT )
 				else
 				{
-					notify_warning_printf( "%s: unsupported header2 format: %c%c.\n",
-					 function, (char) header_sections->header2[ 36 ],
+					notify_verbose_printf(
+					 "%s: unsupported header2 format: %c%c.\n",
+					 function,
+					 (char) header_sections->header2[ 36 ],
 					 (char) header_sections->header2[ 38 ] );
-
-					return( -1 );
 				}
+#endif
 			}
 			else if( header_sections->header2[ 2 ] == (uint8_t) '1' )
 			{
 				*format = LIBEWF_FORMAT_ENCASE4;
+				result  = 1;
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
 			else
 			{
-				notify_warning_printf( "%s: unsupported header2 version: %c.\n",
-				 function, (char) header_sections->header2[ 2 ] );
-
-				return( -1 );
+				notify_verbose_printf(
+				 "%s: unsupported header2 version: %c.\n",
+				 function,
+				 (char) header_sections->header2[ 2 ] );
 			}
+#endif
 		}
 		else if( header_sections->header != NULL )
 		{
@@ -472,20 +589,24 @@ int libewf_header_sections_determine_format(
 				 && ( header_sections->header[ 18 ] == (uint8_t) 'v' ) )
 				{
 					*format = LIBEWF_FORMAT_LINEN5;
+					result  = 1;
 				}
 				else if( ( header_sections->header[ 17 ] == (uint8_t) 'm' )
 				 && ( header_sections->header[ 18 ] == (uint8_t) 'd' ) )
 				{
 					*format = LIBEWF_FORMAT_LINEN6;
+					result  = 1;
 				}
+#if defined( HAVE_VERBOSE_OUTPUT )
 				else
 				{
-					notify_warning_printf( "%s: unsupported header format: %c%c.\n",
-					 function, (char) header_sections->header[ 17 ],
+					notify_verbose_printf(
+					 "%s: unsupported header format: %c%c.\n",
+					 function,
+					 (char) header_sections->header[ 17 ],
 					 (char) header_sections->header[ 18 ] );
-
-					return( -1 );
 				}
+#endif
 			}
 			else if( header_sections->header[ 0 ] == (uint8_t) '1' )
 			{
@@ -496,24 +617,30 @@ int libewf_header_sections_determine_format(
 					if( header_sections->header[ 25 ] == (uint8_t) 'r' )
 					{
 						*format = LIBEWF_FORMAT_ENCASE1;
+						result  = 1;
 
+#if defined( HAVE_VERBOSE_OUTPUT )
 						if( header_sections->amount_of_header_sections != 1 )
 						{
-							notify_verbose_printf( "%s: multiple header sections found.\n",
+							notify_verbose_printf(
+							 "%s: multiple header sections found.\n",
 							 function );
 						}
+#endif
 					}
 					else if( header_sections->header[ 31 ] == (uint8_t) 'r' )
 					{
 						*format = LIBEWF_FORMAT_ENCASE2;
+						result  = 1;
 					}
+#if defined( HAVE_VERBOSE_OUTPUT )
 					else
 					{
-						notify_warning_printf( "%s: unsupported header version.\n",
+						notify_verbose_printf(
+						 "%s: unsupported header version.\n",
 						 function );
-
-						return( -1 );
 					}
+#endif
 				}
 				/* FTK Imager uses \n
 				 */
@@ -522,50 +649,57 @@ int libewf_header_sections_determine_format(
 					if( header_sections->header[ 29 ] == (uint8_t) 'r' )
 					{
 						*format = LIBEWF_FORMAT_FTK;
+						result  = 1;
 					}
+#if defined( HAVE_VERBOSE_OUTPUT )
 					else
 					{
-						notify_warning_printf( "%s: unsupported header version.\n",
+						notify_verbose_printf(
+						 "%s: unsupported header version.\n",
 						 function );
-
-						return( -1 );
 					}
+#endif
 				}
+#if defined( HAVE_VERBOSE_OUTPUT )
 				else
 				{
-					notify_warning_printf( "%s: unsupported header version.\n",
+					notify_verbose_printf(
+					 "%s: unsupported header version.\n",
 					 function );
-
-					return( -1 );
 				}
+#endif
 			}
+#if defined( HAVE_VERBOSE_OUTPUT )
 			else
 			{
-				notify_warning_printf( "%s: unsupported header version.\n",
+				notify_verbose_printf(
+				 "%s: unsupported header version.\n",
 				 function );
-
-				return( -1 );
 			}
+#endif
 		}
+#if defined( HAVE_VERBOSE_OUTPUT )
 		else
 		{
-			notify_warning_printf( "%s: missing header information.\n",
+			notify_verbose_printf(
+			 "%s: missing header information.\n",
 			 function );
-
-			return( -1 );
 		}
+#endif
 	}
 	else if( ewf_format == EWF_FORMAT_L01 )
 	{
 		*format = LIBEWF_FORMAT_LVF;
+		result  = 1;
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	else
 	{
-		notify_warning_printf( "%s: unsupported EWF file format.\n",
+		notify_verbose_printf(
+		 "%s: unsupported EWF file format.\n",
 		 function );
-
-		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 

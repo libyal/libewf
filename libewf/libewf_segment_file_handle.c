@@ -27,6 +27,7 @@
 #include <types.h>
 #include <system_string.h>
 
+#include "libewf_error.h"
 #include "libewf_filename.h"
 #include "libewf_list_type.h"
 #include "libewf_section_list.h"
@@ -37,13 +38,18 @@
  */
 int libewf_segment_file_handle_initialize(
      libewf_segment_file_handle_t **segment_file_handle,
-     int file_io_pool_entry )
+     int file_io_pool_entry,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_initialize";
 
 	if( segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid segment file handle.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
@@ -55,7 +61,11 @@ int libewf_segment_file_handle_initialize(
 
 		if( *segment_file_handle == NULL )
 		{
-			notify_warning_printf( "%s: unable to create segment file handle.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create segment file handle.\n",
 			 function );
 
 			return( -1 );
@@ -65,7 +75,11 @@ int libewf_segment_file_handle_initialize(
 		     0,
 		     sizeof( libewf_segment_file_handle_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear segment file handle.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear segment file handle.\n",
 			 function );
 
 			memory_free(
@@ -80,7 +94,11 @@ int libewf_segment_file_handle_initialize(
 
 		if( ( *segment_file_handle )->section_list == NULL )
 		{
-			notify_warning_printf( "%s: unable to create section list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create section list.\n",
 			 function );
 
 			memory_free(
@@ -95,7 +113,11 @@ int libewf_segment_file_handle_initialize(
 		     0,
 		     sizeof( libewf_list_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear section list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear section list.\n",
 			 function );
 
 			memory_free(
@@ -116,13 +138,18 @@ int libewf_segment_file_handle_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_free(
-     libewf_segment_file_handle_t **segment_file_handle )
+     libewf_segment_file_handle_t **segment_file_handle,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_segment_file_handle_free";
 
 	if( segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid segment file handle.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid segment file handle.\n",
 		 function );
 
 		return( -1 );
@@ -133,9 +160,14 @@ int libewf_segment_file_handle_free(
 		{
 			if( libewf_list_free(
 			     ( *segment_file_handle )->section_list,
-			     &libewf_section_list_values_free ) != 1 )
+			     &libewf_section_list_values_free,
+			     error ) != 1 )
 			{
-				notify_warning_printf( "%s: unable to free section list.\n",
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+				 "%s: unable to free section list.\n",
 				 function );
 			}
 		}

@@ -30,13 +30,18 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_initialize(
-     libewf_hash_sections_t **hash_sections )
+     libewf_hash_sections_t **hash_sections,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_hash_sections_initialize";
 
 	if( hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid hash sections.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid hash sections.\n",
 		 function );
 
 		return( -1 );
@@ -48,7 +53,11 @@ int libewf_hash_sections_initialize(
 
 		if( *hash_sections == NULL )
 		{
-			notify_warning_printf( "%s: unable to create hash sections.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create hash sections.\n",
 			 function );
 
 			return( -1 );
@@ -58,7 +67,11 @@ int libewf_hash_sections_initialize(
 		     0,
 		     sizeof( libewf_hash_sections_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear hash sections.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear hash sections.\n",
 			 function );
 
 			memory_free(
@@ -76,13 +89,18 @@ int libewf_hash_sections_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_sections_free(
-     libewf_hash_sections_t **hash_sections )
+     libewf_hash_sections_t **hash_sections,
+     libewf_error_t **error )
 {
         static char *function = "libewf_hash_sections_free";
 
 	if( hash_sections == NULL )
 	{
-		notify_warning_printf( "%s: invalid hash sections.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid hash sections.\n",
 		 function );
 
 		return( -1 );

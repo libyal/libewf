@@ -49,14 +49,6 @@
 #define LIBEWF_OPEN_WRITE			( LIBEWF_FLAG_WRITE )
 #define LIBEWF_OPEN_READ_WRITE			( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE )
 
-/* The levels are ordered from zero tollerance to full tollerance of non fatal errors
- * fatal error cannot be tollerated
- */
-#define LIBEWF_ERROR_TOLLERANCE_NONE		(uint8_t) 0x00
-#define LIBEWF_ERROR_TOLLERANCE_DATA_ONLY	(uint8_t) 0x03
-#define LIBEWF_ERROR_TOLLERANCE_COMPENSATE	(uint8_t) 0x0C
-#define LIBEWF_ERROR_TOLLERANCE_NON_FATAL	(uint8_t) 0x0F
-
 /* Libewf file formats
  */
 #define LIBEWF_FORMAT_UNKNOWN			0x00

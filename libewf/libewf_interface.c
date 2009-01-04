@@ -830,7 +830,9 @@ int libewf_get_acquiry_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
+	libewf_error_t *error = NULL;
 	static char *function = "libewf_get_acquiry_error";
+	int result            = 0;
 
 	if( handle == NULL )
 	{
@@ -839,11 +841,24 @@ int libewf_get_acquiry_error(
 
 		return( -1 );
 	}
-	return( libewf_sector_table_get_sector(
-	         ( (libewf_internal_handle_t *) handle )->acquiry_errors,
-	         index,
-	         first_sector,
-	         amount_of_sectors ) );
+	result = libewf_sector_table_get_sector(
+	          ( (libewf_internal_handle_t *) handle )->acquiry_errors,
+	          index,
+	          first_sector,
+	          amount_of_sectors,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve acquiry error.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the amount of CRC errors
@@ -900,8 +915,10 @@ int libewf_get_crc_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_crc_error";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -919,11 +936,24 @@ int libewf_get_crc_error(
 
 		return( -1 );
 	}
-	return( libewf_sector_table_get_sector(
-	         internal_handle->read->crc_errors,
-	         index,
-	         first_sector,
-	         amount_of_sectors ) );
+	result = libewf_sector_table_get_sector(
+	          internal_handle->read->crc_errors,
+	          index,
+	          first_sector,
+	          amount_of_sectors,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve CRC error.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the amount of sessions
@@ -973,7 +1003,9 @@ int libewf_get_session(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
+	libewf_error_t *error = NULL;
 	static char *function = "libewf_get_session";
+	int result            = 0;
 
 	if( handle == NULL )
 	{
@@ -982,11 +1014,24 @@ int libewf_get_session(
 
 		return( -1 );
 	}
-	return( libewf_sector_table_get_sector(
-	         ( (libewf_internal_handle_t *) handle )->sessions,
-	         index,
-	         first_sector,
-	         amount_of_sectors ) );
+	result = libewf_sector_table_get_sector(
+	          ( (libewf_internal_handle_t *) handle )->sessions,
+	          index,
+	          first_sector,
+	          amount_of_sectors,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve session.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the amount of chunks written
@@ -1109,8 +1154,10 @@ int libewf_get_header_value_identifier(
      libewf_character_t *value,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value_identifier";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1125,11 +1172,24 @@ int libewf_get_header_value_identifier(
 	{
 		return( 0 );
 	}
-	return( libewf_values_table_get_identifier(
-	         internal_handle->header_values,
-	         index,
-	         value,
-	         length ) );
+	result = libewf_values_table_get_identifier(
+	          internal_handle->header_values,
+	          index,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve header value identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the header value specified by the identifier
@@ -1141,9 +1201,11 @@ int libewf_get_header_value(
      libewf_character_t *value,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value";
 	size_t identifier_length                  = 0;
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1175,12 +1237,25 @@ int libewf_get_header_value(
 	identifier_length = libewf_string_length(
 	                     identifier );
 
-	return( libewf_values_table_get_value(
-	         internal_handle->header_values,
-	         identifier,
-	         identifier_length,
-	         value,
-	         length ) );
+	result = libewf_values_table_get_value(
+	          internal_handle->header_values,
+	          identifier,
+	          identifier_length,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve header value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the amount of hash values
@@ -1227,8 +1302,10 @@ int libewf_get_hash_value_identifier(
      libewf_character_t *value,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value_identifier";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1243,11 +1320,24 @@ int libewf_get_hash_value_identifier(
 	{
 		return( 0 );
 	}
-	return( libewf_values_table_get_identifier(
-	         internal_handle->hash_values,
-	         index,
-	         value,
-	         length ) );
+	result = libewf_values_table_get_identifier(
+	          internal_handle->hash_values,
+	          index,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve hash value identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the hash value specified by the identifier
@@ -1263,6 +1353,7 @@ int libewf_get_hash_value(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value";
 	size_t identifier_length                  = 0;
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1320,12 +1411,25 @@ int libewf_get_hash_value(
 	{
 		return( 0 );
 	}
-	return( libewf_values_table_get_value(
-                 internal_handle->hash_values,
-	         identifier,
-	         identifier_length,
-	         value,
-	         length ) );
+	result = libewf_values_table_get_value(
+                  internal_handle->hash_values,
+	          identifier,
+	          identifier_length,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to retrieve hash value identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Sets the amount of sectors per chunk in the media information
@@ -2190,6 +2294,7 @@ int libewf_set_header_value(
      libewf_character_t *value,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_header_value";
 	size_t identifier_length                  = 0;
@@ -2223,18 +2328,30 @@ int libewf_set_header_value(
 	{
 		if( libewf_values_table_initialize(
 		     &( internal_handle->header_values ),
-		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT ) != 1 )
+		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header values.\n",
 			 function );
 
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
 			return( -1 );
 		}
 		if( libewf_header_values_initialize(
-		     internal_handle->header_values ) != 1 )
+		     internal_handle->header_values,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize header values.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2242,12 +2359,25 @@ int libewf_set_header_value(
 	identifier_length = libewf_string_length(
 	                     identifier );
 
-	return( libewf_values_table_set_value(
-	         internal_handle->header_values,
-	         identifier,
-	         identifier_length,
-	         value,
-	         length ) );
+	if( libewf_values_table_set_value(
+	     internal_handle->header_values,
+	     identifier,
+	     identifier_length,
+	     value,
+	     length,
+	     &error ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set header value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Sets the hash value specified by the identifier
@@ -2291,10 +2421,16 @@ int libewf_set_hash_value(
 	{
 		if( libewf_values_table_initialize(
 		     &( internal_handle->hash_values ),
-		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT ) != 1 )
+		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create hash values.\n",
 			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2321,10 +2457,16 @@ int libewf_set_hash_value(
 	     identifier,
 	     identifier_length,
 	     value,
-	     length ) != 1 )
+	     length,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set hash value.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -2364,6 +2506,7 @@ int libewf_parse_header_values(
      libewf_handle_t *handle,
      uint8_t date_format )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_parse_header_values";
 
@@ -2392,10 +2535,13 @@ int libewf_parse_header_values(
 	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->xheader,
 	       internal_handle->header_sections->xheader_size,
-	       date_format ) != 1 ) )
+	       date_format,
+	       &error ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse xheader.\n",
 		 function );
+
+		/* TODO */
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header2 != NULL )
@@ -2403,10 +2549,13 @@ int libewf_parse_header_values(
 	       &( internal_handle->header_values ),
 	       internal_handle->header_sections->header2,
 	       internal_handle->header_sections->header2_size,
-	       date_format ) != 1 ) )
+	       date_format,
+	       &error ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse header2.\n",
 		 function );
+
+		/* TODO */
 	}
 	if( ( internal_handle->header_values == NULL )
 	 && ( internal_handle->header_sections->header != NULL )
@@ -2415,10 +2564,13 @@ int libewf_parse_header_values(
 	       internal_handle->header_sections->header,
 	       internal_handle->header_sections->header_size,
 	       internal_handle->header_sections->header_codepage,
-	       date_format ) != 1 ) )
+	       date_format,
+	       &error ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to parse header.\n",
 		 function );
+
+		/* TODO */
 	}
 	if( internal_handle->header_values == NULL )
 	{
@@ -2516,6 +2668,7 @@ int libewf_add_acquiry_error(
      off64_t first_sector,
      uint32_t amount_of_sectors )
 {
+	libewf_error_t *error = NULL;
 	static char *function = "libewf_add_acquiry_error";
 
 	if( handle == NULL )
@@ -2525,11 +2678,24 @@ int libewf_add_acquiry_error(
 
 		return( -1 );
 	}
-	return( libewf_sector_table_add_sector(
-	         ( (libewf_internal_handle_t *) handle )->acquiry_errors,
-	         first_sector,
-	         amount_of_sectors,
-	         1 ) );
+	if( libewf_sector_table_add_sector(
+	     ( (libewf_internal_handle_t *) handle )->acquiry_errors,
+	     first_sector,
+	     amount_of_sectors,
+	     1,
+	     &error ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to add acquiry error.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Add a CRC error
@@ -2540,6 +2706,7 @@ int libewf_add_crc_error(
      off64_t first_sector,
      uint32_t amount_of_sectors )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_add_crc_error";
 
@@ -2559,11 +2726,24 @@ int libewf_add_crc_error(
 
 		return( -1 );
 	}
-	return( libewf_sector_table_add_sector(
-	         internal_handle->read->crc_errors,
-	         first_sector,
-	         amount_of_sectors,
-	         1 ) );
+	if( libewf_sector_table_add_sector(
+	     internal_handle->read->crc_errors,
+	     first_sector,
+	     amount_of_sectors,
+	     1,
+	     &error ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to add CRC error.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Add a session
@@ -2574,6 +2754,7 @@ int libewf_add_session(
      off64_t first_sector,
      uint32_t amount_of_sectors )
 {
+	libewf_error_t *error = NULL;
 	static char *function = "libewf_add_session";
 
 	if( handle == NULL )
@@ -2583,11 +2764,24 @@ int libewf_add_session(
 
 		return( -1 );
 	}
-	return( libewf_sector_table_add_sector(
-	         ( (libewf_internal_handle_t *) handle )->sessions,
-	         first_sector,
-	         amount_of_sectors,
-	         0 ) );
+	if( libewf_sector_table_add_sector(
+	     ( (libewf_internal_handle_t *) handle )->sessions,
+	     first_sector,
+	     amount_of_sectors,
+	     0,
+	     &error ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to add session.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Copies the header values from the source to the destination handle
@@ -2597,6 +2791,7 @@ int libewf_copy_header_values(
      libewf_handle_t *destination_handle,
      libewf_handle_t *source_handle )
 {
+	libewf_error_t *error                                 = NULL;
 	libewf_internal_handle_t *internal_destination_handle = NULL;
 	libewf_internal_handle_t *internal_source_handle      = NULL;
 	static char *function                                 = "libewf_copy_header_values";
@@ -2629,25 +2824,50 @@ int libewf_copy_header_values(
 	{
 		if( libewf_values_table_initialize(
 		     &( internal_destination_handle->header_values ),
-		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT ) != 1 )
+		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create header values in destination handle.\n",
 			 function );
 
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
+
 			return( -1 );
 		}
 		if( libewf_header_values_initialize(
-		     internal_destination_handle->header_values ) != 1 )
+		     internal_destination_handle->header_values,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize header values.\n",
 			 function );
 
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
+
 			return( -1 );
 		}
 	}
-	return( libewf_header_values_copy(
-	         internal_destination_handle->header_values,
-	         internal_source_handle->header_values ) );
+	if( libewf_header_values_copy(
+	     internal_destination_handle->header_values,
+	     internal_source_handle->header_values,
+	     &error ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to copy header values.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Copies the media values from the source to the destination handle

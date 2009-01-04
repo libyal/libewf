@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_error.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -58,26 +60,31 @@ struct libewf_sector_table
 
 int libewf_sector_table_initialize(
      libewf_sector_table_t **sector_table,
-     uint32_t amount );
+     uint32_t amount,
+     libewf_error_t **error );
 
 int libewf_sector_table_free(
-     libewf_sector_table_t **sector_table );
+     libewf_sector_table_t **sector_table,
+     libewf_error_t **error );
 
 int libewf_sector_table_resize(
      libewf_sector_table_t *sector_table,
-     uint32_t amount );
+     uint32_t amount,
+     libewf_error_t **error );
 
 int libewf_sector_table_get_sector(
      libewf_sector_table_t *sector_table,
      uint32_t index,
      off64_t *first_sector,
-     uint32_t *amount_of_sectors );
+     uint32_t *amount_of_sectors,
+     libewf_error_t **error );
 
 int libewf_sector_table_add_sector(
      libewf_sector_table_t *sector_table,
      off64_t first_sector,
      uint32_t amount_of_sectors,
-     int merge_continious_entries );
+     int merge_continious_entries,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

@@ -93,7 +93,6 @@ int libewf_handle_initialize(
 		internal_handle->compression_level = EWF_COMPRESSION_UNKNOWN;
 		internal_handle->format            = LIBEWF_FORMAT_UNKNOWN;
 		internal_handle->ewf_format        = EWF_FORMAT_UNKNOWN;
-		internal_handle->error_tollerance  = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 
 		/* The segment table is initially filled with a single entry
 		 * and no limitations on the amount of open files
@@ -101,7 +100,8 @@ int libewf_handle_initialize(
 		if( libewf_file_io_pool_initialize(
 		     &( internal_handle->file_io_pool ),
 		     0,
-		     LIBEWF_FILE_IO_POOL_UNLIMITED_AMOUNT_OF_OPEN_FILES ) != 1 )
+		     LIBEWF_FILE_IO_POOL_UNLIMITED_AMOUNT_OF_OPEN_FILES,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -130,7 +130,8 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
@@ -154,7 +155,8 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
@@ -162,7 +164,8 @@ int libewf_handle_initialize(
 		}
 		if( libewf_offset_table_initialize(
 		     &( internal_handle->offset_table ),
-		     0 ) != 1 )
+		     0,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -178,7 +181,8 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
@@ -197,7 +201,8 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
+			 &( internal_handle->offset_table ),
+			 NULL );
 			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ),
 			 NULL );
@@ -205,14 +210,16 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
 			return( -1 );
 		}
 		if( libewf_media_values_initialize(
-		     &( internal_handle->media_values ) ) != 1 )
+		     &( internal_handle->media_values ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -225,7 +232,8 @@ int libewf_handle_initialize(
 			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
+			 &( internal_handle->offset_table ),
+			 NULL );
 			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ),
 			 NULL );
@@ -233,14 +241,16 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
 			return( -1 );
 		}
 		if( libewf_header_sections_initialize(
-		     &( internal_handle->header_sections ) ) != 1 )
+		     &( internal_handle->header_sections ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -250,12 +260,14 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_media_values_free(
-			 &( internal_handle->media_values ) );
+			 &( internal_handle->media_values ),
+			 NULL );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
+			 &( internal_handle->offset_table ),
+			 NULL );
 			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ),
 			 NULL );
@@ -263,14 +275,16 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
 			return( -1 );
 		}
 		if( libewf_hash_sections_initialize(
-		     &( internal_handle->hash_sections ) ) != 1 )
+		     &( internal_handle->hash_sections ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -280,14 +294,17 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_header_sections_free(
-			 &( internal_handle->header_sections ) );
+			 &( internal_handle->header_sections ),
+			 NULL );
 			libewf_media_values_free(
-			 &( internal_handle->media_values ) );
+			 &( internal_handle->media_values ),
+			 NULL );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
+			 &( internal_handle->offset_table ),
+			 NULL );
 			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ),
 			 NULL );
@@ -295,7 +312,8 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
@@ -303,7 +321,8 @@ int libewf_handle_initialize(
 		}
 		if( libewf_sector_table_initialize(
 		     &( internal_handle->sessions ),
-		     0 ) != 1 )
+		     0,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -313,16 +332,20 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ) );
+			 &( internal_handle->hash_sections ),
+			 NULL );
 			libewf_header_sections_free(
-			 &( internal_handle->header_sections ) );
+			 &( internal_handle->header_sections ),
+			 NULL );
 			libewf_media_values_free(
-			 &( internal_handle->media_values ) );
+			 &( internal_handle->media_values ),
+			 NULL );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
+			 &( internal_handle->offset_table ),
+			 NULL );
 			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ),
 			 NULL );
@@ -330,7 +353,8 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
@@ -338,7 +362,8 @@ int libewf_handle_initialize(
 		}
 		if( libewf_sector_table_initialize(
 		     &( internal_handle->acquiry_errors ),
-		     0 ) != 1 )
+		     0,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -348,18 +373,23 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_sector_table_free(
-			 &( internal_handle->sessions ) );
+			 &( internal_handle->sessions ),
+			 NULL );
 			libewf_hash_sections_free(
-			 &( internal_handle->hash_sections ) );
+			 &( internal_handle->hash_sections ),
+			 NULL );
 			libewf_header_sections_free(
-			 &( internal_handle->header_sections ) );
+			 &( internal_handle->header_sections ),
+			 NULL );
 			libewf_media_values_free(
-			 &( internal_handle->media_values ) );
+			 &( internal_handle->media_values ),
+			 NULL );
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ),
 			 NULL );
 			libewf_offset_table_free(
-			 &( internal_handle->offset_table ) );
+			 &( internal_handle->offset_table ),
+			 NULL );
 			libewf_segment_table_free(
 			 &( internal_handle->delta_segment_table ),
 			 NULL );
@@ -367,7 +397,8 @@ int libewf_handle_initialize(
 			 &( internal_handle->segment_table ),
 			 NULL );
 			libewf_file_io_pool_free(
-			 &( internal_handle->file_io_pool ) );
+			 &( internal_handle->file_io_pool ),
+			 NULL );
 			memory_free(
 			 internal_handle );
 
@@ -387,20 +418,26 @@ int libewf_handle_initialize(
 				 function );
 
 				libewf_sector_table_free(
-				 &( internal_handle->acquiry_errors ) );
+				 &( internal_handle->acquiry_errors ),
+				 NULL );
 				libewf_sector_table_free(
-				 &( internal_handle->sessions ) );
+				 &( internal_handle->sessions ),
+				 NULL );
 				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ) );
+				 &( internal_handle->hash_sections ),
+				 NULL );
 				libewf_header_sections_free(
-				 &( internal_handle->header_sections ) );
+				 &( internal_handle->header_sections ),
+				 NULL );
 				libewf_media_values_free(
-				 &( internal_handle->media_values ) );
+				 &( internal_handle->media_values ),
+				 NULL );
 				libewf_chunk_cache_free(
 				 &( internal_handle->chunk_cache ),
 				 NULL );
 				libewf_offset_table_free(
-				 &( internal_handle->offset_table ) );
+				 &( internal_handle->offset_table ),
+				 NULL );
 				libewf_segment_table_free(
 				 &( internal_handle->delta_segment_table ),
 				 NULL );
@@ -408,7 +445,8 @@ int libewf_handle_initialize(
 				 &( internal_handle->segment_table ),
 				 NULL );
 				libewf_file_io_pool_free(
-				 &( internal_handle->file_io_pool ) );
+				 &( internal_handle->file_io_pool ),
+				 NULL );
 				memory_free(
 				 internal_handle );
 
@@ -432,20 +470,26 @@ int libewf_handle_initialize(
 				 &( internal_handle->read ),
 				 NULL );
 				libewf_sector_table_free(
-				 &( internal_handle->acquiry_errors ) );
+				 &( internal_handle->acquiry_errors ),
+				 NULL );
 				libewf_sector_table_free(
-				 &( internal_handle->sessions ) );
+				 &( internal_handle->sessions ),
+				 NULL );
 				libewf_hash_sections_free(
-				 &( internal_handle->hash_sections ) );
+				 &( internal_handle->hash_sections ),
+				 NULL );
 				libewf_header_sections_free(
-				 &( internal_handle->header_sections ) );
+				 &( internal_handle->header_sections ),
+				 NULL );
 				libewf_media_values_free(
-				 &( internal_handle->media_values ) );
+				 &( internal_handle->media_values ),
+				 NULL );
 				libewf_chunk_cache_free(
 				 &( internal_handle->chunk_cache ),
 				 NULL );
 				libewf_offset_table_free(
-				 &( internal_handle->offset_table ) );
+				 &( internal_handle->offset_table ),
+				 NULL );
 				libewf_segment_table_free(
 				 &( internal_handle->delta_segment_table ),
 				 NULL );
@@ -453,7 +497,8 @@ int libewf_handle_initialize(
 				 &( internal_handle->segment_table ),
 				 NULL );
 				libewf_file_io_pool_free(
-				 &( internal_handle->file_io_pool ) );
+				 &( internal_handle->file_io_pool ),
+				 NULL );
 				memory_free(
 				 internal_handle );
 
@@ -513,7 +558,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_file_io_pool_free(
-		     &( internal_handle->file_io_pool ) ) != 1 )
+		     &( internal_handle->file_io_pool ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -545,7 +591,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_offset_table_free(
-		     &( internal_handle->offset_table ) ) != 1 )
+		     &( internal_handle->offset_table ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -566,7 +613,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_media_values_free(
-		     &( internal_handle->media_values ) ) != 1 )
+		     &( internal_handle->media_values ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -576,7 +624,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_header_sections_free(
-		     &( internal_handle->header_sections ) ) != 1 )
+		     &( internal_handle->header_sections ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -586,7 +635,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_hash_sections_free(
-		     &( internal_handle->hash_sections ) ) != 1 )
+		     &( internal_handle->hash_sections ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -596,7 +646,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_values_table_free(
-		     &( internal_handle->header_values ) ) != 1 )
+		     &( internal_handle->header_values ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -606,7 +657,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_values_table_free(
-		     &( internal_handle->hash_values ) ) != 1 )
+		     &( internal_handle->hash_values ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -616,7 +668,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_sector_table_free(
-		     &( internal_handle->sessions ) ) != 1 )
+		     &( internal_handle->sessions ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -626,7 +679,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_sector_table_free(
-		     &( internal_handle->acquiry_errors ) ) != 1 )
+		     &( internal_handle->acquiry_errors ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -700,7 +754,8 @@ int libewf_internal_handle_subhandle_read_initialize(
 		}
 		if( libewf_sector_table_initialize(
 		     &( ( *subhandle_read )->crc_errors ),
-		     0 ) != 1 )
+		     0,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -744,7 +799,8 @@ int libewf_internal_handle_subhandle_read_free(
 	if( *subhandle_read != NULL )
 	{
 		if( libewf_sector_table_free(
-		     &( ( *subhandle_read )->crc_errors ) ) != 1 )
+		     &( ( *subhandle_read )->crc_errors ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -1039,7 +1095,7 @@ int libewf_internal_handle_initialize_media_values(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid amount of chunks value exceeds maximum.\n",
 			 function );
 
@@ -1056,7 +1112,7 @@ int libewf_internal_handle_initialize_media_values(
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid amount of sectors value exceeds maximum.\n",
 			 function );
 
@@ -1167,7 +1223,8 @@ int libewf_internal_handle_create_header_values(
 	}
 #endif
 	if( libewf_values_table_free(
-	     &( internal_handle->header_values ) ) != 1 )
+	     &( internal_handle->header_values ),
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1180,7 +1237,8 @@ int libewf_internal_handle_create_header_values(
 	}
 	if( libewf_values_table_initialize(
 	     &( internal_handle->header_values ),
-	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT ) != 1 )
+	     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1192,7 +1250,8 @@ int libewf_internal_handle_create_header_values(
 		return( -1 );
 	}
 	if( libewf_header_values_initialize(
-	     internal_handle->header_values ) != 1 )
+	     internal_handle->header_values,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1208,7 +1267,8 @@ int libewf_internal_handle_create_header_values(
 	     _LIBEWF_CHARACTER_T_STRING( "case_number" ),
 	     11,
 	     _LIBEWF_CHARACTER_T_STRING( "Case Number" ),
-	     11 ) != 1 )
+	     11,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1224,7 +1284,8 @@ int libewf_internal_handle_create_header_values(
 	     _LIBEWF_CHARACTER_T_STRING( "description" ),
 	     11,
 	     _LIBEWF_CHARACTER_T_STRING( "Description" ),
-	     11 ) != 1 )
+	     11,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1240,7 +1301,8 @@ int libewf_internal_handle_create_header_values(
 	     _LIBEWF_CHARACTER_T_STRING( "evidence_number" ),
 	     15,
 	     _LIBEWF_CHARACTER_T_STRING( "Evidence Number" ),
-	     15 ) != 1 )
+	     15,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1256,7 +1318,8 @@ int libewf_internal_handle_create_header_values(
 	     _LIBEWF_CHARACTER_T_STRING( "examiner_name" ),
 	     13,
 	     _LIBEWF_CHARACTER_T_STRING( "Examiner Name" ),
-	     13 ) != 1 )
+	     13,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1272,7 +1335,8 @@ int libewf_internal_handle_create_header_values(
 	     _LIBEWF_CHARACTER_T_STRING( "notes" ),
 	     5,
 	     _LIBEWF_CHARACTER_T_STRING( "Notes" ),
-	     5 ) != 1 )
+	     5,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1288,7 +1352,8 @@ int libewf_internal_handle_create_header_values(
 	     _LIBEWF_CHARACTER_T_STRING( "acquiry_operating_system" ),
 	     24,
 	     _LIBEWF_CHARACTER_T_STRING( "Undetermined" ),
-	     12 ) != 1 )
+	     12,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1305,7 +1370,8 @@ int libewf_internal_handle_create_header_values(
 	     24,
 	     LIBEWF_VERSION_STRING,
 	     libewf_string_length(
-	      LIBEWF_VERSION_STRING ) ) != 1 )
+	      LIBEWF_VERSION_STRING ),
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,

@@ -27,6 +27,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libewf_error.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -79,10 +81,12 @@ struct libewf_media_values
 };
 
 int libewf_media_values_initialize(
-     libewf_media_values_t **media_values );
+     libewf_media_values_t **media_values,
+     libewf_error_t **error );
 
 int libewf_media_values_free(
-     libewf_media_values_t **media_values );
+     libewf_media_values_t **media_values,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

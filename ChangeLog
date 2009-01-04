@@ -121,6 +121,17 @@ Known issues:
 
 Next release(s):
 
+check for notify_verbose_printf( "
+check for funtion,[ ]
+check error tollerance
+check TODO
+
+* refactor libewf_file_io_pool_get_offset out of libewf_section functions?
+
+* use internal format of date/time string convert them in interface
+* what about header values parsing with preservation of timestamps?
+  store a timestamp string in the header value and convert them in ewfinfo
+
 * why does libewf_get_segment_filename return basename?
 
 * implement error handling
@@ -146,13 +157,14 @@ Next release(s):
   - error in primary offset table
   - error in secondary offset table
 * improve offset table correction
-  - add error flag ?
+  - add error flag
+  - flag invalid values and try to correct them in the compare
+  - if not correctable skip chunk while reading? and mark as crc error or try
+  to determine offset/size of chunk somehow
 
 * make compilation resilient for missing crypto library
   - compile on system without libcrypto
   - remove the cryptographic options if crypto library is missing
-
-* remove error_tollerance, just be error tollerant ?
 
 * implement libuca
   - handle codepage in ewftools use -p option
@@ -167,9 +179,6 @@ Next release(s):
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
-
-* what about header values parsing with preservation of timestamps?
-  store a timestamp string in the header value and convert them in ewfinfo
 
 * implement file io pooling?
   - add means to set open file handle limit
@@ -196,6 +205,11 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080912
+* worked on improved error handling
+* removed error tollerance setting the code will be error tollerant if it is
+  able to compensate or certain a value is valid
 
 Version: 20080911
 * worked on improved error handling

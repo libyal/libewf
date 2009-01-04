@@ -26,6 +26,8 @@
 #include <system_string.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
+#include "libewf_file_io_handle.h"
 #include "libewf_file_io_pool.h"
 
 /* Initialize the file io pool
@@ -34,28 +36,41 @@
 int libewf_file_io_pool_initialize(
      libewf_file_io_pool_t **file_io_pool,
      int amount_of_files_io_handles,
-     int maximum_amount_of_open_files )
+     int maximum_amount_of_open_files,
+     libewf_error_t **error )
 {
 	static char *function    = "libewf_file_io_pool_initialize";
 	size_t file_io_pool_size = 0;
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( amount_of_files_io_handles < 0 )
 	{
-		notify_warning_printf( "%s: invalid amount of file io handles value less than zero.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 "%s: invalid amount of file io handles value less than zero.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( maximum_amount_of_open_files < 0 )
 	{
-		notify_warning_printf( "%s: invalid maximum amount of open files value less than zero.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_LESS_THAN_ZERO,
+		 "%s: invalid maximum amount of open files value less than zero.\n",
 		 function );
 
 		return( -1 );
@@ -66,7 +81,11 @@ int libewf_file_io_pool_initialize(
 
 		if( file_io_pool_size > (size_t) SSIZE_MAX )
 		{
-			notify_warning_printf( "%s: invalid file io pool size value exceeds maximum.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid file io pool size value exceeds maximum.\n",
 			 function );
 
 			return( -1 );
@@ -76,7 +95,11 @@ int libewf_file_io_pool_initialize(
 
 		if( *file_io_pool == NULL )
 		{
-			notify_warning_printf( "%s: unable to create file io pool.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create file io pool.\n",
 			 function );
 
 			return( -1 );
@@ -86,7 +109,11 @@ int libewf_file_io_pool_initialize(
 		     0,
 		     sizeof( libewf_file_io_pool_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear file io pool.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear file io pool.\n",
 			 function );
 
 			memory_free(
@@ -101,7 +128,11 @@ int libewf_file_io_pool_initialize(
 
 		if( ( *file_io_pool )->last_used_list == NULL )
 		{
-			notify_warning_printf( "%s: unable to create last used list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create last used list.\n",
 			 function );
 
 			memory_free(
@@ -116,7 +147,11 @@ int libewf_file_io_pool_initialize(
 		     0,
 		     sizeof( libewf_list_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear last used list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear last used list.\n",
 			 function );
 
 			memory_free(
@@ -135,7 +170,11 @@ int libewf_file_io_pool_initialize(
 
 			if( ( *file_io_pool )->file_io_handle == NULL )
 			{
-				notify_warning_printf( "%s: unable to create file io handles.\n",
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_MEMORY,
+				 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to create file io handles.\n",
 				 function );
 
 				memory_free(
@@ -152,7 +191,11 @@ int libewf_file_io_pool_initialize(
 			     0,
 			     file_io_pool_size ) == NULL )
 			{
-				notify_warning_printf( "%s: unable to clear file io handles.\n",
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_MEMORY,
+				 LIBEWF_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to clear file io handles.\n",
 				 function );
 
 				memory_free(
@@ -177,14 +220,19 @@ int libewf_file_io_pool_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_file_io_pool_free(
-     libewf_file_io_pool_t **file_io_pool )
+     libewf_file_io_pool_t **file_io_pool,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_file_io_pool_free";
 	int iterator          = 0;
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
@@ -194,10 +242,16 @@ int libewf_file_io_pool_free(
 		for( iterator = 0; iterator < ( *file_io_pool )->amount_of_files_io_handles; iterator++ )
 		{
 			if( libewf_file_io_handle_close(
-			     &( ( *file_io_pool )->file_io_handle[ iterator ] ) ) != 0 )
+			     &( ( *file_io_pool )->file_io_handle[ iterator ] ),
+			     error ) != 0 )
 			{
-				notify_warning_printf( "%s: unable to close file io handle: %d.\n",
-				 function, iterator );
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_CLOSE_FAILED,
+				 "%s: unable to close file io handle: %d.\n",
+				 function,
+				 iterator );
 			}
 			if( ( *file_io_pool )->file_io_handle[ iterator ].filename != NULL )
 			{
@@ -208,9 +262,14 @@ int libewf_file_io_pool_free(
 		if( ( ( *file_io_pool )->last_used_list != NULL )
 		 && ( libewf_list_free(
 		       ( *file_io_pool )->last_used_list,
-		       NULL ) != 1 ) )
+		       NULL,
+		       error ) != 1 ) )
 		{
-			notify_warning_printf( "%s: unable to free last used list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
+			 "%s: unable to free last used list.\n",
 			 function );
 		}
 		if( ( *file_io_pool )->file_io_handle != NULL )
@@ -231,7 +290,8 @@ int libewf_file_io_pool_free(
  */
 int libewf_file_io_pool_resize(
      libewf_file_io_pool_t *file_io_pool,
-     int amount_of_files_io_handles )
+     int amount_of_files_io_handles,
+     libewf_error_t **error )
 {
 	void *reallocation       = NULL;
 	static char *function    = "libewf_file_io_pool_resize";
@@ -239,14 +299,22 @@ int libewf_file_io_pool_resize(
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( amount_of_files_io_handles <= 0 )
 	{
-		notify_warning_printf( "%s: invalid amount of file io handles value zero or less.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_ZERO_OR_LESS,
+		 "%s: invalid amount of file io handles value zero or less.\n",
 		 function );
 
 		return( -1 );
@@ -257,7 +325,11 @@ int libewf_file_io_pool_resize(
 
 		if( file_io_pool_size > (size_t) SSIZE_MAX )
 		{
-			notify_warning_printf( "%s: invalid file io pool size value exceeds maximum.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid file io pool size value exceeds maximum.\n",
 			 function );
 
 			return( -1 );
@@ -268,7 +340,11 @@ int libewf_file_io_pool_resize(
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to resize file io handles.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to resize file io handles.\n",
 			 function );
 
 			return( -1 );
@@ -280,7 +356,11 @@ int libewf_file_io_pool_resize(
 		     0,
 		     sizeof( libewf_file_io_handle_t ) * ( amount_of_files_io_handles - file_io_pool->amount_of_files_io_handles ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear file io handles.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear file io handles.\n",
 			 function );
 
 			return( -1 );
@@ -296,27 +376,40 @@ int libewf_file_io_pool_resize(
 int libewf_file_io_pool_create_file_io_handle(
      libewf_file_io_pool_t *file_io_pool,
      libewf_file_io_handle_t **file_io_handle,
-     int *entry )
+     int *entry,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_file_io_pool_create_file_io_handle";
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( entry == NULL )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
@@ -329,9 +422,14 @@ int libewf_file_io_pool_create_file_io_handle(
 	{
 		if( libewf_file_io_pool_resize(
 		     file_io_pool,
-		     *entry + 1 ) != 1 )
+		     *entry + 1,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to resize file io pool.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+			 "%s: unable to resize file io pool.\n",
 			 function );
 
 			*entry          = -1;
@@ -357,21 +455,30 @@ int libewf_file_io_pool_create_file_io_handle(
 int libewf_file_io_pool_open_file_io_handle(
      libewf_file_io_pool_t *file_io_pool,
      libewf_file_io_handle_t *file_io_handle,
-     int flags )
+     int flags,
+     libewf_error_t **error )
 {
 	libewf_list_element_t *last_used_list_element = NULL;
 	static char *function                         = "libewf_file_io_pool_open_file_io_handle";
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle.\n",
 		 function );
 
 		return( -1 );
@@ -387,7 +494,11 @@ int libewf_file_io_pool_open_file_io_handle(
 	{
 		if( file_io_pool->last_used_list == NULL )
 		{
-			notify_warning_printf( "%s: invalid file io pool - missing last used list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: invalid file io pool - missing last used list.\n",
 			 function );
 
 			return( -1 );
@@ -396,24 +507,38 @@ int libewf_file_io_pool_open_file_io_handle(
 
 		if( last_used_list_element == NULL )
 		{
-			notify_warning_printf( "%s: invalid last used list element.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 "%s: invalid last used list element.\n",
 			 function );
 
 			return( -1 );
 		}
 		if( libewf_list_remove_element(
 		     file_io_pool->last_used_list,
-		     last_used_list_element ) != 1 )
+		     last_used_list_element,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to remove last used list element from list.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_REMOVE_FAILED,
+			 "%s: unable to remove last used list element from list.\n",
 			 function );
 
 			return( -1 );
 		}
 		if( libewf_file_io_handle_close(
-		     (libewf_file_io_handle_t *) last_used_list_element->value ) != 0 )
+		     (libewf_file_io_handle_t *) last_used_list_element->value,
+		     error ) != 0 )
 		{
-			notify_warning_printf( "%s: unable to close file io handle.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close file io handle.\n",
 			 function );
 
 			memory_free(
@@ -431,7 +556,11 @@ int libewf_file_io_pool_open_file_io_handle(
 
 		if( last_used_list_element == NULL )
 		{
-			notify_warning_printf( "%s: unable to create last used list element.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create last used list element.\n",
 			 function );
 
 			return( -1 );
@@ -441,7 +570,11 @@ int libewf_file_io_pool_open_file_io_handle(
 		     0,
 		     sizeof( libewf_list_element_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear last used list element.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear last used list element.\n",
 			 function );
 
 			memory_free(
@@ -452,9 +585,14 @@ int libewf_file_io_pool_open_file_io_handle(
 	}
 	if( libewf_file_io_handle_open(
 	     file_io_handle,
-	     flags ) != 1 )
+	     flags,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to open file io handle.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open file io handle.\n",
 		 function );
 
 		memory_free(
@@ -466,9 +604,14 @@ int libewf_file_io_pool_open_file_io_handle(
 
 	if( libewf_list_prepend_element(
 	     file_io_pool->last_used_list,
-	     last_used_list_element ) != 1 )
+	     last_used_list_element,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to prepend last used list element to list.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to prepend last used list element to list.\n",
 		 function );
 
 		memory_free(
@@ -485,21 +628,30 @@ int libewf_file_io_pool_open_file_io_handle(
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
-     int flags )
+     int flags,
+     libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_open";
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -507,7 +659,11 @@ int libewf_file_io_pool_open(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry value out of range.\n",
 		 function );
 
 		return( -1 );
@@ -516,8 +672,13 @@ int libewf_file_io_pool_open(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -528,10 +689,16 @@ int libewf_file_io_pool_open(
 		if( libewf_file_io_pool_open_file_io_handle(
 		     file_io_pool,
 		     file_io_handle,
-		     file_io_handle->flags ) != 1 )
+		     file_io_handle->flags,
+		     error ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to open entry: %d.\n",
-			 function, entry );
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to open entry: %d.\n",
+			 function,
+			 entry );
 
 			return( -1 );
 		}
@@ -545,21 +712,30 @@ int libewf_file_io_pool_open(
 int libewf_file_io_pool_reopen(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
-     int flags )
+     int flags,
+     libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_reopen";
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -567,7 +743,11 @@ int libewf_file_io_pool_reopen(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
@@ -576,17 +756,28 @@ int libewf_file_io_pool_reopen(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
 	if( libewf_file_io_handle_reopen(
 	     file_io_handle,
-	     flags ) != 0 )
+	     flags,
+	     error ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to reopen file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to reopen file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -598,21 +789,30 @@ int libewf_file_io_pool_reopen(
  */
 int libewf_file_io_pool_close(
      libewf_file_io_pool_t *file_io_pool,
-     int entry )
+     int entry,
+     libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_close";
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -620,7 +820,11 @@ int libewf_file_io_pool_close(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
@@ -629,16 +833,27 @@ int libewf_file_io_pool_close(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
 	if( libewf_file_io_handle_close(
-	     file_io_handle ) != 0 )
+	     file_io_handle,
+	     error ) != 0 )
 	{
-		notify_warning_printf( "%s: unable to close file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -649,7 +864,8 @@ int libewf_file_io_pool_close(
  * Returns 0 if successful or -1 on error
  */
 int libewf_file_io_pool_close_all(
-     libewf_file_io_pool_t *file_io_pool )
+     libewf_file_io_pool_t *file_io_pool,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_file_io_pool_close_all";
 	int iterator          = 0;
@@ -657,7 +873,11 @@ int libewf_file_io_pool_close_all(
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
@@ -665,10 +885,16 @@ int libewf_file_io_pool_close_all(
 	for( iterator = 0; iterator < file_io_pool->amount_of_files_io_handles; iterator++ )
 	{
 		if( libewf_file_io_handle_close(
-		     &( file_io_pool->file_io_handle[ iterator ] ) ) != 0 )
+		     &( file_io_pool->file_io_handle[ iterator ] ),
+		     error ) != 0 )
 		{
-			notify_warning_printf( "%s: unable to close file io handle: %d.\n",
-			 function, iterator );
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close file io handle: %d.\n",
+			 function,
+			 iterator );
 
 			result = -1;
 		}
@@ -683,7 +909,8 @@ ssize_t libewf_file_io_pool_read(
          libewf_file_io_pool_t *file_io_pool,
          int entry,
          uint8_t *buffer,
-         size_t size )
+         size_t size,
+         libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_read";
@@ -691,14 +918,22 @@ ssize_t libewf_file_io_pool_read(
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -706,7 +941,11 @@ ssize_t libewf_file_io_pool_read(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
@@ -715,8 +954,13 @@ ssize_t libewf_file_io_pool_read(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -726,22 +970,34 @@ ssize_t libewf_file_io_pool_read(
 	 && ( libewf_file_io_pool_open_file_io_handle(
 	       file_io_pool,
 	       file_io_handle,
-	       file_io_handle->flags ) != 1 ) )
+	       file_io_handle->flags,
+	       error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to open entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
 	read_count = libewf_file_io_handle_read(
 	              file_io_handle,
 	              buffer,
-	              size );
+	              size,
+	              error );
 
 	if( read_count < 0 )
 	{
-		notify_warning_printf( "%s: unable to read from entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to read from entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -755,7 +1011,8 @@ ssize_t libewf_file_io_pool_write(
          libewf_file_io_pool_t *file_io_pool,
          int entry,
          uint8_t *buffer,
-         size_t size )
+         size_t size,
+         libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_write";
@@ -763,14 +1020,22 @@ ssize_t libewf_file_io_pool_write(
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -778,7 +1043,11 @@ ssize_t libewf_file_io_pool_write(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
@@ -787,8 +1056,13 @@ ssize_t libewf_file_io_pool_write(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -798,22 +1072,34 @@ ssize_t libewf_file_io_pool_write(
 	 && ( libewf_file_io_pool_open_file_io_handle(
 	       file_io_pool,
 	       file_io_handle,
-	       file_io_handle->flags ) != 1 ) )
+	       file_io_handle->flags,
+	       error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to open entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
 	write_count = libewf_file_io_handle_write(
 	               file_io_handle,
 	               buffer,
-	               size );
+	               size,
+	               error );
 
 	if( write_count < 0 )
 	{
-		notify_warning_printf( "%s: unable to write to entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write to entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -827,7 +1113,8 @@ off64_t libewf_file_io_pool_seek_offset(
          libewf_file_io_pool_t *file_io_pool,
          int entry,
          off64_t offset,
-         int whence )
+         int whence,
+         libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_seek_offset";
@@ -835,14 +1122,22 @@ off64_t libewf_file_io_pool_seek_offset(
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -850,7 +1145,11 @@ off64_t libewf_file_io_pool_seek_offset(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
@@ -859,8 +1158,13 @@ off64_t libewf_file_io_pool_seek_offset(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -870,22 +1174,34 @@ off64_t libewf_file_io_pool_seek_offset(
 	 && ( libewf_file_io_pool_open_file_io_handle(
 	       file_io_pool,
 	       file_io_handle,
-	       file_io_handle->flags ) != 1 ) )
+	       file_io_handle->flags,
+	       error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to open entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
 	seek_offset = libewf_file_io_handle_seek_offset(
 	               file_io_handle,
 	               offset,
-	               whence );
+	               whence,
+	               error );
 
 	if( seek_offset < 0 )
 	{
-		notify_warning_printf( "%s: unable to seek offset in entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset in entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -898,21 +1214,30 @@ off64_t libewf_file_io_pool_seek_offset(
 int libewf_file_io_pool_get_offset(
      libewf_file_io_pool_t *file_io_pool,
      int entry,
-     off64_t *offset )
+     off64_t *offset,
+     libewf_error_t **error )
 {
 	libewf_file_io_handle_t *file_io_handle = NULL;
 	static char *function                   = "libewf_file_io_pool_get_offset";
 
 	if( file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io pool.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( file_io_pool->file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io pool - missing file io handles.\n",
 		 function );
 
 		return( -1 );
@@ -920,14 +1245,22 @@ int libewf_file_io_pool_get_offset(
 	if( ( entry < 0 )
 	 || ( entry >= file_io_pool->amount_of_files ) )
 	{
-		notify_warning_printf( "%s: invalid entry.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_OUT_OF_RANGE,
+		 "%s: invalid entry.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( offset == NULL )
 	{
-		notify_warning_printf( "%s: invalid offset.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid offset.\n",
 		 function );
 
 		return( -1 );
@@ -936,8 +1269,13 @@ int libewf_file_io_pool_get_offset(
 
 	if( file_io_handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid file io handle for entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid file io handle for entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}
@@ -947,10 +1285,16 @@ int libewf_file_io_pool_get_offset(
 	 && ( libewf_file_io_pool_open_file_io_handle(
 	       file_io_pool,
 	       file_io_handle,
-	       file_io_handle->flags ) != 1 ) )
+	       file_io_handle->flags,
+	       error ) != 1 ) )
 	{
-		notify_warning_printf( "%s: unable to open entry: %d.\n",
-		 function, entry );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_OPEN_FAILED,
+		 "%s: unable to open entry: %d.\n",
+		 function,
+		 entry );
 
 		return( -1 );
 	}

@@ -395,7 +395,8 @@ ssize_t libewf_raw_read_chunk(
 	     internal_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset,
-	     SEEK_SET ) <= -1 )
+	     SEEK_SET,
+	     error ) <= -1 )
 	{
 		libewf_error_set(
 		 error,
@@ -417,7 +418,8 @@ ssize_t libewf_raw_read_chunk(
 			    internal_handle->file_io_pool,
 			    segment_file_handle->file_io_pool_entry,
 			    chunk_buffer,
-			    chunk_data_size );
+			    chunk_data_size,
+	                    error );
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
 	{
@@ -438,7 +440,8 @@ ssize_t libewf_raw_read_chunk(
 		                  internal_handle->file_io_pool,
 		                  segment_file_handle->file_io_pool_entry,
 				  stored_crc_buffer,
-				  sizeof( ewf_crc_t ) );
+				  sizeof( ewf_crc_t ),
+		                  error );
 
 		if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
@@ -737,10 +740,6 @@ ssize_t libewf_read_chunk_data(
 
 				return( -1 );
 			}
-			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
 			chunk_data_size = amount_of_sectors * internal_handle->media_values->bytes_per_sector;
 		}
 		/* Flag that the chunk was cached
@@ -784,7 +783,7 @@ ssize_t libewf_read_chunk_data(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid available amount of bytes value exceeds maximum.\n",
 		 function );
 

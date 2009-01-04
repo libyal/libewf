@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <notify.h>
 
+#include "libewf_error.h"
 #include "libewf_media_values.h"
 
 #include "ewf_definitions.h"
@@ -32,13 +33,18 @@
  * Returns 1 if successful or -1 on error
  */
 int libewf_media_values_initialize(
-     libewf_media_values_t **media_values )
+     libewf_media_values_t **media_values,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_media_values_initialize";
 
 	if( media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid media values.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -46,11 +52,15 @@ int libewf_media_values_initialize(
 	if( *media_values == NULL )
 	{
 		*media_values = (libewf_media_values_t *) memory_allocate(
-		                                             sizeof( libewf_media_values_t ) );
+		                                           sizeof( libewf_media_values_t ) );
 
 		if( *media_values == NULL )
 		{
-			notify_warning_printf( "%s: unable to create media values.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create media values.\n",
 			 function );
 
 			return( -1 );
@@ -60,7 +70,11 @@ int libewf_media_values_initialize(
 		     0,
 		     sizeof( libewf_media_values_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear media values.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear media values.\n",
 			 function );
 
 			memory_free(
@@ -83,13 +97,18 @@ int libewf_media_values_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_media_values_free(
-     libewf_media_values_t **media_values )
+     libewf_media_values_t **media_values,
+     libewf_error_t **error )
 {
         static char *function = "libewf_media_values_free";
 
 	if( media_values == NULL )
 	{
-		notify_warning_printf( "%s: invalid media values.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );

@@ -24,6 +24,7 @@
 #include <notify.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_handle.h"
 #include "libewf_string.h"
 #include "libewf_support.h"
@@ -42,12 +43,22 @@ const libewf_character_t *libewf_get_version(
 int libewf_signal_abort(
      libewf_handle_t *handle )
 {
+	libewf_error_t *error = NULL;
 	static char *function = "libewf_signal_abort";
 
 	if( handle == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle.\n",
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}

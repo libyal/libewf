@@ -26,6 +26,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_error.h"
 #include "libewf_list_type.h"
 
 #if defined( __cplusplus )
@@ -62,7 +63,8 @@ int libewf_section_list_append(
      uint8_t *type,
      size_t type_length,
      off64_t start_offset,
-     off64_t end_offset );
+     off64_t end_offset,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

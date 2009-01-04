@@ -58,10 +58,12 @@ struct libewf_hash_sections
 };
 
 int libewf_hash_sections_initialize(
-     libewf_hash_sections_t **hash_sections );
+     libewf_hash_sections_t **hash_sections,
+     libewf_error_t **error );
 
 int libewf_hash_sections_free(
-     libewf_hash_sections_t **hash_sections );
+     libewf_hash_sections_t **hash_sections,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

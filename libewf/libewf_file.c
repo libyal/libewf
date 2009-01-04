@@ -78,7 +78,8 @@ int libewf_check_file_signature(
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open file: %" PRIs_SYSTEM ".\n",
-		 function, filename );
+		 function,
+		 filename );
 
 		libewf_error_backtrace_notify(
 		 error );
@@ -88,7 +89,8 @@ int libewf_check_file_signature(
 		return( -1 );
 	}
 	result = libewf_segment_file_check_file_signature(
-	          file_descriptor );
+	          file_descriptor,
+	          &error );
 
 	if( file_io_close(
 	     file_descriptor ) != 0 )
@@ -98,7 +100,8 @@ int libewf_check_file_signature(
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close file: %" PRIs_SYSTEM ".\n",
-		 function, filename );
+		 function,
+		 filename );
 
 		libewf_error_backtrace_notify(
 		 error );
@@ -114,7 +117,8 @@ int libewf_check_file_signature(
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
 		 "%s: unable to read signature from file: %" PRIs_SYSTEM ".\n",
-		 function, filename );
+		 function,
+		 filename );
 
 		libewf_error_backtrace_notify(
 		 error );
@@ -255,7 +259,8 @@ int libewf_glob(
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 			 "%s: invalid filename - unsupported extension: .\n",
-			 function, &( filename[ length - 4 ] ) );
+			 function,
+			 &( filename[ length - 4 ] ) );
 
 			libewf_error_backtrace_notify(
 			 error );
@@ -509,7 +514,6 @@ libewf_handle_t *libewf_open(
 		     &( internal_handle->format ),
 		     &( internal_handle->ewf_format ),
 		     segment_file_size,
-		     internal_handle->error_tollerance,
 		     &( internal_handle->abort ),
 		     &error ) != 1 )
 		{
@@ -536,13 +540,26 @@ libewf_handle_t *libewf_open(
 		if( libewf_header_sections_determine_format(
 		     internal_handle->header_sections,
 		     internal_handle->ewf_format,
-		     &( internal_handle->format ) ) != 1 )
+		     &( internal_handle->format ),
+		     &error ) == -1 )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
 			 "%s: unable to determine format.\n",
 			 function );
-#endif
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
 		}
 		/* Calculate the media size
 		 */
@@ -648,7 +665,8 @@ int libewf_close(
 		 handle );
 	}
 	if( libewf_file_io_pool_close_all(
-	     internal_handle->file_io_pool ) != 0 )
+	     internal_handle->file_io_pool,
+	     &error ) != 0 )
 	{
 		libewf_error_set(
 		 &error,
@@ -775,7 +793,7 @@ off64_t libewf_seek_offset(
 			libewf_error_set(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid chunk value exceeds maximum.\n",
 			 function );
 
@@ -789,7 +807,8 @@ off64_t libewf_seek_offset(
 		if( libewf_offset_table_seek_chunk_offset(
 		     internal_handle->offset_table,
 		     (uint32_t) chunk,
-		     internal_handle->file_io_pool ) == -1 )
+		     internal_handle->file_io_pool,
+		     &error ) == -1 )
 		{
 			libewf_error_set(
 			 &error,
@@ -816,7 +835,7 @@ off64_t libewf_seek_offset(
 			libewf_error_set(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 			 "%s: invalid chunk offset value exceeds maximum.\n",
 			 function );
 

@@ -88,7 +88,6 @@ int libewf_segment_table_build(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance,
      int *abort,
      libewf_error_t **error );
 
@@ -121,7 +120,6 @@ int libewf_segment_table_read_open(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance,
      int *abort,
      libewf_error_t **error );
 

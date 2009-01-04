@@ -135,10 +135,6 @@ struct libewf_internal_handle
 	 */
 	uint8_t ewf_format;
 
-	/* Value to indicate the level of error tollerance
-	 */
-	uint8_t error_tollerance;
-
 	/* Value to indicate if abort was signalled
 	 */
 	int abort;

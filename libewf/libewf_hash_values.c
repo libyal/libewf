@@ -58,7 +58,8 @@ int libewf_hash_values_initialize(
 	     hash_values,
 	     LIBEWF_HASH_VALUES_INDEX_MD5,
 	     _LIBEWF_CHARACTER_T_STRING( "MD5" ),
-	     3 ) != 1 )
+	     3,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -126,7 +127,8 @@ int libewf_hash_values_parse_md5_hash(
 	{
 		if( libewf_values_table_initialize(
 		     hash_values,
-		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT ) != 1 )
+		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -156,7 +158,8 @@ int libewf_hash_values_parse_md5_hash(
 	          _LIBEWF_CHARACTER_T_STRING( "MD5" ),
 	          3,
 	          md5_hash_string,
-	          33 );
+	          33,
+	          error );
 
 	if( result == -1 )
 	{
@@ -203,14 +206,17 @@ int libewf_hash_values_parse_md5_hash(
 		  _LIBEWF_CHARACTER_T_STRING( "MD5" ),
 		  3,
 		  md5_hash_string,
-		  32 );
+		  32,
+	          error );
 
 	if( result != 1 )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: unable to set value with identifier: MD5.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set value with identifier: MD5.\n",
 		 function );
-#endif
 	}
 	return( result );
 }
@@ -249,7 +255,8 @@ int libewf_hash_values_parse_hash_string_xml(
 	}
 	if( libewf_values_table_initialize(
 	     hash_values,
-	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT ) != 1 )
+	     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -283,8 +290,8 @@ int libewf_hash_values_parse_hash_string_xml(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_CONVERSION,
-		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
 		 "%s: unable to split hash string into lines.\n",
 		 function );
 
@@ -377,12 +384,23 @@ int libewf_hash_values_parse_hash_string_xml(
 		     &open_tag_start[ 1 ],
 		     identifier_length,
 		     &open_tag_end[ 1 ],
-		     value_length ) != 1 )
+		     value_length,
+		     error ) != 1 )
 		{
-#if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf( "%s: unable to set value with identifier: %" PRIs_LIBEWF ".\n",
-			 function, &open_tag_start[ 1 ] );
-#endif
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set value with identifier: %" PRIs_LIBEWF ".\n",
+			 function,
+			 &open_tag_start[ 1 ] );
+
+			libewf_string_split_values_free(
+			 lines,
+			 amount_of_lines,
+			 NULL );
+
+			return( -1 );
 		}
 	}
 	if( libewf_string_split_values_free(
@@ -962,7 +980,8 @@ int libewf_hash_values_generate_md5_hash(
 	          _LIBEWF_CHARACTER_T_STRING( "MD5" ),
 	          3,
 	          md5_hash_string,
-	          33 );
+	          33,
+	          error );
 
 	if( result == -1 )
 	{

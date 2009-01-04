@@ -59,46 +59,54 @@ struct libewf_values_table
 
 int libewf_values_table_initialize(
      libewf_values_table_t **values_table,
-     int amount_of_values );
+     int amount_of_values,
+     libewf_error_t **error );
 
 int libewf_values_table_free(
-     libewf_values_table_t **values_table );
+     libewf_values_table_t **values_table,
+     libewf_error_t **error );
 
 int libewf_values_table_resize(
      libewf_values_table_t *values_table,
-     int amount_of_values );
+     int amount_of_values,
+     libewf_error_t **error );
 
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
      libewf_character_t *identifier,
      size_t identifier_length,
-     int *index );
+     int *index,
+     libewf_error_t **error );
 
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
      libewf_character_t *identifier,
-     size_t identifier_size );
+     size_t identifier_size,
+     libewf_error_t **error );
 
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
      libewf_character_t *identifier,
-     size_t indentifier_length );
+     size_t indentifier_length,
+     libewf_error_t **error );
 
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
      libewf_character_t *identifier,
      size_t identifier_length,
      libewf_character_t *value,
-     size_t value_size );
+     size_t value_size,
+     libewf_error_t **error );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
      libewf_character_t *identifier,
      size_t identifier_length,
      libewf_character_t *value,
-     size_t value_length );
+     size_t value_length,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

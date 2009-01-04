@@ -27,6 +27,7 @@
 #include <types.h>
 
 #include "libewf_chunk_offset.h"
+#include "libewf_error.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_list_type.h"
 #include "libewf_segment_file_handle.h"
@@ -61,14 +62,17 @@ struct libewf_offset_table
 
 int libewf_offset_table_initialize(
      libewf_offset_table_t **offset_table,
-     uint32_t amount_of_chunk_offsets );
+     uint32_t amount_of_chunk_offsets,
+     libewf_error_t **error );
 
 int libewf_offset_table_free(
-     libewf_offset_table_t **offset_table );
+     libewf_offset_table_t **offset_table,
+     libewf_error_t **error );
 
 int libewf_offset_table_resize(
      libewf_offset_table_t *offset_table,
-     uint32_t amount_of_chunk_offsets );
+     uint32_t amount_of_chunk_offsets,
+     libewf_error_t **error );
 
 int libewf_offset_table_fill(
      libewf_offset_table_t *offset_table,
@@ -76,12 +80,12 @@ int libewf_offset_table_fill(
      ewf_table_offset_t *offsets,
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
-     uint8_t error_tollerance );
+     libewf_error_t **error );
 
 int libewf_offset_table_fill_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
-     uint8_t error_tollerance );
+     libewf_error_t **error );
 
 int libewf_offset_table_fill_offsets(
      libewf_offset_table_t *offset_table,
@@ -89,7 +93,8 @@ int libewf_offset_table_fill_offsets(
      uint32_t amount_of_chunk_offsets,
      off64_t base_offset,
      ewf_table_offset_t *offsets,
-     uint32_t amount_of_offsets );
+     uint32_t amount_of_offsets,
+     libewf_error_t **error );
 
 int libewf_offset_table_compare(
      libewf_offset_table_t *offset_table,
@@ -98,18 +103,19 @@ int libewf_offset_table_compare(
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
      uint8_t correct_errors,
-     uint8_t error_tollerance );
+     libewf_error_t **error );
 
 int libewf_offset_table_compare_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
      uint8_t correct_errors,
-     uint8_t error_tollerance );
+     libewf_error_t **error );
 
 off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
-         libewf_file_io_pool_t *file_io_pool );
+         libewf_file_io_pool_t *file_io_pool,
+         libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

@@ -186,14 +186,16 @@ int libewf_segment_table_free(
 		for( iterator = 0; iterator < ( *segment_table )->amount; iterator++ )
 		{
 			if( libewf_segment_file_handle_free(
-			     &( ( *segment_table )->segment_file_handle[ iterator ] ) ) != 1 )
+			     &( ( *segment_table )->segment_file_handle[ iterator ] ),
+			     error ) != 1 )
 			{
 				libewf_error_set(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_RUNTIME,
 				 LIBEWF_RUNTIME_ERROR_FREE_FAILED,
 				 "%s: unable to free segment file handle: %" PRIu16 ".\n",
-				 function, ( iterator + 1 ) );
+				 function,
+				 iterator + 1 );
 			}
 		}
 		memory_free(
@@ -302,7 +304,6 @@ int libewf_segment_table_build(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance,
      int *abort,
      libewf_error_t **error )
 {
@@ -358,7 +359,6 @@ int libewf_segment_table_build(
 		          format,
 		          ewf_format,
 		          segment_file_size,
-		          error_tollerance,
 		          error );
 
 		if( result == -1 )
@@ -567,7 +567,6 @@ int libewf_segment_table_read_open(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance,
      int *abort,
      libewf_error_t **error )
 {
@@ -712,7 +711,8 @@ int libewf_segment_table_read_open(
 		if( libewf_file_io_pool_create_file_io_handle(
 		     file_io_pool,
 		     &file_io_handle,
-		     &file_io_pool_entry ) != 1 )
+		     &file_io_pool_entry,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -729,7 +729,8 @@ int libewf_segment_table_read_open(
 		if( libewf_file_io_handle_set_filename(
 		     file_io_handle,
 		     filenames[ iterator ],
-		     filename_size ) != 1 )
+		     filename_size,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -743,20 +744,23 @@ int libewf_segment_table_read_open(
 		if( libewf_file_io_pool_open(
 		     file_io_pool,
 		     file_io_pool_entry,
-		     FILE_IO_O_RDONLY ) != 1 )
+		     FILE_IO_O_RDONLY,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_OPEN_FAILED,
 			 "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
-			 function, filenames[ iterator ] );
+			 function,
+			 filenames[ iterator ] );
 
 			return( -1 );
 		}
 		if( libewf_segment_file_handle_initialize(
 		     &segment_file_handle,
-		     file_io_pool_entry ) != 1 )
+		     file_io_pool_entry,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -770,17 +774,20 @@ int libewf_segment_table_read_open(
 		if( libewf_segment_file_read_file_header(
 		     segment_file_handle,
 		     &segment_number,
-		     file_io_pool ) <= -1 )
+		     file_io_pool,
+		     error ) <= -1 )
 		{
 			libewf_error_set(
 			 error,
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: unable to read file header in: %" PRIs_SYSTEM ".\n",
-			 function, filenames[ iterator ] );
+			 function,
+			 filenames[ iterator ] );
 
 			libewf_segment_file_handle_free(
-			 &segment_file_handle );
+			 &segment_file_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -794,7 +801,8 @@ int libewf_segment_table_read_open(
 			 function );
 
 			libewf_segment_file_handle_free(
-			 &segment_file_handle );
+			 &segment_file_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -808,7 +816,8 @@ int libewf_segment_table_read_open(
 			 function );
 
 			libewf_segment_file_handle_free(
-			 &segment_file_handle );
+			 &segment_file_handle,
+			 NULL );
 
 			return( -1 );
 		}
@@ -852,14 +861,16 @@ int libewf_segment_table_read_open(
 				if( libewf_file_io_pool_reopen(
 				     file_io_pool,
 				     file_io_pool_entry,
-				     FILE_IO_O_RDWR ) != 1 )
+				     FILE_IO_O_RDWR,
+				     error ) != 1 )
 				{
 					libewf_error_set(
 					 error,
 					 LIBEWF_ERROR_DOMAIN_IO,
 					 LIBEWF_IO_ERROR_OPEN_FAILED,
 					 "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
-					 function, filenames[ iterator ] );
+					 function,
+					 filenames[ iterator ] );
 
 					return( -1 );
 				}
@@ -918,7 +929,6 @@ int libewf_segment_table_read_open(
 	     format,
 	     ewf_format,
 	     segment_file_size,
-	     error_tollerance,
 	     abort,
 	     error ) != 1 )
 	{
@@ -945,7 +955,6 @@ int libewf_segment_table_read_open(
 	       format,
 	       ewf_format,
 	       segment_file_size,
-	       error_tollerance,
 	       abort,
 	       error ) != 1 ) )
 	{
@@ -1141,7 +1150,8 @@ int libewf_segment_table_create_segment_file(
 	if( libewf_file_io_pool_create_file_io_handle(
 	     file_io_pool,
 	     &file_io_handle,
-	     &file_io_pool_entry ) != 1 )
+	     &file_io_pool_entry,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1202,20 +1212,23 @@ int libewf_segment_table_create_segment_file(
 	if( libewf_file_io_pool_open(
 	     file_io_pool,
 	     file_io_pool_entry,
-	     flags ) != 1 )
+	     flags,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_OPEN_FAILED,
 		 "%s: unable to open segment file: %" PRIu16 ".\n",
-		 function, segment_number );
+		 function,
+		 segment_number );
 
 		return( -1 );
 	}
 	if( libewf_segment_file_handle_initialize(
 	     &( segment_table->segment_file_handle[ segment_number ] ),
-	     file_io_pool_entry ) != 1 )
+	     file_io_pool_entry,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,

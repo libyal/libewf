@@ -27,6 +27,8 @@
 #include <system_string.h>
 #include <types.h>
 
+#include "libewf_error.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -59,42 +61,51 @@ struct libewf_file_io_handle
 int libewf_file_io_handle_get_filename(
      libewf_file_io_handle_t *file_io_handle,
      system_character_t *filename,
-     size_t filename_size );
+     size_t filename_size,
+     libewf_error_t **error );
 
 int libewf_file_io_handle_set_filename(
      libewf_file_io_handle_t *file_io_handle,
      const system_character_t *filename,
-     size_t filename_size );
+     size_t filename_size,
+     libewf_error_t **error );
 
 int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,
-     int flags );
+     int flags,
+     libewf_error_t **error );
 
 int libewf_file_io_handle_reopen(
      libewf_file_io_handle_t *file_io_handle,
-     int flags );
+     int flags,
+     libewf_error_t **error );
 
 int libewf_file_io_handle_close(
-     libewf_file_io_handle_t *file_io_handle );
+     libewf_file_io_handle_t *file_io_handle,
+     libewf_error_t **error );
 
 ssize_t libewf_file_io_handle_read(
          libewf_file_io_handle_t *file_io_handle,
          uint8_t *buffer,
-         size_t size );
+         size_t size,
+         libewf_error_t **error );
 
 ssize_t libewf_file_io_handle_write(
          libewf_file_io_handle_t *file_io_handle,
          uint8_t *buffer,
-         size_t size );
+         size_t size,
+         libewf_error_t **error );
 
 off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,
          off64_t offset,
-         int whence );
+         int whence,
+         libewf_error_t **error );
 
 int libewf_file_io_handle_get_offset(
      libewf_file_io_handle_t *file_io_handle,
-     off64_t *offset );
+     off64_t *offset,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

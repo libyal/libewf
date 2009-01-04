@@ -207,8 +207,7 @@ int libewf_write_calculate_chunks_per_segment(
 	}
 	else
 	{
-		/* Leave space for the chunk,
-		table and table2 section starts and the table and table2 offset table CRCs
+		/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table CRCs
 		 */
 		calculated_chunks_per_segment -= required_chunk_sections
 		                               * ( ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( ewf_crc_t ) ) );
@@ -1013,9 +1012,9 @@ ssize_t libewf_raw_write_chunk_new(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_CONFLICTING_VALUE,
-		 "%s: invalid chunk: %" PRIu32 " already exists.\n",
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid chunk: %" PRIu32 " already set.\n",
 		 function,
 		 chunk );
 
@@ -1028,7 +1027,8 @@ ssize_t libewf_raw_write_chunk_new(
         {
 		if( libewf_offset_table_resize(
 		     internal_handle->offset_table,
-		     internal_handle->media_values->amount_of_chunks ) != 1 )
+		     internal_handle->media_values->amount_of_chunks,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -1151,7 +1151,8 @@ ssize_t libewf_raw_write_chunk_new(
 			     internal_handle->header_sections,
 			     internal_handle->header_values,
 			     internal_handle->compression_level,
-			     internal_handle->format ) == -1 )
+			     internal_handle->format,
+			     error ) == -1 )
 			{
 				libewf_error_set(
 				 error,
@@ -1301,15 +1302,15 @@ ssize_t libewf_raw_write_chunk_new(
 		}
 		else
 		{
-			/* Leave space for the chunk,
-			table and table2 section starts and the table and table2 offset table CRCs
+			/* Leave space for the chunk, table and table2 section starts and the table and table2 offset table CRCs
 			 */
 			internal_handle->write->remaining_segment_file_size -= ( 3 * sizeof( ewf_section_t ) ) + ( 2 * sizeof( ewf_crc_t ) );
 		}
 		if( libewf_file_io_pool_get_offset(
 		     internal_handle->file_io_pool,
 		     internal_handle->segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
-		     &( internal_handle->write->chunks_section_offset ) ) != 1 )
+		     &( internal_handle->write->chunks_section_offset ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -1320,8 +1321,7 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
-		/* Start with chunks section number number 1,
-		value is initialized with 0
+		/* Start with chunks section number number 1, value is initialized with 0
 		 */
 		internal_handle->write->chunks_section_number += 1;
 
@@ -1417,7 +1417,8 @@ ssize_t libewf_raw_write_chunk_new(
 		               internal_handle->write->amount_of_chunks,
 		               internal_handle->write->chunks_per_chunks_section,
 		               internal_handle->format,
-		               internal_handle->ewf_format );
+		               internal_handle->ewf_format,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -1452,7 +1453,8 @@ ssize_t libewf_raw_write_chunk_new(
 		       chunk_size,
 		       is_compressed,
 		       &chunk_crc,
-		       write_crc );
+		       write_crc,
+	               error );
 
 	if( write_count <= -1 )
 	{
@@ -1490,7 +1492,8 @@ ssize_t libewf_raw_write_chunk_new(
 	if( libewf_file_io_pool_get_offset(
 	     internal_handle->file_io_pool,
 	     internal_handle->segment_table->segment_file_handle[ segment_number ]->file_io_pool_entry,
-	     &segment_file_offset ) != 1 )
+	     &segment_file_offset,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -1501,8 +1504,7 @@ ssize_t libewf_raw_write_chunk_new(
 
 		return( -1 );
 	}
-	/* Check if the current chunks section is full,
-	if so close the current section
+	/* Check if the current chunks section is full, if so close the current section
 	 */
 	result = libewf_write_test_chunks_section_full(
 	          internal_handle->write->chunks_section_offset,
@@ -1559,8 +1561,7 @@ ssize_t libewf_raw_write_chunk_new(
 			internal_handle->write->amount_of_table_offsets = internal_handle->write->section_amount_of_chunks;
 		}
 
-		/* Correct the offset,
-		size in the chunks section
+		/* Correct the offset, size in the chunks section
 		 */
 		write_count = libewf_segment_file_write_chunks_correction(
 		               internal_handle->segment_table->segment_file_handle[ segment_number ],
@@ -1573,7 +1574,8 @@ ssize_t libewf_raw_write_chunk_new(
 		               internal_handle->write->amount_of_chunks,
 		               internal_handle->write->section_amount_of_chunks,
 		               internal_handle->format,
-		               internal_handle->ewf_format );
+		               internal_handle->ewf_format,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -1591,8 +1593,7 @@ ssize_t libewf_raw_write_chunk_new(
 		internal_handle->write->create_chunks_section  = 1;
 		internal_handle->write->chunks_section_offset  = 0;
 
-		/* Check if the current segment file is full,
-		if so close the current segment file
+		/* Check if the current segment file is full, if so close the current segment file
 		 */
 		result = libewf_write_test_segment_file_full(
 			  internal_handle->write->remaining_segment_file_size,
@@ -1907,7 +1908,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			if( libewf_file_io_pool_get_offset(
 			     internal_handle->file_io_pool,
 			     segment_file_handle->file_io_pool_entry,
-			     &segment_file_offset ) != 1 )
+			     &segment_file_offset,
+			     error ) != 1 )
 			{
 				libewf_error_set(
 				 error,
@@ -1925,7 +1927,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			       internal_handle->file_io_pool,
 			       segment_file_handle->file_io_pool_entry,
 			       last_section_start_offset,
-			       SEEK_SET ) == -1 ) )
+			       SEEK_SET,
+			       error ) == -1 ) )
 			{
 				libewf_error_set(
 				 error,
@@ -1951,7 +1954,8 @@ ssize_t libewf_raw_write_chunk_existing(
 					       internal_handle->file_io_pool,
 					       0,
 					       internal_handle->format,
-					       internal_handle->ewf_format );
+					       internal_handle->ewf_format,
+				               error );
 
 				if( write_count == -1 )
 				{
@@ -1971,7 +1975,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			{
 				if( libewf_list_remove_element(
 				     segment_file_handle->section_list,
-				     last_list_element ) != 1 )
+				     last_list_element,
+				     error ) != 1 )
 				{
 					libewf_error_set(
 					 error,
@@ -2073,7 +2078,8 @@ ssize_t libewf_raw_write_chunk_existing(
 		     internal_handle->file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     segment_file_offset,
-		     SEEK_SET ) == -1 )
+		     SEEK_SET,
+		     error ) == -1 )
 		{
 			libewf_error_set(
 			 error,
@@ -2090,7 +2096,8 @@ ssize_t libewf_raw_write_chunk_existing(
 	if( libewf_file_io_pool_get_offset(
 	     internal_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
-	     &segment_file_offset ) != 1 )
+	     &segment_file_offset,
+	     error ) != 1 )
 	{
 		libewf_error_set(
 		 error,
@@ -2118,7 +2125,8 @@ ssize_t libewf_raw_write_chunk_existing(
 		       chunk_size,
 		       &chunk_crc,
 	               write_crc,
-	               no_section_append );
+	               no_section_append,
+	               error );
 
 	if( write_count == -1 )
 	{
@@ -2143,7 +2151,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			       internal_handle->file_io_pool,
 			       1,
 			       internal_handle->format,
-			       internal_handle->ewf_format );
+			       internal_handle->ewf_format,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -2282,7 +2291,7 @@ ssize_t libewf_write_chunk_data_new(
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid read size value exceeds maximum.\n",
 		 function );
 
@@ -3589,8 +3598,7 @@ ssize_t libewf_write_finalize(
 		 */
 		if( internal_handle->write->chunks_section_offset != 0 )
 		{
-			/* Correct the offset,
-			size in the chunks section
+			/* Correct the offset, size in the chunks section
 			 */
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf(
@@ -3634,7 +3642,8 @@ ssize_t libewf_write_finalize(
 				       internal_handle->write->amount_of_chunks,
 				       internal_handle->write->section_amount_of_chunks,
 				       internal_handle->format,
-				       internal_handle->ewf_format );
+				       internal_handle->ewf_format,
+			               &error );
 
 			if( write_count == -1 )
 			{
@@ -3787,7 +3796,8 @@ ssize_t libewf_write_finalize(
 			if( libewf_file_io_pool_open(
 			     internal_handle->file_io_pool,
 			     segment_file_handle->file_io_pool_entry,
-			     FILE_IO_O_RDWR ) != 1 )
+			     FILE_IO_O_RDWR,
+			     &error ) != 1 )
 			{
 				libewf_error_set(
 				 &error,
@@ -3849,7 +3859,8 @@ ssize_t libewf_write_finalize(
 					     internal_handle->file_io_pool,
 					     segment_file_handle->file_io_pool_entry,
 					     section_list_values->start_offset,
-					     SEEK_SET ) == -1 )
+					     SEEK_SET,
+					     &error ) == -1 )
 					{
 						libewf_error_set(
 						 &error,
@@ -3874,7 +3885,8 @@ ssize_t libewf_write_finalize(
 							       segment_file_handle,
 							       internal_handle->media_values,
 							       internal_handle->format,
-							       1 );
+							       1,
+						               &error );
 					}
 					else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
 					{
@@ -3886,7 +3898,8 @@ ssize_t libewf_write_finalize(
 							       internal_handle->media_values,
 							       internal_handle->compression_level,
 							       internal_handle->format,
-							       1 );
+							       1,
+						               &error );
 					}
 					else
 					{
@@ -3924,7 +3937,8 @@ ssize_t libewf_write_finalize(
 					     internal_handle->file_io_pool,
 					     segment_file_handle->file_io_pool_entry,
 					     section_list_values->start_offset,
-					     SEEK_SET ) == -1 )
+					     SEEK_SET,
+					     &error ) == -1 )
 					{
 						libewf_error_set(
 						 &error,
@@ -3949,7 +3963,8 @@ ssize_t libewf_write_finalize(
 					               internal_handle->compression_level,
 					               internal_handle->format,
 					               &( internal_handle->write->data_section ),
-					               1 );
+					               1,
+					               &error );
 
 					if( write_count == -1 )
 					{
@@ -3987,7 +4002,8 @@ ssize_t libewf_write_finalize(
 					     internal_handle->file_io_pool,
 					     segment_file_handle->file_io_pool_entry,
 					     section_list_values->start_offset,
-					     SEEK_SET ) == -1 )
+					     SEEK_SET,
+					     &error ) == -1 )
 					{
 						libewf_error_set(
 						 &error,
@@ -4041,7 +4057,8 @@ ssize_t libewf_write_finalize(
 			}
 			if( libewf_file_io_pool_close(
 			     internal_handle->file_io_pool,
-			     segment_file_handle->file_io_pool_entry ) != 0 )
+			     segment_file_handle->file_io_pool_entry,
+			     &error ) != 0 )
 			{
 				libewf_error_set(
 				 &error,

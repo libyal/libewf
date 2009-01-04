@@ -66,49 +66,60 @@ struct libewf_list
 
 int libewf_list_free(
      libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value ) );
+     int (*value_free_function)( intptr_t *value ),
+     libewf_error_t **error );
 
 int libewf_list_empty(
      libewf_list_t *list,
-     int (*value_free_function)( intptr_t *value ) );
+     int (*value_free_function)( intptr_t *value ),
+     libewf_error_t **error );
 
 int libewf_list_prepend_element(
      libewf_list_t *list,
-     libewf_list_element_t *element );
+     libewf_list_element_t *element,
+     libewf_error_t **error );
 
 int libewf_list_prepend_value(
      libewf_list_t *list,
-     intptr_t *value );
+     intptr_t *value,
+     libewf_error_t **error );
 
 int libewf_list_append_element(
      libewf_list_t *list,
-     libewf_list_element_t *element );
+     libewf_list_element_t *element,
+     libewf_error_t **error );
 
 int libewf_list_append_value(
      libewf_list_t *list,
-     intptr_t *value );
+     intptr_t *value,
+     libewf_error_t **error );
 
 int libewf_list_insert_element(
      libewf_list_t *list,
      libewf_list_element_t *element,
-     int (*value_compare_function)( intptr_t *first, intptr_t *second ) );
+     int (*value_compare_function)( intptr_t *first, intptr_t *second ),
+     libewf_error_t **error );
 
 int libewf_list_insert_value(
      libewf_list_t *list,
      intptr_t *value,
-     int (*value_compare_function)( intptr_t *first, intptr_t *second ) );
+     int (*value_compare_function)( intptr_t *first, intptr_t *second ),
+     libewf_error_t **error );
 
 int libewf_list_remove_element(
      libewf_list_t *list,
-     libewf_list_element_t *element );
+     libewf_list_element_t *element,
+     libewf_error_t **error );
 
 int libewf_list_get_amount_of_elements(
-     libewf_list_t *list );
+     libewf_list_t *list,
+     libewf_error_t **error );
 
 int libewf_list_get_element(
      libewf_list_t *list,
      int element_index,
-     libewf_list_element_t **element );
+     libewf_list_element_t **element,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }
