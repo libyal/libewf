@@ -1124,11 +1124,11 @@ int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_s
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_digest_hash(
-	     md5_hash_string,
-	     size,
+	if( ewfdigest_copy_to_string(
 	     md5_hash,
-	     EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
+	     EWFDIGEST_HASH_SIZE_MD5,
+	     md5_hash_string,
+	     size) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
 		 function );
@@ -1191,11 +1191,11 @@ int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_ha
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_digest_hash(
-	     sha1_hash_string,
-	     size,
+	if( ewfdigest_copy_to_string(
 	     sha1_hash,
-	     EWFDIGEST_HASH_SIZE_SHA1 ) != 1 )
+	     EWFDIGEST_HASH_SIZE_SHA1,
+	     sha1_hash_string,
+	     size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
 		 function );
@@ -2958,6 +2958,18 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 			return( -1 );
 		}
+		/* The MD5 hash must be set before write finalized is used
+		 */
+		if( libewf_set_hash_value_md5(
+		     handle,
+		     md5_hash_string,
+		     md5_hash_string_length ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string in handle.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( calculate_sha1 == 1 )
 	{
@@ -2971,50 +2983,30 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 			return( -1 );
 		}
-	}
-	if( write_size == 0 )
-	{
-		if( calculate_md5 == 1 )
+		/* The SHA1 hash must be set before write finalized is used
+		 */
+		if( libewf_set_hash_value_sha1(
+		     handle,
+		     sha1_hash_string,
+		     sha1_hash_string_length ) != 1 )
 		{
-			/* The MD5 hash must be set before write finalized is used
-			 */
-			if( libewf_set_hash_value_md5(
-			     handle,
-			     md5_hash_string,
-			     md5_hash_string_length ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string in handle.\n",
-				 function );
-
-				return( -1 );
-			}
-		}
-		if( calculate_sha1 == 1 )
-		{
-			/* The SHA1 hash must be set before write finalized is used
-			 */
-			if( libewf_set_hash_value_sha1(
-			     handle,
-			     sha1_hash_string,
-			     sha1_hash_string_length ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string in handle.\n",
-				 function );
-
-				return( -1 );
-			}
-		}
-		write_count = libewf_write_finalize( handle );
-
-		if( write_count == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to finalize EWF file(s).\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string in handle.\n",
 			 function );
 
 			return( -1 );
 		}
-		total_write_count += write_count;
 	}
+	write_count = libewf_write_finalize( handle );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to finalize EWF file(s).\n",
+		 function );
+
+		return( -1 );
+	}
+	total_write_count += write_count;
+
 	return( total_write_count );
 }
 

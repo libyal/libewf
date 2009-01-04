@@ -1588,7 +1588,6 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	}
 	if( last_segment_file != 0 )
 	{
-#ifdef LIBEWF_MD5
 		if( internal_handle->md5_hash != NULL )
 		{
 			/* Write the hash section
@@ -1619,7 +1618,8 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 			}
 			start_offset      += write_count;
 			total_write_count += write_count;
-#endif
+		}
+
 		/* Write the xhash section
 		 */
 		if( internal_handle->format == LIBEWF_FORMAT_EWFX )
@@ -2446,36 +2446,37 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 			total_write_count                                             += write_count;
 		}
 	}
-	/* Write the end of the segment file
-	 * like the next, done and/or hash section
+	/* Write the end and close segment files that are not the last
 	 */
-	write_count = libewf_segment_file_write_end(
-	               internal_handle,
-	               internal_handle->segment_table->file_descriptor[ segment_number ],
-	               internal_handle->segment_table->section_list[ segment_number ],
-	               internal_handle->segment_table->file_offset[ segment_number ],
-	               last_segment_file );
-
-	if( write_count == -1 )
+	if( last_segment_file == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write end of segment file.\n",
-		 function );
+		write_count = libewf_segment_file_write_end(
+			       internal_handle,
+			       internal_handle->segment_table->file_descriptor[ segment_number ],
+			       internal_handle->segment_table->section_list[ segment_number ],
+			       internal_handle->segment_table->file_offset[ segment_number ],
+			       last_segment_file );
 
-		return( -1 );
+		if( write_count == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write end of segment file.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->segment_table->file_offset[ segment_number ] += write_count;
+		total_write_count                                             += write_count;
+
+		if( libewf_common_close( internal_handle->segment_table->file_descriptor[ segment_number ] ) != 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->segment_table->file_descriptor[ segment_number ]  = -1;
+		internal_handle->segment_table->amount_of_chunks[ segment_number ] = segment_amount_of_chunks;
 	}
-	internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-	total_write_count                                             += write_count;
-
-	if( libewf_common_close( internal_handle->segment_table->file_descriptor[ segment_number ] ) != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->segment_table->file_descriptor[ segment_number ]  = -1;
-	internal_handle->segment_table->amount_of_chunks[ segment_number ] = segment_amount_of_chunks;
-
 	return( total_write_count );
 }
 

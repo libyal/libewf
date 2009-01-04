@@ -5,7 +5,7 @@ bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
 ewfacquire_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.h \
+	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
@@ -18,7 +18,7 @@ ewfacquire_LDADD  = ../libewf/libewf.la
 ewfacquirestream_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.h \
+	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
@@ -31,7 +31,7 @@ ewfacquirestream_LDADD  = ../libewf/libewf.la
 ewfalter_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.h \
+	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
@@ -44,7 +44,7 @@ ewfalter_LDADD  = ../libewf/libewf.la
 ewfexport_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.h \
+	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
@@ -57,7 +57,7 @@ ewfexport_LDADD  = ../libewf/libewf.la
 ewfinfo_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.h \
+	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
@@ -70,7 +70,7 @@ ewfinfo_LDADD  = ../libewf/libewf.la
 ewfverify_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
-	ewfdigest_hash.h \
+	ewfdigest_hash.c ewfdigest_hash.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \

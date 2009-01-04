@@ -620,14 +620,17 @@ int libewf_internal_handle_set_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	internal_handle->md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( size );
-
 	if( internal_handle->md5_hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
-		 function );
+		internal_handle->md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( size );
 
-		return( -1 );
+		if( internal_handle->md5_hash == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( libewf_common_memcpy( internal_handle->md5_hash, md5_hash, size ) == NULL )
 	{

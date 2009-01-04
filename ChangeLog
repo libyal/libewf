@@ -148,6 +148,8 @@ TODO
   because the MSB is normally used to mark if the chunk is compressed
 * fix >2Gb segment file write support for chunk offset value overflow
 
+* move libewf_string_copy_from_digest_hash to ewfdigest_hash
+
 Version: 20070908
 * worked on remove of MD5 calculation from library
   - implemented MD5 calculation in ewfcommon for ewfacquire and ewfacquirestream
