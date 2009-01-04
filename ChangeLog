@@ -116,6 +116,9 @@ TODO
 * check if segment table entry 0 is used in read mode make sure to use consistent
   usage of the segment table for read/write
 
+Version: 20070728
+* worked on restructuring to improve internal structure
+
 Version: 20070725
 * worked on restructuring to improve internal structure
 
