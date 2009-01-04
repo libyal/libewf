@@ -113,6 +113,10 @@ Code clean up
 
 Next release(s):
 
+* store narrow strings internally as UTF-8, convert them when required to
+  reduce memory overhead or don't bother?
+* improve handling Unicode/USC input and output
+
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.

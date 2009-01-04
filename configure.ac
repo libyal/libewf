@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080821],
+ [20080824],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080821])
+ [20080824])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -449,6 +449,9 @@ AS_IF(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [1],
 	 [Defines if wide character type should be used])
+	dnl Determine wide character byte size
+	AC_CHECK_SIZEOF([wchar_t])
+	dnl Check for wide character string functions
 	AC_CHECK_FUNCS([btowc])
 	AC_CHECK_FUNCS([fgetws])
 	AC_CHECK_FUNCS([mbsinit])
@@ -471,6 +474,7 @@ AS_IF(
 	AC_CHECK_FUNCS([wcrtomb])
 	AC_CHECK_FUNCS([wcstoll])
 	AC_CHECK_FUNCS([wcstoull])
+	dnl Check for the wide character header
 	AC_CHECK_HEADERS(
 	 [wchar.h],
 	 [AC_DEFINE(
