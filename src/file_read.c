@@ -63,8 +63,6 @@
 #include "ewf_table.h"
 #include "libewf_file.h"
 #include "handle.h"
-#include "section_list.h"
-#include "offset_table.h"
 #include "segment_table.h"
 
 /* Prints a dump of section data
@@ -602,8 +600,10 @@ void libewf_section_ltree_read( LIBEWF_HANDLE *handle, int file_descriptor, size
 {
 	EWF_LTREE *ltree       = NULL;
 	EWF_HEADER *tree_data  = NULL;
+/*
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
+*/
 
 	if( handle == NULL )
 	{

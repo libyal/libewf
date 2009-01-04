@@ -51,7 +51,7 @@ EWF_HASH *ewf_hash_alloc( void )
 	EWF_HASH *hash     = NULL;
 	EWF_HASH *data_set = NULL;
 
-	hash = (EWF_HASH *) libewf_alloc_cleared( EWF_HASH_SIZE );
+	hash = (EWF_HASH *) libewf_alloc_cleared( EWF_HASH_SIZE, 0 );
 
 	if( hash == NULL )
 	{

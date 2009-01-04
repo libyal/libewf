@@ -676,6 +676,12 @@ int main( int argc, const char **argv )
 	}
 	header_values = libewf_header_values_alloc();
 
+	if( header_values == NULL )
+	{
+		fprintf( stderr, "Unable to create header values.\n" );
+
+		exit( EXIT_FAILURE );
+	}
 	/* Determine acquiry system type
 	 */
 	if( uname( &utsname_buffer ) == -1 )

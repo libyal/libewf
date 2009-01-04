@@ -49,7 +49,7 @@ EWF_VOLUME_SMART *ewf_volume_smart_alloc( void )
 {
 	EWF_VOLUME_SMART *volume = NULL;
 
-	volume = (EWF_VOLUME_SMART *) libewf_alloc_cleared( EWF_VOLUME_SMART_SIZE );
+	volume = (EWF_VOLUME_SMART *) libewf_alloc_cleared( EWF_VOLUME_SMART_SIZE, 0 );
 
 	if( volume == NULL )
 	{

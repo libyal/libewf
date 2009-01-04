@@ -1,5 +1,5 @@
 /*
- * libewf file handling
+ * libewf string
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -33,28 +33,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_FILE_H
-#define _LIBEWF_FILE_H
+#ifndef _LIBEWF_STRING_H
+#define _LIBEWF_STRING_H
 
-#include "ewf_section.h"
-#include "handle.h"
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define LIBEWF_OPEN_READ	1
-#define LIBEWF_OPEN_WRITE	2
+#define LIBEWF_STRING libewf_string_t
+#define LIBEWF_STRING_SIZE sizeof( LIBEWF_STRING )
 
-uint8_t libewf_check_file_signature( const char *filename );
-LIBEWF_HANDLE *libewf_open( const char **filenames, uint32_t file_amount, uint8_t flags );
-LIBEWF_HANDLE *libewf_open_read( LIBEWF_HANDLE *handle, const char *filename );
-LIBEWF_HANDLE *libewf_open_write( LIBEWF_HANDLE *handle, const char *filename );
-LIBEWF_HANDLE *libewf_build_index( LIBEWF_HANDLE *handle );
-void libewf_close( LIBEWF_HANDLE *handle );
-uint64_t libewf_data_size( LIBEWF_HANDLE *handle );
-char *libewf_data_md5hash( LIBEWF_HANDLE *handle );
-char *libewf_calculate_md5hash( LIBEWF_HANDLE *handle );
+typedef char libewf_string_t;
+
+LIBEWF_STRING *libewf_string_alloc( uint32_t size );
+void libewf_string_free( LIBEWF_STRING *string );
+
+uint32_t libewf_string_length( LIBEWF_STRING *string );
+int8_t libewf_string_compare( LIBEWF_STRING *string1, LIBEWF_STRING *string2, uint32_t size );
+
+LIBEWF_STRING **libewf_string_split( LIBEWF_STRING *string, uint8_t delimiter, uint32_t *amount );
+void libewf_string_split_values_free( LIBEWF_STRING **split_values, uint32_t amount );
 
 #ifdef __cplusplus
 }

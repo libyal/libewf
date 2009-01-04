@@ -46,6 +46,7 @@ void *libewf_alloc( uint32_t size );
 void *libewf_realloc( void *buffer, uint32_t size );
 void libewf_free( void *buffer );
 void *libewf_memset( void *buffer, uint8_t value, uint32_t count );
+void *libewf_memcpy( void *destination, const void *source, uint32_t size );
 int32_t libewf_memcmp( const void *buffer1, const void *buffer2, uint32_t size );
 char *libewf_strdup( const char *string );
 uint32_t libewf_strlen( const char *string );
@@ -53,9 +54,10 @@ char *libewf_strchr( const char *string, uint8_t character );
 uint8_t libewf_strncmp( const char *string1, const char *string2, uint32_t length );
 int32_t libewf_read( int file_descriptor, void *buffer, uint32_t count );
 int32_t libewf_write( int file_descriptor, const void *buffer, uint32_t count );
-void *libewf_alloc_cleared( uint32_t size );
-void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_t new_size );
-void *libewf_realloc_new_cleared( void *buffer, uint32_t previous_size, uint32_t new_size );
+
+void *libewf_alloc_cleared( uint32_t size, int8_t clear_value );
+void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_t new_size, int8_t clear_value );
+void *libewf_realloc_new_cleared( void *buffer, uint32_t previous_size, uint32_t new_size, int8_t clear_value );
 
 #ifdef __cplusplus
 }

@@ -49,7 +49,7 @@ EWF_TABLE *ewf_table_alloc( void )
 {
 	EWF_TABLE *table = NULL;
 
-	table = (EWF_TABLE *) libewf_alloc_cleared( EWF_TABLE_SIZE );
+	table = (EWF_TABLE *) libewf_alloc_cleared( EWF_TABLE_SIZE, 0 );
 
 	if( table == NULL )
 	{
@@ -69,7 +69,7 @@ EWF_TABLE_OFFSET *ewf_table_offsets_alloc( uint32_t amount )
 	uint32_t size             = 0;
 
 	size    = EWF_TABLE_OFFSET_SIZE * amount;
-	offsets = (EWF_TABLE_OFFSET *) libewf_alloc_cleared( size );
+	offsets = (EWF_TABLE_OFFSET *) libewf_alloc_cleared( size, 0 );
 
 	if( offsets == NULL )
 	{
@@ -94,7 +94,7 @@ EWF_TABLE_OFFSET *ewf_table_offsets_realloc( EWF_TABLE_OFFSET *offsets, uint32_t
 
 		return( NULL );
 	}
-	offsets = (EWF_TABLE_OFFSET *) libewf_realloc_new_cleared( offsets, previous_size, new_size );
+	offsets = (EWF_TABLE_OFFSET *) libewf_realloc_new_cleared( offsets, previous_size, new_size, 0 );
 
 	if( offsets == NULL )
 	{

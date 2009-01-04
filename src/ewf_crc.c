@@ -46,7 +46,7 @@ EWF_CRC *ewf_crc_alloc( void )
 {
 	EWF_CRC *crc = NULL;
 
-	crc = (EWF_CRC *) libewf_alloc_cleared( EWF_CRC_SIZE );
+	crc = (EWF_CRC *) libewf_alloc_cleared( EWF_CRC_SIZE, 0 );
 
 	if( crc == NULL )
 	{

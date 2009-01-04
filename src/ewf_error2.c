@@ -49,7 +49,7 @@ EWF_ERROR2 *ewf_error2_alloc( void )
 {
 	EWF_ERROR2 *error2 = NULL;
 
-	error2 = (EWF_ERROR2 *) libewf_alloc_cleared( EWF_ERROR2_SIZE );
+	error2 = (EWF_ERROR2 *) libewf_alloc_cleared( EWF_ERROR2_SIZE, 0 );
 
 	if( error2 == NULL )
 	{
@@ -69,7 +69,7 @@ EWF_ERROR2_SECTOR *ewf_error2_sectors_alloc( uint32_t amount )
 	uint32_t size              = 0;
 
 	size    = EWF_ERROR2_SECTOR_SIZE * amount;
-	sectors = (EWF_ERROR2_SECTOR *) libewf_alloc_cleared( size );
+	sectors = (EWF_ERROR2_SECTOR *) libewf_alloc_cleared( size, 0 );
 
 	if( sectors == NULL )
 	{
@@ -94,7 +94,7 @@ EWF_ERROR2_SECTOR *ewf_error2_sectors_realloc( EWF_ERROR2_SECTOR *sectors, uint3
 
 		return( NULL );
 	}
-	sectors = (EWF_ERROR2_SECTOR *) libewf_realloc_new_cleared( sectors, previous_size, new_size );
+	sectors = (EWF_ERROR2_SECTOR *) libewf_realloc_new_cleared( sectors, previous_size, new_size, 0 );
 
 	if( sectors == NULL )
 	{

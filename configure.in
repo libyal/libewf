@@ -1,6 +1,6 @@
 AC_PREREQ( 2.59 )
-AC_INIT( libewf, 20060828-1, forensics@hoffmannbv.nl )
-AM_INIT_AUTOMAKE( libewf, 20060828-1 )
+AC_INIT( libewf, 20060830-1, forensics@hoffmannbv.nl )
+AM_INIT_AUTOMAKE( libewf, 20060830-1 )
 AM_CONFIG_HEADER( config.h )
 
 AC_CANONICAL_HOST

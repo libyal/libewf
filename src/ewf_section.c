@@ -50,7 +50,7 @@ EWF_SECTION *ewf_section_alloc( void )
 {
 	EWF_SECTION *section = NULL;
 
-	section = (EWF_SECTION *) libewf_alloc_cleared( EWF_SECTION_SIZE );
+	section = (EWF_SECTION *) libewf_alloc_cleared( EWF_SECTION_SIZE, 0 );
 
 	if( section == NULL )
 	{

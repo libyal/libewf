@@ -50,7 +50,7 @@ EWF_LTREE *ewf_ltree_alloc( void )
 {
 	EWF_LTREE *ltree = NULL;
 
-	ltree = (EWF_LTREE *) libewf_alloc_cleared( EWF_LTREE_SIZE );
+	ltree = (EWF_LTREE *) libewf_alloc_cleared( EWF_LTREE_SIZE, 0 );
 
 	if( ltree == NULL )
 	{
@@ -109,7 +109,9 @@ EWF_LTREE *ewf_ltree_read( int file_descriptor )
  */
 int32_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 {
+/*
 	EWF_CRC *crc  = NULL;
+*/
 	uint32_t size = EWF_LTREE_SIZE;
 	int32_t count = 0;
 

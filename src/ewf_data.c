@@ -49,7 +49,7 @@ EWF_DATA *ewf_data_alloc( void )
 {
 	EWF_DATA *data = NULL;
 
-	data = (EWF_DATA *) libewf_alloc_cleared( EWF_DATA_SIZE );
+	data = (EWF_DATA *) libewf_alloc_cleared( EWF_DATA_SIZE, 0 );
 
 	if( data == NULL )
 	{

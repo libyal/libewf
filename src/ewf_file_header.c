@@ -51,7 +51,7 @@ EWF_FILE_HEADER *ewf_file_header_alloc( void )
 	EWF_FILE_HEADER *file_header = NULL;
 	EWF_FILE_HEADER *data_set    = NULL;
 
-	file_header = (EWF_FILE_HEADER *) libewf_alloc_cleared( EWF_FILE_HEADER_SIZE );
+	file_header = (EWF_FILE_HEADER *) libewf_alloc_cleared( EWF_FILE_HEADER_SIZE, 0 );
 
 	if( file_header == NULL )
 	{

@@ -9,7 +9,9 @@ To do/think about:
 * read: add functionality for byte swap in data for endian fix of data - test this
 * read: warn when maximum offsets in table of S01 format is exceeded
 * all: add LVF support - ltree section
-* all: make a more generic libewf_string (use this in ewf_header, ewf_ltree) also move ASCII and UTF, split code here
+* all: make a more generic libewf_string (use this in libewf_header_values, ewf_header, ewf_ltree) also move ASCII and UTF
+* all: make string functions safe to be char or uint8_t
+* all: prepend endian functions with libewf
 * write: reduce multiple successive error2 entries to a single
 * write: add additional data to file for different EWF formats
 * ewfacquire: make size input and output human friendly (support kM notation etc)
@@ -41,8 +43,10 @@ Code clean up:
 Finished:
   - libewf_common (c/h)
   - libewf_endian (c/h)
+  - libewf_header_values (c/h)
   - libewf_notify (c/h)
   - libewf_md5 (c/h)
+  - libewf_string (c/h)
   - ewf_compress (c/h)
   - ewf_crc (c/h)
   - ewf_data (c/h)
@@ -60,9 +64,10 @@ Finished:
   - ewf_volume_smart (c/h)
 
 To do:
-  - libewf_header_values (c/h) - refering code
 
   - libewf_offset_table (c/h)
+  * do I want current behavior of libewf_offset_table_values_alloc ? - or combine with libewf_offset_table_alloc ?
+
   - libewf_section_list (c/h)
   - libewf_segment_table (c/h)
   - libewf_handle (c/h)
@@ -70,9 +75,17 @@ To do:
   - libewf_file_write (c/h)
   - libewf_file (c/h)
 
+Version: 20060830
+* worked on code clean up and improved error handling
+* allow to set clean value in libewf_(re)alloc_cleared functions
+
+Version: 20060829
+* worked on code clean up and improved error handling
+* worked on libewf_string - moved split code to it
+
 Version: 20060828
 * worked on code clean up and improved error handling
-* fixed bug - reminder do not free result from localtime()
+* introduced and fixed new bug - reminder do not free result from localtime()
 
 Version: 20060826
 * worked on code clean up and improved error handling

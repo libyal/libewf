@@ -50,7 +50,7 @@ EWF_HEADER *ewf_header_alloc( uint32_t size )
 	uint32_t header_size = 0;
 
 	header_size = size * sizeof( EWF_HEADER );
-	header      = (EWF_HEADER *) libewf_alloc_cleared( header_size );
+	header      = (EWF_HEADER *) libewf_alloc_cleared( header_size, 0 );
 
 	if( header == NULL )
 	{

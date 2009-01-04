@@ -24,15 +24,17 @@ libewf_a_SOURCES = \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_md5.h \
 	libewf_notify.c libewf_notify.h \
+	libewf_offset_table.c libewf_offset_table.h \
+	libewf_string.c libewf_string.h \
 	\
 	handle.c handle.h \
 	file_read.c file_read.h \
 	file_write.c file_write.h \
-	offset_table.c offset_table.h \
 	section_list.c section_list.h \
 	segment_table.c segment_table.h
 
 #libewf_a_LDADD = -lz -lcrypto
+libewf_a_CFLAGS = -Wall
 
 ewfacquire_SOURCES = \
 	libewf.h \

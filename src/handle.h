@@ -43,7 +43,8 @@
 #include "ewf_header2.h"
 #include "ewf_md5hash.h"
 #include "ewf_sectors.h"
-#include "offset_table.h"
+
+#include "libewf_offset_table.h"
 #include "segment_table.h"
 
 #ifdef __cplusplus

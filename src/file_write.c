@@ -66,7 +66,7 @@
 #include "file_write.h"
 #include "handle.h"
 #include "section_list.h"
-#include "offset_table.h"
+#include "libewf_offset_table.h"
 #include "segment_table.h"
 
 /* Check for empty block, a block that contains the same value for every byte
@@ -556,20 +556,50 @@ void libewf_headers_create( LIBEWF_HANDLE *handle, LIBEWF_HEADER_VALUES *header_
 	if( ( handle->format == LIBEWF_FORMAT_ENCASE1 ) || ( handle->format == LIBEWF_FORMAT_ENCASE2 ) || ( handle->format == LIBEWF_FORMAT_ENCASE3 ) )
 	{
 		handle->header = libewf_header_values_generate_header_string_encase3( header_values, timestamp, handle->compression_level );
+
+		if( handle->header == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_headers_create: unable to create header values.\n" );
+		}
 	}
 	else if( ( handle->format == LIBEWF_FORMAT_FTK ) || ( handle->format == LIBEWF_FORMAT_SMART ) )
 	{
 		handle->header = libewf_header_values_generate_header_string_ftk( header_values, timestamp, handle->compression_level );
+
+		if( handle->header == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_headers_create: unable to create header values.\n" );
+		}
 	}
 	else if( handle->format == LIBEWF_FORMAT_ENCASE4 )
 	{
-		handle->header  = libewf_header_values_generate_header_string_encase4( header_values, timestamp );
+		handle->header = libewf_header_values_generate_header_string_encase4( header_values, timestamp );
+
+		if( handle->header == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_headers_create: unable to create header values.\n" );
+		}
 		handle->header2 = libewf_header_values_generate_header2_string_encase4( header_values, timestamp );
+
+		if( handle->header2 == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_headers_create: unable to create header2 values.\n" );
+		}
 	}
 	else if( handle->format == LIBEWF_FORMAT_ENCASE5 )
 	{
 		handle->header  = libewf_header_values_generate_header_string_encase4( header_values, timestamp );
+
+		if( handle->header == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_headers_create: unable to create header values.\n" );
+		}
 		handle->header2 = libewf_header_values_generate_header2_string_encase5( header_values, timestamp );
+
+		if( handle->header2 == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_headers_create: unable to create header2 values.\n" );
+		}
 	}
 }
 

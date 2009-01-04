@@ -50,7 +50,7 @@ EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( uint32_t size )
 	uint32_t sectors_chunk_size      = 0;
 
 	sectors_chunk_size = size * sizeof( EWF_SECTORS_CHUNK );
-	sectors_chunk      = (EWF_SECTORS_CHUNK *) libewf_alloc_cleared( sectors_chunk_size );
+	sectors_chunk      = (EWF_SECTORS_CHUNK *) libewf_alloc_cleared( sectors_chunk_size, 0 );
 
 	if( sectors_chunk == NULL )
 	{

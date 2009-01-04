@@ -47,7 +47,7 @@ EWF_MD5HASH *ewf_md5hash_alloc( void )
 {
 	EWF_MD5HASH *md5hash = NULL;
 
-	md5hash = (EWF_MD5HASH *) libewf_alloc_cleared( EWF_MD5HASH_SIZE );
+	md5hash = (EWF_MD5HASH *) libewf_alloc_cleared( EWF_MD5HASH_SIZE, 0 );
 
 	if( md5hash == NULL )
 	{

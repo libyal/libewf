@@ -149,6 +149,12 @@ int main( int argc, const char **argv )
 	{
 		header_values = libewf_header_values_parse_header( handle->header, date_format );
 
+		if( header_values == NULL )
+		{
+			fprintf( stderr, "Unable to parse header values.\n" );
+
+			exit( EXIT_FAILURE );
+		}
 		if( header_values->acquiry_software_version != NULL )
 		{
 			if( handle->header[ 1 ] == '\r' )
@@ -191,6 +197,12 @@ int main( int argc, const char **argv )
 	{
 		header2_values = libewf_header_values_parse_header( handle->header2, date_format );
 
+		if( header2_values == NULL )
+		{
+			fprintf( stderr, "Unable to parse header values.\n" );
+
+			exit( EXIT_FAILURE );
+		}
 		if( handle->header2[ 0 ] == '3' )
 		{
 			handle->format = LIBEWF_FORMAT_ENCASE5;

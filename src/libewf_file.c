@@ -59,8 +59,8 @@
 #include "libewf_file.h"
 #include "file_read.h"
 #include "handle.h"
+#include "libewf_offset_table.h"
 #include "section_list.h"
-#include "offset_table.h"
 #include "segment_table.h"
 
 /* Detects if a file is an EWF file

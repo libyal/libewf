@@ -244,7 +244,7 @@ int32_t libewf_write( int file_descriptor, const void *buffer, uint32_t count )
 
 /* Function to allocated wiped memory
  */
-void *libewf_alloc_cleared( uint32_t size )
+void *libewf_alloc_cleared( uint32_t size, int8_t clear_value )
 {
 	void *allocated_buffer = NULL;
 	void *cleared_buffer   = NULL;
@@ -257,7 +257,7 @@ void *libewf_alloc_cleared( uint32_t size )
 
 		return( NULL );
 	}
-	cleared_buffer = libewf_memset( allocated_buffer, 0, size );
+	cleared_buffer = libewf_memset( allocated_buffer, clear_value, size );
 
 	if( cleared_buffer == NULL )
 	{
@@ -272,7 +272,7 @@ void *libewf_alloc_cleared( uint32_t size )
 
 /* Function to reallocated fully wiped memory
  */
-void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_t new_size )
+void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_t new_size, int8_t clear_value )
 {
 	void *reallocated_buffer = NULL;
 	void *cleared_buffer     = NULL;
@@ -297,7 +297,7 @@ void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_
 
 		return( NULL );
 	}
-	cleared_buffer = libewf_memset( reallocated_buffer, 0, new_size );
+	cleared_buffer = libewf_memset( reallocated_buffer, clear_value, new_size );
 
 	if( cleared_buffer == NULL )
 	{
@@ -312,7 +312,7 @@ void *libewf_realloc_full_cleared( void *buffer, uint32_t previous_size, uint32_
 
 /* Function to reallocated wiped newly allocated memory
  */
-void *libewf_realloc_new_cleared( void *buffer, uint32_t previous_size, uint32_t new_size )
+void *libewf_realloc_new_cleared( void *buffer, uint32_t previous_size, uint32_t new_size, int8_t clear_value )
 {
 	void *reallocated_buffer = NULL;
 	void *cleared_buffer     = NULL;
@@ -337,7 +337,7 @@ void *libewf_realloc_new_cleared( void *buffer, uint32_t previous_size, uint32_t
 
 		return( NULL );
 	}
-	cleared_buffer = libewf_memset( ( reallocated_buffer + previous_size ), 0, ( new_size - previous_size ) );
+	cleared_buffer = libewf_memset( ( reallocated_buffer + previous_size ), clear_value, ( new_size - previous_size ) );
 
 	if( cleared_buffer == NULL )
 	{

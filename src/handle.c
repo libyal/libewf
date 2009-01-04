@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_definitions.h"
 #include "libewf_header_values.h"
 #include "libewf_notify.h"
@@ -49,7 +50,6 @@
 #include "ewf_md5hash.h"
 #include "ewf_sectors.h"
 #include "handle.h"
-#include "offset_table.h"
 #include "segment_table.h"
 
 /* Allocates memory for a new handle struct

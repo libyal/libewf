@@ -33,24 +33,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_notify.h"
-
-#include "offset_table.h"
+#include "libewf_offset_table.h"
 
 /* Allocates memory for a new offset table struct
+ * Return a pointer to the new instance, NULL on error
  */
 LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( void )
 {
-	LIBEWF_OFFSET_TABLE *offset_table = (LIBEWF_OFFSET_TABLE *) malloc( LIBEWF_OFFSET_TABLE_SIZE );
+	LIBEWF_OFFSET_TABLE *offset_table = NULL;
+
+	offset_table = (LIBEWF_OFFSET_TABLE *) libewf_alloc( LIBEWF_OFFSET_TABLE_SIZE );
 
 	if( offset_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_offset_table_alloc: unable to allocate offset_table.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_offset_table_alloc: unable to allocate offset_table.\n" );
+
+		return( NULL );
 	}
         offset_table->amount          = 0;
         offset_table->last            = 0;
@@ -63,49 +65,99 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( void )
 }
 
 /* Allocates memory for the dynamic file descriptor, offset and size array
+ * Return a pointer to the new instance, NULL on error
+ * Warning: frees the entire offset table on error !!!
  */
 LIBEWF_OFFSET_TABLE *libewf_offset_table_values_alloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t size )
 {
+	void *data_set = NULL;
+
 	if( offset_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_offset_table_values_alloc: invalid offset_table.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_offset_table_values_alloc: invalid offset_table.\n" );
+
+		return( NULL );
 	}
-	offset_table->file_descriptor = (int *) malloc( size * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE );
+	offset_table->file_descriptor = (int *) libewf_alloc( size * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE );
 
 	if( offset_table->file_descriptor == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "offset_table_values_alloc: unable to allocate file descriptor.\n" );
-	}
-	memset( offset_table->file_descriptor, -1, ( size * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE ) );
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to allocate file descriptor.\n" );
 
-	offset_table->compressed = (uint8_t *) malloc( size * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE );
+		libewf_offset_table_free( offset_table );
+
+		return( NULL );
+	}
+	data_set = libewf_memset( offset_table->file_descriptor, -1, ( size * LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE ) );
+
+	if( data_set == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to set file descriptor.\n" );
+
+		libewf_offset_table_free( offset_table );
+
+		return( NULL );
+	}
+	offset_table->compressed = (uint8_t *) libewf_alloc( size * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE );
 
 	if( offset_table->compressed == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "offset_table_values_alloc: unable to allocate compressed.\n" );
-	}
-	memset( offset_table->compressed, 0, ( size * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE ) );
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to allocate compressed.\n" );
 
-	offset_table->offset = (uint64_t *) malloc( size * LIBEWF_OFFSET_TABLE_OFFSET_SIZE );
+		libewf_offset_table_free( offset_table );
+
+		return( NULL );
+	}
+	data_set = libewf_memset( offset_table->compressed, -1, ( size * LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE ) );
+
+	if( data_set == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to set compressed.\n" );
+
+		libewf_offset_table_free( offset_table );
+
+		return( NULL );
+	}
+	offset_table->offset = (uint64_t *) libewf_alloc( size * LIBEWF_OFFSET_TABLE_OFFSET_SIZE );
 
 	if( offset_table->offset == NULL )
 	{
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to allocate offset.\n" );
+
 		libewf_offset_table_free( offset_table );
 
-		LIBEWF_FATAL_PRINT( "offset_table_values_alloc: unable to allocate offset.\n" );
+		return( NULL );
 	}
-	memset( offset_table->offset, 0, ( size * LIBEWF_OFFSET_TABLE_OFFSET_SIZE ) );
+	data_set = libewf_memset( offset_table->offset, 0, ( size * LIBEWF_OFFSET_TABLE_OFFSET_SIZE ) );
 
-	offset_table->size = (uint64_t *) malloc( size * LIBEWF_OFFSET_TABLE_SIZE_SIZE );
+	if( data_set == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to set offset.\n" );
+
+		libewf_offset_table_free( offset_table );
+
+		return( NULL );
+	}
+	offset_table->size = (uint64_t *) libewf_alloc( size * LIBEWF_OFFSET_TABLE_SIZE_SIZE );
 
 	if( offset_table->size == NULL )
 	{
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to allocate size.\n" );
+
 		libewf_offset_table_free( offset_table );
 
-		LIBEWF_FATAL_PRINT( "offset_table_values_alloc: unable to allocate size.\n" );
+		return( NULL );
 	}
-	memset( offset_table->size, 0, ( size * LIBEWF_OFFSET_TABLE_SIZE_SIZE ) );
+	data_set = libewf_memset( offset_table->size, 0, ( size * LIBEWF_OFFSET_TABLE_SIZE_SIZE ) );
 
+	if( data_set == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "offset_table_values_alloc: unable to set size.\n" );
+
+		libewf_offset_table_free( offset_table );
+
+		return( NULL );
+	}
 	offset_table->amount = size;
 
 	return( offset_table );
@@ -168,11 +220,29 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_values_realloc( LIBEWF_OFFSET_TABLE *of
  */
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 {
-	free( offset_table->file_descriptor );
-	free( offset_table->offset );
-	free( offset_table->size );
+	if( offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_offset_table_free: invalid offset table.\n" );
 
-	free( offset_table );
+		return;
+	}
+	if( offset_table->file_descriptor != NULL )
+	{
+		libewf_free( offset_table->file_descriptor );
+	}
+	if( offset_table->compressed != NULL )
+	{
+		libewf_free( offset_table->compressed );
+	}
+	if( offset_table->offset != NULL )
+	{
+		libewf_free( offset_table->offset );
+	}
+	if( offset_table->size != NULL )
+	{
+		libewf_free( offset_table->size );
+	}
+	libewf_free( offset_table );
 }
 
 /* Sets the values for a specific offset

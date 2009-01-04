@@ -49,7 +49,7 @@ EWF_VOLUME *ewf_volume_alloc( void )
 {
 	EWF_VOLUME *volume = NULL;
 
-	volume = (EWF_VOLUME *) libewf_alloc_cleared( EWF_VOLUME_SIZE );
+	volume = (EWF_VOLUME *) libewf_alloc_cleared( EWF_VOLUME_SIZE, 0 );
 
 	if( volume == NULL )
 	{

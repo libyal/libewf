@@ -36,10 +36,13 @@
 #ifndef _LIBEWF_HEADERVALUES_H
 #define _LIBEWF_HEADERVALUES_H
 
+#include <inttypes.h>
 #include <unistd.h>
 #include <time.h>
 
 #include "ewf_header.h"
+
+#include "libewf_string.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -70,65 +73,61 @@ struct libewf_header_values
 {
 	/* Case number
 	 */
-	char *case_number;
+	LIBEWF_STRING *case_number;
 
 	/* Description
 	 */
-	char *description;
+	LIBEWF_STRING *description;
 
 	/* Examiner name
 	 */
-	char *examiner_name;
+	LIBEWF_STRING *examiner_name;
 
 	/* Evidence number
 	 */
-	char *evidence_number;
+	LIBEWF_STRING *evidence_number;
 
 	/* Notes
 	 */
-	char *notes;
+	LIBEWF_STRING *notes;
 
 	/* Acquiry date
 	 */
-	char *acquiry_date;
+	LIBEWF_STRING *acquiry_date;
 
 	/* System date
 	 */
-	char *system_date;
+	LIBEWF_STRING *system_date;
 
 	/* Acquiry operating system
 	 */
-	char *acquiry_operating_system;
+	LIBEWF_STRING *acquiry_operating_system;
 
 	/* Acquiry software version
 	 */
-	char *acquiry_software_version;
+	LIBEWF_STRING *acquiry_software_version;
 
 	/* Password
 	 */
-	char *password;
+	LIBEWF_STRING *password;
 
 	/* Compression type
 	 */
-	char *compression_type;
+	LIBEWF_STRING *compression_type;
 
 	/* Unknown dc
 	 */
-	char *unknown_dc;
+	LIBEWF_STRING *unknown_dc;
 };
 
 LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void );
-char *libewf_header_value_string_alloc( uint32_t amount );
 void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values );
 
-char **libewf_split_string( char *string, int delimiter, uint32_t *amount );
-void libewf_split_values_free( char **split_values, uint32_t amount );
-
-char *libewf_convert_date_header_value( char *header_value, uint8_t date_format );
-char *libewf_generate_date_header_value( time_t timestamp );
-char *libewf_convert_date_header2_value( char *header_value, uint8_t date_format );
-char *libewf_generate_date_header2_value( time_t timestamp );
-char *libewf_header_values_set_value( char* header_value, char *value );
+LIBEWF_STRING *libewf_convert_date_header_value( LIBEWF_STRING *header_value, uint8_t date_format );
+LIBEWF_STRING *libewf_generate_date_header_value( time_t timestamp );
+LIBEWF_STRING *libewf_convert_date_header2_value( LIBEWF_STRING *header_value, uint8_t date_format );
+LIBEWF_STRING *libewf_generate_date_header2_value( time_t timestamp );
+LIBEWF_STRING *libewf_header_values_set_value( LIBEWF_STRING* header_value, char *value );
 
 LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_HEADER *header, uint8_t date_format );
 void libewf_header_values_fprint( FILE *stream, LIBEWF_HEADER_VALUES *header_values );
