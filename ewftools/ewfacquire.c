@@ -397,12 +397,13 @@ int main( int argc, char * const argv[] )
 
 	if( file_descriptor == -1 )
 	{
-#if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
-		error_string = libewf_common_strerror( errno );
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+		error_string = ewfcommon_strerror( errno );
 
 		if( error_string != NULL )
 		{
-			fprintf( stderr, "Error opening file or device: %" PRIs " with failure: %" PRIs ".\n", argv[ optind ], error_string );
+			fprintf( stderr, "Error opening file or device: %" PRIs " with failure: %" PRIs ".\n",
+			 argv[ optind ], error_string );
 
 			libewf_common_free( error_string );
 		}
@@ -421,8 +422,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-#ifndef HAVE_WINDOWS_API
-	if( S_ISBLK( input_file_stat.st_mode ) || S_ISCHR( input_file_stat.st_mode ) )
+#if !defined( HAVE_WINDOWS_API )
+	if( S_ISBLK( input_file_stat.st_mode )
+	 || S_ISCHR( input_file_stat.st_mode ) )
 	{
 		input_size = determine_device_size( file_descriptor );
 	}

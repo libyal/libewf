@@ -42,136 +42,20 @@
 #include "libewf_common.h"
 #include "libewf_notify.h"
 
-#if defined( HAVE_WINDOWS_API )
-#define libewf_common_strerror_r( error_number, string, size ) \
-	strerror_s( string, size, error_number )
-
-#define LIBEWF_COMMON_STRERROR_R_RETURN_ERROR	0
-
-#elif defined( HAVE_STRERROR_R )
-#define libewf_common_strerror_r( error_number, string, size ) \
-	strerror_r( error_number, string, size )
-
-#if defined( STRERROR_R_CHAR_P )
-#define LIBEWF_COMMON_STRERROR_R_RETURN_ERROR	NULL
-#else
-#define LIBEWF_COMMON_STRERROR_R_RETURN_ERROR	0
-#endif
-
-#endif
-
-/* Function to wrap strerror()
- * Returns a new instance to a string containing the error string, NULL on error
- */
-char *libewf_common_strerror( int error_number )
-{
-#if !defined( libewf_common_strerror_r ) && defined( HAVE_STRERROR )
-	char *static_error_string = NULL;
-#endif
-#if defined( libewf_common_strerror_r ) || defined( HAVE_STRERROR )
-	char *error_string        = NULL;
-	size_t error_string_size  = 256;
-
-	error_string = (char *) libewf_common_alloc( error_string_size * sizeof( char ) );
-
-	if( error_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_strerror: unable to create error string.\n" );
-
-		return( NULL );
-	}
-#endif
-#if defined( libewf_common_strerror_r )
-	if( libewf_common_strerror_r( error_number, error_string, error_string_size ) != LIBEWF_COMMON_STRERROR_R_RETURN_ERROR )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_strerror: unable to set error string.\n" );
-
-		libewf_common_free( error_string );
-
-		return( NULL );
-	}
-	return( error_string );
-#elif defined( HAVE_STRERROR )
-	static_error_string = strerror( error_number );
-
-	if( static_error_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_strerror: unable to create static error string.\n" );
-
-		libewf_common_free( error_string );
-
-		return( NULL );
-	}
-	if( libewf_common_string_copy( error_string, static_error_string, error_string_size ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_strerror: unable to set error string.\n" );
-
-		libewf_common_free( error_string );
-
-		return( NULL );
-	}
-	return( error_string );
-#else
-	return( NULL );
-#endif
-}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-#if defined( HAVE_WINDOWS_API )
-#define libewf_common_wide_strerror_r( error_number, string, size ) \
-	_wcserror_s( string, size, error_number )
-
-#define LIBEWF_COMMON_WIDE_STRERROR_R_RETURN_ERROR	0
-
-#else
-#error Missing wide character equivalent of strerror()
-#endif
-
-/* Function to wrap wide character equivalent of strerror()
- * Returns a new instance to a string containing the error string, NULL on error
- */
-wchar_t *libewf_common_wide_strerror( int error_number )
-{
-#if defined( libewf_wide_common_strerror_r )
-	wchar_t *error_string      = NULL;
-	uint16_t error_string_size = 256;
-
-	error_string = (wchar_t *) libewf_common_alloc( error_string_size * sizeof( wchar_t ) );
-
-	if( error_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_strerror: unable to create error string.\n" );
-
-		return( NULL );
-	}
-	if( libewf_common_strerror_r( error_number, error_string, error_string_size ) != LIBEWF_COMMON_STRERROR_R_RETURN_ERROR )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_strerror: unable to set error string.\n" );
-
-		libewf_common_free( error_string );
-
-		return( NULL );
-	}
-	return( error_string );
-#else
-	return( NULL );
-#endif
-}
-#endif
-
 /* Function to wrap open()
  */
 int libewf_common_open( const char *filename, uint8_t flags )
 {
+	static char *function = "libewf_common_open";
 #if defined( HAVE_WINDOWS_API )
-	int file_descriptor  = 0;
+	int file_descriptor   = 0;
 #endif
-	int open_flags       = 0;
+	int open_flags        = 0;
 
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_open: invalid filename.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -205,14 +89,16 @@ int libewf_common_open( const char *filename, uint8_t flags )
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_open: flags not supported.\n" );
+		LIBEWF_WARNING_PRINT( "$s: flags not supported.\n",
+		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_WINDOWS_API )
 	if( _sopen_s( &file_descriptor, filename, open_flags, _SH_DENYRW, ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_open: error opening file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error opening file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -228,14 +114,16 @@ int libewf_common_open( const char *filename, uint8_t flags )
  */
 int libewf_common_wide_open( const wchar_t *filename, uint8_t flags )
 {
+	static char *function = "libewf_common_wide_open";
 #if defined( HAVE_WINDOWS_API )
-	int file_descriptor  = 0;
+	int file_descriptor   = 0;
 #endif
-	int open_flags       = 0;
+	int open_flags        = 0;
 
 	if( filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_open: invalid filename.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -269,14 +157,16 @@ int libewf_common_wide_open( const wchar_t *filename, uint8_t flags )
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_open: flags not supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: flags not supported.\n",
+		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_WINDOWS_API )
 	if( _wsopen_s( &file_descriptor, filename, open_flags, _SH_DENYRW, ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_open: error opening file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error opening file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -291,25 +181,29 @@ int libewf_common_wide_open( const wchar_t *filename, uint8_t flags )
  */
 void *libewf_common_alloc_cleared( size_t size, int clear_value )
 {
+	static char *function  = "libewf_common_alloc_cleared";
 	void *allocated_buffer = NULL;
 
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( NULL );
+	}
 	allocated_buffer = libewf_common_alloc( size );
 
 	if( allocated_buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_alloc_cleared: unable to allocate buffer.\n" );
-
-		return( NULL );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_common_alloc_cleared: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate buffer.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( libewf_common_memset( allocated_buffer, clear_value, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_alloc_cleared: unable to clear buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear buffer.\n",
+		 function );
 
 		libewf_common_free( allocated_buffer );
 
@@ -322,17 +216,21 @@ void *libewf_common_alloc_cleared( size_t size, int clear_value )
  */
 void *libewf_common_realloc_full_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value )
 {
+	static char *function    = "libewf_common_realloc_full_cleared";
 	void *reallocated_buffer = NULL;
 
-	if( ( previous_size > (size_t) SSIZE_MAX ) || ( new_size > (size_t) SSIZE_MAX ) )
+	if( ( previous_size > (size_t) SSIZE_MAX )
+	 || ( new_size > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_full_cleared: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( new_size <= previous_size )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_full_cleared: new size must be greater than previous size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: new size must be greater than previous size.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -340,13 +238,15 @@ void *libewf_common_realloc_full_cleared( void *buffer, size_t previous_size, si
 
 	if( reallocated_buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_full_cleared: unable to reallocate buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate buffer.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( libewf_common_memset( reallocated_buffer, clear_value, new_size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_full_cleared: unable to clear buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear buffer.\n",
+		 function );
 
 		libewf_common_free( reallocated_buffer );
 
@@ -359,17 +259,21 @@ void *libewf_common_realloc_full_cleared( void *buffer, size_t previous_size, si
  */
 void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value )
 {
+	static char *function    = "libewf_common_realloc_new_cleared";
 	void *reallocated_buffer = NULL;
 
-	if( ( previous_size > (size_t) SSIZE_MAX ) || ( new_size > (size_t) SSIZE_MAX ) )
+	if( ( previous_size > (size_t) SSIZE_MAX )
+	 || ( new_size > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_new_cleared: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( new_size <= previous_size )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_new_cleared: new size must be greater than previous size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: new size must be greater than previous size.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -377,13 +281,18 @@ void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, siz
 
 	if( reallocated_buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_new_cleared: unable to reallocate buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate buffer.\n",
+		 function );
 
 		return( NULL );
 	}
-	if( libewf_common_memset( (void *) &( (uint8_t *) reallocated_buffer )[ previous_size ], clear_value, ( new_size - previous_size ) ) == NULL )
+	if( libewf_common_memset(
+	     (void *) &( (uint8_t *) reallocated_buffer )[ previous_size ],
+	     clear_value,
+	     ( new_size - previous_size ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_realloc_new_cleared: unable to clear buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear buffer.\n",
+		 function );
 
 		libewf_common_free( reallocated_buffer );
 
@@ -397,17 +306,20 @@ void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, siz
  */
 uint8_t libewf_common_test_empty_block( uint8_t *block_buffer, size_t size )
 {
-	size_t iterator = 0;
+	static char *function = "libewf_common_test_empty_block";
+	size_t iterator       = 0;
 
 	if( block_buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_test_empty_block: invalid block buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid block buffer.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_test_empty_block: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -518,6 +430,7 @@ struct tm *libewf_common_localtime( const time_t *timestamp )
  */
 char *libewf_common_ctime( const time_t *timestamp )
 {
+	static char *function    = "libewf_common_ctime";
 #if !defined( libewf_common_ctime_r ) && defined( HAVE_CTIME )
 	char *static_time_string = NULL;
 #endif
@@ -526,7 +439,8 @@ char *libewf_common_ctime( const time_t *timestamp )
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_ctime: invalid time stamp.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -534,7 +448,8 @@ char *libewf_common_ctime( const time_t *timestamp )
 
 	if( time_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_ctime: unable to create time string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create time string.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -545,7 +460,8 @@ char *libewf_common_ctime( const time_t *timestamp )
 	if( libewf_common_ctime_r( timestamp, time_string, time_string_size ) == NULL )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_ctime: unable to set time string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
+		 function );
 
 		libewf_common_free( time_string );
 
@@ -557,7 +473,8 @@ char *libewf_common_ctime( const time_t *timestamp )
 
 	if( static_time_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_ctime: unable to create static time string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create static time string.\n",
+		 function );
 
 		libewf_common_free( time_string );
 
@@ -565,7 +482,8 @@ char *libewf_common_ctime( const time_t *timestamp )
 	}
 	if( libewf_common_string_copy( time_string, static_time_string, time_string_size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_ctime: unable to set time string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
+		 function );
 
 		libewf_common_free( time_string );
 
@@ -591,12 +509,14 @@ char *libewf_common_ctime( const time_t *timestamp )
  */
 wchar_t *libewf_common_wide_ctime( const time_t *timestamp )
 {
+	static char *function   = "libewf_common_wide_ctime";
 	wchar_t *time_string    = NULL;
 	size_t time_string_size = 32;
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_ctime: invalid time stamp.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -604,14 +524,16 @@ wchar_t *libewf_common_wide_ctime( const time_t *timestamp )
 
 	if( time_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_ctime: unable to create time string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create time string.\n",
+		 function );
 
 		return( NULL );
 	}
-#if defined( libewf_common_ctime_r )
-	if( libewf_common_ctime_r( timestamp, time_string, time_string_size ) != 0 )
+#if defined( libewf_common_wide_ctime_r )
+	if( libewf_common_wide_ctime_r( timestamp, time_string, time_string_size ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_wide_ctime: unable to set time string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
+		 function );
 
 		libewf_common_free( time_string );
 
@@ -630,23 +552,27 @@ wchar_t *libewf_common_wide_ctime( const time_t *timestamp )
  */
 int8_t libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t size )
 {
-	size_t iterator = 0;
+	static char *function = "libewf_common_copy_wchar_to_char";
+	size_t iterator       = 0;
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_copy_wchar_to_char: invalid source.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_copy_wchar_to_char: invalid destination.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_copy_wchar_to_char: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -672,23 +598,27 @@ int8_t libewf_common_copy_wchar_to_char( char *destination, const wchar_t *sourc
  */
 int8_t libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t size )
 {
-	size_t iterator = 0;
+	static char *function = "libewf_common_copy_char_to_wchar";
+	size_t iterator       = 0;
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_copy_char_to_wchar: invalid source.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_copy_char_to_wchar: invalid destination.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_copy_char_to_wchar: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}

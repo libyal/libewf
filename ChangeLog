@@ -123,7 +123,9 @@ DELTA FILE
 Version: 20070812
 * worked on restructuring to improve internal structure
 * worked on improved rewrite using delta segment files
-* moved gmtime from libewf_common to ewfcommon
+* moved gmtime function from libewf_common to ewfcommon
+* removed error string from libewf_write_finalize
+* moved strerror functions from libewf_common to ewfcommon
 
 Version: 20070811
 * removed external char

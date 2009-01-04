@@ -1745,11 +1745,6 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle        = NULL;
 	LIBEWF_SECTION_LIST_ENTRY *list_entry_iterator = NULL;
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *error_string                          = NULL;
-#else
-	char *error_string                             = NULL;
-#endif
 	static char *function                          = "libewf_write_finalize";
 	ssize_t write_count_finalize                   = 0;
 	ssize_t write_count                            = 0;
@@ -1948,33 +1943,12 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 			if( file_descriptor == -1 )
 			{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				error_string = libewf_common_wide_strerror( errno );
+				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+				 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
 #else
-				error_string = libewf_common_strerror( errno );
+				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+				 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
 #endif
-
-				if( error_string == NULL )
-				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-					 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-					 function, internal_handle->segment_table->filename[ segment_table_iterator ] );
-#endif
-				}
-				else
-				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
-					 function, internal_handle->segment_table->filename[ segment_table_iterator ], error_string );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-					 function, internal_handle->segment_table->filename[ segment_table_iterator ], error_string );
-#endif
-
-					libewf_common_free( error_string );
-				}
 				return( -1 );
 			}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )

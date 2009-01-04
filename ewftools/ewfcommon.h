@@ -224,6 +224,12 @@ extern "C" {
 
 #endif
 
+char *ewfcommon_strerror( int error_number );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+wchar_t *ewfcommon_wide_strerror( int error_number );
+#endif
+
 LIBEWF_CHAR *ewfcommon_determine_operating_system( void );
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format );
 LIBEWF_CHAR *ewfcommon_determine_units_string( int factor );
@@ -239,7 +245,7 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 
 int8_t ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size );
 
-struct tm *libewf_common_gmtime( const time_t *timestamp );
+struct tm *ewfcommon_gmtime( const time_t *timestamp );
 
 void ewfcommon_version_fprint( FILE *stream, LIBEWF_CHAR *program );
 void ewfcommon_copyright_fprint( FILE *stream );

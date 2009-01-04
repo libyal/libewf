@@ -169,12 +169,6 @@ extern "C" {
 
 #endif
 
-char *libewf_common_strerror( int error_number );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_common_wide_strerror( int error_number );
-#endif
-
 int libewf_common_open( const char *filename, uint8_t flags );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
