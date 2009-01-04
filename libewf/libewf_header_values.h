@@ -238,8 +238,10 @@ libewf_char_t *libewf_convert_date_xheader_value(
                 size_t header_value_length,
                 uint8_t date_format );
 
-libewf_char_t *libewf_generate_date_xheader_value(
-                time_t timestamp );
+int libewf_generate_date_xheader_value(
+     time_t timestamp,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 int libewf_header_values_parse_header_string_xml(
      libewf_values_table_t **header_values,

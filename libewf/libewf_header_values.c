@@ -3528,27 +3528,60 @@ libewf_char_t *libewf_convert_date_xheader_value(
 }
 
 /* Generate date string within a xheader value
- * Returns a pointer to the new instance, NULL on error
+ * Sets date string and date string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_generate_date_xheader_value(
-                time_t timestamp )
+int libewf_generate_date_xheader_value(
+     time_t timestamp, 
+     libewf_char_t **date_string,
+     size_t *date_string_length )
 {
-	libewf_char_t *date_string = NULL;
-	libewf_char_t *newline     = NULL;
-	static char *function      = "libewf_generate_date_xheader_value";
+	libewf_char_t *newline = NULL;
+	static char *function  = "libewf_generate_date_xheader_value";
+
+	if( date_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *date_string != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: date string already created.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( date_string_length == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid date string length.\n",
+		 function );
+
+		return( -1 );
+	}
+	*date_string = libewf_string_ctime(
+	                &timestamp );
 
 	/* The libewf_string_ctime function returns a string of length 32
 	 */
-	date_string = libewf_string_ctime( &timestamp );
+	*date_string_length = 32;
 
-	if( date_string == NULL )
+	/* refactor to have libewf_string_ctime create the date string and
+	 * set the date string length
+	 */
+
+	if( *date_string == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	newline = libewf_string_search( date_string, (libewf_char_t) '\n', 32 );
+	newline = libewf_string_search(
+	           *date_string,
+	           (libewf_char_t) '\n',
+	           *date_string_length );
 
 	if( newline != NULL )
 	{
@@ -3558,7 +3591,7 @@ libewf_char_t *libewf_generate_date_xheader_value(
 		newline[ 3 ] = (libewf_char_t) tzname[ 0 ][ 2 ];
 		newline[ 4 ] = (libewf_char_t) '\0';
 	}
-	return( date_string );
+	return( 1 );
 }
 
 /* Parse a xml header string for the values
@@ -3842,6 +3875,7 @@ int libewf_header_values_generate_header_string_xml(
 	libewf_char_t *acquiry_date          = _S_LIBEWF_CHAR( "" );
 	static char *function                = "libewf_header_values_generate_header_string_xml";
 	uint32_t iterator                    = 0;
+	size_t acquiry_date_length           = 0;
 	int string_offset                    = 0;
 	int character_count                  = 0;
 
@@ -3908,10 +3942,10 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
 	{
-		acquiry_date = libewf_generate_date_xheader_value(
-		                timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_xheader_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -3921,6 +3955,7 @@ int libewf_header_values_generate_header_string_xml(
 		else
 		{
 			/* Add space for a leading tab, <acquiry_date>, header value, </acquiry_date> and an end of line
+			 * Make sure to determine the effective length of the acquiry date string
 			 */
 			*header_string_length += 31 + libewf_string_length(
 			                               acquiry_date );
