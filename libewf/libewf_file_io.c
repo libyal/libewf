@@ -148,7 +148,6 @@ int libewf_file_io_open_wide(
 	     ( flags | _O_BINARY ),
 	     _SH_DENYRW,
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
-	{
 #else
 	filename_size = 1 + wide_string_length(
 	                     filename );

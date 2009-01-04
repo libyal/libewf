@@ -263,7 +263,7 @@ int byte_size_string_convert(
 		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
 		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
 		{
-			remainder = ( byte_size_string[ byte_size_string_iterator ] - '0' );
+			remainder = (int8_t) ( byte_size_string[ byte_size_string_iterator ] - '0' );
 
 			byte_size_string_iterator++;
 		}
@@ -272,7 +272,7 @@ int byte_size_string_convert(
 		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
 		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
 		{
-			remainder += ( byte_size_string[ byte_size_string_iterator ] - '0' );
+			remainder += (int8_t) ( byte_size_string[ byte_size_string_iterator ] - '0' );
 
 			byte_size_string_iterator++;
 		}

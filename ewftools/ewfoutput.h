@@ -101,20 +101,6 @@ void ewfoutput_sessions_fprint(
       libewf_handle_t *handle,
       uint32_t *amount_of_sessions );
 
-int ewfoutput_get_header_value(
-     libewf_handle_t *handle,
-     const char *utf8_header_value_identifier,
-     character_t *header_value,
-     size_t header_value_size,
-     liberror_error_t **error );
-
-int ewfoutput_get_hash_value(
-     libewf_handle_t *handle,
-     const char *utf8_hash_value_identifier,
-     character_t *hash_value,
-     size_t hash_value_size,
-     liberror_error_t **error );
-
 void ewfoutput_header_values_fprint(
       FILE *stream,
       libewf_handle_t *handle );
@@ -122,7 +108,7 @@ void ewfoutput_header_values_fprint(
 void ewfoutput_hash_values_fprint(
       FILE *stream,
       libewf_handle_t *handle,
-      character_t *indentation,
+      const char *indentation,
       uint8_t ignore_md5,
       uint8_t ignore_sha1 );
 

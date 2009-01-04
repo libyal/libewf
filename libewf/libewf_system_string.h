@@ -85,7 +85,7 @@ typedef wchar_t libewf_system_character_t;
 /* narrow string conversion functions
  */
 #define libewf_system_string_size_from_narrow_string( narrow_string, narrow_string_size, system_string_size, error ) \
-	libuna_utf16_string_size_from_utf8( narrow_string, (libuna_utf8_character_t *) narrow_string_size, system_string_size, error )
+	libuna_utf16_string_size_from_utf8( (libuna_utf8_character_t *) narrow_string, narrow_string_size, system_string_size, error )
 
 #define libewf_system_string_copy_from_narrow_string( system_string, system_string_size, narrow_string, narrow_string_size, error ) \
 	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) system_string, system_string_size, (libuna_utf8_character_t *) narrow_string, narrow_string_size, error )

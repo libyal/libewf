@@ -122,10 +122,6 @@ Testing
 * add export unattended to automated tests
 
 Other:
-check for notify_verbose_printf( "
-  - library done
-check for funtion,[ ]
-  - library done
 check error tollerance
 check TODO
 
@@ -137,7 +133,7 @@ check TODO
 * have failed on open return a more sensible error (do not rely on errno)
 
 * API changes
-  - add error parameter
+  - add error parameter (V2)
   - remove write_finalize in API v2?
   - Change char to uint8_t to prevent mis interpretation of UTF-8 string type
 
@@ -200,9 +196,14 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20081012
+* Worked on UTF character suppport
+
 Version: 20081011
 * changed ewfguid into guid
 * removed string duplicate functions
+* Worked on MSVSCPP build
+* Worked on UTF character suppport
 
 Version: 20081007
 * small adjustments to support

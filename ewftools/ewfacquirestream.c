@@ -35,7 +35,7 @@
 #include <unistd.h>
 #endif
 
-#if defined( HAVE_FCNLTL_H )
+#if defined( HAVE_FCNTL_H )
 #include <fcntl.h>
 #endif
 

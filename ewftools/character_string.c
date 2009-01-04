@@ -148,7 +148,7 @@ int string_to_uint64(
 }
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( date_time_ctime )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( date_time_ctime ) && !defined( date_time_wctime )
 
 /* Sets ctime in the string
  * The string must be at least 32 characters of size

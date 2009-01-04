@@ -87,18 +87,6 @@ int ewfcommon_determine_guid(
      uint8_t *guid,
      uint8_t libewf_format );
 
-int ewfcommon_set_header_value(
-     libewf_handle_t *handle,
-     const char *header_value_identifier,
-     character_t *header_value,
-     liberror_error_t **error );
-
-int ewfcommon_set_hash_value(
-     libewf_handle_t *handle,
-     const char *hash_value_identifier,
-     character_t *hash_value,
-     liberror_error_t **error );
-
 int ewfcommon_initialize_write(
      libewf_handle_t *handle,
      character_t *case_number,

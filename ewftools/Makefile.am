@@ -17,6 +17,7 @@ ewfacquire_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
+	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -43,6 +44,7 @@ ewfacquirestream_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
+	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -69,6 +71,7 @@ ewfalter_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
+	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -95,6 +98,7 @@ ewfexport_SOURCES = \
 	ewfexport.c \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinput.c ewfinput.h \
+	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -119,6 +123,7 @@ ewfinfo_SOURCES = \
 	ewfcommon.c ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinfo.c \
+	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
@@ -143,6 +148,7 @@ ewfverify_SOURCES = \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
+	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \

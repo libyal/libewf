@@ -29,7 +29,17 @@
 #include <wide_string.h>
 
 #if defined( HAVE_LOCAL_LIBUNA )
-#include <libuna_definitions.h>
+#include <libuna_byte_stream.h>
+#include <libuna_compare.h>
+#include <libuna_error.h>
+#include <libuna_unicode_character.h>
+#include <libuna_utf8_stream.h>
+#include <libuna_utf8_string.h>
+#include <libuna_utf16_stream.h>
+#include <libuna_utf16_string.h>
+#include <libuna_utf32_stream.h>
+#include <libuna_utf32_string.h>
+
 #elif defined( HAVE_LIBUNA_H )
 #include <libuna.h>
 #endif
@@ -200,7 +210,7 @@ character_t *string_ctime(
 /* UTF-8 string conversion functions
  */
 #define string_size_from_utf8_string( utf8_string, utf8_string_size, string_size, error ) \
-	libuna_utf16_string_size_from_utf8( utf8_string, (libuna_utf8_character_t *) utf8_string_size, string_size, error )
+	libuna_utf16_string_size_from_utf8( (libuna_utf8_character_t *)  utf8_string, utf8_string_size, string_size, error )
 
 #define string_copy_from_utf8_string( string, string_size, utf8_string, utf8_string_size, error ) \
 	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) string, string_size, (libuna_utf8_character_t *) utf8_string, utf8_string_size, error )

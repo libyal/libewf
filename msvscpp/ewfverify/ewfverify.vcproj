@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib"
+				AdditionalDependencies="advapi32.lib liberror.lib libuna.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
@@ -137,6 +137,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfinput.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewflibewf.c"
 				>
 			</File>
 			<File
@@ -219,6 +223,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfinput.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\ewflibewf.h"
 				>
 			</File>
 			<File

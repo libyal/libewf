@@ -51,6 +51,7 @@
 #include "digest_context.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
+#include "ewflibewf.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
@@ -63,22 +64,6 @@
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
 #define USE_LIBEWF_GET_HASH_VALUE_MD5
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-#define ewfverify_get_hash_value_md5( handle, hash_value, hash_value_length ) \
-	libewf_get_hash_value_md5_wide( handle, hash_value, hash_value_length )
-
-#define ewfverify_get_hash_value_sha1( handle, hash_value, hash_value_length ) \
-	libewf_get_hash_value_sha1_wide( handle, hash_value, hash_value_length )
-
-#else
-#define ewfverify_get_hash_value_md5( handle, hash_value, hash_value_length ) \
-	libewf_get_hash_value_md5( handle, hash_value, hash_value_length )
-
-#define ewfverify_get_hash_value_sha1( handle, hash_value, hash_value_length ) \
-	libewf_get_hash_value_sha1( handle, hash_value, hash_value_length )
-
 #endif
 
 /* Prints the executable usage information to the stream
@@ -632,10 +617,13 @@ int main( int argc, char * const argv[] )
 			}
 #endif
 #if defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
-			stored_md5_hash_result = ewfverify_get_hash_value_md5(
+			stored_md5_hash_result = ewflibewf_get_hash_value(
 			                           ewfcommon_libewf_handle,
+			                           "MD5",
+			                           3,
 			                           stored_md5_hash_string,
-			                           EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+			                           EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+			                           NULL );
 
 			if( stored_md5_hash_result == -1 )
 			{
@@ -662,10 +650,13 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_result = ewfverify_get_hash_value_sha1(
+			stored_sha1_hash_result = ewflibewf_get_hash_value(
 						   ewfcommon_libewf_handle,
+						   "SHA1",
+						   4,
 						   stored_sha1_hash_string,
-						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+						   NULL );
 
 			if( stored_sha1_hash_result == -1 )
 			{
@@ -790,7 +781,7 @@ int main( int argc, char * const argv[] )
 		ewfoutput_hash_values_fprint(
 		 stdout,
 		 ewfcommon_libewf_handle,
-		 _CHARACTER_T_STRING( "" ),
+		 "",
 		 calculate_md5,
 		 calculate_sha1 );
 
@@ -799,7 +790,7 @@ int main( int argc, char * const argv[] )
 			ewfoutput_hash_values_fprint(
 			 log_file_stream,
 			 ewfcommon_libewf_handle,
-			 _CHARACTER_T_STRING( "" ),
+			 "",
 			 calculate_md5,
 			 calculate_sha1 );
 		}
