@@ -130,6 +130,8 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
  */
 ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *read_crc )
 {
+	uint8_t stored_crc_buffer[ 4 ];
+
 	EWF_CHUNK *chunk_data     = NULL;
 	EWF_CHUNK *chunk_read     = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -339,9 +341,10 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 			if( ( chunk_read != internal_handle->chunk_cache->compressed )
 			 && ( chunk_read != internal_handle->chunk_cache->data ) )
 			{
-				crc_read_count = ewf_crc_read(
-				                  chunk_crc,
-				                  internal_handle->offset_table->file_descriptor[ chunk ] );
+				crc_read_count = libewf_common_read(
+				                  internal_handle->offset_table->file_descriptor[ chunk ],
+				                  stored_crc_buffer,
+				                  EWF_CRC_SIZE );
 
 				if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
 				{
@@ -363,6 +366,14 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 					return( -1 );
 				}
 				internal_handle->segment_table->file_offset[ segment_number ] += (off64_t) crc_read_count;
+
+				if( libewf_endian_convert_32bit( chunk_crc, stored_crc_buffer ) != 1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
+					 function );
+
+					return( -1 );
+				}
 			}
 			/* Otherwise convert the last 4 bytes of the chunk cache
 			 */

@@ -1210,6 +1210,8 @@ ssize_t libewf_section_volume_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
  */
 int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint32_t *amount_of_chunks, int file_descriptor, uint16_t segment_number, size_t size, uint8_t ewf_format, uint8_t error_tollerance )
 {
+	uint8_t stored_crc_buffer[ 4 ];
+
 	EWF_TABLE *table          = NULL;
 	EWF_TABLE_OFFSET *offsets = NULL;
 	static char *function     = "libewf_offset_table_read";
@@ -1395,9 +1397,23 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 
 				return( -1 );
 			}
-			if( ewf_crc_read( &stored_crc, file_descriptor ) != (int32_t) EWF_CRC_SIZE )
+			read_count = libewf_common_read(
+			              file_descriptor,
+			              stored_crc_buffer,
+			              EWF_CRC_SIZE );
+
+			if( read_count != (ssize_t) EWF_CRC_SIZE )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
+				 function );
+
+				libewf_common_free( offsets );
+
+				return( -1 );
+			}
+			if( libewf_endian_convert_32bit( &stored_crc, stored_crc_buffer ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
 				 function );
 
 				libewf_common_free( offsets );
@@ -1540,6 +1556,8 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
  */
 ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_type, size_t section_type_length, size_t additional_size )
 {
+	uint8_t calculated_crc_buffer[ 4 ];
+
 	EWF_TABLE *table                      = NULL;
 	EWF_TABLE_OFFSET *offsets             = NULL;
 	static char *function                 = "libewf_section_table_write";
@@ -1791,9 +1809,17 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( write_crc == 1 )
 	{
-		table_offsets_crc_write_count = ewf_crc_write(
-	        	                         &calculated_crc,
-		                                 file_descriptor );
+		if( libewf_endian_revert_32bit( calculated_crc, calculated_crc_buffer ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+			 function );
+
+			return( -1 );
+		}
+		table_offsets_crc_write_count = libewf_common_write(
+		                                 file_descriptor,
+	        	                         calculated_crc_buffer,
+	        	                         EWF_CRC_SIZE );
 
 		if( table_offsets_crc_write_count != (ssize_t) EWF_CRC_SIZE )
 		{
@@ -2544,6 +2570,8 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
  */
 ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
+	uint8_t stored_crc_buffer[ 4 ];
+
 	EWF_ERROR2 *error2                = NULL;
 	EWF_ERROR2_SECTOR *error2_sectors = NULL;
 	static char *function             = "libewf_section_error2_read";
@@ -2686,9 +2714,23 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 			return( -1 );
 		}
-		if( ewf_crc_read( &stored_crc, file_descriptor ) != EWF_CRC_SIZE )
+		read_count = libewf_common_read(
+		              file_descriptor,
+		              stored_crc_buffer,
+		              EWF_CRC_SIZE );
+
+		if( read_count != (ssize_t) EWF_CRC_SIZE )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
+			 function );
+
+			libewf_common_free( error2_sectors );
+
+			return( -1 );
+		}
+		if( libewf_endian_convert_32bit( &stored_crc, stored_crc_buffer ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
 			 function );
 
 			libewf_common_free( error2_sectors );

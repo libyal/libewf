@@ -148,6 +148,7 @@ TODO
   ewf_session.c
   ewf_table.c
   ewf_ltree.c
+  ewf_error2.c
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
