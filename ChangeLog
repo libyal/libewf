@@ -170,6 +170,10 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080831
+* added libewf_extern.h
+* Improved configure.ac
+
 Version: 20080830
 * removed errno.h include from ewftools where not used
 * Improved common and configure.ac

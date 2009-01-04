@@ -26,17 +26,10 @@
 #include <common.h>
 #include <types.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
-#endif
-
-#include <libewf/extern.h>
 #include <libewf/handle.h>
 
 #include "libewf_chunk_cache.h"
+#include "libewf_extern.h"
 #include "libewf_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_segment_file_handle.h"

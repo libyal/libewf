@@ -34,6 +34,15 @@
 #include <string.h>
 #endif
 
+#if defined( HAVE_LIBUCA_H )
+#include <libuca.h>
+#elif defined( HAVE_LOCAL_LIBUCA )
+#include "../libuca/libuca_unicode_character.h"
+#include "../libuca/libuca_utf8_string.h"
+#include "../libuca/libuca_utf16_string.h"
+#include "../libuca/libuca_utf32_string.h"
+#endif
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -169,80 +178,6 @@ int libewf_string_to_uint64(
 
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-#if SIZEOF_WCHAR_T == 4
-#define string_size_from_ascii_stream( stream, size_stream, byte_order ) \
-	libunistring_utf32_string_size_from_ascii( stream, size_stream, byte_order, 0 )
-
-#define string_copy_from_ascii_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf32_string_copy_from_ascii( (libunistring_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#define string_copy_to_ascii_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf32_string_copy_to_ascii( (libunistring_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#elif SIZEOF_WCHAR_T == 2
-#define string_size_from_ascii_stream( stream, size_stream, byte_order ) \
-	libunistring_utf16_string_size_from_ascii( stream, size_stream, byte_order, 0 )
-
-#define string_copy_from_ascii_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf16_string_copy_from_ascii( (libunistring_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#define string_copy_to_ascii_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf16_string_copy_to_ascii( (libunistring_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#else
-#error Unsupported size of wchar_t
-#endif
-
-#else
-#define string_size_from_ascii_stream( stream, size_stream, byte_order ) \
-	libunistring_utf8_string_size_from_ascii( stream, size_stream, byte_order, 0 )
-
-#define string_copy_from_ascii_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf8_string_copy_from_ascii( (libunistring_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#define string_copy_to_ascii_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf8_string_copy_to_ascii( (libunistring_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-#if SIZEOF_WCHAR_T == 4
-#define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
-	libunistring_utf32_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
-
-#define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf32_string_copy_from_utf16_stream( (libunistring_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf32_string_copy_to_utf16_stream( (libunistring_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#elif SIZEOF_WCHAR_T == 2
-#define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
-	libunistring_utf16_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
-
-#define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf16_string_copy_from_utf16_stream( (libunistring_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf16_string_copy_to_utf16_stream( (libunistring_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#else
-#error Unsupported size of wchar_t
-#endif
-
-#else
-#define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
-	libunistring_utf8_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
-
-#define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf8_string_copy_from_utf16_stream( (libunistring_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libunistring_utf8_string_copy_to_utf16_stream( (libunistring_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
-
-#endif
-
 /* Define the character string ctime function
  * if date_time_ctime (or equivalent) was defined
  */
@@ -264,6 +199,84 @@ character_t *libewf_string_ctime(
 #elif defined( date_time_ctime )
 #define string_ctime( timestamp, string, size ) \
 	date_time_ctime( timestamp, string, size )
+#endif
+
+#if defined( HAVE_LIBUCA_H ) || defined( HAVE_LOCAL_LIBUCA )
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if SIZEOF_WCHAR_T == 4
+#define string_size_from_byte_stream( stream, size_stream, byte_order ) \
+	libuca_utf32_string_size_from_byte_stream( stream, size_stream, byte_order, 0 )
+
+#define string_copy_from_byte_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf32_string_copy_from_byte_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#define string_copy_to_byte_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf32_string_copy_to_byte_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#elif SIZEOF_WCHAR_T == 2
+#define string_size_from_byte_stream( stream, size_stream, byte_order ) \
+	libuca_utf16_string_size_from_byte_stream( stream, size_stream, byte_order, 0 )
+
+#define string_copy_from_byte_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf16_string_copy_from_byte_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#define string_copy_to_byte_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf16_string_copy_to_byte_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#else
+#error Unsupported size of wchar_t
+#endif
+
+#else
+#define string_size_from_byte_stream( stream, size_stream, byte_order ) \
+	libuca_utf8_string_size_from_byte_stream( stream, size_stream, byte_order, 0 )
+
+#define string_copy_from_byte_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf8_string_copy_from_byte_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#define string_copy_to_byte_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf8_string_copy_to_byte_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if SIZEOF_WCHAR_T == 4
+#define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
+	libuca_utf32_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
+
+#define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf32_string_copy_from_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf32_string_copy_to_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#elif SIZEOF_WCHAR_T == 2
+#define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
+	libuca_utf16_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
+
+#define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf16_string_copy_from_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf16_string_copy_to_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#else
+#error Unsupported size of wchar_t
+#endif
+
+#else
+#define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
+	libuca_utf8_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
+
+#define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf8_string_copy_from_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
+	libuca_utf8_string_copy_to_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+
+#endif
+
 #endif
 
 #if defined( __cplusplus )

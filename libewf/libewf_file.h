@@ -27,15 +27,9 @@
 #include <character_string.h>
 #include <system_string.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
-#endif
-
-#include <libewf/extern.h>
 #include <libewf/handle.h>
+
+#include "libewf_extern.h"
 
 #if defined( __cplusplus )
 extern "C" {
