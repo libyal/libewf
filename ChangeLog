@@ -196,6 +196,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20081013
+* Fixed APIv2 of libewf_check_file_signature
+
 Version: 20081012
 * Worked on UTF character suppport
 

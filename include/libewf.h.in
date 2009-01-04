@@ -108,11 +108,11 @@ LIBEWF_EXTERN int libewf_handle_free(
  */
 #if @HAVE_V2_API@
 LIBEWF_EXTERN int libewf_check_file_signature(
-                   const char *filename );
-#else
-LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename,
                    libewf_error_t **error );
+#else
+LIBEWF_EXTERN int libewf_check_file_signature(
+                   const char *filename );
 #endif
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
