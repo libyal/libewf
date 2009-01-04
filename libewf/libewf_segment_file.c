@@ -1839,7 +1839,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		}
 		/* Write the error2 section if required 
 		 */
-		if( ( internal_handle->acquiry_amount_of_errors > 0 )
+		if( ( internal_handle->amount_of_acquiry_errors > 0 )
 		 && ( ( internal_handle->format == LIBEWF_FORMAT_ENCASE3 )
 		  || ( internal_handle->format == LIBEWF_FORMAT_ENCASE4 )
 		  || ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
@@ -1851,7 +1851,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 			write_count = libewf_section_error2_write(
 			               segment_file,
 			               internal_handle->acquiry_error_sectors,
-			               internal_handle->acquiry_amount_of_errors );
+			               internal_handle->amount_of_acquiry_errors );
 
 			if( write_count == -1 )
 			{

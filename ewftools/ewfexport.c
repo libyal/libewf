@@ -139,6 +139,7 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose              = 0;
 	int8_t compression_level     = LIBEWF_COMPRESSION_NONE;
 	int8_t compress_empty_block  = 0;
+	int argument_set_format      = 0;
 	int interactive_mode         = 1;
 	int output_raw               = 1;
 
@@ -212,7 +213,8 @@ int main( int argc, char * const argv[] )
 			case (INT_T) 'f':
 				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "raw" ), 3 ) == 0 )
 				{
-					output_raw = 1;
+					output_raw          = 1;
+					argument_set_format = 1;
 				}
 				else
 				{
@@ -224,7 +226,8 @@ int main( int argc, char * const argv[] )
 					}
 					else
 					{
-						output_raw = 0;
+						output_raw          = 0;
+						argument_set_format = 1;
 					}
 				}
 				break;
@@ -373,43 +376,45 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Information for export required, please provide the necessary input\n" );
 
-		/* File format
-		 */
-		user_input = ewfinput_get_fixed_value(
-		              stderr,
-		              _S_LIBEWF_CHAR( "Export to file format" ),
-		              ewfexport_format_types,
-		              13,
-		              0 );
-
-		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "raw" ), 3 ) == 0 )
+		if( argument_set_format == 0 )
 		{
-			output_raw = 1;
-		}
-		else
-		{
-			libewf_format = ewfinput_determine_libewf_format( user_input );
+			/* File format
+			 */
+			user_input = ewfinput_get_fixed_value(
+				      stderr,
+				      _S_LIBEWF_CHAR( "Export to file format" ),
+				      ewfexport_format_types,
+				      13,
+				      0 );
 
-			if( libewf_format == 0 )
+			if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "raw" ), 3 ) == 0 )
 			{
-				fprintf( stderr, "Unsupported file format.\n" );
-
-				if( libewf_close( handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
-				libewf_common_free( target_filename );
-				libewf_common_free( user_input );
-
-				exit( EXIT_FAILURE );
+				output_raw = 1;
 			}
 			else
 			{
-				output_raw = 0;
-			}
-		}
-		libewf_common_free( user_input );
+				libewf_format = ewfinput_determine_libewf_format( user_input );
 
+				if( libewf_format == 0 )
+				{
+					fprintf( stderr, "Unsupported file format.\n" );
+
+					if( libewf_close( handle ) != 0 )
+					{
+						fprintf( stderr, "Unable to close EWF file(s).\n" );
+					}
+					libewf_common_free( target_filename );
+					libewf_common_free( user_input );
+
+					exit( EXIT_FAILURE );
+				}
+				else
+				{
+					output_raw = 0;
+				}
+			}
+			libewf_common_free( user_input );
+		}
 		if( output_raw == 0 )
 		{
 			/* Target filename

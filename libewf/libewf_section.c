@@ -2668,7 +2668,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 /* Reads a error2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_ERROR_SECTOR **acquiry_error_sectors, uint32_t *amount_of_acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_ERROR2 error2;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -2683,16 +2683,23 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 	uint32_t iterator                 = 0;
 	uint32_t sector                   = 0;
 
-	if( internal_handle == NULL )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( segment_file == NULL )
+	if( acquiry_error_sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid acquiry error sectors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_acquiry_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of acquiry errors.\n",
 		 function );
 
 		return( -1 );
@@ -2824,16 +2831,16 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 				return( -1 );
 			}
 		}
-		if( internal_handle->acquiry_error_sectors != NULL )
+		if( *acquiry_error_sectors != NULL )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: acquiry error sectors already set in handle - removing previous one.\n",
 			 function );
 
-			libewf_common_free( internal_handle->acquiry_error_sectors );
+			libewf_common_free( *acquiry_error_sectors );
 		}
-		internal_handle->acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE * amount_of_errors );
+		*acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE * amount_of_errors );
 
-		if( internal_handle->acquiry_error_sectors == NULL )
+		if( *acquiry_error_sectors == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create acquiry error sectors.\n",
 			 function );
@@ -2842,7 +2849,7 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 
 			return( -1 );
 		}
-		internal_handle->acquiry_amount_of_errors = amount_of_errors;
+		*amount_of_acquiry_errors = amount_of_errors;
 
 		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
@@ -2855,10 +2862,10 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 
 				return( -1 );
 			}
-			internal_handle->acquiry_error_sectors[ iterator ].sector = (uint64_t) sector;
+			( *acquiry_error_sectors )[ iterator ].sector = (uint64_t) sector;
 
 			if( libewf_endian_convert_32bit(
-			     &internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors,
+			     &( ( *acquiry_error_sectors )[ iterator ].amount_of_sectors ),
 			     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
@@ -4149,9 +4156,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "error2", 7 ) == 0 )
 	{
 		read_count = libewf_section_error2_read(
-		              internal_handle,
 		              segment_file,
 		              (size_t) size,
+		              &( internal_handle->acquiry_error_sectors ),
+		              &( internal_handle->amount_of_acquiry_errors ),
 		              internal_handle->ewf_format,
  		              internal_handle->error_tollerance );
 	}
