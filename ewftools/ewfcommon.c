@@ -616,7 +616,7 @@ ssize32_t ewfcommon_read_input(
 				 || ( errno == ENXIO )
 				 || ( errno == ENODEV ) )
 				{
-					error_string = ewfstring_strerror(
+					error_string = ewfcommon_strerror(
 					                errno );
 
 					if( error_string != NULL )
@@ -841,7 +841,8 @@ ssize32_t ewfcommon_read_input(
 				     SEEK_CUR ) == -1 )
 				{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-					error_string = ewfstring_strerror( errno );
+					error_string = ewfcommon_strerror(
+					                errno );
 
 					if( error_string != NULL )
 					{

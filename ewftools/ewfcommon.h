@@ -37,6 +37,9 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <error_string.h>
+#include <date_time.h>
+#include <file_io.h>
 #include <system_string.h>
 
 #include <stdio.h>
@@ -57,6 +60,28 @@
 
 #if defined( __cplusplus )
 extern "C" {
+#endif
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#define ewfcommon_ctime( timestamp ) \
+	date_time_wctime( timestamp )
+
+#define ewfcommon_strerror( error_number ) \
+	error_string_wcserror( error_number )
+
+#define ewfcommon_fopen( filename, mode ) \
+	file_io_wfopen( filename, mode )
+
+#else
+#define ewfcommon_ctime( timestamp ) \
+	date_time_ctime( timestamp )
+
+#define ewfcommon_strerror( error_number ) \
+	error_string_strerror( error_number )
+
+#define ewfcommon_fopen( filename, mode ) \
+	file_io_fopen( filename, mode )
+
 #endif
 
 extern int ewfcommon_abort;

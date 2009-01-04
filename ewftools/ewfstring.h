@@ -37,9 +37,6 @@
 
 #include <common.h>
 #include <character_string.h>
-#include <date_time.h>
-#include <error_string.h>
-#include <file_io.h>
 #include <system_string.h>
 
 #if defined( __cplusplus )
@@ -50,36 +47,6 @@ extern "C" {
  */
 #define EWFSTRING_DIGEST_HASH_LENGTH_MD5	33
 #define EWFSTRING_DIGEST_HASH_LENGTH_SHA1	41
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define ewfstring_ctime( timestamp ) \
-	date_time_wctime( timestamp )
-
-#else
-#define ewfstring_ctime( timestamp ) \
-	date_time_ctime( timestamp )
-
-#endif
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define ewfstring_strerror( error_number ) \
-	error_string_wcserror( error_number )
-
-#else
-#define ewfstring_strerror( error_number ) \
-	error_string_strerror( error_number )
-
-#endif
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define ewfstring_fopen( filename, mode ) \
-	file_io_wfopen( filename, mode )
-
-#else
-#define ewfstring_fopen( filename, mode ) \
-	file_io_fopen( filename, mode )
-
-#endif
 
 int ewfstring_copy_system_string_to_character_string(
      character_t *destination,

@@ -664,7 +664,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 			if( errno != 0 )
 			{
-				error_string = ewfstring_strerror(
+				error_string = ewfcommon_strerror(
 				                errno );
 			}
 			if( error_string != NULL )
@@ -789,7 +789,7 @@ int main( int argc, char * const argv[] )
 		/* Start acquiring data
 		 */
 		timestamp_start = time( NULL );
-		time_string     = ewfstring_ctime(
+		time_string     = ewfcommon_ctime(
 		                   &timestamp_start );
 		if( time_string != NULL )
 		{
@@ -837,7 +837,7 @@ int main( int argc, char * const argv[] )
 		/* Done acquiring data
 		 */
 		timestamp_end = time( NULL );
-		time_string   = ewfstring_ctime(
+		time_string   = ewfcommon_ctime(
 		                 &timestamp_end );
 
 		if( write_count <= -1 )
@@ -894,7 +894,7 @@ int main( int argc, char * const argv[] )
 
 		if( log_filename != NULL )
 		{
-			log_file_stream = ewfstring_fopen(
+			log_file_stream = ewfcommon_fopen(
 					   log_filename,
 					   _SYSTEM_CHARACTER_T_STRING( "w" ) );
 

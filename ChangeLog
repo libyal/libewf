@@ -42,11 +42,10 @@ To do/think about:
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
 * ewfverify: verify against all available hashes that can be verified
-* windows port: for ewftools integrate certain functions in the library
 * windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
-* windows port: linux alternative to wmain?
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
+* windows port: linux alternative to wmain?
 
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   - header2 and ltree only affected sections
@@ -148,9 +147,6 @@ Next stable:
 * test abort
 * test session section R/W functionality
 
-* fix signal handling for WIN32
-* fix MSVCPP project
-
 * refactor character_string_split to return int
 
 * change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T
@@ -159,21 +155,11 @@ Next stable:
 
 * ewfinfo: change session print?
 
-* WIN32: fix ewfcommon_determine_operating_system
-
 CLOSED
-* use LIBEWF_CHAR internally instead of seperate wide functions?
-  only for none wide support functions
 * what about read+write and compression?
   solved by delta files
-* move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
-  no, this could be read from the error2 section
-* add basic string functions to API for accessing strings outside the library
-  - does this work with application and library memory space?
-  - if so remove libewf_string include from ewfacquire
-  not needed
 * change string duplicate function to macro?
-  no, strndup is not available on all platforms
+  strndup is not available on all platforms
 * do not finalize on error
   no, does not add any additional value
   if a write error did occur the library should not make any guesses about if
@@ -182,30 +168,40 @@ CLOSED
   no the glob function provides for a way to determine segment filenames using
   the basename
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
-  - no
+  no
+
+Version: 20080309
+* Code clean up
+* fixed ewfcommon_determine_operating_system
 
 Version: 20080308
+* Code clean up
 * worked on seperating common code
 * fixed issue with byte size string and more than 1 digit after the seperator
   will now handle 2 digits and skip remaining
 * fixed issue with minimum segement file size in ewf tools also lowered values to 1.0 MiB
 * implemented determining session size
 * fixed MSVCPP project
+* fiexde signal handling for Windows
 
 Version: 20080306
+* Code clean up
 * worked on seperating common code
 
 Version: 20080305
+* Code clean up
 * worked on signal handling
 * fixed issues with date string in header
 * fixes for missing printf "%jd" and "%zd" under Cygwin and WIN32
 * worked on seperating common code
 
 Version: 20080304
+* Code clean up
 * worked on signal handling
 * fixed error due to fclose( NULL ) in ewftools
 
 Version: 20080303
+* Code clean up
 * added byte size string to ewfinfo
 * updated manuals of ewfinfo
 * worked on signal handling

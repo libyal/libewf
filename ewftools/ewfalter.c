@@ -63,21 +63,25 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "ewfstring.h"
 
-/* Prints the executable usage information
- */
-void usage( void )
+/* Prints the executable usage information to the stream
+ *  */
+void usage_fprint(
+      FILE *stream )
 {
-	fprintf( stdout, "Usage: ewfalter [ -t target_file ] [ -hsqvV ] ewf_files\n\n" );
+        if( stream == NULL )
+        {
+                return;
+        }
+	fprintf( stream, "Usage: ewfalter [ -t target_file ] [ -hsqvV ] ewf_files\n\n" );
 
-	fprintf( stdout, "\t-h: shows this help\n" );
-	fprintf( stdout, "\t-q: quiet shows no status information\n" );
-	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-t: specify the target delta path and base filename (default is the same as the ewf_files)\n" );
-	fprintf( stdout, "\t-v: verbose output to stderr\n" );
-	fprintf( stdout, "\t-V: print version\n" );
+	fprintf( stream, "\t-h: shows this help\n" );
+	fprintf( stream, "\t-q: quiet shows no status information\n" );
+	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stream, "\t-t: specify the target delta path and base filename (default is the same as the ewf_files)\n" );
+	fprintf( stream, "\t-v: verbose output to stderr\n" );
+	fprintf( stream, "\t-V: print version\n" );
 }
 
 /* The main program
@@ -127,12 +131,14 @@ int main( int argc, char * const argv[] )
 				fprintf( stderr, "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind ] );
 
-				usage();
+				usage_fprint(
+				 stdout );
 
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'h':
-				usage();
+				usage_fprint(
+				 stdout );
 
 				return( EXIT_SUCCESS );
 
@@ -165,7 +171,8 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Missing EWF image file(s).\n" );
 
-		usage();
+		usage_fprint(
+		 stdout );
 
 		return( EXIT_FAILURE );
 	}
@@ -219,7 +226,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
 		{
-			error_string = ewfstring_strerror(
+			error_string = ewfcommon_strerror(
 			                errno );
 		}
 		if( error_string != NULL )

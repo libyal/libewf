@@ -66,7 +66,6 @@
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "ewfstring.h"
 
 /* Prints the executable usage information to the stream
  */
@@ -485,7 +484,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
 		{
-			error_string = ewfstring_strerror(
+			error_string = ewfcommon_strerror(
 			                errno );
 		}
 		if( error_string != NULL )
@@ -773,7 +772,7 @@ int main( int argc, char * const argv[] )
 		/* Start exporting data
 		 */
 		timestamp_start = time( NULL );
-		time_string     = ewfstring_ctime(
+		time_string     = ewfcommon_ctime(
 		                   &timestamp_start );
 
 		if( time_string != NULL )
@@ -814,7 +813,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 				if( errno != 0 )
 				{
-					error_string = ewfstring_strerror(
+					error_string = ewfcommon_strerror(
 							errno );
 				}
 				if( error_string != NULL )
@@ -879,7 +878,7 @@ int main( int argc, char * const argv[] )
 			 target_filename );
 		}
 		timestamp_end = time( NULL );
-		time_string   = ewfstring_ctime(
+		time_string   = ewfcommon_ctime(
 		                 &timestamp_end );
 
 		if( count <= -1 )
