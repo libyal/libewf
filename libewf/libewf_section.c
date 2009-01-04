@@ -4164,7 +4164,7 @@ ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t s
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
  */
-int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
+int libewf_section_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;
@@ -4173,13 +4173,6 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	uint64_t next_offset       = 0;
 	size_t section_type_length = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -4421,7 +4414,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              segment_file,
 		              (size_t) size,
 		              media_values->amount_of_chunks,
-		              internal_handle->secondary_offset_table,
+		              secondary_offset_table,
 		              *format,
 		              *ewf_format,
 		              error_tollerance );
@@ -4435,7 +4428,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              segment_file,
 		              (size_t) size,
 		              media_values->amount_of_chunks,
-		              internal_handle->offset_table,
+		              offset_table,
 		              *format,
 		              *ewf_format,
 		              error_tollerance );
@@ -4459,8 +4452,8 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_delta_chunk_read(
  		              segment_file,
  		              (size_t) size,
- 		              internal_handle->offset_table,
- 		              internal_handle->secondary_offset_table,
+ 		              offset_table,
+ 		              secondary_offset_table,
  		              error_tollerance );
 	}
 	/* Read the ltree section

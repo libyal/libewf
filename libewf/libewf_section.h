@@ -38,7 +38,6 @@
 #include "libewf_error_sector.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
-#include "libewf_internal_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_section_list.h"
@@ -47,6 +46,7 @@
 
 #include "ewf_char.h"
 #include "ewf_crc.h"
+#include "ewf_data.h"
 #include "ewf_digest_hash.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
@@ -107,7 +107,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size );
 #endif
 
-int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
+int libewf_section_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
 
 #if defined( __cplusplus )
 }

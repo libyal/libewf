@@ -650,11 +650,12 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	while( result != -1 )
 	{
 		result = libewf_section_read(
-		          internal_handle,
 		          segment_file,
 		          internal_handle->header_sections,
 		          internal_handle->hash_sections,
 		          internal_handle->media_values,
+		          internal_handle->offset_table,
+		          internal_handle->secondary_offset_table,
 		          internal_handle->acquiry_errors,
 		          &( internal_handle->compression_level ),
 		          &( internal_handle->format ),
