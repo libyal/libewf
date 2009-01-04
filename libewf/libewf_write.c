@@ -1105,7 +1105,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	}
 	else if( result == 1 )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: closing chunks section amount of data written: %" PRIi32 ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: closing chunks section amount of data written: %" PRIi64 ".\n",
 		 function, internal_handle->write->chunks_section_write_count );
 
 		/* Correct the offset, size in the chunks section
@@ -1114,7 +1114,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
 		               internal_handle->write->chunks_section_offset,
-		               (size_t) internal_handle->write->chunks_section_write_count,
+		               (size64_t) internal_handle->write->chunks_section_write_count,
 		               internal_handle->write->amount_of_chunks,
 		               internal_handle->write->section_amount_of_chunks );
 
@@ -2386,7 +2386,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				       internal_handle,
 				       segment_file,
 				       internal_handle->write->chunks_section_offset,
-				       (size_t) internal_handle->write->chunks_section_write_count,
+				       (size64_t) internal_handle->write->chunks_section_write_count,
 				       internal_handle->write->amount_of_chunks,
 				       internal_handle->write->section_amount_of_chunks );
 

@@ -592,7 +592,7 @@ int main( int argc, char * const argv[] )
 		 */
 		if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 		{
-			maximum_segment_file_size = ULONG_MAX;
+			maximum_segment_file_size = INT64_MAX;
 		}
 		else
 		{
@@ -608,11 +608,11 @@ int main( int argc, char * const argv[] )
 
 		segment_file_size *= 1024;
 
-		/* Make sure the segment file size is 1 byte smaller than the maximum
+		/* Make sure the segment file size is smaller than or equal to the maximum
 		 */
-		if( segment_file_size >= maximum_segment_file_size )
+		if( segment_file_size > maximum_segment_file_size )
 		{
-			segment_file_size = maximum_segment_file_size - 1;
+			segment_file_size = maximum_segment_file_size;
 		}
 
 		/* Chunk size (sectors per block)

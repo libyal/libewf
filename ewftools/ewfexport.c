@@ -70,13 +70,14 @@
  */
 void usage( void )
 {
-	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -f format ] [ -o offset ]\n" );
-	fprintf( stderr, "                 [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
+	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -d digest_type ] [ -f format ]\n" );
+	fprintf( stderr, "                 [ -o offset ] [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
 
 	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
 	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stderr, "\t-B: specify the amount of bytes to export (default is all bytes)\n" );
 	fprintf( stderr, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stderr, "\t-f: specify the file format to write to, options: raw (default), ewf, smart,\n" );
 	fprintf( stderr, "\t    encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx\n" );
 	fprintf( stderr, "\t-h: shows this help\n" );
@@ -146,6 +147,8 @@ int main( int argc, char * const argv[] )
 	int argument_set_segment_file_size = 0;
 	int argument_set_size              = 0;
 	int interactive_mode               = 1;
+	uint8_t calculate_md5              = 1;
+	uint8_t calculate_sha1             = 0;
 	int output_raw                     = 1;
 
 	LIBEWF_CHAR *ewfexport_format_types[ 13 ] = \
@@ -167,7 +170,7 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_version_fprint( stderr, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:d:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -217,6 +220,17 @@ int main( int argc, char * const argv[] )
 					{
 						argument_set_compression = 1;
 					}
+				}
+				break;
+
+			case (INT_T) 'd':
+				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "sha1" ), 4 ) == 0 )
+				{
+					calculate_sha1 = 1;
+				}
+				else
+				{
+					fprintf( stderr, "Unsupported digest type.\n" );
 				}
 				break;
 
@@ -719,6 +733,8 @@ int main( int argc, char * const argv[] )
 		         export_handle,
 		         export_size,
 		         export_offset,
+		         calculate_md5,
+		         calculate_sha1,
 		         swap_byte_pairs,
 		         wipe_chunk_on_error,
 		         callback );

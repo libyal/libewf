@@ -122,7 +122,7 @@ ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTIO
 /* Writes a section start to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, size_t section_data_size )
+ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, size64_t section_data_size )
 {
 	EWF_SECTION section;
 
@@ -180,6 +180,13 @@ ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR 
 	section_size   = EWF_SECTION_SIZE + section_data_size;
 	section_offset = segment_file->file_offset + section_size;
 
+	if( section_size > (uint64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( libewf_endian_revert_64bit( section_size, section.size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert size value.\n",
@@ -438,7 +445,7 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE *segment_fil
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       compressed_string_size );
+	                       (size64_t) compressed_string_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -971,7 +978,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBE
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       EWF_VOLUME_SMART_SIZE );
+	                       (size64_t) EWF_VOLUME_SMART_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -1339,7 +1346,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE *segment_file, LIBE
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       EWF_VOLUME_SIZE );
+	                       (size64_t) EWF_VOLUME_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -1934,7 +1941,7 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t b
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       section_size );
+	                       (size64_t) section_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -2738,7 +2745,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       EWF_DATA_SIZE );
+	                       (size64_t) EWF_DATA_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3103,7 +3110,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       section_size );
+	                       (size64_t) section_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3307,7 +3314,7 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_DIGEST
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       EWF_HASH_SIZE );
+	                       (size64_t) EWF_HASH_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3894,7 +3901,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       section_size );
+	                       (size64_t) section_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
