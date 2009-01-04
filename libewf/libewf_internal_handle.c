@@ -1979,6 +1979,7 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	int64_t amount_of_chunks            = 0;
 	int64_t amount_of_sectors           = 0;
 	uint64_t maximum_input_file_size    = 0;
+	uint64_t maximum_segment_file_size  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2050,14 +2051,23 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 
 		internal_handle->write->segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	}
-	if( internal_handle->write->segment_file_size > (uint32_t) INT32_MAX )
+	if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	{
+		maximum_segment_file_size = INT64_MAX;
+	}
+	else
+	{
+		maximum_segment_file_size = INT32_MAX;
+	}
+	if( internal_handle->write->segment_file_size > maximum_segment_file_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( internal_handle->compression_level != EWF_COMPRESSION_NONE ) && ( internal_handle->compression_level != EWF_COMPRESSION_FAST )
+	if( ( internal_handle->compression_level != EWF_COMPRESSION_NONE )
+	 && ( internal_handle->compression_level != EWF_COMPRESSION_FAST )
 	 && ( internal_handle->compression_level != EWF_COMPRESSION_BEST ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unsupported compression level - using default.\n",
@@ -2168,7 +2178,8 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	{
 		/* Determine the required amount of segments allowed to write
 		 */
-		required_amount_of_segments = (int64_t) internal_handle->write->input_write_size / (int64_t) internal_handle->write->segment_file_size;
+		required_amount_of_segments = (int64_t) internal_handle->write->input_write_size
+		                            / (int64_t) internal_handle->write->segment_file_size;
 
 		if( required_amount_of_segments > (int64_t) internal_handle->write->maximum_amount_of_segments )
 		{

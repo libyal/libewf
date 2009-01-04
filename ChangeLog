@@ -134,6 +134,7 @@ TODO
 Version: 20070828
 * added read support for > 2Gb segment file for EnCase 6.7
 * changed off_t to off64_t for Windows >2Gb segment file support
+* worked on write support for > 2Gb segment file for EnCase 6.7
 
 Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy

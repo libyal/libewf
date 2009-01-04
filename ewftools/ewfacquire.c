@@ -262,12 +262,13 @@ int main( int argc, char * const argv[] )
 	size_t string_length                     = 0;
 	time_t timestamp_start                   = 0;
 	time_t timestamp_end                     = 0;
+	uint64_t maximum_segment_file_size       = 0;
 	uint64_t segment_file_size               = 0;
 	uint64_t input_size                      = 0;
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;
 	uint64_t sectors_per_chunk               = 0;
-	uint32_t sector_error_granularity        = 0;
+	uint64_t sector_error_granularity        = 0;
 	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
 	int8_t compress_empty_block              = 0;
 	int8_t result_md5_hash                   = 0;
@@ -582,20 +583,29 @@ int main( int argc, char * const argv[] )
 
 		/* Segment file size
 		 */
+		if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+		{
+			maximum_segment_file_size = INT64_MAX;
+		}
+		else
+		{
+			maximum_segment_file_size = INT32_MAX;
+		}
+
 		segment_file_size = ewfcommon_get_user_input_size_variable(
 		                     stdout,
 		                     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
 		                     1440,
-		                     ( 2 * 1024 * 1024 ),
+		                     ( maximum_segment_file_size / 1024 ),
 		                     ( 650 * 1024 ) );
 
 		segment_file_size *= 1024;
 
-		/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
+		/* Make sure the segment file size is 1 byte smaller than the maximum
 		 */
-		if( segment_file_size >= (uint64_t) INT32_MAX )
+		if( segment_file_size >= maximum_segment_file_size )
 		{
-			segment_file_size = (uint64_t) INT32_MAX - 1;
+			segment_file_size = maximum_segment_file_size - 1;
 		}
 
 		/* Chunk size (sectors per block)
@@ -613,12 +623,12 @@ int main( int argc, char * const argv[] )
 
 		/* Error granularity
 		 */
-		sector_error_granularity = (uint32_t) ewfcommon_get_user_input_size_variable(
-		                                       stdout,
-		                                       _S_LIBEWF_CHAR( "The amount of sectors to be used as error granularity" ),
-		                                       1,
-		                                       sectors_per_chunk,
-		                                       64 );
+		sector_error_granularity = ewfcommon_get_user_input_size_variable(
+		                            stdout,
+		                            _S_LIBEWF_CHAR( "The amount of sectors to be used as error granularity" ),
+		                            1,
+		                            sectors_per_chunk,
+		                            64 );
 
 		/* The amount of read error retry
 		 */
@@ -668,7 +678,7 @@ int main( int argc, char * const argv[] )
 	        (size64_t) acquiry_size,
 	        (size64_t) segment_file_size,
 	        (uint32_t) sectors_per_chunk,
-	        sector_error_granularity,
+	        (uint32_t) sector_error_granularity,
 	        read_error_retry,
 	        (uint8_t) wipe_block_on_read_error ) == 0 );
 
@@ -734,7 +744,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_error_granularity( handle, sector_error_granularity ) != 1 )
+	if( libewf_set_write_error_granularity( handle, (uint32_t) sector_error_granularity ) != 1 )
 	{
 		fprintf( stderr, "Unable to set write error granularity in handle.\n" );
 
@@ -1093,7 +1103,7 @@ int main( int argc, char * const argv[] )
 	               acquiry_size,
 	               acquiry_offset,
 	               read_error_retry,
-	               sector_error_granularity,
+	               (uint32_t) sector_error_granularity,
 	               (uint8_t) wipe_block_on_read_error,
 	               seek_on_error,
 	               calculate_sha1,
