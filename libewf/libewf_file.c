@@ -1010,11 +1010,45 @@ int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error
  */
-int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size )
+int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size )
 {
-	return( libewf_internal_handle_set_write_segment_file_size(
-	         (LIBEWF_INTERNAL_HANDLE *) handle,
-	         segment_file_size ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_write_segment_file_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( segment_file_size == 0 )
+	 || ( segment_file_size > (size64_t) INT64_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid value segment file value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->write->segment_file_size = segment_file_size;
+
+	return( 1 );
 }
 
 /* Sets the write error granularity

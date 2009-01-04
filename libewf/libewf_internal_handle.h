@@ -290,7 +290,7 @@ struct libewf_internal_handle_write
 
 	/* The segment file size
 	 */
-	size32_t segment_file_size;
+	size64_t segment_file_size;
 
 	/* The maximum amount of segments
 	 */
@@ -391,7 +391,6 @@ int libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal
 
 int libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
 
-int libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size32_t segment_file_size );
 int libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
 int libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );
 int libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_type, uint8_t volume_type );

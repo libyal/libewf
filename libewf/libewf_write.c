@@ -1548,7 +1548,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		/* Check if chunk fits in exisiting delta segment file
 		 */
 		else if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
-		    + chunk_data_size + EWF_CRC_SIZE ) > internal_handle->write->segment_file_size )
+		    + chunk_data_size + EWF_CRC_SIZE ) > (off64_t) internal_handle->write->segment_file_size )
 		{
 			result = 0;
 		}

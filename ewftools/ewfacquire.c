@@ -113,7 +113,7 @@ void usage( void )
  * and asks the user for confirmation
  * Return 1 if confirmed by user, 0 otherwise
  */
-int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, uint64_t acquiry_offset, uint64_t acquiry_size, uint32_t segment_file_size, uint64_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
+int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
 {
 	LIBEWF_CHAR *user_input = NULL;
 	int input_confirmed     = -1;
@@ -262,7 +262,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                     = 0;
 	time_t timestamp_start                   = 0;
 	time_t timestamp_end                     = 0;
-	int64_t segment_file_size                = 0;
+	uint64_t segment_file_size               = 0;
 	uint64_t input_size                      = 0;
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;
@@ -593,10 +593,11 @@ int main( int argc, char * const argv[] )
 
 		/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
 		 */
-		if( segment_file_size >= (int64_t) INT32_MAX )
+		if( segment_file_size >= (uint64_t) INT32_MAX )
 		{
-			segment_file_size = (int64_t) INT32_MAX - 1;
+			segment_file_size = (uint64_t) INT32_MAX - 1;
 		}
+
 		/* Chunk size (sectors per block)
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
@@ -663,10 +664,10 @@ int main( int argc, char * const argv[] )
 	        compression_level,
 	        (uint8_t) compress_empty_block,
 	        libewf_format,
-	        acquiry_offset,
-	        acquiry_size,
-	        (uint32_t) segment_file_size,
-	        sectors_per_chunk,
+	        (off64_t) acquiry_offset,
+	        (size64_t) acquiry_size,
+	        (size64_t) segment_file_size,
+	        (uint32_t) sectors_per_chunk,
 	        sector_error_granularity,
 	        read_error_retry,
 	        (uint8_t) wipe_block_on_read_error ) == 0 );
@@ -717,7 +718,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_segment_file_size( handle, (uint32_t) segment_file_size ) != 1 )
+	if( libewf_set_write_segment_file_size( handle, (size64_t) segment_file_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to set write segment file size in handle.\n" );
 

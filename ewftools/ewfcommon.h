@@ -278,7 +278,7 @@ struct tm *ewfcommon_gmtime( const time_t *timestamp );
 
 void ewfcommon_version_fprint( FILE *stream, LIBEWF_CHAR *program );
 void ewfcommon_copyright_fprint( FILE *stream );
-void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, uint64_t acquiry_offset, uint64_t acquiry_size, uint32_t segment_file_size, uint64_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error );
+void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error );
 void ewfcommon_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfcommon_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfcommon_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle );

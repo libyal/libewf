@@ -108,7 +108,7 @@ LIBEWF_EXTERN int libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t secto
 
 LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 
-LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size );
+LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size );
 LIBEWF_EXTERN int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity );
 LIBEWF_EXTERN int libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block );
 LIBEWF_EXTERN int libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type );

@@ -401,7 +401,7 @@ LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t 
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size );
+LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size );
 
 /* Sets the write error granularity
  * Returns 1 if successful, -1 on error

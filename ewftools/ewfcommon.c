@@ -1273,7 +1273,7 @@ void ewfcommon_copyright_fprint( FILE *stream )
 
 /* Prints an overview of the aquiry parameters
  */
-void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, uint64_t acquiry_offset, uint64_t acquiry_size, uint32_t segment_file_size, uint64_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
+void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
 {
 	static char *function = "ewfcommon_acquiry_parameters_fprint";
 
@@ -1433,7 +1433,7 @@ void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF
 	{
 		fprintf( stream, "\n" );
 	}
-	fprintf( stream, "Acquiry start offet:\t\t%" PRIu64 "\n", acquiry_offset );
+	fprintf( stream, "Acquiry start offet:\t\t%" PRIi64 "\n", acquiry_offset );
 	fprintf( stream, "Amount of bytes to acquire:\t%" PRIu64 "", acquiry_size );
 
 	if( acquiry_size == 0 )
@@ -1442,8 +1442,8 @@ void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF
 	}
 	fprintf( stream, "\n" );
 
-	fprintf( stream, "Evidence segment file size:\t%" PRIu32 " kbytes\n", ( segment_file_size / 1024 ) );
-	fprintf( stream, "Block size:\t\t\t%" PRIu64 " sectors\n", sectors_per_chunk );
+	fprintf( stream, "Evidence segment file size:\t%" PRIu64 " kbytes\n", ( segment_file_size / 1024 ) );
+	fprintf( stream, "Block size:\t\t\t%" PRIu32 " sectors\n", sectors_per_chunk );
 	fprintf( stream, "Error granularity:\t\t%" PRIu32 " sectors\n", sector_error_granularity );
 	fprintf( stream, "Retries on read error:\t\t%" PRIu8 "\n", read_error_retry );
 

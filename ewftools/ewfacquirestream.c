@@ -334,7 +334,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* And larger than 1440 kb (1440 * 1024)
 	 */
-	else if( segment_file_size < (1440 * 1024) )
+	else if( segment_file_size < ( 1440 * 1024 ) )
 	{
 		segment_file_size = 1440 * 1024;
 	}
@@ -471,10 +471,10 @@ int main( int argc, char * const argv[] )
 	 compression_level,
 	 compress_empty_block,
 	 libewf_format,
-	 acquiry_offset,
-	 acquiry_size,
-	 (uint32_t) segment_file_size,
-	 sectors_per_chunk,
+	 (off64_t) acquiry_offset,
+	 (size64_t) acquiry_size,
+	 (size64_t) segment_file_size,
+	 (uint32_t) sectors_per_chunk,
 	 sector_error_granularity,
 	 read_error_retry,
 	 wipe_block_on_read_error );
@@ -509,7 +509,7 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_write_segment_file_size( handle, (uint32_t) segment_file_size ) != 1 )
+	if( libewf_set_write_segment_file_size( handle, (size64_t) segment_file_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to set write segment file size in handle.\n" );
 
