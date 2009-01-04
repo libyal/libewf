@@ -1912,7 +1912,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 			return( -1 );
 		}
 	}
-	write_count = libewf_write_finalize( handle );
+	write_count = libewf_write_finalize(
+	               handle );
 
 	if( write_count == -1 )
 	{

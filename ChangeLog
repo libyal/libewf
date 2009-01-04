@@ -130,26 +130,17 @@ Next release(s):
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing
 
+* ewfalter
+  - allow to set maximum delta file size default 4 GiB?
+
+* refactor character_string_split to return int
+
 Documentation update:
 * DVD also uses CD media type
 * No additional session values in EnCase 6
 
 Next stable:
 * full platform test
-
-* ewfalter
-  - allow to set maximum delta file size default 4 GiB?
-
-* test abort
-* test session section R/W functionality
-
-* refactor character_string_split to return int
-
-* refactor time/date string functions to only set the string not allocate it?
-
-* change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T?
-* missing \n in some headers?
-* ewfinfo: change session print?
 
 CLOSED
 * what about read+write and compression?
@@ -165,6 +156,10 @@ CLOSED
   the basename
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   no
+
+Version: 20080313
+* tested session section R/W functionality
+* made package ready for stable test
 
 Version: 20080312
 * Code clean up

@@ -12,8 +12,7 @@ libcommon_la_SOURCES = \
 	notify.c notify.h \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h \
-	types.h \
-	memwatch.c memwatch.h
+	types.h
 
 distclean: clean
 	/bin/rm -f Makefile

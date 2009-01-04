@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080312],
+ [20080313],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080312])
+ [20080313])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -492,15 +492,6 @@ AS_IF(
 	 [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
 	ac_libewf_enable_raw_access=yes])
 
-dnl Check if libewf should be build with reduced memory usage
-AS_IF(
-	[test "x$ac_libewf_enable_low_memory_usage" != xno ],
-	[AC_DEFINE(
-	 [HAVE_LOW_MEMORY_USAGE],
-	 [1],
-	 [Defines if libewf should be build with low memory usage] )
-	ac_libewf_enable_low_memory_usage=yes])
-
 dnl Check if libewf should be build with verbose output
 AS_IF(
 	[test "x$ac_libewf_enable_verbose_output" != xno ],
@@ -522,7 +513,7 @@ AS_IF(
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
-CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO"
+CFLAGS="$CFLAGS -Wall"
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
@@ -556,7 +547,6 @@ Building:
 Features:
    Wide character type support:             $ac_libewf_enable_wide_character_type
    ewftools use raw read and write support: $ac_libewf_enable_raw_access
-   Low memory usage:                        $ac_libewf_enable_low_memory_usage
    Verbose output:                          $ac_libewf_enable_verbose_output
    Debug output:                            $ac_libewf_enable_debug_output
 ]);

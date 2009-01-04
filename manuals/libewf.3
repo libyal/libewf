@@ -1,4 +1,4 @@
-.Dd March 2, 2008
+.Dd March 13, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -363,6 +363,14 @@ function can be used to parse the values in the hash string within a set of EWF 
 The
 .Fn libewf_add_acquiry_error
 function can be used to add an acquiry error (a read error during acquiry) to be written into a set of EWF files.
+.Pp
+The
+.Fn libewf_add_crc_error
+function can be used to add a CRC error (a validation error in a chunk in a set of EWF files) to be set in the handle.
+.Pp
+The
+.Fn libewf_add_session
+function can be used to add a sesssion to be written into a set of EWF files. Note that the only the start offset is stored in a set of EWF files. Libewf ignores the session amount of sectors on write and determines the session sizes using the available session and media information on read.
 .Pp
 The
 .Fn libewf_copy_*
