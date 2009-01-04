@@ -129,6 +129,8 @@ Next release:
 * ewfcommon_export_ewf - add raw access write support
 * change default wipe behavior for ewfacquire(stream)
 * automate delta file testing
+* ewfalter allow to set delta segment file path/basename
+  test if no delta files were added before change
 * add ewfx_delta_chunk.h to MSVC++ project
 
 CLOSED

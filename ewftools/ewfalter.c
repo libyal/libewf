@@ -68,12 +68,13 @@
  */
 void usage( void )
 {
-	fprintf( stdout, "Usage: ewfalter [ -hsqvV ] ewf_files\n\n" );
+	fprintf( stdout, "Usage: ewfalter [ -t target_file ] [ -hsqvV ] ewf_files\n\n" );
 
 	fprintf( stdout, "\t-h: shows this help\n" );
 	fprintf( stdout, "\t-q: quiet shows no status information\n" );
 	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stderr, "\t-t: specify the target delta path and base filename (default is the same as the ewf_files)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
 	fprintf( stdout, "\t-V: print version\n" );
 }
@@ -93,6 +94,7 @@ int main( int argc, char * const argv[] )
 
 	LIBEWF_CHAR *program       = _S_LIBEWF_CHAR( "ewfalter" );
 
+	CHAR_T *target_filename    = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string       = NULL;
 #endif
@@ -108,7 +110,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	fprintf( stdout, "ewfalter is for expirimental usage only.\n" );
+	fprintf( stdout, "ewfalter is for testing purposes only.\n" );
 
 	ewfoutput_version_fprint( stdout, program );
 
@@ -129,12 +131,17 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_SUCCESS );
 
+			case (INT_T) 'q':
+				break;
+
 			case (INT_T) 's':
 				swap_byte_pairs = 1;
 
 				break;
 
-			case (INT_T) 'q':
+			case (INT_T) 't':
+				target_filename = optarg;
+
 				break;
 
 			case (INT_T) 'v':
@@ -290,14 +297,14 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	fprintf( stdout, "Alteration completed.\n" );
-
 	if( libewf_close( handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
 		return( EXIT_FAILURE );
 	}
+	fprintf( stdout, "Alteration completed.\n" );
+
 	return( EXIT_SUCCESS );
 }
 
