@@ -25,6 +25,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
@@ -115,6 +117,8 @@ int main( int argc, char * const argv[] )
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+
+	liberror_error_t *error                    = NULL;
 #endif
 
 #if !defined( HAVE_GLOB_H )
@@ -574,11 +578,15 @@ int main( int argc, char * const argv[] )
 			stored_md5_hash_result = libewf_get_md5_hash(
 						  ewfcommon_libewf_handle,
 						  md5_hash,
-						  DIGEST_HASH_SIZE_MD5 );
+						  DIGEST_HASH_SIZE_MD5,
+			                          &error );
 
 			if( stored_md5_hash_result == -1 )
 			{
 				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+
+				liberror_error_free(
+				 &error );
 
 				if( calculate_sha1 == 1 )
 				{
@@ -597,7 +605,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( digest_copy_to_string(
+			if( digest_hash_copy_to_string(
 			     md5_hash,
 			     DIGEST_HASH_SIZE_MD5,
 			     stored_md5_hash_string,

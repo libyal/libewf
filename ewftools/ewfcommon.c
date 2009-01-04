@@ -1202,8 +1202,8 @@ ssize64_t ewfcommon_read_verify(
            size_t data_buffer_size,
            void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
-	MD5_CONTEXT md5_context;
-	SHA1_CONTEXT sha1_context;
+	md5_context_t md5_context;
+	sha1_context_t sha1_context;
 
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
@@ -1551,14 +1551,18 @@ ssize64_t ewfcommon_read_verify(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
-		     md5_hash_string_length ) != 1 )
+		     md5_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1579,14 +1583,18 @@ ssize64_t ewfcommon_read_verify(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
-		     sha1_hash_string_length ) != 1 )
+		     sha1_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1618,8 +1626,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            size_t data_buffer_size,
            void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
-	MD5_CONTEXT md5_context;
-	SHA1_CONTEXT sha1_context;
+	md5_context_t md5_context;
+	sha1_context_t sha1_context;
 
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
@@ -1970,14 +1978,18 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
-		     md5_hash_string_length ) != 1 )
+		     md5_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2026,14 +2038,18 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
-		     sha1_hash_string_length ) != 1 )
+		     sha1_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2096,8 +2112,8 @@ ssize64_t ewfcommon_export_raw(
            size_t data_buffer_size,
            void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
-	MD5_CONTEXT md5_context;
-	SHA1_CONTEXT sha1_context;
+	md5_context_t md5_context;
+	sha1_context_t sha1_context;
 
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
@@ -2520,14 +2536,18 @@ ssize64_t ewfcommon_export_raw(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
-		     md5_hash_string_length ) != 1 )
+		     md5_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2548,14 +2568,18 @@ ssize64_t ewfcommon_export_raw(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
-		     sha1_hash_string_length ) != 1 )
+		     sha1_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2593,8 +2617,8 @@ ssize64_t ewfcommon_export_ewf(
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
-	MD5_CONTEXT md5_context;
-	SHA1_CONTEXT sha1_context;
+	md5_context_t md5_context;
+	sha1_context_t sha1_context;
 
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
@@ -3159,14 +3183,18 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     md5_hash,
 		     md5_hash_size,
 		     md5_hash_string,
-		     md5_hash_string_length ) != 1 )
+		     md5_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -3215,14 +3243,18 @@ ssize64_t ewfcommon_export_ewf(
 
 			return( -1 );
 		}
-		if( digest_copy_to_string(
+		if( digest_hash_copy_to_string(
 		     sha1_hash,
 		     sha1_hash_size,
 		     sha1_hash_string,
-		     sha1_hash_string_length ) != 1 )
+		     sha1_hash_string_length,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}

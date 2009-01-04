@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "character_string.h"
 
 #if defined( __cplusplus )
@@ -37,11 +39,12 @@ extern "C" {
 
 typedef uint8_t digest_hash_t;
 
-int digest_copy_to_string(
+int digest_hash_copy_to_string(
      digest_hash_t *digest_hash,
-     size_t size_digest_hash,
+     size_t digest_hash_size,
      character_t *string,
-     size_t size_string );
+     size_t string_size,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

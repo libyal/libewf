@@ -24,6 +24,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <errno.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -1158,12 +1160,14 @@ void ewfoutput_hash_values_fprint(
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 
 	character_t *stored_md5_hash_string  = NULL;
+	liberror_error_t *error              = NULL;
 	static char *function                = "ewfoutput_hash_values_fprint";
 	uint32_t hash_identifier_length      = 32;
 	uint32_t hash_value_length           = 128;
 	uint32_t amount_of_values            = 0;
 	uint32_t iterator                    = 0;
 	uint8_t print_additional_hash_values = 1;
+	int result                           = 0;
 
 	if( stream == NULL )
 	{
@@ -1188,35 +1192,60 @@ void ewfoutput_hash_values_fprint(
 	}
 	if( ignore_md5 == 0 )
 	{
-		if( libewf_get_md5_hash(
-		     handle,
-		     md5_hash,
-		     DIGEST_HASH_SIZE_MD5 ) != 1 )
+		result = libewf_get_md5_hash(
+		          handle,
+		          md5_hash,
+		          DIGEST_HASH_SIZE_MD5 );
+
+		if( result == -1 )
 		{
 			notify_warning_printf( "%s: unable to retrieve MD5 hash.\n",
 			 function );
 
 			return;
 		}
-		stored_md5_hash_string = (character_t *) memory_allocate(
-							  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
-
-		if( ( stored_md5_hash_string != NULL )
-		 && ( digest_copy_to_string(
-		       md5_hash,
-		       DIGEST_HASH_SIZE_MD5,
-		       stored_md5_hash_string,
-		       EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
+		else if( result == 0 )
 		{
-			fprintf( stream, "\tMD5 hash in file:\t%" PRIs "\n",
+			fprintf(
+			 stream,
+			 "\tMD5 hash in file:\tN/A\n" );
+		}
+		else
+		{
+			stored_md5_hash_string = (character_t *) memory_allocate(
+								  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+
+			if( stored_md5_hash_string == NULL )
+			{
+				notify_warning_printf( "%s: unable to create MD5 hash string.\n",
+				 function );
+
+				return;
+			}
+			if( digest_hash_copy_to_string(
+			     md5_hash,
+			     DIGEST_HASH_SIZE_MD5,
+			     stored_md5_hash_string,
+			     EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+			     &error ) != 1 )
+			{
+				notify_warning_printf( "%s: unable to set MD5 hash string.\n",
+				 function );
+
+				liberror_error_free(
+				 &error );
+				memory_free(
+				 stored_md5_hash_string );
+
+				return;
+			}
+			fprintf(
+			 stream,
+			 "\tMD5 hash in file:\t%" PRIs "\n",
 			 stored_md5_hash_string );
 
 			memory_free(
 			 stored_md5_hash_string );
-		}
-		else
-		{
-			fprintf( stream, "\tMD5 hash in file:\tN/A\n" );
 		}
 	}
 	if( libewf_parse_hash_values(
@@ -1282,8 +1311,12 @@ void ewfoutput_hash_values_fprint(
 
 							print_additional_hash_values = 0;
 						}
-						fprintf( stream, "%" PRIs "%" PRIs ":\t%" PRIs "\n",
-						 indentation, hash_identifier, hash_value );
+						fprintf(
+						 stream,
+						 "%" PRIs "%" PRIs ":\t%" PRIs "\n",
+						 indentation,
+						 hash_identifier,
+						 hash_value );
 					}
 				}
 			}

@@ -21,59 +21,86 @@
  */
 
 #include <common.h>
-#include <notify.h>
 #include <types.h>
 
+#include <liberror.h>
+
+#include "character_string.h"
 #include "digest_hash.h"
 
 /* Converts the EWF digest hash to a printable string
- * Returns 1 if successful, 0 if hash was not set, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-int digest_copy_to_string(
+int digest_hash_copy_to_string(
      digest_hash_t *digest_hash,
-     size_t size_digest_hash,
+     size_t digest_hash_size,
      character_t *string,
-     size_t size_string )
+     size_t string_size,
+     liberror_error_t **error )
 {
-	static char *function       = "digest_copy_to_string";
+	static char *function       = "digest_hash_copy_to_string";
 	size_t string_iterator      = 0;
 	size_t digest_hash_iterator = 0;
 	uint8_t digest_digit        = 0;
 
 	if( digest_hash == NULL )
 	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: invalid digest hash.\n",
-		 function );
-#endif
-
-		return( 0 );
-	}
-	if( string == NULL )
-	{
-		notify_warning_printf( "%s: invalid string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid digest hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( size_string > (size_t) SSIZE_MAX )
-	 || ( size_digest_hash > (size_t) SSIZE_MAX ) )
+	if( digest_hash_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid digest hash size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	/* The string requires space for 2 characters per digest hash digit and a end of string
 	 */
-	if( size_string < ( ( 2 * size_digest_hash ) + 1 ) )
+	if( string_size < ( ( 2 * digest_hash_size ) + 1 ) )
 	{
-		notify_warning_printf( "%s: string too small.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: string too small.\n",
 		 function );
 
 		return( -1 );
 	}
-	for( digest_hash_iterator = 0; digest_hash_iterator < size_digest_hash; digest_hash_iterator++ )
+	for( digest_hash_iterator = 0; digest_hash_iterator < digest_hash_size; digest_hash_iterator++ )
 	{
 		digest_digit = digest_hash[ digest_hash_iterator ] / 16;
 

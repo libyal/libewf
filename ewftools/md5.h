@@ -37,7 +37,7 @@ extern "C" {
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
 
-#define MD5_CONTEXT	MD5_CTX
+typedef MD5_CTX md5_context_t;
 
 #define md5_initialize( context, error ) \
 	MD5_Init( context )
@@ -50,7 +50,7 @@ extern "C" {
 
 #else
 
-#define MD5_CONTEXT	digest_context_t
+typedef digest_context_t md5_context_t;
 
 #define md5_initialize( context, error ) \
 	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_MD5, error )

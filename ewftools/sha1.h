@@ -37,7 +37,7 @@ extern "C" {
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
 
-#define SHA1_CONTEXT	SHA_CTX
+typedef SHA_CTX sha1_context_t;
 
 #define sha1_initialize( context, error ) \
 	SHA1_Init( context )
@@ -50,7 +50,7 @@ extern "C" {
 
 #else
 
-#define SHA1_CONTEXT	digest_context_t
+typedef digest_context_t sha1_context_t;
 
 #define sha1_initialize( context, error ) \
 	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_SHA1, error )
