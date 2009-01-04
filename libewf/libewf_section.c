@@ -4276,7 +4276,7 @@ ssize_t libewf_section_delta_chunk_write(
 	if( write_crc != 0 )
 	{
 		endian_little_revert_32bit(
-		  calculated_crc_buffer,
+		 calculated_crc_buffer,
 		 *chunk_crc );
 
 		write_count = libewf_segment_file_handle_write(

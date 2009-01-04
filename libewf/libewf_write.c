@@ -62,6 +62,8 @@
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
+#include "ewf_section.h"
+#include "ewfx_delta_chunk.h"
 
 /* Check for empty block, a block that contains the same value for every byte
  * Returns 1 if block is empty, or 0 otherwise
@@ -1382,6 +1384,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	ssize_t write_count                               = 0;
 	uint16_t segment_number                           = 0;
 	uint8_t segment_file_type                         = 0;
+	int no_section_append                             = 0;
 	int result                                        = 0;
 
 	if( internal_handle == NULL )
@@ -1466,8 +1469,8 @@ ssize_t libewf_raw_write_chunk_existing(
 	segment_file_type = segment_file_handle->file_type;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: writing delta chunk of size: %" PRIzu " with data of size: %" PRIzd ".\n",
-	 function, chunk_size, chunk_data_size );
+	notify_verbose_printf( "%s: writing delta chunk: %" PRIu32 " of size: %" PRIzu " with data of size: %" PRIzd ".\n",
+	 function, ( chunk + 1 ), chunk_size, chunk_data_size );
 #endif
 
 	/* Check if the chunk already exists in a delta segment file
@@ -1627,13 +1630,14 @@ ssize_t libewf_raw_write_chunk_existing(
 	{
 		if( libewf_segment_file_handle_seek_offset(
 		      segment_file_handle,
-		      internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+		      internal_handle->offset_table->chunk_offset[ chunk ].file_offset - sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_section_t ) ) == -1 )
 		{
 			notify_warning_printf( "%s: unable to seek chunk offset.\n",
 			 function );
 
 			return( -1 );
 		}
+		no_section_append = 1;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing chunk at offset: %" PRIjd ".\n",
@@ -1649,7 +1653,8 @@ ssize_t libewf_raw_write_chunk_existing(
 		       chunk_buffer, 
 		       chunk_size, 
 		       &chunk_crc,
-	               write_crc );
+	               write_crc,
+	               no_section_append );
 
 	if( write_count == -1 )
 	{
@@ -1660,7 +1665,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	}
 	total_write_count += write_count;
 
-	if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	if( no_section_append == 0 )
 	{
 		/* Write the last section
 		 * The segment file offset is updated by the function
@@ -1922,12 +1927,13 @@ ssize_t libewf_write_chunk_data_existing(
          size_t size,
          size_t data_size )
 {
-	ewf_char_t *chunk_data = NULL;
-	static char *function  = "libewf_write_chunk_data_existing";
-	ewf_crc_t chunk_crc    = 0;
-	ssize_t read_count     = 0;
-	ssize_t write_count    = 0;
-	size_t write_size      = 0;
+	ewf_char_t *chunk_data      = NULL;
+	static char *function       = "libewf_write_chunk_data_existing";
+	ewf_crc_t chunk_crc         = 0;
+	size_t remaining_chunk_size = 0;
+	ssize_t read_count          = 0;
+	ssize_t write_count         = 0;
+	size_t write_size           = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2030,17 +2036,29 @@ ssize_t libewf_write_chunk_data_existing(
 
 			return( -1 );
 		}
-		write_size = internal_handle->media_values->chunk_size - chunk_offset;
+		internal_handle->current_chunk_offset = chunk_offset;
+
+		remaining_chunk_size = internal_handle->media_values->chunk_size
+		                     - internal_handle->current_chunk_offset;
+
+		if( data_size > (size_t) remaining_chunk_size )
+		{
+			data_size = remaining_chunk_size;
+		}
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf( "%s: updating data in chunk: %" PRIu32 " at offset: %" PRIu32 " with size: %" PRIzd ".\n",
+		 function, ( chunk + 1 ), chunk_offset, data_size );
+#endif
 
 		/* Update the chunk data
 		 */
 		if( memory_copy(
 		     &( internal_handle->chunk_cache->data[ chunk_offset ] ),
 		     buffer,
-		     write_size ) == NULL )
+		     data_size ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to update data in chunk.\n",
-			 function );
+			notify_warning_printf( "%s: unable to update data in chunk: %" PRIu32 ".\n",
+			 function, (chunk + 1 ) );
 
 			return( -1 );
 		}

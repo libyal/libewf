@@ -1242,9 +1242,11 @@ ssize_t libewf_segment_file_write_delta_chunk(
          ewf_char_t *chunk_data,
          size_t chunk_size,
          ewf_crc_t *chunk_crc,
-         uint8_t write_crc )
+         uint8_t write_crc,
+	 uint8_t no_section_append )
 {
 	static char *function = "libewf_segment_file_write_delta_chunk";
+	ssize_t write_count   = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1269,22 +1271,37 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
-	/* Set the values in the offset table
+#if defined( HAVE_VERBOSE_OUTPUT )
+	/* Print a verbose notification
 	 */
-	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
-	offset_table->chunk_offset[ chunk ].compressed          = 0;
+	notify_warning_printf( "%s: writing UNCOMPRESSED delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	 function, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
+#endif
 
 	/* Write the chunk in the delta segment file
 	 */
-	return( libewf_section_delta_chunk_write(
-		 segment_file_handle,
-		 chunk, 
-		 chunk_data, 
-		 chunk_size, 
-		 chunk_crc,
-	         write_crc,
-	         0 ) );
+	write_count = libewf_section_delta_chunk_write(
+	               segment_file_handle,
+	               chunk, 
+	               chunk_data, 
+	               chunk_size, 
+	               chunk_crc,
+	               write_crc,
+	               no_section_append );
+
+	/* Set the values in the offset table
+	 * if the delta chunk was added newly
+	 *  and the delta chunk was written correctly
+	 */
+	if( ( no_section_append == 0 )
+	 && ( write_count > 0 ) )
+	{
+		offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
+		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset - chunk_size - sizeof( ewf_crc_t );
+		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( ewf_crc_t );
+		offset_table->chunk_offset[ chunk ].compressed          = 0;
+	}
+	return( write_count );
 }
 
 /* Closes the segment file, necessary sections at the end of the segment file will be written

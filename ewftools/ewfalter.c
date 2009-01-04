@@ -105,10 +105,14 @@ int main( int argc, char * const argv[] )
 #endif
 	uint8_t *buffer                     = NULL;
 	system_integer_t option             = 0;
+	off64_t write_offset                = 0;
 	size64_t media_size                 = 0;
-	int64_t count                       = 0;
+	ssize_t write_size                  = 0;
+	int64_t alter_count                 = 0;
+	int64_t write_count                 = 0;
 	uint64_t alter_offset               = 0;
 	uint64_t alter_size                 = 0;
+	uint64_t alter_buffer_size          = 0;
 	uint8_t swap_byte_pairs             = 0;
 	uint8_t verbose                     = 0;
 
@@ -280,14 +284,21 @@ int main( int argc, char * const argv[] )
 			      ( media_size - alter_offset ),
 			      ( media_size - alter_offset ) );
 	
-		if( alter_size > (size_t) SSIZE_MAX )
+		alter_buffer_size = ewfinput_get_size_variable(
+		                     stdout,
+		                     _CHARACTER_T_STRING( "Alteration buffer size" ),
+		                     1,
+		                     SSIZE_MAX,
+		                     ( 64 * 512 ) );
+	
+		if( alter_buffer_size > (size_t) SSIZE_MAX )
 		{
-			fprintf( stderr, "Invalid amount of bytes to alter value exceeds maximum.\n" );
+			fprintf( stderr, "Invalid alteration buffer size value exceeds maximum.\n" );
 
 			return( EXIT_FAILURE );
 		}
 		buffer = memory_allocate(
-		          (size_t) alter_size );
+		          (size_t) alter_buffer_size );
 
 		if( buffer == NULL )
 		{
@@ -303,7 +314,7 @@ int main( int argc, char * const argv[] )
 		if( memory_set(
 		     buffer,
 		     'X',
-		     (size_t) alter_size ) == NULL )
+		     (size_t) alter_buffer_size ) == NULL )
 		{
 			fprintf( stderr, "Unable to set buffer.\n" );
 
@@ -350,51 +361,99 @@ int main( int argc, char * const argv[] )
 	{
 		/* First alteration run
 		 */
-		count = libewf_write_random(
-			 ewfcommon_libewf_handle,
-			 buffer,
-			 (size_t) alter_size,
-			 alter_offset );
+		alter_count  = (int64_t) alter_size;
+		write_offset = (off64_t) alter_offset;
 
-	}
-	if( count <= -1 )
-	{
-		fprintf( stdout, "Alteration failed.\n" );
-
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
+		while( alter_count > 0 )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		memory_free(
-		 buffer );
+			if( alter_count > alter_buffer_size )
+			{
+				write_size = (ssize_t) alter_buffer_size;
+			}
+			else
+			{
+				write_size = (ssize_t) alter_count;
+			}
+			write_count = libewf_write_random(
+			               ewfcommon_libewf_handle,
+			               buffer,
+			               (size_t) write_size,
+			               write_offset );
 
-		return( EXIT_FAILURE );
+			if( write_count <= -1 )
+			{
+				fprintf( stdout, "Alteration failed.\n" );
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				memory_free(
+				 buffer );
+
+				return( EXIT_FAILURE );
+			}
+			alter_count  -= write_count;
+			write_offset += write_count;
+
+			if( ewfcommon_abort != 0 )
+			{
+				break;
+			}
+		}
 	}
+#ifdef X
 	if( ewfcommon_abort == 0 )
 	{
 		/* Second alteration run
 		 */
-		count = libewf_write_random(
-			 ewfcommon_libewf_handle,
-			 buffer,
-			 (size_t) alter_size,
-			 alter_offset );
+		alter_count  = (int64_t) alter_size;
+		write_offset = (off64_t) alter_offset;
+
+		while( alter_count > 0 )
+		{
+			if( alter_count > alter_buffer_size )
+			{
+				write_size = (ssize_t) alter_buffer_size;
+			}
+			else
+			{
+				write_size = (ssize_t) alter_count;
+			}
+			write_count = libewf_write_random(
+			               ewfcommon_libewf_handle,
+			               buffer,
+			               (size_t) write_size,
+			               write_offset );
+
+			if( write_count <= -1 )
+			{
+				fprintf( stdout, "Alteration failed.\n" );
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				memory_free(
+				 buffer );
+
+				return( EXIT_FAILURE );
+			}
+			alter_count  -= write_count;
+			write_offset += write_count;
+
+			if( ewfcommon_abort != 0 )
+			{
+				break;
+			}
+		}
 	}
+#endif
 	memory_free(
 	 buffer );
 
-	if( count <= -1 )
-	{
-		fprintf( stdout, "Alteration failed.\n" );
-
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
 	if( libewf_close(
 	     ewfcommon_libewf_handle ) != 0 )
 	{

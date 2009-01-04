@@ -638,8 +638,10 @@ ssize_t libewf_read_chunk_data(
 		return( -1 );
 	}
 	/* If the data was read into the chunk cache copy it to the buffer
+	 *  and the buffer is not the chunk cache itself
 	 */
-	if( chunk_data == internal_handle->chunk_cache->data )
+	if( ( chunk_data == internal_handle->chunk_cache->data )
+	 && ( buffer != internal_handle->chunk_cache->data ) )
 	{
 		/* Copy the relevant data to buffer
 		 */

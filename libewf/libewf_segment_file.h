@@ -139,7 +139,8 @@ ssize_t libewf_segment_file_write_delta_chunk(
          ewf_char_t *chunk_data,
          size_t chunk_size,
          ewf_crc_t *chunk_crc,
-         uint8_t write_crc );
+         uint8_t write_crc,
+	 uint8_t no_section_append );
 
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_handle_t *segment_file_handle,
