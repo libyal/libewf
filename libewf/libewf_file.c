@@ -299,9 +299,9 @@ int libewf_glob(
  * Returns a pointer to the new instance of handle, NULL on error
  */
 libewf_handle_t *libewf_open(
-                system_character_t * const filenames[],
-                uint16_t amount_of_files,
-                uint8_t flags )
+                  system_character_t * const filenames[],
+                  uint16_t amount_of_files,
+                  uint8_t flags )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_open";

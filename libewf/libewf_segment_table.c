@@ -71,7 +71,7 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 		return( NULL );
 	}
 	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) memory_allocate(
-	                                      ( amount * sizeof( libewf_segment_file_handle_t * ) ) );
+	                                                                        sizeof( libewf_segment_file_handle_t * ) * amount );
 
 	if( segment_table->segment_file_handle == NULL )
 	{
@@ -98,13 +98,15 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 
 		return( NULL );
 	} 
-	segment_table->amount = amount;
+	segment_table->amount          = amount;
+	segment_table->basename        = NULL;
+	segment_table->basename_length = 0;
 
 	return( segment_table );
 }
 
 /* Reallocates memory for the segment table values
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_realloc(
      libewf_segment_table_t *segment_table,
@@ -185,7 +187,7 @@ void libewf_segment_table_free(
 }
 
 /* Builds the segment table from all segment files
- * Returns 1 if successful, 0 if not, or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
@@ -278,9 +280,57 @@ int libewf_segment_table_build(
 	return( 1 );
 }
 
+/* Sets the basename in the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_set_basename(
+     libewf_segment_table_t *segment_table,
+     system_character_t *basename,
+     size_t length )
+{
+	static char *function = "libewf_segment_table_set_basename";
+
+	if( segment_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		notify_warning_printf( "%s: invalid basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename        = NULL;
+		segment_table->basename_length = 0;
+	}
+	segment_table->basename = system_string_duplicate(
+	                           basename,
+	                           length );
+
+	if( segment_table->basename == NULL )
+	{
+		notify_warning_printf( "%s: unable to set basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	segment_table->basename_length = length;
+
+	return( 1 );
+}
+
 /* Initializes the segment table
  * Opens EWF segment files for reading and EWF delta segment files for reading and writing
- * Returns 1 if successful, 0 if not, or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
@@ -365,42 +415,24 @@ int libewf_segment_table_read_open(
 	}
 	/* Set segment table basename
 	 */
-	segment_table->segment_file_handle[ 0 ] = libewf_segment_file_handle_alloc();
-
-	if( segment_table->segment_file_handle[ 0 ] == NULL )
-	{
-		notify_warning_printf( "%s: unable to create segment file handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_segment_file_handle_set_filename(
-	     segment_table->segment_file_handle[ 0 ],
-	     filenames[ iterator ],
+	if( libewf_segment_table_set_basename(
+	     segment_table,
+	     filenames[ 0 ],
 	     ( filename_length - 4 ) ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set filename in segment table.\n",
+		notify_warning_printf( "%s: unable to set basename in segment table.\n",
 		 function );
 
 		return( -1 );
 	}
 	/* Set delta segment table basename
 	 */
-	delta_segment_table->segment_file_handle[ 0 ] = libewf_segment_file_handle_alloc();
-
-	if( delta_segment_table->segment_file_handle[ 0 ] == NULL )
-	{
-		notify_warning_printf( "%s: unable to create segment file handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_segment_file_handle_set_filename(
-	     delta_segment_table->segment_file_handle[ 0 ],
-	     filenames[ iterator ],
+	if( libewf_segment_table_set_basename(
+	     delta_segment_table,
+	     filenames[ 0 ],
 	     ( filename_length - 4 ) ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set filename in delta segment table.\n",
+		notify_warning_printf( "%s: unable to set basename in delta segment table.\n",
 		 function );
 
 		return( -1 );
@@ -628,7 +660,7 @@ int libewf_segment_table_read_open(
 
 /* Initializes the segment table
  * Opens EWF segment file(s) for writing
- * Returns 1 if successful, 0 if not, or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
@@ -671,21 +703,12 @@ int libewf_segment_table_write_open(
 	}
 	/* Set segment table basename
 	 */
-	segment_table->segment_file_handle[ 0 ] = libewf_segment_file_handle_alloc();
-
-	if( segment_table->segment_file_handle[ 0 ] == NULL )
-	{
-		notify_warning_printf( "%s: unable to create segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_segment_file_handle_set_filename(
-	     segment_table->segment_file_handle[ 0 ],
+	if( libewf_segment_table_set_basename(
+	     segment_table,
 	     filenames[ 0 ],
 	     filename_length ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set filename in segment table.\n",
+		notify_warning_printf( "%s: unable to set basename in segment table.\n",
 		 function );
 
 		return( -1 );
@@ -694,7 +717,7 @@ int libewf_segment_table_write_open(
 }
 
 /* Closes all the EWF segment file(s) in the segment table
- * Returns 1 if successful, 0 if not, or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libewf_segment_table_close_all(
      libewf_segment_table_t *segment_table )
@@ -742,7 +765,7 @@ int libewf_segment_table_close_all(
 
 /* Creates a new segment file and opens it for writing
  * The necessary sections at the start of the segment file are written
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
@@ -824,8 +847,8 @@ int libewf_segment_table_create_segment_file(
 	if( libewf_filename_create(
 	     &( segment_file_handle->filename ),
 	     &( segment_file_handle->length_filename ),
-	     segment_table->segment_file_handle[ 0 ]->filename,
-	     segment_table->segment_file_handle[ 0 ]->length_filename,
+	     segment_table->basename,
+	     segment_table->basename_length,
 	     segment_number,
 	     maximum_amount_of_segments,
 	     segment_file_type,

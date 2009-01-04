@@ -62,6 +62,14 @@ struct libewf_segment_table
 	/* A dynamic array containting references to segment file handles
 	 */
 	libewf_segment_file_handle_t **segment_file_handle;
+
+	/* The basename
+	 */
+	system_character_t *basename;
+
+	/* The basename length
+	 */
+	size_t basename_length;
 };
 
 libewf_segment_table_t *libewf_segment_table_alloc(
@@ -89,6 +97,11 @@ int libewf_segment_table_build(
      size64_t *segment_file_size,
      uint8_t error_tollerance,
      int *abort );
+
+int libewf_segment_table_set_basename(
+     libewf_segment_table_t *segment_table,
+     system_character_t *basename,
+     size_t length );
 
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
