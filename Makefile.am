@@ -65,6 +65,13 @@ MSVCPP_FILES = \
 	msvscpp/libewf_dll/libewf_dll.vcproj \
 	msvscpp/libewf.sln
 
+MACOSX_FILES = \
+	macosx/Introduction.rtf \
+	macosx/Introduction.rtf.in \
+	macosx/libewf.pmproj \
+	macosx/License.rtf \
+	macosx/Readme.rtf
+
 REDHAT_FILES = \
 	libewf.spec \
 	libewf.spec.in
@@ -73,6 +80,7 @@ EXTRA_DIST = \
 	$(DEBIAN_FILES) \
 	$(MANUAL_FILES) \
 	$(MSVCPP_FILES) \
+	$(MACOSX_FILES) \
 	$(REDHAT_FILES) \
 	doc/header.txt \
 	doc/header2.txt \
@@ -118,6 +126,7 @@ distclean: clean
 	/bin/rm -f include/libewf/libewf_definitions.h
 	/bin/rm -f include/libewf/libewf_types.h
 	/bin/rm -f libewf/libewf_config.h
+	/bin/rm -f macosx/Introduction.rtf
 	@for dir in ${subdirs}; do \
 		(cd $$dir && $(MAKE) distclean) \
 		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
