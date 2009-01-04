@@ -206,8 +206,8 @@ int libewf_segment_file_read_sections(
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
      libewf_offset_table_t *secondary_offset_table,
-     libewf_sector_table_t *acquiry_errors,
      libewf_sector_table_t *sessions,
+     libewf_sector_table_t *acquiry_errors,
      int8_t *compression_level,
      uint8_t *format,
      uint8_t *ewf_format,
@@ -249,8 +249,8 @@ int libewf_segment_file_read_sections(
 		          media_values,
 		          offset_table,
 		          secondary_offset_table,
-		          acquiry_errors,
 		          sessions,
+		          acquiry_errors,
 		          compression_level,
 		          format,
 		          ewf_format,
@@ -1276,6 +1276,7 @@ ssize_t libewf_segment_file_write_close(
          libewf_hash_sections_t *hash_sections,
          libewf_values_table_t *hash_values,
          libewf_media_values_t *media_values,
+         libewf_sector_table_t *sessions,
          libewf_sector_table_t *acquiry_errors,
          int8_t compression_level,
          uint8_t format,
@@ -1307,6 +1308,13 @@ ssize_t libewf_segment_file_write_close(
 
 		return( -1 );
 	}
+	if( sessions == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sessions.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( acquiry_errors == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid acquiry errors.\n",
@@ -1332,6 +1340,28 @@ ssize_t libewf_segment_file_write_close(
 			if( write_count == -1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to write data section.\n",
+				 function );
+
+				return( -1 );
+			}
+			total_write_count += write_count;
+		}
+		/* Write the session section if required 
+		 */
+		if( ( sessions->amount > 0 )
+		 && ( ( format == LIBEWF_FORMAT_ENCASE5 )
+		  || ( format == LIBEWF_FORMAT_ENCASE6 )
+		  || ( format == LIBEWF_FORMAT_LINEN5 )
+		  || ( format == LIBEWF_FORMAT_LINEN6 )
+		  || ( format == LIBEWF_FORMAT_EWFX ) ) )
+		{
+			write_count = libewf_section_session_write(
+			               segment_file_handle,
+			               sessions );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write sessions section.\n",
 				 function );
 
 				return( -1 );

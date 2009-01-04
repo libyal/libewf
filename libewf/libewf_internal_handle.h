@@ -110,13 +110,13 @@ struct libewf_internal_handle
 	 */
 	libewf_values_table_t *hash_values;
 
-	/* The sectors with acquiry read errors
-	 */
-	libewf_sector_table_t *acquiry_errors;
-
 	/* The stored sessions information
 	 */
 	libewf_sector_table_t *sessions;
+
+	/* The sectors with acquiry read errors
+	 */
+	libewf_sector_table_t *acquiry_errors;
 
 	/* The current chunk
 	 */

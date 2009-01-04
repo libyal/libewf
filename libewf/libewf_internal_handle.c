@@ -79,8 +79,8 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 	internal_handle->hash_sections            = NULL;
 	internal_handle->header_values            = NULL;
 	internal_handle->hash_values              = NULL;
-	internal_handle->acquiry_errors           = NULL;
 	internal_handle->sessions                 = NULL;
+	internal_handle->acquiry_errors           = NULL;
 	internal_handle->current_chunk            = 0;
 	internal_handle->current_chunk_offset     = 0;
 	internal_handle->compression_level        = EWF_COMPRESSION_UNKNOWN;
@@ -247,11 +247,11 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		return( NULL );
 	}
-	internal_handle->acquiry_errors = libewf_sector_table_alloc( 0 );
+	internal_handle->sessions = libewf_sector_table_alloc( 0 );
 
-	if( internal_handle->acquiry_errors == NULL )
+	if( internal_handle->sessions == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry errors.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create sessions.\n",
 		 function );
 
 		libewf_hash_sections_free(
@@ -275,15 +275,15 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		return( NULL );
 	}
-	internal_handle->sessions = libewf_sector_table_alloc( 0 );
+	internal_handle->acquiry_errors = libewf_sector_table_alloc( 0 );
 
-	if( internal_handle->sessions == NULL )
+	if( internal_handle->acquiry_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create sessions.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry errors.\n",
 		 function );
 
 		libewf_sector_table_free(
-		 internal_handle->acquiry_errors );
+		 internal_handle->sessions );
 		libewf_hash_sections_free(
 		 internal_handle->hash_sections );
 		libewf_header_sections_free(
@@ -315,9 +315,9 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			 function );
 
 			libewf_sector_table_free(
-			 internal_handle->sessions );
-			libewf_sector_table_free(
 			 internal_handle->acquiry_errors );
+			libewf_sector_table_free(
+			 internal_handle->sessions );
 			libewf_hash_sections_free(
 			 internal_handle->hash_sections );
 			libewf_header_sections_free(
@@ -355,9 +355,9 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 				 internal_handle->read );
 			}
 			libewf_sector_table_free(
-			 internal_handle->sessions );
-			libewf_sector_table_free(
 			 internal_handle->acquiry_errors );
+			libewf_sector_table_free(
+			 internal_handle->sessions );
 			libewf_hash_sections_free(
 			 internal_handle->hash_sections );
 			libewf_header_sections_free(
@@ -432,15 +432,15 @@ void libewf_internal_handle_free(
 		libewf_offset_table_free(
 		 internal_handle->secondary_offset_table );
 	}
-	if( internal_handle->acquiry_errors != NULL )
-	{
-		libewf_sector_table_free(
-		 internal_handle->acquiry_errors );
-	}
 	if( internal_handle->sessions != NULL )
 	{
 		libewf_sector_table_free(
 		 internal_handle->sessions );
+	}
+	if( internal_handle->acquiry_errors != NULL )
+	{
+		libewf_sector_table_free(
+		 internal_handle->acquiry_errors );
 	}
 	if( internal_handle->header_sections != NULL )
 	{
