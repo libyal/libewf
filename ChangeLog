@@ -171,6 +171,9 @@ CLOSED
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   - no
 
+Version: 20080304
+* worked on signal handling
+
 Version: 20080303
 * added byte size string to ewfinfo
 * updated manuals of ewfinfo

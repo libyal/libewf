@@ -607,6 +607,23 @@ int main( int argc, char * const argv[] )
 		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
 		 program );
 
+		if( calculate_md5 == 1 )
+		{
+			libewf_common_free(
+			 stored_md5_hash_string );
+			libewf_common_free(
+			 calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			libewf_common_free(
+			 stored_sha1_hash_string );
+			libewf_common_free(
+			 calculated_sha1_hash_string );
+		}
+		fclose(
+		 log_file_stream );
+
 		return( EXIT_FAILURE );
 	}
 	if( calculate_md5 == 1 )

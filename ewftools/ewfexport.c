@@ -176,7 +176,6 @@ int main( int argc, char * const argv[] )
 #endif
 	CHAR_T *filenames[ 1 ]             = { NULL };
 
-	LIBEWF_HANDLE *handle              = NULL;
 	LIBEWF_HANDLE *export_handle       = NULL;
 	libewf_char_t *user_input          = NULL;
 	libewf_char_t *program             = _S_LIBEWF_CHAR( "ewfexport" );
@@ -232,8 +231,6 @@ int main( int argc, char * const argv[] )
 	   _S_LIBEWF_CHAR( "linen5" ),
 	   _S_LIBEWF_CHAR( "linen6" ),
 	   _S_LIBEWF_CHAR( "ewfx" ) };
-
-	ewfsignal_initialize();
 
 	ewfoutput_version_fprint(
 	 stderr,
@@ -444,6 +441,11 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( ewfsignal_attach(
+	     ewfcommon_signal_handler ) != 1 )
+	{
+		fprintf( stderr, "Unable to attach signal handler.\n" );
+	}
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
@@ -476,21 +478,21 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	handle = libewf_open(
-	          glob->results,
-	          glob->amount,
-	          LIBEWF_OPEN_READ );
+	ewfcommon_libewf_handle = libewf_open(
+	                           glob->results,
+	                           glob->amount,
+	                           LIBEWF_OPEN_READ );
 
 	ewfglob_free(
 	 glob );
 #else
-	handle = libewf_open(
-	          &argv[ optind ],
-	          ( argc - optind ),
-	          LIBEWF_OPEN_READ );
+	ewfcommon_libewf_handle = libewf_open(
+	                           &argv[ optind ],
+	                           ( argc - optind ),
+	                           LIBEWF_OPEN_READ );
 #endif
 
-	if( handle == NULL )
+	if( ewfcommon_libewf_handle == NULL )
 	{
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
@@ -520,13 +522,13 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	if( libewf_get_media_size(
-	     handle,
+	     ewfcommon_libewf_handle,
 	     &media_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to determine media size.\n" );
 
 		if( libewf_close(
-		     handle ) != 0 )
+		     ewfcommon_libewf_handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
@@ -572,7 +574,8 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf( stderr, "Unsupported file format.\n" );
 
-					if( libewf_close( handle ) != 0 )
+					if( libewf_close(
+					     ewfcommon_libewf_handle ) != 0 )
 					{
 						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
@@ -625,7 +628,7 @@ int main( int argc, char * const argv[] )
 					fprintf( stderr, "Unsupported compression type.\n" );
 
 					if( libewf_close(
-					     handle ) != 0 )
+					     ewfcommon_libewf_handle ) != 0 )
 					{
 						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
@@ -659,7 +662,7 @@ int main( int argc, char * const argv[] )
 						fprintf( stderr, "Unsupported answer.\n" );
 
 						if( libewf_close(
-						     handle ) != 0 )
+						     ewfcommon_libewf_handle ) != 0 )
 						{
 							fprintf( stderr, "Unable to close EWF file(s).\n" );
 						}
@@ -827,14 +830,14 @@ int main( int argc, char * const argv[] )
 #endif
 
 			if( libewf_close(
-			     handle ) != 0 )
+			     ewfcommon_libewf_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
 		count = ewfcommon_export_ewf(
-		         handle,
+		         ewfcommon_libewf_handle,
 		         export_handle,
 		         compression_level,
 		         (uint8_t) compress_empty_block,
@@ -860,7 +863,7 @@ int main( int argc, char * const argv[] )
 	else
 	{
 		count = ewfcommon_export_raw(
-		         handle,
+		         ewfcommon_libewf_handle,
 		         target_filename,
 		         export_size,
 		         export_offset,
@@ -890,7 +893,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Export failed.\n" );
 		}
 		if( libewf_close(
-		     handle ) != 0 )
+		     ewfcommon_libewf_handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
@@ -919,11 +922,22 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_crc_errors_fprint(
 	 stderr,
-	 handle,
+	 ewfcommon_libewf_handle,
 	 &amount_of_crc_errors );
 
+	if( ewfsignal_detach() != 1 )
+	{
+		fprintf( stderr, "Unable to detach signal handler.\n" );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
+		 program );
+
+		return( EXIT_FAILURE );
+	}
 	if( libewf_close(
-	     handle ) != 0 )
+	     ewfcommon_libewf_handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
