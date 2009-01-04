@@ -62,6 +62,12 @@ typedef wchar_t libewf_system_character_t;
 
 /* UTF-8 string functions
  */
+#define libewf_system_string_size_from_utf8( utf8_string, utf8_string_size, string_size, error ) \
+	libuna_utf32_string_size_from_utf8( utf8_string, sutf8_stringsize, string_size, error )
+
+#define libewf_system_string_copy_from_utf8( string, string_size, utf8_string, utf8_string_size, error ) \
+	libuna_utf32_string_copy_from_utf8( (libuna_utf32_character_t *) string, string_size, utf8_string, utf8_string_size, error )
+
 #define utf8_string_size_from_libewf_system_string( system_string, system_string_size, utf8_string_size, error ) \
 	libuna_utf8_string_size_from_utf32( (libuna_utf32_character_t *) system_string, system_string_size, utf8_string_size, error )
 
@@ -74,6 +80,12 @@ typedef wchar_t libewf_system_character_t;
 
 /* UTF-8 string functions
  */
+#define libewf_system_string_size_from_utf8( utf8_string, utf8_string_size, string_size, error ) \
+	libuna_utf16_string_size_from_utf8( utf8_string, sutf8_stringsize, string_size, error )
+
+#define libewf_system_string_copy_from_utf8( string, string_size, utf8_string, utf8_string_size, error ) \
+	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) string, string_size, utf8_string, utf8_string_size, error )
+
 #define utf8_string_size_from_libewf_system_string( system_string, system_string_size, utf8_string_size, error ) \
 	libuna_utf8_string_size_from_utf16( (libuna_utf16_character_t *) system_string, system_string_size, utf8_string_size, error )
 
@@ -101,6 +113,9 @@ typedef char libewf_system_character_t;
 
 #define libewf_system_string_length( string ) \
 	narrow_string_length( string )
+
+/* UTF-8 string functions
+ */
 
 #endif
 

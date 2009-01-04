@@ -21,9 +21,11 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
@@ -46,10 +48,12 @@
 int libewf_check_file_signature(
      const char *filename )
 {
+	uint8_t signature[ 8 ];
+
 	libewf_error_t *error = NULL;
 	static char *function = "libewf_check_file_signature";
+	ssize_t read_count    = 0;
 	int file_descriptor   = 0;
-	int result            = 0;
 
 	if( filename == NULL )
 	{
@@ -88,17 +92,18 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	result = libewf_segment_file_check_file_signature(
-	          file_descriptor,
-	          &error );
+	read_count = libewf_file_io_read(
+	              file_descriptor,
+	              signature,
+	              8 );
 
-	if( result <= -1 )
+	if( read_count != 8 )
 	{
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to check file signature.\n",
+		 "%s: unable to read signature.\n",
 		 function );
 
 		libewf_file_io_close(
@@ -128,7 +133,30 @@ int libewf_check_file_signature(
 
 		return( -1 );
 	}
-	return( result );
+	/* The amount of EWF segment files will be the largest
+	 */
+	if( memory_compare(
+	     evf_file_signature,
+	     signature,
+	     8 ) == 0 )
+	{
+		return( 1 );
+	}
+	else if( memory_compare(
+	          lvf_file_signature,
+	          signature,
+	          8 ) == 0 )
+	{
+		return( 1 );
+	}
+	else if( memory_compare(
+	          dvf_file_signature,
+	          signature,
+	          8 ) == 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
@@ -138,10 +166,12 @@ int libewf_check_file_signature(
 int libewf_check_file_signature_wide(
      const wchar_t *filename )
 {
+	uint8_t signature[ 8 ];
+
 	libewf_error_t *error = NULL;
-	static char *function = "libewf_check_file_signature_wide";
+	static char *function = "libewf_check_file_signature";
+	ssize_t read_count    = 0;
 	int file_descriptor   = 0;
-	int result            = 0;
 
 	if( filename == NULL )
 	{
@@ -159,7 +189,7 @@ int libewf_check_file_signature_wide(
 
 		return( -1 );
 	}
-	file_descriptor = libewf_file_io_open(
+	file_descriptor = libewf_file_io_open_wide(
 	                   filename,
 	                   LIBEWF_FILE_IO_O_RDONLY,
 	                   &error );
@@ -180,17 +210,18 @@ int libewf_check_file_signature_wide(
 
 		return( -1 );
 	}
-	result = libewf_segment_file_check_file_signature(
-	          file_descriptor,
-	          &error );
+	read_count = libewf_file_io_read(
+	              file_descriptor,
+	              signature,
+	              8 );
 
-	if( result <= -1 )
+	if( read_count != 8 )
 	{
 		libewf_error_set(
 		 &error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to check file signature.\n",
+		 "%s: unable to read signature.\n",
 		 function );
 
 		libewf_file_io_close(
@@ -220,7 +251,30 @@ int libewf_check_file_signature_wide(
 
 		return( -1 );
 	}
-	return( result );
+	/* The amount of EWF segment files will be the largest
+	 */
+	if( memory_compare(
+	     evf_file_signature,
+	     signature,
+	     8 ) == 0 )
+	{
+		return( 1 );
+	}
+	else if( memory_compare(
+	          lvf_file_signature,
+	          signature,
+	          8 ) == 0 )
+	{
+		return( 1 );
+	}
+	else if( memory_compare(
+	          dvf_file_signature,
+	          signature,
+	          8 ) == 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 #endif
 
@@ -230,20 +284,20 @@ int libewf_check_file_signature_wide(
  * Returns the amount of filenames if successful or -1 on error
  */
 int libewf_glob(
-     const system_character_t *filename,
+     const char *filename,
      size_t length,
      uint8_t format,
-     system_character_t **filenames[] )
+     char **filenames[] )
 {
-	libewf_error_t *error                = NULL;
-	system_character_t *segment_filename = NULL;
-	void *reallocation                   = NULL;
-	static char *function                = "libewf_glob";
-	size_t additional_length             = 4;
-	int amount_of_files                  = 0;
-	int file_descriptor                  = 0;
-	uint8_t segment_file_type            = 0;
-	uint8_t ewf_format                   = 0;
+	libewf_error_t *error     = NULL;
+	char *segment_filename    = NULL;
+	void *reallocation        = NULL;
+	static char *function     = "libewf_glob";
+	size_t additional_length  = 4;
+	int amount_of_files       = 0;
+	int result                = 0;
+	uint8_t segment_file_type = 0;
+	uint8_t ewf_format        = 0;
 
 	if( filename == NULL )
 	{
@@ -278,7 +332,8 @@ int libewf_glob(
 
 		return( -1 );
 	}
-	if( ( format != LIBEWF_FORMAT_ENCASE1 )
+	if( ( format != LIBEWF_FORMAT_UNKNOWN )
+	 && ( format != LIBEWF_FORMAT_ENCASE1 )
 	 && ( format != LIBEWF_FORMAT_ENCASE2 )
 	 && ( format != LIBEWF_FORMAT_ENCASE3 )
 	 && ( format != LIBEWF_FORMAT_ENCASE4 )
@@ -292,7 +347,19 @@ int libewf_glob(
 	 && ( format != LIBEWF_FORMAT_EWF )
 	 && ( format != LIBEWF_FORMAT_EWFX ) )
 	{
-		format = LIBEWF_FORMAT_UNKNOWN;
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
 	}
 	if( filenames == NULL )
 	{
@@ -312,7 +379,7 @@ int libewf_glob(
 	}
 	if( format == LIBEWF_FORMAT_UNKNOWN )
 	{
-		if( filename[ length - 4 ] != (system_character_t) '.' )
+		if( filename[ length - 4 ] != (char) '.' )
 		{
 			libewf_error_set(
 			 &error,
@@ -330,19 +397,19 @@ int libewf_glob(
 		}
 		additional_length = 0;
 
-		if( filename[ length - 3 ] == (system_character_t) 'E' )
+		if( filename[ length - 3 ] == (char) 'E' )
 		{
 			format = LIBEWF_FORMAT_ENCASE5;
 		}
-		else if( filename[ length - 3 ] == (system_character_t) 'e' )
+		else if( filename[ length - 3 ] == (char) 'e' )
 		{
 			format = LIBEWF_FORMAT_EWF;
 		}
-		else if( filename[ length - 3 ] == (system_character_t) 'L' )
+		else if( filename[ length - 3 ] == (char) 'L' )
 		{
 			format = LIBEWF_FORMAT_LVF;
 		}
-		else if( filename[ length - 3 ] == (system_character_t) 's' )
+		else if( filename[ length - 3 ] == (char) 's' )
 		{
 			format = LIBEWF_FORMAT_SMART;
 		}
@@ -352,7 +419,7 @@ int libewf_glob(
 			 &error,
 			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid filename - unsupported extension: .\n",
+			 "%s: invalid filename - unsupported extension: %s.\n",
 			 function,
 			 &( filename[ length - 4 ] ) );
 
@@ -381,8 +448,8 @@ int libewf_glob(
 	}
 	while( amount_of_files < (int) UINT16_MAX )
 	{
-		segment_filename = memory_allocate(
-			            sizeof( system_character_t ) * ( length + additional_length + 1 ) );
+		segment_filename = (char * ) memory_allocate(
+			                      sizeof( char ) * ( length + additional_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -400,7 +467,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		if( memory_copy(
+		if( narrow_string_copy(
 		     segment_filename,
 		     filename,
 		     length ) == NULL )
@@ -424,7 +491,7 @@ int libewf_glob(
 		}
 		if( additional_length > 0 )
 		{
-			segment_filename[ length ] = (system_character_t) '.';
+			segment_filename[ length ] = (char) '.';
 		}
 		if( libewf_filename_set_extension(
 		     &( segment_filename[ length + additional_length - 3 ] ),
@@ -454,12 +521,30 @@ int libewf_glob(
 		}
 		segment_filename[ length + additional_length ] = 0;
 
-		file_descriptor = libewf_file_io_open(
-		                   segment_filename,
-		                   LIBEWF_FILE_IO_O_RDONLY,
-		                   &error );
+		result = libewf_file_io_exists(
+		          segment_filename,
+		          &error );
 
-		if( file_descriptor == -1 )
+		if( result == -1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_GENERIC,
+			 "%s: unable to test if file exists.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+
+			return( -1 );
+		}
+		else if( result == 0 )
 		{
 			memory_free(
 			 segment_filename );
@@ -468,12 +553,9 @@ int libewf_glob(
 		}
 		amount_of_files++;
 
-		libewf_file_io_close(
-		 file_descriptor );
-
 		reallocation = memory_reallocate(
 		                *filenames,
-		                sizeof( system_character_t * ) * amount_of_files );
+		                sizeof( char * ) * amount_of_files );
 
 		if( reallocation == NULL )
 		{
@@ -494,12 +576,319 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		*filenames = (system_character_t **) reallocation;
+		*filenames = (char **) reallocation;
 
 		( *filenames )[ amount_of_files - 1 ] = segment_filename;
 	}
 	return( amount_of_files );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Globs the segment files according to the EWF naming schema
+ * if format is known the filename should contain the base of the filename
+ * otherwise the function will try to determine the format based on the extension
+ * Returns the amount of filenames if successful or -1 on error
+ */
+int libewf_glob_wide(
+     const wchar_t *filename,
+     size_t length,
+     uint8_t format,
+     wchar_t **filenames[] )
+{
+	libewf_error_t *error     = NULL;
+	wchar_t *segment_filename = NULL;
+	void *reallocation        = NULL;
+	static char *function     = "libewf_glob_wide";
+	size_t additional_length  = 4;
+	int amount_of_files       = 0;
+	int result                = 0;
+	uint8_t segment_file_type = 0;
+	uint8_t ewf_format        = 0;
+
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( length == 0 )
+	 || ( length > (size_t) SSIZE_MAX ) )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid filename length.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( format != LIBEWF_FORMAT_UNKNOWN )
+	 && ( format != LIBEWF_FORMAT_ENCASE1 )
+	 && ( format != LIBEWF_FORMAT_ENCASE2 )
+	 && ( format != LIBEWF_FORMAT_ENCASE3 )
+	 && ( format != LIBEWF_FORMAT_ENCASE4 )
+	 && ( format != LIBEWF_FORMAT_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LINEN5 )
+	 && ( format != LIBEWF_FORMAT_LINEN6 )
+	 && ( format != LIBEWF_FORMAT_SMART )
+	 && ( format != LIBEWF_FORMAT_FTK )
+	 && ( format != LIBEWF_FORMAT_LVF )
+	 && ( format != LIBEWF_FORMAT_EWF )
+	 && ( format != LIBEWF_FORMAT_EWFX ) )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported format.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( format == LIBEWF_FORMAT_UNKNOWN )
+	{
+		if( filename[ length - 4 ] != (wchar_t) '.' )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid filename - missing extension.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		additional_length = 0;
+
+		if( filename[ length - 3 ] == (wchar_t) 'E' )
+		{
+			format = LIBEWF_FORMAT_ENCASE5;
+		}
+		else if( filename[ length - 3 ] == (wchar_t) 'e' )
+		{
+			format = LIBEWF_FORMAT_EWF;
+		}
+		else if( filename[ length - 3 ] == (wchar_t) 'L' )
+		{
+			format = LIBEWF_FORMAT_LVF;
+		}
+		else if( filename[ length - 3 ] == (wchar_t) 's' )
+		{
+			format = LIBEWF_FORMAT_SMART;
+		}
+		else
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+			 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid filename - unsupported extension: %s.\n",
+			 function,
+			 &( filename[ length - 4 ] ) );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	if( format == LIBEWF_FORMAT_LVF )
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
+		ewf_format        = EWF_FORMAT_L01;
+	}
+	else if( format == LIBEWF_FORMAT_SMART )
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+		ewf_format        = EWF_FORMAT_S01;
+	}
+	else
+	{
+		segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+		ewf_format        = EWF_FORMAT_E01;
+	}
+	while( amount_of_files < (int) UINT16_MAX )
+	{
+		segment_filename = memory_allocate(
+			            sizeof( wchar_t ) * ( length + additional_length + 1 ) );
+
+		if( segment_filename == NULL )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create segment filename.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		if( wide_string_copy(
+		     segment_filename,
+		     filename,
+		     length ) == NULL )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy filename.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+
+			return( -1 );
+		}
+		if( additional_length > 0 )
+		{
+			segment_filename[ length ] = (wchar_t) '.';
+		}
+		if( libewf_filename_set_extension(
+		     &( segment_filename[ length + additional_length - 3 ] ),
+		     (uint16_t) ( amount_of_files + 1 ),
+		     UINT16_MAX,
+		     segment_file_type,
+		     format,
+		     ewf_format,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set extension.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+
+			return( -1 );
+		}
+		segment_filename[ length + additional_length ] = 0;
+
+		result = libewf_file_io_exists_wide(
+		          segment_filename,
+		          &error );
+
+		if( result == -1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_GENERIC,
+			 "%s: unable to test if file exists.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			memory_free(
+			 segment_filename );
+
+			break;
+		}
+		amount_of_files++;
+
+		reallocation = memory_reallocate(
+		                *filenames,
+		                sizeof( wchar_t * ) * amount_of_files );
+
+		if( reallocation == NULL )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to resize filenames.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			memory_free(
+			 segment_filename );
+
+			return( -1 );
+		}
+		*filenames = (wchar_t **) reallocation;
+
+		( *filenames )[ amount_of_files - 1 ] = segment_filename;
+	}
+	return( amount_of_files );
+}
+#endif
 
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image

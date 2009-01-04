@@ -35,7 +35,16 @@ extern "C" {
 #endif
 
 int libewf_filename_set_extension(
-     libewf_system_character_t *extension,
+     char *extension,
+     uint16_t segment_number,
+     uint16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format,
+     libewf_error_t **error );
+
+int libewf_filename_set_extension_wide(
+     char *extension,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,

@@ -35,79 +35,15 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 #include "libewf_string.h"
+#include "libewf_system_string.h"
 
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
 #include "ewfx_delta_chunk.h"
 
-const uint8_t dvf_file_signature[] = { 0x64, 0x76, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-const uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-
-/* Detects if a file is an EWF file (check for the EWF file signature)
- * Returns 1 if true, 0 if not or -1 on error
- */
-int libewf_segment_file_check_file_signature(
-     int file_descriptor,
-     libewf_error_t **error )
-{
-	uint8_t signature[ 8 ];
-
-	static char *function = "libewf_segment_file_check_file_signature";
-	ssize_t read_count    = 0;
-
-	if( file_descriptor == -1 )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file descriptor.\n",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_file_io_read(
-	              file_descriptor,
-	              signature,
-	              8 );
-
-	if( read_count != 8 )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read signature.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* The amount of EWF segment files will be the largest
-	 */
-	if( memory_compare(
-	     evf_file_signature,
-	     signature,
-	     8 ) == 0 )
-	{
-		return( 1 );
-	}
-	else if( memory_compare(
-	          lvf_file_signature,
-	          signature,
-	          8 ) == 0 )
-	{
-		return( 1 );
-	}
-	else if( memory_compare(
-	          dvf_file_signature,
-	          signature,
-	          8 ) == 0 )
-	{
-		return( 1 );
-	}
-	return( 0 );
-}
+const uint8_t dvf_file_signature[ 8 ] = { 0x64, 0x76, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+const uint8_t evf_file_signature[ 8 ] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror

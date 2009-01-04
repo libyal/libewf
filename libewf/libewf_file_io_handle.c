@@ -252,10 +252,17 @@ int libewf_file_io_handle_open(
 	}
 	if( file_io_handle->file_descriptor == -1 )
 	{
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+		file_io_handle->file_descriptor = libewf_file_io_open_wide(
+						   file_io_handle->filename,
+						   flags,
+		                                   error );
+#else
 		file_io_handle->file_descriptor = libewf_file_io_open(
 						   file_io_handle->filename,
 						   flags,
 		                                   error );
+#endif
 
 		if( file_io_handle->file_descriptor == -1 )
 		{
@@ -330,10 +337,17 @@ int libewf_file_io_handle_reopen(
 			return( -1 );
 		}
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	file_io_handle->file_descriptor = libewf_file_io_open_wide(
+					   file_io_handle->filename,
+					   flags,
+	                                   error );
+#else
 	file_io_handle->file_descriptor = libewf_file_io_open(
 					   file_io_handle->filename,
 					   flags,
 	                                   error );
+#endif
 
 	if( file_io_handle->file_descriptor == -1 )
 	{

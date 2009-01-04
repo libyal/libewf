@@ -70,9 +70,16 @@ extern "C" {
 #endif
 
 int libewf_file_io_open(
-     const libewf_system_character_t *filename,
+     const char *filename,
      int flags,
      libewf_error_t **error );
+
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+int libewf_file_io_open_wide(
+     const wchar_t *filename,
+     int flags,
+     libewf_error_t **error );
+#endif
 
 #if defined( HAVE_WINDOWS_API )
 #define libewf_file_io_close( file_descriptor ) \
@@ -111,8 +118,14 @@ int libewf_file_io_open(
 #endif
 
 int libewf_file_io_exists(
-     const libewf_system_character_t *filename,
+     const char *filename,
      libewf_error_t **error );
+
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+int libewf_file_io_exists_wide(
+     const wchar_t *filename,
+     libewf_error_t **error );
+#endif
 
 #if defined( __cplusplus )
 }

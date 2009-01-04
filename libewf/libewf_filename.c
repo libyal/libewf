@@ -37,7 +37,7 @@
  * Returns 1 on success or -1 on error
  */
 int libewf_filename_set_extension(
-     libewf_system_character_t *extension,
+     char *extension,
      uint16_t segment_number,
      uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
@@ -45,9 +45,9 @@ int libewf_filename_set_extension(
      uint8_t ewf_format,
      libewf_error_t **error )
 {
-	static char *function                                     = "libewf_filename_set_extension";
-	libewf_system_character_t extension_first_character       = 0;
-	libewf_system_character_t extension_additional_characters = 0;
+	static char *function                = "libewf_filename_set_extension";
+	char extension_first_character       = 0;
+	char extension_additional_characters = 0;
 
 	if( extension == NULL )
 	{
@@ -78,29 +78,29 @@ int libewf_filename_set_extension(
 		if( ( format == LIBEWF_FORMAT_EWF )
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
-			extension_first_character       = (libewf_system_character_t) 'e';
-			extension_additional_characters = (libewf_system_character_t) 'a';
+			extension_first_character       = (char) 'e';
+			extension_additional_characters = (char) 'a';
 		}
 		else if( ewf_format == EWF_FORMAT_S01 )
 		{
-			extension_first_character       = (libewf_system_character_t) 's';
-			extension_additional_characters = (libewf_system_character_t) 'a';
+			extension_first_character       = (char) 's';
+			extension_additional_characters = (char) 'a';
 		}
 		else
 		{
-			extension_first_character       = (libewf_system_character_t) 'E';
-			extension_additional_characters = (libewf_system_character_t) 'A';
+			extension_first_character       = (char) 'E';
+			extension_additional_characters = (char) 'A';
 		}
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
 	{
-		extension_first_character       = (libewf_system_character_t) 'L';
-		extension_additional_characters = (libewf_system_character_t) 'A';
+		extension_first_character       = (char) 'L';
+		extension_additional_characters = (char) 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
-		extension_first_character       = (libewf_system_character_t) 'd';
-		extension_additional_characters = (libewf_system_character_t) 'a';
+		extension_first_character       = (char) 'd';
+		extension_additional_characters = (char) 'a';
 	}
 	else
 	{
@@ -117,15 +117,15 @@ int libewf_filename_set_extension(
 
 	if( segment_number <= 99 )
 	{
-		extension[ 2 ] = (libewf_system_character_t) '0' + (libewf_system_character_t) ( segment_number % 10 );
-		extension[ 1 ] = (libewf_system_character_t) '0' + (libewf_system_character_t) ( segment_number / 10 );
+		extension[ 2 ] = (char) '0' + (char) ( segment_number % 10 );
+		extension[ 1 ] = (char) '0' + (char) ( segment_number / 10 );
 	}
 	else if( segment_number >= 100 )
 	{
 		segment_number -= 100;
-		extension[ 2 ]  = extension_additional_characters + (libewf_system_character_t) ( segment_number % 26 );
+		extension[ 2 ]  = extension_additional_characters + (char) ( segment_number % 26 );
 		segment_number /= 26;
-		extension[ 1 ]  = extension_additional_characters + (libewf_system_character_t) ( segment_number % 26 );
+		extension[ 1 ]  = extension_additional_characters + (char) ( segment_number % 26 );
 		segment_number /= 26;
 
 		if( segment_number >= 26 )
@@ -139,13 +139,13 @@ int libewf_filename_set_extension(
 
 			return( -1 );
 		}
-		extension[ 0 ] = extension_first_character + (libewf_system_character_t) segment_number;
+		extension[ 0 ] = extension_first_character + (char) segment_number;
 	}
 	/* Safety check
 	 */
-	if( ( extension[ 0 ] > (libewf_system_character_t) 'z' )
-	 || ( ( extension[ 0 ] > (libewf_system_character_t) 'Z' )
-	  && ( extension[ 0 ] < (libewf_system_character_t) 'a' ) ) )
+	if( ( extension[ 0 ] > (char) 'z' )
+	 || ( ( extension[ 0 ] > (char) 'Z' )
+	  && ( extension[ 0 ] < (char) 'a' ) ) )
 	{
 		libewf_error_set(
 		 error,
@@ -160,6 +160,137 @@ int libewf_filename_set_extension(
 
 	return( 1 );
 }
+
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+/* Creates the filename extension for a certain segment file
+ * For EWF-E01, EWF-S01 segment file extension naming schema
+ * Returns 1 on success or -1 on error
+ */
+int libewf_filename_set_extension_wide(
+     wchar_t *extension,
+     uint16_t segment_number,
+     uint16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format,
+     libewf_error_t **error )
+{
+	static char *function                   = "libewf_filename_set_extension_wide";
+	wchar_t extension_first_character       = 0;
+	wchar_t extension_additional_characters = 0;
+
+	if( extension == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid extension.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( segment_number == 0 )
+	 || ( segment_number > maximum_amount_of_segments ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: segment number: %" PRIu16 " is out of range.\n",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+	{
+		if( ( format == LIBEWF_FORMAT_EWF )
+		 || ( format == LIBEWF_FORMAT_EWFX ) )
+		{
+			extension_first_character       = (wchar_t) 'e';
+			extension_additional_characters = (wchar_t) 'a';
+		}
+		else if( ewf_format == EWF_FORMAT_S01 )
+		{
+			extension_first_character       = (wchar_t) 's';
+			extension_additional_characters = (wchar_t) 'a';
+		}
+		else
+		{
+			extension_first_character       = (wchar_t) 'E';
+			extension_additional_characters = (wchar_t) 'A';
+		}
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
+	{
+		extension_first_character       = (wchar_t) 'L';
+		extension_additional_characters = (wchar_t) 'A';
+	}
+	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	{
+		extension_first_character       = (wchar_t) 'd';
+		extension_additional_characters = (wchar_t) 'a';
+	}
+	else
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported segment file type.\n",
+		 function );
+
+		return( -1 );
+	}
+	extension[ 0 ] = extension_first_character;
+
+	if( segment_number <= 99 )
+	{
+		extension[ 2 ] = (wchar_t) '0' + (wchar_t) ( segment_number % 10 );
+		extension[ 1 ] = (wchar_t) '0' + (wchar_t) ( segment_number / 10 );
+	}
+	else if( segment_number >= 100 )
+	{
+		segment_number -= 100;
+		extension[ 2 ]  = extension_additional_characters + (wchar_t) ( segment_number % 26 );
+		segment_number /= 26;
+		extension[ 1 ]  = extension_additional_characters + (wchar_t) ( segment_number % 26 );
+		segment_number /= 26;
+
+		if( segment_number >= 26 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: unable to support for more segment files.\n",
+			 function );
+
+			return( -1 );
+		}
+		extension[ 0 ] = extension_first_character + (wchar_t) segment_number;
+	}
+	/* Safety check
+	 */
+	if( ( extension[ 0 ] > (wchar_t) 'z' )
+	 || ( ( extension[ 0 ] > (wchar_t) 'Z' )
+	  && ( extension[ 0 ] < (wchar_t) 'a' ) ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unable to support for more segment files.\n",
+		 function );
+
+		return( -1 );
+	}
+	extension[ 3 ] = 0;
+
+	return( 1 );
+}
+#endif
 
 /* Creates a filename for a certain segment file
  * Returns 1 if successful or -1 on error
@@ -260,6 +391,16 @@ int libewf_filename_create(
 	}
 	new_filename[ basename_length ] = (libewf_system_character_t) '.';
 
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_filename_set_extension_wide(
+	     &( new_filename[ basename_length + 1 ] ),
+	     segment_number,
+	     maximum_amount_of_segments,
+	     segment_file_type,
+	     format,
+	     ewf_format,
+	     error ) != 1 )
+#else
 	if( libewf_filename_set_extension(
 	     &( new_filename[ basename_length + 1 ] ),
 	     segment_number,
@@ -268,6 +409,7 @@ int libewf_filename_create(
 	     format,
 	     ewf_format,
 	     error ) != 1 )
+#endif
 	{
 		libewf_error_set(
 		 error,

@@ -33,7 +33,86 @@
  * Returns the file descriptor or -1 on error 
  */
 int libewf_file_io_open(
-     const libewf_system_character_t *filename,
+     const char *filename,
+     int flags,
+     libewf_error_t **error )
+{
+	static char *function = "libewf_file_io_open";
+	int file_descriptor   = 0;
+
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WINDOWS_API )
+	if( _sopen_s(
+	     &file_descriptor,
+	     filename,
+	     ( flags | _O_BINARY ),
+	     _SH_DENYRW,
+	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
+#else
+	file_descriptor = open(
+	                   filename,
+	                   flags,
+	                   0644 );
+
+	if( file_descriptor == -1 )
+#endif
+	{
+		switch( errno )
+		{
+			case EACCES:
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_ACCESS_DENIED,
+				 "%s: access denied to file: %s.\n",
+				 function,
+				 filename );
+
+				break;
+
+			case ENOENT:
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_INVALID_RESOURCE,
+				 "%s: no such file: %s.\n",
+				 function,
+				 filename );
+
+				break;
+
+			default:
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_OPEN_FAILED,
+				 "%s: error opening file: %s.\n",
+				 function,
+				 filename );
+
+				break;
+		}
+		return( -1 );
+	}
+	return( file_descriptor );
+}
+
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+/* Function to open a file
+ * Returns the file descriptor or -1 on error 
+ */
+int libewf_file_io_open_wide(
+     const wchar_t *filename,
      int flags,
      libewf_error_t **error )
 {
@@ -43,7 +122,7 @@ int libewf_file_io_open(
 	size_t narrow_filename_size = 0;
 #endif
 
-	static char *function       = "libewf_file_io_open";
+	static char *function       = "libewf_file_io_open_wide";
 	int file_descriptor         = 0;
 
 	if( filename == NULL )
@@ -58,7 +137,6 @@ int libewf_file_io_open(
 		return( -1 );
 	}
 #if defined( HAVE_WINDOWS_API )
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( _wsopen_s(
 	     &file_descriptor,
 	     filename,
@@ -67,15 +145,6 @@ int libewf_file_io_open(
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
 #else
-	if( _sopen_s(
-	     &file_descriptor,
-	     filename,
-	     ( flags | _O_BINARY ),
-	     _SH_DENYRW,
-	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
-#endif
-#else
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_TYPE )
 	filename_size = 1 + libewf_system_string_length(
 	                     filename );
 
@@ -95,7 +164,7 @@ int libewf_file_io_open(
 		return( -1 );
 	}
 	narrow_filename = (char *) memory_allocate(
-	                            narrow_filename_size );
+	                            sizeof( char ) * narrow_filename_size );
 
 	if( narrow_filename == NULL )
 	{
@@ -131,12 +200,6 @@ int libewf_file_io_open(
 
 	memory_free(
 	 narrow_filename );
-#else
-	file_descriptor = open(
-	                   filename,
-	                   flags,
-	                   0644 );
-#endif
 
 	if( file_descriptor == -1 )
 #endif
@@ -148,7 +211,7 @@ int libewf_file_io_open(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_ACCESS_DENIED,
-				 "%s: access denied to file: %" PRIs_LIBEWF_SYSTEM ".\n",
+				 "%s: access denied to file: %ls.\n",
 				 function,
 				 filename );
 
@@ -159,7 +222,7 @@ int libewf_file_io_open(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_INVALID_RESOURCE,
-				 "%s: no such file: %" PRIs_LIBEWF_SYSTEM ".\n",
+				 "%s: no such file: %ls.\n",
 				 function,
 				 filename );
 
@@ -170,7 +233,7 @@ int libewf_file_io_open(
 				 error,
 				 LIBEWF_ERROR_DOMAIN_IO,
 				 LIBEWF_IO_ERROR_OPEN_FAILED,
-				 "%s: error opening file: %" PRIs_LIBEWF_SYSTEM ".\n",
+				 "%s: error opening file: %ls.\n",
 				 function,
 				 filename );
 
@@ -180,12 +243,13 @@ int libewf_file_io_open(
 	}
 	return( file_descriptor );
 }
+#endif
 
 /* Function to determine if a file exists
  * Return 1 if file exists, 0 if not or -1 on error
  */
 int libewf_file_io_exists(
-     const libewf_system_character_t *filename,
+     const char *filename,
      libewf_error_t **error )
 {
 	libewf_error_t *local_error = NULL;
@@ -246,7 +310,7 @@ int libewf_file_io_exists(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 "%s: unable to close file: %s.\n",
 		 function,
 		 filename );
 
@@ -254,4 +318,80 @@ int libewf_file_io_exists(
 	}
 	return( result );
 }
+
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+/* Function to determine if a file exists
+ * Return 1 if file exists, 0 if not or -1 on error
+ */
+int libewf_file_io_exists_wide(
+     const wchar_t *filename,
+     libewf_error_t **error )
+{
+	libewf_error_t *local_error = NULL;
+	static char *function       = "libewf_file_io_exists_wide";
+	int file_descriptor         = 0;
+	int result                  = 0;
+
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( error == NULL )
+	{
+		error = &local_error;
+	}
+	file_descriptor = libewf_file_io_open_wide(
+	                   filename,
+	                   LIBEWF_FILE_IO_O_RDONLY,
+	                   error );
+
+	if( file_descriptor == -1 )
+	{
+		if( libewf_error_matches(
+		     *error,
+		     LIBEWF_ERROR_DOMAIN_IO,
+		     LIBEWF_IO_ERROR_ACCESS_DENIED ) != 0 )
+		{
+			result = 1;
+		}
+		else if( libewf_error_matches(
+		          *error,
+		          LIBEWF_ERROR_DOMAIN_IO,
+		          LIBEWF_IO_ERROR_INVALID_RESOURCE ) != 0 )
+		{
+			result = 0;
+		}
+		else
+		{
+			result = -1;
+		}
+		if( error == &local_error )
+		{
+			libewf_error_free(
+			 error );
+		}
+	}
+	else if( libewf_file_io_close(
+		  file_descriptor ) != 0 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file: %ls.\n",
+		 function,
+		 filename );
+
+		return( -1 );
+	}
+	return( result );
+}
+#endif
 

@@ -35,6 +35,7 @@
 #include "libewf_section_list.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
+#include "libewf_system_string.h"
 
 #include "ewf_crc.h"
 #include "ewf_data.h"
@@ -43,9 +44,9 @@
 extern "C" {
 #endif
 
-int libewf_segment_file_check_file_signature(
-     int file_descriptor,
-     libewf_error_t **error );
+extern const uint8_t dvf_file_signature[ 8 ];
+extern const uint8_t evf_file_signature[ 8 ];
+extern const uint8_t lvf_file_signature[ 8 ];
 
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
