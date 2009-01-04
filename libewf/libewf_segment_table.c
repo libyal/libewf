@@ -409,11 +409,12 @@ int libewf_segment_table_build(
  */
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
-     libewf_system_character_t *basename,
-     size_t length,
+     char *basename,
+     size_t basename_size,
      libewf_error_t **error )
 {
-	static char *function = "libewf_segment_table_get_basename";
+	static char *function       = "libewf_segment_table_get_basename";
+	size_t narrow_basename_size = 0;
 
 	if( segment_table == NULL )
 	{
@@ -441,9 +442,26 @@ int libewf_segment_table_get_basename(
 	{
 		return( 0 );
 	}
-	/* Make sure to include the end of string character
-	 */
-	if( length < ( segment_table->basename_length + 1 ) )
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( narrow_string_size_from_libewf_system_string(
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     &narrow_basename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#else
+	narrow_basename_size = segment_table->basename_size;
+#endif
+	if( basename_size < narrow_basename_size )
 	{
 		libewf_error_set(
 		 error,
@@ -454,10 +472,28 @@ int libewf_segment_table_get_basename(
 
 		return( -1 );
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( narrow_string_copy_from_libewf_system_string(
+	     basename,
+	     basename_size,
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.\n",
+		 function );
+
+		return( -1 );
+	}
+#else
 	if( libewf_system_string_copy(
 	     basename,
 	     segment_table->basename,
-	     ( segment_table->basename_length + 1 ) ) == NULL )
+	     segment_table->basename_size ) == NULL )
 	{
 		libewf_error_set(
 		 error,
@@ -468,6 +504,8 @@ int libewf_segment_table_get_basename(
 
 		return( -1 );
 	}
+	basename[ segment_table->basename_size - 1 ] = 0;
+#endif
 	return( 1 );
 }
 
@@ -476,8 +514,8 @@ int libewf_segment_table_get_basename(
  */
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
-     libewf_system_character_t *basename,
-     size_t basename_length,
+     const char *basename,
+     size_t basename_size,
      libewf_error_t **error )
 {
 	static char *function = "libewf_segment_table_set_basename";
@@ -509,11 +547,262 @@ int libewf_segment_table_set_basename(
 		memory_free(
 		 segment_table->basename );
 
-		segment_table->basename        = NULL;
-		segment_table->basename_length = 0;
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_size_from_narrow_string(
+	     basename,
+	     basename_size,
+	     &( segment_table->basename_size ),
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#else
+	segment_table->basename_size = basename_size;
+#endif
 	segment_table->basename = (libewf_system_character_t *) memory_allocate(
-	                                                         sizeof( libewf_system_character_t ) * ( basename_length + 1 ) );
+	                                                         sizeof( libewf_system_character_t ) * segment_table->basename_size );
+
+	if( segment_table->basename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create basename.\n",
+		 function );
+
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_copy_from_narrow_string(
+	     basename,
+	     basename_size,
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.\n",
+		 function );
+
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+#else
+	if( libewf_system_string_copy(
+	     segment_table->basename,
+	     basename,
+	     basename_size ) == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set basename.\n",
+		 function );
+
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+	segment_table->basename[ basename_size - 1 ] = 0;
+#endif
+	return( 1 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+/* retrieves the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename_wide(
+     libewf_segment_table_t *segment_table,
+     wchar_t *basename,
+     size_t basename_size,
+     libewf_error_t **error )
+{
+	static char *function     = "libewf_segment_table_get_basename_wide";
+	size_t wide_basename_size = 0;
+
+	if( segment_table == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	wide_basename_size = segment_table->basename_size;
+#else
+	if( wide_string_size_from_libewf_system_string(
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     &wide_basename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( basename_size < wide_basename_size )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: basename too small.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_copy(
+	     basename,
+	     segment_table->basename,
+	     segment_table->basename_size ) == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	basename[ segment_table->basename_size - 1 ] = 0;
+#else
+	if( wide_string_copy_from_libewf_system_string(
+	     basename,
+	     basename_size,
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+/* Sets the basename in the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_set_basename_wide(
+     libewf_segment_table_t *segment_table,
+     const wchar_t *basename,
+     size_t basename_size,
+     libewf_error_t **error )
+{
+	static char *function = "libewf_segment_table_set_basename_wide";
+
+	if( segment_table == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( basename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename != NULL )
+	{
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	segment_table->basename_size = basename_size;
+#else
+	if( libewf_system_string_size_from_narrow_string(
+	     basename,
+	     basename_size,
+	     &( segment_table->basename_size ),
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	segment_table->basename = (libewf_system_character_t *) memory_allocate(
+	                                                         sizeof( libewf_system_character_t ) * segment_table->basename_size );
+
 
 	if( segment_table->basename == NULL )
 	{
@@ -526,10 +815,11 @@ int libewf_segment_table_set_basename(
 
 		return( -1 );
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
 	if( libewf_system_string_copy(
 	     segment_table->basename,
 	     basename,
-	     basename_length ) == NULL )
+	     basename_size ) == NULL )
 	{
 		libewf_error_set(
 		 error,
@@ -538,14 +828,42 @@ int libewf_segment_table_set_basename(
 		 "%s: unable to set basename.\n",
 		 function );
 
+		memory_free(
+		 segment_table->basename );
+
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
 		return( -1 );
 	}
-	segment_table->basename[ basename_length ] = 0;
+	segment_table->basename[ basename_size - 1 ] = 0;
+#else
+	if( libewf_system_string_copy_from_wide_string(
+	     basename,
+	     basename_size,
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set basename.\n",
+		 function );
 
-	segment_table->basename_length = basename_length;
+		memory_free(
+		 segment_table->basename );
 
+		segment_table->basename      = NULL;
+		segment_table->basename_size = 0;
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
+#endif
 
 /* Creates a new segment file and opens it for writing
  * The necessary sections at the start of the segment file are written
@@ -663,7 +981,7 @@ int libewf_segment_table_create_segment_file(
 	     &( file_io_handle->filename ),
 	     &( file_io_handle->filename_size ),
 	     segment_table->basename,
-	     segment_table->basename_length,
+	     segment_table->basename_size - 1,
 	     segment_number,
 	     maximum_amount_of_segments,
 	     segment_file_type,

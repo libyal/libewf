@@ -182,14 +182,14 @@ LIBEWF_EXTERN int libewf_get_header_value_identifier_wide(
 
 LIBEWF_EXTERN int libewf_get_header_value(
                    libewf_handle_t *handle,
-                   char *identifier,
+                   const char *identifier,
                    char *value,
                    size_t length );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_get_header_value_wide(
                    libewf_handle_t *handle,
-                   wchar_t *identifier,
+                   const wchar_t *identifier,
                    wchar_t *value,
                    size_t length );
 #endif
@@ -214,14 +214,14 @@ LIBEWF_EXTERN int libewf_get_hash_value_identifier_wide(
 
 LIBEWF_EXTERN int libewf_get_hash_value(
                    libewf_handle_t *handle,
-                   char *identifier,
+                   const char *identifier,
                    char *value,
                    size_t length );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_get_hash_value_wide(
                    libewf_handle_t *handle,
-                   wchar_t *identifier,
+                   const wchar_t *identifier,
                    wchar_t *value,
                    size_t length );
 #endif
@@ -279,25 +279,25 @@ LIBEWF_EXTERN int libewf_set_md5_hash(
 
 LIBEWF_EXTERN int libewf_set_segment_filename(
                    libewf_handle_t *handle,
-                   char *filename,
+                   const char *filename,
                    size_t length );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_set_segment_filename_wide(
                    libewf_handle_t *handle,
-                   wchar_t *filename,
+                   const wchar_t *filename,
                    size_t length );
 #endif
 
 LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    libewf_handle_t *handle,
-                   char *filename,
+                   const char *filename,
                    size_t length );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
                    libewf_handle_t *handle,
-                   wchar_t *filename,
+                   const wchar_t *filename,
                    size_t length );
 #endif
 
@@ -311,29 +311,29 @@ LIBEWF_EXTERN int libewf_set_header_codepage(
 
 LIBEWF_EXTERN int libewf_set_header_value(
                    libewf_handle_t *handle,
-                   char *identifier,
-                   char *value,
+                   const char *identifier,
+                   const char *value,
                    size_t length );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_set_header_value_wide(
                    libewf_handle_t *handle,
-                   wchar_t *identifier,
-                   wchar_t *value,
+                   const wchar_t *identifier,
+                   const wchar_t *value,
                    size_t length );
 #endif
 
 LIBEWF_EXTERN int libewf_set_hash_value(
                    libewf_handle_t *handle,
-                   char *identifier,
-                   char *value,
+                   const char *identifier,
+                   const char *value,
                    size_t length );
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_set_hash_value_wide(
                    libewf_handle_t *handle,
-                   wchar_t *identifier,
-                   wchar_t *value,
+                   const wchar_t *identifier,
+                   const wchar_t *value,
                    size_t length );
 #endif
 

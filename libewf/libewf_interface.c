@@ -21,8 +21,9 @@
  */
 
 #include <common.h>
+#include <narrow_string.h>
 #include <memory.h>
-#include <notify.h>
+#include <wide_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
@@ -30,7 +31,6 @@
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_interface.h"
-#include "libewf_string.h"
 #include "libewf_segment_file_handle.h"
 
 #include "ewf_definitions.h"
@@ -1171,12 +1171,13 @@ int libewf_get_md5_hash(
 }
 
 /* Retrieves the segment filename
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_segment_filename(
      libewf_handle_t *handle,
      char *filename,
-     size_t length )
+     size_t size )
 {
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1220,7 +1221,7 @@ int libewf_get_segment_filename(
 	result = libewf_segment_table_get_basename(
 	          internal_handle->segment_table,
 	          filename,
-	          length,
+	          size,
 	          &error );
 
 	if( result == -1 )
@@ -1241,15 +1242,88 @@ int libewf_get_segment_filename(
 }
 
 #if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the segment filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_segment_filename_wide(
+     libewf_handle_t *handle,
+     wchar_t *filename,
+     size_t size )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_segment_filename_wide";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->segment_table == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	result = libewf_segment_table_get_basename_wide(
+	          internal_handle->segment_table,
+	          filename,
+	          size,
+	          &error );
+
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
+
 #endif
 
 /* Retrieves the delta segment filename
+ * The size should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_delta_segment_filename(
      libewf_handle_t *handle,
-     system_character_t *filename,
-     size_t length )
+     char *filename,
+     size_t size )
 {
 	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1293,7 +1367,7 @@ int libewf_get_delta_segment_filename(
 	result = libewf_segment_table_get_basename(
 	          internal_handle->delta_segment_table,
 	          filename,
-	          length,
+	          size,
 	          &error );
 
 	if( result == -1 )
@@ -1312,6 +1386,81 @@ int libewf_get_delta_segment_filename(
 	}
 	return( result );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the delta segment filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_delta_segment_filename_wide(
+     libewf_handle_t *handle,
+     wchar_t *filename,
+     size_t size )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_delta_segment_filename_wide";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	result = libewf_segment_table_get_basename_wide(
+	          internal_handle->delta_segment_table,
+	          filename,
+	          size,
+	          &error );
+
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif
 
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful, 0 if no acquiry errors are present or -1 on error
@@ -1897,7 +2046,7 @@ int libewf_get_amount_of_header_values(
 int libewf_get_header_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
-     libewf_character_t *value,
+     char *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -1951,13 +2100,77 @@ int libewf_get_header_value_identifier(
 	return( result );
 }
 
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the header value identifier specified by its index
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_header_value_identifier_wide(
+     libewf_handle_t *handle,
+     uint32_t index,
+     wchar_t *value,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_header_value_identifier_wide";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->header_values == NULL )
+	{
+		return( 0 );
+	}
+	result = libewf_values_table_get_identifier_wide(
+	          internal_handle->header_values,
+	          index,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif
+
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_header_value(
      libewf_handle_t *handle,
-     libewf_character_t *identifier,
-     libewf_character_t *value,
+     const char *identifier,
+     char *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -2020,7 +2233,7 @@ int libewf_get_header_value(
 	{
 		return( 0 );
 	}
-	identifier_length = libewf_string_length(
+	identifier_length = narrow_string_length(
 	                     identifier );
 
 	result = libewf_values_table_get_value(
@@ -2047,6 +2260,107 @@ int libewf_get_header_value(
 	}
 	return( result );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the header value specified by the identifier
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_header_value_wide(
+     libewf_handle_t *handle,
+     const char *identifier,
+     char *value,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_header_value_wide";
+	size_t identifier_length                  = 0;
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( identifier == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( value == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( internal_handle->header_values == NULL )
+	{
+		return( 0 );
+	}
+	identifier_length = wide_string_length(
+	                     identifier );
+
+	result = libewf_values_table_get_value_wide(
+	          internal_handle->header_values,
+	          identifier,
+	          identifier_length,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif
 
 /* Retrieves the amount of hash values
  * Returns 1 if successful or -1 on error
@@ -2108,7 +2422,7 @@ int libewf_get_amount_of_hash_values(
 int libewf_get_hash_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
-     libewf_character_t *value,
+     char *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -2162,13 +2476,77 @@ int libewf_get_hash_value_identifier(
 	return( result );
 }
 
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the hash value identifier specified by its index
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_hash_value_identifier_wide(
+     libewf_handle_t *handle,
+     uint32_t index,
+     wchar_t *value,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_hash_value_identifier_wide";
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->hash_values == NULL )
+	{
+		return( 0 );
+	}
+	result = libewf_values_table_get_identifier_wide(
+	          internal_handle->hash_values,
+	          index,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif
+
 /* Retrieves the hash value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_hash_value(
      libewf_handle_t *handle,
-     libewf_character_t *identifier,
-     libewf_character_t *value,
+     const char *identifier,
+     char *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -2227,16 +2605,16 @@ int libewf_get_hash_value(
 
 		return( -1 );
 	}
-	identifier_length = libewf_string_length(
+	identifier_length = narrow_string_length(
 	                     identifier );
 
 	if( ( internal_handle->hash_values == NULL )
 	 && ( internal_handle->hash_sections != NULL )
 	 && ( internal_handle->hash_sections->md5_hash_set != 0 )
 	 && ( identifier_length == 3 )
-	 && ( libewf_string_compare(
+	 && ( narrow_string_compare(
 	       identifier,
-	       _LIBEWF_STRING( "MD5" ),
+	       "MD5",
 	       identifier_length ) == 0 ) )
 	{
 		if( libewf_hash_values_parse_md5_hash(
@@ -2288,6 +2666,137 @@ int libewf_get_hash_value(
 	}
 	return( result );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the hash value specified by the identifier
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_hash_value_wide(
+     libewf_handle_t *handle,
+     const wchar_t *identifier,
+     wchar_t *value,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_hash_value_wide";
+	size_t identifier_length                  = 0;
+	int result                                = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( identifier == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( value == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	identifier_length = wide_string_length(
+	                     identifier );
+
+	if( ( internal_handle->hash_values == NULL )
+	 && ( internal_handle->hash_sections != NULL )
+	 && ( internal_handle->hash_sections->md5_hash_set != 0 )
+	 && ( identifier_length == 3 )
+	 && ( wide_string_compare(
+	       identifier,
+	       L"MD5",
+	       identifier_length ) == 0 ) )
+	{
+		if( libewf_hash_values_parse_md5_hash(
+		     &( internal_handle->hash_values ),
+		     internal_handle->hash_sections->md5_hash,
+		     EWF_DIGEST_HASH_SIZE_MD5,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash for its value.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	if( internal_handle->hash_values == NULL )
+	{
+		return( 0 );
+	}
+	result = libewf_values_table_get_value(
+                  internal_handle->hash_values,
+	          identifier,
+	          identifier_length,
+	          value,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+#endif
 
 /* Sets the amount of sectors per chunk in the media information
  * Returns 1 if successful or -1 on error
@@ -3352,7 +3861,7 @@ int libewf_set_md5_hash(
  */
 int libewf_set_segment_filename(
      libewf_handle_t *handle,
-     system_character_t *filename,
+     const char *filename,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -3409,6 +3918,10 @@ int libewf_set_segment_filename(
 
 		return( -1 );
 	}
+	if( filename[ length - 1 ] != 0 )
+	{
+		length += 1;
+	}
 	if( libewf_segment_table_set_basename(
 	     internal_handle->segment_table,
 	     filename,
@@ -3432,12 +3945,105 @@ int libewf_set_segment_filename(
 	return( 1 );
 }
 
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Sets the segment file
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_segment_filename_wide(
+     libewf_handle_t *handle,
+     const wchar_t *filename,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_segment_filename_wide";
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: segment filename cannot be changed.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( filename[ length - 1 ] != 0 )
+	{
+		length += 1;
+	}
+	if( libewf_segment_table_set_basename_wide(
+	     internal_handle->segment_table,
+	     filename,
+	     length,
+	     &error ) != 1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#endif
+
 /* Sets the delta segment file
  * Returns 1 if successful or -1 on error
  */
 int libewf_set_delta_segment_filename(
      libewf_handle_t *handle,
-     system_character_t *filename,
+     const char *filename,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -3494,6 +4100,10 @@ int libewf_set_delta_segment_filename(
 
 		return( -1 );
 	}
+	if( filename[ length - 1 ] != 0 )
+	{
+		length += 1;
+	}
 	if( libewf_segment_table_set_basename(
 	     internal_handle->delta_segment_table,
 	     filename,
@@ -3516,6 +4126,99 @@ int libewf_set_delta_segment_filename(
 	}
 	return( 1 );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Sets the delta segment file
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_delta_segment_filename_wide(
+     libewf_handle_t *handle,
+     const wchar_t *filename,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_delta_segment_filename_wide";
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: delta segment filename cannot be changed.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( filename[ length - 1 ] != 0 )
+	{
+		length += 1;
+	}
+	if( libewf_segment_table_set_basename_wide(
+	     internal_handle->delta_segment_table,
+	     filename,
+	     length,
+	     &error ) != 1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#endif
 
 /* Sets the read wipe chunk on error
  * The chunk is not wiped if read raw is used
@@ -3646,8 +4349,8 @@ int libewf_set_header_codepage(
  */
 int libewf_set_header_value(
      libewf_handle_t *handle,
-     libewf_character_t *identifier,
-     libewf_character_t *value,
+     const char *identifier,
+     const char *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -3747,7 +4450,7 @@ int libewf_set_header_value(
 			return( -1 );
 		}
 	}
-	identifier_length = libewf_string_length(
+	identifier_length = narrow_string_length(
 	                     identifier );
 
 	if( libewf_values_table_set_value(
@@ -3775,13 +4478,151 @@ int libewf_set_header_value(
 	return( 1 );
 }
 
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Sets the header value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_header_value_wide(
+     libewf_handle_t *handle,
+     const wchar_t *identifier,
+     const wchar_t *value,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_header_value_wide";
+	size_t identifier_length                  = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: header value cannot be changed.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( internal_handle->header_values == NULL )
+	{
+		if( libewf_values_table_initialize(
+		     &( internal_handle->header_values ),
+		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create header values.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		if( libewf_header_values_initialize(
+		     internal_handle->header_values,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize header values.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	identifier_length = wide_string_length(
+	                     identifier );
+
+	if( libewf_values_table_set_value_wide(
+	     internal_handle->header_values,
+	     identifier,
+	     identifier_length,
+	     value,
+	     length,
+	     &error ) != 1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#endif
+
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful or -1 on error
  */
 int libewf_set_hash_value(
      libewf_handle_t *handle,
-     libewf_character_t *identifier,
-     libewf_character_t *value,
+     const char *identifier,
+     const char *value,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -3879,7 +4720,7 @@ int libewf_set_hash_value(
 			return( -1 );
 		}
 	}
-	identifier_length = libewf_string_length(
+	identifier_length = narrow_string_length(
 	                     identifier );
 
 	if( libewf_values_table_set_value(
@@ -3906,9 +4747,9 @@ int libewf_set_hash_value(
 	}
 	if( ( internal_handle->hash_sections != NULL )
 	 && ( identifier_length == 3 )
-	 && ( libewf_string_compare(
+	 && ( narrow_string_compare(
 	       identifier,
-	       _LIBEWF_STRING( "MD5" ),
+	       "MD5",
 	       identifier_length ) == 0 ) )
 	{
 		if( libewf_hash_values_generate_md5_hash(
@@ -3935,6 +4776,171 @@ int libewf_set_hash_value(
 	}
 	return( 1 );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+
+/* Sets the hash value specified by the identifier
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_hash_value_wide(
+     libewf_handle_t *handle,
+     const wchar_t *identifier,
+     const wchar_t *value,
+     size_t length )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_hash_value_wide";
+	size_t identifier_length                  = 0;
+
+	if( handle == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->read != NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: hash value cannot be changed.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		error );
+		libewf_error_free(
+		&error );
+
+		return( -1 );
+	}
+	if( internal_handle->hash_values == NULL )
+	{
+		if( libewf_values_table_initialize(
+		     &( internal_handle->hash_values ),
+		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		if( libewf_hash_values_initialize(
+		     internal_handle->hash_values,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize hash values.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	identifier_length = wide_string_length(
+	                     identifier );
+
+	if( libewf_values_table_set_value_wide(
+	     internal_handle->hash_values,
+	     identifier,
+	     identifier_length,
+	     value,
+	     length,
+	     &error ) != 1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set hash value.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error);
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( internal_handle->hash_sections != NULL )
+	 && ( identifier_length == 3 )
+	 && ( wide_string_compare(
+	       identifier,
+	       L"MD5",
+	       identifier_length ) == 0 ) )
+	{
+		if( libewf_hash_values_generate_md5_hash(
+		     internal_handle->hash_values,
+		     internal_handle->hash_sections->md5_hash,
+		     EWF_DIGEST_HASH_SIZE_MD5,
+		     &( internal_handle->hash_sections->md5_hash_set ),
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash value for its value.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error);
+			libewf_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+#endif
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above

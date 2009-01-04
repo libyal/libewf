@@ -22,8 +22,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <notify.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
@@ -36,11 +38,12 @@
  */
 int libewf_file_io_handle_get_filename(
      libewf_file_io_handle_t *file_io_handle,
-     libewf_system_character_t *filename,
+     char *filename,
      size_t filename_size,
      libewf_error_t **error )
 {
-	static char *function = "libewf_file_io_handle_get_filename";
+	static char *function       = "libewf_file_io_handle_get_filename";
+	size_t narrow_filename_size = 0;
 
 	if( file_io_handle == NULL )
 	{
@@ -75,7 +78,26 @@ int libewf_file_io_handle_get_filename(
 
 		return( -1 );
 	}
-	if( filename_size < file_io_handle->filename_size )
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( narrow_string_size_from_libewf_system_string(
+	     file_io_handle->filename,
+	     file_io_handle->filename_size,
+	     &narrow_filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine filename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#else
+	narrow_filename_size = file_io_handle->filename_size;
+#endif
+	if( filename_size < narrow_filename_size )
 	{
 		libewf_error_set(
 		 error,
@@ -86,6 +108,24 @@ int libewf_file_io_handle_get_filename(
 
 		return( -1 );
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( narrow_string_copy_from_libewf_system_string(
+	     filename,
+	     filename_size,
+	     file_io_handle->filename,
+	     file_io_handle->filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#else
 	if( libewf_system_string_copy(
 	     filename,
 	     file_io_handle->filename,
@@ -100,10 +140,8 @@ int libewf_file_io_handle_get_filename(
 
 		return( -1 );
 	}
-	/* Make sure the string is terminated
-	 */
 	filename[ file_io_handle->filename_size - 1 ] = 0;
-
+#endif
 	return( 1 );
 }
 
@@ -113,7 +151,7 @@ int libewf_file_io_handle_get_filename(
  */
 int libewf_file_io_handle_set_filename(
      libewf_file_io_handle_t *file_io_handle,
-     const libewf_system_character_t *filename,
+     const char *filename,
      size_t filename_size,
      libewf_error_t **error )
 {
@@ -175,8 +213,27 @@ int libewf_file_io_handle_set_filename(
 
 		return( -1 );
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_size_from_narrow_string(
+	     filename,
+	     filename_size,
+	     &( file_io_handle->filename_size ),
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine filename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#else
+	file_io_handle->filename_size = filename_size;
+#endif
 	file_io_handle->filename = (libewf_system_character_t *) memory_allocate(
-	                                                          sizeof( libewf_system_character_t ) * filename_size );
+	                                                          sizeof( libewf_system_character_t ) * file_io_handle->filename_size );
 
 	if( file_io_handle->filename == NULL )
 	{
@@ -189,6 +246,30 @@ int libewf_file_io_handle_set_filename(
 
 		return( -1 );
 	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_copy_from_narrow_string(
+	     filename,
+	     filename_size,
+	     file_io_handle->filename,
+	     file_io_handle->filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set filename.\n",
+		 function );
+
+		memory_free(
+		 file_io_handle->filename );
+
+		file_io_handle->filename      = NULL;
+		file_io_handle->filename_size = 0;
+
+		return( -1 );
+	}
+#else
 	if( libewf_system_string_copy(
 	     file_io_handle->filename,
 	     filename,
@@ -204,18 +285,282 @@ int libewf_file_io_handle_set_filename(
 		memory_free(
 		 file_io_handle->filename );
 
-		file_io_handle->filename = NULL;
+		file_io_handle->filename      = NULL;
+		file_io_handle->filename_size = 0;
 
 		return( -1 );
 	}
-	/* Make sure the string is terminated
-	 */
 	file_io_handle->filename[ filename_size - 1 ] = 0;
-
-	file_io_handle->filename_size = filename_size;
-
+#endif
 	return( 1 );
 }
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Retrieves a filename of a certain file io handle
+ * Returns 1 if succesful or -1 on error
+ */
+int libewf_file_io_handle_get_filename_wide(
+     libewf_file_io_handle_t *file_io_handle,
+     wchar_t *filename,
+     size_t filename_size,
+     libewf_error_t **error )
+{
+	static char *function     = "libewf_file_io_handle_get_filename_wide";
+	size_t wide_filename_size = 0;
+
+	if( file_io_handle == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file io handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_handle->filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file io handle - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	wide_filename_size = file_io_handle->filename_size;
+#else
+	if( wide_string_size_from_libewf_system_string(
+	     file_io_handle->filename,
+	     file_io_handle->filename_size,
+	     &wide_filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine filename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( filename_size < wide_filename_size )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: filename too small.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_copy(
+	     filename,
+	     file_io_handle->filename,
+	     file_io_handle->filename_size ) == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	filename[ file_io_handle->filename_size - 1 ] = 0;
+#else
+	if( wide_string_copy_from_libewf_system_string(
+	     filename,
+	     filename_size,
+	     file_io_handle->filename,
+	     file_io_handle->filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+/* Sets a filename for a specific file io handle
+ * Creates a duplicate of the filename string
+ * Returns 1 if succesful or -1 on error
+ */
+int libewf_file_io_handle_set_filename_wide(
+     libewf_file_io_handle_t *file_io_handle,
+     const wchar_t *filename,
+     size_t filename_size,
+     libewf_error_t **error )
+{
+	static char *function = "libewf_file_io_handle_set_filename_wide";
+
+	if( file_io_handle == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file io handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_handle->filename != NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: filename already set: %" PRIs_LIBEWF_SYSTEM ".\n",
+		 function,
+		 file_io_handle->filename );
+
+		return( -1 );
+	}
+	if( filename_size == 0 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid filename size is zero.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename_size >= (size_t) SSIZE_MAX )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid filename size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	file_io_handle->filename_size = filename_size;
+#else
+
+	if( libewf_system_string_size_from_wide_string(
+	     filename,
+	     filename_size,
+	     &( file_io_handle->filename_size ),
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine filename size.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	file_io_handle->filename = (libewf_system_character_t *) memory_allocate(
+	                                                          sizeof( libewf_system_character_t ) * file_io_handle->filename_size );
+
+	if( file_io_handle->filename == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libewf_system_string_copy(
+	     file_io_handle->filename,
+	     filename,
+	     filename_size ) == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set filename.\n",
+		 function );
+
+		memory_free(
+		 file_io_handle->filename );
+
+		file_io_handle->filename      = NULL;
+		file_io_handle->filename_size = 0;
+
+		return( -1 );
+	}
+	file_io_handle->filename[ filename_size - 1 ] = 0;
+#else
+	if( libewf_system_string_copy_from_wide_string(
+	     filename,
+	     filename_size,
+	     file_io_handle->filename,
+	     file_io_handle->filename_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set filename.\n",
+		 function );
+
+		memory_free(
+		 file_io_handle->filename );
+
+		file_io_handle->filename      = NULL;
+		file_io_handle->filename_size = 0;
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+#endif
 
 /* Opens a file io handle
  * Sets the filename and the file descriptor in the file io handle struct

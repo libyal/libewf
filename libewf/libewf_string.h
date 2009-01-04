@@ -121,6 +121,23 @@ typedef wchar_t libewf_character_t;
 #define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
 	libuna_utf16_stream_copy_from_utf32( stream, stream_size, byte_order, (libuna_utf32_character_t *) string, string_size, error )
 
+/* narrow string conversion functions
+ */
+#define libewf_string_size_from_narrow_string( narrow_string, narrow_string_size, string_size, error ) \
+	libuna_utf32_string_size_from_utf8( narrow_string, narrow_string_size, string_size, error )
+
+#define libewf_string_copy_from_narrow_string( string, string_size, narrow_string, narrow_string_size, error ) \
+	libuna_utf32_string_copy_from_utf8( (libuna_utf32_character_t *) string, string_size, narrow_string, narrow_string_size, error )
+
+#define narrow_string_size_from_libewf_string( string, string_size, narrow_string_size, error ) \
+	libuna_utf8_string_size_from_utf32( (libuna_utf32_character_t *) string, string_size, narrow_string_size, error )
+
+#define narrow_string_copy_from_libewf_string( narrow_string, narrow_string_size, string, string_size, error ) \
+	libuna_utf8_string_copy_from_utf32( narrow_string, narrow_string_size, (libuna_utf32_character_t *) string, string_size, error )
+
+#define libewf_string_compare_with_narrow_string( string, string_size, narrow_string, narrow_string_size, error ) \
+	libuna_compare_utf8_with_utf32( narrow_string, narrow_string_size, (libuna_utf32_character_t *) string, string_size, error )
+
 /* The internal string type contains UTF-16
  */
 #elif SIZEOF_WCHAR_T == 2
@@ -166,6 +183,23 @@ typedef wchar_t libewf_character_t;
 
 #define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
 	libuna_utf16_stream_copy_from_utf16( stream, stream_size, byte_order, (libuna_utf16_character_t *) string, string_size, error )
+
+/* narrow string conversion functions
+ */
+#define libewf_string_size_from_narrow_string( narrow_string, narrow_string_size, string_size, error ) \
+	libuna_utf16_string_size_from_utf8( narrow_string, narrow_string_size, string_size, error )
+
+#define libewf_string_copy_from_narrow_string( string, string_size, narrow_string, narrow_string_size, error ) \
+	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) string, string_size, narrow_string, narrow_string_size, error )
+
+#define narrow_string_size_from_libewf_string( string, string_size, narrow_string_size, error ) \
+	libuna_utf8_string_size_from_utf16( (libuna_utf16_character_t *) string, string_size, narrow_string_size, error )
+
+#define narrow_string_copy_from_libewf_string( narrow_string, narrow_string_size, string, string_size, error ) \
+	libuna_utf8_string_copy_from_utf16( narrow_string, narrow_string_size, (libuna_utf16_character_t *) string, string_size, error )
+
+#define libewf_string_compare_with_narrow_string( string, string_size, narrow_string, narrow_string_size, error ) \
+	libuna_compare_utf8_with_utf16( narrow_string, narrow_string_size, (libuna_utf16_character_t *) string, string_size, error )
 
 #else
 #error Unsupported size of wchar_t
@@ -249,6 +283,57 @@ typedef char libewf_character_t;
 #define utf16_stream_copy_from_libewf_string( stream, stream_size, byte_order, string, string_size, error ) \
 	libuna_utf16_stream_copy_from_utf8( stream, stream_size, byte_order, (libuna_utf8_character_t *) string, string_size, error )
 
+/* These definitions are here for completeness only
+ */
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* The wide character string type contains UTF-32
+ */
+#if SIZEOF_WCHAR_T == 4
+
+/* wide string conversion functions
+ */
+#define libewf_string_size_from_wide_string( wide_string, wide_string_size, string_size, error ) \
+	libuna_utf8_string_size_from_utf32( wide_string, wide_string_size, string_size, error )
+
+#define libewf_string_copy_from_wide_string( string, string_size, wide_string, wide_string_size, error ) \
+	libuna_utf8_string_copy_from_utf32( (libuna_utf8_character_t *) string, string_size, wide_string, wide_string_size, error )
+
+#define wide_string_size_from_libewf_string( string, string_size, wide_string_size, error ) \
+	libuna_utf32_string_size_from_utf8( (libuna_utf8_character_t *) string, string_size, wide_string_size, error )
+
+#define wide_string_copy_from_libewf_string( wide_string, wide_string_size, string, string_size, error ) \
+	libuna_utf32_string_copy_from_utf8( wide_string, wide_string_size, (libuna_utf8_character_t *) string, string_size, error )
+
+#define libewf_string_compare_with_wide_string( string, string_size, wide_string, wide_string_size, error ) \
+	libuna_compare_utf8_with_utf32( (libuna_utf8_character_t *) string, string_size, wide_string, wide_string_size, error )
+
+/* The wide character string type contains UTF-16
+ */
+#elif SIZEOF_WCHAR_T == 2
+
+/* wide string conversion functions
+ */
+#define libewf_string_size_from_wide_string( wide_string, wide_string_size, string_size, error ) \
+	libuna_utf8_string_size_from_utf16( wide_string, wide_string_size, string_size, error )
+
+#define libewf_string_copy_from_wide_string( string, string_size, wide_string, wide_string_size, error ) \
+	libuna_utf8_string_copy_from_utf16( (libuna_utf8_character_t *) string, string_size, wide_string, wide_string_size, error )
+
+#define wide_string_size_from_libewf_string( string, string_size, wide_string_size, error ) \
+	libuna_utf16_string_size_from_utf8( (libuna_utf8_character_t *) string, string_size, wide_string_size, error )
+
+#define wide_string_copy_from_libewf_string( wide_string, wide_string_size, string, string_size, error ) \
+	libuna_utf16_string_copy_from_utf8( wide_string, wide_string_size, (libuna_utf8_character_t *) string, string_size, error )
+
+#define libewf_string_compare_with_wide_string( string, string_size, wide_string, wide_string_size, error ) \
+	libuna_compare_utf8_with_utf16( (libuna_utf8_character_t *) string, string_size, wide_string, wide_string_size, error )
+
+#else
+#error Unsupported size of wchar_t
+#endif
+
+#endif
 #endif
 
 int libewf_string_split(

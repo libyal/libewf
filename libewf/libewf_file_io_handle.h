@@ -62,15 +62,29 @@ struct libewf_file_io_handle
 
 int libewf_file_io_handle_get_filename(
      libewf_file_io_handle_t *file_io_handle,
-     libewf_system_character_t *filename,
+     char *filename,
      size_t filename_size,
      libewf_error_t **error );
 
 int libewf_file_io_handle_set_filename(
      libewf_file_io_handle_t *file_io_handle,
-     const libewf_system_character_t *filename,
+     const char *filename,
      size_t filename_size,
      libewf_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+int libewf_file_io_handle_get_filename_wide(
+     libewf_file_io_handle_t *file_io_handle,
+     wchar_t *filename,
+     size_t filename_size,
+     libewf_error_t **error );
+
+int libewf_file_io_handle_set_filename_wide(
+     libewf_file_io_handle_t *file_io_handle,
+     const wchar_t *filename,
+     size_t filename_size,
+     libewf_error_t **error );
+#endif
 
 int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,

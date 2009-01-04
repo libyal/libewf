@@ -56,9 +56,9 @@ struct libewf_segment_table
 	 */
 	libewf_system_character_t *basename;
 
-	/* The basename length
+	/* The basename size
 	 */
-	size_t basename_length;
+	size_t basename_size;
 };
 
 int libewf_segment_table_initialize(
@@ -93,15 +93,29 @@ int libewf_segment_table_build(
 
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
-     libewf_system_character_t *basename,
-     size_t length,
+     char *basename,
+     size_t basename_size,
      libewf_error_t **error );
 
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
-     libewf_system_character_t *basename,
-     size_t basename_length,
+     const char *basename,
+     size_t basename_size,
      libewf_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+int libewf_segment_table_get_basename_wide(
+     libewf_segment_table_t *segment_table,
+     wchar_t *basename,
+     size_t basename_size,
+     libewf_error_t **error );
+
+int libewf_segment_table_set_basename_wide(
+     libewf_segment_table_t *segment_table,
+     const wchar_t *basename,
+     size_t basename_size,
+     libewf_error_t **error );
+#endif
 
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080913],
+ [20080914],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080913])
+ [20080914])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -747,6 +747,42 @@ AS_IF(
 	AC_CHECK_LIB(
 	 una,
 	 libuna_utf8_string_copy_from_utf32,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+
+	dnl UTF-16 string functions
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf16_string_size_from_utf8,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf16_string_copy_from_utf8,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+
+	dnl UTF-32 string functions
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf32_string_size_from_utf8,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+	AC_CHECK_LIB(
+	 una,
+	 libuna_utf32_string_copy_from_utf8,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+
+	dnl compare string functions
+	AC_CHECK_LIB(
+	 una,
+	 libuna_compare_utf8_with_utf16,
+	 [ac_libewf_dummy=yes],
+	 [ac_libewf_have_libuna=no])
+	AC_CHECK_LIB(
+	 una,
+	 libuna_compare_utf8_with_utf32,
 	 [ac_libewf_dummy=yes],
 	 [ac_libewf_have_libuna=no])
 	])

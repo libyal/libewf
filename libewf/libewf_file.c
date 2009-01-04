@@ -1154,7 +1154,7 @@ libewf_handle_t *libewf_open(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->segment_table,
 		     first_segment_filename,
-		     filename_length - 4,
+		     filename_length - 4 + 1,
 		     &error ) != 1 )
 		{
 			libewf_error_set(
@@ -1185,7 +1185,7 @@ libewf_handle_t *libewf_open(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->delta_segment_table,
 		     first_delta_segment_filename,
-		     filename_length - 4,
+		     filename_length - 4 + 1,
 		     &error ) != 1 )
 		{
 			libewf_error_set(
@@ -1318,7 +1318,7 @@ libewf_handle_t *libewf_open(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->segment_table,
 		     filenames[ 0 ],
-		     filename_length,
+		     filename_length + 1,
 		     &error ) != 1 )
 		{
 			libewf_error_set(
@@ -1640,7 +1640,7 @@ libewf_handle_t *libewf_open_wide(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->segment_table,
 		     first_segment_filename,
-		     filename_length - 4,
+		     filename_length - 4 + 1,
 		     &error ) != 1 )
 		{
 			libewf_error_set(
@@ -1671,7 +1671,7 @@ libewf_handle_t *libewf_open_wide(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->delta_segment_table,
 		     first_delta_segment_filename,
-		     filename_length - 4,
+		     filename_length - 4 + 1,
 		     &error ) != 1 )
 		{
 			libewf_error_set(
@@ -1804,7 +1804,7 @@ libewf_handle_t *libewf_open_wide(
 		if( libewf_segment_table_set_basename(
 		     internal_handle->segment_table,
 		     filenames[ 0 ],
-		     filename_length,
+		     filename_length + 1,
 		     &error ) != 1 )
 		{
 			libewf_error_set(

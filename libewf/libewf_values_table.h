@@ -24,7 +24,9 @@
 #define _LIBEWF_VALUES_TABLE_H
 
 #include <common.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libewf_string.h"
 
@@ -73,40 +75,83 @@ int libewf_values_table_resize(
 
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
-     libewf_character_t *identifier,
+     const char *identifier,
      size_t identifier_length,
      int *index,
      libewf_error_t **error );
 
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+int libewf_values_table_get_index_wide(
+     libewf_values_table_t *values_table,
+     const wchar_t *identifier,
+     size_t identifier_length,
+     int *index,
+     libewf_error_t **error );
+#endif
+
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
-     libewf_character_t *identifier,
+     char *identifier,
      size_t identifier_size,
      libewf_error_t **error );
 
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
-     libewf_character_t *identifier,
+     const char *identifier,
      size_t indentifier_length,
      libewf_error_t **error );
 
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+int libewf_values_table_get_identifier_wide(
+     libewf_values_table_t *values_table,
+     int index,
+     wchar_t *identifier,
+     size_t identifier_size,
+     libewf_error_t **error );
+
+int libewf_values_table_set_identifier_wide(
+     libewf_values_table_t *values_table,
+     int index,
+     const wchar_t *identifier,
+     size_t indentifier_length,
+     libewf_error_t **error );
+#endif
+
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     libewf_character_t *identifier,
+     const char *identifier,
      size_t identifier_length,
-     libewf_character_t *value,
+     char *value,
      size_t value_size,
      libewf_error_t **error );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     libewf_character_t *identifier,
+     const char *identifier,
      size_t identifier_length,
-     libewf_character_t *value,
+     const char *value,
      size_t value_length,
      libewf_error_t **error );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+int libewf_values_table_get_value_wide(
+     libewf_values_table_t *values_table,
+     const wchar_t *identifier,
+     size_t identifier_length,
+     wchar_t *value,
+     size_t value_size,
+     libewf_error_t **error );
+
+int libewf_values_table_set_value_wide(
+     libewf_values_table_t *values_table,
+     const wchar_t *identifier,
+     size_t identifier_length,
+     const wchar_t *value,
+     size_t value_length,
+     libewf_error_t **error );
+#endif
 
 #if defined( __cplusplus )
 }

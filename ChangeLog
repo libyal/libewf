@@ -200,7 +200,11 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080914
+* worked on separation of narrow and wide character string functions
+
 Version: 20080913
+* worked on separation of narrow and wide character string functions
 
 Version: 20080912
 * worked on improved error handling
