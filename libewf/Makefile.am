@@ -40,6 +40,7 @@ libewf_la_SOURCES = \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \
+	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 
 libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0

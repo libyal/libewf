@@ -38,10 +38,9 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_error_sector.h"
-#include "libewf_hash_values.h"
-#include "libewf_header_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
+#include "libewf_values_table.h"
 
 #include "ewf_char.h"
 #include "ewf_data.h"
@@ -139,11 +138,11 @@ struct libewf_internal_handle
 
 	/* The header values
 	 */
-	LIBEWF_HEADER_VALUES *header_values;
+	LIBEWF_VALUES_TABLE *header_values;
 
 	/* The hash values
 	 */
-	LIBEWF_HASH_VALUES *hash_values;
+	LIBEWF_VALUES_TABLE *hash_values;
 
 	/* The MD5 hash of the data
 	 */
@@ -363,7 +362,7 @@ int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal
 int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values );
+int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_VALUES_TABLE *header_values );
 
 int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );

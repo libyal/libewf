@@ -304,7 +304,7 @@ void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, siz
 /* Check for empty block, a block that contains the same value for every byte
  * Returns 1 if block is empty, or 0 otherwise
  */
-uint8_t libewf_common_test_empty_block( uint8_t *block_buffer, size_t size )
+int libewf_common_test_empty_block( uint8_t *block_buffer, size_t size )
 {
 	static char *function = "libewf_common_test_empty_block";
 	size_t iterator       = 0;

@@ -38,8 +38,9 @@
 #include <libewf/libewf_definitions.h>
 
 #include "libewf_common.h"
-#include "libewf_notify.h"
+#include "libewf_header_values.h"
 #include "libewf_internal_handle.h"
+#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
@@ -240,11 +241,11 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 	if( internal_handle->header_values != NULL )
 	{
-		libewf_header_values_free( internal_handle->header_values );
+		libewf_values_table_free( internal_handle->header_values );
 	}
 	if( internal_handle->hash_values != NULL )
 	{
-		libewf_hash_values_free( internal_handle->hash_values );
+		libewf_values_table_free( internal_handle->hash_values );
 	}
 	if( internal_handle->chunk_cache != NULL )
 	{
@@ -678,9 +679,9 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 		LIBEWF_WARNING_PRINT( "%s: header values already created - cleaning up previous header values.\n",
 		 function );
 
-		libewf_header_values_free( internal_handle->header_values );
+		libewf_values_table_free( internal_handle->header_values );
 	}
-	internal_handle->header_values = libewf_header_values_alloc();
+	internal_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 	if( internal_handle->header_values == NULL )
 	{
@@ -689,7 +690,14 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "case_number" ),
 	     case_number,
@@ -700,7 +708,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "description" ),
 	     description,
@@ -711,7 +719,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "evidence_number" ),
 	     evidence_number,
@@ -722,7 +730,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "examiner_name" ),
 	     examiner_name,
@@ -733,7 +741,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "notes" ),
 	     notes,
@@ -744,7 +752,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "acquiry_operating_system" ),
 	     acquiry_operating_system,
@@ -755,7 +763,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 
 		return( -1 );
 	}
-	if( libewf_header_values_set_value(
+	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
 	     _S_LIBEWF_CHAR( "acquiry_software_version" ),
 	     acquiry_software_version,
@@ -775,7 +783,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 /* Create the header strings from the header values
  * Returns 1 on success, -1 on error
  */
-int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values )
+int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_VALUES_TABLE *header_values )
 {
 	static char *function = "libewf_internal_handle_create_headers";
 	time_t timestamp      = time( NULL );

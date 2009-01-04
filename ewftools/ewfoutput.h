@@ -44,7 +44,6 @@
 #include "ewfstring.h"
 
 #include "../libewf/libewf_char.h"
-#include "../libewf/libewf_internal_handle.h"
 
 #if defined( __cplusplus )
 extern "C" {

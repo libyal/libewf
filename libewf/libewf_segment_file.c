@@ -39,6 +39,7 @@
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
+#include "libewf_hash_values.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"

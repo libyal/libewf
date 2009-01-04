@@ -923,10 +923,9 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 		return( -1 );
 	}
-	if( ( buffer == internal_handle->chunk_cache->data )
-	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	if( buffer == internal_handle->chunk_cache->compressed )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache compressed.\n",
 		 function );
 
 		return( -1 );
@@ -1101,9 +1100,11 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 		return( -1 );
 	}
-	/* Check if raw access is being used
+	/* Check if the chunk cache data is directly being passed (for finalize)
+	 * or raw access is being used
 	 */
-	if( raw_access != 0 )
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( raw_access != 0 ) )
 	{
 		chunk_data = (EWF_CHAR *) buffer;
 		write_size = read_size;

@@ -1,5 +1,5 @@
 /*
- * libewf hash values
+ * libewf values table
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,12 +31,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_HASHVALUES_H )
-#define _LIBEWF_HASHVALUES_H
+#if !defined( _LIBEWF_VALUES_TABLE_H )
+#define _LIBEWF_VALUES_TABLE_H
 
 #include "libewf_includes.h"
 #include "libewf_char.h"
-#include "libewf_values_table.h"
 
 #include "ewf_char.h"
 
@@ -44,16 +43,34 @@
 extern "C" {
 #endif
 
-#define LIBEWF_HASH_VALUES_DEFAULT_AMOUNT	1
+#define LIBEWF_VALUES_TABLE libewf_values_table_t
+#define LIBEWF_VALUES_TABLE_SIZE sizeof( LIBEWF_VALUES_TABLE )
 
-int libewf_hash_values_initialize( LIBEWF_VALUES_TABLE *hash_values );
+typedef struct libewf_values_table libewf_values_table_t;
 
-LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash_string_xml, size_t length );
-LIBEWF_VALUES_TABLE *libewf_hash_values_parse_xhash( EWF_CHAR *xhash, size_t size );
+struct libewf_values_table
+{
+	/* The amount of values
+	 */
+	uint32_t amount;
 
-EWF_CHAR *libewf_hash_values_convert_hash_string_to_hash( LIBEWF_CHAR *hash_string, size_t string_length, size_t *hash_length );
-LIBEWF_CHAR *libewf_hash_values_generate_hash_string_xml( LIBEWF_VALUES_TABLE *hash_values, size_t *string_length );
-EWF_CHAR *libewf_hash_values_generate_xhash_string_ewfx( LIBEWF_VALUES_TABLE *hash_values, size_t *hash_length );
+	/* The value identifiers
+	 */
+	LIBEWF_CHAR **identifiers;
+
+	/* The values
+	 */
+	LIBEWF_CHAR **values;
+};
+
+LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount );
+int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t previous_amount, uint32_t new_amount );
+void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table );
+
+int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier );
+int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, LIBEWF_CHAR *identifier, size_t length );
+int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 #if defined( __cplusplus )
 }
