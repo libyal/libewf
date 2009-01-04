@@ -173,6 +173,8 @@ CLOSED
 Version: 20080309
 * Code clean up
 * fixed ewfcommon_determine_operating_system
+* fixed overflow on compression read error, buffer is no longer passed for
+  compressed chunks
 
 Version: 20080308
 * Code clean up

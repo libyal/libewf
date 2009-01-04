@@ -332,10 +332,10 @@ uint64_t libewf_string_to_uint64(
 
 #else
 #define string_copy_from_char( destination, source, length ) \
-	string_copy( destination, source, length )
+	( string_copy( destination, source, length ) == NULL ) ? -1 : 1
 
 #define string_copy_to_char( destination, source, length ) \
-	string_copy( destination, source, length )
+	( string_copy( destination, source, length ) == NULL ) ? -1 : 1
 
 #endif
 

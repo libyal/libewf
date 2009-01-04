@@ -1407,16 +1407,24 @@ ssize64_t ewfcommon_read_verify(
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update( &md5_context, uncompressed_data, read_count );
+			ewfmd5_update(
+			 &md5_context,
+			 uncompressed_data,
+			 read_count );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			ewfsha1_update( &sha1_context, uncompressed_data, read_count );
+			ewfsha1_update(
+			 &sha1_context,
+			 uncompressed_data,
+			 read_count );
 		}
 		/* Swap byte pairs
 		 */
 		if( ( swap_byte_pairs == 1 )
-		 && ( ewfcommon_swap_byte_pairs( uncompressed_data, read_count ) != 1 ) )
+		 && ( ewfcommon_swap_byte_pairs(
+		       uncompressed_data,
+		       read_count ) != 1 ) )
 		{
 			notify_warning_printf( "%s: unable to swap byte pairs.\n",
 			 function );
@@ -1434,7 +1442,9 @@ ssize64_t ewfcommon_read_verify(
 
 		if( callback != NULL )
 		{
-			callback( (size64_t) total_read_count, media_size );
+			callback(
+			 (size64_t) total_read_count,
+			 media_size );
 		}
 		if( ewfcommon_abort != 0 )
 		{

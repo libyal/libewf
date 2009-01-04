@@ -94,7 +94,7 @@ ssize_t libewf_read_process_chunk_data(
 
 			if( libewf_endian_convert_32bit(
 			     &chunk_crc,
-			     &chunk_data[ chunk_data_size ] ) != 1 )
+			     &( chunk_data[ chunk_data_size ] ) ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to convert stored CRC value.\n",
 				 function );
@@ -508,19 +508,18 @@ ssize_t libewf_read_chunk_data(
 		 *  the buffer isn't the chunk cache
 		 *  and no data was previously copied into the chunk cache
 		 *  and the buffer contains the necessary amount of bytes to fill a chunk
+		 *  and the buffer is not compressed
 		 */
 		if( ( buffer != internal_handle->chunk_cache->data )
 		 && ( chunk_offset == 0 )
-		 && ( size >= (size_t) internal_handle->media_values->chunk_size ) )
+		 && ( size >= (size_t) internal_handle->media_values->chunk_size )
+		 && ( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 ) )
 		{
 			chunk_data = buffer;
 
 			/* The CRC is read seperately for uncompressed chunks
 			 */
-			if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 )
-			{
-				chunk_data_size -= sizeof( ewf_crc_t );
-			}
+			chunk_data_size -= sizeof( ewf_crc_t );
 		}
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
@@ -551,7 +550,6 @@ ssize_t libewf_read_chunk_data(
 
 			return( -1 );
 		}
-
 		if( is_compressed != 0 )
 		{
 			chunk_data_size = internal_handle->media_values->chunk_size
@@ -574,7 +572,7 @@ ssize_t libewf_read_chunk_data(
 				if( memory_set(
 				     chunk_read,
 				     0,
-				     internal_handle->media_values->chunk_size ) == NULL )
+				     size ) == NULL )
 				{
 					notify_warning_printf( "%s: unable to wipe chunk data.\n",
 					 function );
@@ -591,7 +589,10 @@ ssize_t libewf_read_chunk_data(
 			{
 				amount_of_sectors = (uint32_t) ( (off64_t) internal_handle->media_values->amount_of_sectors - sector );
 			}
-			if( libewf_add_crc_error( (LIBEWF_HANDLE *) internal_handle, sector, amount_of_sectors ) != 1 )
+			if( libewf_add_crc_error(
+			     (LIBEWF_HANDLE *) internal_handle,
+			     sector,
+			     amount_of_sectors ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to set CRC error.\n",
 				 function );
@@ -652,7 +653,7 @@ ssize_t libewf_read_chunk_data(
 		if( ( bytes_available > 0 )
 		 && ( memory_copy(
 		       buffer,
-		       &chunk_data[ chunk_offset ],
+		       &( chunk_data[ chunk_offset ] ),
 		       bytes_available ) == NULL ) )
 		{
 			notify_warning_printf( "%s: unable to set chunk data in buffer.\n",
