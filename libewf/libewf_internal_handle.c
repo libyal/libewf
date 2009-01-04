@@ -488,7 +488,7 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 /* Sets the header and its byte size
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size )
+int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *header, size_t size )
 {
 	static char *function = "libewf_internal_handle_set_header";
 
@@ -508,7 +508,7 @@ int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 /* Sets the header2 and its byte size
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size )
+int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *header2, size_t size )
 {
 	static char *function = "libewf_internal_handle_set_header2";
 
@@ -528,7 +528,7 @@ int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle,
 /* Sets the xheader and its byte size
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *xheader, size_t size )
+int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *xheader, size_t size )
 {
 	static char *function = "libewf_internal_handle_set_xheader";
 
@@ -548,7 +548,7 @@ int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle,
 /* Sets the xhash and its byte size
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *xhash, size_t size )
+int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *xhash, size_t size )
 {
 	static char *function = "libewf_internal_handle_set_xhash";
 

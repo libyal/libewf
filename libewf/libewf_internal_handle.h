@@ -43,11 +43,10 @@
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
 
+#include "ewf_char.h"
 #include "ewf_data.h"
 #include "ewf_digest_hash.h"
 #include "ewf_error2.h"
-#include "ewf_header.h"
-#include "ewf_header2.h"
 #include "ewf_table.h"
 
 #if defined( __cplusplus )
@@ -108,7 +107,7 @@ struct libewf_internal_handle
 
 	/* The stored header
 	 */
-	EWF_HEADER *header;
+	EWF_CHAR *header;
 
 	/* The size of the stored header
 	 */
@@ -116,7 +115,7 @@ struct libewf_internal_handle
 
 	/* The stored header2
 	 */
-	EWF_HEADER2 *header2;
+	EWF_CHAR *header2;
 
 	/* The size of the stored header2
 	 */
@@ -124,7 +123,7 @@ struct libewf_internal_handle
 
 	/* The stored xheader
 	 */
-	EWF_HEADER *xheader;
+	EWF_CHAR *xheader;
 
 	/* The size of the stored xheader
 	 */
@@ -132,7 +131,7 @@ struct libewf_internal_handle
 
 	/* The stored xhash
 	 */
-	EWF_HEADER *xhash;
+	EWF_CHAR *xhash;
 
 	/* The size of the stored xhash
 	 */
@@ -363,10 +362,10 @@ int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_han
 
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size );
-int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size );
-int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xheader, size_t size );
-int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xhash, size_t size );
+int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *header, size_t size );
+int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *header2, size_t size );
+int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *xheader, size_t size );
+int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *xhash, size_t size );
 
 int libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
 int libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );

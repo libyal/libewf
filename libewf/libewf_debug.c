@@ -252,7 +252,7 @@ void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string
 
 /* Prints the header data to a stream
  */
-void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
+void libewf_debug_header_fprint( FILE *stream, EWF_CHAR *header, size_t size )
 {
 	LIBEWF_CHAR *header_string = NULL;
 	static char *function      = "libewf_debug_header_fprint";
@@ -289,7 +289,7 @@ void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
 
 /* Prints the header2 data to a stream
  */
-void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t size )
+void libewf_debug_header2_fprint( FILE *stream, EWF_CHAR *header2, size_t size )
 {
 	LIBEWF_CHAR *header_string = NULL;
 	static char *function      = "libewf_debug_header2_fprint";

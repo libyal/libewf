@@ -46,6 +46,7 @@
 #include "ewf_compress.h"
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
+#include "ewf_string.h"
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error

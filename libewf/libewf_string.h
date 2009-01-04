@@ -37,9 +37,8 @@
 #include "libewf_includes.h"
 #include "libewf_char.h"
 
+#include "ewf_char.h"
 #include "ewf_digest_hash.h"
-#include "ewf_header.h"
-#include "ewf_header2.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -218,8 +217,8 @@ int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF
 #define libewf_string_copy_to_header( string, size_string, header, size_header ) \
 	libewf_string_copy_to_ewf_char( string, size_string, header, size_header )
 
-int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 );
-int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 );
+int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *header2, size_t size_header2 );
+int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *header2, size_t size_header2 );
 
 #if defined( __cplusplus )
 }

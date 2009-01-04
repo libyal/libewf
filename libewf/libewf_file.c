@@ -57,7 +57,6 @@
 #include "ewf_crc.h"
 #include "ewf_digest_hash.h"
 #include "ewf_file_header.h"
-#include "ewf_header.h"
 #include "ewf_section.h"
 #include "ewf_volume.h"
 #include "ewf_table.h"

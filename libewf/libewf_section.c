@@ -297,7 +297,7 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal
  */
 ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
-	EWF_HEADER *header    = NULL;
+	EWF_CHAR *header      = NULL;
 	static char *function = "libewf_section_header_read";
 	ssize_t read_count    = (ssize_t) size;
 
@@ -308,7 +308,7 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-	header = ewf_header_read( file_descriptor, &size );
+	header = ewf_string_read_compressed( file_descriptor, &size );
 
 	if( header == NULL )
 	{
@@ -349,7 +349,7 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 /* Writes a header section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_HEADER *header, size_t size, int8_t compression_level )
+ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *header, size_t size, int8_t compression_level )
 {
 	ssize_t section_write_count = 0;
 
@@ -375,7 +375,7 @@ ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
  */
 ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
-	EWF_HEADER *header2   = NULL;
+	EWF_CHAR *header2     = NULL;
 	static char *function = "libewf_section_header2_read";
 	ssize_t read_count    = (ssize_t) size;
 
@@ -386,7 +386,7 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	header2 = ewf_header2_read( file_descriptor, &size );
+	header2 = ewf_string_read_compressed( file_descriptor, &size );
 
 	if( header2 == NULL )
 	{
@@ -427,7 +427,7 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 /* Writes a header2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_HEADER2 *header2, size_t size, int8_t compression_level )
+ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *header2, size_t size, int8_t compression_level )
 {
 	ssize_t section_write_count = 0;
 
