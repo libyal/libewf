@@ -112,6 +112,12 @@ Code clean up
 
 Next release(s):
 
+* fix
+libuca_utf8_string_size_from_utf8_stream: missing UTF-8 stream bytes.
+libewf_header_values_parse_xheader: unable to determine XML header string
+size.
+libewf_parse_header_values: unable to parse xheader.
+
 * implement libuca
   - handle codepage in ewftools use -p option
   - add '-p list' option? to list codepages
@@ -176,6 +182,11 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080904
+* worked on refactoring function in ewfinput
+* combined empty block compression and other compressions in ewftools
+* change empty_block to empty-block the former remains to work
 
 Version: 20080903
 * worked on integrating libuca and replacing string conversion routines

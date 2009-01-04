@@ -1,4 +1,4 @@
-.Dd September 2, 2008
+.Dd September 4, 2008
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -45,13 +45,13 @@ the amount of sectors to read at once (per chunk), options: 64 (default), 128, 2
 .It Fl B Ar amount_of_bytes
 the amount of bytes to export
 .It Fl c Ar compression_type
-the compression type, options: none (is default), empty_block, fast, best
+the compression type, options: none (default), empty-block, fast, best
 (not used for raw format)
 .It Fl d Ar digest_type
 calculate additional digest (hash) types besides md5, options: sha1
 (not used for raw format)
 .It Fl f Ar format
-the file format to write to, options: raw (is default), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
+the file format to write to, options: raw (default), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
 .It Fl h
 shows this help
 .It Fl s
@@ -82,7 +82,7 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20080320 (libewf 20080320, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfexport 20080904 (libewf 20080904, libuca 20080903, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Information for export required, please provide the necessary input
 Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
@@ -90,7 +90,7 @@ Target path and filename with extension or - for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 
-Export started at: Thu Mar 20 19:19:40 2008
+Export started at: Thu Sep  4 19:19:40 2008
 
 This could take a while.
 
@@ -103,7 +103,7 @@ Status: at 100%.
         exported 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
         completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Export completed at: Thu Mar 20 19:19:41 2008
+Export completed at: Thu Sep  4 19:19:41 2008
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 .Ed

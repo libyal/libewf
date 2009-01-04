@@ -135,7 +135,7 @@ int confirm_input(
      uint8_t wipe_chunk_on_error )
 {
 	character_t *user_input = NULL;
-	int input_confirmed     = -1;
+	int8_t input_confirmed  = -1;
 
 	fprintf( stdout, "The following acquiry parameters were provided:\n" );
 
@@ -171,16 +171,16 @@ int confirm_input(
 		              2,
 		              0 );
 
-		input_confirmed = ewfinput_determine_yes_no(
-		                   user_input );
-
-		memory_free(
-		 user_input );
-
-		if( input_confirmed <= -1 )	
+		if( ewfinput_determine_yes_no(
+		     user_input,
+		     (uint8_t *) &input_confirmed ) != 1 )
 		{
 			fprintf( stdout, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
+
+			input_confirmed = -1;
 		}
+		memory_free(
+		 user_input );
 	}
 	fprintf( stdout, "\n" );
 
@@ -297,21 +297,21 @@ int main( int argc, char * const argv[] )
 	uint64_t input_size                      = 0;
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;
-	uint64_t sectors_per_chunk               = 0;
 	uint64_t sector_error_granularity        = 0;
 	uint32_t amount_of_acquiry_errors        = 0;
-	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
-	int8_t compress_empty_block              = 0;
-	int8_t media_type                        = LIBEWF_MEDIA_TYPE_FIXED;
-	int8_t volume_type                       = LIBEWF_VOLUME_TYPE_LOGICAL;
-	int8_t wipe_chunk_on_error               = 0;
+	uint32_t sectors_per_chunk               = 0;
+	uint8_t calculate_md5                    = 1;
+	uint8_t calculate_sha1                   = 0;
+	uint8_t compress_empty_block             = 0;
 	uint8_t libewf_format                    = LIBEWF_FORMAT_UNKNOWN;
+	uint8_t media_type                       = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t read_error_retry                 = 2;
 	uint8_t swap_byte_pairs                  = 0;
 	uint8_t seek_on_error                    = 1;
-	uint8_t calculate_md5                    = 1;
-	uint8_t calculate_sha1                   = 0;
 	uint8_t verbose                          = 0;
+	uint8_t volume_type                      = LIBEWF_VOLUME_TYPE_LOGICAL;
+	uint8_t wipe_chunk_on_error              = 0;
+	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
 	int file_descriptor                      = 0;
 	int error_abort                          = 0;
 	int status                               = 0;
@@ -545,18 +545,16 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_MEDIA_TYPES_AMOUNT,
 		              EWFINPUT_MEDIA_TYPES_DEFAULT );
 
-		media_type = ewfinput_determine_media_type(
-		              user_input );
-
-		memory_free(
-		 user_input );
-
-		if( media_type <= -1 )
+		if( ewfinput_determine_media_type(
+		     user_input,
+		     &media_type ) != 1 )
 		{
 			fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
 
 			media_type = LIBEWF_MEDIA_TYPE_FIXED;
 		}
+		memory_free(
+		 user_input );
 
 		/* Volume type
 		 */
@@ -567,18 +565,16 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_VOLUME_TYPES_AMOUNT,
 		              EWFINPUT_VOLUME_TYPES_DEFAULT );
 
-		volume_type = ewfinput_determine_volume_type(
-		               user_input );
-
-		memory_free(
-		 user_input );
-
-		if( volume_type <= -1 )
+		if( ewfinput_determine_volume_type(
+		     user_input,
+		     &volume_type ) != 1 )
 		{
 			fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
 
 			volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 		}
+		memory_free(
+		 user_input );
 
 		/* Compression
 		 */
@@ -589,43 +585,18 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 		              EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
 
-		compression_level = ewfinput_determine_compression_level(
-		                     user_input );
-
-		memory_free(
-		 user_input );
-
-		if( compression_level <= -1 )
+		if( ewfinput_determine_compression_level(
+		     user_input,
+		     &compression_level,
+		     &compress_empty_block ) != 1 )
 		{
 			fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
-			compression_level = LIBEWF_COMPRESSION_NONE;
+			compression_level    = LIBEWF_COMPRESSION_NONE;
+			compress_empty_block = 0;
 		}
-
-		/* Empty block compression
-		 */
-		if( compression_level == LIBEWF_COMPRESSION_NONE )
-		{
-			user_input = ewfinput_get_fixed_value(
-			              stdout,
-			              _CHARACTER_T_STRING( "Compress empty blocks" ),
-			              ewfinput_yes_no,
-			              2,
-			              1 );
-
-			compress_empty_block = ewfinput_determine_yes_no(
-			                        user_input );
-
-			memory_free(
-			 user_input );
-
-			if( compress_empty_block <= -1 )
-			{
-				fprintf( stderr, "Unsupported compress emtpy blocks defaulting to: no.\n" );
-
-				compress_empty_block = 0;
-			}
-		}
+		memory_free(
+		 user_input );
 
 		/* File format
 		 */
@@ -696,16 +667,13 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
-		if( string_to_uint64(
+		if( ewfinput_determine_sectors_per_chunk(
 		     user_input,
-		     string_length(
-		      user_input ),
 		     &sectors_per_chunk ) != 1 )
 		{
-			fprintf( stderr, "Unsupported sectors per chunk on error defaulting to: %d.\n",
-			 EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+			fprintf( stderr, "Unsupported sectors per chunk defaulting to: 64.\n" );
 
-			sectors_per_chunk = EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT;
+			sectors_per_chunk = 64;
 		}
 		memory_free(
 		 user_input );
@@ -716,7 +684,7 @@ int main( int argc, char * const argv[] )
 		                            stdout,
 		                            _CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
 		                            1,
-		                            sectors_per_chunk,
+		                            (uint64_t) sectors_per_chunk,
 		                            64 );
 
 		/* The amount of read error retry
@@ -737,18 +705,17 @@ int main( int argc, char * const argv[] )
 		              2,
 		              1 );
 
-		wipe_chunk_on_error = ewfinput_determine_yes_no(
-		                       user_input );
-
-		memory_free(
-		 user_input );
-
-		if( wipe_chunk_on_error <= -1 )
+		if( ewfinput_determine_yes_no(
+		     user_input,
+		     &wipe_chunk_on_error ) != 1 )
 		{
 			fprintf( stderr, "Unsupported wipe chunk on error defaulting to: no.\n" );
 
 			wipe_chunk_on_error = 0;
 		}
+		memory_free(
+		 user_input );
+
 		fprintf( stdout, "\n" );
 	}
 	/* Check if user is content with values
@@ -760,18 +727,18 @@ int main( int argc, char * const argv[] )
 	        evidence_number,
 	        examiner_name,
 	        notes,
-	        (uint8_t) media_type,
-	        (uint8_t) volume_type,
+	        media_type,
+	        volume_type,
 	        compression_level,
-	        (uint8_t) compress_empty_block,
+	        compress_empty_block,
 	        libewf_format,
 	        (off64_t) acquiry_offset,
 	        (size64_t) acquiry_size,
 	        (size64_t) segment_file_size,
-	        (uint32_t) sectors_per_chunk,
+	        sectors_per_chunk,
 	        (uint32_t) sector_error_granularity,
 	        read_error_retry,
-	        (uint8_t) wipe_chunk_on_error ) == 0 );
+	        wipe_chunk_on_error ) == 0 );
 
 	if( ewfsignal_attach(
 	     ewfcommon_signal_handler ) != 1 )
@@ -809,10 +776,10 @@ int main( int argc, char * const argv[] )
 			  acquiry_operating_system,
 			  program,
 			  acquiry_software_version,
-			  (uint8_t) media_type,
-			  (uint8_t) volume_type,
+			  media_type,
+			  volume_type,
 			  compression_level,
-			  (uint8_t) compress_empty_block,
+			  compress_empty_block,
 			  libewf_format,
 			  (size64_t) segment_file_size,
 			  (uint32_t) sector_error_granularity ) != 1 )
@@ -963,11 +930,11 @@ int main( int argc, char * const argv[] )
 			       file_descriptor,
 			       acquiry_size,
 			       acquiry_offset,
-			       (uint32_t) sectors_per_chunk,
+			       sectors_per_chunk,
 			       512,
 			       read_error_retry,
 			       (uint32_t) sector_error_granularity,
-			       (uint8_t) wipe_chunk_on_error,
+			       wipe_chunk_on_error,
 			       seek_on_error,
 			       calculate_md5,
 			       calculated_md5_hash_string,

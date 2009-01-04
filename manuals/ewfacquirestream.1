@@ -1,4 +1,4 @@
-.Dd September 2, 2008
+.Dd September 4, 2008
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -48,7 +48,7 @@ The options are as follows:
 .It Fl b Ar amount_of_sectors
 the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
 .It Fl c Ar compression_type
-the compression type, options: none (is default), empty_block, fast, best
+the compression type, options: none (default), empty-block, fast, best
 .It Fl C Ar case_number
 the case number (default is case_number)
 .It Fl d Ar digest_type
@@ -60,7 +60,7 @@ the examiner name (default is examiner_name)
 .It Fl E Ar evidence_number
 the evidence number (default is evidence_number)
 .It Fl f Ar format
-the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase5 (is default), encase6, linen5, linen6, ewfx.
+the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase5 (default), encase6, linen5, linen6, ewfx.
 .Nm libewf
 does not support streamed writes for other EWF formats.
 .It Fl h
@@ -68,9 +68,9 @@ shows this help
 .It Fl l Ar filename
 logs acquiry errors and the digest (hash) to the filename
 .It Fl m Ar media_type
-the media type, options: fixed (is default), removable
+the media type, options: fixed (default), removable
 .It Fl M Ar volume_type
-the volume type, options: logical, physical (is default)
+the volume type, options: logical, physical (default)
 .It Fl N Ar notes
 the notes (default is notes)
 .It Fl s
@@ -101,7 +101,7 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfacquirestream -C 1 -D Floppy -E 1.1 -e 'John D.' -N 'Just a floppy in my system' -m removable -M physical -t floppy </dev/fd0
-ewfacquirestream 20080320 (libewf 20080320, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfacquirestream 20080904 (libewf 20080904, libuca 20080903, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Using the following acquiry parameters:
 Image path and filename:        floppy.E01
@@ -113,7 +113,6 @@ Notes:                          Just a floppy in my system
 Media type:                     removable
 Volume type:                    physical
 Compression used:               none
-Compress empty blocks:          no
 EWF file format:                EnCase 5
 Acquiry start offet:            0
 Amount of bytes to acquire:     0 (until end of input)
@@ -123,14 +122,14 @@ Error granularity:              64 sectors
 Retries on read error:          2
 Wipe sectors on read error:     no
 
-Acquiry started at: Thu Mar 10 11:32:41 2008
+Acquiry started at: Thu Sep  4 11:32:41 2008
 
 This could take a while.
 
 Status: acquired 1.4 MiB (1474560 bytes)
         in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Acquiry completed at: Thu Mar 20 11:32:42 2008
+Acquiry completed at: Thu Sep  4 11:32:42 2008
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 

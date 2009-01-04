@@ -65,7 +65,7 @@ void usage_fprint(
 	}
 	fprintf( stream, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
 
-	fprintf( stream, "\t-d: specify the date format, options: ctime (is default), dm (day/month), md (month/day), iso8601\n" );
+	fprintf( stream, "\t-d: specify the date format, options: ctime (default), dm (day/month), md (month/day), iso8601\n" );
 	fprintf( stream, "\t-e: only show EWF read error information\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
 	fprintf( stream, "\t-i: only show EWF acquiry information\n" );

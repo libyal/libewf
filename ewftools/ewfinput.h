@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#define EWFINPUT_COMPRESSION_LEVELS_AMOUNT		3
+#define EWFINPUT_COMPRESSION_LEVELS_AMOUNT		4
 #define EWFINPUT_COMPRESSION_LEVELS_DEFAULT		0
 
 #define EWFINPUT_FORMAT_TYPES_AMOUNT			12
@@ -51,7 +51,7 @@ extern "C" {
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
 
-extern character_t *ewfinput_compression_levels[ 3 ];
+extern character_t *ewfinput_compression_levels[ 4 ];
 extern character_t *ewfinput_format_types[ 12 ];
 #if defined( LIBEWF_CD_SUPPORT )
 extern character_t *ewfinput_media_types[ 3 ];
@@ -64,35 +64,53 @@ extern character_t *ewfinput_yes_no[ 2 ];
 
 int ewfinput_determine_libewf_format(
      const character_t *argument,
-     uint8_t *format );
+     uint8_t *libewf_format );
 
-uint8_t ewfinput_determine_libewf_format_system_character(
-         const system_character_t *argument );
+int ewfinput_determine_libewf_format_system_character(
+     const system_character_t *argument,
+     uint8_t *libewf_format );
 
-uint32_t ewfinput_determine_sectors_per_chunk(
-          const character_t *argument );
+int ewfinput_determine_sectors_per_chunk(
+     const character_t *argument,
+     uint32_t *sectors_per_chunk );
 
-uint32_t ewfinput_determine_sectors_per_chunk_system_character(
-          const system_character_t *argument );
+int ewfinput_determine_sectors_per_chunk_system_character(
+     const system_character_t *argument,
+     uint32_t *sectors_per_chunk );
 
-int8_t ewfinput_determine_compression_level(
-        const character_t *argument );
+int ewfinput_determine_compression_level(
+     const character_t *argument,
+     int8_t *compression_level,
+     uint8_t *compress_empty_block );
 
-int8_t ewfinput_determine_compression_level_system_character(
-        const system_character_t *argument );
+int ewfinput_determine_compression_level_system_character(
+     const system_character_t *argument,
+     int8_t *compression_level,
+     uint8_t *compress_empty_block );
 
-int8_t ewfinput_determine_media_type(
-        const character_t *argument );
+int ewfinput_determine_media_type(
+     const character_t *argument,
+     uint8_t *media_type );
 
-int8_t ewfinput_determine_volume_type(
-        const character_t *argument );
+int ewfinput_determine_media_type_system_character(
+     const system_character_t *argument,
+     uint8_t *media_type );
+
+int ewfinput_determine_volume_type(
+     const character_t *argument,
+     uint8_t *volume_type );
+
+int ewfinput_determine_volume_type_system_character(
+     const system_character_t *argument,
+     uint8_t *volume_type );
 
 int ewfinput_determine_header_codepage_system_character(
      const system_character_t *argument,
      int *header_codepage );
 
-int8_t ewfinput_determine_yes_no(
-        const character_t *argument );
+int ewfinput_determine_yes_no(
+     const character_t *argument,
+     uint8_t *yes_no_value );
 
 character_t *ewfinput_get_variable(
               FILE *stream,

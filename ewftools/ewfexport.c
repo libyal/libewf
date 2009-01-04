@@ -108,7 +108,7 @@ void usage_fprint(
 	fprintf( stream, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stream, "\t    (not used for raw format)\n" );
 	fprintf( stream, "\t-B: specify the amount of bytes to export (default is all bytes)\n" );
-	fprintf( stream, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast, best\n" );
 	fprintf( stream, "\t    (not used for raw format)\n" );
 	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t    (not used for raw format)\n" );
@@ -174,17 +174,20 @@ int main( int argc, char * const argv[] )
 	size64_t media_size                        = 0;
 	ssize64_t export_count                     = 0;
 	uint64_t maximum_segment_file_size         = 0;
-	uint64_t segment_file_size                 = 0;
 	uint64_t export_offset                     = 0;
 	uint64_t export_size                       = 0;
-	uint64_t sectors_per_chunk                 = 64;
+	uint64_t segment_file_size                 = 0;
 	uint32_t amount_of_crc_errors              = 0;
+	uint32_t sectors_per_chunk                 = 64;
+	uint8_t calculate_md5                      = 1;
+	uint8_t calculate_sha1                     = 0;
+	uint8_t compress_empty_block               = 0;
 	uint8_t libewf_format                      = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs                    = 0;
 	uint8_t wipe_chunk_on_error                = 0;
 	uint8_t verbose                            = 0;
 	int8_t compression_level                   = LIBEWF_COMPRESSION_NONE;
-	int8_t compress_empty_block                = 0;
+	int amount_of_filenames                    = 0;
 	int argument_set_compression               = 0;
 	int argument_set_format                    = 0;
 	int argument_set_offset                    = 0;
@@ -192,9 +195,6 @@ int main( int argc, char * const argv[] )
 	int argument_set_segment_file_size         = 0;
 	int argument_set_size                      = 0;
 	int interactive_mode                       = 1;
-	uint8_t calculate_md5                      = 1;
-	uint8_t calculate_sha1                     = 0;
-	int amount_of_filenames                    = 0;
 	int output_raw                             = 1;
 	int result                                 = 1;
 	int status                                 = 0;
@@ -250,10 +250,9 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_system_character(
-				                     optarg );
-
-				if( sectors_per_chunk == 0 )
+				if( ewfinput_determine_sectors_per_chunk_system_character(
+				     optarg,
+				     &sectors_per_chunk ) != 1 )
 				{
 					fprintf( stderr, "Unsupported amount of sectors per chunk defaulting to: 64.\n" );
 
@@ -270,29 +269,19 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'c':
-				if( system_string_compare(
+				if( ewfinput_determine_compression_level_system_character(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "empty_block" ),
-				     11 ) == 0 )
+				     &compression_level,
+				     &compress_empty_block ) != 1 )
 				{
-					compress_empty_block     = 1;
-					argument_set_compression = 1;
+					fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
+
+					compression_level    = LIBEWF_COMPRESSION_NONE;
+					compress_empty_block = 0;
 				}
 				else
 				{
-					compression_level = ewfinput_determine_compression_level_system_character(
-					                     optarg );
-				
-					if( compression_level <= -1 )
-					{
-						fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
-
-						compression_level = LIBEWF_COMPRESSION_NONE;
-					}
-					else
-					{
-						argument_set_compression = 1;
-					}
+					argument_set_compression = 1;
 				}
 				break;
 
@@ -321,10 +310,9 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					libewf_format = ewfinput_determine_libewf_format_system_character(
-					                 optarg );
-
-					if( libewf_format == 0 )
+					if( ewfinput_determine_libewf_format_system_character(
+					     optarg,
+					     &libewf_format ) != 1 )
 					{
 						fprintf( stderr, "Unsupported file format type defaulting to: raw.\n" );
 
@@ -616,54 +604,18 @@ int main( int argc, char * const argv[] )
 					      EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
 					      EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
 
-				compression_level = ewfinput_determine_compression_level(
-				                     user_input );
-
-				if( compression_level <= -1 )
+				if( ewfinput_determine_compression_level(
+				     user_input,
+				     &compression_level,
+				     &compress_empty_block ) != 1 )
 				{
-					fprintf( stderr, "Unsupported compression type.\n" );
+					fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
-					libewf_close(
-					 ewfcommon_libewf_handle );
-
-					memory_free(
-					 target_filename );
-
-					return( EXIT_FAILURE );
+					compression_level    = LIBEWF_COMPRESSION_NONE;
+					compress_empty_block = 0;
 				}
 				memory_free(
 				 user_input );
-
-				/* Empty block compression
-				 */
-				if( compression_level == LIBEWF_COMPRESSION_NONE )
-				{
-					user_input = ewfinput_get_fixed_value(
-						      stderr,
-						      _CHARACTER_T_STRING( "Compress empty blocks" ),
-						      ewfinput_yes_no,
-						      2,
-						      1 );
-
-					compress_empty_block = ewfinput_determine_yes_no(
-					                        user_input );
-
-					memory_free(
-					 user_input );
-
-					if( compress_empty_block <= -1 )
-					{
-						fprintf( stderr, "Unsupported answer.\n" );
-
-						libewf_close(
-						 ewfcommon_libewf_handle );
-
-						memory_free(
-						 target_filename );
-
-						return( EXIT_FAILURE );
-					}
-				}
 			}
 			if( argument_set_segment_file_size == 0 )
 			{
@@ -704,16 +656,13 @@ int main( int argc, char * const argv[] )
 					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
-				if( string_to_uint64(
+				if( ewfinput_determine_sectors_per_chunk(
 				     user_input,
-				     string_length(
-				      user_input ),
 				     &sectors_per_chunk ) != 1 )
 				{
-					fprintf( stderr, "Unsupported sectors per chunk on error defaulting to: %d.\n",
-					 EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+					fprintf( stderr, "Unsupported sectors per chunk on error defaulting to: 64.\n" );
 
-					sectors_per_chunk = EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT;
+					sectors_per_chunk = 64;
 				}
 				memory_free(
 				 user_input );
@@ -841,7 +790,7 @@ int main( int argc, char * const argv[] )
 			                segment_file_size,
 			                export_size,
 			                export_offset,
-			                (uint32_t) sectors_per_chunk,
+			                sectors_per_chunk,
 			                calculate_md5,
 			                calculate_sha1,
 			                swap_byte_pairs,

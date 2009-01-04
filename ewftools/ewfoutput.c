@@ -352,17 +352,13 @@ void ewfoutput_acquiry_parameters_fprint(
 	}
 	else if( compression_level == LIBEWF_COMPRESSION_NONE )
 	{
-		fprintf( stream, "none\n" );
-
-		fprintf( stream, "Compress empty blocks:\t\t" );
-
 		if( compress_empty_block == 0 )
 		{
-			fprintf( stream, "no\n" );
+			fprintf( stream, "none\n" );
 		}
 		else
 		{
-			fprintf( stream, "yes\n" );
+			fprintf( stream, "empty block\n" );
 		}
 	}
 	fprintf( stream, "EWF file format:\t\t" );

@@ -50,8 +50,9 @@
 
 /* Input selection defintions
  */
-character_t *ewfinput_compression_levels[ 3 ] = \
+character_t *ewfinput_compression_levels[ 4 ] = \
  { _CHARACTER_T_STRING( "none" ),
+   _CHARACTER_T_STRING( "empty-block" ),
    _CHARACTER_T_STRING( "fast" ),
    _CHARACTER_T_STRING( "best" ) };
 
@@ -105,7 +106,7 @@ character_t *ewfinput_yes_no[ 2 ] = \
  */
 int ewfinput_determine_libewf_format(
      const character_t *argument,
-     uint8_t *format )
+     uint8_t *libewf_format )
 {
 	static char *function = "ewfinput_determine_libewf_format";
 	int result            = -1;
@@ -117,85 +118,92 @@ int ewfinput_determine_libewf_format(
 
 		return( -1 );
 	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "smart" ),
-	          3 ) == 0 )
+	if( libewf_format == NULL )
 	{
-		*format = LIBEWF_FORMAT_SMART;
-		result  = 1;
+		notify_warning_printf( "%s: invalid libewf format.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_compare(
+	     argument,
+	     _CHARACTER_T_STRING( "smart" ),
+	     3 ) == 0 )
+	{
+		*libewf_format = LIBEWF_FORMAT_SMART;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "ftk" ),
 	          3 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_FTK;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_FTK;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase1" ),
 	          7 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_ENCASE1;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_ENCASE1;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase2" ),
 	          7 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_ENCASE2;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_ENCASE2;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase3" ),
 	          7 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_ENCASE3;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_ENCASE3;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase4" ),
 	          7 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_ENCASE4;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_ENCASE4;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase5" ),
 	          7 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_ENCASE5;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_ENCASE5;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase6" ),
 	          7 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_ENCASE6;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_ENCASE6;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "linen5" ),
 	          6 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_LINEN5;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_LINEN5;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "linen6" ),
 	          6 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_LINEN6;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_LINEN6;
+		result         = 1;
 	}
 	/* This check must before the check for "ewf"
 	 */
@@ -204,104 +212,123 @@ int ewfinput_determine_libewf_format(
 	          _CHARACTER_T_STRING( "ewfx" ),
 	          4 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_EWFX;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_EWFX;
+		result         = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "ewf" ),
 	          3 ) == 0 )
 	{
-		*format = LIBEWF_FORMAT_EWF;
-		result  = 1;
+		*libewf_format = LIBEWF_FORMAT_EWF;
+		result         = 1;
 	}
 	return( result );
 }
 
 /* Determines the sectors per chunk value from an argument string
- * Returns the sectors per chunk value, or 0 on error
+ * Returns 1 if successful or -1 on error
  */
-uint8_t ewfinput_determine_libewf_format_system_character(
-         const system_character_t *argument )
+int ewfinput_determine_libewf_format_system_character(
+     const system_character_t *argument,
+     uint8_t *libewf_format )
 {
 	static char *function = "ewfinput_determine_libewf_format_system_character";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
 		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
-	else if( system_string_compare(
-	          argument,
-	          _SYSTEM_CHARACTER_T_STRING( "smart" ),
-	          3 ) == 0 )
+	if( libewf_format == NULL )
 	{
-		return( LIBEWF_FORMAT_SMART );
+		notify_warning_printf( "%s: invalid libewf format.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_compare(
+	     argument,
+	     _SYSTEM_CHARACTER_T_STRING( "smart" ),
+	     3 ) == 0 )
+	{
+		*libewf_format = LIBEWF_FORMAT_SMART;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "ftk" ),
 	          3 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_FTK );
+		*libewf_format = LIBEWF_FORMAT_FTK;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "encase1" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE1 );
+		*libewf_format = LIBEWF_FORMAT_ENCASE1;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "encase2" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE2 );
+		*libewf_format = LIBEWF_FORMAT_ENCASE2;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "encase3" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE3 );
+		*libewf_format = LIBEWF_FORMAT_ENCASE3;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "encase4" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE4 );
+		*libewf_format = LIBEWF_FORMAT_ENCASE4;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "encase5" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE5 );
+		*libewf_format = LIBEWF_FORMAT_ENCASE5;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "encase6" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE6 );
+		*libewf_format = LIBEWF_FORMAT_ENCASE6;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "linen5" ),
 	          6 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_LINEN5 );
+		*libewf_format = LIBEWF_FORMAT_LINEN5;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "linen6" ),
 	          6 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_LINEN6 );
+		*libewf_format = LIBEWF_FORMAT_LINEN6;
+		result         = 1;
 	}
 	/* This check must before the check for "ewf"
 	 */
@@ -310,25 +337,29 @@ uint8_t ewfinput_determine_libewf_format_system_character(
 	          _SYSTEM_CHARACTER_T_STRING( "ewfx" ),
 	          4 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_EWFX );
+		*libewf_format = LIBEWF_FORMAT_EWFX;
+		result         = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "ewf" ),
 	          3 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_EWF );
+		*libewf_format = LIBEWF_FORMAT_EWF;
+		result         = 1;
 	}
-	return( 0 );
+	return( result );
 }
 
 /* Determines the sectors per chunk value from an argument string
- * Returns the sectors per chunk value, or 0 on error
+ * Returns 1 if successful or -1 on error
  */
-uint32_t ewfinput_determine_sectors_per_chunk(
-          const character_t *argument )
+int ewfinput_determine_sectors_per_chunk(
+     const character_t *argument,
+     uint32_t *sectors_per_chunk )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
@@ -337,86 +368,105 @@ uint32_t ewfinput_determine_sectors_per_chunk(
 
 		return( 0 );
 	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "32768" ),
-	          5 ) == 0 )
+	if( sectors_per_chunk == NULL )
 	{
-		return( 32768 );
+		notify_warning_printf( "%s: invalid sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_compare(
+	     argument,
+	     _CHARACTER_T_STRING( "32768" ),
+	     5 ) == 0 )
+	{
+		*sectors_per_chunk = 32768;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "16384" ),
 	          5 ) == 0 )
 	{
-		return( 16384 );
+		*sectors_per_chunk = 16384;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "8192" ),
 	          4 ) == 0 )
 	{
-		return( 8192 );
+		*sectors_per_chunk = 8192;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "4096" ),
 	          4 ) == 0 )
 	{
-		return( 4096 );
+		*sectors_per_chunk = 4096;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "2048" ),
 	          4 ) == 0 )
 	{
-		return( 2048 );
+		*sectors_per_chunk = 2048;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "1024" ),
 	          4 ) == 0 )
 	{
-		return( 1024 );
+		*sectors_per_chunk = 1024;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "512" ),
 	          3 ) == 0 )
 	{
-		return( 512 );
+		*sectors_per_chunk = 512;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "256" ),
 	          3 ) == 0 )
 	{
-		return( 256 );
+		*sectors_per_chunk = 256;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "128" ),
 	          3 ) == 0 )
 	{
-		return( 128 );
+		*sectors_per_chunk = 128;
+		result             = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "64" ),
 	          2 ) == 0 )
 	{
-		return( 64 );
+		*sectors_per_chunk = 64;
+		result             = 1;
 	}
-	return( 0 );
+	return( result );
 }
 
 /* Determines the sectors per chunk value from an argument string
- * Returns the sectors per chunk value, or 0 on error
+ * Returns 1 if successful or -1 on error
  */
-uint32_t ewfinput_determine_sectors_per_chunk_system_character(
-          const system_character_t *argument )
+int ewfinput_determine_sectors_per_chunk_system_character(
+     const character_t *argument,
+     uint32_t *sectors_per_chunk )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk_system_character";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
@@ -425,86 +475,106 @@ uint32_t ewfinput_determine_sectors_per_chunk_system_character(
 
 		return( 0 );
 	}
-	else if( system_string_compare(
-	          argument,
-	          _SYSTEM_CHARACTER_T_STRING( "32768" ),
-	          5 ) == 0 )
+	if( sectors_per_chunk == NULL )
 	{
-		return( 32768 );
+		notify_warning_printf( "%s: invalid sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_compare(
+	     argument,
+	     _SYSTEM_CHARACTER_T_STRING( "32768" ),
+	     5 ) == 0 )
+	{
+		*sectors_per_chunk = 32768;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "16384" ),
 	          5 ) == 0 )
 	{
-		return( 16384 );
+		*sectors_per_chunk = 16384;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "8192" ),
 	          4 ) == 0 )
 	{
-		return( 8192 );
+		*sectors_per_chunk = 8192;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "4096" ),
 	          4 ) == 0 )
 	{
-		return( 4096 );
+		*sectors_per_chunk = 4096;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "2048" ),
 	          4 ) == 0 )
 	{
-		return( 2048 );
+		*sectors_per_chunk = 2048;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "1024" ),
 	          4 ) == 0 )
 	{
-		return( 1024 );
+		*sectors_per_chunk = 1024;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "512" ),
 	          3 ) == 0 )
 	{
-		return( 512 );
+		*sectors_per_chunk = 512;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "256" ),
 	          3 ) == 0 )
 	{
-		return( 256 );
+		*sectors_per_chunk = 256;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "128" ),
 	          3 ) == 0 )
 	{
-		return( 128 );
+		*sectors_per_chunk = 128;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "64" ),
 	          2 ) == 0 )
 	{
-		return( 64 );
+		*sectors_per_chunk = 64;
+		result             = 1;
 	}
-	return( 0 );
+	return( result );
 }
 
 /* Determines the compression level value from an argument string
- * Returns the compression level value, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-int8_t ewfinput_determine_compression_level(
-        const character_t *argument )
+int ewfinput_determine_compression_level(
+     const character_t *argument,
+     int8_t *compression_level,
+     uint8_t *compress_empty_block )
 {
 	static char *function = "ewfinput_determine_compression_level";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
@@ -513,37 +583,78 @@ int8_t ewfinput_determine_compression_level(
 
 		return( -1 );
 	}
+	if( compression_level == NULL )
+	{
+		notify_warning_printf( "%s: invalid compression level.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( compress_empty_block == NULL )
+	{
+		notify_warning_printf( "%s: invalid compress empty block.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_compare(
+	     argument,
+	     _CHARACTER_T_STRING( "none" ),
+	     4 ) == 0 )
+	{
+		*compression_level    = LIBEWF_COMPRESSION_NONE;
+		*compress_empty_block = 0;
+		result                = 1;
+	}
 	else if( string_compare(
 	          argument,
-	          _CHARACTER_T_STRING( "none" ),
-	          4 ) == 0 )
+	          _CHARACTER_T_STRING( "empty-block" ),
+	          11 ) == 0 )
 	{
-		return( LIBEWF_COMPRESSION_NONE );
+		*compression_level    = LIBEWF_COMPRESSION_NONE;
+		*compress_empty_block = 1;
+		result                = 1;
+	}
+	else if( string_compare(
+	          argument,
+	          _CHARACTER_T_STRING( "empty_block" ),
+	          11 ) == 0 )
+	{
+		*compression_level    = LIBEWF_COMPRESSION_NONE;
+		*compress_empty_block = 1;
+		result                = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "fast" ),
 	          4 ) == 0 )
 	{
-		return( LIBEWF_COMPRESSION_FAST );
+		*compression_level    = LIBEWF_COMPRESSION_FAST;
+		*compress_empty_block = 0;
+		result                = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "best" ),
 	          4 ) == 0 )
 	{
-		return( LIBEWF_COMPRESSION_BEST );
+		*compression_level    = LIBEWF_COMPRESSION_BEST;
+		*compress_empty_block = 0;
+		result                = 1;
 	}
-	return( -1 );
+	return( result );
 }
 
 /* Determines the compression level value from an argument string
- * Returns the compression level value, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-int8_t ewfinput_determine_compression_level_system_character(
-        const system_character_t *argument )
+int ewfinput_determine_compression_level_system_character(
+     const character_t *argument,
+     int8_t *compression_level,
+     uint8_t *compress_empty_block )
 {
 	static char *function = "ewfinput_determine_compression_level_system_character";
+	int result            = 1;
 
 	if( argument == NULL )
 	{
@@ -552,37 +663,77 @@ int8_t ewfinput_determine_compression_level_system_character(
 
 		return( -1 );
 	}
+	if( compression_level == NULL )
+	{
+		notify_warning_printf( "%s: invalid compression level.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( compress_empty_block == NULL )
+	{
+		notify_warning_printf( "%s: invalid compress empty block.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_compare(
+	     argument,
+	     _SYSTEM_CHARACTER_T_STRING( "none" ),
+	     4 ) == 0 )
+	{
+		*compression_level    = LIBEWF_COMPRESSION_NONE;
+		*compress_empty_block = 0;
+		result                = 1;
+	}
 	else if( system_string_compare(
 	          argument,
-	          _SYSTEM_CHARACTER_T_STRING( "none" ),
-	          4 ) == 0 )
+	          _SYSTEM_CHARACTER_T_STRING( "empty-block" ),
+	          11 ) == 0 )
 	{
-		return( LIBEWF_COMPRESSION_NONE );
+		*compression_level    = LIBEWF_COMPRESSION_NONE;
+		*compress_empty_block = 1;
+		result                = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "empty_block" ),
+	          11 ) == 0 )
+	{
+		*compression_level    = LIBEWF_COMPRESSION_NONE;
+		*compress_empty_block = 1;
+		result                = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "fast" ),
 	          4 ) == 0 )
 	{
-		return( LIBEWF_COMPRESSION_FAST );
+		*compression_level    = LIBEWF_COMPRESSION_FAST;
+		*compress_empty_block = 0;
+		result                = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "best" ),
 	          4 ) == 0 )
 	{
-		return( LIBEWF_COMPRESSION_BEST );
+		*compression_level    = LIBEWF_COMPRESSION_BEST;
+		*compress_empty_block = 0;
+		result                = 1;
 	}
-	return( -1 );
+	return( result );
 }
 
 /* Determines the media type value from an argument string
- * Returns the media type value, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-int8_t ewfinput_determine_media_type(
-        const character_t *argument )
+int ewfinput_determine_media_type(
+     const character_t *argument,
+     uint8_t *media_type )
 {
 	static char *function = "ewfinput_determine_media_type";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
@@ -591,19 +742,28 @@ int8_t ewfinput_determine_media_type(
 
 		return( -1 );
 	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "fixed" ),
+	if( media_type == NULL )
+	{
+		notify_warning_printf( "%s: invalid media type.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_compare(
+	     argument,
+	     _CHARACTER_T_STRING( "fixed" ),
 	          5 ) == 0 )
 	{
-		return( LIBEWF_MEDIA_TYPE_FIXED );
+		*media_type = LIBEWF_MEDIA_TYPE_FIXED;
+		result      = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "removable" ),
 	          9 ) == 0 )
 	{
-		return( LIBEWF_MEDIA_TYPE_REMOVABLE );
+		*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
+		result      = 1;
 	}
 #if defined( LIBEWF_CD_SUPPORT )
 	else if( string_compare(
@@ -611,19 +771,22 @@ int8_t ewfinput_determine_media_type(
 	          _CHARACTER_T_STRING( "cd" ),
 	          2 ) == 0 )
 	{
-		return( LIBEWF_MEDIA_TYPE_CD );
+		*media_type = LIBEWF_MEDIA_TYPE_CD;
+		result      = 1;
 	}
 #endif
-	return( -1 );
+	return( result );
 }
 
-/* Determines the volume type value from an argument string
- * Returns the volume type value, or -1 on error
+/* Determines the media type value from an argument string
+ * Returns 1 if successful or -1 on error
  */
-int8_t ewfinput_determine_volume_type(
-        const character_t *argument )
+int ewfinput_determine_media_type_system_character(
+     const system_character_t *argument,
+     uint8_t *media_type )
 {
-	static char *function = "ewfinput_determine_volume_type";
+	static char *function = "ewfinput_determine_media_type_system_character";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
@@ -632,21 +795,126 @@ int8_t ewfinput_determine_volume_type(
 
 		return( -1 );
 	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "logical" ),
-	          7 ) == 0 )
+	if( media_type == NULL )
 	{
-		return( LIBEWF_VOLUME_TYPE_LOGICAL );
+		notify_warning_printf( "%s: invalid media type.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_compare(
+	     argument,
+	     _SYSTEM_CHARACTER_T_STRING( "fixed" ),
+	          5 ) == 0 )
+	{
+		*media_type = LIBEWF_MEDIA_TYPE_FIXED;
+		result      = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "removable" ),
+	          9 ) == 0 )
+	{
+		*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
+		result      = 1;
+	}
+#if defined( LIBEWF_CD_SUPPORT )
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "cd" ),
+	          2 ) == 0 )
+	{
+		*media_type = LIBEWF_MEDIA_TYPE_CD;
+		result      = 1;
+	}
+#endif
+	return( result );
+}
+
+/* Determines the volume type value from an argument string
+ * Returns 1 if successful or -1 on error
+ */
+int ewfinput_determine_volume_type(
+     const character_t *argument,
+     uint8_t *volume_type )
+{
+	static char *function = "ewfinput_determine_volume_type";
+	int result            = -1;
+
+	if( argument == NULL )
+	{
+		notify_warning_printf( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( volume_type == NULL )
+	{
+		notify_warning_printf( "%s: invalid volume type.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_compare(
+	     argument,
+	     _CHARACTER_T_STRING( "logical" ),
+	     7 ) == 0 )
+	{
+		*volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
+		result       = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "physical" ),
 	          8 ) == 0 )
 	{
-		return( LIBEWF_VOLUME_TYPE_PHYSICAL );
+		*volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+		result       = 1;
 	}
-	return( -1 );
+	return( result );
+}
+
+/* Determines the volume type value from an argument string
+ * Returns 1 if successful or -1 on error
+ */
+int ewfinput_determine_volume_type_system_character(
+     const system_character_t *argument,
+     uint8_t *volume_type )
+{
+	static char *function = "ewfinput_determine_volume_type_system_character";
+	int result            = -1;
+
+	if( argument == NULL )
+	{
+		notify_warning_printf( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( volume_type == NULL )
+	{
+		notify_warning_printf( "%s: invalid volume type.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_compare(
+	     argument,
+	     _SYSTEM_CHARACTER_T_STRING( "logical" ),
+	     7 ) == 0 )
+	{
+		*volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
+		result       = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "physical" ),
+	          8 ) == 0 )
+	{
+		*volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
+		result       = 1;
+	}
+	return( result );
 }
 
 /* Determines the codepage from an argument string
@@ -757,12 +1025,14 @@ int ewfinput_determine_header_codepage_system_character(
 }
 
 /* Determines the yes or no value from an argument string
- * Returns 1 if yes, 0 if no, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
-int8_t ewfinput_determine_yes_no(
-        const character_t *argument )
+int ewfinput_determine_yes_no(
+     const character_t *argument,
+     uint8_t *yes_no_value )
 {
 	static char *function = "ewfinput_determine_yes_no";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
@@ -771,21 +1041,30 @@ int8_t ewfinput_determine_yes_no(
 
 		return( -1 );
 	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "yes" ),
-	          3 ) == 0 )
+	if( yes_no_value == NULL )
 	{
-		return( 1 );
+		notify_warning_printf( "%s: invalid yes no value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_compare(
+	     argument,
+	     _CHARACTER_T_STRING( "yes" ),
+	     3 ) == 0 )
+	{
+		*yes_no_value = 1;
+		result        = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "no" ),
 	          2 ) == 0 )
 	{
-		return( 0 );
+		*yes_no_value = 0;
+		result        = 1;
 	}
-	return( -1 );
+	return( result );
 }
 
 /* Get variable input from the user

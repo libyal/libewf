@@ -117,18 +117,18 @@ void usage_fprint(
 
 	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
 	fprintf( stream, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast, best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-D: specify the description (default is description).\n" );
 	fprintf( stream, "\t-e: specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E: specify the evidence number (default is evidence_number).\n" );
 	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
-	fprintf( stream, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
+	fprintf( stream, "\t    encase5 (default), encase6, linen5, linen6, ewfx\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
 	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the filename\n" );
-	fprintf( stream, "\t-m: specify the media type, options: fixed (is default), removable\n" );
-	fprintf( stream, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
+	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable\n" );
+	fprintf( stream, "\t-M: specify the volume type, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
@@ -194,21 +194,21 @@ int main( int argc, char * const argv[] )
 	uint64_t segment_file_size                 = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	uint64_t acquiry_offset                    = 0;
 	uint64_t acquiry_size                      = 0;
-	uint64_t sectors_per_chunk                 = 64;
-	uint32_t sector_error_granularity          = 64;
 	uint32_t amount_of_acquiry_errors          = 0;
+	uint32_t sectors_per_chunk                 = 64;
+	uint32_t sector_error_granularity          = 64;
 	int8_t compression_level                   = LIBEWF_COMPRESSION_NONE;
-	uint8_t media_type                         = LIBEWF_MEDIA_TYPE_FIXED;
-	uint8_t volume_type                        = LIBEWF_VOLUME_TYPE_PHYSICAL;
-	uint8_t compress_empty_block               = 0;
-	uint8_t libewf_format                      = LIBEWF_FORMAT_ENCASE5;
-	uint8_t wipe_chunk_on_error                = 0;
-	uint8_t read_error_retry                   = 2;
-	uint8_t swap_byte_pairs                    = 0;
-	uint8_t seek_on_error                      = 0;
 	uint8_t calculate_md5                      = 1;
 	uint8_t calculate_sha1                     = 0;
+	uint8_t compress_empty_block               = 0;
+	uint8_t libewf_format                      = LIBEWF_FORMAT_ENCASE5;
+	uint8_t media_type                         = LIBEWF_MEDIA_TYPE_FIXED;
+	uint8_t read_error_retry                   = 2;
+	uint8_t seek_on_error                      = 0;
+	uint8_t swap_byte_pairs                    = 0;
 	uint8_t verbose                            = 0;
+	uint8_t volume_type                        = LIBEWF_VOLUME_TYPE_PHYSICAL;
+	uint8_t wipe_chunk_on_error                = 0;
 	int error_abort                            = 0;
 	int result                                 = 0;
 	int status                                 = 0;
@@ -250,10 +250,9 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_system_character(
-				                     optarg );
-
-				if( sectors_per_chunk == 0 )
+				if( ewfinput_determine_sectors_per_chunk_system_character(
+				     optarg,
+				     &sectors_per_chunk ) != 1 )
 				{
 					fprintf( stderr, "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
 
@@ -262,24 +261,15 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'c':
-				if( system_string_compare(
+				if( ewfinput_determine_compression_level_system_character(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "empty_block" ),
-				     11 ) == 0 )
+				     &compression_level,
+				     &compress_empty_block ) != 1 )
 				{
-					compress_empty_block = 1;
-				}
-				else
-				{
-					compression_level = ewfinput_determine_compression_level_system_character(
-					                     optarg );
-				
-					if( compression_level <= -1 )
-					{
-						fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
+					fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
-						compression_level = LIBEWF_COMPRESSION_NONE;
-					}
+					compression_level    = LIBEWF_COMPRESSION_NONE;
+					compress_empty_block = 0;
 				}
 				break;
 
@@ -318,10 +308,9 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'f':
-				libewf_format = ewfinput_determine_libewf_format_system_character(
-				                 optarg );
-
-				if( ( libewf_format == 0 )
+				if( ( ewfinput_determine_libewf_format_system_character(
+				       optarg,
+				       &libewf_format ) != 1 )
 				 || ( libewf_format == LIBEWF_FORMAT_EWF )
 				 || ( libewf_format == LIBEWF_FORMAT_SMART ) )
 				{
@@ -343,44 +332,24 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'm':
-				if( system_string_compare(
+				if( ewfinput_determine_media_type_system_character(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "fixed" ),
-				     5 ) == 0 )
-				{
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
-				}
-				else if( system_string_compare(
-				          optarg,
-				          _SYSTEM_CHARACTER_T_STRING( "removable" ),
-				          9 ) == 0 )
-				{
-					media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
-				}
-				else
+				     &media_type ) != 1 )
 				{
 					fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
+
+					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
 				break;
 
 			case (system_integer_t) 'M':
-				if( system_string_compare(
+				if( ewfinput_determine_volume_type_system_character(
 				     optarg,
-				     _SYSTEM_CHARACTER_T_STRING( "logical" ),
-				     7 ) == 0 )
-				{
-					volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-				}
-				else if( system_string_compare(
-				          optarg,
-				          _SYSTEM_CHARACTER_T_STRING( "physical" ),
-				          8 ) == 0 )
-				{
-					volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
-				}
-				else
+				     &volume_type ) != 1 )
 				{
 					fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
+
+					volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 				}
 				break;
 
@@ -648,7 +617,7 @@ int main( int argc, char * const argv[] )
 		 (off64_t) acquiry_offset,
 		 (size64_t) acquiry_size,
 		 (size64_t) segment_file_size,
-		 (uint32_t) sectors_per_chunk,
+		 sectors_per_chunk,
 		 sector_error_granularity,
 		 read_error_retry,
 		 wipe_chunk_on_error );
@@ -675,10 +644,10 @@ int main( int argc, char * const argv[] )
 			  acquiry_operating_system,
 			  program,
 			  acquiry_software_version,
-			  (uint8_t) media_type,
-			  (uint8_t) volume_type,
+			  media_type,
+			  volume_type,
 			  compression_level,
-			  (uint8_t) compress_empty_block,
+			  compress_empty_block,
 			  libewf_format,
 			  (size64_t) segment_file_size,
 			  (uint32_t) sector_error_granularity ) != 1 )
@@ -816,7 +785,7 @@ int main( int argc, char * const argv[] )
 			       0,
 			       acquiry_size,
 			       acquiry_offset,
-			       (uint32_t) sectors_per_chunk,
+			       sectors_per_chunk,
 			       512,
 			       read_error_retry,
 			       sector_error_granularity,
