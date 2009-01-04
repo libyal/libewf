@@ -36,6 +36,7 @@
 #include <libewf/libewf_definitions.h>
 
 #include "libewf_common.h"
+#include "libewf_compression.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 #include "libewf_file.h"
@@ -44,7 +45,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 
-#include "ewf_compress.h"
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
 #include "ewf_string.h"
@@ -126,7 +126,11 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 			return( -1 );
 		}
-		if( ewf_uncompress( uncompressed_chunk_data, uncompressed_chunk_data_size, chunk_data, chunk_data_size ) != 1 )
+		if( libewf_uncompress(
+		     uncompressed_chunk_data,
+		     uncompressed_chunk_data_size,
+		     chunk_data,
+		     chunk_data_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to uncompressed chunk data.\n",
 			 function );

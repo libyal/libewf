@@ -2260,12 +2260,12 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle        = NULL;
 	LIBEWF_SECTION_LIST_ENTRY *list_entry_iterator = NULL;
+	LIBEWF_SEGMENT_FILE *segment_file              = NULL;
 	static char *function                          = "libewf_write_finalize";
 	ssize_t write_count_finalize                   = 0;
 	ssize_t write_count                            = 0;
 	uint16_t segment_table_iterator                = 0;
 	uint16_t segment_number                        = 0;
-	int file_descriptor                            = 0;
 
 	if( handle == NULL )
 	{
@@ -2353,12 +2353,19 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		}
 		write_count_finalize += write_count;
 	}
-	segment_number  = internal_handle->segment_table->amount - 1;
-	file_descriptor = internal_handle->segment_table->segment_file[ segment_number ]->file_descriptor;
+	segment_number = internal_handle->segment_table->amount - 1;
+	segment_file   = internal_handle->segment_table->segment_file[ segment_number ];
 
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
 	/* Check if the last segment file has been closed
 	 */
-	if( file_descriptor != -1 )
+	if( segment_file->file_descriptor != -1 )
 	{
 		/* Check if chunks section needs to be corrected
 		 */
@@ -2371,7 +2378,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 			write_count = libewf_segment_file_write_chunks_correction(
 				       internal_handle,
-				       internal_handle->segment_table->segment_file[ segment_number ],
+				       segment_file,
 				       internal_handle->write->chunks_section_offset,
 				       (size_t) internal_handle->write->chunks_section_write_count,
 				       internal_handle->write->amount_of_chunks,
@@ -2395,7 +2402,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 		write_count = libewf_segment_file_write_close(
 		               internal_handle,
-		               internal_handle->segment_table->segment_file[ segment_number ],
+		               segment_file,
 		               segment_number,
 		               internal_handle->write->segment_amount_of_chunks,
 		               1 );
@@ -2424,45 +2431,52 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		 */
 		for( segment_table_iterator = 1; segment_table_iterator < internal_handle->segment_table->amount; segment_table_iterator++ )
 		{
-			if( internal_handle->segment_table->segment_file[ segment_table_iterator ]->section_list == NULL )
+			segment_file = internal_handle->segment_table->segment_file[ segment_table_iterator ];
+
+			if( segment_file == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: missing section list.\n",
+				LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 				 function );
 
 				return( -1 );
 			}
-			if( internal_handle->segment_table->segment_file[ segment_table_iterator ]->section_list->first == NULL )
+			if( segment_file->section_list == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "%s: missing section list entries.\n",
+				LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing section list.\n",
 				 function );
 
 				return( -1 );
 			}
-			file_descriptor = internal_handle->segment_table->segment_file[ segment_table_iterator ]->file_descriptor;
-
-			if( file_descriptor == -1 )
+			if( segment_file->section_list->first == NULL )
 			{
-				if( internal_handle->segment_table->segment_file[ segment_table_iterator ]->filename == NULL )
+				LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid section list - missing entries.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( segment_file->file_descriptor == -1 )
+			{
+				if( segment_file->filename == NULL )
 				{
 					LIBEWF_WARNING_PRINT( "%s: invalid filename for segment file: %" PRIu32 ".\n",
 					 function, segment_table_iterator );
 
 					return( -1 );
 				}
-				file_descriptor = libewf_filename_open(
-						   internal_handle->segment_table->segment_file[ segment_table_iterator ]->filename,
-						   LIBEWF_OPEN_READ_WRITE );
+				segment_file->file_descriptor = libewf_filename_open(
+				                                 segment_file->filename,
+				                                 LIBEWF_OPEN_READ_WRITE );
 
-				if( file_descriptor == -1 )
+				if( segment_file->file_descriptor == -1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
-					 function, internal_handle->segment_table->segment_file[ segment_table_iterator ]->filename );
+					 function, segment_file->filename );
 					return( -1 );
 				}
 				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %" PRIs_EWF_filename ".\n",
-				 function, internal_handle->segment_table->segment_file[ segment_table_iterator ]->filename );
+				 function, segment_file->filename );
 			}
-			list_entry_iterator = internal_handle->segment_table->segment_file[ segment_table_iterator ]->section_list->first;
+			list_entry_iterator = segment_file->section_list->first;
 
 			while( list_entry_iterator != NULL )
 			{
@@ -2471,7 +2485,10 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 					LIBEWF_VERBOSE_PRINT( "%s: correcting volume section.\n",
 					 function );
 
-					if( libewf_common_lseek( file_descriptor, list_entry_iterator->start_offset, SEEK_SET ) == -1 )
+					if( libewf_common_lseek(
+					     segment_file->file_descriptor,
+					     list_entry_iterator->start_offset,
+					     SEEK_SET ) == -1 )
 					{
 						LIBEWF_WARNING_PRINT( "%s: unable to find offset to correct volume section.\n",
 						 function );
@@ -2484,7 +2501,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						 */
 						write_count = libewf_section_volume_s01_write(
 							       internal_handle,
-							       file_descriptor,
+							       segment_file->file_descriptor,
 							       list_entry_iterator->start_offset );
 					}
 					else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
@@ -2493,7 +2510,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						 */
 						write_count = libewf_section_volume_e01_write(
 							       internal_handle,
-							       file_descriptor,
+							       segment_file->file_descriptor,
 							       list_entry_iterator->start_offset );
 					}
 					else
@@ -2514,7 +2531,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 					 function );
 
 					if( libewf_common_lseek(
-					     file_descriptor,
+					     segment_file->file_descriptor,
 					     list_entry_iterator->start_offset,
 					     SEEK_SET ) == -1 )
 					{
@@ -2526,9 +2543,19 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 					/* Write data section
 					 */
 					write_count = libewf_section_data_write(
-						       internal_handle,
-						       file_descriptor,
-						       list_entry_iterator->start_offset );
+					               segment_file,
+					               internal_handle->media->amount_of_chunks,
+					               internal_handle->media->sectors_per_chunk,
+					               internal_handle->media->bytes_per_sector,
+					               internal_handle->media->amount_of_sectors,
+					               internal_handle->media->error_granularity,
+					               internal_handle->media->media_type,
+					               internal_handle->media->media_flags,
+					               internal_handle->compression_level,
+					               internal_handle->guid,
+					               internal_handle->format,
+					               &( internal_handle->write->data_section ),
+					               1 );
 
 					if( write_count == -1 )
 					{
@@ -2540,14 +2567,14 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				}
 				list_entry_iterator = list_entry_iterator->next;
 			}
-			if( libewf_common_close( file_descriptor ) != 0 )
+			if( libewf_common_close( segment_file->file_descriptor ) != 0 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
 				 function );
 
 				return( -1 );
 			}
-			internal_handle->segment_table->segment_file[ segment_table_iterator ]->file_descriptor = -1;
+			segment_file->file_descriptor = -1;
 		}
 	}
 	internal_handle->write->write_finalized = 1;

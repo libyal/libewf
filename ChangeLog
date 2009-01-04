@@ -141,6 +141,7 @@ Next release:
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
 * remove ewf_compress and ewf_string.c
+* libewf_section_list_append add section_type length parameter
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
