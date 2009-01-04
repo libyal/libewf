@@ -1202,7 +1202,15 @@ ssize_t libewf_segment_file_write_chunks_data(
 	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
-	offset_table->chunk_offset[ chunk ].compressed          = is_compressed;
+
+	if( is_compressed == 0 )
+	{
+		offset_table->chunk_offset[ chunk ].flags = 0;
+	}
+	else
+	{
+		offset_table->chunk_offset[ chunk ].flags |= LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED;
+	}
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	/* Print a verbose notification
@@ -1219,7 +1227,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 chunk_type,
-	 ( chunk + 1 ),
+	 chunk + 1,
 	 segment_file_offset,
 	 chunk_size,
 	 *chunk_crc );
@@ -1656,7 +1664,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( ewf_crc_t );
-		offset_table->chunk_offset[ chunk ].compressed          = 0;
+		offset_table->chunk_offset[ chunk ].flags               = 0;
 	}
 	return( write_count );
 }

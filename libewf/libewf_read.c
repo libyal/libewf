@@ -362,9 +362,9 @@ ssize_t libewf_raw_read_chunk(
 	 */
 	chunk_data_size = internal_handle->offset_table->chunk_offset[ chunk ].size;
 
-	/* Determine if the chunk is not compressed
+	/* Determine if the chunk is compressed or not
 	 */
-	if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 )
+	if( ( internal_handle->offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == 0 )
 	{
 		if( chunk_size < chunk_data_size )
 		{
@@ -373,8 +373,6 @@ ssize_t libewf_raw_read_chunk(
 		}
 		*is_compressed = 0;
 	}
-	/* Determine if the chunk is compressed
-	 */
 	else
 	{
 		*is_compressed = 1;
@@ -655,6 +653,14 @@ ssize_t libewf_read_chunk_data(
 				buffer = internal_handle->chunk_cache->data;
 			}
 		}
+		if( ( internal_handle->offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == 0 )
+		{
+			is_compressed = 0;
+		}
+		else
+		{
+			is_compressed = 1;
+		}
 		chunk_data = internal_handle->chunk_cache->data;
 
 		/* Directly read to the buffer if
@@ -666,7 +672,7 @@ ssize_t libewf_read_chunk_data(
 		if( ( buffer != internal_handle->chunk_cache->data )
 		 && ( chunk_offset == 0 )
 		 && ( size >= (size_t) internal_handle->media_values->chunk_size )
-		 && ( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 ) )
+		 && ( is_compressed == 0 ) )
 		{
 			chunk_data = buffer;
 
@@ -677,7 +683,7 @@ ssize_t libewf_read_chunk_data(
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */
-		if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 1 )
+		if( is_compressed == 1 )
 		{
 			chunk_read = internal_handle->chunk_cache->compressed;
 		}

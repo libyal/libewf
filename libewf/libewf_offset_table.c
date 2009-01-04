@@ -272,19 +272,24 @@ int libewf_offset_table_fill(
      ewf_table_offset_t *offsets,
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t tainted,
      libewf_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
-	char *chunk_type        = NULL;
+	char *chunk_type                    = NULL;
+	char *remarks                       = NULL;
 #endif
-	static char *function   = "libewf_offset_table_fill";
-	uint32_t chunk_size     = 0;
-	uint32_t current_offset = 0;
-	uint32_t next_offset    = 0;
-	uint32_t raw_offset     = 0;
-	uint32_t iterator       = 0;
-	uint8_t compressed      = 0;
-	uint8_t overflow        = 0;
+
+	libewf_chunk_offset_t *chunk_offset = NULL;
+	static char *function               = "libewf_offset_table_fill";
+	uint32_t chunk_size                 = 0;
+	uint32_t current_offset             = 0;
+	uint32_t next_offset                = 0;
+	uint32_t raw_offset                 = 0;
+	uint32_t iterator                   = 0;
+	uint8_t compressed                  = 0;
+	uint8_t corrupted                   = 0;
+	uint8_t overflow                    = 0;
 
 	if( offset_table == NULL )
 	{
@@ -373,6 +378,8 @@ int libewf_offset_table_fill(
 		{
 			next_offset = raw_offset;
 		}
+		corrupted = 0;
+
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6.7
 		 */
@@ -380,25 +387,26 @@ int libewf_offset_table_fill(
 		{
 			if( raw_offset < current_offset )
 			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_INVALID_DATA,
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
 				 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
 				 function,
 				 current_offset,
 				 raw_offset );
-
-				return( -1 );
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
-			 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
-			 function,
-			 current_offset,
-			 next_offset );
 #endif
 
+				corrupted = 1;
+			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			else
+			{
+				notify_verbose_printf(
+				 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
+				 function,
+				 current_offset,
+				 next_offset );
+			}
+#endif
 			chunk_size = raw_offset - current_offset;
 		}
 		else
@@ -407,25 +415,19 @@ int libewf_offset_table_fill(
 		}
 		if( chunk_size == 0 )
 		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_INVALID_DATA,
-			 "%s: invalid chunk size - size is zero.\n",
+			notify_verbose_printf(
+			 "%s: invalid chunk size value is zero.\n",
 			 function );
 
-			return( -1 );
+			corrupted = 1;
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_INVALID_DATA,
+			notify_verbose_printf(
 			 "%s: invalid chunk size value exceeds maximum.\n",
 			 function );
 
-			return( -1 );
+			corrupted = 1;
 		}
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( compressed == 0 )
@@ -436,21 +438,44 @@ int libewf_offset_table_fill(
 		{
 			chunk_type = "compressed";
 		}
+		if( corrupted != 0 )
+		{
+			remarks = " corrupted";
+		}
+		else if( tainted != 0 )
+		{
+			remarks = " tainted";
+		}
+		else
+		{
+			remarks = "";
+		}
 		notify_verbose_printf(
-		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 ".\n",
+		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
 		 function,
 		 chunk_type,
-		 ( offset_table->last_chunk_offset_filled + 1 ),
+		 offset_table->last_chunk_offset_filled + 1,
 		 base_offset,
 		 current_offset,
-		 chunk_size );
+		 chunk_size,
+		 remarks );
 #endif
 
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].segment_file_handle = segment_file_handle;
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].file_offset         = (off64_t) ( base_offset + current_offset );
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].size                = (size_t) chunk_size;
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].compressed          = compressed;
+		chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
 
+		chunk_offset->segment_file_handle = segment_file_handle;
+		chunk_offset->file_offset         = (off64_t) ( base_offset + current_offset );
+		chunk_offset->size                = (size_t) chunk_size;
+		chunk_offset->flags              |= compressed;
+
+		if( corrupted != 0 )
+		{
+			chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED;
+		}
+		else if( tainted != 0 )
+		{
+			chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED;
+		}
 		offset_table->last_chunk_offset_filled++;
 
 		/* This is to compensate for the crappy >2Gb segment file
@@ -484,6 +509,8 @@ int libewf_offset_table_fill(
 	{
 		current_offset = raw_offset;
 	}
+	corrupted = 0;
+
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( compressed == 0 )
 	{
@@ -493,19 +520,42 @@ int libewf_offset_table_fill(
 	{
 		chunk_type = "compressed";
 	}
+	if( corrupted != 0 )
+	{
+		remarks = " corrupted";
+	}
+	else if( tainted != 0 )
+	{
+		remarks = " tainted";
+	}
+	else
+	{
+		remarks = "";
+	}
 	notify_verbose_printf(
-	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 ".\n",
+	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
 	 function,
 	 chunk_type,
 	 ( offset_table->last_chunk_offset_filled + 1 ),
 	 base_offset,
-	 current_offset );
+	 current_offset,
+	 remarks );
 #endif
 
-	offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].file_offset         = (off64_t) ( base_offset + current_offset );
-	offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].compressed          = compressed;
+	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
 
+	chunk_offset->segment_file_handle = segment_file_handle;
+	chunk_offset->file_offset         = (off64_t) ( base_offset + current_offset );
+	chunk_offset->flags              |= compressed;
+
+	if( corrupted != 0 )
+	{
+		chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED;
+	}
+	else if( tainted != 0 )
+	{
+		chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED;
+	}
 	return( 1 );
 }
 
@@ -515,13 +565,20 @@ int libewf_offset_table_fill(
 int libewf_offset_table_fill_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
+     uint8_t tainted,
      libewf_error_t **error )
 {
+#if defined( HAVE_VERBOSE_OUTPUT )
+	char *remarks                                     = NULL;
+#endif
+
+	libewf_chunk_offset_t *chunk_offset               = NULL;
 	libewf_list_element_t *list_element               = NULL;
 	libewf_section_list_values_t *section_list_values = NULL;
 	static char *function                             = "libewf_offset_table_fill_last_offset";
 	off64_t last_offset                               = 0;
 	off64_t chunk_size                                = 0;
+	uint8_t corrupted                                 = 0;
 
 	if( offset_table == NULL )
 	{
@@ -561,7 +618,8 @@ int libewf_offset_table_fill_last_offset(
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
 	list_element = section_list->first;
-	last_offset  = offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].file_offset;
+	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
+	last_offset  = chunk_offset->file_offset;
 
 	while( list_element != NULL )
 	{
@@ -602,39 +660,60 @@ int libewf_offset_table_fill_last_offset(
 
 				return( -1 );
 			}
+			corrupted = 0;
+
 			if( chunk_size == 0 )
 			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_INVALID_DATA,
-				 "%s: invalid chunk size - size is zero.\n",
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
+				 "%s: invalid chunk size value is zero.\n",
 				 function );
+#endif
 
-				return( -1 );
+				corrupted = 1;
 			}
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_INVALID_DATA,
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
 				 "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
-
-				return( -1 );
-			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
-			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu ".\n",
-			 function,
-			 ( offset_table->last_chunk_offset_filled + 1 ),
-			 last_offset,
-			 (size_t) chunk_size );
 #endif
 
-			offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ].size = (size_t) chunk_size;
+				corrupted = 1;
+			}
+#if defined( HAVE_VERBOSE_OUTPUT )
+			if( corrupted != 0 )
+			{
+				remarks = " corrupted";
+			}
+			else if( tainted != 0 )
+			{
+				remarks = " tainted";
+			}
+			else
+			{
+				remarks = "";
+			}
+			notify_verbose_printf(
+			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
+			 function,
+			 offset_table->last_chunk_offset_filled + 1,
+			 last_offset,
+			 (size_t) chunk_size,
+			 remarks );
+#endif
 
+			chunk_offset->size = (size_t) chunk_size;
+
+			if( corrupted != 0 )
+			{
+				chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED;
+			}
+			else if( tainted != 0 )
+			{
+				chunk_offset->flags |= LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED;
+			}
 			break;
 		}
 		list_element = list_element->next;
@@ -655,10 +734,11 @@ int libewf_offset_table_fill_offsets(
      uint32_t amount_of_offsets,
      libewf_error_t **error )
 {
-	static char *function   = "libewf_offset_table_fill_offsets";
-	off64_t offset64_value  = 0;
-	uint32_t offset32_value = 0;
-	uint32_t iterator       = 0;
+	libewf_chunk_offset_t *chunk_offset = NULL;
+	static char *function               = "libewf_offset_table_fill_offsets";
+	off64_t offset64_value              = 0;
+	uint32_t offset32_value             = 0;
+	uint32_t iterator                   = 0;
 
 	if( offset_table == NULL )
 	{
@@ -717,8 +797,8 @@ int libewf_offset_table_fill_offsets(
 	}
 	for( iterator = 0; iterator < amount_of_chunk_offsets; iterator++ )
 	{
-		offset64_value = offset_table->chunk_offset[ offset_table_index + iterator ].file_offset
-		               - base_offset;
+		chunk_offset   = &( offset_table->chunk_offset[ offset_table_index + iterator ] );
+		offset64_value = chunk_offset->file_offset - base_offset;
 
 		if( ( offset64_value < 0 )
 		 || ( offset64_value > (off64_t) INT32_MAX ) )
@@ -734,7 +814,7 @@ int libewf_offset_table_fill_offsets(
 		}
 		offset32_value = (uint32_t) offset64_value;
 
-		if( offset_table->chunk_offset[ offset_table_index + iterator ].compressed != 0 )
+		if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED )
 		{
 			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
@@ -754,21 +834,25 @@ int libewf_offset_table_compare(
      ewf_table_offset_t *offsets,
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
-     uint8_t correct_errors,
+     uint8_t tainted,
      libewf_error_t **error )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
-	char *chunk_type        = NULL;
+	char *chunk_type                    = NULL;
+	char *remarks                       = NULL;
 #endif
-	static char *function   = "libewf_offset_table_compare";
-	uint32_t chunk_size     = 0;
-	uint32_t current_offset = 0;
-	uint32_t next_offset    = 0;
-	uint32_t raw_offset     = 0;
-	uint32_t iterator       = 0;
-	uint8_t compressed      = 0;
-	uint8_t mismatch        = 0;
-	uint8_t overflow        = 0;
+
+	libewf_chunk_offset_t *chunk_offset = NULL;
+	static char *function               = "libewf_offset_table_compare";
+	uint32_t chunk_size                 = 0;
+	uint32_t current_offset             = 0;
+	uint32_t next_offset                = 0;
+	uint32_t raw_offset                 = 0;
+	uint32_t iterator                   = 0;
+	uint8_t compressed                  = 0;
+	uint8_t corrupted                   = 0;
+	uint8_t mismatch                    = 0;
+	uint8_t overflow                    = 0;
 
 	if( offset_table == NULL )
 	{
@@ -857,6 +941,7 @@ int libewf_offset_table_compare(
 		{
 			next_offset = raw_offset;
 		}
+		corrupted = 0;
 
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6.7
@@ -865,23 +950,25 @@ int libewf_offset_table_compare(
 		{
 			if( raw_offset < current_offset )
 			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_INVALID_DATA,
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
 				 "%s: chunk offset %" PRIu32 " larger than raw %" PRIu32 ".\n",
 				 function,
 				 current_offset,
 				 raw_offset );
+#endif
 
-				return( -1 );
+				corrupted = 1;
 			}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
-			 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
-			 function,
-			 current_offset,
-			 next_offset );
+			else
+			{
+				notify_verbose_printf(
+				 "%s: chunk offset %" PRIu32 " larger than next %" PRIu32 ".\n",
+				 function,
+				 current_offset,
+				 next_offset );
+			}
 #endif
 
 			chunk_size = raw_offset - current_offset;
@@ -893,46 +980,27 @@ int libewf_offset_table_compare(
 
 		if( chunk_size == 0 )
 		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_INVALID_DATA,
+#if defined( HAVE_VERBOSE_OUTPUT )
+			notify_verbose_printf(
 			 "%s: invalid chunk size - size is zero.\n",
 			 function );
+#endif
 
-			return( -1 );
+			corrupted = 1;
 		}
 		if( chunk_size > (uint32_t) INT32_MAX )
 		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_INVALID_DATA,
+#if defined( HAVE_VERBOSE_OUTPUT )
+			notify_verbose_printf(
 			 "%s: invalid chunk size value exceeds maximum.\n",
 			 function );
-
-			return( -1 );
-		}
-#if defined( HAVE_VERBOSE_OUTPUT )
-		if( compressed == 0 )
-		{
-			chunk_type = "uncompressed";
-		}
-		else
-		{
-			chunk_type = "compressed";
-		}
-		notify_verbose_printf(
-		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 ".\n",
-		 function,
-		 chunk_type,
-		 ( offset_table->last_chunk_offset_compared + 1 ),
-		 base_offset,
-		 current_offset,
-		 chunk_size );
 #endif
 
-		if( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset != (off64_t) ( base_offset + current_offset ) )
+			corrupted = 1;
+		}
+		chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ] );
+
+		if( chunk_offset->file_offset != (off64_t) ( base_offset + current_offset ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf(
@@ -943,7 +1011,7 @@ int libewf_offset_table_compare(
 
 			mismatch = 1;
 		}
-		else if( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].size != (size_t) chunk_size )
+		else if( chunk_offset->size != (size_t) chunk_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf(
@@ -954,7 +1022,7 @@ int libewf_offset_table_compare(
 
 			mismatch = 1;
 		}
-		else if( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].compressed != compressed )
+		else if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) != compressed )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf(
@@ -969,20 +1037,51 @@ int libewf_offset_table_compare(
 		{
 			mismatch = 0;
 		}
-		if( ( mismatch == 1 )
-		 && ( correct_errors != 0 ) )
-		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
-			 "%s: correcting chunk offset: %" PRIu32 ".\n",
-			 function,
-			 offset_table->last_chunk_offset_compared );
+		if( compressed == 0 )
+		{
+			chunk_type = "uncompressed";
+		}
+		else
+		{
+			chunk_type = "compressed";
+		}
+		if( corrupted != 0 )
+		{
+			remarks = " corrupted";
+		}
+		else if( tainted != 0 )
+		{
+			remarks = " tainted";
+		}
+		else if( mismatch == 1 )
+		{
+			remarks = " corrected";
+		}
+		else
+		{
+			remarks = "";
+		}
+		notify_verbose_printf(
+		 "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 "%s.\n",
+		 function,
+		 chunk_type,
+		 offset_table->last_chunk_offset_compared + 1,
+		 base_offset,
+		 current_offset,
+		 chunk_size,
+		 remarks );
 #endif
 
-			offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].segment_file_handle = segment_file_handle;
-			offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset         = (off64_t) ( base_offset + current_offset );
-			offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].size                = (size_t) chunk_size;
-			offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].compressed          = compressed;
+		if( ( corrupted == 0 )
+		 && ( tainted == 0 )
+		 && ( mismatch == 1 ) )
+		{
+			chunk_offset->segment_file_handle = segment_file_handle;
+			chunk_offset->file_offset         = (off64_t) ( base_offset + current_offset );
+			chunk_offset->size                = (size_t) chunk_size;
+			chunk_offset->flags              |= compressed;
+			chunk_offset->flags              &= ~ ( LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED | LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED ) ;
 		}
 		offset_table->last_chunk_offset_compared++;
 
@@ -1017,25 +1116,11 @@ int libewf_offset_table_compare(
 	{
 		current_offset = raw_offset;
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( compressed == 0 )
-	{
-		chunk_type = "uncompressed";
-	}
-	else
-	{
-		chunk_type = "compressed";
-	}
-	notify_verbose_printf(
-	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 ".\n",
-	 function,
-	 chunk_type,
-	 ( offset_table->last_chunk_offset_compared + 1 ),
-	 base_offset,
-	 current_offset );
-#endif
+	corrupted = 0;
 
-	if( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset != (off64_t) ( base_offset + current_offset ) )
+	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ] );
+
+	if( chunk_offset->file_offset != (off64_t) ( base_offset + current_offset ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf(
@@ -1046,7 +1131,7 @@ int libewf_offset_table_compare(
 
 		mismatch = 1;
 	}
-	else if( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].compressed != compressed )
+	else if( ( chunk_offset->flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) != compressed )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf(
@@ -1061,19 +1146,49 @@ int libewf_offset_table_compare(
 	{
 		mismatch = 0;
 	}
-	if( ( mismatch == 1 )
-	 && ( correct_errors != 0 ) )
-	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
-		 "%s: correcting chunk offset: %" PRIu32 ".\n",
-		 function,
-		 offset_table->last_chunk_offset_compared );
+	if( compressed == 0 )
+	{
+		chunk_type = "uncompressed";
+	}
+	else
+	{
+		chunk_type = "compressed";
+	}
+	if( corrupted != 0 )
+	{
+		remarks = " corrupted";
+	}
+	else if( tainted != 0 )
+	{
+		remarks = " tainted";
+	}
+	else if( mismatch == 1 )
+	{
+		remarks = " corrected";
+	}
+	else
+	{
+		remarks = "";
+	}
+	notify_verbose_printf(
+	 "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 "%s.\n",
+	 function,
+	 chunk_type,
+	 offset_table->last_chunk_offset_compared + 1,
+	 base_offset,
+	 current_offset,
+	 remarks );
 #endif
 
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].segment_file_handle = segment_file_handle;
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset         = (off64_t) ( base_offset + current_offset );
-		offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].compressed          = compressed;
+	if( ( corrupted == 0 )
+	 && ( tainted == 0 )
+	 && ( mismatch == 1 ) )
+	{
+		chunk_offset->segment_file_handle = segment_file_handle;
+		chunk_offset->file_offset         = (off64_t) ( base_offset + current_offset );
+		chunk_offset->flags              |= compressed;
+		chunk_offset->flags              &= ~ ( LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED | LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED ) ;
 	}
 	return( 1 );
 }
@@ -1084,14 +1199,20 @@ int libewf_offset_table_compare(
 int libewf_offset_table_compare_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
-     uint8_t correct_errors,
+     uint8_t tainted,
      libewf_error_t **error )
 {
+#if defined( HAVE_VERBOSE_OUTPUT )
+	char *remarks                                     = NULL;
+#endif
+
+	libewf_chunk_offset_t *chunk_offset               = NULL;
 	libewf_list_element_t *list_element               = NULL;
 	libewf_section_list_values_t *section_list_values = NULL;
 	static char *function                             = "libewf_offset_table_fill_last_offset";
 	off64_t last_offset                               = 0;
 	off64_t chunk_size                                = 0;
+	uint8_t corrupted                                 = 0;
 	uint8_t mismatch                                  = 0;
 
 	if( offset_table == NULL )
@@ -1132,7 +1253,8 @@ int libewf_offset_table_compare_last_offset(
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
 	list_element = section_list->first;
-	last_offset  = offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].file_offset;
+	chunk_offset = &( offset_table->chunk_offset[ offset_table->last_chunk_offset_filled ] );
+	last_offset  = chunk_offset->file_offset;
 
 	while( list_element != NULL )
 	{
@@ -1175,36 +1297,21 @@ int libewf_offset_table_compare_last_offset(
 			}
 			if( chunk_size == 0 )
 			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_INVALID_DATA,
+				notify_verbose_printf(
 				 "%s: invalid chunk size - size is zero.\n",
 				 function );
 
-				return( -1 );
+				corrupted = 1;
 			}
 			if( chunk_size > (off64_t) INT32_MAX )
 			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_INVALID_DATA,
+				notify_verbose_printf(
 				 "%s: invalid chunk size value exceeds maximum.\n",
 				 function );
 
-				return( -1 );
+				corrupted = 1;
 			}
-#if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
-			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu ".\n",
-			 function,
-			 ( offset_table->last_chunk_offset_compared + 1 ),
-			 last_offset,
-			 (size_t) chunk_size );
-#endif
-
-			if( offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].size != (size_t) chunk_size )
+			if( chunk_offset->size != (size_t) chunk_size )
 			{
 #if defined( HAVE_VERBOSE_OUTPUT )
 				notify_verbose_printf(
@@ -1219,17 +1326,38 @@ int libewf_offset_table_compare_last_offset(
 			{
 				mismatch = 0;
 			}
-			if( ( mismatch == 1 )
-			 && ( correct_errors != 0 ) )
-			{
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf(
-				 "%s: correcting chunk offset: %" PRIu32 ".\n",
-				 function,
-				 offset_table->last_chunk_offset_compared );
+			if( corrupted != 0 )
+			{
+				remarks = " corrupted";
+			}
+			else if( tainted != 0 )
+			{
+				remarks = " tainted";
+			}
+			else if( mismatch == 1 )
+			{
+				remarks = " corrected";
+			}
+			else
+			{
+				remarks = "";
+			}
+			notify_verbose_printf(
+			 "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu "%s.\n",
+			 function,
+			 offset_table->last_chunk_offset_compared + 1,
+			 last_offset,
+			 (size_t) chunk_size,
+			 remarks );
 #endif
 
-				offset_table->chunk_offset[ offset_table->last_chunk_offset_compared ].size = (size_t) chunk_size;
+			if( ( corrupted == 0 )
+			 && ( tainted == 0 )
+			 && ( mismatch == 1 ) )
+			{
+				chunk_offset->size   = (size_t) chunk_size;
+				chunk_offset->flags &= ~ ( LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED | LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED ) ;
 			}
 			break;
 		}

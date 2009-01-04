@@ -2083,361 +2083,7 @@ ssize_t libewf_section_table_read(
 	ssize_t read_count          = 0;
 	uint64_t base_offset        = 0;
 	uint32_t amount_of_chunks   = 0;
-
-	if( segment_file_handle == NULL )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( section_size > (size_t) SSIZE_MAX )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid section size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Allocate the necessary amount of chunk offsets
-	 * this reduces the amount of reallocations
-	 */
-	if( ( offset_table->amount_of_chunk_offsets < media_amount_of_chunks )
-	 && ( libewf_offset_table_resize(
-	       offset_table,
-	       media_amount_of_chunks,
-	       error ) != 1 ) )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	section_read_count = libewf_file_io_pool_read(
-	                      file_io_pool,
-	                      segment_file_handle->file_io_pool_entry,
-	                      (uint8_t *) &table,
-	                      sizeof( ewf_table_t ),
-	                      error );
-	
-	if( section_read_count != (ssize_t) sizeof( ewf_table_t ) )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_IO,
-		 LIBEWF_IO_ERROR_READ_FAILED,
-		 "%s: unable to read table.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* The table size contains the size of the CRC (4 bytes)
-	 */
-	calculated_crc = ewf_crc_calculate(
-	                  &table,
-	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
-	                  1 );
-
-	endian_little_convert_32bit(
-	 stored_crc,
-	 table.crc );
-
-	if( stored_crc != calculated_crc )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_INPUT,
-		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
-		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
-		 function,
-		 stored_crc,
-		 calculated_crc );
-
-		/* TODO error_tollerance */
-
-		return( -1 );
-	}
-	endian_little_convert_32bit(
-	 amount_of_chunks,
-	 table.amount_of_chunks );
-
-	endian_little_convert_64bit(
-	 base_offset,
-	 table.base_offset );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
-	 table.padding1,
-	 4 );
-	notify_dump_data(
-	 table.padding2,
-	 4 );
-#endif
-#if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
-	 function,
-	 amount_of_chunks,
-	 stored_crc,
-	 calculated_crc );
-#endif
-
-	if( amount_of_chunks > 0 )
-	{
-		/* Check if the maximum amount of offsets is not exceeded
-		 */
-		if( amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
-		{
-			notify_verbose_printf(
-			 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
-			 function,
-			 amount_of_chunks,
-			 EWF_MAXIMUM_OFFSETS_IN_TABLE );
-		}
-		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
-
-		if( offsets_size > (size_t) SSIZE_MAX )
-		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid offsets size value exceeds maximum.\n",
-			 function );
-
-			return( -1 );
-		}
-		offsets = (ewf_table_offset_t *) memory_allocate(
-		                                  offsets_size );
-
-		if( offsets == NULL )
-		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_MEMORY,
-			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to allocated table offsets.\n",
-			 function );
-
-			return( -1 );
-		}
-		read_count = libewf_file_io_pool_read(
-		              file_io_pool,
-		              segment_file_handle->file_io_pool_entry,
-		              (uint8_t *) offsets,
-		              offsets_size,
-		              error );
-	
-		if( read_count != (ssize_t) offsets_size )
-		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_IO,
-			 LIBEWF_IO_ERROR_READ_FAILED,
-			 "%s: unable to read table offsets.\n",
-			 function );
-
-			memory_free(
-			 offsets );
-
-			return( -1 );
-		}
-		section_read_count += read_count;
-
-		/* The EWF-S01 format does not contain a CRC after the offsets
-		 */
-		if( ewf_format != EWF_FORMAT_S01 )
-		{
-			/* Check if the offset table CRC matches
-			 */
-			calculated_crc = ewf_crc_calculate(
-			                  offsets,
-			                  offsets_size,
-			                  1 );
-
-			read_count = libewf_file_io_pool_read(
-			              file_io_pool,
-			              segment_file_handle->file_io_pool_entry,
-			              stored_crc_buffer,
-			              sizeof( ewf_crc_t ),
-			              error );
-
-			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
-			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_IO,
-				 LIBEWF_IO_ERROR_READ_FAILED,
-				 "%s: unable to read CRC from file descriptor.\n",
-				 function );
-
-				memory_free(
-				 offsets );
-
-				return( -1 );
-			}
-			section_read_count += read_count;
-
-			endian_little_convert_32bit(
-			 stored_crc,
-			 stored_crc_buffer );
-
-			if( stored_crc != calculated_crc )
-			{
-				libewf_error_set(
-				 error,
-				 LIBEWF_ERROR_DOMAIN_INPUT,
-				 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
-				 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
-				 function,
-				 stored_crc,
-				 calculated_crc );
-
-				/* TODO error_tollerance */
-
-				return( -1 );
-			}
-		}
-		if( libewf_offset_table_fill(
-		     offset_table,
-		     (off64_t) base_offset,
-		     offsets,
-		     amount_of_chunks,
-		     segment_file_handle,
-		     error ) != 1 )
-		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to fill offset table.\n",
-			 function );
-
-			memory_free(
-			 offsets );
-
-			return( -1 );
-		}
-		memory_free(
-		 offsets );
-
-		if( libewf_offset_table_fill_last_offset(
-		     offset_table,
-		     segment_file_handle->section_list,
-		     error ) != 1 )
-		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to fill last offset.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		notify_verbose_printf(
-		 "%s: table contains no offsets.\n",
-		 function );
-
-		/* TODO error_tollerance
-		 * mark all offset that should be in the table with an error flag?
-		 * how do you now which offsets should be in the table?
-		 */
-	}
-	if( section_size < (size_t) section_read_count )
-	{
-		notify_verbose_printf(
-		 "%s: section size: %" PRIzd " smaller than section read count: %" PRIzd ".\n",
-		 function,
-		 section_size,
-		 section_read_count );
-	}
-	/* Skip the chunk data within the section
-	 * for chunks after the table section
-	 */
-	if( section_size != (size_t) section_read_count )
-	{
-		if( ( ewf_format != EWF_FORMAT_S01 )
-		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
-		{
-			notify_verbose_printf(
-			 "%s: unexpected data found after table offsets.\n",
-			 function );
-		}
-		if( libewf_file_io_pool_seek_offset(
-		     file_io_pool,
-		     segment_file_handle->file_io_pool_entry,
-		     section_size - section_read_count,
-		     SEEK_CUR,
-		     error ) == -1 )
-		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_IO,
-			 LIBEWF_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to align with next section.\n",
-			 function );
-
-			return( -1 );
-		}
-		section_read_count = (ssize_t) section_size;
-	}
-	segment_file_handle->amount_of_chunks += amount_of_chunks;
-
-	return( section_read_count );
-}
-
-/* Reads a table2 section from file
- * Returns the amount of bytes read or -1 on error
- */
-ssize_t libewf_section_table2_read(
-         libewf_file_io_pool_t *file_io_pool,
-         libewf_segment_file_handle_t *segment_file_handle,
-         size_t section_size,
-         uint32_t media_amount_of_chunks,
-         libewf_offset_table_t *offset_table,
-         uint8_t format,
-         uint8_t ewf_format,
-         libewf_error_t **error )
-{
-	ewf_table_t table;
-	uint8_t stored_crc_buffer[ 4 ];
-
-	ewf_table_offset_t *offsets   = NULL;
-	static char *function         = "libewf_section_table2_read";
-	ewf_crc_t calculated_crc      = 0;
-	ewf_crc_t stored_crc          = 0;
-	size_t offsets_size           = 0;
-	ssize_t section_read_count    = 0;
-	ssize_t read_count            = 0;
-	uint64_t base_offset          = 0;
-	uint32_t amount_of_chunks     = 0;
-	uint8_t correct_offset_errors = 1;
+	uint8_t offsets_tainted     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2667,9 +2313,363 @@ ssize_t libewf_section_table2_read(
 				 stored_crc,
 				 calculated_crc );
 
-				/* The offset cannot be trusted therefore do not try to correct them during compare
+				/* The offsets cannot be fully trusted therefore mark them as tainted during fill 
 				 */
-				correct_offset_errors = 0;
+				offsets_tainted = 1;
+			}
+		}
+		if( libewf_offset_table_fill(
+		     offset_table,
+		     (off64_t) base_offset,
+		     offsets,
+		     amount_of_chunks,
+		     segment_file_handle,
+		     offsets_tainted,
+		     error ) != 1 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to fill offset table.\n",
+			 function );
+
+			memory_free(
+			 offsets );
+
+			return( -1 );
+		}
+		memory_free(
+		 offsets );
+
+		if( libewf_offset_table_fill_last_offset(
+		     offset_table,
+		     segment_file_handle->section_list,
+		     offsets_tainted,
+		     error ) != 1 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to fill last offset.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		notify_verbose_printf(
+		 "%s: table contains no offsets.\n",
+		 function );
+
+		/* TODO error_tollerance
+		 * mark all offset that should be in the table with an error flag?
+		 * how do you now which offsets should be in the table?
+		 */
+	}
+	if( section_size < (size_t) section_read_count )
+	{
+		notify_verbose_printf(
+		 "%s: section size: %" PRIzd " smaller than section read count: %" PRIzd ".\n",
+		 function,
+		 section_size,
+		 section_read_count );
+	}
+	/* Skip the chunk data within the section
+	 * for chunks after the table section
+	 */
+	if( section_size != (size_t) section_read_count )
+	{
+		if( ( ewf_format != EWF_FORMAT_S01 )
+		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
+		{
+			notify_verbose_printf(
+			 "%s: unexpected data found after table offsets.\n",
+			 function );
+		}
+		if( libewf_file_io_pool_seek_offset(
+		     file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     section_size - section_read_count,
+		     SEEK_CUR,
+		     error ) == -1 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to align with next section.\n",
+			 function );
+
+			return( -1 );
+		}
+		section_read_count = (ssize_t) section_size;
+	}
+	segment_file_handle->amount_of_chunks += amount_of_chunks;
+
+	return( section_read_count );
+}
+
+/* Reads a table2 section from file
+ * Returns the amount of bytes read or -1 on error
+ */
+ssize_t libewf_section_table2_read(
+         libewf_file_io_pool_t *file_io_pool,
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         uint32_t media_amount_of_chunks,
+         libewf_offset_table_t *offset_table,
+         uint8_t format,
+         uint8_t ewf_format,
+         libewf_error_t **error )
+{
+	ewf_table_t table;
+	uint8_t stored_crc_buffer[ 4 ];
+
+	ewf_table_offset_t *offsets = NULL;
+	static char *function       = "libewf_section_table2_read";
+	ewf_crc_t calculated_crc    = 0;
+	ewf_crc_t stored_crc        = 0;
+	size_t offsets_size         = 0;
+	ssize_t section_read_count  = 0;
+	ssize_t read_count          = 0;
+	uint64_t base_offset        = 0;
+	uint32_t amount_of_chunks   = 0;
+	uint8_t offsets_tainted     = 0;
+
+	if( segment_file_handle == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_size > (size_t) SSIZE_MAX )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Allocate the necessary amount of chunk offsets
+	 * this reduces the amount of reallocations
+	 */
+	if( ( offset_table->amount_of_chunk_offsets < media_amount_of_chunks )
+	 && ( libewf_offset_table_resize(
+	       offset_table,
+	       media_amount_of_chunks,
+	       error ) != 1 ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
+		 "%s: unable to resize offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_read_count = libewf_file_io_pool_read(
+	                      file_io_pool,
+	                      segment_file_handle->file_io_pool_entry,
+	                      (uint8_t *) &table,
+	                      sizeof( ewf_table_t ),
+	                      error );
+	
+	if( section_read_count != (ssize_t) sizeof( ewf_table_t ) )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_IO,
+		 LIBEWF_IO_ERROR_READ_FAILED,
+		 "%s: unable to read table.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* The table size contains the size of the CRC (4 bytes)
+	 */
+	calculated_crc = ewf_crc_calculate(
+	                  &table,
+	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
+
+	endian_little_convert_32bit(
+	 stored_crc,
+	 table.crc );
+
+	if( stored_crc != calculated_crc )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_INPUT,
+		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
+		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+		 function,
+		 stored_crc,
+		 calculated_crc );
+
+		/* TODO error_tollerance */
+
+		return( -1 );
+	}
+	endian_little_convert_32bit(
+	 amount_of_chunks,
+	 table.amount_of_chunks );
+
+	endian_little_convert_64bit(
+	 base_offset,
+	 table.base_offset );
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	notify_dump_data(
+	 table.padding1,
+	 4 );
+	notify_dump_data(
+	 table.padding2,
+	 4 );
+#endif
+#if defined( HAVE_VERBOSE_OUTPUT )
+	notify_verbose_printf(
+	 "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
+	 function,
+	 amount_of_chunks,
+	 stored_crc,
+	 calculated_crc );
+#endif
+
+	if( amount_of_chunks > 0 )
+	{
+		/* Check if the maximum amount of offsets is not exceeded
+		 */
+		if( amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
+		{
+			notify_verbose_printf(
+			 "%s: table contains more offsets: %" PRIu32 " than the maximum amount: %d.\n",
+			 function,
+			 amount_of_chunks,
+			 EWF_MAXIMUM_OFFSETS_IN_TABLE );
+		}
+		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
+
+		if( offsets_size > (size_t) SSIZE_MAX )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid offsets size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		offsets = (ewf_table_offset_t *) memory_allocate(
+		                                  offsets_size );
+
+		if( offsets == NULL )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to allocated table offsets.\n",
+			 function );
+
+			return( -1 );
+		}
+		read_count = libewf_file_io_pool_read(
+		              file_io_pool,
+		              segment_file_handle->file_io_pool_entry,
+		              (uint8_t *) offsets,
+		              offsets_size,
+		              error );
+	
+		if( read_count != (ssize_t) offsets_size )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_IO,
+			 LIBEWF_IO_ERROR_READ_FAILED,
+			 "%s: unable to read table offsets.\n",
+			 function );
+
+			memory_free(
+			 offsets );
+
+			return( -1 );
+		}
+		section_read_count += read_count;
+
+		/* The EWF-S01 format does not contain a CRC after the offsets
+		 */
+		if( ewf_format != EWF_FORMAT_S01 )
+		{
+			/* Check if the offset table CRC matches
+			 */
+			calculated_crc = ewf_crc_calculate(
+			                  offsets,
+			                  offsets_size,
+			                  1 );
+
+			read_count = libewf_file_io_pool_read(
+			              file_io_pool,
+			              segment_file_handle->file_io_pool_entry,
+			              stored_crc_buffer,
+			              sizeof( ewf_crc_t ),
+			              error );
+
+			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
+			{
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_IO,
+				 LIBEWF_IO_ERROR_READ_FAILED,
+				 "%s: unable to read CRC from file descriptor.\n",
+				 function );
+
+				memory_free(
+				 offsets );
+
+				return( -1 );
+			}
+			section_read_count += read_count;
+
+			endian_little_convert_32bit(
+			 stored_crc,
+			 stored_crc_buffer );
+
+			if( stored_crc != calculated_crc )
+			{
+				notify_verbose_printf(
+				 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+				 function,
+				 stored_crc,
+				 calculated_crc );
+
+				/* The offsets cannot be trusted therefore do not try to correct corrupted offsets during compare
+				 */
+				offsets_tainted = 1;
 			}
 		}
 		if( libewf_offset_table_compare(
@@ -2678,7 +2678,7 @@ ssize_t libewf_section_table2_read(
 		     offsets,
 		     amount_of_chunks,
 		     segment_file_handle,
-		     correct_offset_errors,
+		     offsets_tainted,
 		     error ) != 1 )
 		{
 			libewf_error_set(
@@ -2699,7 +2699,7 @@ ssize_t libewf_section_table2_read(
 		if( libewf_offset_table_compare_last_offset(
 		     offset_table,
 		     segment_file_handle->section_list,
-		     correct_offset_errors,
+		     offsets_tainted,
 		     error ) != 1 )
 		{
 			libewf_error_set(
@@ -5844,7 +5844,7 @@ ssize_t libewf_section_delta_chunk_read(
 	}
 	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
-	offset_table->chunk_offset[ chunk ].compressed          = 0;
+	offset_table->chunk_offset[ chunk ].flags               = 0;
 
 	/* Skip the chunk data within the section
 	 */

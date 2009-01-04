@@ -148,14 +148,10 @@ check TODO
 * have segment file number in libewf_raw_read_chunk for warning output?
 
 * add export unattended to automated tests
-* create floppy-table-errors.E01 for testing purpose
-  - error in primary offset table
-  - error in secondary offset table
+
 * improve offset table correction
-  - add error flag
-  - flag invalid values and try to correct them in the compare
-  - if not correctable skip chunk while reading? and mark as crc error or try
-  to determine offset/size of chunk somehow
+  - if not correctable skip chunk while reading and mark as crc error
+    or try to determine offset/size of chunk somehow
 
 * make compilation resilient for missing crypto library
   - compile on system without libcrypto
@@ -207,6 +203,8 @@ Version: 20080912
   able to compensate or certain a value is valid
 * fixed issue regarding write finalize did not set data sections correctly
   for streamed writes due to data section cache
+* changed chunk offset compressed value to flags to also contain corrupted
+* worked on improved method of handling corrupted offset tables
 
 Version: 20080911
 * worked on improved error handling

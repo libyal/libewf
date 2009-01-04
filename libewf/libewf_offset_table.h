@@ -80,11 +80,13 @@ int libewf_offset_table_fill(
      ewf_table_offset_t *offsets,
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t tainted,
      libewf_error_t **error );
 
 int libewf_offset_table_fill_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
+     uint8_t tainted,
      libewf_error_t **error );
 
 int libewf_offset_table_fill_offsets(
@@ -102,13 +104,13 @@ int libewf_offset_table_compare(
      ewf_table_offset_t *offsets,
      uint32_t amount_of_chunks,
      libewf_segment_file_handle_t *segment_file_handle,
-     uint8_t correct_errors,
+     uint8_t tainted,
      libewf_error_t **error );
 
 int libewf_offset_table_compare_last_offset(
      libewf_offset_table_t *offset_table,
      libewf_list_t *section_list,
-     uint8_t correct_errors,
+     uint8_t tainted,
      libewf_error_t **error );
 
 off64_t libewf_offset_table_seek_chunk_offset(

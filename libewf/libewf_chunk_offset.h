@@ -34,6 +34,10 @@
 extern "C" {
 #endif
 
+#define LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED	0x01
+#define LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED 	0x02
+#define LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED 	0x04
+
 typedef struct libewf_chunk_offset libewf_chunk_offset_t;
 
 struct libewf_chunk_offset
@@ -50,9 +54,12 @@ struct libewf_chunk_offset
 	 */
 	size_t size;
 
-	/* Value to indicate if the chunk is compressed
+	/* Flags
+	 * 0x01 indicates if the chunk is compressed
+	 * 0x02 indicates if the chunk is tainted and possibly corrupted
+	 * 0x04 indicates if the chunk is corrupted
 	 */
-	uint8_t compressed;
+	uint8_t flags;
 };
 
 #if defined( __cplusplus )
