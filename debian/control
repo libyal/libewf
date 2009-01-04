@@ -18,7 +18,7 @@ Description: Library and tools to support the Expert Witness Compression Format
 Package: libewf-dev
 Section: libdevel
 Architecture: any
-Depends: libewf (= ${Source-Version}), ${shlibs:Depends}
+Depends: libewf (= ${Source-Version})
 Description: Header files and libraries for developing applications for libewf
  Header files and libraries for developing applications for libewf.
 
@@ -28,4 +28,5 @@ Architecture: any
 Depends: libewf (= ${Source-Version}), ${shlibs:Depends}
 Description: Several tools for reading and writing EWF files
  Several tools for reading and writing EWF files.
+ It contains tools to acquire, verify and export EWF files.
 

@@ -103,9 +103,9 @@ binary-arch: build install
 	dh_fixperms
 #	dh_perl
 #	dh_python
-	dh_makeshlibs
+	dh_makeshlibs -V
 	dh_installdeb
-	dh_shlibdeps
+	dh_shlibdeps -L libewf -l debian/libewf/usr/lib
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
