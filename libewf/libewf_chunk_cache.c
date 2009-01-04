@@ -26,26 +26,36 @@
 #include <types.h>
 
 #include "libewf_chunk_cache.h"
+#include "libewf_error.h"
 
 /* Initialize the chunk cache
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_cache_initialize(
      libewf_chunk_cache_t **chunk_cache,
-     size_t size )
+     size_t size,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_chunk_cache_initialize";
 
 	if( chunk_cache == NULL )
 	{
-		notify_warning_printf( "%s: invalid chunk cache.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid chunk cache.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -57,7 +67,11 @@ int libewf_chunk_cache_initialize(
 
 		if( *chunk_cache == NULL )
 		{
-			notify_warning_printf( "%s: unable to create chunk cache.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create chunk cache.\n",
 			 function );
 
 			return( -1 );
@@ -67,7 +81,11 @@ int libewf_chunk_cache_initialize(
 		     0,
 		     sizeof( libewf_chunk_cache_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear chunk cache.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear chunk cache.\n",
 			 function );
 
 			memory_free(
@@ -82,7 +100,11 @@ int libewf_chunk_cache_initialize(
 
 		if( ( *chunk_cache )->compressed == NULL )
 		{
-			notify_warning_printf( "%s: unable to create chunk cache compressed.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create chunk cache compressed.\n",
 			 function );
 
 			memory_free(
@@ -97,7 +119,11 @@ int libewf_chunk_cache_initialize(
 
 		if( ( *chunk_cache )->data == NULL )
 		{
-			notify_warning_printf( "%s: unable to create chunk cache data.\n",
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create chunk cache data.\n",
 			 function );
 
 			memory_free(
@@ -118,13 +144,18 @@ int libewf_chunk_cache_initialize(
  * Returns 1 if successful or -1 on error
  */
 int libewf_chunk_cache_free(
-     libewf_chunk_cache_t **chunk_cache )
+     libewf_chunk_cache_t **chunk_cache,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_chunk_cache_free";
 
 	if( chunk_cache == NULL )
 	{
-		notify_warning_printf( "%s: invalid chunk cache.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -154,62 +185,74 @@ int libewf_chunk_cache_free(
  */
 int libewf_chunk_cache_resize(
      libewf_chunk_cache_t *chunk_cache,
-     size_t size )
+     size_t size,
+     libewf_error_t **error )
 {
 	static char *function = "libewf_chunk_cache_resize";
 	void *reallocation    = NULL;
 
 	if( chunk_cache == NULL )
 	{
-		notify_warning_printf( "%s: invalid chunk cache.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID,
+		 "%s: invalid chunk cache.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( size <= chunk_cache->allocated_size )
+	if( size > chunk_cache->allocated_size )
 	{
-		notify_warning_printf( "%s: new size must be greater than previous size.\n",
-		 function );
+		reallocation = memory_reallocate(
+				chunk_cache->compressed,
+				sizeof( uint8_t ) * size );
 
-		return( -1 );
+		if( reallocation == NULL )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to resize chunk cache compressed.\n",
+			 function );
+
+			return( -1 );
+		}
+		chunk_cache->compressed = (uint8_t *) reallocation;
+		reallocation            = memory_reallocate(
+					   chunk_cache->data,
+					   sizeof( uint8_t ) * size );
+
+		if( reallocation == NULL )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to resize chunk cache data.\n",
+			 function );
+
+			return( -1 );
+		}
+		chunk_cache->data           = (uint8_t *) reallocation;
+		chunk_cache->allocated_size = size;
+		chunk_cache->chunk          = 0;
+		chunk_cache->amount         = 0;
+		chunk_cache->offset         = 0;
+		chunk_cache->cached         = 0;
 	}
-	reallocation = memory_reallocate(
-	                chunk_cache->compressed,
-	                sizeof( uint8_t) * size );
-
-	if( reallocation == NULL )
-	{
-		notify_warning_printf( "%s: unable to resize chunk cache compressed.\n",
-		 function );
-
-		return( -1 );
-	}
-	chunk_cache->compressed = (uint8_t *) reallocation;
-	reallocation            = memory_reallocate(
-	                           chunk_cache->data,
-	                           sizeof( uint8_t) * size );
-
-	if( reallocation == NULL )
-	{
-		notify_warning_printf( "%s: unable to resize chunk cache data.\n",
-		 function );
-
-		return( -1 );
-	}
-	chunk_cache->data           = (uint8_t *) reallocation;
-	chunk_cache->allocated_size = size;
-	chunk_cache->chunk          = 0;
-	chunk_cache->amount         = 0;
-	chunk_cache->offset         = 0;
-	chunk_cache->cached         = 0;
-
 	return( 1 );
 }
 

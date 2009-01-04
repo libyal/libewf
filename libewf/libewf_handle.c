@@ -186,7 +186,8 @@ int libewf_handle_initialize(
 		}
 		if( libewf_chunk_cache_initialize(
 		     &( internal_handle->chunk_cache ),
-		     EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ) ) != 1 )
+		     EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -221,7 +222,8 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ) );
+			 &( internal_handle->chunk_cache ),
+			 NULL );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -250,7 +252,8 @@ int libewf_handle_initialize(
 			libewf_media_values_free(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ) );
+			 &( internal_handle->chunk_cache ),
+			 NULL );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -281,7 +284,8 @@ int libewf_handle_initialize(
 			libewf_media_values_free(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ) );
+			 &( internal_handle->chunk_cache ),
+			 NULL );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -315,7 +319,8 @@ int libewf_handle_initialize(
 			libewf_media_values_free(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ) );
+			 &( internal_handle->chunk_cache ),
+			 NULL );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -351,7 +356,8 @@ int libewf_handle_initialize(
 			libewf_media_values_free(
 			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
-			 &( internal_handle->chunk_cache ) );
+			 &( internal_handle->chunk_cache ),
+			 NULL );
 			libewf_offset_table_free(
 			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
@@ -391,7 +397,8 @@ int libewf_handle_initialize(
 				libewf_media_values_free(
 				 &( internal_handle->media_values ) );
 				libewf_chunk_cache_free(
-				 &( internal_handle->chunk_cache ) );
+				 &( internal_handle->chunk_cache ),
+				 NULL );
 				libewf_offset_table_free(
 				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
@@ -435,7 +442,8 @@ int libewf_handle_initialize(
 				libewf_media_values_free(
 				 &( internal_handle->media_values ) );
 				libewf_chunk_cache_free(
-				 &( internal_handle->chunk_cache ) );
+				 &( internal_handle->chunk_cache ),
+				 NULL );
 				libewf_offset_table_free(
 				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
@@ -547,7 +555,8 @@ int libewf_handle_free(
 			 function );
 		}
 		if( libewf_chunk_cache_free(
-		     &( internal_handle->chunk_cache ) ) != 1 )
+		     &( internal_handle->chunk_cache ),
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,

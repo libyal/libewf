@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_error.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -65,14 +67,17 @@ struct libewf_chunk_cache
 
 int libewf_chunk_cache_initialize(
      libewf_chunk_cache_t **chunk_cache,
-     size_t size );
+     size_t size,
+     libewf_error_t **error );
 
 int libewf_chunk_cache_free(
-     libewf_chunk_cache_t **chunk_cache );
+     libewf_chunk_cache_t **chunk_cache,
+     libewf_error_t **error );
 
 int libewf_chunk_cache_resize(
      libewf_chunk_cache_t *chunk_cache,
-     size_t size );
+     size_t size,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

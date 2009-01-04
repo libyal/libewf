@@ -605,7 +605,8 @@ ssize_t libewf_read_chunk_data(
 
 			if( libewf_chunk_cache_resize(
 			     internal_handle->chunk_cache,
-			     chunk_data_size ) != 1 )
+			     chunk_data_size,
+			     error ) != 1 )
 			{
 				libewf_error_set(
 				 error,
@@ -1164,7 +1165,8 @@ ssize_t libewf_read_buffer(
 
 		if( libewf_chunk_cache_resize(
 		     internal_handle->chunk_cache,
-		     chunk_data_size ) != 1 )
+		     chunk_data_size,
+		     &error ) != 1 )
 		{
 			libewf_error_set(
 			 &error,
