@@ -85,11 +85,11 @@ typedef __int64			off64_t;
 #error Missing integer type definitions (inttypes.h, stdint.h)
 #endif
 
-#if 1 || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if 0 || defined( HAVE_WIDE_CHARACTER_TYPE )
 
 #define LIBEWF_WIDE_CHARACTER_TYPE	1
 
-#if 1 || defined( HAVE_WCHAR_H )
+#if 0 || defined( HAVE_WCHAR_H )
 
 /* __USE_UNIX98 is required to add swprintf definition
  */

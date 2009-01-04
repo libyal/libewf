@@ -550,7 +550,7 @@ ssize32_t ewfcommon_read_input(
 	}
 	if( libewf_get_write_amount_of_chunks(
 	     handle,
-	      &chunk_amount ) != 1 )
+	     &chunk_amount ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine amount of chunks written.\n",
 		 function );

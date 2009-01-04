@@ -1695,7 +1695,7 @@ int libewf_header_values_generate_header_string_type1(
 #else
 	print_count = libewf_string_snprintf(
 	               *header_string,
-	               *string_length,
+	               *header_string_length,
 	               _S_LIBEWF_CHAR( "%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s" ),
 	               header_string_head,
 	               case_number,

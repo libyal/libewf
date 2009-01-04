@@ -2373,7 +2373,8 @@ ssize_t libewf_section_ltree_read(
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, ltree_data, ltree_data_size ); );
 
-	libewf_common_free( ltree_data );
+	libewf_common_free(
+	 ltree_data );
 
 	return( read_count );
 }

@@ -39,17 +39,21 @@
 #include <windows.h>
 
 #if defined( _MANAGED )
-#pragma managed(push, off)
+#pragma managed( push, off )
 #endif
 
 /* Defines the entry point for the DLL
  */
-BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
+BOOL WINAPI DllMain(
+             HINSTANCE hinstDLL,
+             DWORD fdwReason,
+             LPVOID lpvReserved )
 {
 	switch( fdwReason )
 	{
 		case DLL_PROCESS_ATTACH:
-			DisableThreadLibraryCalls( hinstDLL );
+			DisableThreadLibraryCalls(
+			 hinstDLL );
 		break;
 
 		case DLL_THREAD_ATTACH:

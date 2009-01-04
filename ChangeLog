@@ -87,6 +87,8 @@ Possible performance improvements:
 * optimize empty block test
 * what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
 * optimize string functions
+* remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use
+  local variable instead
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -116,6 +118,7 @@ Next release(s):
   - for write only offset table is not needed etc.
 
 * implement session section
+  - internal storage type
   - write
   - api functions
 
@@ -160,7 +163,7 @@ CLOSED
 Version: 20080301
 * Code clean up
 * Refactored hash and header value functions
-* fixed not writing linen6 header correctly
+* fixed writing incorrect linen6 header
 
 Version: 20080229
 * Code clean up

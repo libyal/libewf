@@ -48,13 +48,31 @@
 extern "C" {
 #endif
 
-void libewf_debug_dump_data( uint8_t *data, size_t size );
+void libewf_debug_dump_data(
+      uint8_t *data,
+      size_t size );
 
-void libewf_debug_section_fprint( FILE *stream, ewf_section_t *section );
-void libewf_debug_header_string_fprint( FILE *stream, libewf_char_t *header_string );
-void libewf_debug_header_fprint( FILE *stream, ewf_char_t *header, size_t size );
-void libewf_debug_header2_fprint( FILE *stream, ewf_char_t *header2, size_t size );
-void libewf_debug_chunk_fprint( FILE *stream, ewf_char_t *chunk );
+void libewf_debug_section_fprint(
+      FILE *stream,
+      ewf_section_t *section );
+
+void libewf_debug_header_string_fprint(
+      FILE *stream,
+      libewf_char_t *header_string );
+
+void libewf_debug_header_fprint(
+      FILE *stream,
+      ewf_char_t *header,
+      size_t size );
+
+void libewf_debug_header2_fprint(
+      FILE *stream,
+      ewf_char_t *header2,
+      size_t size );
+
+void libewf_debug_chunk_fprint(
+      FILE *stream,
+      ewf_char_t *chunk );
 
 #if defined( __cplusplus )
 }

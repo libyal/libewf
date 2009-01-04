@@ -1,5 +1,5 @@
 /*
- * libewf file reading
+ * libewf debug
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -47,7 +47,9 @@
 
 /* Prints a dump of data
  */
-void libewf_debug_dump_data( uint8_t *data, size_t size )
+void libewf_debug_dump_data(
+      uint8_t *data,
+      size_t size )
 {
 	static char *function    = "libewf_debug_dump_data";
 	ewf_crc_t stored_crc     = 0;
@@ -60,11 +62,19 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 		return;
 	}
-	calculated_crc = ewf_crc_calculate( data, ( size - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  data,
+	                  ( size - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	libewf_dump_data( data, size );
+	libewf_dump_data(
+	 data,
+	 size );
 
-	if( libewf_common_memcpy( &stored_crc, &data[ size - sizeof( ewf_crc_t ) ], sizeof( ewf_crc_t ) ) == NULL )
+	if( libewf_common_memcpy(
+	     &stored_crc,
+	     &data[ size - sizeof( ewf_crc_t ) ],
+	     sizeof( ewf_crc_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set CRC.\n",
 		 function );
@@ -78,7 +88,9 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 /* Prints the section data to a stream
  */
-void libewf_debug_section_fprint( FILE *stream, ewf_section_t *section )
+void libewf_debug_section_fprint(
+      FILE *stream,
+      ewf_section_t *section )
 {
 	static char *function    = "libewf_debug_section_fprint";
 	ewf_crc_t calculated_crc = 0;
@@ -105,21 +117,27 @@ void libewf_debug_section_fprint( FILE *stream, ewf_section_t *section )
 	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, section->crc ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &stored_crc,
+	     section->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
 
 		return;
 	}
-	if( libewf_endian_convert_64bit( &next, section->next ) != 1 )
+	if( libewf_endian_convert_64bit(
+	     &next,
+	     section->next ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert next offset value.\n",
 		 function );
 
 		return;
 	}
-	if( libewf_endian_convert_64bit( &size, section->size ) != 1 )
+	if( libewf_endian_convert_64bit(
+	     &size,
+	     section->size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert size value.\n",
 		 function );
@@ -127,16 +145,22 @@ void libewf_debug_section_fprint( FILE *stream, ewf_section_t *section )
 		return;
 	}
 	fprintf( stream, "Section:\n" );
-	fprintf( stream, "type: %s\n", (char *) section->type );
-	fprintf( stream, "next: %" PRIu64 "\n", next );
-	fprintf( stream, "size: %" PRIu64 "\n", size );
-	fprintf( stream, "crc: %" PRIu32 " ( %" PRIu32 " )\n", stored_crc, calculated_crc );
+	fprintf( stream, "type: %s\n",
+	 (char *) section->type );
+	fprintf( stream, "next: %" PRIu64 "\n",
+	 next );
+	fprintf( stream, "size: %" PRIu64 "\n",
+	 size );
+	fprintf( stream, "crc: %" PRIu32 " ( %" PRIu32 " )\n",
+	 stored_crc, calculated_crc );
 	fprintf( stream, "\n" );
 }
 
 /* Prints a header string to a stream
  */
-void libewf_debug_header_string_fprint( FILE *stream, libewf_char_t *header_string )
+void libewf_debug_header_string_fprint(
+      FILE *stream,
+      libewf_char_t *header_string )
 {
 	static char *function = "libewf_debug_header_string_fprint";
 
@@ -154,12 +178,16 @@ void libewf_debug_header_string_fprint( FILE *stream, libewf_char_t *header_stri
 
 		return;
 	}
-	fprintf( stream, "%" PRIs_EWF "", header_string );
+	fprintf( stream, "%" PRIs_EWF "",
+	 header_string );
 }
 
 /* Prints the header data to a stream
  */
-void libewf_debug_header_fprint( FILE *stream, ewf_char_t *header, size_t size )
+void libewf_debug_header_fprint(
+      FILE *stream,
+      ewf_char_t *header,
+      size_t size )
 {
 	libewf_char_t *header_string = NULL;
 	static char *function        = "libewf_debug_header_fprint";
@@ -181,23 +209,33 @@ void libewf_debug_header_fprint( FILE *stream, ewf_char_t *header, size_t size )
 
 		return;
 	}
-	if( libewf_string_copy_from_header( header_string, size, header, size ) != 1 )
+	if( libewf_string_copy_from_header(
+	     header_string,
+	     size,
+	     header, size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to copy header to header string.\n",
 		 function );
 
-		libewf_common_free( header_string );
+		libewf_common_free(
+		 header_string );
 
 		return;
 	}
-	libewf_debug_header_string_fprint( stream, header_string );
+	libewf_debug_header_string_fprint(
+	 stream,
+	 header_string );
 
-	libewf_common_free( header_string );
+	libewf_common_free(
+	 header_string );
 }
 
 /* Prints the header2 data to a stream
  */
-void libewf_debug_header2_fprint( FILE *stream, ewf_char_t *header2, size_t size )
+void libewf_debug_header2_fprint(
+      FILE *stream,
+      ewf_char_t *header2,
+      size_t size )
 {
 	libewf_char_t *header_string = NULL;
 	static char *function        = "libewf_debug_header2_fprint";
@@ -221,23 +259,32 @@ void libewf_debug_header2_fprint( FILE *stream, ewf_char_t *header2, size_t size
 
 		return;
 	}
-	if( libewf_string_copy_from_header2( header_string, header_size, header2, size ) != 1 )
+	if( libewf_string_copy_from_header2(
+	     header_string,
+	     header_size,
+	     header2, size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to copy header2 to header string.\n",
 		 function );
 
-		libewf_common_free( header_string );
+		libewf_common_free(
+		 header_string );
 
 		return;
 	}
-	libewf_debug_header_string_fprint( stream, header_string );
+	libewf_debug_header_string_fprint(
+	 stream,
+	 header_string );
 
-	libewf_common_free( header_string );
+	libewf_common_free(
+	 header_string );
 }
 
 /* Print the chunk data to a stream
  */
-void libewf_debug_chunk_fprint( FILE *stream, ewf_char_t *chunk )
+void libewf_debug_chunk_fprint(
+      FILE *stream,
+      ewf_char_t *chunk )
 {
 	static char *function = "libewf_debug_chunk_fprint";
 
@@ -255,6 +302,7 @@ void libewf_debug_chunk_fprint( FILE *stream, ewf_char_t *chunk )
 
 		return;
 	}
-	fprintf( stream, "%s", (char *) chunk );
+	fprintf( stream, "%s",
+	 (char *) chunk );
 }
 

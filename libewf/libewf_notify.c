@@ -47,7 +47,9 @@ uint8_t libewf_notify_verbose = 0;
 
 /* Set the notify values
  */
-void libewf_notify_set_values( FILE *stream, uint8_t verbose )
+void libewf_notify_set_values(
+      FILE *stream,
+      uint8_t verbose )
 {
 	libewf_notify_stream  = stream;
 	libewf_notify_verbose = verbose;
@@ -60,7 +62,8 @@ void VARARGS( libewf_verbose_print, char *, format )
 #if defined( HAVE_VERBOSE_OUTPUT )
 	va_list argument_list;
 
-	if( ( libewf_notify_stream != NULL ) && ( libewf_notify_verbose != 0 ) )
+	if( ( libewf_notify_stream != NULL )
+	 && ( libewf_notify_verbose != 0 ) )
 	{
 		VASTART( argument_list, char *, format );
 
@@ -77,7 +80,8 @@ void VARARGS( libewf_warning_print, char *, format )
 {
 	va_list argument_list;
 
-	if( ( libewf_notify_stream != NULL ) && ( libewf_notify_verbose != 0 ) )
+	if( ( libewf_notify_stream != NULL )
+	 && ( libewf_notify_verbose != 0 ) )
 	{
 		VASTART( argument_list, char *, format );
 
@@ -106,7 +110,9 @@ void VARARGS( libewf_fatal_print, char *, format )
 
 /* Prints a dump of data
  */
-void libewf_dump_data( uint8_t *data, size_t size )
+void libewf_dump_data(
+      uint8_t *data,
+      size_t size )
 {
 	size_t iterator = 0;
 

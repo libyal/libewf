@@ -58,13 +58,17 @@ extern "C" {
 
 extern uint8_t libewf_notify_verbose;
 
-void libewf_notify_set_values( FILE *stream, uint8_t verbose );
+void libewf_notify_set_values(
+      FILE *stream,
+      uint8_t verbose );
 
 void libewf_verbose_print( char *, ... );
 void libewf_warning_print( char *, ... );
 void libewf_fatal_print( char *, ... );
 
-void libewf_dump_data( uint8_t *data, size_t size );
+void libewf_dump_data(
+      uint8_t *data,
+      size_t size );
 
 #if defined( __cplusplus )
 }
