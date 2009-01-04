@@ -553,6 +553,99 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 	return( (int32_t) buffer_offset );
 }
 
+/* Writes the data an EWF file
+ * using the raw access functions
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t *buffer, size_t buffer_size, size_t write_size )
+{
+	static char *function     = "ewfcommon_raw_write_ewf";
+	uint8_t *raw_write_buffer = NULL;
+	ssize_t raw_write_count   = 0;
+	ssize_t write_count       = 0;
+	uint32_t chunk_crc        = 0;
+	int8_t is_compressed      = 0;
+	int8_t write_crc          = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( raw_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid raw buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( write_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid write size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( write_size > buffer_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid write size value exceeds buffer size.\n",
+		 function );
+
+		return( -1 );
+	}
+	raw_write_count = libewf_raw_write_prepare_buffer(
+			   handle,
+			   (void *) buffer,
+			   write_size,
+			   (void *) raw_buffer,
+			   &raw_buffer_size,
+			   &is_compressed,
+			   &chunk_crc,
+			   &write_crc );
+
+	if( raw_write_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer for raw write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( is_compressed == 0 )
+	{
+		raw_write_buffer = buffer;
+	}
+	else
+	{
+		raw_write_buffer = raw_buffer;
+	}
+	write_count = libewf_raw_write_buffer(
+		       handle,
+		       (void *) raw_write_buffer,
+		       (size_t) raw_write_count,
+		       write_size,
+		       is_compressed,
+		       chunk_crc,
+		       write_crc );
+
+	if( write_count != raw_write_count )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( write_size );
+}
+
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
  * Returns the amount of bytes read if successful, or -1 on error
  */
@@ -667,6 +760,28 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 		return( -1 );
 	}
+#endif
+	if( calculate_md5 == 1 )
+	{
+		if( ewfmd5_initialize( &md5_context ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 digest context.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( calculate_sha1 == 1 )
+	{
+		if( ewfsha1_initialize( &sha1_context ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+#if defined( HAVE_RAW_ACCESS )
 	buffer_size = chunk_size;
 #else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
@@ -696,36 +811,6 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		return( -1 );
 	}
 #endif
-	if( calculate_md5 == 1 )
-	{
-		if( ewfmd5_initialize( &md5_context ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 digest context.\n",
-			 function );
-
-			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
-#endif
-
-			return( -1 );
-		}
-	}
-	if( calculate_sha1 == 1 )
-	{
-		if( ewfsha1_initialize( &sha1_context ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
-			 function );
-
-			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
-#endif
-
-			return( -1 );
-		}
-	}
 
 	while( total_read_count < (ssize64_t) media_size )
 	{
@@ -746,7 +831,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 		if( raw_read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read raw buffer.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
 			 function );
 
 			libewf_common_free( data );
@@ -833,7 +918,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: error reading data.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
 			libewf_common_free( data );
@@ -957,10 +1042,10 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
-	uint8_t *data               = NULL;
+	uint8_t *data_buffer        = NULL;
 	static char *function       = "ewfcommon_write_from_file_descriptor";
 	size32_t chunk_size         = 0;
-	size_t buffer_size          = 0;
+	size_t data_buffer_size     = 0;
 	size_t md5_hash_size        = EWFDIGEST_HASH_SIZE_MD5;
 	size_t sha1_hash_size       = EWFDIGEST_HASH_SIZE_SHA1;
 	ssize64_t total_write_count = 0;
@@ -968,13 +1053,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	ssize32_t read_count        = 0;
 	uint32_t bytes_per_sector   = 0;
 #if defined( HAVE_RAW_ACCESS )
-	uint8_t *compressed_data    = NULL;
-	uint8_t *raw_write_data     = NULL;
-	size_t compressed_size      = 0;
-	ssize_t raw_write_count     = 0;
-	uint32_t chunk_crc          = 0;
-	int8_t is_compressed        = 0;
-	int8_t write_crc            = 0;
+	uint8_t *raw_data_buffer    = NULL;
+	size_t raw_data_buffer_size = 0;
 #endif
 
 	if( handle == NULL )
@@ -1074,44 +1154,12 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
-	buffer_size = chunk_size;
-#else
-	buffer_size = EWFCOMMON_BUFFER_SIZE;
-#endif
-	data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
-
-	if( data == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_RAW_ACCESS )
-	compressed_data = (uint8_t *) libewf_common_alloc( ( buffer_size * 2 ) * sizeof( uint8_t ) );
-
-	if( compressed_data == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate compressed data.\n",
-		 function );
-
-		libewf_common_free( data );
-
-		return( -1 );
-	}
-#endif
 	if( calculate_md5 == 1 )
 	{
 		if( ewfmd5_initialize( &md5_context ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 digest context.\n",
 			 function );
-
-			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( compressed_data );
-#endif
 
 			return( -1 );
 		}
@@ -1123,14 +1171,37 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
 
-			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( compressed_data );
-#endif
-
 			return( -1 );
 		}
 	}
+#if defined( HAVE_RAW_ACCESS )
+	data_buffer_size = chunk_size;
+#else
+	data_buffer_size = EWFCOMMON_BUFFER_SIZE;
+#endif
+	data_buffer = (uint8_t *) libewf_common_alloc( data_buffer_size * sizeof( uint8_t ) );
+
+	if( data_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate data buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_RAW_ACCESS )
+	raw_data_buffer_size = data_buffer_size * 2;
+	raw_data_buffer      = (uint8_t *) libewf_common_alloc( raw_data_buffer_size * sizeof( uint8_t ) );
+
+	if( raw_data_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate compressed raw data buffer.\n",
+		 function );
+
+		libewf_common_free( data_buffer );
+
+		return( -1 );
+	}
+#endif
 	while( ( write_size == 0 )
 	 || ( total_write_count < (int64_t) write_size ) )
 	{
@@ -1139,8 +1210,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		read_count = ewfcommon_read_input(
 		              handle,
 		              input_file_descriptor,
-		              data,
-		              buffer_size,
+		              data_buffer,
+		              data_buffer_size,
 		              chunk_size,
 		              bytes_per_sector,
 		              total_write_count,
@@ -1152,12 +1223,12 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
+			LIBEWF_WARNING_PRINT( "%s: error reading data from input.\n",
 			 function );
 
-			libewf_common_free( data );
+			libewf_common_free( data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( compressed_data );
+			libewf_common_free( raw_data_buffer );
 #endif
 
 			return( -1 );
@@ -1169,9 +1240,9 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 				LIBEWF_WARNING_PRINT( "%s: unexpected end of input.\n",
 				 function );
 
-				libewf_common_free( data );
+				libewf_common_free( data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-				libewf_common_free( compressed_data );
+				libewf_common_free( raw_data_buffer );
 #endif
 				return( -1 );
 			}
@@ -1180,7 +1251,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		/* Swap byte pairs
 		 */
 		if( ( swap_byte_pairs == 1 )
-		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		 && ( ewfcommon_swap_byte_pairs( data_buffer, read_count ) != 1 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 			 function );
@@ -1193,7 +1264,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
  */
 			ewfmd5_update(
 			 &md5_context,
-			 data,
+			 data_buffer,
 			 read_count );
 		}
 		if( calculate_sha1 == 1 )
@@ -1202,75 +1273,36 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
  */
 			ewfsha1_update(
 			 &sha1_context,
-			 data,
+			 data_buffer,
 			 read_count );
 		}
 #if defined( HAVE_RAW_ACCESS )
-		compressed_size = buffer_size * 2;
-
-		raw_write_count = libewf_raw_write_prepare_buffer(
-		                   handle,
-		                   data,
-		                   (size_t) read_count,
-		                   compressed_data,
-		                   &compressed_size,
-		                   &is_compressed,
-		                   &chunk_crc,
-		                   &write_crc );
-
-		if( raw_write_count <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer for write raw.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( compressed_data );
-
-			return( -1 );
-		}
-		if( is_compressed == 1 )
-		{
-			raw_write_data = compressed_data;
-		}
-		else
-		{
-			raw_write_data = data;
-		}
-		write_count = libewf_raw_write_buffer(
+		write_count = ewfcommon_raw_write_ewf(
 		               handle,
-		               (void *) raw_write_data,
-		               (size_t) raw_write_count,
-		               (size_t) read_count,
-		               is_compressed,
-		               chunk_crc,
-		               write_crc );
-
-		if( write_count != raw_write_count )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( compressed_data );
-
-			return( -1 );
-		}
+		               raw_data_buffer,
+		               raw_data_buffer_size,
+		               data_buffer,
+		               data_buffer_size,
+		               read_count );
 #else
 		write_count = libewf_write_buffer(
 		               handle,
-		               (void *) data,
+		               (void *) data_buffer,
 		               read_count );
 
+#endif
 		if( write_count != read_count )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write chunk to file.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
 			 function );
 
-			libewf_common_free( data );
+			libewf_common_free( data_buffer );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_data_buffer );
+#endif
 
 			return( -1 );
 		}
-#endif
 		total_write_count += read_count;
 
 		/* Callback for status update
@@ -1280,9 +1312,9 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			callback( (size64_t) total_write_count, write_size );
 		}
 	}
-	libewf_common_free( data );
+	libewf_common_free( data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-	libewf_common_free( compressed_data );
+	libewf_common_free( raw_data_buffer );
 #endif
 
 	if( calculate_md5 == 1 )
@@ -1554,7 +1586,7 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 
 		if( raw_read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read raw buffer.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
 			 function );
 
 			libewf_common_free( data );
@@ -1641,7 +1673,7 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: error reading data.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
 			libewf_common_free( data );
@@ -1903,7 +1935,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		if( raw_read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read raw buffer.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read chunk from file.\n",
 			 function );
 
 			libewf_common_free( data );
@@ -1990,7 +2022,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: error reading data.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
 			libewf_common_free( data );
@@ -2039,17 +2071,17 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 #endif
 			return( -1 );
 		}
-		write_count = libewf_write_buffer( export_handle, uncompressed_data, (size_t) read_count );
+		write_count = libewf_write_buffer(
+		               export_handle,
+		               (void *) uncompressed_data,
+		               read_count );
 
-		if( write_count < read_count )
+		if( write_count != read_count )
 		{
-			LIBEWF_WARNING_PRINT( "%s: error writing data.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
 			 function );
 
 			libewf_common_free( data );
-#if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
-#endif
 
 			return( -1 );
 		}

@@ -1159,7 +1159,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	}
 	else if( result == 1 )
 	{
-		/* Check if this is the last segment file
+		/* Check if this is not the last segment file
 		 */
 		if( ( internal_handle->write->input_write_size == 0 )
 		 || ( internal_handle->write->input_write_count < (ssize64_t) internal_handle->write->input_write_size ) )
@@ -2444,28 +2444,33 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	 */
 	if( file_descriptor != -1 )
 	{
-		/* Correct the offset, size in the chunks section
+		/* Check if chunks section needs to be corrected
 		 */
-		LIBEWF_VERBOSE_PRINT( "%s: correcting chunks section.\n",
-		 function );
-
-		write_count = libewf_segment_file_write_chunks_correction(
-		               internal_handle,
-		               segment_number,
-		               internal_handle->write->chunks_section_offset,
-		               (size_t) internal_handle->write->chunks_section_write_count,
-		               internal_handle->write->amount_of_chunks,
-		               internal_handle->write->section_amount_of_chunks );
-
-		if( write_count == -1 )
+		if( internal_handle->write->chunks_section_offset != 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to correct chunks section.\n",
+			/* Correct the offset, size in the chunks section
+			 */
+			LIBEWF_VERBOSE_PRINT( "%s: correcting chunks section.\n",
 			 function );
 
-			return( -1 );
+			write_count = libewf_segment_file_write_chunks_correction(
+				       internal_handle,
+				       segment_number,
+				       internal_handle->write->chunks_section_offset,
+				       (size_t) internal_handle->write->chunks_section_write_count,
+				       internal_handle->write->amount_of_chunks,
+				       internal_handle->write->section_amount_of_chunks );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to correct chunks section.\n",
+				 function );
+
+				return( -1 );
+			}
+			write_count_finalize                += write_count;
+			internal_handle->write->write_count += write_count;
 		}
-		write_count_finalize                += write_count;
-		internal_handle->write->write_count += write_count;
 
 		/* Close the segment file
 		 */

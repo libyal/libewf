@@ -1,4 +1,4 @@
-.Dd May 12, 2007
+.Dd November 4, 2007
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -7,7 +7,7 @@
 .Sh SYNOPSIS
 .Nm ewfexport
 .Op Fl t Ar target_file
-.Op Fl hsqvV
+.Op Fl hsqvVw
 .Va Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfexport
@@ -45,6 +45,8 @@ target file to export to (default is stdout)
 verbose output to stderr
 .It Fl V
 print version
+.It Fl w
+wipe sectors on CRC error (mimic EnCase like behavior)
 .El
 .Sh ENVIRONMENT
 None
