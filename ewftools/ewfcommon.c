@@ -719,6 +719,83 @@ int8_t ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1
 	return( 1 );
 }
 
+#if defined( HAVE_WINDOWS_API )
+#define ewfcommon_gmtime_r( timestamp, time_elements ) \
+	gmtime_s( time_elements, timestamp )
+
+#elif defined( HAVE_GMTIME_R )
+#define ewfcommon_gmtime_r( timestamp, time_elements ) \
+	gmtime_r( timestamp, time_elements )
+
+#endif
+
+/* Returns a structured representation of a time using UTC (GMT), or NULL on error
+ */
+struct tm *ewfcommon_gmtime( const time_t *timestamp )
+{
+#if !defined( ewfcommon_gmtime_r ) && defined( HAVE_GMTIME )
+	struct tm *static_time_elements = NULL;
+#endif
+	struct tm *time_elements        = NULL;
+	static char *function           = "ewfcommon_gmtime";
+
+	if( timestamp == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		 function );
+
+		return( NULL );
+	}
+	time_elements = (struct tm *) libewf_common_alloc( sizeof( struct tm ) );
+
+	if( time_elements == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
+		 function );
+
+		return( NULL );
+	}
+#if defined( ewfcommon_gmtime_r )
+#if defined( HAVE_WINDOWS_API )
+	if( ewfcommon_gmtime_r( timestamp, time_elements ) != 0 )
+#else
+	if( ewfcommon_gmtime_r( timestamp, time_elements ) == NULL )
+#endif
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		 function );
+
+		libewf_common_free( time_elements );
+
+		return( NULL );
+	}
+	return( time_elements );
+#elif defined( HAVE_GMTIME )
+	static_time_elements = gmtime( timestamp );
+
+	if( static_time_elements == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create static time elements.\n",
+		 function );
+
+		libewf_common_free( time_elements );
+
+		return( NULL );
+	}
+	if( libewf_common_memcpy( time_elements, static_time_elements, sizeof( struct tm ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		 function );
+
+		libewf_common_free( time_elements );
+
+		return( NULL );
+	}
+#else
+#error Missing equivalent of function gmtime
+#endif
+}
+
 /* Print the version information to a stream
  */
 void ewfcommon_version_fprint( FILE *stream, LIBEWF_CHAR *program )
@@ -1230,7 +1307,7 @@ void ewfcommon_timestamp_fprint( FILE *stream, time_t timestamp )
 	{
 		return;
 	}
-	time_elements = libewf_common_gmtime( &timestamp );
+	time_elements = ewfcommon_gmtime( &timestamp );
 
 	if( time_elements != NULL )
 	{

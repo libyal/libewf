@@ -831,7 +831,7 @@ int libewf_segment_file_create_file_entry( LIBEWF_INTERNAL_HANDLE *internal_hand
 	char *filename                      = NULL;
 #endif
 	static char *function               = "libewf_write_create_segment_file_entry";
-	size_t length_filename              = 0;
+	size_t filename_length              = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -906,12 +906,12 @@ int libewf_segment_file_create_file_entry( LIBEWF_INTERNAL_HANDLE *internal_hand
 		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	length_filename = libewf_common_wide_string_length( filename );
+	filename_length = libewf_common_wide_string_length( filename );
 #else
-	length_filename = libewf_common_string_length( filename );
+	filename_length = libewf_common_string_length( filename );
 #endif
 
-	if( length_filename == 0 )
+	if( filename_length == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
 		 function );
@@ -2658,7 +2658,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	filename_length = libewf_common_string_length( filenames[ 0 ] );
 #endif
 
-	if( length_filename == 0 )
+	if( filename_length == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
 		 function );
