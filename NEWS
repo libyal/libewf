@@ -1,0 +1,8 @@
+libewf supports SMART (EWF-S01) files
+* both read and write
+
+ewfacquire
+* EWF-S01 files are not filled to maximum size by ewfacquire where EWF-E01 files are
+* allows for more than 255 segment files using FTK/EnCase compatible extension naming convention
+* corrected header values sequence for header2 section
+

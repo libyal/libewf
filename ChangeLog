@@ -1,0 +1,215 @@
+To do/think about:
+* ewfinfo: add date format in ewfinfo to month in text - no interpretation differences possible
+* header2: enhance UTF16 conversion code
+* header2: enhance utf conversion routine
+* read: always compare a data section with the volume/disk section for EWF-E01
+* read: build in additional constraints
+* read: remove file descriptor check in last_offset calculation?
+  if( ( section_list_entry->file_descriptor == file_descriptor ) && ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
+* read: correct for errors in the table or table2 section for EWF-E01
+* read: add functionality for byte swap in data for endian fix of data
+* all: Enhance error handling - no program exit but a nice return - nicer prints - return error in sector message
+* all: due to 20060505 fix give all value definitions a default value - looks nicer
+* all: add LVF support - vtree section
+* write: reduce multiple successive error2 entries to a single
+* write: add additional data to file for different EWF formats
+* ewfacquire: make size input and output human friendly (support kM notation etc)
+
+* more integration with autoconf/automake config.h
+
+Further analysis of the EWF format:
+* media type
+* password hash
+* 16 bytes in hash section
+
+Possible performance improvements:
+* create a offset table per segment file - create it on demand - section list per segment table is done
+* build offset table while reading ?
+
+Version: 20060820
+* ewfacquire: small change to confirmation
+
+Version: 20060819
+* lifted the 255 segment file limit on write, however it uses an (horrible) increment based naming scheme much like EnCase
+  write: allow more than 255 segment files - completed
+* write: worked on SMART (EWF-S01) support
+* write: SMART (EWF-S01) - build in support for table2
+* all: add SMART support - complete
+* worked on - all: due to 20060505 fix give all value definitions a default value - looks nicer
+* due to changes to the read and write logic the library was retested
+* read: error in percentage in libewf_read_random - works on FC5
+* table size limitation does not seem present in EWF-E01 only in EWF-S01
+* use autoconf/automake cross compilation parameters for platform determination - completed
+
+Version: 20060818
+* read: worked on SMART (EWF-S01) support
+* alternative read method was removed, the assumption it was based on is no longer valid
+  read: remove alternative read method the assumption behind is fails for the SMART format - completed
+* renamed alternative write method to wipe block on read error
+  write: rename the alternative write method to wipe_block_on_error (or something) - completed
+* read random: chunk based size check now is a buffer based size check
+* removed handle->chunk_crc no longer needed
+* for the EWF-S01 format the entries in table2 are appended to the offset table - have yet to test a file with a table2 section
+* write: worked on SMART (EWF-S01) support
+
+Version: 20060817
+* read: worked on SMART (EWF-S01) support
+
+Version: 20060816
+* ewfacquire: add overview to confirm user input, otherwise restart input query - completed
+* ewfacquire: make encase5 file option default - completed
+* fixed incorrect order for values in header2 on write - also in documentation
+
+Version: 20060812
+* made the amount of read error retries flexible and user adjustable through ewfacquire
+* new file size algorithm to fill up closer to max file size when compressing
+  (write: change algorithm to fill files upto file size - completed)
+* correction of "int result" in file_write to be C89 code compliant
+* added empty block compression
+  (write: always compress empty chunks - completed as an option)
+
+Version: 20060809
+* fixed size bug for large images on Cygwin - fix of 20060610 not sufficient for Cygwin
+* fixed invalid value in printf volume read verbose messages
+* added autoconf/automake structure
+
+Version: 20060708
+* renamed endian.h to libewf_endian.h for compatibility issues
+
+Version: 20060617
+* put conditions around debug code in eqfacquire
+
+Version: 20060611
+* fixed - one off bug in header value end of string
+
+Version: 20060610
+* ewfacquire test on multiple platforms
+* added support for SMART format volume section - equals the original EWF volume section definition
+* fixed - type casting error in data size
+* fixed - missing header for encase1 format in write
+* fixed - bug in writing encase4 and encase5 header2 in write - error in ascii to utf16 routine
+* fixed - bug in writing encase4 and enacse5 header in write - logical formatting error
+* write: timestamp is now generated only once
+* write: fixed incorrect free in header values
+* write: fixed memory corruption bug in ewfacquire - required explicit zero of string
+
+Version: 20060605
+* fix of data corruption bug - one off
+* ewfacquire: sanitize input provided by user
+* ewfinfo/eqwfacquire ? 1970 date when no case data is provided - bug in split function regarding first empty value
+* removed file cache - no longer required
+
+Version: 20060527
+* started analysis of a data corruption bug
+
+Version: 20060526
+* fixed write bug when read is successful after error with small error granualirity
+* fixed write bug with error granularity 1
+* ewfacquire: add chunk size input possibility
+* ewfacquire: add error granularity size input possibility
+* ewfacquire: memory corruption bug in user input - repaced some code - looks OK now - but hard to reproduce
+* fixed write bug with block size 128 error granularity 16 in test
+* write: improve reading of bad sectors and writing a error2 section to file for encase5 file option
+
+Version: 20060520
+* fixed media size bug - old method of calculation was still in there :-(
+* worked on ewfacquire read on error
+* added alternative write method to test acquired images against existing tooling
+* ewfaquire: able to produce exact media data as linen
+* write: what if read error is in last chunk and it is smaller than chunk size !?
+
+Version: 20060517
+* removed duplicate include from notify.c
+
+Version: 20060516
+* added media size to ewfinfo
+* worked on ewfacquire read on error
+
+Version: 20060513
+* minor adjustment in libewf.h - ewf_close renamed to libewf_close
+
+Version: 20060505
+* Fix for older compilers like gcc 2.95 - rewrite to older C statements
+
+Version: 20060424
+* added warning macro to allow overriding some fatal errors
+* allow overriding invalid CRC's
+* refactored crc check in ewf_section to file_read - for scope of handle and uniformity within the code
+* further analysis of unknown values in hash section - also found difference in signature value Encase4 and Encase5
+
+Version: 20060423
+* Fix for Solaris in definitions.h
+
+Version: 20060422
+* Fixed missing PRI definitions on OpenBSD - now defines in definitions.h
+* changed sprintf to snprintf
+* added device size determination for OpenBSD
+* fixed bug in header values parsing for empty first value empty
+* added compression level definition
+* ewfinfo: add compression media information in ewfinfo - Encase5 format only
+* write: moved compression type functionality from ewfacquire into library
+
+Version: 20060419
+* Adjusted write method - to fix filesize problem
+* Correction of verbose print of last chunk number
+* the write function works only when a data section is at the start of the file - why ? not a bug in write
+  but in read the first offset in the segment table was filled with 0 instead of 13 which is the size
+  of the file header
+
+Version: 20060418
+* Tested on FreeBSD 6.0 needed to add include header in ewf_sectors.h
+* Adjusted Make to be more generic and to work on FreeBSD 6.0
+
+Version: 20060415
+* changed u_int to uint
+* removed LIBEWF_ types
+* zlib uses a long which varies per 32 and 64 bit architecture using an intermediate variable
+  fixes not able to read compressed images on a x86_64 architecure
+* Memory corruption bug in segment table filename fixed
+
+Version: 20060414
+* Fixed previous offset size
+* removed memcpy assignments
+* type fixed malloc assignments
+* removed (void *) from memset
+* reduced the amount of int definions
+* changed printf formaters
+* added status indication to ewfexport using callback function in read_from_file_descriptor
+* added quiet option to ewfexport and ewfacquire
+* removed dependency on libiconv - created a naive utf16 to ascii conversion
+* moved header string generation code to header_values
+* added time string generation code to header_values
+* added acquire options for compression and file type to ewfacquire
+* code now partially fixed for x86_64 systems fixed malloc statement, printf sizes, and some type definitions
+* additional changes to memcpy statements made
+* Use header_values for write
+* ewfacquire fix error print on correct fixed value
+* ewfacquire fix for empty input values
+* ewfacquire fix strange image file rights
+* ewfacquire fix image filename weird characters - one byte off allocation problem in ewfacquire
+* ewfacquire allow for a default value - for fixed values
+* ewfacquire can now acquire devices on works on Mac OS-X/Darwin
+* fix write crc error in chunk on mac os x
+* ewfacquire add EWF file size input possibility - check upper bound 2Gb, lower bound 1440k
+* fix write bug with small file size 1440k - for floppy image - this has to do if
+  both the filesize and the ewf size are the same - write will adjust with one additional
+  segment file
+
+Version: 20060413
+* Used LIBEWF_VERSION in executables
+* Added file signature function to library for integration in The SleuthKit
+* Added md5.h for allowing to do with different MD5 calculation code bases
+  like the one integrated in the The SleuthKit
+
+Version: 20060412
+* Created separate file for header value logic - moved code from ewfinfo
+
+Version: 20060411
+Nearing release version, so started logging changes
+* Removed memory leak with duplicate header assignment to handle
+* Renamed ewfmd5sum to ewfverify - still have to enhance functionality
+* Renamed ewfcat to ewfexport - still have to enhance functionality
+* Added time parsing functionality to ewfinfo - date format is currently
+  fixed in MM/DD/YYYY
+* Enhanced password and compression header value output in ewfinfo
+
