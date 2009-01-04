@@ -295,7 +295,6 @@ int libewf_segment_table_read_open(
 	size_t filename_length                            = 0;
 	uint32_t iterator                                 = 0;
 	uint16_t segment_number                           = 0;
-	uint8_t segment_file_type                         = 0;
 	int file_descriptor                               = 0;
 	int result                                        = 0;
 
@@ -441,8 +440,7 @@ int libewf_segment_table_read_open(
 		}
 		if( libewf_segment_file_read_file_header(
 		     segment_file_handle,
-		     &segment_number,
-		     &segment_file_type ) <= -1 )
+		     &segment_number ) <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %" PRIs_EWF_filename ".\n",
 			 function, filenames[ iterator ] );
@@ -472,8 +470,8 @@ int libewf_segment_table_read_open(
 
 			return( -1 );
 		}
-		if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
-		 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
+		if( ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+		 || ( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
 		{
 			if( segment_number >= segment_table->amount )
 			{
@@ -492,7 +490,7 @@ int libewf_segment_table_read_open(
 			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, filenames[ iterator ], file_descriptor, segment_number );
 		}
-		else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+		else if( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 		{
 			/* Make sure to re-open the delta segment file
 			 * to allow writing if necessary

@@ -65,28 +65,32 @@
 
 /* Returns the library version
  */
-const libewf_char_t *libewf_get_version( void )
+const libewf_char_t *libewf_get_version(
+                      void )
 {
 	return( (const libewf_char_t *) LIBEWF_VERSION_STRING );
 }
 
 /* Returns the flags for reading
  */
-uint8_t libewf_get_flags_read( void )
+uint8_t libewf_get_flags_read(
+         void )
 {
 	return( (uint8_t) LIBEWF_FLAG_READ );
 }
 
 /* Returns the flags for reading and writing
  */
-uint8_t libewf_get_flags_read_write( void )
+uint8_t libewf_get_flags_read_write(
+         void )
 {
 	return( (uint8_t) ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) );
 }
 
 /* Returns the flags for writing
  */
-uint8_t libewf_get_flags_write( void )
+uint8_t libewf_get_flags_write(
+         void )
 {
 	return( (uint8_t) LIBEWF_FLAG_WRITE );
 }
@@ -2288,6 +2292,59 @@ int libewf_set_delta_segment_filename(
 	         length ) );
 }
 
+/* Sets the delta segment file size
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_delta_segment_file_size(
+     LIBEWF_HANDLE *handle,
+     size64_t delta_segment_file_size )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_delta_segment_file_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( delta_segment_file_size == 0 )
+	 || ( delta_segment_file_size > (size64_t) INT64_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->delta_segment_file_size > (size64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid delta segment file size value exceeds maximum segment file size.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->write->delta_segment_file_size = delta_segment_file_size;
+
+	return( 1 );
+}
+
 /* Sets the read wipe chunk on error
  * The chunk is not wiped if read raw is used
  * Returns 1 if successful, or -1 on error
@@ -2350,7 +2407,8 @@ int libewf_set_header_value(
 	}
 	if( internal_handle->header_values == NULL )
 	{
-		internal_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+		internal_handle->header_values = libewf_values_table_alloc(
+		                                  LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 		if( internal_handle->header_values == NULL )
 		{
@@ -2359,7 +2417,8 @@ int libewf_set_header_value(
 
 			return( -1 );
 		}
-		if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
+		if( libewf_header_values_initialize(
+		     internal_handle->header_values ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize header values.\n",
 			 function );
@@ -2367,7 +2426,11 @@ int libewf_set_header_value(
 			return( -1 );
 		}
 	}
-	return( libewf_values_table_set_value( internal_handle->header_values, identifier, value, length ) );
+	return( libewf_values_table_set_value(
+	         internal_handle->header_values,
+	         identifier,
+	         value,
+	         length ) );
 }
 
 /* Sets the hash value specified by the identifier
@@ -2400,7 +2463,8 @@ int libewf_set_hash_value(
 	}
 	if( internal_handle->hash_values == NULL )
 	{
-		internal_handle->hash_values = libewf_values_table_alloc( LIBEWF_HASH_VALUES_DEFAULT_AMOUNT );
+		internal_handle->hash_values = libewf_values_table_alloc(
+		                                LIBEWF_HASH_VALUES_DEFAULT_AMOUNT );
 
 		if( internal_handle->hash_values == NULL )
 		{
@@ -2409,7 +2473,8 @@ int libewf_set_hash_value(
 
 			return( -1 );
 		}
-		if( libewf_hash_values_initialize( internal_handle->hash_values ) != 1 )
+		if( libewf_hash_values_initialize(
+		     internal_handle->hash_values ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize hash values.\n",
 			 function );
@@ -2417,7 +2482,11 @@ int libewf_set_hash_value(
 			return( -1 );
 		}
 	}
-	return( libewf_values_table_set_value( internal_handle->hash_values, identifier, value, length ) );
+	return( libewf_values_table_set_value(
+	         internal_handle->hash_values,
+	         identifier,
+	         value,
+	         length ) );
 }
 
 /* Parses the header values from the xheader, header2 or header section
@@ -2655,7 +2724,8 @@ int libewf_copy_header_values(
 	}
 	if( internal_destination_handle->header_values == NULL )
 	{
-		internal_destination_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+		internal_destination_handle->header_values = libewf_values_table_alloc(
+		                                              LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 		if( internal_destination_handle->header_values == NULL )
 		{
@@ -2664,7 +2734,8 @@ int libewf_copy_header_values(
 
 			return( -1 );
 		}
-		if( libewf_header_values_initialize( internal_destination_handle->header_values ) != 1 )
+		if( libewf_header_values_initialize(
+		     internal_destination_handle->header_values ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize header values.\n",
 			 function );

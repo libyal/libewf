@@ -50,7 +50,12 @@
 /* Compresses data, wraps zlib uncompress function
  * Returns 1 on success, -1 on error
  */
-int libewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t *uncompressed_data, size_t uncompressed_size, int8_t compression_level )
+int libewf_compress(
+     uint8_t *compressed_data,
+     size_t *compressed_size,
+     uint8_t *uncompressed_data,
+     size_t uncompressed_size,
+     int8_t compression_level )
 {
 	static char *function        = "libewf_compress";
 	uLongf safe_compressed_size  = 0;
@@ -159,7 +164,11 @@ int libewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t 
 /* Uncompresses data, wraps zlib uncompress function
  * Returns 1 on success, 0 on failure, -1 on error
  */
-int libewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, uint8_t *compressed_data, size_t compressed_size )
+int libewf_uncompress(
+     uint8_t *uncompressed_data,
+     size_t *uncompressed_size,
+     uint8_t *compressed_data,
+     size_t compressed_size )
 {
 	static char *function         = "libewf_uncompress";
 	uLongf safe_uncompressed_size = 0;

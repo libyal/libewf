@@ -1369,6 +1369,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	ssize_t total_write_count                         = 0;
 	ssize_t write_count                               = 0;
 	uint16_t segment_number                           = 0;
+	uint8_t segment_file_type                         = 0;
 	int result                                        = 0;
 
 	if( internal_handle == NULL )
@@ -1441,12 +1442,21 @@ ssize_t libewf_raw_write_chunk_existing(
 
 		return( -1 );
 	}
+	if( internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - invalid chunk offset - missing segment file handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	segment_file_type = internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle->file_type;
+
 	LIBEWF_VERBOSE_PRINT( "%s: writing delta chunk of size: %zu with data of size: %zd.\n",
 	 function, chunk_size, chunk_data_size );
 
-	/* Check if the chunk does not already exists in a delta segment file
+	/* Check if the chunk already exists in a delta segment file
 	 */
-	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
+	if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
 		/* Write the chunk to the last delta segment file
 		 */
@@ -1647,7 +1657,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	}
 	total_write_count += write_count;
 
-	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
+	if( segment_file_type != LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
 		/* Write the last section
 		 * The segment file offset is updated by the function
@@ -1666,8 +1676,6 @@ ssize_t libewf_raw_write_chunk_existing(
 			return( -1 );
 		}
 		total_write_count += write_count;
-
-		internal_handle->offset_table->chunk_offset[ chunk ].dirty = 1;
 	}
 	return( total_write_count );
 }

@@ -56,8 +56,7 @@ int libewf_segment_file_check_file_signature(
 
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
-         uint16_t *segment_number,
-         uint8_t *segment_file_type );
+         uint16_t *segment_number );
 
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,

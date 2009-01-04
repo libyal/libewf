@@ -4074,7 +4074,6 @@ ssize_t libewf_section_delta_chunk_read(
 	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
 	offset_table->chunk_offset[ chunk ].compressed          = 0;
-	offset_table->chunk_offset[ chunk ].dirty               = 1;
 
 	/* Update the chunk data in the secondary offset table
 	 * if necessary
@@ -4085,7 +4084,6 @@ ssize_t libewf_section_delta_chunk_read(
 		secondary_offset_table->chunk_offset[ chunk ].file_offset         = segment_file_handle->file_offset;
 		secondary_offset_table->chunk_offset[ chunk ].size                = chunk_size;
 		secondary_offset_table->chunk_offset[ chunk ].compressed          = 0;
-		secondary_offset_table->chunk_offset[ chunk ].dirty               = 1;
 	}
 
 	/* Skip the chunk data within the section

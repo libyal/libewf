@@ -259,6 +259,10 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    libewf_filename_t *filename,
                    size_t length );
 
+LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
+                   LIBEWF_HANDLE *handle,
+                   size64_t delta_segment_file_size );
+
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
                    LIBEWF_HANDLE *handle,
                    uint8_t wipe_on_error );

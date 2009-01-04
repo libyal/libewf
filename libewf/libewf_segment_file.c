@@ -119,8 +119,7 @@ int libewf_segment_file_check_file_signature(
  */
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
-         uint16_t *segment_number,
-         uint8_t *segment_file_type )
+         uint16_t *segment_number )
 {
 	ewf_file_header_t file_header;
 
@@ -137,13 +136,6 @@ ssize_t libewf_segment_file_read_file_header(
 	if( segment_number == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_type == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file type.\n",
 		 function );
 
 		return( -1 );
@@ -167,21 +159,21 @@ ssize_t libewf_segment_file_read_file_header(
 	     file_header.signature,
 	     8 ) == 0 )
 	{
-		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+		segment_file_handle->file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 	}
 	else if( libewf_common_memcmp(
 	          lvf_file_signature,
 	          file_header.signature,
 	          8 ) == 0 )
 	{
-		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
+		segment_file_handle->file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
 	}
 	else if( libewf_common_memcmp(
 	          dvf_file_signature,
 	          file_header.signature,
 	          8 ) == 0 )
 	{
-		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_DWF;
+		segment_file_handle->file_type = LIBEWF_SEGMENT_FILE_TYPE_DWF;
 	}
 	else
 	{
@@ -671,6 +663,8 @@ ssize_t libewf_segment_file_write_start(
 
 		return( -1 );
 	}
+	segment_file_handle->file_type = segment_file_type;
+
 	if( libewf_common_memcpy(
 	     file_header.signature,
 	     file_signature,

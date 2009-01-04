@@ -186,6 +186,10 @@ struct libewf_internal_handle_write
 	 */
 	size64_t segment_file_size;
 
+	/* The delta segment file size
+	 */
+	size64_t delta_segment_file_size;
+
 	/* The maximum amount of segments
 	 */
 	uint16_t maximum_amount_of_segments;

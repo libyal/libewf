@@ -76,6 +76,7 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
 	segment_file_handle->amount_of_chunks    = 0;
 	segment_file_handle->section_list->first = NULL;
 	segment_file_handle->section_list->last  = NULL;
+	segment_file_handle->file_type           = 0;
 
 	return( segment_file_handle );
 }

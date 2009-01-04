@@ -40,8 +40,18 @@
 extern "C" {
 #endif
 
-int libewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t *uncompressed_data, size_t uncompressed_size, int8_t compression_level );
-int libewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, uint8_t *compressed_data, size_t compressed_size );
+int libewf_compress(
+     uint8_t *compressed_data,
+     size_t *compressed_size,
+     uint8_t *uncompressed_data,
+     size_t uncompressed_size,
+     int8_t compression_level );
+
+int libewf_uncompress(
+     uint8_t *uncompressed_data,
+     size_t *uncompressed_size,
+     uint8_t *compressed_data,
+     size_t compressed_size );
 
 #if defined( __cplusplus )
 }

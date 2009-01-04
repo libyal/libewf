@@ -63,11 +63,6 @@ struct libewf_chunk_offset
 	/* Value to indicate if the chunk is compressed
 	 */
 	uint8_t compressed;
-
-	/* Value to indicate if the chunk is stored in
-	 * a delta segment file
-	 */
-	uint8_t dirty;
 };
 
 #if defined( __cplusplus )

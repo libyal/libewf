@@ -429,6 +429,7 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 	handle_write->write_count                      = 0;
 	handle_write->maximum_segment_file_size        = INT32_MAX;
 	handle_write->segment_file_size                = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
+	handle_write->delta_segment_file_size          = INT64_MAX;
 	handle_write->maximum_amount_of_segments       = 0;
 	handle_write->chunks_section_write_count       = 0;
 	handle_write->amount_of_chunks                 = 0;

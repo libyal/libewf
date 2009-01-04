@@ -107,6 +107,8 @@ Code clean up
 * have ewftools only use API ?
   - most of the internal library code has been removed
 * check unused parameters gcc -Wextra
+* seperate common code from libary and tools
+* change ewf_char/string into byte_char/string
 
 Next release(s):
 * implement low memory usage option
@@ -122,6 +124,7 @@ Next release(s):
 
 * improve error handling
   - store error in handle? or additional parameter?
+  - useful to store error/warning string
 
 Next stable:
 * full platform test
@@ -136,23 +139,15 @@ Next stable:
 
 * merge alloc and realloc blocks
 
-* change ewf_char/string into byte_char/string
-* create common functions i.e. for libewf_char/string
-
 * test abort
 
 * refactor write initialize into seperate functions
+  - function that remains is minimal, refactor any way?
 * what about open read write and set functions?
 
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
   - functions basically use libewf_section_compressed_string_read
-
-* offset table dirty still needed?
-  only needed for write
-  need to determine if a chunks is stored in a delta segment file
-  what about adding the segment file type to the segment file struct?
-  - reduces memory usage
 
 * implement TODO in ewfexport
 * check TODOs
@@ -178,6 +173,7 @@ CLOSED
 Version: 20080228
 * Worked on not finalizing on error
 * Refactored libewf_header_values_parse_header and libewf_header_values_parse_header2
+* Removed dirty value from offset table entry, reduces memory usage
 
 Version: 20080227
 * refactored ewfdigest_hash

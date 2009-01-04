@@ -733,6 +733,13 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    size_t length );
 #endif
 
+/* Sets the delta segment file size
+ * Returns 1 if successful, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
+                   LIBEWF_HANDLE *handle,
+                   size64_t delta_segment_file_size );
+
 /* Sets the read wipe chunk on error
  * The chunk is not wiped if read raw is used
  * Returns 1 if successful, or -1 on error
