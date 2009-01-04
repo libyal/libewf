@@ -1,0 +1,11 @@
+Package: libewf-tools
+Version: 20080305-1
+Section: utils
+Priority: extra
+Architecture: i386
+Depends: libewf (= 20080305-1), libc6 (>= 2.5-0ubuntu1), libssl0.9.8 (>= 0.9.8c-1), libuuid1, zlib1g (>= 1:1.2.1)
+Installed-Size: 376
+Maintainer: Joachim Metz <forensics@hoffmannbv.nl>
+Source: libewf
+Description: Several tools for reading and writing EWF files
+ Several tools for reading and writing EWF files.

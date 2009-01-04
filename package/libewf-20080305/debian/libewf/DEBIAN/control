@@ -1,0 +1,13 @@
+Package: libewf
+Version: 20080305-1
+Section: libs
+Priority: extra
+Architecture: i386
+Depends: libc6 (>= 2.5-0ubuntu1), libssl0.9.8 (>= 0.9.8c-1), libuuid1, zlib1g (>= 1:1.2.1)
+Installed-Size: 272
+Maintainer: Joachim Metz <forensics@hoffmannbv.nl>
+Description: Library and tools to support the Expert Witness Compression Format
+ libewf is library for support of the Expert Witness Compression Format (EWF).
+ libewf allows you to read media information of EWF files in the SMART (EWF-S01)
+ format and the EnCase (EWF-E01) format. libewf allows to read files created by
+ EnCase 1 to 6, linen and FTK Imager.

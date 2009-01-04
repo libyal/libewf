@@ -1,0 +1,11 @@
+Package: libewf-dev
+Version: 20080305-1
+Section: libdevel
+Priority: extra
+Architecture: i386
+Depends: libewf (= 20080305-1)
+Installed-Size: 432
+Maintainer: Joachim Metz <forensics@hoffmannbv.nl>
+Source: libewf
+Description: Header files and libraries for developing applications for libewf
+ Header files and libraries for developing applications for libewf.

@@ -63,13 +63,6 @@
 
 #include <time.h>
 
-#define PRI_jd_EWF	"jd"
-#define PRI_jd_EWF	"jd"
-#define PRI_jx_EWF	"jx"
-#define PRI_zd_EWF	"zd"
-#define PRI_zu_EWF	"zu"
-#define PRI_zx_EWF	"zx"
-
 #if defined( HAVE_STDARG_H )
 
 #include <stdarg.h>

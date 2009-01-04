@@ -1,0 +1,17 @@
+b50fa22ccc7acb3ddbae21e3833c0542  usr/lib/libewf.la
+58be66acf5b56fc4330551776f6629c0  usr/lib/pkgconfig/libewf.pc
+0336400b57c51c34278384066dac62f7  usr/lib/libewf.a
+92d9bda7a684aa3c8eb0d1c3f8a582ed  usr/share/doc/libewf-dev/README
+345c31cbf0c0f37e858e62888df112e7  usr/share/doc/libewf-dev/NEWS.gz
+e29eddd96ba844592b568ee4236f7c03  usr/share/doc/libewf-dev/AUTHORS
+e2961960373f56f6999242d3299d02b6  usr/share/doc/libewf-dev/copyright
+bb999a240e9106d5c3384981ceb2af2d  usr/share/doc/libewf-dev/changelog.gz
+302de335914fc44122c2f964746c2a39  usr/share/doc/libewf-dev/ChangeLog.gz
+a99629132ec519a1e0f9c3e2706141f4  usr/share/doc/libewf-dev/COPYING
+9e75afda6b1d39a17acb151bd47dabd0  usr/share/doc/libewf-dev/changelog.Debian.gz
+6962c48a21c2dc887eef739957f9cbe8  usr/share/man/man3/libewf.3.gz
+dd5aa93bbb3e5b297bef6b675a0b96d5  usr/include/libewf/libewf_types.h
+13fe16fe94f4767cb747f364939ba946  usr/include/libewf/libewf_extern.h
+a6c4c74acdbe06348a144a6cd683323d  usr/include/libewf/libewf_definitions.h
+80a08458c512ec3952b952a034c2f2ed  usr/include/libewf/libewf_handle.h
+96ff8cb57300840db23a1ab9f74f33d5  usr/include/libewf.h

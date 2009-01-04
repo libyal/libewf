@@ -298,6 +298,7 @@ int libewf_segment_table_read_open(
 	size_t filename_length                            = 0;
 	uint32_t iterator                                 = 0;
 	uint16_t segment_number                           = 0;
+	int file_descriptor                               = 0;
 	int result                                        = 0;
 
 	if( segment_table == NULL )
@@ -487,10 +488,10 @@ int libewf_segment_table_read_open(
 					return( -1 );
 				}
 			}
-			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
-
 			segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
+
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
 		}
 		else if( segment_file_handle->file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 		{
@@ -521,10 +522,10 @@ int libewf_segment_table_read_open(
 					return( -1 );
 				}
 			}
-			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, segment_file_handle->filename, segment_file_handle->file_descriptor, segment_number );
-
 			delta_segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
+
+			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
 		}
 		else
 		{

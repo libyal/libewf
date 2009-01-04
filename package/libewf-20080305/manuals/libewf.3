@@ -1,0 +1,392 @@
+.Dd March 2, 2008
+.Dt libewf 3
+.Os libewf
+.Sh NAME
+.Nm libewf.h
+.Nd Library to read from and write to the Expert Witness Compression Format (EWF) file format
+.Sh LIBRARY
+.Lb libewf
+.Sh SYNOPSIS
+.In libewf.h
+.Ft uint8_t
+.Fn libewf_get_flags_read
+.Ft uint8_t
+.Fn libewf_get_flags_read_write
+.Ft uint8_t
+.Fn libewf_get_flags_write
+.Ft int
+.Fn libewf_check_file_signature "const char *filename"
+.Ft int
+.Fn libewf_glob "const char *filename, size_t length, uint8_t format, char ** filenames[]"
+.Ft int
+.Fn libewf_signal_abort "LIBEWF_HANDLE *handle"
+.Ft LIBEWF_HANDLE *
+.Fn libewf_open "char * const filenames[], uint16_t amount_of_files, uint8_t flags"
+.Ft off64_t
+.Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off64_t offset"
+.Ft ssize_t
+.Fn libewf_raw_read_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t read_crc"
+.Ft ssize_t
+.Fn libewf_raw_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc"
+.Ft ssize_t
+.Fn libewf_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
+.Ft ssize_t
+.Fn libewf_read_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
+.Ft ssize_t
+.Fn libewf_raw_write_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
+.Ft ssize_t
+.Fn libewf_raw_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
+.Ft ssize_t
+.Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
+.Ft ssize_t
+.Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
+.Ft ssize_t
+.Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_close "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_get_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk"
+.Ft int
+.Fn libewf_get_bytes_per_sector "LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector"
+.Ft int
+.Fn libewf_get_amount_of_sectors "LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors"
+.Ft int
+.Fn libewf_get_chunk_size "LIBEWF_HANDLE *handle, size32_t *chunk_size"
+.Ft int
+.Fn libewf_get_error_granularity "LIBEWF_HANDLE *handle, uint32_t *error_granularity"
+.Ft int
+.Fn libewf_get_compression_values "LIBEWF_HANDLE *handle, int8_t *compression_level, uint8_t *compress_empty_block"
+.Ft int
+.Fn libewf_get_media_size "LIBEWF_HANDLE *handle, size64_t *media_size"
+.Ft int
+.Fn libewf_get_media_type "LIBEWF_HANDLE *handle, int8_t *media_type"
+.Ft int
+.Fn libewf_get_media_flags "LIBEWF_HANDLE *handle, int8_t *media_flags"
+.Ft int
+.Fn libewf_get_volume_type "LIBEWF_HANDLE *handle, int8_t *volume_type"
+.Ft int
+.Fn libewf_get_format "LIBEWF_HANDLE *handle, uint8_t* format"
+.Ft int
+.Fn libewf_get_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
+.Ft int
+.Fn libewf_get_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
+.Ft int
+.Fn libewf_get_amount_of_acquiry_errors "LIBEWF_HANDLE *handle, uint32_t *amount_of_errors"
+.Ft int
+.Fn libewf_get_acquiry_error "LIBEWF_HANDLE *handle, uint32_t index, off64_t *first_sector, uint32_t *amount_of_sectors"
+.Ft int
+.Fn libewf_get_amount_of_crc_errors "LIBEWF_HANDLE *handle, uint32_t *amount_of_errors"
+.Ft int
+.Fn libewf_get_crc_error "LIBEWF_HANDLE *handle, uint32_t index, off64_t *first_sector, uint32_t *amount_of_sectors"
+.Ft int
+.Fn libewf_get_amount_of_sessions "LIBEWF_HANDLE *handle, uint32_t *amount_of_sessions"
+.Ft int
+.Fn libewf_get_session "LIBEWF_HANDLE *handle, uint32_t index, off64_t *first_sector, uint32_t *amount_of_sectors"
+.Ft int
+.Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks"
+.Ft int
+.Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks"
+.Ft int
+.Fn libewf_get_amount_of_header_values "LIBEWF_HANDLE *handle, uint32_t *amount_of_values"
+.Ft int
+.Fn libewf_get_amount_of_hash_values "LIBEWF_HANDLE *handle, uint32_t *amount_of_values"
+.Ft int
+.Fn libewf_set_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk"
+.Ft int
+.Fn libewf_set_bytes_per_sector "LIBEWF_HANDLE *handle, uint32_t bytes_per_sector"
+.Ft int
+.Fn libewf_set_error_granularity "LIBEWF_HANDLE *handle, uint32_t error_granularity"
+.Ft int
+.Fn libewf_set_compression_values "LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block"
+.Ft int
+.Fn libewf_set_media_size "LIBEWF_HANDLE *handle, size64_t media_size"
+.Ft int
+.Fn libewf_set_segment_file_size "LIBEWF_HANDLE *handle, size64_t segment_file_size"
+.Ft int
+.Fn libewf_set_delta_segment_file_size "LIBEWF_HANDLE *handle, size64_t delta_segment_file_size"
+.Ft int
+.Fn libewf_set_media_type "LIBEWF_HANDLE *handle, uint8_t media_type"
+.Ft int
+.Fn libewf_set_volume_type "LIBEWF_HANDLE *handle, uint8_t volume_type"
+.Ft int
+.Fn libewf_set_format "LIBEWF_HANDLE *handle, uint8_t format"
+.Ft int
+.Fn libewf_set_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
+.Ft int
+.Fn libewf_set_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
+.Ft int
+.Fn libewf_set_read_wipe_chunk_on_error "LIBEWF_HANDLE *handle, uint8_t wipe_on_error"
+.Ft int
+.Fn libewf_parse_header_values "LIBEWF_HANDLE *handle, uint8_t date_format"
+.Ft int
+.Fn libewf_parse_hash_values "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_add_acquiry_error "LIBEWF_HANDLE *handle, off64_t first_sector, uint32_t amount_of_sectors"
+.Ft int
+.Fn libewf_add_crc_error "LIBEWF_HANDLE *handle, off64_t first_sector, uint32_t amount_of_sectors"
+.Ft int
+.Fn libewf_add_session "LIBEWF_HANDLE *handle, off64_t first_sector, uint32_t amount_of_sectors"
+.Ft int
+.Fn libewf_copy_header_values "LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle"
+.Ft void
+.Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
+.Pp
+When the library was compiled with narrow character support (default) the following functions are available
+.Ft const char *
+.Fn libewf_get_version "void"
+.Ft int
+.Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, char *filename, size_t size"
+.Ft int
+.Fn libewf_get_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
+.Ft int
+.Fn libewf_get_header_value_case_number "LIBEWF_HANDLE *handle, char *case_number, size_t length"
+.Ft int
+.Fn libewf_get_header_value_description "LIBEWF_HANDLE *handle, char *description, size_t length"
+.Ft int
+.Fn libewf_get_header_value_examiner_name "LIBEWF_HANDLE *handle, char *examiner_name, size_t length"
+.Ft int
+.Fn libewf_get_header_value_evidence_number "LIBEWF_HANDLE *handle, char *evidence_number, size_t length"
+.Ft int
+.Fn libewf_get_header_value_notes "LIBEWF_HANDLE *handle, char *notes, size_t length"
+.Ft int
+.Fn libewf_get_header_value_acquiry_date "LIBEWF_HANDLE *handle, char *acquiry_date, size_t length"
+.Ft int
+.Fn libewf_get_header_value_system_date "LIBEWF_HANDLE *handle, char *system_date, size_t length"
+.Ft int
+.Fn libewf_get_header_value_acquiry_operating_system "LIBEWF_HANDLE *handle, char *acquiry_operating_system, size_t length"
+.Ft int
+.Fn libewf_get_header_value_acquiry_software_version "LIBEWF_HANDLE *handle, char *acquiry_software_version, size_t length"
+.Ft int
+.Fn libewf_get_header_value_password "LIBEWF_HANDLE *handle, char *password, size_t length"
+.Ft int
+.Fn libewf_get_header_value_compression_type "LIBEWF_HANDLE *handle, char *compression_type, size_t length"
+.Ft int
+.Fn libewf_get_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
+.Ft int
+.Fn libewf_get_hash_value_md5 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Ft int
+.Fn libewf_get_hash_value_sha1 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Ft int
+.Fn libewf_set_delta_segment_filename "LIBEWF_HANDLE *handle, char *filename, size_t size"
+.Ft int
+.Fn libewf_set_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
+.Ft int
+.Fn libewf_set_header_value_case_number "LIBEWF_HANDLE *handle, char *case_number, size_t length"
+.Ft int
+.Fn libewf_set_header_value_description "LIBEWF_HANDLE *handle, char *description, size_t length"
+.Ft int
+.Fn libewf_set_header_value_examiner_name "LIBEWF_HANDLE *handle, char *examiner_name, size_t length"
+.Ft int
+.Fn libewf_set_header_value_evidence_number "LIBEWF_HANDLE *handle, char *evidence_number, size_t length"
+.Ft int
+.Fn libewf_set_header_value_notes "LIBEWF_HANDLE *handle, char *notes, size_t length"
+.Ft int
+.Fn libewf_set_header_value_acquiry_date "LIBEWF_HANDLE *handle, char *acquiry_date, size_t length"
+.Ft int
+.Fn libewf_set_header_value_system_date "LIBEWF_HANDLE *handle, char *system_date, size_t length"
+.Ft int
+.Fn libewf_set_header_value_acquiry_operating_system "LIBEWF_HANDLE *handle, char *acquiry_operating_system, size_t length"
+.Ft int
+.Fn libewf_set_header_value_acquiry_software_version "LIBEWF_HANDLE *handle, char *acquiry_software_version, size_t length"
+.Ft int
+.Fn libewf_set_header_value_password "LIBEWF_HANDLE *handle, char *password, size_t length"
+.Ft int
+.Fn libewf_set_header_value_compression_type "LIBEWF_HANDLE *handle, char *compression_type, size_t length"
+.Ft int
+.Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
+.Ft int
+.Fn libewf_set_hash_value_md5 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Ft int
+.Fn libewf_set_hash_value_sha1 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Pp
+When the library was compiled with wide character support the following functions are available instead of the narrow character functions
+.Ft const wchar_t *
+.Fn libewf_get_version "void"
+.Ft int
+.Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, wchar_t *filename, size_t size"
+.Ft int
+.Fn libewf_get_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_get_header_value_case_number "LIBEWF_HANDLE *handle, wchar_t *case_number, size_t length"
+.Ft int
+.Fn libewf_get_header_value_description "LIBEWF_HANDLE *handle, wchar_t *description, size_t length"
+.Ft int
+.Fn libewf_get_header_value_examiner_name "LIBEWF_HANDLE *handle, wchar_t *examiner_name, size_t length"
+.Ft int
+.Fn libewf_get_header_value_evidence_number "LIBEWF_HANDLE *handle, wchar_t *evidence_number, size_t length"
+.Ft int
+.Fn libewf_get_header_value_notes "LIBEWF_HANDLE *handle, wchar_t *notes, size_t length"
+.Ft int
+.Fn libewf_get_header_value_acquiry_date "LIBEWF_HANDLE *handle, wchar_t *acquiry_date, size_t length"
+.Ft int
+.Fn libewf_get_header_value_system_date "LIBEWF_HANDLE *handle, wchar_t *system_date, size_t length"
+.Ft int
+.Fn libewf_get_header_value_acquiry_operating_system "LIBEWF_HANDLE *handle, wchar_t *acquiry_operating_system, size_t length"
+.Ft int
+.Fn libewf_get_header_value_acquiry_software_version "LIBEWF_HANDLE *handle, wchar_t *acquiry_software_version, size_t length"
+.Ft int
+.Fn libewf_get_header_value_password "LIBEWF_HANDLE *handle, wchar_t *password, size_t length"
+.Ft int
+.Fn libewf_get_header_value_compression_type "LIBEWF_HANDLE *handle, wchar_t *compression_type, size_t length"
+.Ft int
+.Fn libewf_get_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_get_hash_value_md5 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_get_hash_value_sha1 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_set_delta_segment_filename "LIBEWF_HANDLE *handle, wchar_t *filename, size_t size"
+.Ft int
+.Fn libewf_set_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_set_header_value_case_number "LIBEWF_HANDLE *handle, wchar_t *case_number, size_t length"
+.Ft int
+.Fn libewf_set_header_value_description "LIBEWF_HANDLE *handle, wchar_t *description, size_t length"
+.Ft int
+.Fn libewf_set_header_value_examiner_name "LIBEWF_HANDLE *handle, wchar_t *examiner_name, size_t length"
+.Ft int
+.Fn libewf_set_header_value_evidence_number "LIBEWF_HANDLE *handle, wchar_t *evidence_number, size_t length"
+.Ft int
+.Fn libewf_set_header_value_notes "LIBEWF_HANDLE *handle, wchar_t *notes, size_t length"
+.Ft int
+.Fn libewf_set_header_value_acquiry_date "LIBEWF_HANDLE *handle, wchar_t *acquiry_date, size_t length"
+.Ft int
+.Fn libewf_set_header_value_system_date "LIBEWF_HANDLE *handle, wchar_t *system_date, size_t length"
+.Ft int
+.Fn libewf_set_header_value_acquiry_operating_system "LIBEWF_HANDLE *handle, wchar_t *acquiry_operating_system, size_t length"
+.Ft int
+.Fn libewf_set_header_value_acquiry_software_version "LIBEWF_HANDLE *handle, wchar_t *acquiry_software_version, size_t length"
+.Ft int
+.Fn libewf_set_header_value_password "LIBEWF_HANDLE *handle, wchar_t *password, size_t length"
+.Ft int
+.Fn libewf_set_header_value_compression_type "LIBEWF_HANDLE *handle, wchar_t *compression_type, size_t length"
+.Ft int
+.Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_set_hash_value_md5 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_set_hash_value_sha1 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Pp
+When wide character support functions like wmain and wopen are present and libewf is compiled with
+.Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+the following functions will replace their narrow character functions.
+.Ft int8_t
+.Fn libewf_check_file_signature "const wchar_t *filename"
+.Ft int
+.Fn libewf_glob "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
+.Ft LIBEWF_HANDLE *
+.Fn libewf_open "wchar_t * const filenames[], uint16_t amount_of_files, uint8_t flags"
+.Sh DESCRIPTION
+The
+.Fn libewf_get_version
+function is used to retrieve the library version.
+.Pp
+The
+.Fn libewf_get_flags_*
+functions are used to get the values of the flags for read and/or write.
+.Pp
+The
+.Fn libewf_check_file_signature
+function is used to test if the EWF file signature is present within a certain
+.Ar filename.
+.Pp
+The
+.Fn libewf_signal_abort
+function signals the handle to aborts it current activity.
+.Pp
+The
+.Fn libewf_glob
+function globs
+.Ar filenames
+using the
+.Ar filename
+and the
+.Ar format
+according to the EWF segment file naming schema.
+If the
+.Ar format
+is known the filename should contain the base of the filename otherwise the function will try to determine the format based on the extension.
+.Pp
+The
+.Fn libewf_open ,
+.Fn libewf_seek_offset ,
+.Fn libewf_read_buffer ,
+.Fn libewf_read_random ,
+.Fn libewf_write_buffer ,
+.Fn libewf_write_random ,
+.Fn libewf_close
+functions can be used to open, seek in, read from, write to and close a set of EWF files.
+.Pp
+The
+.Fn libewf_write_finalize
+function needs to be called after writing a set of EWF files without knowing the input size upfront, e.g. reading from a pipe.
+.Fn libewf_write_finalize
+will the necessary correction to the set of EWF files.
+.Pp
+The
+.Fn libewf_raw_read_prepare_buffer ,
+.Fn libewf_raw_read_buffer
+functions can be used to read 'raw' chunks to a set of EWF files.
+.Pp
+The
+.Fn libewf_raw_write_prepare_buffer ,
+.Fn libewf_raw_write_buffer
+functions can be used to write 'raw' chunks to a set of EWF files.
+.Pp
+The
+.Fn libewf_get_*
+functions can be used to retrieve information from the
+.Ar handle.
+This information is read from a set of EWF files when
+.Fn libewf_open
+is used. The
+.Fn libewf_parse_header_values,
+.Fn libewf_parse_hash_values
+functions need to be called before retrieving header or hash values.
+.Pp
+The
+.Fn libewf_set_*
+functions can be used to set information in the
+.Ar handle.
+This information is written to a set of EWF files when
+.Fn libewf_write_buffer
+is used.
+.Pp
+The
+.Fn libewf_parse_header_values
+function can be used to parse the values in the header strings within a set of EWF files.
+.Pp
+The
+.Fn libewf_parse_hash_values
+function can be used to parse the values in the hash string within a set of EWF files. The hash string is currently only present in the EWF-X format.
+.Pp
+The
+.Fn libewf_add_acquiry_error
+function can be used to add an acquiry error (a read error during acquiry) to be written into a set of EWF files.
+.Pp
+The
+.Fn libewf_copy_*
+functions copy information from the
+.Ar source_handle
+to the 
+.Ar destination_handle.
+.Pp
+The
+.Fn libewf_set_notify_values
+function can be used to direct the warning, verbose and debug output from the library.
+.Sh RETURN VALUES
+Most of the functions return NULL or -1 on error, dependent on the return type. For the actual return values refer to libewf.h
+.Sh ENVIRONMENT
+None
+.Sh FILES
+None
+.Sh BUGS
+Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
+https://libewf.uitwisselplatform.nl/
+.Sh AUTHOR
+These man pages were written by Joachim Metz.
+.Sh COPYRIGHT
+Copyright 2006-2008 Joachim Metz, Hoffmann Investigations <forensics@hoffmannbv.nl> and contributors.
+This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.Sh SEE ALSO
+the libewf.h include file
