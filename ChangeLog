@@ -140,8 +140,6 @@ Next release(s):
 
 FIXES
 * MacOS-X package should install in /usr/
-* unnecessary reopen of delta segement file in libewf_segment_table_create_segment_file
-  add truncate flag?
 * update ewfalter to handle more complex RW scenarios
 
 CLOSED
@@ -165,6 +163,7 @@ Version: 20080330
 * Fixed multiple bugs in read write mode, delta files were initiallity opened without read access
 * Worked on ewfalter to handle more complex RW scenarios
 * Changed libewf_read_chunk_data no longer to copy to buffer if buffer is the chunk cache data
+* Fixed unnecessary reopen of delta segement file in libewf_segment_table_create_segment_file
 
 Version: 20080329
 * Fixed wrong license in MacOS-X package

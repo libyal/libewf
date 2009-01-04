@@ -32,7 +32,6 @@
  */
 
 #include <common.h>
-#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -258,53 +257,5 @@ int libewf_filename_create(
 	*length_filename = length_basename + 5;
 
 	return( 1 );
-}
-
-/* Opens a filename
- * Returns the file descriptor or -1 on error
- */
-int libewf_filename_open(
-     const system_character_t *filename,
-     uint8_t flags )
-{
-	static char *function = "libewf_filename_open";
-	int file_io_flags     = 0;
-
-	if( filename == NULL )
-	{
-		notify_warning_printf( "%s: invalid file io handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	 && ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE ) )
-	{
-		file_io_flags = FILE_IO_O_RDWR;
-	}
-	else if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	{
-		file_io_flags = FILE_IO_O_RDONLY;
-	}
-	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-	{
-		file_io_flags = FILE_IO_O_CREAT | FILE_IO_O_WRONLY | FILE_IO_O_TRUNC;
-	}
-	else
-	{
-		notify_warning_printf( "%s: unsuported flags.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-	return( file_io_wopen(
-	         filename,
-	         file_io_flags ) );
-#else
-	return( file_io_open(
-	         filename,
-	         file_io_flags ) );
-#endif
 }
 

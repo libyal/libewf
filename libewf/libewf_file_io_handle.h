@@ -66,7 +66,7 @@ struct libewf_file_io_handle
 
 int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,
-     uint8_t flags );
+     int flags );
 
 ssize_t libewf_file_io_handle_read(
          libewf_file_io_handle_t *file_io_handle,

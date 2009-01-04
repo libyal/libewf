@@ -71,7 +71,7 @@ int libewf_check_file_signature(
 	}
 	file_descriptor = libewf_filename_open(
 	                   filename,
-	                   LIBEWF_OPEN_READ );
+	                   FILE_IO_O_RDONLY );
 
 	if( file_descriptor == -1 )
 	{
@@ -258,7 +258,7 @@ int libewf_glob(
 
 		file_descriptor = libewf_filename_open(
 		                   filename,
-		                   LIBEWF_OPEN_READ );
+		                   FILE_IO_O_RDONLY );
 
 		if( file_descriptor == -1 )
 		{

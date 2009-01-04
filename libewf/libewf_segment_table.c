@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <file_io.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -441,7 +442,7 @@ int libewf_segment_table_read_open(
 		}
 		if( libewf_segment_file_handle_open(
 		     segment_file_handle,
-		     LIBEWF_FLAG_READ ) != 1 )
+		     FILE_IO_O_RDONLY ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
 			 function, filenames[ iterator ] );
@@ -514,7 +515,7 @@ int libewf_segment_table_read_open(
 			{
 				if( libewf_segment_file_handle_reopen(
 				     segment_file_handle,
-				     ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) ) != 1 )
+				     FILE_IO_O_RDWR ) != 1 )
 				{
 					notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
 					 function, filenames[ iterator ] );
@@ -753,6 +754,7 @@ int libewf_segment_table_create_segment_file(
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_segment_table_create_segment_file";
+	int flags                                         = 0;
 
 	if( segment_table == NULL )
 	{
@@ -847,21 +849,19 @@ int libewf_segment_table_create_segment_file(
 	notify_verbose_printf( "%s: segment file created: %" PRIu32 " with name: %" PRIs_SYSTEM ".\n",
 	 function, segment_number, segment_file_handle->filename );
 #endif
+	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	{
+		flags = FILE_IO_O_RDWR | FILE_IO_O_CREAT | FILE_IO_O_TRUNC;
+	}
+	else
+	{
+		flags = FILE_IO_O_WRONLY | FILE_IO_O_CREAT | FILE_IO_O_TRUNC;
+	}
 	if( libewf_segment_file_handle_open(
 	     segment_file_handle,
-	     LIBEWF_OPEN_WRITE ) != 1 )
+	     flags ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
-		 function, segment_file_handle->filename );
-
-		return( -1 );
-	}
-	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
-	 && ( libewf_segment_file_handle_reopen(
-	       segment_file_handle,
-	       ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) ) != 1 ) )
-	{
-		notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );

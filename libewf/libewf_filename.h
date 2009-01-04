@@ -35,6 +35,7 @@
 #define _LIBEWF_FILENAME_H
 
 #include <common.h>
+#include <file_io.h>
 #include <memory.h>
 #include <system_string.h>
 
@@ -65,7 +66,17 @@ int libewf_filename_create(
 
 int libewf_filename_open(
      const system_character_t *filename,
-     uint8_t flags );
+     int flags );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#define libewf_filename_open( filename, flags ) \
+	file_io_wopen( filename, flags )
+
+#else
+#define libewf_filename_open( filename, flags ) \
+	file_io_open( filename, flags )
+
+#endif
 
 #if defined( __cplusplus )
 }

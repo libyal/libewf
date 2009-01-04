@@ -96,11 +96,11 @@ int libewf_segment_file_handle_set_filename(
 
 int libewf_segment_file_handle_open(
      libewf_segment_file_handle_t *segment_file_handle,
-     uint8_t flags );
+     int flags );
 
 int libewf_segment_file_handle_reopen(
      libewf_segment_file_handle_t *segment_file_handle,
-     uint8_t flags );
+     int flags );
 
 ssize_t libewf_segment_file_handle_read(
          libewf_segment_file_handle_t *segment_file_handle,
