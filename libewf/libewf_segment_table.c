@@ -71,6 +71,20 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
+	if( libewf_common_memset(
+	     segment_table->segment_file,
+	     0, 
+	     ( amount * sizeof( LIBEWF_SEGMENT_FILE* ) ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear segment file array.\n",
+		 function );
+
+		libewf_common_free( segment_table->segment_file );
+		libewf_common_free( segment_table );
+
+		return( NULL );
+	} 
+#ifndef REFACTOR
 	for( iterator = 0; iterator < amount; iterator++ )
 	{
 		segment_table->segment_file[ iterator ] = libewf_segment_file_alloc();
@@ -96,6 +110,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 			return( NULL );
 		}
 	}
+#endif
 	segment_table->amount = amount;
 
 	return( segment_table );
@@ -137,6 +152,17 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 	}
 	segment_table->segment_file = (LIBEWF_SEGMENT_FILE **) reallocation;
 
+	if( libewf_common_memset(
+	     &( segment_table->segment_file[ segment_table->amount ] ),
+	     0, 
+	     ( ( amount - segment_table->amount ) * sizeof( LIBEWF_SEGMENT_FILE* ) ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear segment file array.\n",
+		 function );
+
+		return( 1 );
+	} 
+#ifndef REFACTOR
 	for( iterator = segment_table->amount; iterator < amount; iterator++ )
 	{
 		segment_table->segment_file[ iterator ] = libewf_segment_file_alloc();
@@ -149,6 +175,7 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 			return( -1 );
 		}
 	}
+#endif
 	segment_table->amount = amount;
 
 	return( 1 );

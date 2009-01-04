@@ -518,6 +518,12 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 					if( internal_handle->header[ 25 ] == (EWF_CHAR) 'r' )
 					{
 						internal_handle->format = LIBEWF_FORMAT_ENCASE1;
+
+						if( internal_handle->amount_of_header_sections != 1 )
+						{
+							LIBEWF_VERBOSE_PRINT( "%s: multiple header sections found.\n",
+							 function );
+						}
 					}
 					else if( internal_handle->header[ 31 ] == (EWF_CHAR) 'r' )
 					{

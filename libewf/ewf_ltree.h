@@ -46,8 +46,6 @@ extern "C" {
 #define EWF_LTREE ewf_ltree_t
 #define EWF_LTREE_SIZE sizeof( EWF_LTREE )
 
-#define EWF_LTREE_DATA EWF_CHAR
-
 typedef struct ewf_ltree ewf_ltree_t;
 
 struct ewf_ltree
@@ -70,6 +68,7 @@ struct ewf_ltree
 
 	/* Unknown
 	 * consists of 4 bytes
+	 * possible CRC?
 	 */
 	uint8_t unknown3[ 4 ];
 

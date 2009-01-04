@@ -1,5 +1,5 @@
 /*
- * EWF character type string functions
+ * libewf compression handling
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,62 +31,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _EWF_STRING_H )
-#define _EWF_STRING_H
+#if !defined( _LIBEWF_COMPRESS_H )
+#define _LIBEWF_COMPRESS_H
 
 #include "libewf_includes.h"
-
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
-
-#include "ewf_char.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_STRLEN )
-#define ewf_string_length( string ) \
-	strlen( (char *) string )
-#else
-#error Missing string length function (strlen)
-#endif
-
-#if defined( HAVE_MEMCMP )
-#define ewf_string_compare( string1, string2, size ) \
-	memcmp( (void *) string1, (void *) string2, size )
-#elif defined( HAVE_STRNCMP )
-#define ewf_string_compare( string1, string2, size ) \
-	strncmp( string1, string2, size )
-#elif defined( HAVE_STRCMP )
-#define ewf_string_compare( string1, string2, size ) \
-	strcmp( string1, string2 )
-#else
-#error Missing string compare function (memcmp, strncmp and strcmp)
-#endif
-
-#if defined( HAVE_MEMCPY )
-#define ewf_string_copy( destination, source, size ) \
-	(LIBEWF_CHAR *) memcpy( (void *) destination, (void *) source, size )
-#elif defined( HAVE_STRNCPY )
-#define ewf_string_copy( destination, source, size ) \
-	strncpy( destination, source, size )
-#elif defined( HAVE_STRCPY )
-#define ewf_string_copy( destination, source, size ) \
-	strcpy( destination, source )
-#else
-#error Missing string copy function (memcpy, strncpy and strcpy)
-#endif
-
-EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8_t compression_level );
-
-ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, size_t size );
-
-#define ewf_string_write( string, file_descriptor, size ) \
-	ewf_string_write_from_buffer( string, file_descriptor, size )
-
-ssize_t ewf_string_write_compressed( EWF_CHAR *string, int file_descriptor, size_t *size, int8_t compression_level );
+int libewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t *uncompressed_data, size_t uncompressed_size, int8_t compression_level );
+int libewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, uint8_t *compressed_data, size_t compressed_size );
 
 #if defined( __cplusplus )
 }

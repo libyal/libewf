@@ -138,6 +138,9 @@ Next release:
 * store length segment filename in segment file
 * move libewf_section_list_append to section write functions?
   - for some sections not useful
+* refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
+  function
+* remove ewf_compress and ewf_string.c
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -154,9 +157,9 @@ CLOSED
   no, strndup is not available on all platforms
 
 Version: 20071118
-* worked on refactoring the offset table to use the segment file struct
 * refactored segment table to a table of segment file **
-* refactored chunk offset segment_number and file_descriptor to reference of segment file
+* refactored offset table chunk offset segment_number and file_descriptor to reference of segment file
+* worked on refactoring to use segment file struct in section
 
 Version: 20071117
 * changed MB to MiB, etc.

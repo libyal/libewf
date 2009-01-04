@@ -304,9 +304,9 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	}
 	/* Read the chunk data
 	 */
-	chunk_read_count = ewf_string_read_to_buffer(
+	chunk_read_count = libewf_segment_file_read(
+			    segment_file,
 			    chunk_buffer,
-			    segment_file->file_descriptor,
 			    chunk_data_size );
 
 	if( chunk_read_count != (ssize_t) chunk_data_size )
@@ -316,8 +316,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	segment_file->file_offset += (off64_t) chunk_read_count;
-
 	/* Determine if the chunk is not compressed
 	 */
 	if( *is_compressed == 0 )
@@ -326,8 +324,8 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 		 */
 		if( *read_crc != 0 )
 		{
-			crc_read_count = libewf_common_read(
-					  segment_file->file_descriptor,
+			crc_read_count = libewf_segment_file_read(
+					  segment_file,
 					  stored_crc_buffer,
 					  EWF_CRC_SIZE );
 
@@ -338,8 +336,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 				return( -1 );
 			}
-			segment_file->file_offset += (off64_t) crc_read_count;
-
 			if( libewf_endian_convert_32bit( chunk_crc, stored_crc_buffer ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
@@ -361,7 +357,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s.\n",
 	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
 #endif
-	return( chunk_read_count );
+	return( chunk_read_count + crc_read_count );
 }
 
 /* Reads a certain chunk of data from the segment file(s)

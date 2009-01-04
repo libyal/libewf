@@ -268,8 +268,6 @@ ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffe
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read from segment file: %" PRIs_EWF_filename ".\n",
 		 function, segment_file->filename );
-
-		return( -1 );
 	}
 	return( read_count );
 }
@@ -551,7 +549,6 @@ int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_ha
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
 		          internal_handle->segment_table->segment_file[ segment_number ],
-		          segment_number,
 		          &last_segment_file );
 
 		if( result == -1 )
@@ -622,7 +619,6 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
 		          internal_handle->delta_segment_table->segment_file[ segment_number ],
-		          segment_number,
 		          &last_segment_file );
 
 		if( result == -1 )
@@ -656,7 +652,7 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, int *last_segment_file )
+int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, int *last_segment_file )
 {
 	EWF_SECTION section;
 
@@ -697,7 +693,6 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 		          internal_handle,
 		          segment_file,
 		          &section,
-		          segment_number,
 		          &previous_offset );
 
 		if( result != 1 )
@@ -1459,7 +1454,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc )
+ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 
@@ -2555,8 +2550,7 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
  */
 off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk )
 {
-	static char *function   = "libewf_segment_file_seek_chunk_offset";
-	uint16_t segment_number = 0;
+	static char *function = "libewf_segment_file_seek_chunk_offset";
 
 	if( internal_handle == NULL )
 	{

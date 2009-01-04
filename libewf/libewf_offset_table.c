@@ -156,7 +156,7 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 /* Fills the offset table
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t error_tollerance )
+int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE *segment_file, uint8_t error_tollerance )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *chunk_type        = NULL;

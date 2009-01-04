@@ -1061,7 +1061,6 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	write_count = libewf_segment_file_write_chunks_data(
 		       internal_handle,
 		       internal_handle->segment_table->segment_file[ segment_number ],
-		       segment_number,
 		       chunk,
 		       chunk_buffer,
 		       chunk_size,
