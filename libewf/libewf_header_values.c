@@ -181,7 +181,7 @@ int libewf_convert_timestamp(
 
 		if( newline != NULL )
 		{
-			newline[ 0 ] = (character_t) '\0';
+			newline[ 0 ] = 0;
 		}
 	}
 	else
@@ -250,7 +250,7 @@ int libewf_convert_timestamp(
 
 		/* Make sure the string is terminated
 		 */
-		date_string[ date_string_size - 1 ] = (character_t) '\0';
+		date_string[ date_string_size - 1 ] = 0;
 	}
 	return( 1 );
 }
@@ -323,7 +323,7 @@ int libewf_convert_date_header_value(
 
 	/* Set the month
 	 */
-	if( date_elements[ 1 ][ 1 ] == (character_t) '\0' )
+	if( date_elements[ 1 ][ 1 ] == 0 )
 	{
 		time_elements.tm_mon = (int) ( ( date_elements[ 1 ][ 0 ] - (character_t) '0' )
 		                     - 1 );
@@ -336,7 +336,7 @@ int libewf_convert_date_header_value(
 	}
 	/* Set the day of the month
 	 */
-	if( date_elements[ 2 ][ 1 ] == (character_t) '\0' )
+	if( date_elements[ 2 ][ 1 ] == 0 )
 	{
 		time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (character_t) '0' );
 	}
@@ -347,7 +347,7 @@ int libewf_convert_date_header_value(
 	}
 	/* Set the hour
 	 */
-	if( date_elements[ 3 ][ 1 ] == (character_t) '\0' )
+	if( date_elements[ 3 ][ 1 ] == 0 )
 	{
 		time_elements.tm_hour = (int) ( date_elements[ 3 ][ 0 ] - (character_t) '0' );
 	}
@@ -358,7 +358,7 @@ int libewf_convert_date_header_value(
 	}
 	/* Set the minutes
 	 */
-	if( date_elements[ 4 ][ 1 ] == (character_t) '\0' )
+	if( date_elements[ 4 ][ 1 ] == 0 )
 	{
 		time_elements.tm_min = (int) ( date_elements[ 4 ][ 0 ] - (character_t) '0' );
 	}
@@ -369,7 +369,7 @@ int libewf_convert_date_header_value(
 	}
 	/* Set the seconds
 	 */
-	if( date_elements[ 5 ][ 1 ] == (character_t) '\0' )
+	if( date_elements[ 5 ][ 1 ] == 0 )
 	{
 		time_elements.tm_sec = (int) ( date_elements[ 5 ][ 0 ] - (character_t) '0' );
 	}
@@ -438,13 +438,13 @@ int libewf_convert_date_header_value(
 }
 
 /* Generate date string within a header value
- * Sets date string and date string length
+ * Sets date string and date string size
  * Returns 1 if successful or -1 on error
  */
 int libewf_generate_date_header_value(
      time_t timestamp,
      character_t **date_string,
-     size_t *date_string_length )
+     size_t *date_string_size )
 {
 	struct tm *time_elements = NULL;
 	static char *function    = "libewf_generate_date_header_value";
@@ -463,9 +463,9 @@ int libewf_generate_date_header_value(
 
 		return( -1 );
 	}
-	if( date_string_length == NULL )
+	if( date_string_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid date string length.\n",
+		notify_warning_printf( "%s: invalid date string size.\n",
 		 function );
 
 		return( -1 );
@@ -480,10 +480,10 @@ int libewf_generate_date_header_value(
 
 		return( -1 );
 	}
-	*date_string_length = 20;
+	*date_string_size = 20;
 
 	*date_string = (character_t *) memory_allocate(
-	                                sizeof( character_t ) * *date_string_length );
+	                                sizeof( character_t ) * *date_string_size );
 
 	if( *date_string == NULL )
 	{
@@ -493,13 +493,13 @@ int libewf_generate_date_header_value(
 		memory_free(
 		 time_elements );
 
-		*date_string_length = 0;
+		*date_string_size = 0;
 
 		return( -1 );
 	}
 	if( string_snprintf(
 	     *date_string,
-	     *date_string_length,
+	     *date_string_size,
 	     _CHARACTER_T_STRING( "%4d %d %d %d %d %d" ),
 	     ( time_elements->tm_year + 1900 ),
 	     ( time_elements->tm_mon + 1 ),
@@ -516,14 +516,14 @@ int libewf_generate_date_header_value(
 		memory_free(
 		 time_elements );
 
-		*date_string        = NULL;
-		*date_string_length = 0;
+		*date_string      = NULL;
+		*date_string_size = 0;
 
 		return( -1 );
 	}
 	/* Make sure the string is terminated
 	 */
-	( *date_string )[ *date_string_length - 1 ] = (character_t) '\0';
+	( *date_string )[ *date_string_size - 1 ] = 0;
 
 	memory_free(
 	 time_elements );
@@ -607,13 +607,13 @@ int libewf_convert_date_header2_value(
 }
 
 /* Generate date string within a header2 value
- * Sets date string and date string length
+ * Sets date string and date string size
  * Returns 1 if successful or -1 on error
  */
 int libewf_generate_date_header2_value(
      time_t timestamp,
      character_t **date_string,
-     size_t *date_string_length )
+     size_t *date_string_size )
 {
 	static char *function = "libewf_generate_date_header2_value";
 
@@ -631,30 +631,30 @@ int libewf_generate_date_header2_value(
 
 		return( -1 );
 	}
-	if( date_string_length == NULL )
+	if( date_string_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid date string length.\n",
+		notify_warning_printf( "%s: invalid date string size.\n",
 		 function );
 
 		return( -1 );
 	}
-	*date_string_length = 11;
+	*date_string_size = 11;
 
 	*date_string = (character_t *) memory_allocate(
-	                                sizeof( character_t ) * *date_string_length );
+	                                sizeof( character_t ) * *date_string_size );
 
 	if( *date_string == NULL )
 	{
 		notify_warning_printf( "%s: unable to create date string.\n",
 		 function );
 
-		*date_string_length = 0;
+		*date_string_size = 0;
 
 		return( -1 );
 	}
 	if( string_snprintf(
 	     *date_string,
-	     *date_string_length,
+	     *date_string_size,
 	     _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIu32 ),
 	     (uint32_t) timestamp ) <= -1 )
 	{
@@ -664,14 +664,14 @@ int libewf_generate_date_header2_value(
 		memory_free(
 		 *date_string );
 
-		*date_string        = NULL;
-		*date_string_length = 0;
+		*date_string      = NULL;
+		*date_string_size = 0;
 
 		return( -1 );
 	}
 	/* Make sure the string is terminated
 	 */
-	( *date_string )[ *date_string_length - 1 ] = (character_t) '\0';
+	( *date_string )[ *date_string_size - 1 ] = 0;
 
 	return( 1 );
 }
@@ -1471,16 +1471,17 @@ int libewf_header_values_parse_header2(
 }
 
 /* Converts a header string into a header
- * Sets the header and header length
+ * Sets the header and header size
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_convert_header_string_to_header(
      character_t *header_string,
-     size_t header_string_length,
+     size_t header_string_size,
      uint8_t **header,
-     size_t *header_length )
+     size_t *header_size )
 {
-	static char *function = "libewf_header_values_convert_header_string_to_header";
+	static char *function    = "libewf_header_values_convert_header_string_to_header";
+	ssize_t byte_stream_size = 0;
 
 	if( header_string == NULL )
 	{
@@ -1503,31 +1504,41 @@ int libewf_header_values_convert_header_string_to_header(
 
 		return( -1 );
 	}
-	if( header_length == NULL )
+	if( header_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid header length.\n",
+		notify_warning_printf( "%s: invalid header size.\n",
 		 function );
 
 		return( -1 );
 	}
-	*header_length = header_string_length;
+	byte_stream_size = byte_stream_size_from_string(
+	                    header_string,
+	                    header_string_size,
+	                    LIBUCA_CODEPAGE_ASCII );
 
+	if( byte_stream_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header size.\n",
+		 function );
+
+		return( -1 );
+	}
 	*header = (uint8_t *) memory_allocate(
-	                       sizeof( uint8_t ) * *header_length );
+	                       sizeof( uint8_t ) * (size_t) byte_stream_size );
 
 	if( *header == NULL )
 	{
 		notify_warning_printf( "%s: unable to create header.\n",
 		 function );
 
-		*header_length = 0;
-
 		return( -1 );
 	}
-	if( string_copy_to_char(
-	     (char *) *header,
+	if( byte_stream_copy_from_string(
+	     *header,
+	     (size_t) byte_stream_size,
+	     LIBUCA_CODEPAGE_ASCII,
 	     header_string,
-	     header_string_length ) != 1 )
+	     header_string_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header.\n",
 		 function );
@@ -1535,11 +1546,12 @@ int libewf_header_values_convert_header_string_to_header(
 		memory_free(
 		 header );
 
-		*header        = NULL;
-		*header_length = 0;
+		*header = NULL;
 
 		return( -1 );
 	}
+	*header_size = (size_t) byte_stream_size;
+
 	return( 1 );
 }
 
@@ -1650,8 +1662,8 @@ int libewf_header_values_generate_header_string_type1(
 	character_t *password_hash    = _CHARACTER_T_STRING( "" );
 	character_t *compression_type = _CHARACTER_T_STRING( "" );
 	static char *function         = "libewf_header_values_generate_header_string_type1";
-	size_t system_date_length     = 0;
-	size_t acquiry_date_length    = 0;
+	size_t system_date_size       = 0;
+	size_t acquiry_date_size      = 0;
 	ssize_t print_count           = 0;
 
 	if( header_values == NULL )
@@ -1755,7 +1767,7 @@ int libewf_header_values_generate_header_string_type1(
 		if( libewf_generate_date_header_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -1782,7 +1794,7 @@ int libewf_header_values_generate_header_string_type1(
 		if( libewf_generate_date_header_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -1925,7 +1937,7 @@ int libewf_header_values_generate_header_string_type1(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -1955,8 +1967,8 @@ int libewf_header_values_generate_header_string_type2(
 	character_t *password_hash            = _CHARACTER_T_STRING( "" );
 	character_t *compression_type         = _CHARACTER_T_STRING( "" );
 	static char *function                 = "libewf_header_values_generate_header_string_type2";
-	size_t system_date_length             = 0;
-	size_t acquiry_date_length            = 0;
+	size_t system_date_size               = 0;
+	size_t acquiry_date_size              = 0;
 	ssize_t print_count                   = 0;
 
 	if( header_values == NULL )
@@ -2060,7 +2072,7 @@ int libewf_header_values_generate_header_string_type2(
 		if( libewf_generate_date_header_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2087,7 +2099,7 @@ int libewf_header_values_generate_header_string_type2(
 		if( libewf_generate_date_header_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2248,7 +2260,7 @@ int libewf_header_values_generate_header_string_type2(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -2276,8 +2288,8 @@ int libewf_header_values_generate_header_string_type3(
 	character_t *acquiry_software_version = _CHARACTER_T_STRING( "" );
 	character_t *password_hash            = _CHARACTER_T_STRING( "" );
 	static char *function                 = "libewf_header_values_generate_header_string_type3";
-	size_t system_date_length             = 0;
-	size_t acquiry_date_length            = 0;
+	size_t system_date_size               = 0;
+	size_t acquiry_date_size              = 0;
 	ssize_t print_count                   = 0;
 
 	if( header_values == NULL )
@@ -2372,7 +2384,7 @@ int libewf_header_values_generate_header_string_type3(
 		if( libewf_generate_date_header_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2399,7 +2411,7 @@ int libewf_header_values_generate_header_string_type3(
 		if( libewf_generate_date_header_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2534,7 +2546,7 @@ int libewf_header_values_generate_header_string_type3(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -2562,8 +2574,8 @@ int libewf_header_values_generate_header_string_type4(
 	character_t *acquiry_software_version = _CHARACTER_T_STRING( "" );
 	character_t *password_hash            = _CHARACTER_T_STRING( "" );
 	static char *function                 = "libewf_header_values_generate_header_string_type4";
-	size_t system_date_length             = 0;
-	size_t acquiry_date_length            = 0;
+	size_t system_date_size               = 0;
+	size_t acquiry_date_size              = 0;
 	ssize_t print_count                   = 0;
 
 	if( header_values == NULL )
@@ -2658,7 +2670,7 @@ int libewf_header_values_generate_header_string_type4(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2685,7 +2697,7 @@ int libewf_header_values_generate_header_string_type4(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2814,7 +2826,7 @@ int libewf_header_values_generate_header_string_type4(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -2845,8 +2857,8 @@ int libewf_header_values_generate_header_string_type5(
 	character_t *password_hash            = _CHARACTER_T_STRING( "" );
 	character_t *unknown_dc               = _CHARACTER_T_STRING( "" );
 	static char *function                 = "libewf_header_values_generate_header_string_type5";
-	size_t system_date_length             = 0;
-	size_t acquiry_date_length            = 0;
+	size_t system_date_size               = 0;
+	size_t acquiry_date_size              = 0;
 	ssize_t print_count                   = 0;
 
 	if( header_values == NULL )
@@ -2947,7 +2959,7 @@ int libewf_header_values_generate_header_string_type5(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2974,7 +2986,7 @@ int libewf_header_values_generate_header_string_type5(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -3116,7 +3128,7 @@ int libewf_header_values_generate_header_string_type5(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -3149,8 +3161,8 @@ int libewf_header_values_generate_header_string_type6(
 	character_t *serial_number            = _CHARACTER_T_STRING( "" );
 	character_t *unknown_dc               = _CHARACTER_T_STRING( "" );
 	static char *function                 = "libewf_header_values_generate_header_string_type6";
-	size_t system_date_length             = 0;
-	size_t acquiry_date_length            = 0;
+	size_t system_date_size               = 0;
+	size_t acquiry_date_size              = 0;
 	ssize_t print_count                   = 0;
 
 	if( header_values == NULL )
@@ -3251,7 +3263,7 @@ int libewf_header_values_generate_header_string_type6(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -3278,7 +3290,7 @@ int libewf_header_values_generate_header_string_type6(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -3438,7 +3450,7 @@ int libewf_header_values_generate_header_string_type6(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -3468,8 +3480,8 @@ int libewf_header_values_generate_header_string_type7(
 	character_t *acquiry_software_version = _CHARACTER_T_STRING( "" );
 	character_t *password_hash            = _CHARACTER_T_STRING( "" );
 	static char *function                 = "libewf_header_values_generate_header_string_type7";
-	size_t system_date_length             = 0;
-	size_t acquiry_date_length            = 0;
+	size_t system_date_size               = 0;
+	size_t acquiry_date_size              = 0;
 	ssize_t print_count                   = 0;
 
 	if( header_values == NULL )
@@ -3570,7 +3582,7 @@ int libewf_header_values_generate_header_string_type7(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -3597,7 +3609,7 @@ int libewf_header_values_generate_header_string_type7(
 		if( libewf_generate_date_header2_value(
 		     timestamp,
 		     &system_date,
-		     &system_date_length ) != 1 )
+		     &system_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate system date header value.\n",
 			 function );
@@ -3730,7 +3742,7 @@ int libewf_header_values_generate_header_string_type7(
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -4395,7 +4407,7 @@ int libewf_convert_date_xheader_value(
 		}
 		/* Set the day of the month
 		 */
-		if( date_elements[ 2 ][ 1 ] == (character_t) '\0' )
+		if( date_elements[ 2 ][ 1 ] == 0 )
 		{
 			time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (character_t) '0' );
 		}
@@ -4480,13 +4492,13 @@ int libewf_convert_date_xheader_value(
 }
 
 /* Generate date string within a xheader value
- * Sets date string and date string length
+ * Sets date string and date string size
  * Returns 1 if successful or -1 on error
  */
 int libewf_generate_date_xheader_value(
      time_t timestamp, 
      character_t **date_string,
-     size_t *date_string_length )
+     size_t *date_string_size )
 {
 	character_t *newline  = NULL;
 	static char *function = "libewf_generate_date_xheader_value";
@@ -4505,31 +4517,31 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	if( date_string_length == NULL )
+	if( date_string_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid date string length.\n",
+		notify_warning_printf( "%s: invalid date string size.\n",
 		 function );
 
 		return( -1 );
 	}
-	*date_string_length = 32;
+	*date_string_size = 32;
 
 	*date_string = (character_t *) memory_allocate(
-	                                sizeof( character_t ) * *date_string_length );
+	                                sizeof( character_t ) * *date_string_size );
 
 	if( *date_string == NULL )
 	{
 		notify_warning_printf( "%s: unable to create date string.\n",
 		 function );
 
-		*date_string_length = 0;
+		*date_string_size = 0;
 
 		return( -1 );
 	}
 	if( string_ctime(
 	     &timestamp,
 	     *date_string,
-	     *date_string_length ) == NULL )
+	     *date_string_size ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set ctime string.\n",
 		 function );
@@ -4537,15 +4549,15 @@ int libewf_generate_date_xheader_value(
 		memory_free(
 		 *date_string );
 
-		*date_string        = NULL;
-		*date_string_length = 0;
+		*date_string      = NULL;
+		*date_string_size = 0;
 
 		return( -1 );
 	}
 	newline = string_search(
 	           *date_string,
 	           (character_t) '\n',
-	           *date_string_length );
+	           *date_string_size );
 
 	if( newline != NULL )
 	{
@@ -4553,7 +4565,7 @@ int libewf_generate_date_xheader_value(
 		newline[ 1 ] = (character_t) tzname[ 0 ][ 0 ];
 		newline[ 2 ] = (character_t) tzname[ 0 ][ 1 ];
 		newline[ 3 ] = (character_t) tzname[ 0 ][ 2 ];
-		newline[ 4 ] = (character_t) '\0';
+		newline[ 4 ] = 0;
 	}
 	return( 1 );
 }
@@ -4706,7 +4718,7 @@ int libewf_header_values_parse_header_string_xml(
 
 		/* Make sure the string is terminated
 		 */
-		*open_tag_end = (character_t) '\0';
+		*open_tag_end = 0;
 
 		if( ( string_compare(
 		       &open_tag_start[ 1 ],
@@ -4795,10 +4807,9 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
-	xml_header_string_size = string_size_from_byte_stream(
+	xml_header_string_size = string_size_from_utf8_stream(
 	                          xheader,
-	                          xheader_size,
-	                          LIBUCA_CODEPAGE_ASCII );
+	                          xheader_size );
 
 	if( xml_header_string_size < 0 )
 	{
@@ -4817,12 +4828,11 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
-	if( string_copy_from_byte_stream(
+	if( string_copy_from_utf8_stream(
              xml_header_string,
              (size_t) xml_header_string_size,
              xheader,
-             xheader_size,
-             LIBUCA_CODEPAGE_ASCII ) != 1 )
+             xheader_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set XML header string.\n",
 		 function );
@@ -4849,6 +4859,89 @@ int libewf_header_values_parse_xheader(
 	return( result );
 }
 
+/* Converts an XML header string into a xheader
+ * Sets the xheader and xheader size
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_header_values_convert_header_string_xml_to_xheader(
+     character_t *header_string_xml,
+     size_t header_string_xml_size,
+     uint8_t **xheader,
+     size_t *xheader_size )
+{
+	static char *function    = "libewf_header_values_convert_header_string_xml_to_xheader";
+	ssize_t utf8_stream_size = 0;
+
+	if( header_string_xml == NULL )
+	{
+		notify_warning_printf( "%s: invalid XML header string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( xheader == NULL )
+	{
+		notify_warning_printf( "%s: invalid xheader.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *xheader != NULL )
+	{
+		notify_warning_printf( "%s: xheader already created.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( xheader_size == NULL )
+	{
+		notify_warning_printf( "%s: invalid xheader size.\n",
+		 function );
+
+		return( -1 );
+	}
+	utf8_stream_size = utf8_stream_size_from_string(
+	                    header_string_xml,
+	                    header_string_xml_size );
+
+	if( utf8_stream_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine xheader size.\n",
+		 function );
+
+		return( -1 );
+	}
+	*xheader = (uint8_t *) memory_allocate(
+	                        sizeof( uint8_t ) * (size_t) utf8_stream_size );
+
+	if( *xheader == NULL )
+	{
+		notify_warning_printf( "%s: unable to create xheader.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_stream_copy_from_string(
+	     *header,
+	     (size_t) utf8_stream_size,
+	     LIBUCA_CODEPAGE_ASCII,
+	     header_string_xml,
+	     header_string_xml_length ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set xheader.\n",
+		 function );
+
+		memory_free(
+		 header );
+
+		*xheader = NULL;
+
+		return( -1 );
+	}
+	*xheader_length = (size_t) utf8_stream_size;
+
+	return( 1 );
+}
 /* Generate a header format in XML
  * Sets header string and the header string length
  * Returns 1 if successful or -1 on error
@@ -4857,7 +4950,7 @@ int libewf_header_values_generate_header_string_xml(
      libewf_values_table_t *header_values,
      time_t timestamp, 
      character_t **header_string,
-     size_t *header_string_length )
+     size_t *header_string_size )
 {
 	character_t *xml_head              = _CHARACTER_T_STRING( "<?xml version=\"1.0\"?>" );
 	character_t *xml_open_tag_xheader  = _CHARACTER_T_STRING( "<xheader>" );
@@ -4865,7 +4958,7 @@ int libewf_header_values_generate_header_string_xml(
 	character_t *acquiry_date          = NULL;
 	static char *function              = "libewf_header_values_generate_header_string_xml";
 	uint32_t iterator                  = 0;
-	size_t acquiry_date_length         = 0;
+	size_t acquiry_date_size           = 0;
 	int string_offset                  = 0;
 	int character_count                = 0;
 
@@ -4890,23 +4983,23 @@ int libewf_header_values_generate_header_string_xml(
 
 		return( -1 );
 	}
-	if( header_string_length == NULL )
+	if( header_string_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid string length.\n",
+		notify_warning_printf( "%s: invalid string size.\n",
 		 function );
 
 		return( -1 );
 	}
 	/* Add space for the XML data and an end of line
 	 */
-	*header_string_length = 1 + string_length(
-	                             xml_head );
+	*header_string_size = 1 + string_length(
+	                           xml_head );
 
-	*header_string_length += 1 + string_length(
-	                              xml_open_tag_xheader );
+	*header_string_size += 1 + string_length(
+	                            xml_open_tag_xheader );
 
-	*header_string_length += 1 + string_length(
-	                              xml_close_tag_xheader );
+	*header_string_size += 1 + string_length(
+	                            xml_close_tag_xheader );
 
 	for( iterator = 0; iterator < header_values->amount; iterator++ )
 	{
@@ -4921,13 +5014,13 @@ int libewf_header_values_generate_header_string_xml(
 		{
 			/* Add space for a leading tab, <identifier></identifier> and an end of line
 			 */
-			*header_string_length += 7 + ( 2 * string_length(
-			                                    header_values->identifiers[ iterator ] ) );
+			*header_string_size += 7 + ( 2 * string_length(
+			                                  header_values->identifiers[ iterator ] ) );
 
 			/* Add space for the header value
 			 */
-			*header_string_length += string_length(
-			                          header_values->values[ iterator ] );
+			*header_string_size += string_length(
+			                        header_values->values[ iterator ] );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
@@ -4935,7 +5028,7 @@ int libewf_header_values_generate_header_string_xml(
 		if( libewf_generate_date_xheader_value(
 		     timestamp,
 		     &acquiry_date,
-		     &acquiry_date_length ) != 1 )
+		     &acquiry_date_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -4947,16 +5040,16 @@ int libewf_header_values_generate_header_string_xml(
 			/* Add space for a leading tab, <acquiry_date>, header value, </acquiry_date> and an end of line
 			 * Make sure to determine the effective length of the acquiry date string
 			 */
-			*header_string_length += 31 + string_length(
-			                               acquiry_date );
+			*header_string_size += 31 + string_length(
+			                             acquiry_date );
 		}
 	}
 	/* allow for an empty line and an end of string
 	 */
-	*header_string_length += 2;
+	*header_string_size += 2;
 
 	*header_string = (character_t *) memory_allocate(
-	                                  sizeof( character_t ) * *header_string_length );
+	                                  sizeof( character_t ) * *header_string_size );
 
 	if( *header_string == NULL )
 	{
@@ -4969,13 +5062,13 @@ int libewf_header_values_generate_header_string_xml(
 			memory_free(
 			 acquiry_date );
 		}
-		*header_string_length = 0;
+		*header_string_size = 0;
 
 		return( -1 );
 	}
 	character_count = string_snprintf(
 	                   *header_string,
-	                   *header_string_length,
+	                   *header_string_size,
 	                   _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n%" )
 	                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n" ),
 	                   xml_head,
@@ -4995,8 +5088,8 @@ int libewf_header_values_generate_header_string_xml(
 			memory_free(
 			 acquiry_date );
 		}
-		*header_string        = NULL;
-		*header_string_length = 0;
+		*header_string      = NULL;
+		*header_string_size = 0;
 
 		return( -1 );
 	}
@@ -5015,7 +5108,7 @@ int libewf_header_values_generate_header_string_xml(
 		{
 			character_count = string_snprintf(
 			                   &( ( *header_string )[ string_offset ] ),
-			                   ( *header_string_length - string_offset ),
+			                   ( *header_string_size - string_offset ),
 			                   _CHARACTER_T_STRING( "\t<%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( ">%" )
 			                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "</%" ) _CHARACTER_T_STRING( PRIs )
 			                   _CHARACTER_T_STRING( ">\n" ),
@@ -5037,8 +5130,8 @@ int libewf_header_values_generate_header_string_xml(
 					memory_free(
 					 acquiry_date );
 				}
-				*header_string        = NULL;
-				*header_string_length = 0;
+				*header_string      = NULL;
+				*header_string_size = 0;
 
 				return( -1 );
 			}
@@ -5050,7 +5143,7 @@ int libewf_header_values_generate_header_string_xml(
 	{
 		character_count = string_snprintf(
 		                   &( ( *header_string )[ string_offset ] ),
-		                   ( *header_string_length - string_offset ),
+		                   ( *header_string_size - string_offset ),
 		                   _CHARACTER_T_STRING( "\t<acquiry_date>%" ) _CHARACTER_T_STRING( PRIs )
 		                   _CHARACTER_T_STRING( "</acquiry_date>\n" ),
 		                   acquiry_date );
@@ -5066,8 +5159,8 @@ int libewf_header_values_generate_header_string_xml(
 			memory_free(
 			 *header_string );
 
-			*header_string        = NULL;
-			*header_string_length = 0;
+			*header_string      = NULL;
+			*header_string_size = 0;
 
 			return( -1 );
 		}
@@ -5075,7 +5168,7 @@ int libewf_header_values_generate_header_string_xml(
 	}
 	character_count = string_snprintf(
 	                   &( ( *header_string )[ string_offset ] ),
-	                   ( *header_string_length - string_offset ),
+	                   ( *header_string_size - string_offset ),
 	                   _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "\n\n" ),
 	                   xml_close_tag_xheader );
 
@@ -5087,32 +5180,33 @@ int libewf_header_values_generate_header_string_xml(
 		memory_free(
 		 *header_string );
 
-		*header_string        = NULL;
-		*header_string_length = 0;
+		*header_string      = NULL;
+		*header_string_size = 0;
 
 		return( -1 );
 	}
 	/* Make sure the string is terminated
 	 */
-	( *header_string )[ *header_string_length - 1 ] = (character_t) '\0';
+	( *header_string )[ *header_string_size - 1 ] = 0;
 
 	return( 1 );
 }
 
 /* Generate an EWFX header
- * Sets header and the header length
+ * Sets header and the header size
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_generate_header_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header,
-     size_t *header_length )
+     size_t *header_size )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
 	character_t *header_string_tail = _CHARACTER_T_STRING( "\n\n" );
 	static char *function           = "libewf_header_values_generate_header_ewfx";
+	size_t header_string_size       = 0;
 	int result                      = 0;
 
 	if( libewf_header_values_generate_header_string_type3(
@@ -5121,7 +5215,7 @@ int libewf_header_values_generate_header_ewfx(
 	     header_string_head,
 	     header_string_tail,
 	     &header_string,
-	     header_length ) != 1 )
+	     &header_string_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create header string.\n",
 		 function );
@@ -5130,9 +5224,9 @@ int libewf_header_values_generate_header_ewfx(
 	}
 	result = libewf_header_values_convert_header_string_to_header(
 	          header_string,
-	          *header_length,
+	          header_string_size,
 	          header,
-	          header_length );
+	          header_size );
 
 	if( result != 1 )
 	{
@@ -5146,19 +5240,20 @@ int libewf_header_values_generate_header_ewfx(
 }
 
 /* Generate an EWFX header2
- * Sets header2 and the header2 length
+ * Sets header2 and the header2 size
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_generate_header2_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **header2,
-     size_t *header2_length )
+     size_t *header2_size )
 {
 	character_t *header_string      = NULL;
 	character_t *header_string_head = _CHARACTER_T_STRING( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	character_t *header_string_tail = _CHARACTER_T_STRING( "\n\n" );
 	static char *function           = "libewf_header_values_generate_header2_ewfx";
+	size_t header_string_size       = 0;
 	int result                      = 0;
 
 	if( libewf_header_values_generate_header_string_type4(
@@ -5167,7 +5262,7 @@ int libewf_header_values_generate_header2_ewfx(
 	     header_string_head,
 	     header_string_tail,
 	     &header_string,
-	     header2_length ) != 1 )
+	     &header_string_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create header string.\n",
 		 function );
@@ -5176,9 +5271,9 @@ int libewf_header_values_generate_header2_ewfx(
 	}
 	result = libewf_header_values_convert_header_string_to_header2(
 	          header_string,
-	          *header2_length,
+	          header_string_size,
 	          header2,
-	          header2_length );
+	          header2_size );
 
 	if( result != 1 )
 	{
@@ -5192,35 +5287,36 @@ int libewf_header_values_generate_header2_ewfx(
 }
 
 /* Generate an EWFX xheader
- * Sets xheader and the xheader length
+ * Sets xheader and the xheader size
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_generate_xheader_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
      uint8_t **xheader,
-     size_t *xheader_length )
+     size_t *xheader_size )
 {
-	character_t *header_string = NULL;
-	static char *function        = "libewf_header_values_generate_xheader_ewfx";
-	int result                   = 0;
+	character_t *header_string_xml = NULL;
+	static char *function          = "libewf_header_values_generate_xheader_ewfx";
+	size_t header_string_xml_size  = 0;
+	int result                     = 0;
 
 	if( libewf_header_values_generate_header_string_xml(
 	     header_values,
 	     timestamp,
-	     &header_string,
-	     xheader_length ) != 1 )
+	     &header_string_xml,
+	     &header_string_xml_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create xheader string.\n",
 		 function );
 
 		return( -1 );
 	}
-	result = libewf_header_values_convert_header_string_to_header(
-	          header_string,
-	          *xheader_length,
+	result = libewf_header_values_generate_header_string_xml(
+	          header_string_xml,
+	          header_string_xml_size,
 	          xheader,
-	          xheader_length );
+	          xheader_size );
 
 	if( result != 1 )
 	{
@@ -5228,7 +5324,7 @@ int libewf_header_values_generate_xheader_ewfx(
 		 function );
 	}
 	memory_free(
-	 header_string );
+	 header_string_xml );
 
 	return( result );
 }
