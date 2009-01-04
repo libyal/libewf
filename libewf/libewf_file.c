@@ -254,6 +254,13 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 	uint16_t fields_segment                 = 0;
 	int file_descriptor                     = 0;
 
+	if( file_amount < 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
+		 function );
+
+		return( NULL );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		/* 1 additional entry required because
@@ -443,6 +450,13 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	uint16_t fields_segment                 = 0;
 	int file_descriptor                     = 0;
 
+	if( file_amount < 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
+		 function );
+
+		return( NULL );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		/* 1 additional entry required because
