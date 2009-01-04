@@ -80,7 +80,7 @@ ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE *segment_file, size_t sec
 ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
 
 ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, uint8_t ewf_format, uint8_t error_tollerance );
-ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t amount_of_chunks, uint32_t sectors_per_chunk, uint32_t bytes_per_sector, uint32_t amount_of_sectors, uint32_t error_granularity, uint8_t media_type, uint8_t media_flags, int8_t compression_level, uint8_t *guid, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append );
+ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append );
 
 ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ERROR_SECTOR **acquiry_error_sectors, uint32_t *amount_of_acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance );
 ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors );

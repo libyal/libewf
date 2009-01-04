@@ -127,6 +127,7 @@ Next release:
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
 * move libewf_section_read to segment file
+* move segment table code from segment file to segment table
 
 * Try to correct the table
   - add error flag
@@ -144,6 +145,9 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071128
+* worked on refactoring code
 
 Version: 20071126
 * minor changes

@@ -1067,19 +1067,12 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 /* Write the last section at the end of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, int last_segment_file )
+ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE *segment_file, int last_segment_file, uint8_t format, uint8_t ewf_format )
 {
 	EWF_CHAR *last_section_type = NULL;
 	static char *function       = "libewf_segment_file_write_last_section";
 	ssize_t write_count         = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -1101,8 +1094,8 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 		       segment_file,
 		       last_section_type,
 		       4,
-		       internal_handle->format,
-		       internal_handle->ewf_format );
+		       format,
+		       ewf_format );
 
 	if( write_count == -1 )
 	{
@@ -1117,7 +1110,7 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type )
+ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values )
 {
 	EWF_FILE_HEADER file_header;
 
@@ -1129,13 +1122,6 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -1257,7 +1243,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_section_volume_s01_write(
 					       segment_file,
-					       internal_handle->media_values,
+					       media_values,
 					       internal_handle->format,
 					       0 );
 			}
@@ -1267,7 +1253,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_section_volume_e01_write(
 					       segment_file,
-					       internal_handle->media_values,
+					       media_values,
 					       internal_handle->format,
 					       internal_handle->compression_level,
 					       0 );
@@ -1293,15 +1279,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 */
 			write_count = libewf_section_data_write(
 				       segment_file,
-				       internal_handle->media_values->amount_of_chunks,
-				       internal_handle->media_values->sectors_per_chunk,
-				       internal_handle->media_values->bytes_per_sector,
-				       internal_handle->media_values->amount_of_sectors,
-				       internal_handle->media_values->error_granularity,
-				       internal_handle->media_values->media_type,
-				       internal_handle->media_values->media_flags,
+				       media_values,
 				       internal_handle->compression_level,
-				       internal_handle->media_values->guid,
 				       internal_handle->format,
 				       &( internal_handle->write->data_section ),
 				       0 );
@@ -1857,15 +1836,8 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		{
 			write_count = libewf_section_data_write(
 				       segment_file,
-				       internal_handle->media_values->amount_of_chunks,
-				       internal_handle->media_values->sectors_per_chunk,
-				       internal_handle->media_values->bytes_per_sector,
-				       internal_handle->media_values->amount_of_sectors,
-				       internal_handle->media_values->error_granularity,
-				       internal_handle->media_values->media_type,
-				       internal_handle->media_values->media_flags,
+				       internal_handle->media_values,
 				       internal_handle->compression_level,
-				       internal_handle->media_values->guid,
 				       internal_handle->format,
 				       &( internal_handle->write->data_section ),
 				       0 );
@@ -1977,9 +1949,10 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 	 * The segment file offset is updated by the function
 	 */
 	write_count = libewf_segment_file_write_last_section(
-	               internal_handle,
 		       segment_file,
-	               last_segment_file );
+	               last_segment_file,
+	               internal_handle->format,
+	               internal_handle->ewf_format );
 
 	if( write_count == -1 )
 	{

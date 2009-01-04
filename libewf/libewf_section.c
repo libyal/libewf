@@ -2605,7 +2605,7 @@ ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE *segment_file, size_t sect
 /* Writes a data section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t amount_of_chunks, uint32_t sectors_per_chunk, uint32_t bytes_per_sector, uint32_t amount_of_sectors, uint32_t error_granularity, uint8_t media_type, uint8_t media_flags, int8_t compression_level, uint8_t *guid, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append )
+ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append )
 {
 	EWF_CHAR *section_type      = (EWF_CHAR *) "data";
 	static char *function       = "libewf_section_data_write";
@@ -2622,9 +2622,9 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 
 		return( -1 );
 	}
-	if( guid == NULL )
+	if( media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid GUID.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -2664,12 +2664,12 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 		}
 		else
 		{
-			( *cached_data_section )->media_type = media_type;
+			( *cached_data_section )->media_type = media_values->media_type;
 		}
-		( *cached_data_section )->media_flags = media_flags;
+		( *cached_data_section )->media_flags = media_values->media_flags;
 
 		if( libewf_endian_revert_32bit(
-		     amount_of_chunks,
+		     media_values->amount_of_chunks,
 		     ( *cached_data_section )->amount_of_chunks ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
@@ -2678,7 +2678,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 			return( -1 );
 		}
 		if( libewf_endian_revert_32bit(
-		     sectors_per_chunk,
+		     media_values->sectors_per_chunk,
 		     ( *cached_data_section )->sectors_per_chunk ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
@@ -2687,7 +2687,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 			return( -1 );
 		}
 		if( libewf_endian_revert_32bit(
-		     bytes_per_sector,
+		     media_values->bytes_per_sector,
 		     ( *cached_data_section )->bytes_per_sector ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
@@ -2696,7 +2696,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 			return( -1 );
 		}
 		if( libewf_endian_revert_32bit(
-		     amount_of_sectors,
+		     media_values->amount_of_sectors,
 		     ( *cached_data_section )->amount_of_sectors ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
@@ -2711,7 +2711,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
 			if( libewf_endian_revert_32bit(
-			     error_granularity,
+			     media_values->error_granularity,
 			     ( *cached_data_section )->error_granularity ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
@@ -2721,7 +2721,10 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 			}
 			( *cached_data_section )->compression_level = (uint8_t) compression_level;
 
-			if( libewf_common_memcpy( ( *cached_data_section )->guid, guid, 16 ) == NULL )
+			if( libewf_common_memcpy(
+			     ( *cached_data_section )->guid,
+			     media_values->guid,
+			     16 ) == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
 				 function );

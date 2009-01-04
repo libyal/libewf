@@ -971,7 +971,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
 		               segment_number,
-		               LIBEWF_SEGMENT_FILE_TYPE_EWF );
+		               LIBEWF_SEGMENT_FILE_TYPE_EWF,
+		               internal_handle->media_values );
 
 		if( write_count == -1 )
 		{
@@ -1339,9 +1340,10 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 * The segment file offset is updated by the function
 				 */
 				write_count = libewf_segment_file_write_last_section(
-					       internal_handle,
 					       segment_file,
-					       0 );
+					       0,
+					       internal_handle->format,
+					       internal_handle->ewf_format );
 
 				if( write_count == -1 )
 				{
@@ -1407,7 +1409,8 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				       internal_handle,
 				       segment_file,
 				       segment_number,
-				       LIBEWF_SEGMENT_FILE_TYPE_DWF );
+				       LIBEWF_SEGMENT_FILE_TYPE_DWF,
+				       internal_handle->media_values );
 
 			if( write_count == -1 )
 			{
@@ -1465,9 +1468,10 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		 * The segment file offset is updated by the function
 		 */
 		write_count = libewf_segment_file_write_last_section(
-			       internal_handle,
 			       segment_file,
-			       1 );
+			       1,
+			       internal_handle->format,
+			       internal_handle->ewf_format );
 
 		if( write_count == -1 )
 		{
@@ -2551,15 +2555,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 					 */
 					write_count = libewf_section_data_write(
 					               segment_file,
-					               internal_handle->media_values->amount_of_chunks,
-					               internal_handle->media_values->sectors_per_chunk,
-					               internal_handle->media_values->bytes_per_sector,
-					               internal_handle->media_values->amount_of_sectors,
-					               internal_handle->media_values->error_granularity,
-					               internal_handle->media_values->media_type,
-					               internal_handle->media_values->media_flags,
+					               internal_handle->media_values,
 					               internal_handle->compression_level,
-					               internal_handle->media_values->guid,
 					               internal_handle->format,
 					               &( internal_handle->write->data_section ),
 					               1 );
