@@ -141,7 +141,6 @@ TODO
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
 
-* allow to set the delta file path
 * change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
@@ -154,6 +153,9 @@ CLOSED
   solved by delta files
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
   no, this could be read from the error2 section
+
+Version: 20070910
+* worked to allow to set the delta file path
 
 Version: 20070908
 * worked on remove of MD5 calculation from library

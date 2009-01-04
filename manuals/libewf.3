@@ -1,4 +1,4 @@
-.Dd September 8, 2007
+.Dd September 10, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -65,6 +65,8 @@
 .Ft int
 .Fn libewf_get_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
 .Ft int
+.Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, uint8_t *filename, size_t size"
+.Ft int
 .Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks"
 .Ft int
 .Fn libewf_set_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk"
@@ -75,7 +77,11 @@
 .Ft int
 .Fn libewf_set_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
 .Ft int
+.Fn libewf_set_delta_segment_filename "LIBEWF_HANDLE *handle, uint8_t *filename, size_t size"
+.Ft int
 .Fn libewf_set_write_segment_file_size "LIBEWF_HANDLE *handle, size64_t segment_file_size"
+.Ft int
+.Fn libewf_set_write_error_granularity "LIBEWF_HANDLE *handle, uint32_t error_granularity"
 .Ft int
 .Fn libewf_set_write_compression_values "LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block"
 .Ft int

@@ -913,6 +913,75 @@ int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 	return( 1 );
 }
 
+
+/* Returns the delta segment filename
+ * Returns 1 if successful, 0 if value not present, -1 on error
+ */
+int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filename, size_t length )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_delta_segment_filename";
+	size_t filename_length                  = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->filename[ 0 ] == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	filename_length = libewf_string_length( internal_handle->delta_segment_table->filename[ 0 ] );
+
+	if( length < filename_length )
+	{
+		LIBEWF_WARNING_PRINT( "%s: filename too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_copy(
+	     filename,
+	     internal_handle->delta_segment_table->filename[ 0 ],
+	     filename_length ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Returns the amount of chunks written
  * Returns 1 if successful, -1 on error
  */
@@ -1211,6 +1280,85 @@ int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 	}
 	internal_handle->md5_hash_set = 1;
 
+	return( 1 );
+}
+
+/* Sets the delta segment file
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filename, size_t length )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_delta_segment_filename";
+	size_t filename_length                  = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: delta segment filename cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->filename[ 0 ] != NULL )
+	{
+		libewf_common_free( internal_handle->delta_segment_table->filename[ 0 ] );
+	}
+	internal_handle->delta_segment_table->filename[ 0 ] = libewf_common_alloc( LIBEWF_CHAR_SIZE * length );
+
+	if( internal_handle->delta_segment_table->filename[ 0 ] == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create delta segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_copy(
+	     internal_handle->delta_segment_table->filename[ 0 ],
+	     filename,
+	     length ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set delta segment filename.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

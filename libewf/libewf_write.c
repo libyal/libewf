@@ -1475,7 +1475,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	}
 	else
 	{
-
 		/* Read the chunk data into the chunk cache
 		 */
 		read_count = libewf_read_chunk(
@@ -1543,6 +1542,24 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		    + (off64_t) chunk_data_size + (off64_t) EWF_CRC_SIZE ) > (off64_t) internal_handle->write->segment_file_size )
 		{
 			result = 0;
+
+			/* Make sure to write a next section in the the previous delta segment file
+			 */
+			write_count = libewf_segment_file_write_last_section(
+				       internal_handle,
+				       internal_handle->delta_segment_table->file_descriptor[ segment_number ],
+				       internal_handle->delta_segment_table->section_list[ segment_number ],
+				       internal_handle->delta_segment_table->file_offset[ segment_number ],
+				       0 );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
 		}
 		/* Check if a delta segment already exists
 		 */
@@ -1560,9 +1577,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		}
 		else if( result == 0 )
 		{
-			/* TODO make sure to write a next section in the the previous delta segment file
-			 */
-
 			segment_number++;
 
 			/* Create a new delta segment file
