@@ -143,6 +143,10 @@ struct libewf_internal_handle
 	/* Value to indicate the level of error tollerance
 	 */
 	uint8_t error_tollerance;
+
+	/* Value to indicate if abort was signalled
+	 */
+	int abort;
 };
 
 /* Additional subhandle for read specific parameters

@@ -571,7 +571,18 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
  * buffer will be set to the buffer containing the uncompressed data
  * Returns the amount of bytes read, 0 if no more data can be read, or -1 on error
  */
-ssize_t ewfcommon_raw_read_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t **buffer, size_t buffer_size, size_t read_size, off64_t read_offset, size64_t media_size, uint32_t sectors_per_chunk, uint32_t bytes_per_sector, uint8_t wipe_chunk_on_error )
+ssize_t ewfcommon_raw_read_ewf(
+         LIBEWF_HANDLE *handle,
+         uint8_t *raw_buffer,
+         size_t raw_buffer_size,
+         uint8_t **buffer,
+         size_t buffer_size,
+         size_t read_size,
+         off64_t read_offset,
+         size64_t media_size,
+         uint32_t sectors_per_chunk,
+         uint32_t bytes_per_sector,
+         uint8_t wipe_chunk_on_error )
 {
 	static char *function      = "ewfcommon_raw_read_ewf";
 	ssize_t raw_read_count     = 0;
@@ -702,7 +713,13 @@ ssize_t ewfcommon_raw_read_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size
  * using the raw access functions
  * Returns the amount of bytes written, 0 if no more data can be written, or -1 on error
  */
-ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, size_t raw_buffer_size, uint8_t *buffer, size_t buffer_size, size_t write_size )
+ssize_t ewfcommon_raw_write_ewf(
+         LIBEWF_HANDLE *handle,
+         uint8_t *raw_buffer,
+         size_t raw_buffer_size,
+         uint8_t *buffer,
+         size_t buffer_size,
+         size_t write_size )
 {
 	static char *function     = "ewfcommon_raw_write_ewf";
 	uint8_t *raw_write_buffer = NULL;
@@ -796,7 +813,17 @@ ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, siz
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
  * Returns the amount of bytes read if successful, or -1 on error
  */
-ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, libewf_char_t *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, libewf_char_t *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_read_verify(
+           LIBEWF_HANDLE *handle,
+           uint8_t calculate_md5,
+           libewf_char_t *md5_hash_string,
+           size_t md5_hash_string_length,
+           uint8_t calculate_sha1,
+           libewf_char_t *sha1_hash_string,
+           size_t sha1_hash_string_length,
+           uint8_t swap_byte_pairs,
+           uint8_t wipe_chunk_on_error,
+           void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -939,7 +966,8 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, l
 	/* The EWF-S01 format uses compression this will add bytes
 	 */
 	raw_read_buffer_size = buffer_size * 2;
-	raw_read_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_read_data        = (uint8_t *) libewf_common_alloc(
+	                                    raw_read_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_read_data == NULL )
 	{

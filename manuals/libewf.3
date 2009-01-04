@@ -18,6 +18,8 @@
 .Fn libewf_check_file_signature "const char *filename"
 .Ft int
 .Fn libewf_glob "const char *filename, size_t length, uint8_t format, char ** filenames[]"
+.Ft int
+.Fn libewf_signal_abort "LIBEWF_HANDLE *handle"
 .Ft LIBEWF_HANDLE *
 .Fn libewf_open "char * const filenames[], uint16_t amount_of_files, uint8_t flags"
 .Ft off64_t
@@ -279,6 +281,10 @@ The
 .Fn libewf_check_file_signature
 function is used to test if the EWF file signature is present within a certain
 .Ar filename.
+.Pp
+The
+.Fn libewf_signal_abort
+function signals the handle to aborts it current activity.
 .Pp
 The
 .Fn libewf_glob

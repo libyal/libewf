@@ -153,6 +153,7 @@ int libewf_glob(
 	libewf_filename_t *segment_filename = NULL;
 	void *reallocation                  = NULL;
 	static char *function               = "libewf_glob";
+	size_t additional_length            = 4;
 	int amount_of_files                 = 0;
 	int file_descriptor                 = 0;
 	uint8_t segment_file_type           = 0;
@@ -205,6 +206,8 @@ int libewf_glob(
 
 			return( -1 );
 		}
+		additional_length = 0;
+
 		if( filename[ length - 3 ] != (libewf_filename_t) 'E' )
 		{
 			format = LIBEWF_FORMAT_ENCASE5;
@@ -247,7 +250,7 @@ int libewf_glob(
 	while( amount_of_files < (int) UINT16_MAX )
 	{
 		segment_filename = libewf_common_alloc(
-			            sizeof( libewf_filename_t ) * ( length + 1 ) );
+			            sizeof( libewf_filename_t ) * ( length + additional_length + 1 ) );
 
 		if( segment_filename == NULL )
 		{
@@ -269,8 +272,12 @@ int libewf_glob(
 
 			return( -1 );
 		}
+		if( additional_length > 0 )
+		{
+			segment_filename[ length ] = (libewf_char_t) '.';
+		}
 		if( libewf_filename_set_extension(
-		     &( segment_filename[ length - 3 ] ),
+		     &( segment_filename[ length + additional_length - 3 ] ),
 		     ( amount_of_files + 1 ),
 		     UINT16_MAX,
 		     segment_file_type,
@@ -285,7 +292,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		segment_filename[ length ] = (libewf_char_t) '\0';
+		segment_filename[ length + additional_length ] = (libewf_char_t) '\0';
 
 		file_descriptor = libewf_common_open(
 		                   segment_filename,
@@ -302,8 +309,6 @@ int libewf_glob(
 
 		libewf_common_close(
 		 file_descriptor );
-
-fprintf( stderr, "Found: %s\n", segment_filename );
 
 		reallocation = libewf_common_realloc(
 		                *filenames,
@@ -324,6 +329,26 @@ fprintf( stderr, "Found: %s\n", segment_filename );
 		( *filenames )[ amount_of_files - 1 ] = segment_filename;
 	}
 	return( amount_of_files );
+}
+
+/* Signals the libewf handle to abort its current activity
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_signal_abort(
+     LIBEWF_HANDLE *handle )
+{
+	static char *function = "libewf_signal_abort";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	( (libewf_internal_handle_t *) handle )->abort = 1;
+
+	return( 1 );
 }
 
 /* Opens a set of EWF file(s)

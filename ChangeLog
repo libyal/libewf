@@ -147,6 +147,7 @@ TODO
 * refactor write initialize into seperate functions
 * rename/move libewf_internal_handle_determine_format and 
   libewf_internal_handle_get_write_maximum_amount_of_segments
+* implement abort
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -165,6 +166,8 @@ CLOSED
 Version: 20080126
 * code clean up
 * implemented libewf_glob function
+* worked on signal abort function
+* fixed incorrect return value in raw read
 
 Version: 20080119
 * worked on basic multi threaded safety

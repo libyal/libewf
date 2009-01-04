@@ -77,6 +77,9 @@ LIBEWF_EXTERN int libewf_glob(
                    uint8_t format,
                    libewf_filename_t **filenames[] );
 
+LIBEWF_EXTERN int libewf_signal_abort(
+                   LIBEWF_HANDLE *handle );
+
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               libewf_filename_t * const filenames[],
                               uint16_t amount_of_files,

@@ -87,6 +87,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 	internal_handle->format                   = LIBEWF_FORMAT_UNKNOWN;
 	internal_handle->ewf_format               = EWF_FORMAT_UNKNOWN;
 	internal_handle->error_tollerance         = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
+	internal_handle->abort                    = 0;
 
 	/* The segment table is initially filled with a single entry
 	 */

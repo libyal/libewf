@@ -82,7 +82,6 @@ LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename );
 #endif
 
-
 /* Globs the segment files according to the EWF naming schema
  * if the format is known the filename should contain the base of the filename
  * otherwise the function will try to determine the format based on the extension
@@ -101,6 +100,12 @@ LIBEWF_EXTERN int libewf_glob(
                    uint8_t format,
                    char **filenames[] );
 #endif
+
+/* Signals the libewf handle to abort its current activity
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_signal_abort(
+                   LIBEWF_HANDLE *handle );
 
 /* Opens a set of EWF file(s)
  * For reading files should contain all filenames that make up an EWF image
