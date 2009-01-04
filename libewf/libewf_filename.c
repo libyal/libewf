@@ -45,8 +45,8 @@ int libewf_filename_set_extension(
      uint8_t ewf_format )
 {
 	static char *function                              = "libewf_filename_set_extension";
-	system_character_t extension_first_character       = (system_character_t) '\0';
-	system_character_t extension_additional_characters = (system_character_t) '\0';
+	system_character_t extension_first_character       = 0;
+	system_character_t extension_additional_characters = 0;
 
 	if( extension == NULL )
 	{
@@ -140,7 +140,7 @@ int libewf_filename_set_extension(
 
 		return( -1 );
 	}
-	extension[ 3 ] = (system_character_t) '\0';
+	extension[ 3 ] = 0;
 
 	return( 1 );
 }

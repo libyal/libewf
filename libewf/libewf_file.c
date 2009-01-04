@@ -243,7 +243,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		segment_filename[ length + additional_length ] = (character_t) '\0';
+		segment_filename[ length + additional_length ] = 0;
 
 		file_descriptor = libewf_filename_open(
 		                   segment_filename,

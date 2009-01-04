@@ -29,12 +29,15 @@ libewf_la_SOURCES = \
 	libewf_extern.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \
+	libewf_file_io_handle.c libewf_file_io_handle.h \
+	libewf_file_io_pool.c libewf_file_io_pool.h \
 	libewf_handle.c libewf_handle.h \
 	libewf_hash_sections.c libewf_hash_sections.h \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_sections.c libewf_header_sections.h \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_interface.c libewf_interface.h \
+	libewf_list_type.c libewf_list_type.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_offset_table.c libewf_offset_table.h \
 	libewf_read.c libewf_read.h \
@@ -48,10 +51,6 @@ libewf_la_SOURCES = \
 	libewf_support.c libewf_support.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
-
-IGNORE = \
-	libewf_file_io_handle.c libewf_file_io_handle.h \
-	libewf_file_io_pool.c libewf_file_io_pool.h
 
 if HAVE_LOCAL_LIBUCA
 libewf_la_LIBADD  = ../common/libcommon.la ../libuca/libuca.la

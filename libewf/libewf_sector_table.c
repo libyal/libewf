@@ -316,6 +316,8 @@ int libewf_sector_table_add_sector(
 	}
 	/* Create a new sector
 	 */
+#ifdef REFACTOR
+	/* 20080905 */
 	reallocation = (libewf_sector_table_entry_t *) memory_reallocate(
 	                                                sector_table->sector,
 	                                                ( sizeof( libewf_sector_table_entry_t ) * ( sector_table->amount + 1 ) ) );
@@ -333,6 +335,19 @@ int libewf_sector_table_add_sector(
 	sector_table->sector[ sector_table->amount ].amount_of_sectors = amount_of_sectors;
 
 	sector_table->amount += 1;
+#else
+	if( libewf_sector_table_resize(
+	     sector_table,
+	     sector_table->amount + 1 ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to resize sector table.\n",
+		 function );
+
+		return( -1 );
+	}
+	sector_table->sector[ sector_table->amount - 1 ].first_sector      = first_sector;
+	sector_table->sector[ sector_table->amount - 1 ].amount_of_sectors = amount_of_sectors;
+#endif
 
 	return( 1 );
 }

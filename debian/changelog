@@ -1,4 +1,4 @@
-libewf (20080904-1) unstable; urgency=low
+libewf (20080905-1) unstable; urgency=low
 
   * Initial release
   * First version of libewf debian package based on work by Guy Voncken

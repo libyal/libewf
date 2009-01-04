@@ -41,7 +41,7 @@ struct libewf_segment_file_handle
 	 */
 	system_character_t *filename;
 
-	/* The filename length
+	/* The length of the filename
 	 */
 	size_t length_filename;
 

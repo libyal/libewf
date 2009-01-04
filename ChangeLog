@@ -43,9 +43,9 @@ To do/think about:
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
 * ewfverify: verify against all available hashes that can be verified, print others
-* windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
+* windows port: improve globbing support ?
 
 Recovery and analysis:
 * ewfacquire: detect disk full and ask for new segment file location?
@@ -86,18 +86,6 @@ Possible performance improvements:
 * remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
   - currently used for verbose output
 
-Known issues:
-* error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
-  virtualisation could be part of the problem
-* output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
-  - binary mode of the stdout file descriptor
-* The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
-* check chunk size for > 2 GiB table offsets
-  the current assumption is that these chunks only can be uncompressed
-  because the MSB is normally used to mark if the chunk is compressed
-  This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
-* MSVS C++ does not allow pre compiler macro in macro definitions
-
 Code clean up
 * remove internal_handle passing from most functions
   only pass the necessary values
@@ -110,6 +98,24 @@ Code clean up
 Python bindings
 * rewrite to match libewf API
 
+API
+* make libewf_handle_initialize and libewf_handle_free available
+* rewrite open and close in correspondence with handle_initialize and handle_free
+* change compress empty blocks into a compression level
+* low level api
+
+Known issues:
+* error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
+  virtualisation could be part of the problem
+* output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
+  - binary mode of the stdout file descriptor
+* The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
+* check chunk size for > 2 GiB table offsets
+  the current assumption is that these chunks only can be uncompressed
+  because the MSB is normally used to mark if the chunk is compressed
+  This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
+* MSVS C++ does not allow pre compiler macro in macro definitions
+
 Next release(s):
 
 * create floppy-table-errors.E01 for testing purpose
@@ -118,6 +124,8 @@ Next release(s):
 
 * remove error_tollerance, just be error tollerant ?
 
+* have section list use list type
+
 * improve offset table correction
   - add error flag ?
 
@@ -125,9 +133,6 @@ Next release(s):
   - handle codepage in ewftools use -p option
   - add '-p list' option? to list codepages
   - what about LC_TYPE setting in ewftools
-
-* rewrite _alloc() functions into _initialize() functions
-  with corresponding _free() functions
 
 * rewrite ewfinput determine functions to pass value as argument
   and have return value be 1 or -1
@@ -138,8 +143,6 @@ Next release(s):
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
-
-* create libewf_create_handle and libewf_destroy_handle functions?
 
 * improve error handling
   - store error in handle? or additional parameter?
@@ -177,6 +180,11 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080905
+* worked on refactoring code
+* rewrote _alloc() functions into _initialize() functions with corresponding _free() functions
+* worked on file pooling
+
 Version: 20080904
 * worked on refactoring function in ewfinput
 * combined empty block compression and other compressions in ewftools
@@ -187,6 +195,9 @@ Version: 20080904
 * fixed multiple ewfglob issues
 * removed secondary offset table from handle
   libewf now checks and corrects differences with primary offset table
+* integrated check for ctime in autoconf CTIME check
+* created libewf_handle_initialize and libewf_handle_free functions
+  not available for api yet
 
 Version: 20080903
 * worked on integrating libuca and replacing string conversion routines

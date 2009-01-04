@@ -289,7 +289,7 @@ int libewf_segment_file_handle_set_filename(
 	}
 	/* Make sure the string is terminated
 	 */
-	segment_file_handle->filename[ length_filename ] = '\0';
+	segment_file_handle->filename[ length_filename ] = 0;
 	segment_file_handle->length_filename             = length_filename;
 
 	return( 1 );

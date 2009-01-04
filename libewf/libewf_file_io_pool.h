@@ -28,10 +28,13 @@
 #include <types.h>
 
 #include "libewf_file_io_handle.h"
+#include "libewf_list_type.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
+
+#define LIBEWF_FILE_IO_POOL_UNLIMITED_AMOUNT_OF_OPEN_FILES	0
 
 typedef struct libewf_file_io_pool libewf_file_io_pool_t;
 
@@ -39,54 +42,79 @@ struct libewf_file_io_pool
 {
 	/* The amount of files in the pool
 	 */
-	size_t amount_of_files;
+	int amount_of_files;
 
-	/* The amount of open file descriptors
+	/* The amount of open file descriptors in the pool
 	 */
-	size_t amount_of_open_files;
+	int amount_of_open_files;
 
-	/* A dynamic array containting the file io handles
+	/* The maximum amount of open file descriptors in the pool
 	 */
-	libewf_file_io_handle_t *handle;
+	int maximum_amount_of_open_files;
+
+	/* The amount of file io handles in the pool
+	 */
+	int amount_of_files_io_handles;
+
+	/* A dynamic array containing the file io handles
+	 */
+	libewf_file_io_handle_t *file_io_handle;
+
+	/* A list containing the file io handles in order of the last use
+	 * it starts with the last used at the beginning of the list
+	 * the value of the list element refers to the corresponding file io handle
+	 */
+	libewf_list_t *last_used_list;
 };
 
 int libewf_file_io_pool_initialize(
      libewf_file_io_pool_t **file_io_pool,
-     size_t amount_of_files );
+     int amount_of_files_io_handles,
+     int maximum_amount_of_open_files );
 
 int libewf_file_io_pool_free(
      libewf_file_io_pool_t **file_io_pool );
 
 int libewf_file_io_pool_resize(
      libewf_file_io_pool_t *file_io_pool,
-     size_t amount_of_files );
+     int amount_of_files_io_handles );
+
+int libewf_file_io_pool_open_file_io_handle(
+     libewf_file_io_pool_t *file_io_pool,
+     libewf_file_io_handle_t *file_io_handle,
+     int flags );
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,
-     system_character_t *filename,
+     const system_character_t *filename,
      int flags );
 
+int libewf_file_io_pool_reopen(
+     libewf_file_io_pool_t *file_io_pool,
+     size_t entry,
+     int flags );
+
+int libewf_file_io_pool_close(
+     libewf_file_io_pool_t *file_io_pool,
+     size_t entry );
+
 ssize_t libewf_file_io_pool_read(
-         libewf_file_io_pool_t *pool,
-         size_t entry,
+         libewf_file_io_pool_t *file_io_pool,
+         int entry,
          uint8_t *buffer,
          size_t size );
 
 ssize_t libewf_file_io_pool_write(
-         libewf_file_io_pool_t *pool,
-         size_t entry,
+         libewf_file_io_pool_t *file_io_pool,
+         int entry,
          uint8_t *buffer,
          size_t size );
 
-off64_t libewf_file_io_pool_seek(
-         libewf_file_io_pool_t *pool,
-         size_t entry,
+off64_t libewf_file_io_pool_seek_offset(
+         libewf_file_io_pool_t *file_io_pool,
+         int entry,
          off64_t offset,
          int whence );
-
-int libewf_file_io_pool_close(
-     libewf_file_io_pool_t *pool,
-     size_t entry );
 
 #if defined( __cplusplus )
 }

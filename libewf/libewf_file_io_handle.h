@@ -39,6 +39,10 @@ struct libewf_file_io_handle
 	 */
 	system_character_t *filename;
 
+	/* The size of the filename
+	 */
+	size_t filename_size;
+
 	/* The file descriptor
 	 */
 	int file_descriptor;
@@ -52,18 +56,31 @@ struct libewf_file_io_handle
 	int flags;
 };
 
+int libewf_file_io_handle_get_filename(
+     libewf_file_io_handle_t *file_io_handle,
+     system_character_t *filename,
+     size_t filename_size );
+
+int libewf_file_io_handle_set_filename(
+     libewf_file_io_handle_t *file_io_handle,
+     const system_character_t *filename,
+     size_t filename_size );
+
 int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,
      int flags );
 
+int libewf_file_io_handle_close(
+     libewf_file_io_handle_t *file_io_handle );
+
 ssize_t libewf_file_io_handle_read(
          libewf_file_io_handle_t *file_io_handle,
-         void *buffer,
+         uint8_t *buffer,
          size_t size );
 
 ssize_t libewf_file_io_handle_write(
          libewf_file_io_handle_t *file_io_handle,
-         void *buffer,
+         uint8_t *buffer,
          size_t size );
 
 off64_t libewf_file_io_handle_seek_offset(

@@ -185,7 +185,7 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		/* Make sure the identifier string will be terminated
 		 */
-		*open_tag_end = (character_t) '\0';
+		*open_tag_end = 0;
 
 		if( libewf_values_table_set_value(
 		     *hash_values,

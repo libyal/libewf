@@ -429,7 +429,7 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	identifier[ identifier_length - 1 ] = (character_t) '\0';
+	identifier[ identifier_length - 1 ] = 0;
 
 	return( 1 );
 }
@@ -504,7 +504,7 @@ int libewf_values_table_get_value(
 
 		return( -1 );
 	}
-	value[ value_length - 1 ] = (character_t) '\0';
+	value[ value_length - 1 ] = 0;
 
 	return( 1 );
 }
