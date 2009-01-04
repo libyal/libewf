@@ -462,7 +462,7 @@ AS_IF(
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
-CFLAGS="$CFLAGS -Wall";
+CFLAGS="$CFLAGS -Wall"
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])

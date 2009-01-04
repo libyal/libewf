@@ -137,7 +137,7 @@ Next stable:
   - allow to set maximum delta file size default 4 GiB?
 
 * test abort
-* test session section functionality
+* test session section R/W functionality
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
