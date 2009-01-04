@@ -8,7 +8,7 @@
 /* #undef HAVE_BTOWC */
 
 /* Defines if buffer passthrough should be used */
-/* #undef HAVE_BUFFER_PASSTHROUGH */
+#define HAVE_BUFFER_PASSTHROUGH 1
 
 /* Defines if compressBound funtion is present in zlib. */
 #define HAVE_COMPRESS_BOUND 1

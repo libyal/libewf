@@ -41,7 +41,7 @@ To do/think about:
 
 * ewftools: add getoptlong
 * ewfacquire: make size input and output human friendly (support kM notation etc)
-* ewfacquire: restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
+* ewfacquire: restrict error granularity and amount per sectors to encase5 and linen5 format ?
 * ewfacquire: warn if values exceed maximum segment count
 * ewfacquire: add native Windows support for accessing devices
 * ewfacquire: read from pipe
@@ -92,21 +92,24 @@ Known issues:
   virtualisation could be part of the problem
 * output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
 * The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
-* check chunk size for >2Gb table offsets
-  the current assumption is that these chunks only can be uncompressed
-  because the MSB is normally used to mark if the chunk is compressed
 
 Next release:
+* move md5 calculation out library into ewftools (completed)
+* add read/write support for > 2Gb segment file for EnCase 6.7 (initial)
+* raw read/write (partial)
+
 * full platform test
+* profile read and write functions
 * add libewf_convert_date_xheader_value function ?
   - add raw date format to allow to print raw date string
 * change string duplicate function to macro?
 
-* add maximum check to set functions in file/internal handle
+* add maximum check to set functions in internal handle
 * move any access to segment table in file, write and read to segment_file
 * move open segment files in file to segment file to read segment table function
 * update ewfexport man page
 
+TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
   write raw only checks for the raw access mode like prepare function
 * ewfacquire check if last segment file is closed before telling acquiry was completed
@@ -116,15 +119,25 @@ Next release:
 * rewrite ewfglob marcros to function macros (including arguments)
 * what about header values parsing with preservation of timestamps?
 
+* check usage of stderr and stdout in ewftools
+  - change use of stdout and stderr in ewfexport
+* check chunk size for >2Gb table offsets
+  the current assumption is that these chunks only can be uncompressed
+  because the MSB is normally used to mark if the chunk is compressed
+
 * ewfexport: non interactive mode?
 * ewfacquire: account for backspace in user input
 
 * what about setting errno for API set and get function i.e. for size too small
 
+* move wipe on error to ewftools, like in ewfacquire?
+  WIPE_ON_ERROR
+* what about the crc errors in read_raw?
+
 * what about protecting the chunk number in the delta chunks sections
   using a crc?
 
-* have ewftools only use API ?
+* have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -139,21 +152,17 @@ CLOSED
   not needed
 
 WORKING
-* make buffer passthrough default behavior?
+* make buffer passthrough default behavior
 * work on TODO in write
 * check unused parameters gcc -Wextra
 * API function get current chunk size?
+* refactor read and write
+  remove while loop from raw access in libewf_write_chunk_data
 * do not finalize on write error?
-* ewfexport - add raw access support
-* change default wipe behavior for ewfacquire(stream)
+* ewfcommon - size write buffer to chunk size for raw write
 
 Version: 20071104
 * refactored write functions
-* refactored read functions
-* worked on raw access support for ewfexport
-* small fixes in ewfexport
-* fixed write of duplicate table(s) in finalize, introduced by MD5 move
-* usage of stderr and stdout in ewfexport is alright
 
 Version: 20071103
 * refactored write functions
