@@ -152,14 +152,20 @@ CLOSED
   not needed
 
 WORKING
-* make buffer passthrough default behavior
+* make buffer passthrough default behavior?
 * work on TODO in write
 * check unused parameters gcc -Wextra
 * API function get current chunk size?
-* refactor read and write
-  remove while loop from raw access in libewf_write_chunk_data
 * do not finalize on write error?
 * ewfcommon - size write buffer to chunk size for raw write
+* ewfexport - add raw access support
+
+Version: 20071104
+* refactored write functions
+* refactored read functions
+* worked on raw access support for ewfexport
+* small fixes in ewfexport
+* fixed duplicate table(s) write, introduced by MD5 move
 
 Version: 20071103
 * refactored write functions
