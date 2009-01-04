@@ -874,11 +874,29 @@ void ewfoutput_header_values_fprint(
 	 */
 	if( libewf_get_header_value(
 	     handle,
+	     _CHARACTER_T_STRING( "unknown_pid" ),
+	     header_value,
+	     header_value_length ) == 1 )
+	{
+		fprintf( stream, "\tUnknown value pid:\t%" PRIs "\n",
+		 header_value );
+	}
+	if( libewf_get_header_value(
+	     handle,
 	     _CHARACTER_T_STRING( "unknown_dc" ),
 	     header_value,
 	     header_value_length ) == 1 )
 	{
 		fprintf( stream, "\tUnknown value dc:\t%" PRIs "\n",
+		 header_value );
+	}
+	if( libewf_get_header_value(
+	     handle,
+	     _CHARACTER_T_STRING( "unknown_ext" ),
+	     header_value,
+	     header_value_length ) == 1 )
+	{
+		fprintf( stream, "\tUnknown value ext:\t%" PRIs "\n",
 		 header_value );
 	}
 	if( amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )

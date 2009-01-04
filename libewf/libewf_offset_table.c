@@ -622,7 +622,8 @@ int libewf_offset_table_compare(
  * Returns the chunk segment file offset if the seek is successful, or -1 on error
  */
 off64_t libewf_offset_table_seek_chunk_offset(
-         libewf_offset_table_t *offset_table, uint32_t chunk )
+         libewf_offset_table_t *offset_table,
+          uint32_t chunk )
 {
 	static char *function = "libewf_segment_table_seek_chunk_offset";
 

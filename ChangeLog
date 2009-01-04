@@ -164,6 +164,11 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080809
+* Synchronised branches
+* Fixed seek end of file (patch by David Collett)
+* Fixed return at wrong location in libewf_date_time_gmtime
+
 Version: 20080705
 * added ewfouput_error_fprint
 

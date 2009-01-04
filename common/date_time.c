@@ -233,7 +233,6 @@ struct tm *libewf_date_time_gmtime(
 
 		return( NULL );
 	}
-	return( time_elements );
 #elif defined( HAVE_GMTIME )
 	static_time_elements = gmtime(
 	                        timestamp );
@@ -262,5 +261,6 @@ struct tm *libewf_date_time_gmtime(
 		return( NULL );
 	}
 #endif
+	return( time_elements );
 }
 

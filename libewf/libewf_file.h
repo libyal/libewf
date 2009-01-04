@@ -70,7 +70,11 @@ LIBEWF_EXTERN int libewf_close(
                    libewf_handle_t *handle );
 
 LIBEWF_EXTERN off64_t libewf_seek_offset(
-                       libewf_handle_t *handle, off64_t offset );
+                       libewf_handle_t *handle,
+                        off64_t offset );
+
+LIBEWF_EXTERN off64_t libewf_get_offset(
+                       libewf_handle_t *handle );
 
 #if defined( __cplusplus )
 }

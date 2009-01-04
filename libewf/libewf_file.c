@@ -505,7 +505,7 @@ off64_t libewf_seek_offset(
 
 		return( -1 );
 	}
-	if( offset >= (off64_t) internal_handle->media_values->media_size )
+	if( offset > (off64_t) internal_handle->media_values->media_size )
 	{
 		notify_warning_printf( "%s: attempting to read past the end of the file.\n",
 		 function );
@@ -548,5 +548,37 @@ off64_t libewf_seek_offset(
 	internal_handle->current_chunk_offset = (uint32_t) chunk_offset;
 
 	return( offset );
+}
+
+/* Retrieves the current offset of the media data within the EWF file(s)
+ * Returns the offset if successful or -1 on error
+ */
+off64_t libewf_get_offset(
+         libewf_handle_t *handle )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_seek_offset";
+	off64_t current_offset                    = 0;
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->media_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	current_offset  = internal_handle->current_chunk * internal_handle->media_values->chunk_size;
+	current_offset += internal_handle->current_chunk_offset;
+
+	return( current_offset );
 }
 

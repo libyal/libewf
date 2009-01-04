@@ -132,6 +132,12 @@ LIBEWF_EXTERN off64_t libewf_seek_offset(
                        LIBEWF_HANDLE *handle,
                        off64_t offset );
 
+/* Retrieves the current offset of the media data within the EWF file(s)
+ * Returns the offset if successful or -1 on error
+ */
+LIBEWF_EXTERN off64_t libewf_get_offset(
+                       LIBEWF_HANDLE *handle );
+
 /* Prepares a buffer with chunk data after reading it according to the handle settings
  * intended for raw read
  * The buffer size cannot be larger than the chunk size

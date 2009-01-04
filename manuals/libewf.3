@@ -24,6 +24,8 @@
 .Fn libewf_open "char * const filenames[], uint16_t amount_of_files, uint8_t flags"
 .Ft off64_t
 .Fn libewf_seek_offset "libewf_handle_t *handle, off64_t offset"
+.Ft off64_t
+.Fn libewf_get_offset "libewf_handle_t *handle"
 .Ft ssize_t
 .Fn libewf_raw_read_prepare_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t read_crc"
 .Ft ssize_t
