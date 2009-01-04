@@ -144,8 +144,7 @@ Next stable:
 * test abort
 * test session section R/W functionality
 
-* implement signal handling in ewfacquire, ewfacquirestream, ewfinfo,
-  ewfexport, ewfalter
+* implement signal handling in ewfacquire, ewfalter
 * fix signal handling for WIN32
 
 CLOSED
@@ -173,6 +172,7 @@ CLOSED
 
 Version: 20080304
 * worked on signal handling
+* fixed error due to fclose( NULL ) in ewftools
 
 Version: 20080303
 * added byte size string to ewfinfo

@@ -521,30 +521,38 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_get_media_size(
-	     ewfcommon_libewf_handle,
-	     &media_size ) != 1 )
+	if( ewfcommon_abort == 0 )
 	{
-		fprintf( stderr, "Unable to determine media size.\n" );
-
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
+		if( libewf_get_media_size(
+		     ewfcommon_libewf_handle,
+		     &media_size ) != 1 )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		libewf_common_free(
-		 target_filename );
+			fprintf( stderr, "Unable to determine media size.\n" );
 
-		return( EXIT_FAILURE );
-	}
-	if( export_size == 0 )
-	{
-		export_size = media_size - export_offset;
+			if( libewf_close(
+			     ewfcommon_libewf_handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			libewf_common_free(
+			 target_filename );
+
+			return( EXIT_FAILURE );
+		}
+		if( export_size == 0 )
+		{
+			export_size = media_size - export_offset;
+		}
 	}
 	/* Request the necessary case data
 	 */
-	if( interactive_mode == 1 )
+	if( ( ewfcommon_abort == 0 )
+	 && ( interactive_mode == 1 ) )
 	{
+		if( ewfsignal_detach() != 1 )
+		{
+			fprintf( stderr, "Unable to detach signal handler.\n" );
+		}
 		fprintf( stderr, "Information for export required, please provide the necessary input\n" );
 
 		if( argument_set_format == 0 )
@@ -756,133 +764,32 @@ int main( int argc, char * const argv[] )
 				       ( media_size - export_offset ),
 				       export_size );
 		}
-	}
-	if( target_filename == NULL )
-	{
-		fprintf( stderr, "Missing target filename defaulting to export.\n" );
-
-		target_filename = CHAR_T_DUPLICATE(
-		                   _S_CHAR_T( "export" ) );
-	}
-	fprintf( stderr, "\n" );
-
-	/* Start exporting data
-	 */
-	timestamp_start = time( NULL );
-	time_string     = libewf_common_ctime(
-	                   &timestamp_start );
-
-	if( time_string != NULL )
-	{
-		fprintf( stderr, "Export started at: %" PRIs "\n",
-		 time_string );
-
-		libewf_common_free(
-		 time_string );
-	}
-	else
-	{
-		fprintf( stderr, "Export started.\n" );
-	}
-	if( callback != NULL )
-	{
-		ewfoutput_process_status_initialize(
-		 stderr,
-		 _S_LIBEWF_CHAR( "exported" ),
-		 timestamp_start );
-	}
-	fprintf( stderr, "This could take a while.\n\n" );
-
-	if( output_raw == 0 )
-	{
-		filenames[ 0 ] = target_filename;
-
-		export_handle = libewf_open(
-		                 (CHAR_T * const *) filenames,
-		                 1,
-		                 LIBEWF_OPEN_WRITE );
-
-		libewf_common_free(
-		 target_filename );
-
-		if( export_handle == NULL )
+		if( ewfsignal_attach(
+		     ewfcommon_signal_handler ) != 1 )
 		{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-			if( errno != 0 )
-			{
-				error_string = ewfstring_strerror(
-				                errno );
-			}
-			if( error_string != NULL )
-			{
-				fprintf( stderr, "Unable to open export EWF file(s) with failure: %" PRIs ".\n",
-				 error_string );
-
-				libewf_common_free(
-				 error_string );
-			}
-			else
-			{
-				fprintf( stderr, "Unable to open export EWF file(s).\n" );
-			}
-#else
-			fprintf( stderr, "Unable to open export EWF file(s).\n" );
-#endif
-
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		count = ewfcommon_export_ewf(
-		         ewfcommon_libewf_handle,
-		         export_handle,
-		         compression_level,
-		         (uint8_t) compress_empty_block,
-		         libewf_format,
-		         segment_file_size,
-		         export_size,
-		         export_offset,
-		         (uint32_t) sectors_per_chunk,
-		         calculate_md5,
-		         calculate_sha1,
-		         swap_byte_pairs,
-		         wipe_chunk_on_error,
-		         callback );
-
-		if( libewf_close(
-		     export_handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close export EWF file handle.\n" );
-
-			return( EXIT_FAILURE );
+			fprintf( stderr, "Unable to attach signal handler.\n" );
 		}
 	}
-	else
+	if( ewfcommon_abort == 0 )
 	{
-		count = ewfcommon_export_raw(
-		         ewfcommon_libewf_handle,
-		         target_filename,
-		         export_size,
-		         export_offset,
-		         swap_byte_pairs,
-		         wipe_chunk_on_error,
-		         callback );
+		if( target_filename == NULL )
+		{
+			fprintf( stderr, "Missing target filename defaulting to export.\n" );
 
-		libewf_common_free(
-		 target_filename );
-	}
-	timestamp_end = time( NULL );
-	time_string   = libewf_common_ctime(
-	                 &timestamp_end );
+			target_filename = CHAR_T_DUPLICATE(
+			                   _S_CHAR_T( "export" ) );
+		}
+		fprintf( stderr, "\n" );
 
-	if( count <= -1 )
-	{
+		/* Start exporting data
+		 */
+		timestamp_start = time( NULL );
+		time_string     = libewf_common_ctime(
+				   &timestamp_start );
+
 		if( time_string != NULL )
 		{
-			fprintf( stderr, "Export failed at: %" PRIs "\n",
+			fprintf( stderr, "Export started at: %" PRIs "\n",
 			 time_string );
 
 			libewf_common_free(
@@ -890,41 +797,156 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stderr, "Export failed.\n" );
+			fprintf( stderr, "Export started.\n" );
 		}
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
+		if( callback != NULL )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
+			ewfoutput_process_status_initialize(
+			 stderr,
+			 _S_LIBEWF_CHAR( "exported" ),
+			 timestamp_start );
 		}
+		fprintf( stderr, "This could take a while.\n\n" );
+
+		if( output_raw == 0 )
+		{
+			filenames[ 0 ] = target_filename;
+
+			export_handle = libewf_open(
+					 (CHAR_T * const *) filenames,
+					 1,
+					 LIBEWF_OPEN_WRITE );
+
+			libewf_common_free(
+			 target_filename );
+
+			if( export_handle == NULL )
+			{
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+				if( errno != 0 )
+				{
+					error_string = ewfstring_strerror(
+							errno );
+				}
+				if( error_string != NULL )
+				{
+					fprintf( stderr, "Unable to open export EWF file(s) with failure: %" PRIs ".\n",
+					 error_string );
+
+					libewf_common_free(
+					 error_string );
+				}
+				else
+				{
+					fprintf( stderr, "Unable to open export EWF file(s).\n" );
+				}
+#else
+				fprintf( stderr, "Unable to open export EWF file(s).\n" );
+#endif
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				return( EXIT_FAILURE );
+			}
+			count = ewfcommon_export_ewf(
+				 ewfcommon_libewf_handle,
+				 export_handle,
+				 compression_level,
+				 (uint8_t) compress_empty_block,
+				 libewf_format,
+				 segment_file_size,
+				 export_size,
+				 export_offset,
+				 (uint32_t) sectors_per_chunk,
+				 calculate_md5,
+				 calculate_sha1,
+				 swap_byte_pairs,
+				 wipe_chunk_on_error,
+				 callback );
+
+			if( libewf_close(
+			     export_handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close export EWF file handle.\n" );
+
+				return( EXIT_FAILURE );
+			}
+		}
+		else
+		{
+			count = ewfcommon_export_raw(
+				 ewfcommon_libewf_handle,
+				 target_filename,
+				 export_size,
+				 export_offset,
+				 swap_byte_pairs,
+				 wipe_chunk_on_error,
+				 callback );
+
+			libewf_common_free(
+			 target_filename );
+		}
+		timestamp_end = time( NULL );
+		time_string   = libewf_common_ctime(
+				 &timestamp_end );
+
+		if( count <= -1 )
+		{
+			if( time_string != NULL )
+			{
+				fprintf( stderr, "Export failed at: %" PRIs "\n",
+				 time_string );
+
+				libewf_common_free(
+				 time_string );
+			}
+			else
+			{
+				fprintf( stderr, "Export failed.\n" );
+			}
+			if( libewf_close(
+			     ewfcommon_libewf_handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			return( EXIT_FAILURE );
+		}
+		if( time_string != NULL )
+		{
+			fprintf( stderr, "Export completed at: %" PRIs "\n",
+			 time_string );
+
+			libewf_common_free(
+			 time_string );
+		}
+		else
+		{
+			fprintf( stderr, "Export completed.\n" );
+		}
+		ewfoutput_process_summary_fprint(
+		 stderr,
+		 _S_LIBEWF_CHAR( "Written" ),
+		 count,
+		 timestamp_start,
+		 timestamp_end );
+
+		fprintf( stderr, "\n" );
+
+		ewfoutput_crc_errors_fprint(
+		 stderr,
+		 ewfcommon_libewf_handle,
+		 &amount_of_crc_errors );
+	}
+	if( libewf_close(
+	     ewfcommon_libewf_handle ) != 0 )
+	{
+		fprintf( stderr, "Unable to close EWF file(s).\n" );
+
 		return( EXIT_FAILURE );
 	}
-	if( time_string != NULL )
-	{
-		fprintf( stderr, "Export completed at: %" PRIs "\n",
-		 time_string );
-
-		libewf_common_free(
-		 time_string );
-	}
-	else
-	{
-		fprintf( stderr, "Export completed.\n" );
-	}
-	ewfoutput_process_summary_fprint(
-	 stderr,
-	 _S_LIBEWF_CHAR( "Written" ),
-	 count,
-	 timestamp_start,
-	 timestamp_end );
-
-	fprintf( stderr, "\n" );
-
-	ewfoutput_crc_errors_fprint(
-	 stderr,
-	 ewfcommon_libewf_handle,
-	 &amount_of_crc_errors );
-
 	if( ewfsignal_detach() != 1 )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
@@ -933,13 +955,6 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
 		 program );
-
-		return( EXIT_FAILURE );
-	}
-	if( libewf_close(
-	     ewfcommon_libewf_handle ) != 0 )
-	{
-		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
 		return( EXIT_FAILURE );
 	}

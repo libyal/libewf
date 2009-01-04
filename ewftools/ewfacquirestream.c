@@ -178,7 +178,6 @@ int main( int argc, char * const argv[] )
 {
 	CHAR_T *filenames[ 1 ]                     = { _S_CHAR_T( "stream" ) };
 
-	LIBEWF_HANDLE *handle                      = NULL;
 	libewf_char_t *calculated_md5_hash_string  = NULL;
 	libewf_char_t *calculated_sha1_hash_string = NULL;
 	libewf_char_t *case_number                 = NULL;
@@ -229,8 +228,6 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                            = 0;
 	int error_abort                            = 0;
 	int result                                 = 0;
-
-	ewfsignal_initialize();
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -447,6 +444,11 @@ int main( int argc, char * const argv[] )
 				break;
 		}
 	}
+	if( ewfsignal_attach(
+	     ewfcommon_signal_handler ) != 1 )
+	{
+		fprintf( stderr, "Unable to attach signal handler.\n" );
+	}
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
@@ -624,79 +626,85 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	acquiry_operating_system = ewfcommon_determine_operating_system();
-	acquiry_software_version = LIBEWF_VERSION_STRING;
-
-	fprintf( stdout, "Using the following acquiry parameters:\n" );
-
-	ewfoutput_acquiry_parameters_fprint(
-	 stdout,
-	 filenames[ 0 ],
-	 case_number,
-	 description,
-	 evidence_number,
-	 examiner_name,
-	 notes,
-	 media_type,
-	 volume_type,
-	 compression_level,
-	 compress_empty_block,
-	 libewf_format,
-	 (off64_t) acquiry_offset,
-	 (size64_t) acquiry_size,
-	 (size64_t) segment_file_size,
-	 (uint32_t) sectors_per_chunk,
-	 sector_error_granularity,
-	 read_error_retry,
-	 wipe_chunk_on_error );
-
-	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
-
-	if( handle == NULL )
+	if( ewfcommon_abort == 0 )
 	{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-		if( errno != 0 )
-		{
-			error_string = ewfstring_strerror( errno );
-		}
-		if( error_string != NULL )
-		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
-			 error_string );
+		acquiry_operating_system = ewfcommon_determine_operating_system();
+		acquiry_software_version = LIBEWF_VERSION_STRING;
 
-			libewf_common_free( error_string );
-		}
-		else
+		fprintf( stdout, "Using the following acquiry parameters:\n" );
+
+		ewfoutput_acquiry_parameters_fprint(
+		 stdout,
+		 filenames[ 0 ],
+		 case_number,
+		 description,
+		 evidence_number,
+		 examiner_name,
+		 notes,
+		 media_type,
+		 volume_type,
+		 compression_level,
+		 compress_empty_block,
+		 libewf_format,
+		 (off64_t) acquiry_offset,
+		 (size64_t) acquiry_size,
+		 (size64_t) segment_file_size,
+		 (uint32_t) sectors_per_chunk,
+		 sector_error_granularity,
+		 read_error_retry,
+		 wipe_chunk_on_error );
+
+		ewfcommon_libewf_handle = libewf_open(
+					   (CHAR_T * const *) filenames,
+					   1,
+					   LIBEWF_OPEN_WRITE );
+
+		if( ewfcommon_libewf_handle == NULL )
 		{
-			fprintf( stderr, "Unable to create EWF file(s).\n" );
-		}
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+			if( errno != 0 )
+			{
+				error_string = ewfstring_strerror( errno );
+			}
+			if( error_string != NULL )
+			{
+				fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+				 error_string );
+
+				libewf_common_free( error_string );
+			}
+			else
+			{
+				fprintf( stderr, "Unable to create EWF file(s).\n" );
+			}
 #else
-		fprintf( stderr, "Unable to create EWF file(s).\n" );
+			fprintf( stderr, "Unable to create EWF file(s).\n" );
 #endif
 
-		error_abort = 1;
-	}
-	else if( ewfcommon_initialize_write(
-	          handle,
-	          case_number,
-	          description,
-	          evidence_number,
-	          examiner_name,
-	          notes,
-	          acquiry_operating_system,
-	          program,
-	          acquiry_software_version,
-	          (uint8_t) media_type,
-	          (uint8_t) volume_type,
-	          compression_level,
-	          (uint8_t) compress_empty_block,
-	          libewf_format,
-	          (size64_t) segment_file_size,
-	          (uint32_t) sector_error_granularity ) != 1 )
-	{
-		fprintf( stderr, "Unable to initialize settings for EWF file(s).\n" );
+			error_abort = 1;
+		}
+		else if( ewfcommon_initialize_write(
+			  ewfcommon_libewf_handle,
+			  case_number,
+			  description,
+			  evidence_number,
+			  examiner_name,
+			  notes,
+			  acquiry_operating_system,
+			  program,
+			  acquiry_software_version,
+			  (uint8_t) media_type,
+			  (uint8_t) volume_type,
+			  compression_level,
+			  (uint8_t) compress_empty_block,
+			  libewf_format,
+			  (size64_t) segment_file_size,
+			  (uint32_t) sector_error_granularity ) != 1 )
+		{
+			fprintf( stderr, "Unable to initialize settings for EWF file(s).\n" );
 
-		error_abort = 1;
+			error_abort = 1;
+		}
 	}
 	if( case_number != NULL )
 	{
@@ -731,7 +739,7 @@ int main( int argc, char * const argv[] )
 	if( error_abort != 0 )
 	{
 		if( libewf_close(
-		     handle ) != 0 )
+		     ewfcommon_libewf_handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
@@ -747,7 +755,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
 
 			if( libewf_close(
-			     handle ) != 0 )
+			     ewfcommon_libewf_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
@@ -767,71 +775,24 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 
 			if( libewf_close(
-			     handle ) != 0 )
+			     ewfcommon_libewf_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
 	}
-	/* Start acquiring data
-	 */
-	timestamp_start = time( NULL );
-	time_string     = libewf_common_ctime(
-	                   &timestamp_start );
-
-	if( time_string != NULL )
+	if( ewfcommon_abort == 0 )
 	{
-		fprintf( stdout, "Acquiry started at: %" PRIs "\n",
-		 time_string );
+		/* Start acquiring data
+		 */
+		timestamp_start = time( NULL );
+		time_string     = libewf_common_ctime(
+				   &timestamp_start );
 
-		libewf_common_free(
-		 time_string );
-	}
-	else
-	{
-		fprintf( stdout, "Acquiry started.\n" );
-	}
-	if( callback != NULL )
-	{
-		ewfoutput_process_status_initialize(
-		 stdout,
-		 _S_LIBEWF_CHAR( "acquired" ),
-		 timestamp_start );
-	}
-	fprintf( stdout, "This could take a while.\n\n" );
-
-	write_count = ewfcommon_write_from_file_descriptor(
-	               handle,
-	               0,
-	               acquiry_size,
-	               acquiry_offset,
-	               (uint32_t) sectors_per_chunk,
-	               512,
-	               read_error_retry,
-	               sector_error_granularity,
-	               wipe_chunk_on_error,
-	               seek_on_error,
-	               calculate_md5,
-	               calculated_md5_hash_string,
-	               EWFSTRING_DIGEST_HASH_LENGTH_MD5,
-	               calculate_sha1,
-	               calculated_sha1_hash_string,
-	               EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
-	               swap_byte_pairs,
-	               callback );
-
-	/* Done acquiring data
-	 */
-	timestamp_end = time( NULL );
-	time_string   = libewf_common_ctime(
-	                 &timestamp_end );
-
-	if( write_count <= -1 )
-	{
 		if( time_string != NULL )
 		{
-			fprintf( stdout, "Acquiry failed at: %" PRIs "\n",
+			fprintf( stdout, "Acquiry started at: %" PRIs "\n",
 			 time_string );
 
 			libewf_common_free(
@@ -839,70 +800,124 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "Acquiry failed.\n" );
+			fprintf( stdout, "Acquiry started.\n" );
 		}
-		if( libewf_close( handle ) != 0 )
+		if( callback != NULL )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
+			ewfoutput_process_status_initialize(
+			 stdout,
+			 _S_LIBEWF_CHAR( "acquired" ),
+			 timestamp_start );
 		}
-		if( calculate_md5 == 1 )
+		fprintf( stdout, "This could take a while.\n\n" );
+
+		write_count = ewfcommon_write_from_file_descriptor(
+			       ewfcommon_libewf_handle,
+			       0,
+			       acquiry_size,
+			       acquiry_offset,
+			       (uint32_t) sectors_per_chunk,
+			       512,
+			       read_error_retry,
+			       sector_error_granularity,
+			       wipe_chunk_on_error,
+			       seek_on_error,
+			       calculate_md5,
+			       calculated_md5_hash_string,
+			       EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+			       calculate_sha1,
+			       calculated_sha1_hash_string,
+			       EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+			       swap_byte_pairs,
+			       callback );
+	}
+	if( ewfcommon_abort == 0 )
+	{
+		/* Done acquiring data
+		 */
+		timestamp_end = time( NULL );
+		time_string   = libewf_common_ctime(
+				 &timestamp_end );
+
+		if( write_count <= -1 )
 		{
+			if( time_string != NULL )
+			{
+				fprintf( stdout, "Acquiry failed at: %" PRIs "\n",
+				 time_string );
+
+				libewf_common_free(
+				 time_string );
+			}
+			else
+			{
+				fprintf( stdout, "Acquiry failed.\n" );
+			}
+			if( libewf_close(
+			     ewfcommon_libewf_handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			if( calculate_md5 == 1 )
+			{
+				libewf_common_free(
+				 calculated_md5_hash_string );
+			}
+			if( calculate_sha1 == 1 )
+			{
+				libewf_common_free(
+				 calculated_sha1_hash_string );
+			}
+			return( EXIT_FAILURE );
+		}
+		if( time_string != NULL )
+		{
+			fprintf( stdout, "Acquiry completed at: %" PRIs "\n",
+			 time_string );
+
 			libewf_common_free(
-			 calculated_md5_hash_string );
+			 time_string );
 		}
-		if( calculate_sha1 == 1 )
+		else
 		{
-			libewf_common_free(
-			 calculated_sha1_hash_string );
+			fprintf( stdout, "Acquiry completed.\n" );
 		}
-		return( EXIT_FAILURE );
-	}
-	if( time_string != NULL )
-	{
-		fprintf( stdout, "Acquiry completed at: %" PRIs "\n",
-		 time_string );
+		ewfoutput_process_summary_fprint(
+		 stdout,
+		 _S_LIBEWF_CHAR( "Written" ),
+		 write_count,
+		 timestamp_start,
+		 timestamp_end );
 
-		libewf_common_free(
-		 time_string );
-	}
-	else
-	{
-		fprintf( stdout, "Acquiry completed.\n" );
-	}
-	ewfoutput_process_summary_fprint(
-	 stdout,
-	 _S_LIBEWF_CHAR( "Written" ),
-	 write_count,
-	 timestamp_start,
-	 timestamp_end );
+		fprintf( stdout, "\n" );
 
-	fprintf( stdout, "\n" );
+		if( log_filename != NULL )
+		{
+			log_file_stream = fopen(
+					   log_filename,
+					   "w" );
 
-	if( log_filename != NULL )
-	{
-		log_file_stream = fopen(
-		                   log_filename,
-		                   "w" );
+			if( log_file_stream == NULL )
+			{
+				fprintf( stderr, "Unable to open log file: %s.\n",
+				 log_filename );
+			}
+		}
+		ewfoutput_acquiry_errors_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle,
+		 &amount_of_acquiry_errors );
 
 		if( log_file_stream == NULL )
 		{
-			fprintf( stderr, "Unable to open log file: %s.\n",
-			 log_filename );
+			ewfoutput_acquiry_errors_fprint(
+			 log_file_stream,
+			 ewfcommon_libewf_handle,
+			 &amount_of_acquiry_errors );
 		}
 	}
-	ewfoutput_acquiry_errors_fprint(
-	 stdout,
-	 handle,
-	 &amount_of_acquiry_errors );
-
-	if( log_file_stream == NULL )
-	{
-		ewfoutput_acquiry_errors_fprint(
-		 log_file_stream,
-		 handle,
-		 &amount_of_acquiry_errors );
-	}
-	if( libewf_close( handle ) != 0 )
+	if( libewf_close(
+	     ewfcommon_libewf_handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
@@ -916,9 +931,37 @@ int main( int argc, char * const argv[] )
 			libewf_common_free(
 			 calculated_sha1_hash_string );
 		}
-		fclose(
-		 log_file_stream );
+		if( log_file_stream != NULL )
+		{
+			fclose(
+			 log_file_stream );
+		}
+		return( EXIT_FAILURE );
+	}
+	if( ewfsignal_detach() != 1 )
+	{
+		fprintf( stderr, "Unable to detach signal handler.\n" );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		fprintf( stdout, "%" PRIs_EWF ": ABORTED\n",
+		 program );
 
+		if( calculate_md5 == 1 )
+		{
+			libewf_common_free(
+			 calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			libewf_common_free(
+			 calculated_sha1_hash_string );
+		}
+		if( log_file_stream != NULL )
+		{
+			fclose(
+			 log_file_stream );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( calculate_md5 == 1 )

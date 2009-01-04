@@ -345,58 +345,61 @@ int main( int argc, char * const argv[] )
 				libewf_common_free(
 				 calculated_md5_hash_string );
 			}
-			libewf_common_free( stored_sha1_hash_string );
+			libewf_common_free(
+			 stored_sha1_hash_string );
 
 			return( EXIT_FAILURE );
 		}
 	}
-	/* Start verifying data
-	 */
-	timestamp_start = time( NULL );
-	time_string     = libewf_common_ctime(
-	                   &timestamp_start );
+	if( ewfcommon_abort == 0 )
+	{
+		/* Start verifying data
+		 */
+		timestamp_start = time( NULL );
+		time_string     = libewf_common_ctime(
+				   &timestamp_start );
 
-	if( time_string != NULL )
-	{
-		fprintf( stdout, "Verify started at: %" PRIs "\n",
-		 time_string );
-
-		libewf_common_free(
-		 time_string );
-	}
-	else
-	{
-		fprintf( stdout, "Verify started.\n" );
-	}
-	if( callback != NULL )
-	{
-		ewfoutput_process_status_initialize(
-		 stdout,
-		 _S_LIBEWF_CHAR( "verified" ),
-		 timestamp_start );
-	}
-	fprintf( stdout, "This could take a while.\n\n" );
-
-	if( calculate_sha1 == 1 )
-	{
-		if( libewf_parse_hash_values(
-		     ewfcommon_libewf_handle ) != 1 )
+		if( time_string != NULL )
 		{
-			fprintf( stderr, "Unable to get parse hash values.\n" );
-		}
-	}
-	count = ewfcommon_read_verify(
-	         ewfcommon_libewf_handle,
-	         calculate_md5,
-	         calculated_md5_hash_string,
-	         EWFSTRING_DIGEST_HASH_LENGTH_MD5,
-	         calculate_sha1,
-	         calculated_sha1_hash_string,
-	         EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
-	         swap_byte_pairs,
-	         wipe_chunk_on_error,
-	         callback );
+			fprintf( stdout, "Verify started at: %" PRIs "\n",
+			 time_string );
 
+			libewf_common_free(
+			 time_string );
+		}
+		else
+		{
+			fprintf( stdout, "Verify started.\n" );
+		}
+		if( callback != NULL )
+		{
+			ewfoutput_process_status_initialize(
+			 stdout,
+			 _S_LIBEWF_CHAR( "verified" ),
+			 timestamp_start );
+		}
+		fprintf( stdout, "This could take a while.\n\n" );
+
+		if( calculate_sha1 == 1 )
+		{
+			if( libewf_parse_hash_values(
+			     ewfcommon_libewf_handle ) != 1 )
+			{
+				fprintf( stderr, "Unable to get parse hash values.\n" );
+			}
+		}
+		count = ewfcommon_read_verify(
+			 ewfcommon_libewf_handle,
+			 calculate_md5,
+			 calculated_md5_hash_string,
+			 EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+			 calculate_sha1,
+			 calculated_sha1_hash_string,
+			 EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+			 swap_byte_pairs,
+			 wipe_chunk_on_error,
+			 callback );
+	}
 	if( ewfcommon_abort == 0 )
 	{
 		timestamp_end = time( NULL );
@@ -593,9 +596,11 @@ int main( int argc, char * const argv[] )
 			libewf_common_free(
 			 calculated_sha1_hash_string );
 		}
-		fclose(
-		 log_file_stream );
-
+		if( log_file_stream != NULL )
+		{
+			fclose(
+			 log_file_stream );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( ewfsignal_detach() != 1 )
@@ -621,9 +626,11 @@ int main( int argc, char * const argv[] )
 			libewf_common_free(
 			 calculated_sha1_hash_string );
 		}
-		fclose(
-		 log_file_stream );
-
+		if( log_file_stream != NULL )
+		{
+			fclose(
+			 log_file_stream );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( calculate_md5 == 1 )

@@ -319,270 +319,271 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to parse header values.\n" );
 	}
-	if( ewfcommon_abort == 0 )
+	if( ( ewfcommon_abort == 0 )
+	 && ( libewf_get_format(
+	       ewfcommon_libewf_handle,
+	       &format ) != 1 ) )
 	{
-		if( libewf_get_format(
+		fprintf( stderr, "Unable to determine format.\n" );
+	}
+	else if( verbose == 1 )
+	{
+		switch( format )
+		{
+			case LIBEWF_FORMAT_EWF:
+				file_format_string = "original EWF";
+				break;
+
+			case LIBEWF_FORMAT_SMART:
+				file_format_string = "SMART";
+				break;
+
+			case LIBEWF_FORMAT_FTK:
+				file_format_string = "FTK Imager";
+				break;
+
+			case LIBEWF_FORMAT_ENCASE1:
+				file_format_string = "EnCase 1";
+				break;
+
+			case LIBEWF_FORMAT_ENCASE2:
+				file_format_string = "EnCase 2";
+				break;
+
+			case LIBEWF_FORMAT_ENCASE3:
+				file_format_string = "EnCase 3";
+				break;
+
+			case LIBEWF_FORMAT_ENCASE4:
+				file_format_string = "EnCase 4";
+				break;
+
+			case LIBEWF_FORMAT_ENCASE5:
+				file_format_string = "EnCase 5";
+				break;
+
+			case LIBEWF_FORMAT_ENCASE6:
+				file_format_string = "EnCase 6";
+				break;
+
+			case LIBEWF_FORMAT_LINEN5:
+				file_format_string = "linen 5";
+				break;
+
+			case LIBEWF_FORMAT_LINEN6:
+				file_format_string = "linen 6";
+				break;
+
+			case LIBEWF_FORMAT_EWFX:
+				file_format_string = "extended EWF (libewf)";
+				break;
+
+			case LIBEWF_FORMAT_UNKNOWN:
+			default:
+				file_format_string = "unknown";
+				break;
+
+		}
+		fprintf( stdout, "File format:\t\t\t%s\n\n",
+		 file_format_string );
+	}
+	if( ( ewfcommon_abort == 0 )
+	 && ( ( info_option == 'a' )
+	  || ( info_option == 'i' ) ) )
+	{
+		fprintf( stdout, "Acquiry information\n" );
+
+		ewfoutput_header_values_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle );
+
+		fprintf( stdout, "\n" );
+	}
+	if( ( ewfcommon_abort == 0 )
+	 && ( ( info_option == 'a' )
+	  || ( info_option == 'm' ) ) )
+	{
+		fprintf( stdout, "Media information\n" );
+
+		if( ( format != LIBEWF_FORMAT_EWF )
+		 && ( format != LIBEWF_FORMAT_SMART ) )
+		{
+			if( libewf_get_media_type(
+			     ewfcommon_libewf_handle,
+			     &media_type ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine media type.\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
+			{
+				fprintf( stdout, "\tMedia type:\t\tremovable disk\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
+			{
+				fprintf( stdout, "\tMedia type:\t\tfixed disk\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_CD )
+			{
+				fprintf( stdout, "\tMedia type:\t\tCD\n" );
+			}
+			else
+			{
+				fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
+				 media_type );
+			}
+			if( libewf_get_media_flags(
+			     ewfcommon_libewf_handle,
+			     &media_flags ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine media flags.\n" );
+			}
+			else if( verbose == 1 )
+			{
+				fprintf( stdout, "\tMedia flags:\t\t0x%" PRIx8 "\n",
+				 media_flags );
+			}
+			if( libewf_get_volume_type(
+			     ewfcommon_libewf_handle,
+			     &volume_type ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine volume type.\n" );
+			}
+			else if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
+			{
+				fprintf( stdout, "\tMedia is physical:\tno\n" );
+			}
+			else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
+			{
+				fprintf( stdout, "\tMedia is physical:\tyes\n" );
+			}
+			else
+			{
+				fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n",
+				 volume_type );
+			}
+		}
+		if( libewf_get_amount_of_sectors(
 		     ewfcommon_libewf_handle,
-		     &format ) != 1 )
+		     &amount_of_sectors ) == 1 )
 		{
-			fprintf( stderr, "Unable to determine format.\n" );
+			fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n",
+			 amount_of_sectors );
 		}
-		else if( verbose == 1 )
+		else
 		{
-			switch( format )
-			{
-				case LIBEWF_FORMAT_EWF:
-					file_format_string = "original EWF";
-					break;
-
-				case LIBEWF_FORMAT_SMART:
-					file_format_string = "SMART";
-					break;
-
-				case LIBEWF_FORMAT_FTK:
-					file_format_string = "FTK Imager";
-					break;
-
-				case LIBEWF_FORMAT_ENCASE1:
-					file_format_string = "EnCase 1";
-					break;
-
-				case LIBEWF_FORMAT_ENCASE2:
-					file_format_string = "EnCase 2";
-					break;
-
-				case LIBEWF_FORMAT_ENCASE3:
-					file_format_string = "EnCase 3";
-					break;
-
-				case LIBEWF_FORMAT_ENCASE4:
-					file_format_string = "EnCase 4";
-					break;
-
-				case LIBEWF_FORMAT_ENCASE5:
-					file_format_string = "EnCase 5";
-					break;
-
-				case LIBEWF_FORMAT_ENCASE6:
-					file_format_string = "EnCase 6";
-					break;
-
-				case LIBEWF_FORMAT_LINEN5:
-					file_format_string = "linen 5";
-					break;
-
-				case LIBEWF_FORMAT_LINEN6:
-					file_format_string = "linen 6";
-					break;
-
-				case LIBEWF_FORMAT_EWFX:
-					file_format_string = "extended EWF (libewf)";
-					break;
-
-				case LIBEWF_FORMAT_UNKNOWN:
-				default:
-					file_format_string = "unknown";
-					break;
-
-			}
-			fprintf( stdout, "File format:\t\t\t%s\n\n",
-			 file_format_string );
+			fprintf( stderr, "Unable to determine amount of sectors.\n" );
 		}
-		if( ( info_option == 'a' )
-		 || ( info_option == 'i' ) )
+		if( libewf_get_bytes_per_sector(
+		     ewfcommon_libewf_handle,
+		     &bytes_per_sector ) == 1 )
 		{
-			fprintf( stdout, "Acquiry information\n" );
-
-			ewfoutput_header_values_fprint(
-			 stdout,
-			 ewfcommon_libewf_handle );
-
-			fprintf( stdout, "\n" );
+			fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n",
+			 bytes_per_sector );
 		}
-		if( ( info_option == 'a' )
-		 || ( info_option == 'm' ) )
+		else
 		{
-			fprintf( stdout, "Media information\n" );
+			fprintf( stderr, "Unable to determine bytes per sector.\n" );
+		}
+		if( libewf_get_media_size(
+		     ewfcommon_libewf_handle,
+		     &media_size ) == 1 )
+		{
+			result = ewfbyte_size_string_create(
+				  media_size_string,
+				  16,
+				  media_size,
+				  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
-			if( ( format != LIBEWF_FORMAT_EWF )
-			 && ( format != LIBEWF_FORMAT_SMART ) )
+			if( result == 1 )
 			{
-				if( libewf_get_media_type(
-				     ewfcommon_libewf_handle,
-				     &media_type ) != 1 )
-				{
-					fprintf( stderr, "Unable to determine media type.\n" );
-				}
-				else if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-				{
-					fprintf( stdout, "\tMedia type:\t\tremovable disk\n" );
-				}
-				else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
-				{
-					fprintf( stdout, "\tMedia type:\t\tfixed disk\n" );
-				}
-				else if( media_type == LIBEWF_MEDIA_TYPE_CD )
-				{
-					fprintf( stdout, "\tMedia type:\t\tCD\n" );
-				}
-				else
-				{
-					fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
-					 media_type );
-				}
-				if( libewf_get_media_flags(
-				     ewfcommon_libewf_handle,
-				     &media_flags ) != 1 )
-				{
-					fprintf( stderr, "Unable to determine media flags.\n" );
-				}
-				else if( verbose == 1 )
-				{
-					fprintf( stdout, "\tMedia flags:\t\t0x%" PRIx8 "\n",
-					 media_flags );
-				}
-				if( libewf_get_volume_type(
-				     ewfcommon_libewf_handle,
-				     &volume_type ) != 1 )
-				{
-					fprintf( stderr, "Unable to determine volume type.\n" );
-				}
-				else if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
-				{
-					fprintf( stdout, "\tMedia is physical:\tno\n" );
-				}
-				else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
-				{
-					fprintf( stdout, "\tMedia is physical:\tyes\n" );
-				}
-				else
-				{
-					fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n",
-					 volume_type );
-				}
-			}
-			if( libewf_get_amount_of_sectors(
-			     ewfcommon_libewf_handle,
-			     &amount_of_sectors ) == 1 )
-			{
-				fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n",
-				 amount_of_sectors );
+				fprintf( stdout, "\tMedia size:\t\t%" PRIs_EWF " (%" PRIu64 " bytes)\n",
+				 media_size_string, media_size );
 			}
 			else
 			{
-				fprintf( stderr, "Unable to determine amount of sectors.\n" );
+				fprintf( stdout, "\tMedia size:\t\t%" PRIu64 " bytes\n",
+				 media_size );
 			}
-			if( libewf_get_bytes_per_sector(
+		}
+		else
+		{
+			fprintf( stderr, "Unable to determine media size.\n" );
+		}
+		if( ( format == LIBEWF_FORMAT_ENCASE5 )
+		 || ( format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( format == LIBEWF_FORMAT_LINEN5 )
+		 || ( format == LIBEWF_FORMAT_LINEN6 )
+		 || ( format == LIBEWF_FORMAT_EWFX ) )
+		{
+			if( libewf_get_error_granularity(
 			     ewfcommon_libewf_handle,
-			     &bytes_per_sector ) == 1 )
+			     &error_granularity ) == 1 )
 			{
-				fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n",
-				 bytes_per_sector );
+				fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n",
+				 error_granularity );
 			}
 			else
 			{
-				fprintf( stderr, "Unable to determine bytes per sector.\n" );
+				fprintf( stderr, "Unable to determine error granularity.\n" );
 			}
-			if( libewf_get_media_size(
+			if( libewf_get_compression_values(
 			     ewfcommon_libewf_handle,
-			     &media_size ) == 1 )
+			     &compression_level,
+			     &compress_empty_block ) == 1 )
 			{
-				result = ewfbyte_size_string_create(
-					  media_size_string,
-					  16,
-					  media_size,
-					  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-
-				if( result == 1 )
+				if( compression_level == LIBEWF_COMPRESSION_NONE )
 				{
-					fprintf( stdout, "\tMedia size:\t\t%" PRIs_EWF " (%" PRIu64 " bytes)\n",
-					 media_size_string, media_size );
+					fprintf( stdout, "\tCompression type:\tno compression\n" );
+				}
+				else if( compression_level == LIBEWF_COMPRESSION_FAST )
+				{
+					fprintf( stdout, "\tCompression type:\tgood (fast) compression\n" );
+				}
+				else if( compression_level == LIBEWF_COMPRESSION_BEST )
+				{
+					fprintf( stdout, "\tCompression type:\tbest compression\n" );
 				}
 				else
 				{
-					fprintf( stdout, "\tMedia size:\t\t%" PRIu64 " bytes\n",
-					 media_size );
+					fprintf( stdout, "\tCompression type:\tunknown compression\n" );
 				}
 			}
 			else
 			{
-				fprintf( stderr, "Unable to determine media size.\n" );
+				fprintf( stderr, "Unable to determine compression level.\n" );
 			}
-			if( ( format == LIBEWF_FORMAT_ENCASE5 )
-			 || ( format == LIBEWF_FORMAT_ENCASE6 )
-			 || ( format == LIBEWF_FORMAT_LINEN5 )
-			 || ( format == LIBEWF_FORMAT_LINEN6 )
-			 || ( format == LIBEWF_FORMAT_EWFX ) )
+			if( libewf_get_guid(
+			     ewfcommon_libewf_handle,
+			     guid,
+			     16 ) == 1 )
 			{
-				if( libewf_get_error_granularity(
-				     ewfcommon_libewf_handle,
-				     &error_granularity ) == 1 )
-				{
-					fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n",
-					 error_granularity );
-				}
-				else
-				{
-					fprintf( stderr, "Unable to determine error granularity.\n" );
-				}
-				if( libewf_get_compression_values(
-				     ewfcommon_libewf_handle,
-				     &compression_level,
-				     &compress_empty_block ) == 1 )
-				{
-					if( compression_level == LIBEWF_COMPRESSION_NONE )
-					{
-						fprintf( stdout, "\tCompression type:\tno compression\n" );
-					}
-					else if( compression_level == LIBEWF_COMPRESSION_FAST )
-					{
-						fprintf( stdout, "\tCompression type:\tgood (fast) compression\n" );
-					}
-					else if( compression_level == LIBEWF_COMPRESSION_BEST )
-					{
-						fprintf( stdout, "\tCompression type:\tbest compression\n" );
-					}
-					else
-					{
-						fprintf( stdout, "\tCompression type:\tunknown compression\n" );
-					}
-				}
-				else
-				{
-					fprintf( stderr, "Unable to determine compression level.\n" );
-				}
-				if( libewf_get_guid(
-				     ewfcommon_libewf_handle,
-				     guid,
-				     16 ) == 1 )
-				{
-					fprintf( stdout, "\tGUID:\t\t\t%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
-							 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
-							 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
-					 guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ], guid[ 4 ], guid[ 5 ], guid[ 6 ], guid[ 7 ],
-					 guid[ 8 ], guid[ 9 ], guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ]
-					);
-				}
+				fprintf( stdout, "\tGUID:\t\t\t%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
+						 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
+						 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
+				 guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ], guid[ 4 ], guid[ 5 ], guid[ 6 ], guid[ 7 ],
+				 guid[ 8 ], guid[ 9 ], guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ]
+				);
 			}
-			ewfoutput_hash_values_fprint(
-			 stdout,
-			 ewfcommon_libewf_handle );
-
-			fprintf( stdout, "\n" );
-
-			ewfoutput_sessions_fprint(
-			 stdout,
-			 ewfcommon_libewf_handle,
-			 &amount_of_sessions );
 		}
-		if( ( info_option == 'a' )
-		 || ( info_option == 'e' ) )
-		{
-			ewfoutput_acquiry_errors_fprint(
-			 stdout,
-			 ewfcommon_libewf_handle,
-			 &amount_of_acquiry_errors );
-		}
+		ewfoutput_hash_values_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle );
+
+		fprintf( stdout, "\n" );
+
+		ewfoutput_sessions_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle,
+		 &amount_of_sessions );
+	}
+	if( ( ewfcommon_abort == 0 )
+	 && ( ( info_option == 'a' )
+	  || ( info_option == 'e' ) ) )
+	{
+		ewfoutput_acquiry_errors_fprint(
+		 stdout,
+		 ewfcommon_libewf_handle,
+		 &amount_of_acquiry_errors );
 	}
 	if( ewfsignal_detach() != 1 )
 	{
