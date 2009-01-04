@@ -164,6 +164,8 @@ Version: 20080229
 * Code clean up
 * safe guarded libewf set functions for read/write
 * made header parse more fault tollerant
+* rewrote UTF16 conversion routine also handle wide character strings
+  solves issues with mbsrtowcs (handling characters like back space)
 
 Version: 20080228
 * Worked on not finalizing on error
