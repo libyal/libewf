@@ -328,7 +328,7 @@ void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t siz
 
 /* Print the chunk data to a stream
  */
-void libewf_debug_chunk_fprint( FILE *stream, EWF_CHUNK *chunk )
+void libewf_debug_chunk_fprint( FILE *stream, EWF_CHAR *chunk )
 {
 	static char *function = "libewf_debug_chunk_fprint";
 

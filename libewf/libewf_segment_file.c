@@ -1691,7 +1691,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc, uint32_t amount_of_chunks )
+ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc, uint32_t amount_of_chunks )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 
@@ -1833,7 +1833,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 	/* Write the chunk data to the segment file
 	 */
-	write_count = ewf_chunk_write(
+	write_count = ewf_string_write_from_buffer(
 	               chunk_data,
 	               internal_handle->segment_table->file_descriptor[ segment_number ],
 	               size );
@@ -2125,7 +2125,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 /* Write a delta chunk of data to a segment file and update the offset table
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
 {
 	static char *function = "libewf_segment_file_write_delta_chunk";
 	ssize_t write_count   = 0;

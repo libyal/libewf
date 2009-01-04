@@ -57,7 +57,7 @@ void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section );
 void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string );
 void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size );
 void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t size );
-void libewf_debug_chunk_fprint( FILE *stream, EWF_CHUNK *chunk );
+void libewf_debug_chunk_fprint( FILE *stream, EWF_CHAR *chunk );
 
 #if defined( __cplusplus )
 }

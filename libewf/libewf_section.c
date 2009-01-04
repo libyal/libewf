@@ -43,22 +43,16 @@
 #include "libewf_section.h"
 #include "libewf_segment_table.h"
 
-#include "ewf_chunk.h"
 #include "ewf_compress.h"
-#include "ewf_crc.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
 #include "ewf_error2.h"
 #include "ewf_file_header.h"
 #include "ewf_hash.h"
-#include "ewf_header.h"
-#include "ewf_header2.h"
 #include "ewf_ltree.h"
-#include "ewf_section.h"
 #include "ewf_session.h"
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
-#include "ewf_table.h"
 
 /* Reads a section start from file
  * Returns the amount of bytes read, or -1 on error
@@ -3457,7 +3451,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 	EWF_CHAR buffer[ 4 ];
@@ -3506,7 +3500,7 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 	}
 	section_write_count += write_count;
 
-	write_count = ewf_chunk_write( chunk_data, file_descriptor, chunk_size );
+	write_count = ewf_string_write_from_buffer( chunk_data, file_descriptor, chunk_size );
 
 	if( write_count <= -1 )
 	{

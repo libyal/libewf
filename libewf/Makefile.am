@@ -4,7 +4,6 @@ lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
 	ewf_char.h \
-	ewf_chunk.h \
 	ewf_compress.c ewf_compress.h \
 	ewf_crc.h \
 	ewf_data.h \

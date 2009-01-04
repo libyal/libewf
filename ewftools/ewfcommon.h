@@ -49,8 +49,6 @@
 #include "../libewf/libewf_char.h"
 #include "../libewf/libewf_internal_handle.h"
 
-#include "../libewf/ewf_chunk.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -60,7 +58,7 @@ int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size );
 LIBEWF_CHAR *ewfcommon_determine_operating_system( void );
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format );
 
-ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error );
+ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHAR *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error );
 
 ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
