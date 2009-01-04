@@ -200,6 +200,9 @@ ssize64_t ewfcommon_export_ewf(
            uint8_t calculate_sha1,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
+           character_t *acquiry_operating_system,
+           character_t *acquiry_software,
+           character_t *acquiry_software_version,
            void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 #if defined( __cplusplus )

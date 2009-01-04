@@ -43,17 +43,17 @@ struct libewf_values_table
 	 */
 	character_t **identifier;
 
-	/* The value identifier sizes
+	/* The value identifier lengths
 	 */
-	size_t *identifier_size;
+	size_t *identifier_length;
 
 	/* The values
 	 */
 	character_t **value;
 
-	/* The value sizes
+	/* The value lengths
 	 */
-	size_t *value_size;
+	size_t *value_length;
 };
 
 int libewf_values_table_initialize(
@@ -77,7 +77,7 @@ int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
      character_t *identifier,
-     size_t indentifier_length );
+     size_t identifier_size );
 
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
@@ -90,7 +90,7 @@ int libewf_values_table_get_value(
      character_t *identifier,
      size_t identifier_length,
      character_t *value,
-     size_t value_length );
+     size_t value_size );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,

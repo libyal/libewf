@@ -170,6 +170,8 @@ int main( int argc, char * const argv[] )
 	system_character_t *filenames[ 1 ]         = { NULL };
 
 	libewf_handle_t *export_handle             = NULL;
+	character_t *acquiry_operating_system      = NULL;
+	character_t *acquiry_software_version      = NULL;
 	character_t *user_input                    = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfexport" );
 
@@ -790,6 +792,9 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
+			acquiry_operating_system = ewfcommon_determine_operating_system();
+			acquiry_software_version = LIBEWF_VERSION_STRING;
+
 			export_count = ewfcommon_export_ewf(
 			                ewfcommon_libewf_handle,
 			                export_handle,
@@ -804,8 +809,16 @@ int main( int argc, char * const argv[] )
 			                calculate_sha1,
 			                swap_byte_pairs,
 			                wipe_chunk_on_error,
+			                acquiry_operating_system,
+			                program,
+			                acquiry_software_version,
 			                callback );
 
+			if( acquiry_operating_system != NULL )
+			{
+				memory_free(
+				 acquiry_operating_system );
+			}
 			if( libewf_close(
 			     export_handle ) != 0 )
 			{

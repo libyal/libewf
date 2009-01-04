@@ -377,7 +377,8 @@ int ewfcommon_initialize_write(
 	     handle,
 	     _CHARACTER_T_STRING( "acquiry_software" ),
 	     acquiry_software,
-	     10 ) != 1 )
+	     string_length(
+	      acquiry_software ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry software in handle.\n",
 		 function );
@@ -2289,6 +2290,9 @@ ssize64_t ewfcommon_export_ewf(
            uint8_t calculate_sha1,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
+           character_t *acquiry_operating_system,
+           character_t *acquiry_software,
+           character_t *acquiry_software_version,
            void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
@@ -2412,6 +2416,41 @@ ssize64_t ewfcommon_export_ewf(
 	     handle ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set copy header values to export handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( acquiry_operating_system != NULL )
+	 && ( libewf_set_header_value_acquiry_operating_system(
+	       export_handle,
+	       acquiry_operating_system,
+	       string_length(
+	        acquiry_operating_system ) ) != 1 ) )
+	{
+		notify_warning_printf( "%s: unable to set header value acquiry operating system in export handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_header_value(
+	     export_handle,
+	     _CHARACTER_T_STRING( "acquiry_software" ),
+	     acquiry_software,
+	     string_length(
+	      acquiry_software ) ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set header value acquiry software in export handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_header_value_acquiry_software_version(
+	     export_handle,
+	     acquiry_software_version,
+	     string_length(
+	      acquiry_software_version ) ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set header value acquiry software version number in export handle.\n",
 		 function );
 
 		return( -1 );

@@ -114,12 +114,12 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
-		( *values_table )->identifier_size = (size_t *) memory_allocate(
-		                                                 values_table_size );
+		( *values_table )->identifier_length = (size_t *) memory_allocate(
+		                                                   values_table_size );
 
-		if( ( *values_table )->identifier_size == NULL )
+		if( ( *values_table )->identifier_length == NULL )
 		{
-			notify_warning_printf( "%s: unable to create identifier sizes.\n",
+			notify_warning_printf( "%s: unable to create identifier lengths.\n",
 			 function );
 
 			memory_free(
@@ -130,15 +130,15 @@ int libewf_values_table_initialize(
 			return( -1 );
 		}
 		if( memory_set(
-		     ( *values_table )->identifier_size,
+		     ( *values_table )->identifier_length,
 		     0,
 		     values_table_size ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear identifier sizes.\n",
+			notify_warning_printf( "%s: unable to clear identifier lengths.\n",
 			 function );
 
 			memory_free(
-			 ( *values_table )->identifier_size );
+			 ( *values_table )->identifier_length );
 			memory_free(
 			 ( *values_table )->identifier );
 			memory_free(
@@ -155,7 +155,7 @@ int libewf_values_table_initialize(
 			 function );
 
 			memory_free(
-			 ( *values_table )->identifier_size );
+			 ( *values_table )->identifier_length );
 			memory_free(
 			 ( *values_table )->identifier );
 			memory_free(
@@ -174,7 +174,7 @@ int libewf_values_table_initialize(
 			memory_free(
 			 ( *values_table )->value );
 			memory_free(
-			 ( *values_table )->identifier_size );
+			 ( *values_table )->identifier_length );
 			memory_free(
 			 ( *values_table )->identifier );
 			memory_free(
@@ -182,18 +182,18 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
-		( *values_table )->value_size = (size_t *) memory_allocate(
+		( *values_table )->value_length = (size_t *) memory_allocate(
 		                                            values_table_size );
 
-		if( ( *values_table )->value_size == NULL )
+		if( ( *values_table )->value_length == NULL )
 		{
-			notify_warning_printf( "%s: unable to create value sizes.\n",
+			notify_warning_printf( "%s: unable to create value lengths.\n",
 			 function );
 
 			memory_free(
 			 ( *values_table )->value );
 			memory_free(
-			 ( *values_table )->identifier_size );
+			 ( *values_table )->identifier_length );
 			memory_free(
 			 ( *values_table )->identifier );
 			memory_free(
@@ -202,19 +202,19 @@ int libewf_values_table_initialize(
 			return( -1 );
 		}
 		if( memory_set(
-		     ( *values_table )->value_size,
+		     ( *values_table )->value_length,
 		     0,
 		     values_table_size ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear value sizes.\n",
+			notify_warning_printf( "%s: unable to clear value lengths.\n",
 			 function );
 
 			memory_free(
-			 ( *values_table )->value_size );
+			 ( *values_table )->value_length );
 			memory_free(
 			 ( *values_table )->value );
 			memory_free(
-			 ( *values_table )->identifier_size );
+			 ( *values_table )->identifier_length );
 			memory_free(
 			 ( *values_table )->identifier );
 			memory_free(
@@ -263,20 +263,20 @@ int libewf_values_table_free(
 			memory_free(
 			 ( *values_table )->identifier );
 		}
-		if( ( *values_table )->identifier_size != NULL )
+		if( ( *values_table )->identifier_length != NULL )
 		{
 			memory_free(
-			 ( *values_table )->identifier_size );
+			 ( *values_table )->identifier_length );
 		}
 		if( ( *values_table )->value != NULL )
 		{
 			memory_free(
 			 ( *values_table )->value );
 		}
-		if( ( *values_table )->value_size != NULL )
+		if( ( *values_table )->value_length != NULL )
 		{
 			memory_free(
-			 ( *values_table )->value_size );
+			 ( *values_table )->value_length );
 		}
 		memory_free(
 		 *values_table );
@@ -356,24 +356,24 @@ int libewf_values_table_resize(
 			return( -1 );
 		}
 		reallocation = memory_reallocate(
-		                values_table->identifier_size,
+		                values_table->identifier_length,
 		                values_table_size );
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to resize identifier sizes.\n",
+			notify_warning_printf( "%s: unable to resize identifier lengths.\n",
 			 function );
 
 			return( -1 );
 		}
-		values_table->identifier_size = (size_t *) reallocation;
+		values_table->identifier_length = (size_t *) reallocation;
 
 		if( memory_set(
-		     &( values_table->identifier_size[ values_table->amount_of_values ] ),
+		     &( values_table->identifier_length[ values_table->amount_of_values ] ),
 		     0,
 		     sizeof( size_t ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear identifier sizes.\n",
+			notify_warning_printf( "%s: unable to clear identifier lengths.\n",
 			 function );
 
 			return( -1 );
@@ -402,20 +402,20 @@ int libewf_values_table_resize(
 			return( -1 );
 		}
 		reallocation = memory_reallocate(
-		                values_table->value_size,
+		                values_table->value_length,
 		                values_table_size );
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to resize value sizes.\n",
+			notify_warning_printf( "%s: unable to resize value lengths.\n",
 			 function );
 
 			return( -1 );
 		}
-		values_table->value_size = (size_t *) reallocation;
+		values_table->value_length = (size_t *) reallocation;
 
 		if( memory_set(
-		     &( values_table->value_size[ values_table->amount_of_values ] ),
+		     &( values_table->value_length[ values_table->amount_of_values ] ),
 		     0,
 		     sizeof( size_t ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
@@ -435,7 +435,7 @@ int libewf_values_table_resize(
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
      character_t *identifier,
-     size_t identifier_size,
+     size_t identifier_length,
      int *index )
 {
 	static char *function     = "libewf_values_table_get_index";
@@ -462,16 +462,16 @@ int libewf_values_table_get_index(
 
 		return( -1 );
 	}
-	if( identifier_size == 0 )
+	if( identifier_length == 0 )
 	{
-		notify_warning_printf( "%s: invalid identifier size value is zero.\n",
+		notify_warning_printf( "%s: invalid identifier length value is zero.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( identifier_size > (size_t) SSIZE_MAX )
+	if( identifier_length > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid identifier size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid identifier length value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -492,21 +492,21 @@ int libewf_values_table_get_index(
 
 			continue;
 		}
-		if( values_table->identifier_size[ values_table_iterator ] == 0)
+		if( values_table->identifier_length[ values_table_iterator ] == 0 )
 		{
-			notify_warning_printf( "%s: missing identifier size for index: %d.\n",
+			notify_warning_printf( "%s: missing identifier length for index: %d.\n",
 			 function, values_table_iterator );
 
 			continue;
 		}
-		if( values_table->identifier_size[ values_table_iterator ] != identifier_size )
+		if( values_table->identifier_length[ values_table_iterator ] != identifier_length )
 		{
 			continue;
 		}
 		if( string_compare(
 		     identifier,
 		     values_table->identifier[ values_table_iterator ],
-		     identifier_size ) == 0 )
+		     identifier_length ) == 0 )
 		{
 			*index = values_table_iterator;
 
@@ -541,13 +541,6 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	if( identifier_size == 0 )
-	{
-		notify_warning_printf( "%s: invalid identifier size value is zero.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( identifier_size > (size_t) SSIZE_MAX )
 	{
 		notify_warning_printf( "%s: invalid identifier size value exceeds maximum.\n",
@@ -571,14 +564,14 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	if( values_table->identifier_size[ index ] == 0 )
+	if( values_table->identifier_length[ index ] == 0 )
 	{
-		notify_warning_printf( "%s: missing identifier size for index: %d.\n",
+		notify_warning_printf( "%s: missing identifier size for length: %d.\n",
 		 function, index );
 
 		return( -1 );
 	}
-	if( identifier_size < values_table->identifier_size[ index ] )
+	if( identifier_size < ( values_table->identifier_length[ index ] + 1 ) )
 	{
 		notify_warning_printf( "%s: identifier too small.\n",
 		 function );
@@ -588,14 +581,14 @@ int libewf_values_table_get_identifier(
 	if( string_copy(
 	     identifier,
 	     values_table->identifier[ index ],
-	     identifier_size ) == NULL )
+	     values_table->identifier_length[ index ] ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set identifier.\n",
 		 function );
 
 		return( -1 );
 	}
-	identifier[ identifier_size - 1 ] = 0;
+	identifier[ values_table->identifier_length[ index ] ] = 0;
 
 	return( 1 );
 }
@@ -608,7 +601,7 @@ int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
      character_t *identifier,
-     size_t identifier_size )
+     size_t identifier_length )
 {
 	static char *function = "libewf_values_table_set_identifier";
 
@@ -626,16 +619,16 @@ int libewf_values_table_set_identifier(
 
 		return( -1 );
 	}
-	if( identifier_size == 0 )
+	if( identifier_length == 0 )
 	{
-		notify_warning_printf( "%s: invalid identifier size value is zero.\n",
+		notify_warning_printf( "%s: invalid identifier length value is zero.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( identifier_size > (size_t) SSIZE_MAX )
+	if( identifier_length > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid identifier size value exceeds maximum.\n",
+		notify_warning_printf( "%s: invalid identifier length value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -659,7 +652,7 @@ int libewf_values_table_set_identifier(
 		values_table->identifier[ index ] = NULL;
 	}
 	values_table->identifier[ index ] = (character_t *) memory_allocate(
-							     sizeof( character_t ) * identifier_size );
+							     sizeof( character_t ) * ( identifier_length + 1 ) );
 
 	if( values_table->identifier[ index ] == NULL )
 	{
@@ -671,7 +664,7 @@ int libewf_values_table_set_identifier(
 	if( string_copy(
 	     values_table->identifier[ index ],
 	     identifier,
-	     identifier_size ) == NULL )
+	     identifier_length ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set identifier.\n",
 		 function );
@@ -683,9 +676,9 @@ int libewf_values_table_set_identifier(
 
 		return( -1 );
 	}
-	( values_table->identifier[ index ] )[ identifier_size - 1 ] = 0;
+	( values_table->identifier[ index ] )[ identifier_length ] = 0;
 
-	values_table->identifier_size[ index ] = identifier_size;
+	values_table->identifier_length[ index ] = identifier_length;
 
 	return( 1 );
 }
@@ -696,7 +689,7 @@ int libewf_values_table_set_identifier(
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
      character_t *identifier,
-     size_t identifier_size,
+     size_t identifier_length,
      character_t *value,
      size_t value_size )
 {
@@ -711,13 +704,6 @@ int libewf_values_table_get_value(
 
 		return( -1 );
 	}
-	if( value_size == 0 )
-	{
-		notify_warning_printf( "%s: invalid value size value is zero.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( value_size > (size_t) SSIZE_MAX )
 	{
 		notify_warning_printf( "%s: invalid value size value exceeds maximum.\n",
@@ -728,7 +714,7 @@ int libewf_values_table_get_value(
 	result = libewf_values_table_get_index(
 	          values_table,
 	          identifier,
-	          identifier_size,
+	          identifier_length,
 	          &index ) ;
 
 	if( result <= -1 )
@@ -743,11 +729,11 @@ int libewf_values_table_get_value(
 		return( 0 );
 	}
 	if( ( values_table->value[ index ] == NULL )
-	 || ( values_table->value_size[ index ] == 0 ) )
+	 || ( values_table->value_length[ index ] == 0 ) )
 	{
 		return( 0 );
 	}
-	if( value_size < values_table->value_size[ index ] )
+	if( value_size < ( values_table->value_length[ index ] + 1 ) )
 	{
 		notify_warning_printf( "%s: value too small.\n",
 		 function );
@@ -757,14 +743,14 @@ int libewf_values_table_get_value(
 	if( string_copy(
 	     value,
 	     values_table->value[ index ],
-	     value_size ) == NULL )
+	     values_table->value_length[ index ] ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set value.\n",
 		 function );
 
 		return( -1 );
 	}
-	value[ value_size - 1 ] = 0;
+	value[ values_table->value_length[ index ] ] = 0;
 
 	return( 1 );
 }
@@ -776,9 +762,9 @@ int libewf_values_table_get_value(
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
      character_t *identifier,
-     size_t identifier_size,
+     size_t identifier_length,
      character_t *value,
-     size_t value_size )
+     size_t value_length )
 {
 	static char *function = "libewf_values_table_set_value";
 	int index             = 0;
@@ -787,7 +773,7 @@ int libewf_values_table_set_value(
 	result = libewf_values_table_get_index(
 	          values_table,
 	          identifier,
-	          identifier_size,
+	          identifier_length,
 	          &index );
 
 	if( result <= -1 )
@@ -814,7 +800,7 @@ int libewf_values_table_set_value(
 		     values_table,
 		     index,
 		     identifier,
-		     identifier_size ) != 1 )
+		     identifier_length ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set identifier.\n",
 			 function );
@@ -833,10 +819,10 @@ int libewf_values_table_set_value(
 	}
 	if( ( value != NULL )
 	 && ( value[ 0 ] != 0 )
-	 && ( value_size > 0 ) )
+	 && ( value_length > 0 ) )
 	{
 		values_table->value[ index ] = (character_t *) memory_allocate(
-		                                                sizeof( character_t ) * value_size );
+		                                                sizeof( character_t ) * ( value_length + 1 ) );
 
 		if( values_table->value[ index ] == NULL )
 		{
@@ -848,7 +834,7 @@ int libewf_values_table_set_value(
 		if( string_copy(
 		     values_table->value[ index ],
 		     value,
-		     value_size ) == NULL )
+		     value_length ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to set value.\n",
 			 function );
@@ -860,9 +846,9 @@ int libewf_values_table_set_value(
 
 			return( -1 );
 		}
-		( values_table->value[ index ] )[ value_size - 1 ] = 0;
+		( values_table->value[ index ] )[ value_length ] = 0;
 
-		values_table->value_size[ index ] = value_size;
+		values_table->value_length[ index ] = value_length;
 	}
 	return( 1 );
 }

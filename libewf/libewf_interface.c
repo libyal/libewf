@@ -1092,7 +1092,7 @@ int libewf_get_header_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value";
-	size_t identifier_size                    = 0;
+	size_t identifier_length                  = 0;
 
 	if( handle == NULL )
 	{
@@ -1121,13 +1121,13 @@ int libewf_get_header_value(
 	{
 		return( 0 );
 	}
-	identifier_size = string_size(
-	                   identifier );
+	identifier_length = string_length(
+	                     identifier );
 
 	return( libewf_values_table_get_value(
 	         internal_handle->header_values,
 	         identifier,
-	         identifier_size,
+	         identifier_length,
 	         value,
 	         length ) );
 }
@@ -1210,7 +1210,7 @@ int libewf_get_hash_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value";
-	size_t identifier_size                    = 0;
+	size_t identifier_length                  = 0;
 
 	if( handle == NULL )
 	{
@@ -1239,13 +1239,13 @@ int libewf_get_hash_value(
 	{
 		return( 0 );
 	}
-	identifier_size = string_size(
-	                   identifier );
+	identifier_length = string_length(
+	                     identifier );
 
 	return( libewf_values_table_get_value(
                  internal_handle->hash_values,
                  identifier,
-                 identifier_size,
+                 identifier_length,
                  value,
                  length ) );
 }
@@ -2015,7 +2015,7 @@ int libewf_set_header_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_header_value";
-	size_t identifier_size                    = 0;
+	size_t identifier_length                  = 0;
 
 	if( handle == NULL )
 	{
@@ -2062,21 +2062,13 @@ int libewf_set_header_value(
 			return( -1 );
 		}
 	}
-	identifier_size = string_size(
-	                   identifier );
+	identifier_length = string_length(
+	                     identifier );
 
-	/* Make sure length contains the end of string character
-	 */
-	if( ( value != NULL )
-	 && ( length > 0 )
-	 && ( value[ length - 1 ] != 0 ) )
-	{
-		length += 1;
-	}
 	return( libewf_values_table_set_value(
 	         internal_handle->header_values,
 	         identifier,
-	         identifier_size,
+	         identifier_length,
 	         value,
 	         length ) );
 }
@@ -2092,7 +2084,7 @@ int libewf_set_hash_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_hash_value";
-	size_t identifier_size                    = 0;
+	size_t identifier_length                  = 0;
 
 	if( handle == NULL )
 	{
@@ -2137,21 +2129,13 @@ int libewf_set_hash_value(
 			return( -1 );
 		}
 	}
-	identifier_size = string_size(
-	                   identifier );
+	identifier_length = string_length(
+	                     identifier );
 
-	/* Make sure length contains the end of string character
-	 */
-	if( ( value != NULL )
-	 && ( length > 0 )
-	 && ( value[ length - 1 ] != 0 ) )
-	{
-		length += 1;
-	}
 	return( libewf_values_table_set_value(
 	         internal_handle->hash_values,
 	         identifier,
-	         identifier_size,
+	         identifier_length,
 	         value,
 	         length ) );
 }
