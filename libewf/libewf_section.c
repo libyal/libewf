@@ -3189,7 +3189,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+ssize_t libewf_section_delta_chunk_read( int file_descriptor, size_t size )
 {
 	return( 0 );
 }
@@ -3197,7 +3197,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+ssize_t libewf_section_delta_chunk_write( int file_descriptor, off_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
 {
 	EWF_CHAR buffer[ 4 ];
 
@@ -3205,13 +3205,6 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_INTERNAL_HANDLE *internal_handl
 	ssize_t section_write_count = 0;
 	ssize_t write_count         = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( chunk_size > (size_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size only value exceeds maximum.\n",

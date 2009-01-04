@@ -1520,6 +1520,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			total_write_count += write_count;
 		}
 	}
+	internal_handle->segment_table->file_offset[ segment_number ] += total_write_count;
+
 	return( total_write_count );
 }
 
@@ -2242,6 +2244,96 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		total_write_count                                             += write_count;
 	}
 	return( total_write_count );
+}
+
+/* Write a delta chunk of data to a segment file and update the offset table
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+{
+	static char *function = "libewf_segment_file_write_delta_chunk";
+	ssize_t write_count   = 0;
+
+	if( segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number > segment_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number value out of range.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_crc == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk CRC.\n",
+		 function );
+
+		return( -1 );
+	}
+
+	/* Write the chunk in the delta segment file
+	 */
+	write_count = libewf_section_delta_chunk_write(
+		       segment_table->file_descriptor[ segment_number ],
+		       segment_table->file_offset[ segment_number ],
+		       chunk, 
+		       chunk_data, 
+		       chunk_crc );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write delta chunk data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_section_list_append(
+	     segment_table->section_list[ segment_number ],
+	     (EWF_CHAR *) "delta_chunk",
+	     segment_table->file_offset[ segment_number ],
+	     ( segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to append delta_chunk section to section list.\n",
+		 function );
+
+		return( -1 );
+	}
+	segment_table->file_offset[ segment_number ] += write_count;
+
+	return( write_count );
 }
 
 /* Closes the segment file, necessary sections at the end of the segment file will be written

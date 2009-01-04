@@ -124,6 +124,7 @@ TODO
 * have compound reallocation functions return an integer as result
 * remove internal_handle passing from most functions
   only pass the necessary values
+* segment table should only be updated by functions in segment file/table
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
