@@ -101,6 +101,10 @@ Next release:
 
 * refactor function names into static char *
 
+Version: 20070713
+* worked on libtool DLL support
+  with help by David Loveall
+
 Version: 20070710
 * worked on function name refactoring
 * removed type from configure.ac

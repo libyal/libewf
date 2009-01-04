@@ -6,6 +6,7 @@ SUBDIRS = \
 EXTRA_DIST = \
 	include/libewf.h.in \
 	include/libewf/libewf_definitions.h.in \
+	include/libewf/libewf_extern.h.in \
 	include/libewf/libewf_types.h.in \
 	libewf/libewf_config.h \
 	libewf/libewf_config_windows.h \

@@ -44,5 +44,5 @@ libewf_la_SOURCES = \
 	libewf_string.c libewf_string.h \
 	libewf_write.c libewf_write.h
 
-libewf_la_LDFLAGS = -version-info 1:1:0
+libewf_la_LDFLAGS = -no-undefined -version-info 1:1:1
 
