@@ -162,7 +162,7 @@ WORKING
 * ewfcommon - size write buffer to chunk size for raw write
 
 Version: 20071103
-* worked on raw write
+* refactored write functions
 
 Version: 20071030
 * fixed input handling of format in ewfexport wide string support
