@@ -67,9 +67,9 @@
 
 /* Returns the library version
  */
-const LIBEWF_CHAR *libewf_get_version( void )
+const libewf_char_t *libewf_get_version( void )
 {
-	return( (const LIBEWF_CHAR *) LIBEWF_VERSION );
+	return( (const libewf_char_t *) LIBEWF_VERSION );
 }
 
 /* Returns the flags for reading
@@ -1209,7 +1209,7 @@ int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_
 /* Retrieves the header value identifier specified by its index
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
+int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, libewf_char_t *value, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_header_value_identifier";
@@ -1237,7 +1237,7 @@ int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, L
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_get_header_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_header_value";
@@ -1308,7 +1308,7 @@ int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of
 /* Retrieves the hash value identifier specified by its index
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
+int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, libewf_char_t *value, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_hash_value_identifier";
@@ -1336,7 +1336,7 @@ int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIB
 /* Retrieves the hash value specified by the identifier
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_get_hash_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_hash_value";
@@ -1994,7 +1994,7 @@ int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_
 /* Sets the header value specified by the identifier
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_set_header_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_set_header_value";
@@ -2040,7 +2040,7 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_set_hash_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_set_hash_value";

@@ -78,7 +78,7 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 /* Prints the section data to a stream
  */
-void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
+void libewf_debug_section_fprint( FILE *stream, ewf_section_t *section )
 {
 	static char *function  = "libewf_debug_section_fprint";
 	EWF_CRC calculated_crc = 0;
@@ -100,7 +100,10 @@ void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
 
 		return;
 	}
-	calculated_crc = ewf_crc_calculate( section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  section,
+	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, section->crc ) != 1 )
 	{
@@ -133,7 +136,7 @@ void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
 
 /* Prints a header string to a stream
  */
-void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string )
+void libewf_debug_header_string_fprint( FILE *stream, libewf_char_t *header_string )
 {
 	static char *function = "libewf_debug_header_string_fprint";
 
@@ -156,10 +159,10 @@ void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string
 
 /* Prints the header data to a stream
  */
-void libewf_debug_header_fprint( FILE *stream, EWF_CHAR *header, size_t size )
+void libewf_debug_header_fprint( FILE *stream, ewf_char_t *header, size_t size )
 {
-	LIBEWF_CHAR *header_string = NULL;
-	static char *function      = "libewf_debug_header_fprint";
+	libewf_char_t *header_string = NULL;
+	static char *function        = "libewf_debug_header_fprint";
 
 	if( header == NULL )
 	{
@@ -168,7 +171,8 @@ void libewf_debug_header_fprint( FILE *stream, EWF_CHAR *header, size_t size )
 
 		return;
 	}
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * size );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * size );
 
 	if( header_string == NULL )
 	{
@@ -193,11 +197,11 @@ void libewf_debug_header_fprint( FILE *stream, EWF_CHAR *header, size_t size )
 
 /* Prints the header2 data to a stream
  */
-void libewf_debug_header2_fprint( FILE *stream, EWF_CHAR *header2, size_t size )
+void libewf_debug_header2_fprint( FILE *stream, ewf_char_t *header2, size_t size )
 {
-	LIBEWF_CHAR *header_string = NULL;
-	static char *function      = "libewf_debug_header2_fprint";
-	size_t header_size         = 0;
+	libewf_char_t *header_string = NULL;
+	static char *function        = "libewf_debug_header2_fprint";
+	size_t header_size           = 0;
 
 	if( header2 == NULL )
 	{
@@ -207,7 +211,8 @@ void libewf_debug_header2_fprint( FILE *stream, EWF_CHAR *header2, size_t size )
 		return;
 	}
 	header_size   = ( size - 1 ) / 2;
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * header_size );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * header_size );
 
 	if( header_string == NULL )
 	{
@@ -232,7 +237,7 @@ void libewf_debug_header2_fprint( FILE *stream, EWF_CHAR *header2, size_t size )
 
 /* Print the chunk data to a stream
  */
-void libewf_debug_chunk_fprint( FILE *stream, EWF_CHAR *chunk )
+void libewf_debug_chunk_fprint( FILE *stream, ewf_char_t *chunk )
 {
 	static char *function = "libewf_debug_chunk_fprint";
 

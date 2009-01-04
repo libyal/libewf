@@ -60,7 +60,7 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	values_table_size = amount * sizeof( LIBEWF_CHAR* );
+	values_table_size = amount * sizeof( libewf_char_t * );
 
 	if( values_table_size > (size_t) SSIZE_MAX )
 	{
@@ -71,7 +71,7 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	values_table->identifiers = (LIBEWF_CHAR **) libewf_common_alloc( values_table_size );
+	values_table->identifiers = (libewf_char_t **) libewf_common_alloc( values_table_size );
 
 	if( values_table->identifiers == NULL )
 	{
@@ -92,7 +92,7 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	values_table->values = (LIBEWF_CHAR **) libewf_common_alloc( values_table_size );
+	values_table->values = (libewf_char_t **) libewf_common_alloc( values_table_size );
 
 	if( values_table->values == NULL )
 	{
@@ -125,10 +125,10 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
  */
 int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t previous_amount, uint32_t new_amount )
 {
-	LIBEWF_CHAR **reallocation = NULL;
-	static char *function      = "libewf_values_table_realloc";
-	size_t previous_size       = previous_amount * sizeof( LIBEWF_CHAR* );
-	size_t new_size            = new_amount * sizeof( LIBEWF_CHAR* );
+	libewf_char_t **reallocation = NULL;
+	static char *function        = "libewf_values_table_realloc";
+	size_t previous_size         = previous_amount * sizeof( libewf_char_t * );
+	size_t new_size              = new_amount * sizeof( libewf_char_t * );
 
 	if( values_table == NULL )
 	{
@@ -160,7 +160,7 @@ int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t pre
 
 		return( -1 );
 	}
-	reallocation = (LIBEWF_CHAR **) libewf_common_realloc( values_table->identifiers, new_size );
+	reallocation = (libewf_char_t **) libewf_common_realloc( values_table->identifiers, new_size );
 
 	if( reallocation == NULL )
 	{
@@ -181,7 +181,7 @@ int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t pre
 
                 return( -1 );
         }
-	reallocation = (LIBEWF_CHAR **) libewf_common_realloc( values_table->values, new_size );
+	reallocation = (libewf_char_t **) libewf_common_realloc( values_table->values, new_size );
 
 	if( reallocation == NULL )
 	{
@@ -236,7 +236,7 @@ void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table )
 /* Retrieves the value index number, or -1 on error
  * The index number will be larger than the amount when the identifier is not present in the values table
  */
-int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier )
+int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier )
 {
 	static char *function    = "libewf_values_table_get_index";
 	size_t string_length     = 0;
@@ -307,7 +307,7 @@ int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, LIBEWF
  * Length should contain the amount of characters in the string
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, LIBEWF_CHAR *identifier, size_t length )
+int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, libewf_char_t *identifier, size_t length )
 {
 	static char *function    = "libewf_values_table_get_identifier";
 	size_t identifier_length = 0;
@@ -370,7 +370,7 @@ int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint3
 
 		return( -1 );
 	}
-	identifier[ identifier_length - 1 ] = (LIBEWF_CHAR) '\0';
+	identifier[ identifier_length - 1 ] = (libewf_char_t) '\0';
 
 	return( 1 );
 }
@@ -379,7 +379,7 @@ int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint3
  * Length should contain the amount of characters in the string
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	static char *function = "libewf_values_table_get_value";
 	size_t value_length   = 0;
@@ -435,7 +435,7 @@ int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHA
 
 		return( -1 );
 	}
-	value[ value_length - 1 ] = (LIBEWF_CHAR) '\0';
+	value[ value_length - 1 ] = (libewf_char_t) '\0';
 
 	return( 1 );
 }
@@ -445,7 +445,7 @@ int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHA
  * Frees the previous value if necessary
  * Returns 1 if successful, -1 on error
  */
-int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	static char *function = "libewf_values_table_set_value";
 	size_t string_length  = 0;

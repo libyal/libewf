@@ -55,7 +55,7 @@ struct libewf_header_sections
 {
 	/* The stored header
 	 */
-	EWF_CHAR *header;
+	ewf_char_t *header;
 
 	/* The size of the stored header
 	 */
@@ -63,7 +63,7 @@ struct libewf_header_sections
 
 	/* The stored header2
 	 */
-	EWF_CHAR *header2;
+	ewf_char_t *header2;
 
 	/* The size of the stored header2
 	 */
@@ -71,7 +71,7 @@ struct libewf_header_sections
 
 	/* The stored xheader
 	 */
-	EWF_CHAR *xheader;
+	ewf_char_t *xheader;
 
 	/* The size of the stored xheader
 	 */

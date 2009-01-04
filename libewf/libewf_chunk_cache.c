@@ -53,7 +53,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	size *= EWF_CHAR_SIZE;
+	size *= sizeof( ewf_char_t );
 
 	if( size > (size_t) SSIZE_MAX )
 	{
@@ -62,7 +62,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	chunk_cache->compressed = (EWF_CHAR *) libewf_common_alloc( size );
+	chunk_cache->compressed = (ewf_char_t *) libewf_common_alloc( size );
 
 	if( chunk_cache->compressed == NULL )
 	{
@@ -73,7 +73,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	chunk_cache->data = (EWF_CHAR *) libewf_common_alloc( size );
+	chunk_cache->data = (ewf_char_t *) libewf_common_alloc( size );
 
 	if( chunk_cache->data == NULL )
 	{
@@ -99,8 +99,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
  */
 int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 {
-	EWF_CHAR *reallocation = NULL;
-	static char *function  = "libewf_chunk_cache_realloc";
+	ewf_char_t *reallocation = NULL;
+	static char *function    = "libewf_chunk_cache_realloc";
 
 	if( chunk_cache == NULL )
 	{
@@ -109,7 +109,7 @@ int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 
 		return( -1 );
 	}
-	size *= EWF_CHAR_SIZE;
+	size *= sizeof( ewf_char_t );
 
 	if( size > (size_t) SSIZE_MAX )
 	{
@@ -125,7 +125,7 @@ int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 
 		return( -1 );
 	}
-	reallocation = (EWF_CHAR *) libewf_common_realloc( (void *) chunk_cache->compressed, size );
+	reallocation = (ewf_char_t *) libewf_common_realloc( (void *) chunk_cache->compressed, size );
 
 	if( reallocation == NULL )
 	{
@@ -135,7 +135,7 @@ int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 		return( -1 );
 	}
 	chunk_cache->compressed = reallocation;
-	reallocation            = (EWF_CHAR *) libewf_common_realloc( (void *) chunk_cache->data, size );
+	reallocation            = (ewf_char_t *) libewf_common_realloc( (void *) chunk_cache->data, size );
 
 	if( reallocation == NULL )
 	{

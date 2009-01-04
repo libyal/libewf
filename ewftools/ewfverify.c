@@ -94,34 +94,34 @@ int main( int argc, char * const argv[] )
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob                            = NULL;
-	int32_t glob_count                       = 0;
+	EWFGLOB *glob                              = NULL;
+	int32_t glob_count                         = 0;
 #endif
-	LIBEWF_HANDLE *handle                    = NULL;
-	LIBEWF_CHAR *stored_md5_hash_string      = NULL;
-	LIBEWF_CHAR *calculated_md5_hash_string  = NULL;
-	LIBEWF_CHAR *stored_sha1_hash_string     = NULL;
-	LIBEWF_CHAR *calculated_sha1_hash_string = NULL;
-	LIBEWF_CHAR *program                     = _S_LIBEWF_CHAR( "ewfverify" );
+	LIBEWF_HANDLE *handle                      = NULL;
+	libewf_char_t *stored_md5_hash_string      = NULL;
+	libewf_char_t *calculated_md5_hash_string  = NULL;
+	libewf_char_t *stored_sha1_hash_string     = NULL;
+	libewf_char_t *calculated_sha1_hash_string = NULL;
+	libewf_char_t *program                     = _S_LIBEWF_CHAR( "ewfverify" );
 
-	CHAR_T *time_string                      = NULL;
+	CHAR_T *time_string                        = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        CHAR_T *error_string                     = NULL;
+        CHAR_T *error_string                       = NULL;
 #endif
-	void *callback                           = &ewfoutput_process_status_fprint;
-	INT_T option                             = 0;
-	time_t timestamp_start                   = 0;
-	time_t timestamp_end                     = 0;
-	int64_t count                            = 0;
-	int8_t stored_md5_hash_result            = 0;
-	int8_t stored_sha1_hash_result           = 0;
-	uint8_t calculate_md5                    = 1;
-	uint8_t calculate_sha1                   = 0;
-	uint8_t swap_byte_pairs                  = 0;
-	uint8_t wipe_chunk_on_error              = 0;
-	uint8_t verbose                          = 0;
-	int match_md5_hash                       = 0;
-	int match_sha1_hash                      = 0;
+	void *callback                             = &ewfoutput_process_status_fprint;
+	INT_T option                               = 0;
+	time_t timestamp_start                     = 0;
+	time_t timestamp_end                       = 0;
+	int64_t count                              = 0;
+	int8_t stored_md5_hash_result              = 0;
+	int8_t stored_sha1_hash_result             = 0;
+	uint8_t calculate_md5                      = 1;
+	uint8_t calculate_sha1                     = 0;
+	uint8_t swap_byte_pairs                    = 0;
+	uint8_t wipe_chunk_on_error                = 0;
+	uint8_t verbose                            = 0;
+	int match_md5_hash                         = 0;
+	int match_sha1_hash                        = 0;
 
 	ewfsignal_initialize();
 
@@ -242,7 +242,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+		stored_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
+		                                            sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( stored_md5_hash_string == NULL )
 		{
@@ -250,7 +251,8 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+		calculated_md5_hash_string = (libewf_char_t *) libewf_common_alloc( 
+		                                                sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -263,7 +265,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		stored_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+		stored_sha1_hash_string = (libewf_char_t *) libewf_common_alloc( 
+		                                             sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( stored_sha1_hash_string == NULL )
 		{
@@ -276,7 +279,8 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+		calculated_sha1_hash_string = (libewf_char_t *) libewf_common_alloc( 
+		                                                 sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{

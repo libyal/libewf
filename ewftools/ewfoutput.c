@@ -158,7 +158,7 @@ struct tm *ewfoutput_gmtime( const time_t *timestamp )
 /* Determines the units strings of a certain factor value
  * http://nl.wikipedia.org/wiki/Mebibyte
  */
-LIBEWF_CHAR *ewfoutput_determine_units_string( int factor )
+libewf_char_t *ewfoutput_determine_units_string( int factor )
 {
 	switch( factor )
 	{
@@ -189,14 +189,14 @@ LIBEWF_CHAR *ewfoutput_determine_units_string( int factor )
 /* Determines the human readable size as a string
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
+libewf_char_t *ewfoutput_determine_human_readable_size_string( uint64_t size )
 {
-	LIBEWF_CHAR *size_string  = NULL;
-	LIBEWF_CHAR *units_string = NULL;
-	static char *function     = "ewfoutput_determine_human_readable_size_string";
-	int8_t remainder          = -1;
-	uint8_t factor            = 0;
-	uint64_t new_size         = 0;
+	libewf_char_t *size_string  = NULL;
+	libewf_char_t *units_string = NULL;
+	static char *function       = "ewfoutput_determine_human_readable_size_string";
+	int8_t remainder            = -1;
+	uint8_t factor              = 0;
+	uint64_t new_size           = 0;
 
 	while( size >= 1024 )
 	{
@@ -219,7 +219,8 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 	}
 	/* The string has a maximum of 8 characters + end of string '\0'
 	 */
-	size_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 9 );
+	size_string = (libewf_char_t *) libewf_common_alloc(
+	                                 sizeof( libewf_char_t ) * 9 );
 
 	if( size_string == NULL )
 	{
@@ -266,7 +267,7 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 
 /* Print the version information to a stream
  */
-void ewfoutput_version_fprint( FILE *stream, LIBEWF_CHAR *program )
+void ewfoutput_version_fprint( FILE *stream, libewf_char_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -318,7 +319,7 @@ void ewfoutput_copyright_fprint( FILE *stream )
 
 /* Prints an overview of the aquiry parameters
  */
-void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
+void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, libewf_char_t *case_number, libewf_char_t *description, libewf_char_t *evidence_number, libewf_char_t *examiner_name, libewf_char_t *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
 {
 	static char *function = "ewfoutput_acquiry_parameters_fprint";
 
@@ -615,8 +616,8 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	LIBEWF_CHAR header_identifier[ 64 ];
-	LIBEWF_CHAR header_value[ 128 ];
+	libewf_char_t header_identifier[ 64 ];
+	libewf_char_t header_value[ 128 ];
 
 	static char *function           = "ewfoutput_header_values_fprint";
 	size_t header_identifier_length = 64;
@@ -757,16 +758,16 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	LIBEWF_CHAR hash_identifier[ 32 ];
-	LIBEWF_CHAR hash_value[ 128 ];
+	libewf_char_t hash_identifier[ 32 ];
+	libewf_char_t hash_value[ 128 ];
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
-	LIBEWF_CHAR *stored_md5_hash_string = NULL;
-	static char *function               = "ewfoutput_hash_values_fprint";
-	uint32_t hash_identifier_length     = 32;
-	uint32_t hash_value_length          = 128;
-	uint32_t amount_of_values           = 0;
-	uint32_t iterator                   = 0;
+	libewf_char_t *stored_md5_hash_string = NULL;
+	static char *function                 = "ewfoutput_hash_values_fprint";
+	uint32_t hash_identifier_length       = 32;
+	uint32_t hash_value_length            = 128;
+	uint32_t amount_of_values             = 0;
+	uint32_t iterator                     = 0;
 
 	if( stream == NULL )
 	{
@@ -789,7 +790,8 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+	stored_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
+	                                            sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( ( stored_md5_hash_string != NULL )
 	 && ( ewfdigest_copy_to_string(
@@ -887,8 +889,8 @@ void ewfoutput_timestamp_fprint( FILE *stream, time_t timestamp )
  */
 void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t seconds )
 {
-	LIBEWF_CHAR *bytes_per_second_string = NULL;
-	size64_t bytes_per_second            = 0;
+	libewf_char_t *bytes_per_second_string = NULL;
+	size64_t bytes_per_second              = 0;
 
 	if( stream == NULL )
 	{
@@ -924,7 +926,7 @@ void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t sec
  */
 void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes )
 {
-	LIBEWF_CHAR *bytes_string = NULL;
+	libewf_char_t *bytes_string = NULL;
 
 	if( stream == NULL )
 	{
@@ -949,7 +951,7 @@ void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes )
 /* Static values for status information of the process
  */
 FILE* ewfoutput_process_status_stream              = NULL;
-LIBEWF_CHAR *ewfoutput_process_status_string       = NULL;
+libewf_char_t *ewfoutput_process_status_string     = NULL;
 time_t ewfoutput_process_status_timestamp_start    = 0;
 time_t ewfoutput_process_status_timestamp_last     = 0;
 int8_t ewfoutput_process_status_last_percentage    = -1;
@@ -957,7 +959,7 @@ uint64_t ewfoutput_process_status_last_bytes_total = 0;
 
 /* Initializes the status information of the process
  */
-void ewfoutput_process_status_initialize( FILE *stream, LIBEWF_CHAR *string, time_t timestamp_start )
+void ewfoutput_process_status_initialize( FILE *stream, libewf_char_t *string, time_t timestamp_start )
 {
 	ewfoutput_process_status_stream          = stream;
 	ewfoutput_process_status_string          = string;
@@ -1085,7 +1087,7 @@ void ewfoutput_stream_process_status_fprint( size64_t bytes_read, size64_t bytes
 
 /* Prints summary information of the process
  */
-void ewfoutput_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end )
+void ewfoutput_process_summary_fprint( FILE *stream, libewf_char_t *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end )
 {
 	time_t timestamp_acquiry = 0;
 

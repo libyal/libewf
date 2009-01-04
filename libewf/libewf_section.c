@@ -120,7 +120,7 @@ ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Writes a section start to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *section_type, size_t section_type_length, size64_t section_data_size )
+ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, size64_t section_data_size )
 {
 	EWF_SECTION section;
 
@@ -226,14 +226,14 @@ ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Reads a compressed string section from a segment file and uncompresses it
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t compressed_string_size, EWF_CHAR **uncompressed_string, size_t *uncompressed_string_size )
+ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t compressed_string_size, ewf_char_t **uncompressed_string, size_t *uncompressed_string_size )
 {
-	EWF_CHAR *compressed_string = NULL;
-	EWF_CHAR *reallocation      = NULL;
-	EWF_CHAR *uncompressed      = NULL;
-	static char *function       = "libewf_section_compressed_string_read";
-	ssize_t read_count          = 0;
-	int result                  = 0;
+	ewf_char_t *compressed_string = NULL;
+	ewf_char_t *reallocation      = NULL;
+	ewf_char_t *uncompressed      = NULL;
+	static char *function         = "libewf_section_compressed_string_read";
+	ssize_t read_count            = 0;
+	int result                    = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -264,7 +264,8 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segme
 
 		return( -1 );
 	}
-	compressed_string = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * compressed_string_size );
+	compressed_string = (ewf_char_t *) libewf_common_alloc(
+	                                    sizeof( ewf_char_t ) * compressed_string_size );
 
 	if( compressed_string == NULL )
 	{
@@ -293,7 +294,8 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segme
 
 	/* Add a byte for the end of string
 	 */
-	uncompressed = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * ( *uncompressed_string_size + 1 ) );
+	uncompressed = (ewf_char_t *) libewf_common_alloc(
+	                               sizeof( ewf_char_t ) * ( *uncompressed_string_size + 1 ) );
 
 	if( uncompressed == NULL )
 	{
@@ -315,7 +317,9 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segme
 	{
 		/* Add a byte for the end of string
 		 */
-		reallocation = (EWF_CHAR *) libewf_common_realloc( uncompressed, ( *uncompressed_string_size + 1 ) );
+		reallocation = (ewf_char_t *) libewf_common_realloc(
+		                               uncompressed,
+		                               ( sizeof( ewf_char_t ) * ( *uncompressed_string_size + 1 ) ) );
 
 		if( reallocation == NULL )
 		{
@@ -346,7 +350,7 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segme
 
 		return( -1 );
 	}
-	uncompressed[ *uncompressed_string_size ] = (EWF_CHAR) '\0';
+	uncompressed[ *uncompressed_string_size ] = (ewf_char_t) '\0';
 
 	*uncompressed_string       = uncompressed;
 	*uncompressed_string_size += 1;
@@ -357,10 +361,10 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segme
 /* Writes a compressed string section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *section_type, size_t section_type_length, EWF_CHAR *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
+ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, ewf_char_t *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
 {
-	EWF_CHAR *compressed_string   = NULL;
-	EWF_CHAR *reallocation        = NULL;
+	ewf_char_t *compressed_string = NULL;
+	ewf_char_t *reallocation      = NULL;
 	static char *function         = "libewf_section_write_compressed_string";
 	off64_t section_offset        = 0;
 	size_t compressed_string_size = 0;
@@ -391,7 +395,8 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segm
 	}
 	section_offset         = segment_file_handle->file_offset;
 	compressed_string_size = uncompressed_string_size;
-	compressed_string      = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * compressed_string_size );
+	compressed_string      = (ewf_char_t *) libewf_common_alloc(
+	                                         sizeof( ewf_char_t ) * compressed_string_size );
 
 	if( compressed_string == NULL )
 	{
@@ -410,7 +415,9 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segm
 	if( ( result == -1 )
 	 && ( compressed_string_size > 0 ) )
 	{
-		reallocation = (EWF_CHAR *) libewf_common_realloc( compressed_string, compressed_string_size );
+		reallocation = (ewf_char_t *) libewf_common_realloc(
+		                               compressed_string,
+		                               ( sizeof( ewf_char_t ) * compressed_string_size ) );
 
 		if( reallocation == NULL )
 		{
@@ -488,9 +495,9 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segm
 /* Reads a header section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_header_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, EWF_CHAR **cached_header, size_t *cached_header_size )
+ssize_t libewf_section_header_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_header, size_t *cached_header_size )
 {
-	EWF_CHAR *header      = NULL;
+	ewf_char_t *header    = NULL;
 	static char *function = "libewf_section_header_read";
 	ssize_t read_count    = 0;
 	size_t header_size    = 0;
@@ -563,7 +570,7 @@ ssize_t libewf_section_header_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Writes a header section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *header, size_t header_size, int8_t compression_level )
+ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *header, size_t header_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_header_write";
 	ssize_t section_write_count = 0;
@@ -582,7 +589,7 @@ ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 
 	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file_handle,
-	                       (EWF_CHAR *) "header",
+	                       (ewf_char_t *) "header",
 	                       6,
 	                       header,
 	                       header_size,
@@ -601,9 +608,9 @@ ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Reads a header2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, EWF_CHAR **cached_header2, size_t *cached_header2_size )
+ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_header2, size_t *cached_header2_size )
 {
-	EWF_CHAR *header2     = NULL;
+	ewf_char_t *header2   = NULL;
 	static char *function = "libewf_section_header2_read";
 	ssize_t read_count    = 0;
 	size_t header2_size   = 0;
@@ -676,7 +683,7 @@ ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Writes a header2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *header2, size_t header2_size, int8_t compression_level )
+ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *header2, size_t header2_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_header2_write";
 	ssize_t section_write_count = 0;
@@ -695,7 +702,7 @@ ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 
 	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file_handle,
-	                       (EWF_CHAR *) "header2",
+	                       (ewf_char_t *) "header2",
 	                       7,
 	                       header2,
 	                       header2_size,
@@ -857,7 +864,7 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file
  */
 ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t no_section_append )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
+	ewf_char_t *section_type    = (ewf_char_t *) "volume";
 	EWF_VOLUME_SMART *volume    = NULL;
 	static char *function       = "libewf_section_volume_s01_write";
 	EWF_CRC calculated_crc      = 0;
@@ -1192,7 +1199,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file
  */
 ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t no_section_append )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
+	ewf_char_t *section_type    = (ewf_char_t *) "volume";
 	EWF_VOLUME *volume          = NULL;
 	static char *function       = "libewf_section_volume_e01_write";
 	EWF_CRC calculated_crc      = 0;
@@ -1769,7 +1776,7 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Writes a table or table2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append )
+ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, ewf_char_t *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append )
 {
 	EWF_TABLE table;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -2077,7 +2084,7 @@ ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_
  */
 ssize_t libewf_section_sectors_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t sectors_data_size, uint8_t no_section_append )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "sectors";
+	ewf_char_t *section_type    = (ewf_char_t *) "sectors";
 	static char *function       = "libewf_section_sectors_write";
 	off64_t section_offset      = 0;
 	size_t section_type_length  = 7;
@@ -2129,8 +2136,8 @@ ssize_t libewf_section_sectors_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, uint8_t *ewf_format, uint8_t error_tollerance )
 {
 	EWF_LTREE *ltree           = NULL;
-	EWF_CHAR *ltree_data       = NULL;
-	static char *function     = "libewf_section_ltree_read";
+	ewf_char_t *ltree_data     = NULL;
+	static char *function      = "libewf_section_ltree_read";
 	ssize_t section_read_count = 0;
 	ssize_t read_count         = 0;
 	size_t ltree_data_size     = 0;
@@ -2201,7 +2208,8 @@ ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 
 	ltree_data_size = section_size - EWF_LTREE_SIZE;
 
-	ltree_data = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * ltree_data_size );
+	ltree_data = (ewf_char_t *) libewf_common_alloc(
+                                     sizeof( ewf_char_t ) * ltree_data_size );
 
 	if( ltree_data == NULL )
 	{
@@ -2658,7 +2666,7 @@ ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
  */
 ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append )
 {
-	EWF_CHAR *section_type      = (EWF_CHAR *) "data";
+	ewf_char_t *section_type    = (ewf_char_t *) "data";
 	static char *function       = "libewf_section_data_write";
 	EWF_CRC calculated_crc      = 0;
 	off64_t section_offset      = 0;
@@ -3067,7 +3075,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 	uint8_t calculated_crc_buffer[ 4 ];
 
 	EWF_ERROR2_SECTOR *error2_sectors = NULL;
-	EWF_CHAR *section_type            = (EWF_CHAR *) "error2";
+	ewf_char_t *section_type          = (ewf_char_t *) "error2";
 	static char *function             = "libewf_section_error2_write";
 	EWF_CRC calculated_crc            = 0;
 	off64_t section_offset            = 0;
@@ -3319,7 +3327,7 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 {
 	EWF_HASH hash;
 
-	EWF_CHAR *section_type      = (EWF_CHAR *) "hash";
+	ewf_char_t *section_type    = (ewf_char_t *) "hash";
 	static char *function       = "libewf_section_hash_write";
 	EWF_CRC calculated_crc      = 0;
 	off64_t section_offset      = 0;
@@ -3405,7 +3413,7 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
  * This is used for the next and done sections, these sections point back towards themselves
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format )
 {
 	EWF_SECTION section;
 
@@ -3522,9 +3530,9 @@ ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Reads a xheader section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xheader_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, EWF_CHAR **cached_xheader, size_t *cached_xheader_size )
+ssize_t libewf_section_xheader_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_xheader, size_t *cached_xheader_size )
 {
-	EWF_CHAR *xheader     = NULL;
+	ewf_char_t *xheader   = NULL;
 	static char *function = "libewf_section_xheader_read";
 	ssize_t read_count    = 0;
 	size_t xheader_size   = 0;
@@ -3597,7 +3605,7 @@ ssize_t libewf_section_xheader_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Writes a xheader section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *xheader, size_t xheader_size, int8_t compression_level )
+ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *xheader, size_t xheader_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_xheader_write";
 	ssize_t section_write_count = 0;
@@ -3616,7 +3624,7 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 
 	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file_handle,
-	                       (EWF_CHAR *) "xheader",
+	                       (ewf_char_t *) "xheader",
 	                       7,
 	                       xheader,
 	                       xheader_size,
@@ -3635,9 +3643,9 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 /* Reads a xhash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, EWF_CHAR **cached_xhash, size_t *cached_xhash_size )
+ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_xhash, size_t *cached_xhash_size )
 {
-	EWF_CHAR *xhash       = NULL;
+	ewf_char_t *xhash     = NULL;
 	static char *function = "libewf_section_xhash_read";
 	ssize_t read_count    = 0;
 	size_t xhash_size     = 0;
@@ -3710,7 +3718,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Writes a xhash section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_CHAR *xhash, size_t xhash_size, int8_t compression_level )
+ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *xhash, size_t xhash_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_xhash_write";
 	ssize_t section_write_count = 0;
@@ -3729,7 +3737,7 @@ ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 
 	section_write_count = libewf_section_write_compressed_string(
 	                       segment_file_handle,
-	                       (EWF_CHAR *) "xhash",
+	                       (ewf_char_t *) "xhash",
 	                       5,
 	                       xhash,
 	                       xhash_size,
@@ -3881,12 +3889,12 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc, uint8_t no_section_append )
+ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc, uint8_t no_section_append )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 	uint8_t calculated_crc_buffer[ 4 ];
 
-	EWF_CHAR *section_type      = (EWF_CHAR *) "delta_chunk";
+	ewf_char_t *section_type    = (ewf_char_t *) "delta_chunk";
 	static char *function       = "libewf_section_delta_chunk_write";
 	EWF_CRC calculated_crc      = 0;
 	off64_t section_offset      = 0;

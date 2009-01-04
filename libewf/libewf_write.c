@@ -588,7 +588,7 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 /* Processes the chunk data, applies compression if necessary and calculates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
-ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *chunk_data, size_t chunk_data_size, EWF_CHAR *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc )
+ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc )
 {
 	static char *function     = "libewf_write_process_chunk_data";
 	size_t data_write_size    = 0;
@@ -820,7 +820,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
  * The necessary settings of the write values must have been made
  * Returns the amount of bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, EWF_CHAR *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
+ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
 {
 	static char *function     = "libewf_raw_write_chunk_new";
 	ssize_t total_write_count = 0;
@@ -1206,7 +1206,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
  * The necessary settings of the write values must have been made
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, EWF_CHAR *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
+ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
 {
 	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
 	static char *function                           = "libewf_raw_write_chunk_existing";
@@ -1522,7 +1522,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
  */
 ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t force_write )
 {
-	EWF_CHAR *chunk_data              = NULL;
+	ewf_char_t *chunk_data            = NULL;
 	static char *function             = "libewf_write_chunk_data_new";
 	EWF_CRC chunk_crc                 = 0;
 	ssize_t chunk_data_size           = 0;
@@ -1612,7 +1612,7 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
 	 || ( ( internal_handle->chunk_cache->offset == 0 )
 	 && ( data_size >= (size_t) internal_handle->media_values->chunk_size ) ) )
 	{
-		chunk_data = (EWF_CHAR *) buffer;
+		chunk_data = (ewf_char_t *) buffer;
 		write_size = read_size;
 	}
 	else
@@ -1735,12 +1735,12 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
  */
 ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t force_write )
 {
-	EWF_CHAR *chunk_data  = NULL;
-	static char *function = "libewf_write_chunk_data_existing";
-	EWF_CRC chunk_crc     = 0;
-	ssize_t read_count    = 0;
-	ssize_t write_count   = 0;
-	size_t write_size     = 0;
+	ewf_char_t *chunk_data = NULL;
+	static char *function  = "libewf_write_chunk_data_existing";
+	EWF_CRC chunk_crc      = 0;
+	ssize_t read_count     = 0;
+	ssize_t write_count    = 0;
+	size_t write_size      = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1956,9 +1956,9 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
 	}
 	chunk_data_size = libewf_write_process_chunk_data(
 	                   internal_handle,
-	                   (EWF_CHAR *) buffer,
+	                   (ewf_char_t *) buffer,
 	                   buffer_size,
-	                   (EWF_CHAR *) compressed_buffer,
+	                   (ewf_char_t *) compressed_buffer,
 	                   compressed_buffer_size,
 	                   is_compressed,
 	                   (EWF_CRC *) chunk_crc,

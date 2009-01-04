@@ -116,10 +116,10 @@ void usage( void )
  * and asks the user for confirmation
  * Return 1 if confirmed by user, 0 otherwise
  */
-int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_chunk_on_error )
+int confirm_input( CHAR_T *filename, libewf_char_t *case_number, libewf_char_t *description, libewf_char_t *evidence_number, libewf_char_t *examiner_name, libewf_char_t *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_chunk_on_error )
 {
-	LIBEWF_CHAR *user_input = NULL;
-	int input_confirmed     = -1;
+	libewf_char_t *user_input = NULL;
+	int input_confirmed       = -1;
 
 	fprintf( stdout, "The following acquiry parameters were provided:\n" );
 
@@ -238,53 +238,53 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
 #endif
-	CHAR_T *filenames[ 1 ]                   = { NULL };
+	CHAR_T *filenames[ 1 ]                     = { NULL };
 
-	LIBEWF_HANDLE *handle                    = NULL;
-	LIBEWF_CHAR *calculated_md5_hash_string  = NULL;
-	LIBEWF_CHAR *calculated_sha1_hash_string = NULL;
-	LIBEWF_CHAR *user_input                  = NULL;
-	LIBEWF_CHAR *case_number                 = NULL;
-	LIBEWF_CHAR *description                 = NULL;
-	LIBEWF_CHAR *evidence_number             = NULL;
-	LIBEWF_CHAR *examiner_name               = NULL;
-	LIBEWF_CHAR *notes                       = NULL;
-	LIBEWF_CHAR *acquiry_operating_system    = NULL;
-	LIBEWF_CHAR *acquiry_software_version    = NULL;
-	LIBEWF_CHAR *program                     = _S_LIBEWF_CHAR( "ewfacquire" );
+	LIBEWF_HANDLE *handle                      = NULL;
+	libewf_char_t *calculated_md5_hash_string  = NULL;
+	libewf_char_t *calculated_sha1_hash_string = NULL;
+	libewf_char_t *user_input                  = NULL;
+	libewf_char_t *case_number                 = NULL;
+	libewf_char_t *description                 = NULL;
+	libewf_char_t *evidence_number             = NULL;
+	libewf_char_t *examiner_name               = NULL;
+	libewf_char_t *notes                       = NULL;
+	libewf_char_t *acquiry_operating_system    = NULL;
+	libewf_char_t *acquiry_software_version    = NULL;
+	libewf_char_t *program                     = _S_LIBEWF_CHAR( "ewfacquire" );
 
-	CHAR_T *filename                         = NULL;
-	CHAR_T *time_string                      = NULL;
+	CHAR_T *filename                           = NULL;
+	CHAR_T *time_string                        = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-	CHAR_T *error_string                     = NULL;
+	CHAR_T *error_string                       = NULL;
 #endif
-	void *callback                           = &ewfoutput_process_status_fprint;
+	void *callback                             = &ewfoutput_process_status_fprint;
 
-	INT_T option                             = 0;
-	ssize64_t write_count                    = 0;
-	size_t string_length                     = 0;
-	time_t timestamp_start                   = 0;
-	time_t timestamp_end                     = 0;
-	uint64_t maximum_segment_file_size       = 0;
-	uint64_t segment_file_size               = 0;
-	uint64_t input_size                      = 0;
-	uint64_t acquiry_offset                  = 0;
-	uint64_t acquiry_size                    = 0;
-	uint64_t sectors_per_chunk               = 0;
-	uint64_t sector_error_granularity        = 0;
-	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
-	int8_t compress_empty_block              = 0;
-	int8_t media_type                        = LIBEWF_MEDIA_TYPE_FIXED;
-	int8_t volume_type                       = LIBEWF_VOLUME_TYPE_LOGICAL;
-	int8_t wipe_chunk_on_error               = 0;
-	uint8_t libewf_format                    = LIBEWF_FORMAT_UNKNOWN;
-	uint8_t read_error_retry                 = 2;
-	uint8_t swap_byte_pairs                  = 0;
-	uint8_t seek_on_error                    = 1;
-	uint8_t calculate_md5                    = 1;
-	uint8_t calculate_sha1                   = 0;
-	uint8_t verbose                          = 0;
-	int file_descriptor                      = 0;
+	INT_T option                               = 0;
+	ssize64_t write_count                      = 0;
+	size_t string_length                       = 0;
+	time_t timestamp_start                     = 0;
+	time_t timestamp_end                       = 0;
+	uint64_t maximum_segment_file_size         = 0;
+	uint64_t segment_file_size                 = 0;
+	uint64_t input_size                        = 0;
+	uint64_t acquiry_offset                    = 0;
+	uint64_t acquiry_size                      = 0;
+	uint64_t sectors_per_chunk                 = 0;
+	uint64_t sector_error_granularity          = 0;
+	int8_t compression_level                   = LIBEWF_COMPRESSION_NONE;
+	int8_t compress_empty_block                = 0;
+	int8_t media_type                          = LIBEWF_MEDIA_TYPE_FIXED;
+	int8_t volume_type                         = LIBEWF_VOLUME_TYPE_LOGICAL;
+	int8_t wipe_chunk_on_error                 = 0;
+	uint8_t libewf_format                      = LIBEWF_FORMAT_UNKNOWN;
+	uint8_t read_error_retry                   = 2;
+	uint8_t swap_byte_pairs                    = 0;
+	uint8_t seek_on_error                      = 1;
+	uint8_t calculate_md5                      = 1;
+	uint8_t calculate_sha1                     = 0;
+	uint8_t verbose                            = 0;
+	int file_descriptor                        = 0;
 
 	ewfsignal_initialize();
 
@@ -1071,7 +1071,8 @@ int main( int argc, char * const argv[] )
 #endif
 	if( calculate_md5 == 1 )
 	{
-		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+		calculated_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
+		                                                sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -1092,7 +1093,8 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+		calculated_sha1_hash_string = (libewf_char_t *) libewf_common_alloc(
+		                                                 sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{

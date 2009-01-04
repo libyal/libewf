@@ -41,7 +41,6 @@ extern "C" {
 #endif
 
 #define LIBEWF_CHAR libewf_char_t
-#define LIBEWF_CHAR_SIZE sizeof( LIBEWF_CHAR )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 

@@ -77,13 +77,13 @@ int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values )
 /* Convert a time stamp into a date string
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_format )
+libewf_char_t *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_format )
 {
-	struct tm *time_elements  = NULL;
-	LIBEWF_CHAR *date_string  = NULL;
-	LIBEWF_CHAR *newline      = NULL;
-	static char *function     = "libewf_convert_date_timestamp";
-	size_t date_string_length = 20;
+	struct tm *time_elements   = NULL;
+	libewf_char_t *date_string = NULL;
+	libewf_char_t *newline     = NULL;
+	static char *function      = "libewf_convert_date_timestamp";
+	size_t date_string_length  = 20;
 
 	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
 	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
@@ -108,11 +108,11 @@ LIBEWF_CHAR *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_forma
 
 			return( NULL );
 		}
-		newline = libewf_string_search( date_string, (LIBEWF_CHAR) '\n', 32 );
+		newline = libewf_string_search( date_string, (libewf_char_t) '\n', 32 );
 
 		if( newline != NULL )
 		{
-			newline[ 0 ] = (LIBEWF_CHAR) '\0';
+			newline[ 0 ] = (libewf_char_t) '\0';
 		}
 	}
 	else
@@ -126,7 +126,8 @@ LIBEWF_CHAR *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_forma
 
 			return( NULL );
 		}
-		date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * date_string_length );
+		date_string = (libewf_char_t *) libewf_common_alloc(
+                                                 sizeof( libewf_char_t ) * date_string_length );
 
 		if( date_string == NULL )
 		{
@@ -211,15 +212,15 @@ LIBEWF_CHAR *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_forma
 /* Convert a header value into a date string
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format )
+libewf_char_t *libewf_convert_date_header_value( libewf_char_t *header_value, size_t header_value_length, uint8_t date_format )
 {
 	struct tm time_elements;
 
-	LIBEWF_CHAR **date_elements = NULL;
-	LIBEWF_CHAR *date_string    = NULL;
-	static char *function       = "libewf_convert_date_header_value";
-	time_t timestamp            = 0;
-	uint32_t date_element_count = 0;
+	libewf_char_t **date_elements = NULL;
+	libewf_char_t *date_string    = NULL;
+	static char *function         = "libewf_convert_date_header_value";
+	time_t timestamp              = 0;
+	uint32_t date_element_count   = 0;
 
 	if( header_value == NULL )
 	{
@@ -241,7 +242,7 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t
 	date_elements = libewf_string_split(
 			 header_value,
 			 header_value_length,
-			 (LIBEWF_CHAR) ' ',
+			 (libewf_char_t) ' ',
 			 &date_element_count );
 
 	if( date_elements == NULL )
@@ -262,68 +263,68 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t
 	}
 	/* Set the year
 	 */
-	time_elements.tm_year = (int) ( ( ( date_elements[ 0 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 1000 )
-	                      + ( ( date_elements[ 0 ][ 1 ] - (LIBEWF_CHAR) '0' ) * 100 )
-	                      + ( ( date_elements[ 0 ][ 2 ] - (LIBEWF_CHAR) '0' ) * 10 )
-	                      + ( date_elements[ 0 ][ 3 ] - (LIBEWF_CHAR) '0' )
+	time_elements.tm_year = (int) ( ( ( date_elements[ 0 ][ 0 ] - (libewf_char_t) '0' ) * 1000 )
+	                      + ( ( date_elements[ 0 ][ 1 ] - (libewf_char_t) '0' ) * 100 )
+	                      + ( ( date_elements[ 0 ][ 2 ] - (libewf_char_t) '0' ) * 10 )
+	                      + ( date_elements[ 0 ][ 3 ] - (libewf_char_t) '0' )
 	                      - 1900 );
 
 	/* Set the month
 	 */
-	if( date_elements[ 1 ][ 1 ] == (LIBEWF_CHAR) '\0' )
+	if( date_elements[ 1 ][ 1 ] == (libewf_char_t) '\0' )
 	{
-		time_elements.tm_mon = (int) ( ( date_elements[ 1 ][ 0 ] - (LIBEWF_CHAR) '0' )
+		time_elements.tm_mon = (int) ( ( date_elements[ 1 ][ 0 ] - (libewf_char_t) '0' )
 		                     - 1 );
 	}
 	else
 	{
-		time_elements.tm_mon = (int) ( ( ( date_elements[ 1 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-		                     + ( date_elements[ 1 ][ 1 ] - (LIBEWF_CHAR) '0' )
+		time_elements.tm_mon = (int) ( ( ( date_elements[ 1 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+		                     + ( date_elements[ 1 ][ 1 ] - (libewf_char_t) '0' )
 		                     - 1 );
 	}
 	/* Set the day of the month
 	 */
-	if( date_elements[ 2 ][ 1 ] == (LIBEWF_CHAR) '\0' )
+	if( date_elements[ 2 ][ 1 ] == (libewf_char_t) '\0' )
 	{
-		time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (LIBEWF_CHAR) '0' );
+		time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (libewf_char_t) '0' );
 	}
 	else
 	{
-		time_elements.tm_mday = (int) ( ( ( date_elements[ 2 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-		                      + ( date_elements[ 2 ][ 1 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_mday = (int) ( ( ( date_elements[ 2 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+		                      + ( date_elements[ 2 ][ 1 ] - (libewf_char_t) '0' ) );
 	}
 	/* Set the hour
 	 */
-	if( date_elements[ 3 ][ 1 ] == (LIBEWF_CHAR) '\0' )
+	if( date_elements[ 3 ][ 1 ] == (libewf_char_t) '\0' )
 	{
-		time_elements.tm_hour = (int) ( date_elements[ 3 ][ 0 ] - (LIBEWF_CHAR) '0' );
+		time_elements.tm_hour = (int) ( date_elements[ 3 ][ 0 ] - (libewf_char_t) '0' );
 	}
 	else
 	{
-		time_elements.tm_hour = (int) ( ( ( date_elements[ 3 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-		                      + ( date_elements[ 3 ][ 1 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_hour = (int) ( ( ( date_elements[ 3 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+		                      + ( date_elements[ 3 ][ 1 ] - (libewf_char_t) '0' ) );
 	}
 	/* Set the minutes
 	 */
-	if( date_elements[ 4 ][ 1 ] == (LIBEWF_CHAR) '\0' )
+	if( date_elements[ 4 ][ 1 ] == (libewf_char_t) '\0' )
 	{
-		time_elements.tm_min = (int) ( date_elements[ 4 ][ 0 ] - (LIBEWF_CHAR) '0' );
+		time_elements.tm_min = (int) ( date_elements[ 4 ][ 0 ] - (libewf_char_t) '0' );
 	}
 	else
 	{
-		time_elements.tm_min = (int) ( ( ( date_elements[ 4 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-		                     + ( date_elements[ 4 ][ 1 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_min = (int) ( ( ( date_elements[ 4 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+		                     + ( date_elements[ 4 ][ 1 ] - (libewf_char_t) '0' ) );
 	}
 	/* Set the seconds
 	 */
-	if( date_elements[ 5 ][ 1 ] == (LIBEWF_CHAR) '\0' )
+	if( date_elements[ 5 ][ 1 ] == (libewf_char_t) '\0' )
 	{
-		time_elements.tm_sec = (int) ( date_elements[ 5 ][ 0 ] - (LIBEWF_CHAR) '0' );
+		time_elements.tm_sec = (int) ( date_elements[ 5 ][ 0 ] - (libewf_char_t) '0' );
 	}
 	else
 	{
-		time_elements.tm_sec = (int) ( ( ( date_elements[ 5 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-		                     + ( date_elements[ 5 ][ 1 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_sec = (int) ( ( ( date_elements[ 5 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+		                     + ( date_elements[ 5 ][ 1 ] - (libewf_char_t) '0' ) );
 	}
 	/* Set to ignore the daylight saving time
 	 */
@@ -357,11 +358,11 @@ LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t
 /* Generate date string within a header value
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
+libewf_char_t *libewf_generate_date_header_value( time_t timestamp )
 {
-	LIBEWF_CHAR *date_string = NULL;
-	struct tm *time_elements = NULL;
-	static char *function    = "libewf_generate_date_header_value";
+	libewf_char_t *date_string = NULL;
+	struct tm *time_elements   = NULL;
+	static char *function      = "libewf_generate_date_header_value";
 
 	time_elements = libewf_common_localtime( &timestamp );
 
@@ -372,7 +373,8 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 
 		return( NULL );
 	}
-	date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 20 );
+	date_string = (libewf_char_t *) libewf_common_alloc(
+	                                 sizeof( libewf_char_t ) * 20 );
 
 	if( date_string == NULL )
 	{
@@ -404,7 +406,7 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 	}
 	/* Make sure the string is terminated correctly
 	 */
-	date_string[ 19 ] = (LIBEWF_CHAR) '\0';
+	date_string[ 19 ] = (libewf_char_t) '\0';
 
 	libewf_common_free( time_elements );
 
@@ -414,11 +416,11 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 /* Convert a header2 value into a date string
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format )
+libewf_char_t *libewf_convert_date_header2_value( libewf_char_t *header_value, size_t header_value_length, uint8_t date_format )
 {
-	LIBEWF_CHAR *date_string = NULL;
-	static char *function    = "libewf_convert_date_header2_value";
-	time_t timestamp         = 0;
+	libewf_char_t *date_string = NULL;
+	static char *function      = "libewf_convert_date_header2_value";
+	time_t timestamp           = 0;
 
 	if( header_value == NULL )
 	{
@@ -443,12 +445,13 @@ LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, size_
 /* Generate date string within a header2 value
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_generate_date_header2_value( time_t timestamp )
+libewf_char_t *libewf_generate_date_header2_value( time_t timestamp )
 {
-	LIBEWF_CHAR *date_string = NULL;
-	static char *function    = "libewf_generate_date_header2_value";
+	libewf_char_t *date_string = NULL;
+	static char *function      = "libewf_generate_date_header2_value";
 
-	date_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 11 );
+	date_string = (libewf_char_t *) libewf_common_alloc(
+	                                 sizeof( libewf_char_t ) * 11 );
 
 	if( date_string == NULL )
 	{
@@ -472,7 +475,7 @@ LIBEWF_CHAR *libewf_generate_date_header2_value( time_t timestamp )
 	}
 	/* Make sure the string is terminated correctly
 	 */
-	date_string[ 10 ] = (LIBEWF_CHAR) '\0';
+	date_string[ 10 ] = (libewf_char_t) '\0';
 
 	return( date_string );
 }
@@ -568,19 +571,19 @@ int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, L
 /* Parse a header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *header_string, size_t length, uint8_t date_format )
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( libewf_char_t *header_string, size_t length, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values = NULL;
-	LIBEWF_CHAR **lines                = NULL;
-	LIBEWF_CHAR **types                = NULL;
-	LIBEWF_CHAR **values               = NULL;
-	LIBEWF_CHAR *date_string           = NULL;
-	static char *function              = "libewf_header_values_parse_header_string";
-	size_t string_length               = 0;
-	uint32_t line_count                = 0;
-	uint32_t type_count                = 0;
-	uint32_t value_count               = 0;
-	uint32_t iterator                  = 0;
+	libewf_values_table_t *header_values = NULL;
+	libewf_char_t **lines                = NULL;
+	libewf_char_t **types                = NULL;
+	libewf_char_t **values               = NULL;
+	libewf_char_t *date_string           = NULL;
+	static char *function                = "libewf_header_values_parse_header_string";
+	size_t string_length                 = 0;
+	uint32_t line_count                  = 0;
+	uint32_t type_count                  = 0;
+	uint32_t value_count                 = 0;
+	uint32_t iterator                    = 0;
 
 	if( header_string == NULL )
 	{
@@ -590,9 +593,9 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		return( NULL );
 	}
 	lines = libewf_string_split(
-	         (LIBEWF_CHAR *) header_string,
+	         (libewf_char_t *) header_string,
 	         length,
-	         (LIBEWF_CHAR) '\n',
+	         (libewf_char_t) '\n',
 	         &line_count );
 
 	if( lines == NULL )
@@ -605,7 +608,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 	types = libewf_string_split(
 	         lines[ 2 ],
 	         libewf_string_length( lines[ 2 ] ),
-	         (LIBEWF_CHAR) '\t',
+	         (libewf_char_t) '\t',
 	         &type_count );
 
 	if( types == NULL )
@@ -620,7 +623,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 	values = libewf_string_split(
 	          lines[ 3 ],
 	          libewf_string_length( lines[ 3 ] ),
-	          (LIBEWF_CHAR) '\t',
+	          (libewf_char_t) '\t',
 	          &value_count );
 
 	if( values == NULL )
@@ -660,7 +663,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 	for( iterator = 0; iterator < type_count; iterator++ )
 	{
 		if( ( values[ iterator ] == NULL )
-		 || ( values[ iterator ] == (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 || ( values[ iterator ] == (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			continue;
 		}
@@ -669,7 +672,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		/* Remove trailing white space
 		 */
 		if( ( string_length > 0 )
-		 && ( values[ iterator ][ string_length - 1 ] == (LIBEWF_CHAR) '\r' ) )
+		 && ( values[ iterator ][ string_length - 1 ] == (libewf_char_t) '\r' ) )
 		{
 			string_length -= 1;
 		}
@@ -741,7 +744,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 			 */
 			if( libewf_string_search(
 			     values[ iterator ],
-			     (LIBEWF_CHAR) ' ',
+			     (libewf_char_t) ' ',
 			     string_length ) != NULL )
 			{
 				date_string = libewf_convert_date_header_value( values[ iterator ], string_length, date_format );
@@ -795,7 +798,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 				/* Empty hash do nothing
 				 */
 			}
-			else if( ( string_length == 1 ) && ( values[ iterator ][ 0 ] == (LIBEWF_CHAR) '0' ) )
+			else if( ( string_length == 1 ) && ( values[ iterator ][ 0 ] == (libewf_char_t) '0' ) )
 			{
 				/* Empty hash do nothing
 				 */
@@ -904,11 +907,11 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( EWF_CHAR *header, size_t size, uint8_t date_format )
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( ewf_char_t *header, size_t size, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE* header_values = NULL;
-	LIBEWF_CHAR *header_string          = NULL;
-	static char *function               = "libewf_header_values_parse_header";
+	libewf_values_table_t *header_values = NULL;
+	libewf_char_t *header_string         = NULL;
+	static char *function                = "libewf_header_values_parse_header";
 
 	if( header == NULL )
 	{
@@ -917,7 +920,8 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( EWF_CHAR *header, size_t
 
 		return( NULL );
 	}
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * ( size + 1 ) );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * ( size + 1 ) );
 
 	if( header_string == NULL )
 	{
@@ -945,12 +949,12 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( EWF_CHAR *header, size_t
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( EWF_CHAR *header2, size_t size, uint8_t date_format )
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( ewf_char_t *header2, size_t size, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE* header_values = NULL;
-	LIBEWF_CHAR *header_string          = NULL;
-	static char *function               = "libewf_header_values_parse_header2";
-	size_t header_size                  = 0;
+	libewf_values_table_t *header_values = NULL;
+	libewf_char_t *header_string         = NULL;
+	static char *function                = "libewf_header_values_parse_header2";
+	size_t header_size                   = 0;
 
 	if( header2 == NULL )
 	{
@@ -960,7 +964,8 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( EWF_CHAR *header2, size
 		return( NULL );
 	}
 	header_size   = ( size - 2 ) / 2;
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * ( header_size + 1 ) );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * ( header_size + 1 ) );
 
 	if( header_string == NULL )
 	{
@@ -990,9 +995,9 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( EWF_CHAR *header2, size
  * Sets header length
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *header_string, size_t string_length, size_t *header_length )
+ewf_char_t *libewf_header_values_convert_header_string_to_header( libewf_char_t *header_string, size_t string_length, size_t *header_length )
 {
-	EWF_CHAR *header      = NULL;
+	ewf_char_t *header    = NULL;
 	static char *function = "libewf_header_values_convert_header_string_to_header";
 
 	if( header_string == NULL )
@@ -1009,7 +1014,8 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *hea
 
 		return( NULL );
 	}
-	header = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * string_length );
+	header = (ewf_char_t *) libewf_common_alloc(
+	                         sizeof( ewf_char_t ) * string_length );
 
 	if( header == NULL )
 	{
@@ -1044,9 +1050,9 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *hea
  * Sets header2 length
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *header_string, size_t string_length, size_t *header2_length )
+ewf_char_t *libewf_header_values_convert_header_string_to_header2( libewf_char_t *header_string, size_t string_length, size_t *header2_length )
 {
-	EWF_CHAR *header2     = NULL;
+	ewf_char_t *header2   = NULL;
 	static char *function = "libewf_header_values_convert_header_string_to_header2";
 
 	if( header_string == NULL )
@@ -1067,7 +1073,8 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *he
 	 */
 	*header2_length = ( string_length + 1 ) * 2;
 
-	header2 = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * *header2_length );
+	header2 = (ewf_char_t *) libewf_common_alloc(
+	                          sizeof( ewf_char_t ) * *header2_length );
 
 	if( header2 == NULL )
 	{
@@ -1101,19 +1108,19 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *he
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string    = NULL;
-	LIBEWF_CHAR *case_number      = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description      = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number  = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date      = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date     = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *compression_type = _S_LIBEWF_CHAR( "" );
-	static char *function         = "libewf_header_values_generate_header_string_type1";
+	libewf_char_t *header_string    = NULL;
+	libewf_char_t *case_number      = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description      = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number  = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date      = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date     = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *compression_type = _S_LIBEWF_CHAR( "" );
+	static char *function           = "libewf_header_values_generate_header_string_type1";
 
 	if( header_values == NULL )
 	{
@@ -1240,15 +1247,15 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = (LIBEWF_CHAR *) LIBEWF_COMPRESSION_TYPE_NONE;
+			compression_type = (libewf_char_t *) LIBEWF_COMPRESSION_TYPE_NONE;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = (LIBEWF_CHAR *) LIBEWF_COMPRESSION_TYPE_FAST;
+			compression_type = (libewf_char_t *) LIBEWF_COMPRESSION_TYPE_FAST;
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = (LIBEWF_CHAR *) LIBEWF_COMPRESSION_TYPE_BEST;
+			compression_type = (libewf_char_t *) LIBEWF_COMPRESSION_TYPE_BEST;
 		}
 		*string_length += libewf_string_length( compression_type );
 	}
@@ -1258,7 +1265,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
 	 */
 	*string_length += 11;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -1266,12 +1274,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1297,12 +1305,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1311,18 +1319,18 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the header string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -1331,21 +1339,21 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string            = NULL;
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date             = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_software_version = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *compression_type         = _S_LIBEWF_CHAR( "" );
-	static char *function                 = "libewf_header_values_generate_header_string_type2";
+	libewf_char_t *header_string            = NULL;
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *compression_type         = _S_LIBEWF_CHAR( "" );
+	static char *function                   = "libewf_header_values_generate_header_string_type2";
 
 	if( header_values == NULL )
 	{
@@ -1482,15 +1490,15 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = (LIBEWF_CHAR *) LIBEWF_COMPRESSION_TYPE_NONE;
+			compression_type = (libewf_char_t *) LIBEWF_COMPRESSION_TYPE_NONE;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = (LIBEWF_CHAR *) LIBEWF_COMPRESSION_TYPE_FAST;
+			compression_type = (libewf_char_t *) LIBEWF_COMPRESSION_TYPE_FAST;
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = (LIBEWF_CHAR *) LIBEWF_COMPRESSION_TYPE_BEST;
+			compression_type = (libewf_char_t *) LIBEWF_COMPRESSION_TYPE_BEST;
 		}
 		*string_length += libewf_string_length( compression_type );
 	}
@@ -1500,7 +1508,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
 	 */
 	*string_length += 11;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -1508,12 +1517,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1541,12 +1550,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1555,18 +1564,18 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the header string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -1575,20 +1584,20 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string            = NULL;
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date             = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_software_version = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash            = _S_LIBEWF_CHAR( "" );
-	static char *function                 = "libewf_header_values_generate_header_string_type3";
+	libewf_char_t *header_string            = NULL;
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
+	static char *function                   = "libewf_header_values_generate_header_string_type3";
 
 	if( header_values == NULL )
 	{
@@ -1713,7 +1722,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TA
 	 */
 	*string_length += 10;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -1721,12 +1731,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1754,12 +1764,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1768,18 +1778,18 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TA
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -1788,20 +1798,20 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string            = NULL;
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date             = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_software_version = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash            = _S_LIBEWF_CHAR( "" );
-	static char *function                 = "libewf_header_values_generate_header_string_type4";
+	libewf_char_t *header_string            = NULL;
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
+	static char *function                   = "libewf_header_values_generate_header_string_type4";
 
 	if( header_values == NULL )
 	{
@@ -1921,7 +1931,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TA
 	 */
 	*string_length += 10;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -1929,12 +1940,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1962,12 +1973,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -1976,18 +1987,18 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TA
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -1996,23 +2007,23 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string            = NULL;
-	LIBEWF_CHAR *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
-	LIBEWF_CHAR *header_string_sub        = _S_LIBEWF_CHAR( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date             = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_software_version = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *unknown_dc               = _S_LIBEWF_CHAR( "" );
-	static char *function                 = "libewf_header_values_generate_header_string_type5";
+	libewf_char_t *header_string            = NULL;
+	libewf_char_t *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
+	libewf_char_t *header_string_sub        = _S_LIBEWF_CHAR( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *unknown_dc               = _S_LIBEWF_CHAR( "" );
+	static char *function                   = "libewf_header_values_generate_header_string_type5";
 
 	if( header_values == NULL )
 	{
@@ -2139,7 +2150,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TA
 	 */
 	*string_length += 11;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -2147,12 +2159,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -2180,30 +2192,30 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -2212,25 +2224,25 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string            = NULL;
-	LIBEWF_CHAR *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
-	LIBEWF_CHAR *header_string_sub        = _S_LIBEWF_CHAR( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date             = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_software_version = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *model                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *serial_number            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *unknown_dc               = _S_LIBEWF_CHAR( "" );
-	static char *function                 = "libewf_header_values_generate_header_string_type6";
+	libewf_char_t *header_string            = NULL;
+	libewf_char_t *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
+	libewf_char_t *header_string_sub        = _S_LIBEWF_CHAR( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *model                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *serial_number            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *unknown_dc               = _S_LIBEWF_CHAR( "" );
+	static char *function                   = "libewf_header_values_generate_header_string_type6";
 
 	if( header_values == NULL )
 	{
@@ -2367,7 +2379,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TA
 	 */
 	*string_length += 13;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -2375,12 +2388,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -2408,30 +2421,30 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -2441,22 +2454,22 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string            = NULL;
-	LIBEWF_CHAR *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
-	LIBEWF_CHAR *header_string_sub        = _S_LIBEWF_CHAR( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *system_date              = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_date             = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *acquiry_software_version = _S_LIBEWF_CHAR( "" );
-	LIBEWF_CHAR *password_hash            = _S_LIBEWF_CHAR( "" );
-	static char *function                 = "libewf_header_values_generate_header_string_type7";
+	libewf_char_t *header_string            = NULL;
+	libewf_char_t *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
+	libewf_char_t *header_string_sub        = _S_LIBEWF_CHAR( "sub\n0\t1\np\tn\tid\tnu\tco\tgu\n0\t0\n\t\t\t\t1\t\n\n" );
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *system_date              = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_date             = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
+	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
+	static char *function                   = "libewf_header_values_generate_header_string_type7";
 
 	if( header_values == NULL )
 	{
@@ -2578,7 +2591,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TA
 	 */
 	*string_length += 11;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -2586,12 +2600,12 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TA
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
@@ -2619,30 +2633,30 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TA
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-		 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( system_date );
 		}
 		return( NULL );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( acquiry_date );
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] == NULL )
-	 && ( system_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( system_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		libewf_common_free( system_date );
 	}
 	/* Make sure the string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -2650,13 +2664,13 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TA
 /* Generate an EWF header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tm\tu\tp\tr\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header_string_ewf";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tm\tu\tp\tr\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header_string_ewf";
 
 	header_string = libewf_header_values_generate_header_string_type1(
 	                 header_values,
@@ -2665,10 +2679,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2683,13 +2698,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *
 /* Generate an EnCase1 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
-	static char *function           = "libewf_header_values_generate_header_string_encase1";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
+	static char *function             = "libewf_header_values_generate_header_string_encase1";
 
 	header_string = libewf_header_values_generate_header_string_type1(
 	                 header_values,
@@ -2698,10 +2713,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TAB
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2716,13 +2732,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TAB
 /* Generate an FTK Imager header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header_string_ftk";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header_string_ftk";
 
 	header_string = libewf_header_values_generate_header_string_type2(
 	                 header_values,
@@ -2731,10 +2747,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2749,13 +2766,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *
 /* Generate an EnCase2 and EnCase3 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
-	static char *function           = "libewf_header_values_generate_header_string_encase2";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
+	static char *function             = "libewf_header_values_generate_header_string_encase2";
 
 	header_string = libewf_header_values_generate_header_string_type2(
 	                 header_values,
@@ -2764,10 +2781,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TAB
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2782,13 +2800,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TAB
 /* Generate an EnCase4 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
-	static char *function           = "libewf_header_values_generate_header_string_encase4";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
+	static char *function             = "libewf_header_values_generate_header_string_encase4";
 
 	header_string = libewf_header_values_generate_header_string_type3(
 	                 header_values,
@@ -2796,10 +2814,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TAB
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2814,13 +2833,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TAB
 /* Generate an EnCase5 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header_string_encase5_linen";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header_string_encase5_linen";
 
 	header_string = libewf_header_values_generate_header_string_type7(
 	                 header_values,
@@ -2828,10 +2847,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALU
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2846,13 +2866,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALU
 /* Generate an EnCase6 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header_string_encase6_linen";
+	ewf_char_t *header                = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header_string_encase6_linen";
 
 	header_string = libewf_header_values_generate_header_string_type6(
 	                 header_values,
@@ -2860,10 +2880,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALU
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -2878,13 +2899,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALU
 /* Generate an EnCase4 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR *header2               = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header2_string_encase4";
+	ewf_char_t *header2               = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header2_string_encase4";
 
 	header_string = libewf_header_values_generate_header_string_type4(
 	                 header_values,
@@ -2892,10 +2913,11 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TA
 	                 header_string_head,
 	                 header_string_tail,
 	                 header2_length );
-	header2       = libewf_header_values_convert_header_string_to_header2(
-	                 header_string,
-	                 *header2_length,
-	                 header2_length );
+
+	header2 = libewf_header_values_convert_header_string_to_header2(
+	           header_string,
+	           *header2_length,
+	           header2_length );
 
 	if( header2 == NULL )
 	{
@@ -2910,13 +2932,13 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TA
 /* Generate an EnCase5 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR *header2               = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\tdc\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header2_string_encase5";
+	ewf_char_t *header2               = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\tdc\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function               = "libewf_header_values_generate_header2_string_encase5";
 
 	header_string = libewf_header_values_generate_header_string_type5(
 	                 header_values,
@@ -2924,10 +2946,11 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TA
 	                 header_string_head,
 	                 header_string_tail,
 	                 header2_length );
-	header2       = libewf_header_values_convert_header_string_to_header2(
-	                 header_string,
-	                 *header2_length,
-	                 header2_length );
+
+	header2 = libewf_header_values_convert_header_string_to_header2(
+	           header_string,
+	           *header2_length,
+	           header2_length );
 
 	if( header2 == NULL )
 	{
@@ -2942,13 +2965,13 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TA
 /* Generate an EnCase6 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR *header2               = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header2_string_encase6";
+	ewf_char_t *header2               = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header2_string_encase6";
 
 	header_string = libewf_header_values_generate_header_string_type6(
 	                 header_values,
@@ -2956,10 +2979,11 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TA
 	                 header_string_head,
 	                 header_string_tail,
 	                 header2_length );
-	header2       = libewf_header_values_convert_header_string_to_header2(
-	                 header_string,
-	                 *header2_length,
-	                 header2_length );
+
+	header2 = libewf_header_values_convert_header_string_to_header2(
+	           header_string,
+	           *header2_length,
+	           header2_length );
 
 	if( header2 == NULL )
 	{
@@ -2974,15 +2998,15 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TA
 /* Convert date string within an xheader value
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format )
+libewf_char_t *libewf_convert_date_xheader_value( libewf_char_t *header_value, size_t header_value_length, uint8_t date_format )
 {
 	struct tm time_elements;
 
-	LIBEWF_CHAR **date_elements = NULL;
-	LIBEWF_CHAR *date_string    = NULL;
-	static char *function       = "libewf_convert_date_xheader_value";
-	time_t timestamp            = 0;
-	uint32_t date_element_count = 0;
+	libewf_char_t **date_elements = NULL;
+	libewf_char_t *date_string    = NULL;
+	static char *function         = "libewf_convert_date_xheader_value";
+	time_t timestamp              = 0;
+	uint32_t date_element_count   = 0;
 
 	if( header_value == NULL )
 	{
@@ -3010,7 +3034,7 @@ LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_
 		date_elements = libewf_string_split(
 				 header_value,
 				 header_value_length,
-				 (LIBEWF_CHAR) ' ',
+				 (libewf_char_t) ' ',
 				 &date_element_count );
 
 		if( date_elements == NULL )
@@ -3034,10 +3058,10 @@ LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_
 		}
 		/* Set the year
 		 */
-		time_elements.tm_year = (int) ( ( ( date_elements[ 4 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 1000 )
-				      + ( ( date_elements[ 4 ][ 1 ] - (LIBEWF_CHAR) '0' ) * 100 )
-				      + ( ( date_elements[ 4 ][ 2 ] - (LIBEWF_CHAR) '0' ) * 10 )
-				      + ( date_elements[ 4 ][ 3 ] - (LIBEWF_CHAR) '0' )
+		time_elements.tm_year = (int) ( ( ( date_elements[ 4 ][ 0 ] - (libewf_char_t) '0' ) * 1000 )
+				      + ( ( date_elements[ 4 ][ 1 ] - (libewf_char_t) '0' ) * 100 )
+				      + ( ( date_elements[ 4 ][ 2 ] - (libewf_char_t) '0' ) * 10 )
+				      + ( date_elements[ 4 ][ 3 ] - (libewf_char_t) '0' )
 				      - 1900 );
 
 		/* Set the month
@@ -3092,29 +3116,29 @@ LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_
 		}
 		/* Set the day of the month
 		 */
-		if( date_elements[ 2 ][ 1 ] == (LIBEWF_CHAR) '\0' )
+		if( date_elements[ 2 ][ 1 ] == (libewf_char_t) '\0' )
 		{
-			time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (LIBEWF_CHAR) '0' );
+			time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (libewf_char_t) '0' );
 		}
 		else
 		{
-			time_elements.tm_mday = (int) ( ( ( date_elements[ 2 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-					      + ( date_elements[ 2 ][ 1 ] - (LIBEWF_CHAR) '0' ) );
+			time_elements.tm_mday = (int) ( ( ( date_elements[ 2 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+					      + ( date_elements[ 2 ][ 1 ] - (libewf_char_t) '0' ) );
 		}
 		/* Set the hour
 		 */
-		time_elements.tm_hour = (int) ( ( ( date_elements[ 3 ][ 0 ] - (LIBEWF_CHAR) '0' ) * 10 )
-				      + ( date_elements[ 3 ][ 1 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_hour = (int) ( ( ( date_elements[ 3 ][ 0 ] - (libewf_char_t) '0' ) * 10 )
+				      + ( date_elements[ 3 ][ 1 ] - (libewf_char_t) '0' ) );
 
 		/* Set the minutes
 		 */
-		time_elements.tm_min  = (int) ( ( ( date_elements[ 3 ][ 3 ] - (LIBEWF_CHAR) '0' ) * 10 )
-				      + ( date_elements[ 3 ][ 4 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_min  = (int) ( ( ( date_elements[ 3 ][ 3 ] - (libewf_char_t) '0' ) * 10 )
+				      + ( date_elements[ 3 ][ 4 ] - (libewf_char_t) '0' ) );
 
 		/* Set the seconds
 		 */
-		time_elements.tm_sec = (int) ( ( ( date_elements[ 3 ][ 6 ] - (LIBEWF_CHAR) '0' ) * 10 )
-				     + ( date_elements[ 3 ][ 7 ] - (LIBEWF_CHAR) '0' ) );
+		time_elements.tm_sec = (int) ( ( ( date_elements[ 3 ][ 6 ] - (libewf_char_t) '0' ) * 10 )
+				     + ( date_elements[ 3 ][ 7 ] - (libewf_char_t) '0' ) );
 
 		/* Set to ignore the daylight saving time
 		 */
@@ -3148,11 +3172,11 @@ LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_
 /* Generate date string within a xheader value
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp )
+libewf_char_t *libewf_generate_date_xheader_value( time_t timestamp )
 {
-	LIBEWF_CHAR *date_string = NULL;
-	LIBEWF_CHAR *newline     = NULL;
-	static char *function    = "libewf_generate_date_xheader_value";
+	libewf_char_t *date_string = NULL;
+	libewf_char_t *newline     = NULL;
+	static char *function      = "libewf_generate_date_xheader_value";
 
 	/* The libewf_string_ctime function returns a string of length 32
 	 */
@@ -3165,15 +3189,15 @@ LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp )
 
 		return( NULL );
 	}
-	newline = libewf_string_search( date_string, (LIBEWF_CHAR) '\n', 32 );
+	newline = libewf_string_search( date_string, (libewf_char_t) '\n', 32 );
 
 	if( newline != NULL )
 	{
-		newline[ 0 ] = (LIBEWF_CHAR) ' ';
-		newline[ 1 ] = (LIBEWF_CHAR) tzname[ 0 ][ 0 ];
-		newline[ 2 ] = (LIBEWF_CHAR) tzname[ 0 ][ 1 ];
-		newline[ 3 ] = (LIBEWF_CHAR) tzname[ 0 ][ 2 ];
-		newline[ 4 ] = (LIBEWF_CHAR) '\0';
+		newline[ 0 ] = (libewf_char_t) ' ';
+		newline[ 1 ] = (libewf_char_t) tzname[ 0 ][ 0 ];
+		newline[ 2 ] = (libewf_char_t) tzname[ 0 ][ 1 ];
+		newline[ 3 ] = (libewf_char_t) tzname[ 0 ][ 2 ];
+		newline[ 4 ] = (libewf_char_t) '\0';
 	}
 	return( date_string );
 }
@@ -3181,15 +3205,15 @@ LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp )
 /* Parse a xml header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *header_string_xml, size_t length, uint8_t date_format )
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( libewf_char_t *header_string_xml, size_t length, uint8_t date_format )
 {
 	LIBEWF_VALUES_TABLE *header_values = NULL;
-	LIBEWF_CHAR **lines                = NULL;
-	LIBEWF_CHAR *open_tag_start        = NULL;
-	LIBEWF_CHAR *open_tag_end          = NULL;
-	LIBEWF_CHAR *close_tag_start       = NULL;
-	LIBEWF_CHAR *close_tag_end         = NULL;
-	LIBEWF_CHAR *date_string           = NULL;
+	libewf_char_t **lines              = NULL;
+	libewf_char_t *open_tag_start      = NULL;
+	libewf_char_t *open_tag_end        = NULL;
+	libewf_char_t *close_tag_start     = NULL;
+	libewf_char_t *close_tag_end       = NULL;
+	libewf_char_t *date_string         = NULL;
 	static char *function              = "libewf_header_values_parse_header_string_xml";
 	size_t string_length               = 0;
 	uint32_t line_count                = 0;
@@ -3203,9 +3227,9 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		return( NULL );
 	}
 	lines = libewf_string_split(
-	         (LIBEWF_CHAR *) header_string_xml,
+	         (libewf_char_t *) header_string_xml,
 	         length,
-	         (LIBEWF_CHAR) '\n',
+	         (libewf_char_t) '\n',
 	         &line_count );
 
 	if( lines == NULL )
@@ -3238,7 +3262,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 	for( iterator = 0; iterator < line_count; iterator++ )
 	{
 		if( ( lines[ iterator ] == NULL )
-		 || ( lines[ iterator ] == (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 || ( lines[ iterator ] == (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			continue;
 		}
@@ -3252,7 +3276,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		}
 		open_tag_start = libewf_string_search(
 		                  lines[ iterator ],
-		                  (LIBEWF_CHAR) '<',
+		                  (libewf_char_t) '<',
 		                  string_length );
 
 		/* Ignore lines without an open tag
@@ -3263,7 +3287,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		}
 		open_tag_end = libewf_string_search(
 		                lines[ iterator ],
-		                (LIBEWF_CHAR) '>',
+		                (libewf_char_t) '>',
 		                string_length );
 
 		/* Ignore lines without an open tag
@@ -3284,7 +3308,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		}
 		close_tag_start = libewf_string_search_reverse(
 		                   &open_tag_end[ 1 ],
-		                   (LIBEWF_CHAR) '<',
+		                   (libewf_char_t) '<',
 		                   string_length );
 
 		/* Ignore lines without a close tag
@@ -3295,7 +3319,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		}
 		close_tag_end = libewf_string_search_reverse(
 		                 &open_tag_end[ 1 ],
-		                 (LIBEWF_CHAR) '>',
+		                 (libewf_char_t) '>',
 		                 string_length );
 
 		/* Ignore lines without a close tag
@@ -3310,7 +3334,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 
 		/* Make sure the identifier string will be terminated
 		 */
-		*open_tag_end = (LIBEWF_CHAR) '\0';
+		*open_tag_end = (libewf_char_t) '\0';
 
 		if( ( libewf_string_compare( &open_tag_start[ 1 ], _S_LIBEWF_CHAR( "acquiry_date" ), 12 ) == 0 )
 		 || ( libewf_string_compare( &open_tag_start[ 1 ], _S_LIBEWF_CHAR( "system_date" ), 11 ) == 0 ) )
@@ -3357,11 +3381,11 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 /* Parse an EWF xheader for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size_t size, uint8_t date_format )
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( ewf_char_t *xheader, size_t size, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values = NULL;
-	LIBEWF_CHAR *xml_header_string     = NULL;
-	static char *function              = "libewf_header_values_parse_xheader";
+	libewf_values_table_t *header_values = NULL;
+	libewf_char_t *xml_header_string     = NULL;
+	static char *function                = "libewf_header_values_parse_xheader";
 
 	if( xheader == NULL )
 	{
@@ -3370,7 +3394,8 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size
 
 		return( NULL );
 	}
-	xml_header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * ( size + 1 ) );
+	xml_header_string = (libewf_char_t *) libewf_common_alloc(
+	                                       sizeof( libewf_char_t ) * ( size + 1 ) );
 
 	if( xml_header_string == NULL )
 	{
@@ -3399,17 +3424,17 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *string_length )
 {
-	LIBEWF_CHAR *header_string         = NULL;
-	LIBEWF_CHAR *xml_head              = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
-	LIBEWF_CHAR *xml_open_tag_xheader  = _S_LIBEWF_CHAR( "<xheader>" );
-	LIBEWF_CHAR *xml_close_tag_xheader = _S_LIBEWF_CHAR( "</xheader>" );
-	LIBEWF_CHAR *acquiry_date          = _S_LIBEWF_CHAR( "" );
-	static char *function              = "libewf_header_values_generate_header_string_xml";
-	uint32_t iterator                  = 0;
-	int string_offset                  = 0;
-	int character_count                = 0;
+	libewf_char_t *header_string         = NULL;
+	libewf_char_t *xml_head              = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
+	libewf_char_t *xml_open_tag_xheader  = _S_LIBEWF_CHAR( "<xheader>" );
+	libewf_char_t *xml_close_tag_xheader = _S_LIBEWF_CHAR( "</xheader>" );
+	libewf_char_t *acquiry_date          = _S_LIBEWF_CHAR( "" );
+	static char *function                = "libewf_header_values_generate_header_string_xml";
+	uint32_t iterator                    = 0;
+	int string_offset                    = 0;
+	int character_count                  = 0;
 
 	if( header_values == NULL )
 	{
@@ -3480,7 +3505,8 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 	 */
 	*string_length += 2;
 
-	header_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * *string_length );
+	header_string = (libewf_char_t *) libewf_common_alloc(
+	                                   sizeof( libewf_char_t ) * *string_length );
 
 	if( header_string == NULL )
 	{
@@ -3488,7 +3514,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 		 function );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
@@ -3508,7 +3534,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 		libewf_common_free( header_string );
 
 		if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-		 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+		 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 		{
 			libewf_common_free( acquiry_date );
 		}
@@ -3543,7 +3569,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 				libewf_common_free( header_string );
 
 				if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-				 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+				 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 				{
 					libewf_common_free( acquiry_date );
 				}
@@ -3555,7 +3581,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 		}
 	}
 	if( ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE ] == NULL )
-	 && ( acquiry_date != (LIBEWF_CHAR *) _S_LIBEWF_CHAR( "" ) ) )
+	 && ( acquiry_date != (libewf_char_t *) _S_LIBEWF_CHAR( "" ) ) )
 	{
 		character_count = libewf_string_snprintf( &header_string[ string_offset ], ( *string_length - string_offset ),
 							  _S_LIBEWF_CHAR( "\t<acquiry_date>%" ) _S_LIBEWF_CHAR( PRIs_EWF )
@@ -3593,7 +3619,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 	}
 	/* Make sure the string is terminated
 	 */
-	header_string[ *string_length - 1 ] = (LIBEWF_CHAR) '\0';
+	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
 	return( header_string );
 }
@@ -3601,13 +3627,13 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 /* Generate an EWFX header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR  *header               = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header_string_ewfx";
+	ewf_char_t  *header               = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header_string_ewfx";
 
 	header_string = libewf_header_values_generate_header_string_type3(
 	                 header_values,
@@ -3615,10 +3641,11 @@ EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE 
 	                 header_string_head,
 	                 header_string_tail,
 	                 header_length );
-	header        = libewf_header_values_convert_header_string_to_header(
-	                 header_string,
-	                 *header_length,
-	                 header_length );
+
+	header = libewf_header_values_convert_header_string_to_header(
+	          header_string,
+	          *header_length,
+	          header_length );
 
 	if( header == NULL )
 	{
@@ -3633,13 +3660,13 @@ EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE 
 /* Generate an EWFX header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR  *header2              = NULL;
-	LIBEWF_CHAR *header_string      = NULL;
-	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
-	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
-	static char *function           = "libewf_header_values_generate_header2_string_ewfx";
+	ewf_char_t  *header2              = NULL;
+	libewf_char_t *header_string      = NULL;
+	libewf_char_t *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
+	libewf_char_t *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
+	static char *function             = "libewf_header_values_generate_header2_string_ewfx";
 
 	header_string = libewf_header_values_generate_header_string_type4(
 	                 header_values,
@@ -3648,10 +3675,10 @@ EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE
 	                 header_string_tail,
 	                 header2_length );
 
-	header2       = libewf_header_values_convert_header_string_to_header2(
-	                 header_string,
-	                 *header2_length,
-	                 header2_length );
+	header2 = libewf_header_values_convert_header_string_to_header2(
+	           header_string,
+	           *header2_length,
+	           header2_length );
 
 	if( header2 == NULL )
 	{
@@ -3666,11 +3693,11 @@ EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE
 /* Generate an EWFX xheader
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR  *xheader         = NULL;
-	LIBEWF_CHAR *header_string = NULL;
-	static char *function      = "libewf_header_values_generate_xheader_string_ewfx";
+	ewf_char_t  *xheader         = NULL;
+	libewf_char_t *header_string = NULL;
+	static char *function        = "libewf_header_values_generate_xheader_string_ewfx";
 
 	header_string = libewf_header_values_generate_header_string_xml(
 	                 header_values,

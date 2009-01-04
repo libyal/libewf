@@ -525,18 +525,18 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 		 */
 		else if( header_sections->header2 != NULL )
 		{
-			if( header_sections->header2[ 2 ] == (EWF_CHAR) '3' )
+			if( header_sections->header2[ 2 ] == (ewf_char_t) '3' )
 			{
 				/* The EnCase5 header2 contains av on the 6th position (36 ... 38 ...)
 				 * the header2 is an UTF16 string
 				 */
-				if( ( header_sections->header2[ 36 ] == (EWF_CHAR) 'a' )
-				 && ( header_sections->header2[ 38 ] == (EWF_CHAR) 'v' ) )
+				if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'a' )
+				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'v' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_ENCASE5;
 				}
-				else if( ( header_sections->header2[ 36 ] == (EWF_CHAR) 'm' )
-				 && ( header_sections->header2[ 38 ] == (EWF_CHAR) 'd' ) )
+				else if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'm' )
+				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'd' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_ENCASE6;
 				}
@@ -549,7 +549,7 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 					return( -1 );
 				}
 			}
-			else if( header_sections->header2[ 2 ] == (EWF_CHAR) '1' )
+			else if( header_sections->header2[ 2 ] == (ewf_char_t) '1' )
 			{
 				internal_handle->format = LIBEWF_FORMAT_ENCASE4;
 			}
@@ -563,18 +563,18 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 		}
 		else if( header_sections->header != NULL )
 		{
-			if( header_sections->header[ 0 ] == (EWF_CHAR) '3' )
+			if( header_sections->header[ 0 ] == (ewf_char_t) '3' )
 			{
 				/* The linen5 header2 contains av on the 6th position (17 18)
 				 * the header2 is an UTF16 string
 				 */
-				if( ( header_sections->header[ 17 ] == (EWF_CHAR) 'a' )
-				 && ( header_sections->header[ 18 ] == (EWF_CHAR) 'v' ) )
+				if( ( header_sections->header[ 17 ] == (ewf_char_t) 'a' )
+				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'v' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_LINEN5;
 				}
-				else if( ( header_sections->header[ 17 ] == (EWF_CHAR) 'm' )
-				 && ( header_sections->header[ 18 ] == (EWF_CHAR) 'd' ) )
+				else if( ( header_sections->header[ 17 ] == (ewf_char_t) 'm' )
+				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'd' ) )
 				{
 					internal_handle->format = LIBEWF_FORMAT_LINEN6;
 				}
@@ -587,13 +587,13 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 					return( -1 );
 				}
 			}
-			else if( header_sections->header[ 0 ] == (EWF_CHAR) '1' )
+			else if( header_sections->header[ 0 ] == (ewf_char_t) '1' )
 			{
 				/* EnCase uses \r\n
 				 */
-				if( header_sections->header[ 1 ] == (EWF_CHAR) '\r' )
+				if( header_sections->header[ 1 ] == (ewf_char_t) '\r' )
 				{
-					if( header_sections->header[ 25 ] == (EWF_CHAR) 'r' )
+					if( header_sections->header[ 25 ] == (ewf_char_t) 'r' )
 					{
 						internal_handle->format = LIBEWF_FORMAT_ENCASE1;
 
@@ -603,7 +603,7 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 							 function );
 						}
 					}
-					else if( header_sections->header[ 31 ] == (EWF_CHAR) 'r' )
+					else if( header_sections->header[ 31 ] == (ewf_char_t) 'r' )
 					{
 						internal_handle->format = LIBEWF_FORMAT_ENCASE2;
 					}
@@ -617,9 +617,9 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 				}
 				/* FTK Imager uses \n
 				 */
-				else if( header_sections->header[ 1 ] == (EWF_CHAR) '\n' )
+				else if( header_sections->header[ 1 ] == (ewf_char_t) '\n' )
 				{
-					if( header_sections->header[ 29 ] == (EWF_CHAR) 'r' )
+					if( header_sections->header[ 29 ] == (ewf_char_t) 'r' )
 					{
 						internal_handle->format = LIBEWF_FORMAT_FTK;
 					}
@@ -674,14 +674,14 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
  */
 int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
-	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "Case Number" );
-	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "Description" );
-	LIBEWF_CHAR *evidence_number          = _S_LIBEWF_CHAR( "Evidence Number" );
-	LIBEWF_CHAR *examiner_name            = _S_LIBEWF_CHAR( "Examiner Name" );
-	LIBEWF_CHAR *notes                    = _S_LIBEWF_CHAR( "Notes" );
-	LIBEWF_CHAR *acquiry_operating_system = _S_LIBEWF_CHAR( "Undetermined" );
-	LIBEWF_CHAR *acquiry_software_version = LIBEWF_VERSION;
-	static char *function                 = "libewf_internal_handle_create_header_values";
+	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "Case Number" );
+	libewf_char_t *description              = _S_LIBEWF_CHAR( "Description" );
+	libewf_char_t *evidence_number          = _S_LIBEWF_CHAR( "Evidence Number" );
+	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "Examiner Name" );
+	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "Notes" );
+	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "Undetermined" );
+	libewf_char_t *acquiry_software_version = LIBEWF_VERSION;
+	static char *function                   = "libewf_internal_handle_create_header_values";
 
 	if( internal_handle == NULL )
 	{

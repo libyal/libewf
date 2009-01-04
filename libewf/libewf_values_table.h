@@ -56,21 +56,21 @@ struct libewf_values_table
 
 	/* The value identifiers
 	 */
-	LIBEWF_CHAR **identifiers;
+	libewf_char_t **identifiers;
 
 	/* The values
 	 */
-	LIBEWF_CHAR **values;
+	libewf_char_t **values;
 };
 
 LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount );
 int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t previous_amount, uint32_t new_amount );
 void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table );
 
-int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier );
-int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, LIBEWF_CHAR *identifier, size_t length );
-int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier );
+int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, libewf_char_t *identifier, size_t length );
+int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length );
+int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length );
 
 #if defined( __cplusplus )
 }

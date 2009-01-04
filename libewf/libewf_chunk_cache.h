@@ -71,11 +71,11 @@ struct libewf_chunk_cache
 
 	/* The compressed data buffer
 	 */
-	EWF_CHAR *compressed;
+	ewf_char_t *compressed;
 
 	/* The data buffer
 	 */
-	EWF_CHAR *data;
+	ewf_char_t *data;
 };
 
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size );

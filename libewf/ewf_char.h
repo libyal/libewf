@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_CHAR ewf_char_t
-#define EWF_CHAR_SIZE sizeof( EWF_CHAR )
-
 typedef uint8_t ewf_char_t;
 
 #if defined( __cplusplus )

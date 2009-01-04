@@ -56,7 +56,7 @@ struct libewf_hash_sections
 {
 	/* The stored xhash
 	 */
-	EWF_CHAR *xhash;
+	ewf_char_t *xhash;
 
 	/* The size of the stored xhash
 	 */

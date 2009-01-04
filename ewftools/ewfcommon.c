@@ -121,9 +121,9 @@ int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size )
 
 /* Determines the current platform, or NULL on error
  */
-LIBEWF_CHAR *ewfcommon_determine_operating_system( void )
+libewf_char_t *ewfcommon_determine_operating_system( void )
 {
-	LIBEWF_CHAR *string    = NULL;
+	libewf_char_t *string  = NULL;
 	char *operating_system = NULL;
 	uint32_t length        = 0;
 
@@ -144,7 +144,8 @@ LIBEWF_CHAR *ewfcommon_determine_operating_system( void )
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
 	length = (uint32_t) strlen( operating_system ) + 1;
-	string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * length );
+	string = (libewf_char_t *) libewf_common_alloc(
+	                            sizeof( libewf_char_t ) * length );
 
 	if( ( string != NULL )
 	 && ( ewfstring_copy_libewf_char_from_char_t( string, operating_system, length ) != 1 ) )
@@ -795,7 +796,7 @@ ssize_t ewfcommon_raw_write_ewf( LIBEWF_HANDLE *handle, uint8_t *raw_buffer, siz
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
  * Returns the amount of bytes read if successful, or -1 on error
  */
-ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, libewf_char_t *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, libewf_char_t *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1102,7 +1103,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 /* Writes data in EWF format from a file descriptor
  * Returns the amount of bytes written, or -1 on error
  */
-ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_chunk_on_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_chunk_on_error, uint8_t seek_on_error, uint8_t calculate_md5, libewf_char_t *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, libewf_char_t *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1743,8 +1744,8 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
-	LIBEWF_CHAR md5_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_MD5 ];
-	LIBEWF_CHAR sha1_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ];
+	libewf_char_t md5_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_MD5 ];
+	libewf_char_t sha1_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ];
 
 	uint8_t *data                  = NULL;
 	uint8_t *uncompressed_data     = NULL;

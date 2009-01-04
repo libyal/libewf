@@ -68,7 +68,7 @@ extern "C" {
 
 #if defined( HAVE_MEMCPY )
 #define ewf_string_copy( destination, source, size ) \
-	(LIBEWF_CHAR *) memcpy( (void *) destination, (void *) source, size )
+	(ewf_char_t *) memcpy( (void *) destination, (void *) source, size )
 #elif defined( HAVE_STRNCPY )
 #define ewf_string_copy( destination, source, size ) \
 	strncpy( destination, source, size )

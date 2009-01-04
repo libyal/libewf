@@ -51,12 +51,12 @@ extern "C" {
 
 struct tm *ewfoutput_gmtime( const time_t *timestamp );
 
-LIBEWF_CHAR *ewfoutput_determine_units_string( int factor );
-LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size );
+libewf_char_t *ewfoutput_determine_units_string( int factor );
+libewf_char_t *ewfoutput_determine_human_readable_size_string( uint64_t size );
 
-void ewfoutput_version_fprint( FILE *stream, LIBEWF_CHAR *program );
+void ewfoutput_version_fprint( FILE *stream, libewf_char_t *program );
 void ewfoutput_copyright_fprint( FILE *stream );
-void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error );
+void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, libewf_char_t *case_number, libewf_char_t *description, libewf_char_t *evidence_number, libewf_char_t *examiner_name, libewf_char_t *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error );
 void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle );
 void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle );
@@ -65,11 +65,11 @@ void ewfoutput_timestamp_fprint( FILE *stream, time_t timestamp );
 void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t seconds );
 void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes );
 
-void ewfoutput_process_status_initialize( FILE *stream, LIBEWF_CHAR *string, time_t timestamp_start );
+void ewfoutput_process_status_initialize( FILE *stream, libewf_char_t *string, time_t timestamp_start );
 void ewfoutput_process_status_fprint( size64_t bytes_read, size64_t bytes_total );
 void ewfoutput_stream_process_status_fprint( size64_t bytes_read, size64_t bytes_total );
 
-void ewfoutput_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end );
+void ewfoutput_process_summary_fprint( FILE *stream, libewf_char_t *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end );
 
 #if defined( __cplusplus )
 }
