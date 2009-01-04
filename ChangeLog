@@ -103,7 +103,6 @@ Code clean up
 * what about setting errno for API set and get function i.e. for size too small
 * have ewftools only use API ?
   - most of the internal library code has been removed
-* seperate common code from libary and tools
 * change ewf_char/string into byte_char/string
 * merge alloc and realloc blocks
 
@@ -145,6 +144,10 @@ Next stable:
 * test session section R/W functionality
 
 * fix signal handling for WIN32
+* seperate common code from libary and tools
+* fix MSVCPP project
+
+* rename include/libewf/libewf_x to include/libewf/x
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -169,10 +172,14 @@ CLOSED
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   - no
 
+Version: 20080306
+* worked on seperating common code
+
 Version: 20080305
 * worked on signal handling
 * fixed issues with date string in header
 * fixes for missing printf "%jd" and "%zd" under Cygwin and WIN32
+* worked on seperating common code
 
 Version: 20080304
 * worked on signal handling

@@ -35,11 +35,11 @@
 #define _LIBEWF_INCLUDES_H
 
 #if defined( HAVE_CONFIG_H )
-#include "libewf_config.h"
+#include <config.h>
 #endif
 
 #if defined( HAVE_CONFIG_WINDOWS_H )
-#include "libewf_config_windows.h"
+#include <config_windows.h>
 #endif
 
 #include <libewf/libewf_types.h>

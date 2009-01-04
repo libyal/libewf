@@ -1,7 +1,0 @@
-usr/include/*.h
-usr/include/libewf/*.h
-usr/lib/*.la
-usr/lib/lib*.a
-usr/lib/lib*.so
-usr/lib/pkgconfig/*
-usr/share/man/man3/*
