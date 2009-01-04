@@ -164,16 +164,12 @@ int libewf_convert_timestamp(
 	}
 	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		*date_string = libewf_string_ctime(
-		                &timestamp );
-
-		/* The libewf_string_ctime function returns a string of length 32
-		 */
-		*date_string_length = 32;
-
-		if( *date_string == NULL )
+		if( libewf_string_ctime(
+		     &timestamp,
+		     date_string,
+		     date_string_length ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
 			 function );
 
 			return( -1 );
@@ -4294,20 +4290,12 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	*date_string = libewf_string_ctime(
-	                &timestamp );
-
-	/* The libewf_string_ctime function returns a string of length 32
-	 */
-	*date_string_length = 32;
-
-	/* refactor to have libewf_string_ctime create the date string and
-	 * set the date string length
-	 */
-
-	if( *date_string == NULL )
+	if( libewf_string_ctime(
+	     &timestamp,
+	     date_string,
+	     date_string_length ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
 		 function );
 
 		return( -1 );
