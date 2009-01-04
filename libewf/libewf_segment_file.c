@@ -243,8 +243,8 @@ int libewf_segment_file_create_extension( uint16_t segment_number, int16_t maxim
 	}
 	if( segment_number > (uint16_t) maximum_amount_of_segments )
 	{
-		LIBEWF_WARNING_PRINT( "%s: segment number exceeds the maximum amount of segment files.\n",
-		 function );
+		LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " exceeds the maximum amount of segment files: %" PRIu16 ".\n",
+		 function, segment_number, maximum_amount_of_segments );
 
 		return( -1 );
 	}

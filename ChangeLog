@@ -33,6 +33,7 @@ To do/think about:
   - if so remove libewf_string include from ewfacquire
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
+* make compilation resilient for missing crypto library
 
 * ewftools: add getoptlong
 * ewfacquire: make size input and output human friendly (support kM notation etc)
@@ -89,10 +90,9 @@ Known issues:
 * The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
 
 Next release:
-* add read/write support for > 2Gb segment file for EnCase 6.7
-* raw read/write
-* move md5 calculation out library into ewftools
-* make compilation resilient for missing crypto library
+* move md5 calculation out library into ewftools (completed)
+* add read/write support for > 2Gb segment file for EnCase 6.7 (initial)
+* raw read/write (partial)
 
 * full platform test
 * profile read and write functions
@@ -117,21 +117,13 @@ Next release:
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
   write raw only checks for the raw access mode like prepare function
-* remove raw access value in handle and RAW flag
 * ewfacquire check if last segment file is closed before telling acquiry was completed
-* check if segment table entry 0 is used in read mode make sure to use consistent
-  usage of the segment table for read/write
 * make buffer passthrough default behavior
 * remove internal_handle passing from most functions
   only pass the necessary values
 * segment table should only be updated by functions in segment file/table
 
-* move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 * rewrite ewfglob marcros to function macros (including arguments)
-
-* remove libewf_write_chunk ?
-* check if chunk_cache_offset is still needed in write_new_chunk
-  read is now in write_existing_chunk
 
 * what about header values parsing with preservation of timestamps?
 
@@ -141,9 +133,7 @@ TODO
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
 
-* fix rogue next sections in delta segment file section list
-* fix write finalize after ewfalter
-* fix error in 2 concessive writes to delta file
+* fix rogue next sections in delta segment file section list during RW
 
 * change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
@@ -160,6 +150,9 @@ CLOSED
 
 Version: 20070912
 * fixed on error in delta file accouting for multiple rewrites
+* removed libewf_write_chunk, libewf_internal_handle_read_is_initialized
+  and libewf_internal_handle_write_is_initialized
+* fixed write finalize after R or RW open
 
 Version: 20070910
 * worked to allow to set the delta file path

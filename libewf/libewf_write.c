@@ -847,7 +847,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	size_t write_size                 = 0;
 	size_t read_size                  = 0;
 	size_t remaining_chunk_size       = 0;
-	size_t chunk_cache_offset         = 0;
 	size_t compressed_chunk_data_size = 0;
 	uint16_t segment_number           = 0;
 	int chunk_cache_data_used         = 0;
@@ -880,6 +879,12 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		 function );
 
 		return( -1 );
+	}
+	/* Check if the write was already finalized
+	 */
+	if( internal_handle->write->write_finalized == 1 )
+	{
+		return( 0 );
 	}
 	if( internal_handle->segment_table == NULL )
 	{
@@ -1085,8 +1090,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		}
 		internal_handle->write->write_count += write_count;
 	}
-	chunk_cache_offset = internal_handle->chunk_cache->offset;
-
 	/* Determine the size of data to read
 	 */
 	if( data_size < (size_t) internal_handle->media->chunk_size )
@@ -1115,7 +1118,7 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	/* Check if buffer contain the necessary amount of bytes to fill a chunk
 	 * and no data was previously copied into the chunk cache
 	 */
-	else if( ( chunk_cache_offset == 0 )
+	else if( ( internal_handle->chunk_cache->offset == 0 )
 	 && ( data_size >= (size_t) internal_handle->media->chunk_size ) )
 	{
 		chunk_data = (EWF_CHUNK *) buffer;
@@ -1127,7 +1130,8 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		/* Check if data is present in the chunk cache
 		 * and calculate the amount of data to read from the buffer
 		 */
-		remaining_chunk_size = internal_handle->media->chunk_size - chunk_cache_offset;
+		remaining_chunk_size = internal_handle->media->chunk_size
+		                     - internal_handle->chunk_cache->offset;
 
 		if( read_size > (size_t) remaining_chunk_size )
 		{
@@ -1137,7 +1141,7 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		 function, read_size );
 
 		if( libewf_common_memcpy(
-		     &internal_handle->chunk_cache->data[ chunk_cache_offset ],
+		     &internal_handle->chunk_cache->data[ internal_handle->chunk_cache->offset ],
 		     buffer,
 		     read_size ) == NULL )
 		{
@@ -1147,7 +1151,7 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 			return( -1 );
 		}
 		internal_handle->chunk_cache->chunk  = chunk;
-		internal_handle->chunk_cache->amount = chunk_cache_offset + read_size;
+		internal_handle->chunk_cache->amount = internal_handle->chunk_cache->offset + read_size;
 
 		/* Adjust the chunk cache offset
 		 */
@@ -1725,95 +1729,6 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	return( (ssize_t) write_size );
 }
 
-/* Writes a chunk of data in EWF format from a buffer at the current offset
- * The necessary settings of the write values must have been made
- * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
- */
-ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
-{
-	static char *function = "libewf_write_chunk";
-	ssize_t write_count   = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_internal_handle_write_is_initialized( internal_handle ) == 0 )
-	{
-		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* Check if the write was already finalized
-	 */
-	if( internal_handle->write->write_finalized == 1 )
-	{
-		return( 0 );
-	}
-	if( internal_handle->offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid offset table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if chunk has already been created within a segment file
-	 */
-	if( ( chunk < internal_handle->offset_table->amount )
-	 && ( internal_handle->offset_table->file_descriptor[ chunk ] != -1 ) )
-	{
-		write_count = libewf_write_existing_chunk(
-		               internal_handle,
-		               raw_access,
-		               internal_handle->current_chunk,
-		               internal_handle->current_chunk_offset,
-		               buffer,
-		               size,
-		               data_size,
-		               is_compressed,
-		               chunk_crc,
-		               write_crc,
-		               raw_access );
-	}
-	else
-	{
-		write_count = libewf_write_new_chunk(
-		               internal_handle,
-		               raw_access,
-		               internal_handle->current_chunk,
-		               internal_handle->current_chunk_offset,
-		               buffer,
-		               size,
-		               data_size,
-		               is_compressed,
-		               chunk_crc,
-		               write_crc,
-		               raw_access );
-	}
-	if( write_count <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write chunk.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( write_count );
-}
-
 /* Writes chunk data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
@@ -1868,6 +1783,16 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 
 		return( -1 );
 	}
+	if( internal_handle->write->values_initialized == 0 )
+	{
+		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
 	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %zu with data of size: %zd.\n",
 	 function, size, data_size );
 
@@ -1900,19 +1825,39 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 	{
 		/* The write is forced when the raw access mode is set
 		 */
-		chunk_write_count = libewf_write_chunk(
-		                     internal_handle,
-		                     raw_access,
-		                     internal_handle->current_chunk,
-		                     internal_handle->current_chunk_offset,
-		                     (void *) &( (uint8_t *) buffer )[ total_write_count ],
-		                     size,
-		                     data_size,
-		                     is_compressed,
-		                     chunk_crc,
-		                     write_crc,
-		                     raw_access );
-
+		/* Check if chunk has already been created within a segment file
+		 */
+		if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
+		 && ( internal_handle->offset_table->file_descriptor[ internal_handle->current_chunk ] != -1 ) )
+		{
+			chunk_write_count = libewf_write_existing_chunk(
+			                     internal_handle,
+			                     raw_access,
+			                     internal_handle->current_chunk,
+			                     internal_handle->current_chunk_offset,
+			                     (void *) &( (uint8_t *) buffer )[ total_write_count ],
+			                     size,
+			                     data_size,
+			                     is_compressed,
+			                     chunk_crc,
+			                     write_crc,
+			                     raw_access );
+		}
+		else
+		{
+			chunk_write_count = libewf_write_new_chunk(
+			                     internal_handle,
+			                     raw_access,
+			                     internal_handle->current_chunk,
+			                     internal_handle->current_chunk_offset,
+			                     (void *) &( (uint8_t *) buffer )[ total_write_count ],
+			                     size,
+			                     data_size,
+			                     is_compressed,
+			                     chunk_crc,
+			                     write_crc,
+			                     raw_access );
+		}
 		if( chunk_write_count <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write data from chunk.\n",
@@ -2191,6 +2136,19 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 		return( -1 );
 	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* No need for finalization in R or RW mode
+	 */
+	if( internal_handle->read != NULL )
+	{
+		return( 0 );
+	}
 	if( internal_handle->write->write_finalized == 1 )
 	{
 		return( 0 );
@@ -2209,7 +2167,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		LIBEWF_VERBOSE_PRINT( "%s: writing chunk remainder at offset: %" PRIu32 " with size: %" PRIu32 "\n",
 		 function, internal_handle->current_chunk_offset, internal_handle->chunk_cache->amount );
 
-		write_count = libewf_write_chunk(
+		write_count = libewf_write_new_chunk(
 		               internal_handle,
 		               0,
 		               internal_handle->current_chunk,

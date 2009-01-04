@@ -1431,30 +1431,6 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 	return( 1 );
 }
 
-/* Check if the read values have been initialized
- * Returns 0 if not initialized, 1 if set, or -1 on error
- */
-int8_t libewf_internal_handle_read_is_initialized( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_read_is_initialized";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->read == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle read.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( internal_handle->read->values_initialized );
-}
-
 /* Initializes the read values
  * Returns 1 if successful, -1 on error
  */
@@ -1477,30 +1453,6 @@ int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_
 		return( -1 );
 	}
 	return( 1 );
-}
-
-/* Check if the write values have been initialized
- * Returns 0 if not initialized, 1 if set, or -1 on error
- */
-int8_t libewf_internal_handle_write_is_initialized( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_write_is_initialized";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( internal_handle->write->values_initialized );
 }
 
 /* Initializes the write values
