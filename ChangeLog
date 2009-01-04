@@ -105,6 +105,8 @@ Next release:
 * rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle
 * move any access to segment table in file, write and read to segment_file
+* move open segment files in file to segment file to read segment table function
+* use LIBEWF_CHAR internally instead of seperate wide functions?
 
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
@@ -114,6 +116,7 @@ TODO
 
 Version: 20070723
 * worked on allowing to read raw buffers as chunks
+* worked on restructuring to improve internal structure
 
 Version: 20070722
 * worked on allowing to write raw buffers as chunks

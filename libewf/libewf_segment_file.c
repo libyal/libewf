@@ -134,6 +134,83 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	return( read_count );
 }
 
+/* Reads the segment table from all segment files
+ * Returns 1 if successful, 0 if not, or -1 on error
+ */
+int libewf_segment_file_read_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle )
+{
+	static char *function   = "libewf_segment_file_read_segment_table";
+	uint16_t segment_number = 0;
+	int last_segment_file   = 0;
+	int result              = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing section lists.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( segment_number = 1; segment_number < internal_handle->segment_table->amount; segment_number++ )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: reading section list for segment number: %" PRIu16 ".\n",
+		 function, segment_number );
+
+		result = libewf_segment_file_read_sections(
+		          internal_handle,
+		          segment_number,
+		          internal_handle->segment_table->file_descriptor[ segment_number ],
+		          internal_handle->segment_table->section_list[ segment_number ],
+		          &last_segment_file );
+
+		if( result == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read sections.\n",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to missing next or done section.\n",
+			 function );
+
+			return( 0 );
+		}
+	}
+	/* Check to see if the done section has been found in the last segment file
+	 */
+	if( last_segment_file != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to find the last segment file.\n",
+		 function );
+
+		return( 0 );
+	}
+	return( 1 );
+}
+
 /* Reads all sections from a segment file into the section list specific
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error

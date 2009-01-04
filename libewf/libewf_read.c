@@ -51,21 +51,12 @@
  */
 int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
-	static char *function   = "libewf_read_build_index";
-	uint16_t segment_number = 0;
-	int last_segment_file   = 0;
-	int result              = 0;
+	static char *function = "libewf_read_build_index";
+	int result            = 0;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
 		 function );
 
 		return( -1 );
@@ -77,6 +68,8 @@ int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 		return( -1 );
 	}
+	/* Initialize the internal handle for reading
+	 */
 	if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
@@ -84,38 +77,20 @@ int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 		return( -1 );
 	}
-	for( segment_number = 1; segment_number < internal_handle->segment_table->amount; segment_number++ )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: building index for segment number: %" PRIu32 ".\n",
-		 function, segment_number );
-
-		result = libewf_segment_file_read_sections(
-		          internal_handle,
-		          segment_number,
-		          internal_handle->segment_table->file_descriptor[ segment_number ],
-		          internal_handle->segment_table->section_list[ segment_number ],
-		          &last_segment_file );
-
-		if( result == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read sections.\n",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to missing next or done section.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* Check to see if the done section has been found in the last segment file
+	/* Read the segment table from the segment files
 	 */
-	if( last_segment_file != 1 )
+	result = libewf_segment_file_read_segment_table( internal_handle );
+
+	if( result == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to find the last segment file.\n",
+		LIBEWF_WARNING_PRINT( "%s: error while trying to read the segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	else if( result != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read segment table.\n",
 		 function );
 
 		return( -1 );
