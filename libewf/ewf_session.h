@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_SESSION ewf_session_t
-#define EWF_SESSION_SIZE sizeof( EWF_SESSION )
-
 typedef struct ewf_session ewf_session_t;
 
 struct ewf_session
@@ -64,9 +61,6 @@ struct ewf_session
 	 */
 	uint8_t crc[ 4 ];
 };
-
-#define EWF_SESSION_ENTRY ewf_session_entry_t
-#define EWF_SESSION_ENTRY_SIZE sizeof( EWF_SESSION_ENTRY )
 
 typedef struct ewf_session_entry ewf_session_entry_t;
 

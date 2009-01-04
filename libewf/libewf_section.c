@@ -2246,17 +2246,17 @@ ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
  */
 ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
 {
-	EWF_SESSION session;
+	ewf_session_t session;
 	uint8_t stored_crc_buffer[ 4 ];
 
-	EWF_SESSION_ENTRY *sessions = NULL;
-	static char *function       = "libewf_section_session_read";
-	EWF_CRC calculated_crc      = 0;
-	EWF_CRC stored_crc          = 0;
-	ssize_t section_read_count  = 0;
-	ssize_t read_count          = 0;
-	size_t sessions_size        = 0;
-	uint32_t amount_of_sessions = 0;
+	ewf_session_entry_t *sessions = NULL;
+	static char *function         = "libewf_section_session_read";
+	EWF_CRC calculated_crc        = 0;
+	EWF_CRC stored_crc            = 0;
+	ssize_t section_read_count    = 0;
+	ssize_t read_count            = 0;
+	size_t sessions_size          = 0;
+	uint32_t amount_of_sessions   = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2285,16 +2285,19 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 	section_read_count = libewf_segment_file_handle_read(
 	                      segment_file_handle,
 	                      &session,
-	                      EWF_SESSION_SIZE );
+	                      sizeof( ewf_session_t ) );
 
-	if( section_read_count != (ssize_t) EWF_SESSION_SIZE )
+	if( section_read_count != (ssize_t) sizeof( ewf_session_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read session.\n",
 		 function );
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &session, ( EWF_SESSION_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &session,
+	                  ( sizeof( ewf_session_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, session.crc ) != 1 )
 	{
@@ -2336,8 +2339,8 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 	}
 	else
 	{
-		sessions_size = EWF_SESSION_ENTRY_SIZE * amount_of_sessions;
-		sessions      = (EWF_SESSION_ENTRY *) libewf_common_alloc( sessions_size );
+		sessions_size = sizeof( ewf_session_entry_t ) * amount_of_sessions;
+		sessions      = (ewf_session_entry_t *) libewf_common_alloc( sessions_size );
 
 		if( sessions == NULL )
 		{

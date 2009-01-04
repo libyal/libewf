@@ -161,6 +161,7 @@ Version: 20071228
 * updated year in copyright
 * changed LIBEWF_SECTOR_TABLE to libewf_sector_table_t
 * changed LIBEWF_CHAR and EWF_CHAR into libewf_char_t and ewf_char_t
+* changed EWF_SESSION and EWF_SESSION_ENTRY to ewf_session_t and ewf_session_entry_t
 
 Version: 20071227
 * moved hash string length from libewf definitions to ewfstring
