@@ -157,6 +157,7 @@ CLOSED
 
 Version: 20071229
 * added summary message to configure.ac
+* small changed to debian package files and Makefile.am
 
 Version: 20071228
 * removed libewf_error_sector_table.h

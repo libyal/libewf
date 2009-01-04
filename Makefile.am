@@ -3,7 +3,7 @@ SUBDIRS = \
 	ewftools \
 	manuals
 
-EXTRA_DIST = \
+DEBIAN_FILES = \
 	debian/changelog \
 	debian/changelog.in \
 	debian/compat \
@@ -38,20 +38,17 @@ EXTRA_DIST = \
 	debian/prerm.ex \
 	debian/shlibs.local.ex \
 	debian/shlibs.local.ex.in \
-	debian/watch.ex \
-	doc/header.txt \
-	doc/header2.txt \
-	include/libewf.h.in \
-	include/libewf/libewf_definitions.h.in \
-	include/libewf/libewf_types.h.in \
-	libewf/libewf_config.h \
-	libewf/libewf_config_windows.h \
+	debian/watch.ex
+
+MANUAL_FILES = \
 	manuals/ewfacquire.1 \
 	manuals/ewfacquirestream.1 \
 	manuals/ewfexport.1 \
 	manuals/ewfinfo.1 \
 	manuals/ewfverify.1 \
-	manuals/libewf.3 \
+	manuals/libewf.3
+
+MSVCPP_FILES = \
 	msvscpp/ewfacquire \
 	msvscpp/ewfacquire/ewfacquire.vcproj \
 	msvscpp/ewfacquirestream \
@@ -66,11 +63,26 @@ EXTRA_DIST = \
 	msvscpp/ewfverify/ewfverify.vcproj \
 	msvscpp/libewf_dll \
 	msvscpp/libewf_dll/libewf_dll.vcproj \
-	msvscpp/libewf.sln \
+	msvscpp/libewf.sln
+
+REDHAT_FILES = \
+	libewf.spec \
+	libewf.spec.in
+
+EXTRA_DIST = \
+	$(DEBIAN_FILES) \
+	$(MANUAL_FILES) \
+	$(MSVCPP_FILES) \
+	$(REDHAT_FILES) \
+	doc/header.txt \
+	doc/header2.txt \
+	include/libewf.h.in \
+	include/libewf/libewf_definitions.h.in \
+	include/libewf/libewf_types.h.in \
+	libewf/libewf_config.h \
+	libewf/libewf_config_windows.h \
 	libewf.pc \
 	libewf.pc.in \
-	libewf.spec \
-	libewf.spec.in \
 	TESTS
 
 pkgconfigdir = $(libdir)/pkgconfig
@@ -100,8 +112,8 @@ distclean: clean
 	/bin/rm -f config.status config.cache config.log
 	/bin/rm -f libewf.pc
 	/bin/rm -f libewf.spec
-	# /bin/rm -f debian/changelog
-	# /bin/rm -f debian/shlibs.local.ex
+	/bin/rm -f debian/changelog
+	/bin/rm -f debian/shlibs.local.ex
 	/bin/rm -f include/libewf.h
 	/bin/rm -f include/libewf/libewf_definitions.h
 	/bin/rm -f include/libewf/libewf_types.h
