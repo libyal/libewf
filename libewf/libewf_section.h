@@ -88,10 +88,10 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
 ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors );
 
-ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
+ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_DIGEST_HASH *md5_hash, int8_t *md5_hash_set, uint8_t error_tollerance );
 ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_DIGEST_HASH *md5_hash );
 
-ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_CHAR *section_type, size_t section_type_length, off64_t start_offset );
+ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format );
 
 ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size );
 ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *xheader, size_t size, int8_t compression_level );

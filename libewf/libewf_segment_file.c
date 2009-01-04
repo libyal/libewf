@@ -272,6 +272,67 @@ ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffe
 	return( read_count );
 }
 
+/* Writes a buffer to a segment file
+ * Updates the segment file offset
+ * Returns the amount of bytes written if successful, or -1 on errror
+ */
+ssize_t libewf_segment_file_write( LIBEWF_SEGMENT_FILE *segment_file, void *buffer, size_t size )
+{
+	static char *function = "libewf_segment_file_write";
+	ssize_t write_count   = 0;
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	write_count = libewf_common_write(
+	               segment_file->file_descriptor,
+	               buffer,
+	               size );
+
+	if( write_count > 0 )
+	{
+		segment_file->file_offset += (off64_t) write_count;
+	}
+	if( write_count != (ssize_t) size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write to segment file: %" PRIs_EWF_filename ".\n",
+		 function, segment_file->filename );
+	}
+	return( write_count );
+}
+
 /* Seeks a certain offset within the a segment file
  * Returns 1 if the seek is successful, or -1 on error
  */
@@ -1121,11 +1182,11 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 	/* Write next or done section
 	 */
 	write_count = libewf_section_last_write(
-		       internal_handle,
-		       segment_file->file_descriptor,
+		       segment_file,
 		       last_section_type,
 		       4,
-		       segment_file->file_offset );
+		       internal_handle->format,
+		       internal_handle->ewf_format );
 
 	if( write_count == -1 )
 	{
@@ -1134,19 +1195,6 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal
 
 		return( -1 );
 	}
-	if( libewf_section_list_append(
-	     segment_file->section_list,
-	     last_section_type,
-	     segment_file->file_offset,
-	     ( segment_file->file_offset + write_count ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to append %s section to section list.\n",
-		 function, (char *) last_section_type );
-
-		return( -1 );
-	}
-	segment_file->file_offset += write_count;
-
 	return( write_count );
 }
 

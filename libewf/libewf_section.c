@@ -3187,67 +3187,54 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 /* Reads a hash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_DIGEST_HASH *md5_hash, int8_t *md5_hash_set, uint8_t error_tollerance )
 {
-	EWF_HASH *hash         = NULL;
+	EWF_HASH hash;
+
 	static char *function  = "libewf_section_hash_read";
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
 	ssize_t read_count     = 0;
 
-	if( internal_handle == NULL )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( file_descriptor == -1 )
+	if( md5_hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid md5 hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( size != EWF_HASH_SIZE )
+	if( md5_hash_set == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: mismatch in section data size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid md5 hash set.\n",
 		 function );
 
 		return( -1 );
 	}
-	hash = (EWF_HASH *) libewf_common_alloc( EWF_HASH_SIZE );
-
-	if( hash == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate hash.\n",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_common_read( file_descriptor, hash, EWF_HASH_SIZE );
+	read_count = libewf_segment_file_read(
+	              segment_file,
+	              &hash,
+	              EWF_HASH_SIZE );
 
 	if( read_count != (ssize_t) EWF_HASH_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read hash.\n",
 		 function );
 
-		libewf_common_free( hash );
-
 		return( -1 );
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( hash->unknown1, 16 ); );
-#endif
+	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
 
-	calculated_crc = ewf_crc_calculate( hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
-
-	if( libewf_endian_convert_32bit( &stored_crc, hash->crc ) != 1 )
+	if( libewf_endian_convert_32bit( &stored_crc, hash.crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
-
-		libewf_common_free( hash );
 
 		return( -1 );
 	}
@@ -3256,30 +3243,28 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
 		 function, stored_crc, calculated_crc );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( hash );
-
 			return( -1 );
 		}
 	}
-	if( libewf_common_memcpy( internal_handle->md5_hash, hash->md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+#if defined( HAVE_DEBUG_OUTPUT )
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( hash->unknown1, 16 ); );
+#endif
+
+	if( libewf_common_memcpy( md5_hash, hash.md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
 		 function );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( hash );
-
 			return( -1 );
 		}
 	}
-	internal_handle->md5_hash_set = 1;
+	*md5_hash_set = 1;
 
-	libewf_common_free( hash );
-
-	return( (ssize_t) size );
+	return( read_count );
 }
 
 /* Writes a hash section to file
@@ -3380,7 +3365,7 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
  * This is used for the next and done sections, these sections point back towards themselves
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_CHAR *section_type, size_t section_type_length, off64_t start_offset )
+ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format )
 {
 	EWF_SECTION section;
 
@@ -3390,9 +3375,9 @@ ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	uint64_t section_size   = 0;
 	uint64_t section_offset = 0;
 
-	if( internal_handle == NULL )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file\n",
 		 function );
 
 		return( -1 );
@@ -3427,12 +3412,12 @@ ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	}
 	/* The EnCase (EWF-E01) format leaves the size of this section empty
 	 */
-	if( ( internal_handle->ewf_format == EWF_FORMAT_S01 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_FTK ) )
+	if( ( ewf_format == EWF_FORMAT_S01 )
+	 || ( format == LIBEWF_FORMAT_FTK ) )
 	{
 		section_size = EWF_SECTION_SIZE;
 	}
-	section_offset = start_offset;
+	section_offset = segment_file->file_offset;
 
 	/* Add one character for the end of string
 	 */
@@ -3466,12 +3451,26 @@ ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
-	write_count = libewf_common_write( file_descriptor, &section, EWF_SECTION_SIZE );
+	write_count = libewf_segment_file_write(
+	               segment_file,
+	               &section,
+	               EWF_SECTION_SIZE );
 
 	if( write_count != EWF_SECTION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
+
+		return( -1 );
+	}
+	if( libewf_section_list_append(
+	     segment_file->section_list,
+	     section_type,
+	     section_offset,
+	     ( section_offset + write_count ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to append %s section to section list.\n",
+		 function, (char *) section_type );
 
 		return( -1 );
 	}
@@ -3867,7 +3866,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;
-	ssize64_t count            = 0;
+	ssize64_t read_count       = 0;
 	uint64_t size              = 0;
 	uint64_t next_offset       = 0;
 
@@ -3999,30 +3998,30 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	 */
 	else if( ewf_string_compare( section->type, "header2", 8 ) == 0 )
 	{
-		count = libewf_section_header2_read(
-		         internal_handle,
-		         segment_file,
-		         (size_t) size );
+		read_count = libewf_section_header2_read(
+		              internal_handle,
+		              segment_file,
+		              (size_t) size );
 	}
 	/* Read the header section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "header", 7 ) == 0 )
 	{
-		count = libewf_section_header_read(
-		         internal_handle,
-		         segment_file,
-		         (size_t) size );
+		read_count = libewf_section_header_read(
+		              internal_handle,
+		              segment_file,
+		              (size_t) size );
 	}
 	/* Read the xheader section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "xheader", 8 ) == 0 )
 	{
-		count = libewf_section_xheader_read(
-		         internal_handle,
-		         segment_file,
-		         (size_t) size );
+		read_count = libewf_section_xheader_read(
+		              internal_handle,
+		              segment_file,
+		              (size_t) size );
 	}
 	/* Read the volume or disk section
 	 * The \0 byte is included in the compare
@@ -4030,127 +4029,128 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ( ewf_string_compare( section->type, "volume", 7 ) == 0 )
 	 || ( ewf_string_compare( section->type, "disk", 5 ) == 0 ) )
 	{
-		count = libewf_section_volume_read(
-		         segment_file,
-		         (size_t) size,
-		         &( internal_handle->media->amount_of_chunks ),
-		         &( internal_handle->media->sectors_per_chunk ),
-		         &( internal_handle->media->bytes_per_sector ),
-		         &( internal_handle->media->amount_of_sectors ),
-		         &( internal_handle->media->chunk_size ),
-		         &( internal_handle->media->error_granularity ),
-		         &( internal_handle->media->media_type ),
-		         &( internal_handle->media->media_flags ),
-		         &( internal_handle->compression_level ),
-		         internal_handle->guid,
-		         &( internal_handle->format ),
-		         &( internal_handle->ewf_format ),
-		         internal_handle->error_tollerance );
+		read_count = libewf_section_volume_read(
+		              segment_file,
+		              (size_t) size,
+		              &( internal_handle->media->amount_of_chunks ),
+		              &( internal_handle->media->sectors_per_chunk ),
+		              &( internal_handle->media->bytes_per_sector ),
+		              &( internal_handle->media->amount_of_sectors ),
+		              &( internal_handle->media->chunk_size ),
+		              &( internal_handle->media->error_granularity ),
+		              &( internal_handle->media->media_type ),
+		              &( internal_handle->media->media_flags ),
+		              &( internal_handle->compression_level ),
+		              internal_handle->guid,
+		              &( internal_handle->format ),
+		              &( internal_handle->ewf_format ),
+		              internal_handle->error_tollerance );
 	}
 	/* Read the table2 section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "table2", 7 ) == 0 )
 	{
-		count = libewf_section_table2_read(
-		         internal_handle,
-		         segment_file,
-		         *section_start_offset,
-		         (size_t) size );
+		read_count = libewf_section_table2_read(
+		              internal_handle,
+		              segment_file,
+		              *section_start_offset,
+		              (size_t) size );
 	}
 	/* Read the table section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "table", 6 ) == 0 )
 	{
-		count = libewf_section_table_read(
-		         internal_handle,
-		         segment_file,
-		         *section_start_offset,
-		         (size_t) size );
+		read_count = libewf_section_table_read(
+		              internal_handle,
+		              segment_file,
+		              *section_start_offset,
+		              (size_t) size );
 	}
 	/* Read the sectors section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "sectors", 8 ) == 0 )
 	{
-		count = libewf_section_sectors_read(
-		         internal_handle,
-		         segment_file->file_descriptor,
-		         (size_t) size );
+		read_count = libewf_section_sectors_read(
+		              internal_handle,
+		              segment_file->file_descriptor,
+		              (size_t) size );
 	}
 	/* Read the delta_chunk section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "delta_chunk", 12 ) == 0 )
 	{
-		count = libewf_section_delta_chunk_read(
- 		         segment_file,
- 		         *section_start_offset,
- 		         (size_t) size,
- 		         internal_handle->offset_table,
- 		         internal_handle->error_tollerance );
+		read_count = libewf_section_delta_chunk_read(
+ 		              segment_file,
+ 		              *section_start_offset,
+ 		              (size_t) size,
+ 		              internal_handle->offset_table,
+ 		              internal_handle->error_tollerance );
 	}
 	/* Read the ltree section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "ltree", 6 ) == 0 )
 	{
-		count = libewf_section_ltree_read(
-		         segment_file,
-		         (size_t) size,
-		         &( internal_handle->ewf_format ),
- 		         internal_handle->error_tollerance );
+		read_count = libewf_section_ltree_read(
+		              segment_file,
+		              (size_t) size,
+		              &( internal_handle->ewf_format ),
+ 		              internal_handle->error_tollerance );
 	}
 	/* Read the session section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "session", 8 ) == 0 )
 	{
-		count = libewf_section_session_read(
-		         internal_handle,
-		         segment_file->file_descriptor,
-		         (size_t) size );
+		read_count = libewf_section_session_read(
+		              internal_handle,
+		              segment_file->file_descriptor,
+		              (size_t) size );
 	}
 	/* Read the data section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "data", 5 ) == 0 )
 	{
-		count = libewf_section_data_read(
-		         internal_handle,
-		         segment_file->file_descriptor,
-		         (size_t) size );
+		read_count = libewf_section_data_read(
+		              internal_handle,
+		              segment_file->file_descriptor,
+		              (size_t) size );
 	}
 	/* Read the hash section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "hash", 5 ) == 0 )
 	{
-		count = libewf_section_hash_read(
-		         internal_handle,
-		         segment_file->file_descriptor,
-		         (size_t) size );
+		read_count = libewf_section_hash_read(
+		              segment_file,
+		              internal_handle->md5_hash,
+		              &( internal_handle->md5_hash_set ),
+ 		              internal_handle->error_tollerance );
 	}
 	/* Read the xhash section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "xhash", 6 ) == 0 )
 	{
-		count = libewf_section_xhash_read(
-		         internal_handle,
-		         segment_file,
-		         (size_t) size );
+		read_count = libewf_section_xhash_read(
+		              internal_handle,
+		              segment_file,
+		              (size_t) size );
 	}
 	/* Read the error2 section
 	 * The \0 byte is included in the compare
 	 */
 	else if( ewf_string_compare( section->type, "error2", 7 ) == 0 )
 	{
-		count = libewf_section_error2_read(
-		         internal_handle,
-		         segment_file->file_descriptor,
-		         (size_t) size );
+		read_count = libewf_section_error2_read(
+		              internal_handle,
+		              segment_file->file_descriptor,
+		              (size_t) size );
 	}
 	else
 	{
@@ -4183,18 +4183,18 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 			return( -1 );
 		}
 #endif
-		count = (ssize64_t) size;
+		read_count = (ssize64_t) size;
 	}
-	if( count <= -1 )
+	if( read_count <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read section: %s.\n",
 		 function, (char *) section->type );
 
 		return( -1 );
 	}
-	*section_start_offset += (off64_t) count;
+	*section_start_offset += (off64_t) read_count;
 
-	if( count != (ssize64_t) size )
+	if( read_count != (ssize64_t) size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: section: %s was not entirely read.\n",
 		 function, (char *) section->type );
