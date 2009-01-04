@@ -1349,8 +1349,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		               handle,
 		               (void *) data_buffer,
 		               read_count );
-
 #endif
+
 		if( write_count != read_count )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
@@ -1766,7 +1766,9 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	uint8_t read_all               = 0;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *raw_read_data         = NULL;
+	uint8_t *raw_write_data        = NULL;
 	size_t raw_read_buffer_size    = 0;
+	size_t raw_write_buffer_size   = 0;
 	uint32_t sectors_per_chunk     = 0;
 	uint32_t bytes_per_sector      = 0;
 #endif
@@ -1924,6 +1926,19 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
+	raw_write_buffer_size = buffer_size * 2;
+	raw_write_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
+
+	if( raw_read_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate raw write data.\n",
+		 function );
+
+		libewf_common_free( raw_read_data );
+		libewf_common_free( data );
+
+		return( -1 );
+	}
 #endif
 	while( total_read_count < (int64_t) export_size )
 	{
@@ -1964,6 +1979,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			libewf_common_free( data );
 #if defined( HAVE_RAW_ACCESS )
 			libewf_common_free( raw_read_data );
+			libewf_common_free( raw_write_data );
 #endif
 
 			return( -1 );
@@ -1976,6 +1992,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			libewf_common_free( data );
 #if defined( HAVE_RAW_ACCESS )
 			libewf_common_free( raw_read_data );
+			libewf_common_free( raw_write_data );
 #endif
 
 			return( -1 );
@@ -1988,6 +2005,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			libewf_common_free( data );
 #if defined( HAVE_RAW_ACCESS )
 			libewf_common_free( raw_read_data );
+			libewf_common_free( raw_write_data );
 #endif
 
 			return( -1 );
@@ -2005,6 +2023,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			libewf_common_free( data );
 #if defined( HAVE_RAW_ACCESS )
 			libewf_common_free( raw_read_data );
+			libewf_common_free( raw_write_data );
 #endif
 			return( -1 );
 		}
@@ -2018,10 +2037,20 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		{
 			ewfsha1_update( &sha1_context, uncompressed_data, read_count );
 		}
+#if defined( HAVE_RAW_ACCESS )
+		write_count = ewfcommon_raw_write_ewf(
+		               export_handle,
+		               raw_write_data,
+		               raw_write_buffer_size,
+		               uncompressed_data,
+		               buffer_size,
+		               read_count );
+#else
 		write_count = libewf_write_buffer(
 		               export_handle,
 		               (void *) uncompressed_data,
 		               read_count );
+#endif
 
 		if( write_count != read_count )
 		{
@@ -2031,6 +2060,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			libewf_common_free( data );
 #if defined( HAVE_RAW_ACCESS )
 			libewf_common_free( raw_read_data );
+			libewf_common_free( raw_write_data );
 #endif
 
 			return( -1 );
@@ -2045,6 +2075,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	libewf_common_free( data );
 #if defined( HAVE_RAW_ACCESS )
 	libewf_common_free( raw_read_data );
+	libewf_common_free( raw_write_data );
 #endif
 
 	if( calculate_md5 == 1 )

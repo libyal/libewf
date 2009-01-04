@@ -113,7 +113,6 @@ Next release:
   store a timestamp string in the header value and convert them in ewfinfo
 
 * ewfexport
-  - ewfcommon_export_ewf - add raw access write support
   - > 2GiB segment file support
 * ewfacquire
   - account for backspace in user input (no issue on Fedora Core 8)
@@ -165,6 +164,7 @@ Version: 20071124
 * fixed error writing segment files > 2 Gib
 * reduced multiple successive crc error entries to a single
 * reduced multiple successive acquiry error (error2) entries to a single
+* ewfcommon_export_ewf added raw access write support
 
 Version: 20071123
 * worked on refactoring code
