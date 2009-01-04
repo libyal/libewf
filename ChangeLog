@@ -108,6 +108,7 @@ Code clean up
   - most of the internal library code has been removed
 * seperate common code from libary and tools
 * change ewf_char/string into byte_char/string
+* merge alloc and realloc blocks
 
 Next release(s):
 * implement low memory usage option
@@ -127,28 +128,16 @@ Next release(s):
   - store error in handle? or additional parameter?
   - useful to store error/warning string
 
-Next stable:
-* full platform test
-
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
+
+Next stable:
+* full platform test
 
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-* merge alloc and realloc blocks
-
 * test abort
-
-* refactor write initialize into seperate functions
-  - function that remains is minimal, refactor any way?
-* what about open read write and set functions?
-
-* refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
-  function
-  - functions basically use libewf_section_compressed_string_read
-
-* Check refactor
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -170,6 +159,7 @@ CLOSED
 
 Version: 20080229
 * Code clean up
+* safe guarded libewf set functions for read/write
 
 Version: 20080228
 * Worked on not finalizing on error

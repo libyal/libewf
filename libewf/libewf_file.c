@@ -1721,7 +1721,8 @@ int libewf_set_bytes_per_sector(
 
 		return( -1 );
 	}
-	if( ( internal_handle->write == NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
 	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: bytes per sector cannot be changed.\n",
@@ -1762,16 +1763,10 @@ int libewf_set_error_granularity(
 
 		return( -1 );
 	}
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: error granularity cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -1801,16 +1796,10 @@ int libewf_set_compression_values(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: compression values cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -1862,16 +1851,11 @@ int libewf_set_media_size(
 
 		return( -1 );
 	}
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: media size cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -1902,16 +1886,11 @@ int libewf_set_segment_file_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: segment file size cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -1955,16 +1934,10 @@ int libewf_set_delta_segment_file_size(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: delta segment file size cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -2015,16 +1988,11 @@ int libewf_set_media_type(
 
 		return( -1 );
 	}
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: media type cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -2060,16 +2028,11 @@ int libewf_set_volume_type(
 
 		return( -1 );
 	}
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: volume type cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -2113,16 +2076,11 @@ int libewf_set_format(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write == NULL )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		LIBEWF_WARNING_PRINT( "%s: format cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -2200,8 +2158,9 @@ int libewf_set_guid(
 
 		return( -1 );
 	}
-	if( ( internal_handle->write != NULL )
-	 && ( internal_handle->write->values_initialized != 0 ) )
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: GUID cannot be changed.\n",
 		 function );
@@ -2244,6 +2203,13 @@ int libewf_set_md5_hash(
 	if( internal_handle->hash_sections == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing hash sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->read != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: md5 hash cannot be changed.\n",
 		 function );
 
 		return( -1 );
@@ -2304,14 +2270,8 @@ int libewf_set_delta_segment_filename(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
+	if( ( internal_handle->write == NULL )
+	 && ( internal_handle->write->values_initialized != 0 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: delta segment filename cannot be changed.\n",
 		 function );
@@ -2398,6 +2358,15 @@ int libewf_set_header_value(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: header value cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( identifier == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
@@ -2454,6 +2423,13 @@ int libewf_set_hash_value(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
+	if( internal_handle->read != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: hash value cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( identifier == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
