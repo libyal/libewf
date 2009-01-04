@@ -361,3 +361,155 @@ int ewfbyte_size_string_convert(
 	return( 1 );
 }
 
+/* Determines the factor from a factor string
+ * Returns the factor if successful or -1 on error
+ */
+int8_t ewfbyte_size_string_get_factor_char_t(
+        CHAR_T factor )
+{
+	switch( factor )
+	{
+		case 'k':
+		case 'K':
+			return( 1 );
+		case 'm':
+		case 'M':
+			return( 2 );
+		case 'g':
+		case 'G':
+			return( 3 );
+		case 't':
+		case 'T':
+			return( 4 );
+		case 'p':
+		case 'P':
+			return( 5 );
+		case 'e':
+		case 'E':
+			return( 6 );
+		case 'z':
+		case 'Z':
+			return( 7 );
+		case 'y':
+		case 'Y':
+			return( 8 );
+		default :
+			break;
+	}
+	return( -1 );
+}
+
+/* Converts a human readable byte size string into a value
+ * Returns 1 if successful or -1 on error
+ */
+int ewfbyte_size_string_convert_char_t(
+     CHAR_T *byte_size_string,
+     size_t byte_size_string_length,
+     uint64_t *size )
+{
+	static char *function            = "ewfbyte_size_string_convert_char_t";
+	size_t byte_size_string_iterator = 0;
+	uint64_t byte_size               = 0;
+	int8_t factor                    = 0;
+	int8_t remainder                 = -1;
+	int units                        = 0;
+
+	if( byte_size_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid byte size string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		 function );
+
+		return( -1 );
+	}
+	while( byte_size_string_iterator < byte_size_string_length )
+	{
+		if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
+		 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
+		{
+			break;
+		}
+		byte_size *= 10;
+		byte_size += ( byte_size_string[ byte_size_string_iterator ] - '0' );
+
+		byte_size_string_iterator++;
+	}
+	if( byte_size_string[ byte_size_string_iterator ] == '.' )
+	{
+		byte_size_string_iterator++;
+
+		remainder = byte_size_string[ byte_size_string_iterator ] - '0';
+
+		byte_size_string_iterator++;
+	}
+	if( byte_size_string[ byte_size_string_iterator ] == ' ' )
+	{
+		byte_size_string_iterator++;
+	}
+	factor = ewfbyte_size_string_get_factor_char_t(
+	          byte_size_string[ byte_size_string_iterator ] );
+
+	if( factor < 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid factor.\n",
+		 function );
+
+		return( -1 );
+	}
+	byte_size_string_iterator++;
+
+	if( ( byte_size_string[ byte_size_string_iterator ] == 'i' )
+	 && ( byte_size_string[ byte_size_string_iterator + 1 ] == 'B' ) )
+	{
+		units = EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE;
+
+		byte_size_string_iterator += 2;
+	}
+	else if( byte_size_string[ byte_size_string_iterator ] == 'B' )
+	{
+		units = EWFBYTE_SIZE_STRING_UNIT_MEGABYTE;
+
+		byte_size_string_iterator++;
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid units.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( factor > 0 )
+	{
+		if( remainder > 0 )
+		{
+			byte_size *= units;
+
+			factor--;
+
+			byte_size += ( remainder * 100 );
+		}
+		for( ; factor > 0; factor-- )
+		{
+			byte_size *= units;
+		}
+	}
+	else if( remainder >= 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: ignoring byte value remainder.\n",
+		 function );
+	}
+	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
+	{
+		LIBEWF_WARNING_PRINT( "%s: trailing data in byte size string.\n",
+		 function );
+	}
+	*size = byte_size;
+
+	return( 1 );
+}

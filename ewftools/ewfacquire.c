@@ -689,7 +689,7 @@ int main( int argc, char * const argv[] )
 		                  input_size,
 		                  0 );
 
-		acquiry_size = ewfinput_get_byte_size_variable(
+		acquiry_size = ewfinput_get_size_variable(
 		                stdout,
 		                _S_LIBEWF_CHAR( "Amount of bytes to acquire" ),
 		                0,

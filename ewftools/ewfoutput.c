@@ -236,6 +236,7 @@ void ewfoutput_acquiry_parameters_fprint(
       uint8_t read_error_retry,
       uint8_t wipe_block_on_read_error )
 {
+	libewf_char_t acquiry_size_string[ 16 ];
 	libewf_char_t segment_file_size_string[ 16 ];
 
 	static char *function = "ewfoutput_acquiry_parameters_fprint";
@@ -405,12 +406,29 @@ void ewfoutput_acquiry_parameters_fprint(
 	}
 	fprintf( stream, "Acquiry start offet:\t\t%" PRIi64 "\n",
 	 acquiry_offset );
-	fprintf( stream, "Amount of bytes to acquire:\t%" PRIu64 "",
-	 acquiry_size );
+
+	result = ewfbyte_size_string_create(
+	          acquiry_size_string,
+	          16,
+	          acquiry_size,
+	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+
+	fprintf( stream, "Amount of bytes to acquire:\t" );
 
 	if( acquiry_size == 0 )
 	{
-		fprintf( stream, " (until end of input)" );
+		fprintf( stream, "%" PRIu64 " (until end of input)",
+		 acquiry_size );
+	}
+	else if( result == 1 )
+	{
+		fprintf( stream, "%" PRIs_EWF " (%" PRIu64 " bytes)",
+		 acquiry_size_string, acquiry_size );
+	}
+	else
+	{
+		fprintf( stream, "%" PRIu64 " bytes",
+		 acquiry_size );
 	}
 	fprintf( stream, "\n" );
 
@@ -420,16 +438,20 @@ void ewfoutput_acquiry_parameters_fprint(
 	          segment_file_size,
 	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
+	fprintf( stream, "Evidence segment file size:\t" );
+
 	if( result == 1 )
 	{
-		fprintf( stream, "Evidence segment file size:\t%" PRIs_EWF "\n",
-		 segment_file_size_string );
+		fprintf( stream, "%" PRIs_EWF " (%" PRIu64 " bytes)",
+		 segment_file_size_string, segment_file_size );
 	}
 	else
 	{
-		fprintf( stream, "Evidence segment file size:\t%" PRIu64 " bytes\n",
+		fprintf( stream, "%" PRIu64 " bytes",
 		 segment_file_size );
 	}
+	fprintf( stream, "\n" );
+
 	fprintf( stream, "Block size:\t\t\t%" PRIu32 " sectors\n",
 	 sectors_per_chunk );
 	fprintf( stream, "Error granularity:\t\t%" PRIu32 " sectors\n",

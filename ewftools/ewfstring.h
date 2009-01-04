@@ -129,6 +129,16 @@ extern "C" {
 #error Missing wide character string to long (wcstoll)
 #endif
 
+#if defined( HAVE_WINDOWS_API )
+#define CHAR_T_SNPRINTF( target, size, format, ... ) \
+	swprintf_s( target, size, format, __VA_ARGS__ )
+#elif defined( HAVE_SWPRINTF )
+#define CHAR_T_SNPRINTF( target, size, format, ... ) \
+	swprintf( target, size, format, __VA_ARGS__ )
+#else
+#error Missing wide character string print to stream (swprintf)
+#endif
+
 #if defined( HAVE_FGETWS )
 #define CHAR_T_GET_FROM_STREAM( string, size, stream ) \
 	fgetws( string, size, stream )
@@ -214,6 +224,19 @@ extern "C" {
 	(int64_t) atoll( string )
 #else
 #error Missing string to long long function (strtoll and atoll)
+#endif
+
+#if defined( HAVE_WINDOWS_API )
+#define CHAR_T_SNPRINTF( target, size, format, ... ) \
+        sprintf_s( target, size, format, __VA_ARGS__ )
+#elif defined(HAVE_SNPRINTF)
+#define CHAR_T_SNPRINTF( target, size, format, ... ) \
+        snprintf( target, size, format, __VA_ARGS__ )
+#elif defined(HAVE_SPRINTF)
+#define CHAR_T_SNPRINTF( target, size, format, ... ) \
+        sprintf( target, format, __VA_ARGS__ )
+#else
+#error Missing string print to stream (snprintf and sprintf)
 #endif
 
 #if defined( HAVE_FGETS )
