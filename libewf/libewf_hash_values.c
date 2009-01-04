@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_hash_values.h"
 #include "libewf_libuna.h"
 #include "libewf_string.h"
@@ -192,6 +193,7 @@ int libewf_hash_values_parse_hash_string_xml(
 	libewf_character_t *open_tag_end    = NULL;
 	libewf_character_t *close_tag_start = NULL;
 	libewf_character_t *close_tag_end   = NULL;
+	libewf_error_t *error               = NULL;
 	static char *function               = "libewf_hash_values_parse_hash_string_xml";
 	size_t amount_of_lines              = 0;
 	size_t identifier_length            = 0;
@@ -228,10 +230,17 @@ int libewf_hash_values_parse_hash_string_xml(
 	     hash_string_xml_size,
 	     (libewf_character_t) '\n',
 	     &lines,
-	     &amount_of_lines ) != 1 )
+	     &amount_of_lines,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to split hash string into lines.\n",
 		 function );
+
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}
@@ -332,10 +341,17 @@ int libewf_hash_values_parse_hash_string_xml(
 	}
 	if( libewf_string_split_values_free(
 	     lines,
-	     amount_of_lines ) != 1 )
+	     amount_of_lines,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to free split lines.\n",
 		 function );
+
+		libewf_error_backtrace_fprint(
+		 error,
+		 stderr );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}

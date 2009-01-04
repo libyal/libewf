@@ -28,8 +28,7 @@
 #include <types.h>
 #include <wide_string.h>
 
-/* libuna is needed to do the UTF string conversions
- */
+#include "libewf_error.h"
 #include "libewf_libuna.h"
 
 #if defined( _cplusplus )
@@ -257,11 +256,13 @@ int libewf_string_split(
      size_t string_size,
      libewf_character_t delimiter,
      libewf_character_t ***split_values,
-     size_t *amount_of_split_values );
+     size_t *amount_of_split_values,
+     libewf_error_t **error );
 
 int libewf_string_split_values_free(
-      libewf_character_t **split_values,
-      size_t amount_of_split_values );
+     libewf_character_t **split_values,
+     size_t amount_of_split_values,
+     libewf_error_t **error );
 
 #if defined( _cplusplus )
 }
