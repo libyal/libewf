@@ -69,10 +69,10 @@ libtool: @LIBTOOL_DEPS@
 lib: library
 
 library:
-	cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS)
-	cd $(srcdir)/liberror && $(MAKE) $(AM_MAKEFLAGS)
-	cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS)
-	cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS)
+	(cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/liberror && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS))
 
 distclean: clean
 	/bin/rm -f Makefile
@@ -87,4 +87,10 @@ distclean: clean
 		(cd $$dir && $(MAKE) distclean) \
 		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
 	done && test -z "$$fail"
+
+splint:
+	(cd $(srcdir)/liberror && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libuna && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/libewf && $(MAKE) splint $(AM_MAKEFLAGS))
+	(cd $(srcdir)/ewftools && $(MAKE) splint $(AM_MAKEFLAGS))
 

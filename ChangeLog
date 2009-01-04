@@ -202,6 +202,10 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20081019
+* Updated liberror
+* Added splint make option
+
 Version: 20081018
 * Minor adjustments
 * Updated liberror_definitions with encryption error definitions

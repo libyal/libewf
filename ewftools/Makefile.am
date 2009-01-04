@@ -168,3 +168,17 @@ ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 distclean: clean
 	/bin/rm -f Makefile
 
+splint:
+	@echo "Running splint on ewfacquire ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfacquire_SOURCES) 
+	@echo "Running splint on ewfacquirestream ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfacquirestream_SOURCES) 
+	@echo "Running splint on ewfalter ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfalter_SOURCES) 
+	@echo "Running splint on ewfexport ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfexport_SOURCES) 
+	@echo "Running splint on ewfinfo ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfinfo_SOURCES) 
+	@echo "Running splint on ewfverify ..." 
+	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(ewfverify_SOURCES) 
+
