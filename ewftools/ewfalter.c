@@ -60,6 +60,7 @@
 #include "ewfgetopt.h"
 #include "ewfglob.h"
 #include "ewfinput.h"
+#include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -109,7 +110,7 @@ int main( int argc, char * const argv[] )
 
 	fprintf( stdout, "ewfalter is for expirimental usage only.\n" );
 
-	ewfcommon_version_fprint( stdout, program );
+	ewfoutput_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "hsqvV" ) ) ) != (INT_T) -1 )
 	{
@@ -142,7 +143,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stdout );
+				ewfoutput_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}

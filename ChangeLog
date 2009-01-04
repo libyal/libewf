@@ -152,6 +152,8 @@ CLOSED
 Version: 20070916
 * Worked on implementing raw read in ewftools
   - moved the string functions from ewfcommon to ewfstring
+  - moved the user input functions from ewfcommon to ewfinput
+  - moved the user output functions from ewfcommon to ewfoutput
 * Bug fix in libewf_section_hash_read
 
 Version: 20070915

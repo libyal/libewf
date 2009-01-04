@@ -62,6 +62,7 @@
 #include "ewfgetopt.h"
 #include "ewfglob.h"
 #include "ewfinput.h"
+#include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -118,7 +119,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string         = NULL;
 #endif
-	void *callback               = &ewfcommon_process_status_fprint;
+	void *callback               = &ewfoutput_process_status_fprint;
 	INT_T option                 = 0;
 	size64_t media_size          = 0;
 	size_t string_length         = 0;
@@ -154,7 +155,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, program );
+	ewfoutput_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:f:ho:qsS:t:uvV" ) ) ) != (INT_T) -1 )
 	{
@@ -269,7 +270,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stderr );
+				ewfoutput_copyright_fprint( stderr );
 
 				return( EXIT_SUCCESS );
 		}
@@ -569,7 +570,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( callback != NULL )
 	{
-		ewfcommon_process_status_initialize( stderr, _S_LIBEWF_CHAR( "exported" ), timestamp_start );
+		ewfoutput_process_status_initialize( stderr, _S_LIBEWF_CHAR( "exported" ), timestamp_start );
 	}
 	fprintf( stderr, "This could take a while.\n\n" );
 
@@ -732,11 +733,11 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Export completed.\n" );
 	}
-	ewfcommon_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), count, timestamp_start, timestamp_end );
+	ewfoutput_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), count, timestamp_start, timestamp_end );
 
 	fprintf( stderr, "\n" );
 
-	ewfcommon_crc_errors_fprint( stderr, handle );
+	ewfoutput_crc_errors_fprint( stderr, handle );
 
 	if( libewf_close( handle ) != 0 )
 	{

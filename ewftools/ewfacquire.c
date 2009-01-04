@@ -91,6 +91,7 @@ typedef size_t u64;
 #include "ewfgetopt.h"
 #include "ewfglob.h"
 #include "ewfinput.h"
+#include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -122,7 +123,7 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 
 	fprintf( stdout, "The following acquiry parameters were provided:\n" );
 
-	ewfcommon_acquiry_parameters_fprint(
+	ewfoutput_acquiry_parameters_fprint(
 	 stdout,
 	 filename,
 	 case_number,
@@ -257,7 +258,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	CHAR_T *error_string                     = NULL;
 #endif
-	void *callback                           = &ewfcommon_process_status_fprint;
+	void *callback                           = &ewfoutput_process_status_fprint;
 
 	INT_T option                             = 0;
 	ssize64_t write_count                    = 0;
@@ -287,7 +288,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stdout, program );
+	ewfoutput_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hqsvV" ) ) ) != (INT_T) -1 )
 	{
@@ -333,7 +334,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stdout );
+				ewfoutput_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -1117,7 +1118,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( callback != NULL )
 	{
-		ewfcommon_process_status_initialize( stdout, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
+		ewfoutput_process_status_initialize( stdout, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
 	}
 	fprintf( stdout, "This could take a while.\n\n" );
 
@@ -1202,11 +1203,11 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stdout, "Acquiry completed.\n" );
 	}
-	ewfcommon_process_summary_fprint( stdout, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
+	ewfoutput_process_summary_fprint( stdout, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
 
 	fprintf( stdout, "\n" );
 
-	ewfcommon_acquiry_errors_fprint( stdout, handle );
+	ewfoutput_acquiry_errors_fprint( stdout, handle );
 
 	if( libewf_close( handle ) != 0 )
 	{

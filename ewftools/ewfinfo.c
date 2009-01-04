@@ -62,6 +62,7 @@
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -117,7 +118,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stdout, program );
+	ewfoutput_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:himvV" ) ) ) != (INT_T) -1 )
 	{
@@ -196,7 +197,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stdout );
+				ewfoutput_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -331,7 +332,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stdout, "Acquiry information\n" );
 
-		ewfcommon_header_values_fprint( stdout, handle );
+		ewfoutput_header_values_fprint( stdout, handle );
 
 		fprintf( stdout, "\n" );
 	}
@@ -446,13 +447,13 @@ int main( int argc, char * const argv[] )
 				);
 			}
 		}
-		ewfcommon_hash_values_fprint( stdout, handle );
+		ewfoutput_hash_values_fprint( stdout, handle );
 
 		fprintf( stdout, "\n" );
 	}
 	if( ( info_option == 'a' ) || ( info_option == 'e' ) )
 	{
-		ewfcommon_acquiry_errors_fprint( stdout, handle );
+		ewfoutput_acquiry_errors_fprint( stdout, handle );
 	}
 	if( libewf_close( handle ) != 0 )
 	{

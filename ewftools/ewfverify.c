@@ -62,6 +62,7 @@
 #include "ewfgetopt.h"
 #include "ewfglob.h"
 #include "ewfmd5.h"
+#include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
 #include "ewfstring.h"
@@ -106,7 +107,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string                     = NULL;
 #endif
-	void *callback                           = &ewfcommon_process_status_fprint;
+	void *callback                           = &ewfoutput_process_status_fprint;
 	INT_T option                             = 0;
 	time_t timestamp_start                   = 0;
 	time_t timestamp_end                     = 0;
@@ -122,7 +123,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stdout, program );
+	ewfoutput_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hsqvV" ) ) ) != (INT_T) -1 )
 	{
@@ -167,7 +168,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stdout );
+				ewfoutput_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -301,7 +302,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( callback != NULL )
 	{
-		ewfcommon_process_status_initialize(
+		ewfoutput_process_status_initialize(
 		 stdout,
 		 _S_LIBEWF_CHAR( "verified" ),
 		 timestamp_start );
@@ -367,7 +368,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stdout, "Verify completed.\n" );
 	}
-	ewfcommon_process_summary_fprint(
+	ewfoutput_process_summary_fprint(
 	 stdout,
 	 _S_LIBEWF_CHAR( "Read" ),
 	 count,
@@ -451,7 +452,7 @@ int main( int argc, char * const argv[] )
 			return( EXIT_FAILURE );
 		}
 	}
-	ewfcommon_crc_errors_fprint( stdout, handle );
+	ewfoutput_crc_errors_fprint( stdout, handle );
 
 	if( libewf_close( handle ) != 0 )
 	{
