@@ -141,7 +141,8 @@ int libewf_compress(
 	else if( result == Z_BUF_ERROR )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: unable to write compressed data: target buffer too small.\n",
+		notify_verbose_printf(
+		 "%s: unable to write compressed data: target buffer too small.\n",
 		 function );
 #endif
 
@@ -174,7 +175,8 @@ int libewf_compress(
 		 LIBEWF_ERROR_DOMAIN_COMPRESSION,
 		 LIBEWF_COMPRESSION_ERROR_COMPRESS_FAILED,
 		 "%s: zlib returned undefined error: %d.\n",
-		 function, result );
+		 function,
+		 result );
 
 		*compressed_size = 0;
 	}
@@ -256,7 +258,8 @@ int libewf_uncompress(
 	else if( result == Z_DATA_ERROR )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: unable to read compressed data: data error.\n",
+		notify_verbose_printf(
+		 "%s: unable to read compressed data: data error.\n",
 		 function );
 #endif
 
@@ -267,7 +270,8 @@ int libewf_uncompress(
 	else if( result == Z_BUF_ERROR )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: unable to read compressed data: target buffer too small.\n",
+		notify_verbose_printf(
+		 "%s: unable to read compressed data: target buffer too small.\n",
 		 function );
 #endif
 
@@ -293,7 +297,8 @@ int libewf_uncompress(
 		 LIBEWF_ERROR_DOMAIN_COMPRESSION,
 		 LIBEWF_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
 		 "%s: zlib returned undefined error: %d.\n",
-		 function, result );
+		 function,
+		 result );
 
 		*uncompressed_size = 0;
 	}

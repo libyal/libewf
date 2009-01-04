@@ -76,15 +76,8 @@ Possible performance improvements:
 * reduce amount of write by aligining chunk data and CRC
   - requires rewrite of some functions, CRC should be passed as buffer
 
-Code clean up
-* rewrite ewfglob marcros to function macros (including arguments)
-
 Error handling
-* improve error handling
-  - store error in handle? or additional parameter?
-  - useful to store error/warning string
-* what about setting errno for API set and get function i.e. for size too small
-* use glib based error handling
+* what about a function that translates error into an equivalent errno?
 * have wchar error messages?
 
 Python bindings
@@ -94,7 +87,6 @@ API changes
 * make libewf_handle_initialize and libewf_handle_free available
   - rewrite open and close in correspondence with handle_initialize and handle_free
 * change compress empty-block into a compression level
-* add error handling
 * add identifier_length to hash_/header_values functions
 * allow for chunk data and CRC alignment (possible performance enhancement)
 * low level API
@@ -119,14 +111,20 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
+Code clean up
+* rewrite ewfglob marcros to function macros (including arguments)
+* remove file io pool from lower levels and pass file io handle ?
+* refactor libewf_file_io_pool_get_offset out of libewf_section functions?
+* clean up libewf_write_finalize ?
+
 Next release(s):
 
 check for notify_verbose_printf( "
+  - library done
 check for funtion,[ ]
+  - library done
 check error tollerance
 check TODO
-
-* refactor libewf_file_io_pool_get_offset out of libewf_section functions?
 
 * use internal format of date/time string convert them in interface
 * what about header values parsing with preservation of timestamps?
@@ -134,11 +132,8 @@ check TODO
 
 * why does libewf_get_segment_filename return basename?
 
-* implement error handling
-  - update library (keep error in library due to multi threading)
-  - update API later
-
-* clean up libewf_write_finalize ?
+* API changes
+  - add error parameter
 
 * separate narrow and wide character library functions
   - Linux can change wide character into UTF8, but what about Windows ASCII with codepage?
@@ -149,8 +144,6 @@ check TODO
 * ewfexport implement more ewfacquire acquiry parameters?
 
 * have segment file number in libewf_raw_read_chunk for warning output?
-
-* remove file io pool from lower levels and pass file io handle ?
 
 * add export unattended to automated tests
 * create floppy-table-errors.E01 for testing purpose
@@ -166,7 +159,7 @@ check TODO
   - compile on system without libcrypto
   - remove the cryptographic options if crypto library is missing
 
-* implement libuca
+* implement libuna
   - handle codepage in ewftools use -p option
   - add '-p list' option? to list codepages
   - what about LC_TYPE setting in ewftools

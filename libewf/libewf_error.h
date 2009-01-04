@@ -28,6 +28,14 @@
 
 #include <stdio.h>
 
+#if defined( HAVE_STDARG_H )
+#include <stdarg.h>
+#elif defined( HAVE_VARARGS_H )
+#include <varargs.h>
+#else
+#error Missing headers stdarg.h and varargs.h
+#endif
+
 #include <libewf/error.h>
 
 #include "libewf_extern.h"
@@ -67,10 +75,15 @@ void libewf_error_set(
 void libewf_error_add_message(
       libewf_error_t *error,
       const char *format,
-      ... );
+      va_list argument_list );
 
 LIBEWF_EXTERN void libewf_error_free(
                     libewf_error_t **error );
+
+LIBEWF_EXTERN int libewf_error_matches(
+                    libewf_error_t *error,
+                    int error_domain,
+                    int error_code );
 
 LIBEWF_EXTERN void libewf_error_fprint(
                     libewf_error_t *error,

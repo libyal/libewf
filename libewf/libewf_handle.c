@@ -1069,7 +1069,9 @@ int libewf_internal_handle_set_media_values(
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
 		 "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
-		 function, maximum_input_file_size, chunk_size );
+		 function,
+		 maximum_input_file_size,
+		 chunk_size );
 
 		return( -1 );
 	}
@@ -1243,7 +1245,7 @@ int libewf_internal_handle_create_header_values(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( internal_handle->header_values != NULL )
 	{
-		notify_verbose(
+		notify_verbose_printf(
 		 "%s: header values already created - cleaning up previous header values.\n",
 		 function );
 	}

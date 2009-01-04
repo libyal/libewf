@@ -6770,7 +6770,8 @@ int libewf_section_read(
 		read_count = libewf_section_debug_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size );
+		              (size_t) size,
+		              error );
 #else
 		/* Skip the data within the section
 		 */

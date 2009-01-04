@@ -620,7 +620,8 @@ libewf_handle_t *libewf_open(
 		return( NULL );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: open successful.\n",
+	notify_verbose_printf(
+	 "%s: open successful.\n",
 	 function );
 #endif
 
@@ -659,7 +660,8 @@ int libewf_close(
 	 && ( internal_handle->write->write_finalized == 0 ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: finalizing write.\n",
+		notify_verbose_printf(
+		 "%s: finalizing write.\n",
 		 function );
 #endif
 

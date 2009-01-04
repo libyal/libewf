@@ -35,6 +35,10 @@
 #include "libewf_definitions.h"
 #include "libewf_error.h"
 
+#if defined( HAVE_VERBOSE_OUTPUT )
+extern FILE *libewf_notify_stream;
+#endif
+
 #if defined( HAVE_STDARG_H )
 #define VARARGS( function, error, error_domain, error_code, type, argument ) \
         function( error, error_domain, error_code, type argument, ... )
@@ -102,34 +106,13 @@ void VARARGS(
 #undef VASTART
 #undef VAEND
 
-#if defined( HAVE_STDARG_H )
-#define VARARGS( function, error, type, argument ) \
-        function( error, type argument, ... )
-#define VASTART( argument_list, type, name ) \
-        va_start( argument_list, name )
-#define VAEND( argument_list ) \
-        va_end( argument_list )
-
-#elif defined( HAVE_VARARGS_H )
-#define VARARGS( error, function, error, type, argument ) \
-        function( va_alist ) va_dcl
-#define VASTART( argument_list, type, name ) \
-        { type name; va_start( argument_list ); name = va_arg( argument_list, type )
-#define VAEND( argument_list ) \
-        va_end( argument_list ); }
-
-#endif
-
 /* Adds a message to an error
  */
-void VARARGS(
-      libewf_error_add_message,
+void libewf_error_add_message(
       libewf_error_t *error,
-      const char *,
-      format )
+      const char *format,
+      va_list argument_list )
 {
-	va_list argument_list;
-
 	void *reallocation  = NULL;
 	size_t message_size = 64;
 	int print_count     = 0;
@@ -146,13 +129,16 @@ void VARARGS(
 	{
 		return;
 	}
-	( (libewf_internal_error_t *) error )->amount_of_messages += 1;
-	( (libewf_internal_error_t *) error )->message             = (char **) reallocation;
+	( (libewf_internal_error_t *) error )->amount_of_messages                                                      += 1;
+	( (libewf_internal_error_t *) error )->message                                                                  = (char **) reallocation;
+	( (libewf_internal_error_t *) error )->message[ ( (libewf_internal_error_t *) error )->amount_of_messages - 1 ] = NULL;
 
-	VASTART(
-	 argument_list,
-	 const char *,
-	 format );
+#if defined( HAVE_VERBOSE_OUTPUT ) && defined( TODO )
+	vfprintf(
+	 libewf_notify_stream,
+	 format,
+	 argument_list );
+#endif
 
 	do
 	{
@@ -175,26 +161,18 @@ void VARARGS(
 		               format,
 		               argument_list );
 
-		if( ( print_count > -1 )
-		 && ( (size_t) print_count > message_size ) )
-		{
-			message_size = (size_t) ( print_count + 1 );
-		}
-		else if( print_count <= -1 )
+		if( print_count <= -1 )
 		{
 			message_size += 64;
 		}
+		if( (size_t) print_count > message_size )
+		{
+			message_size = (size_t) ( print_count + 1 );
+			print_count  = -1;
+		}
 	}
-	while( ( print_count <= -1 )
-	 || ( (size_t) print_count > message_size ) );
-
-	VAEND(
-	 argument_list );
+	while( print_count <= -1 );
 }
-
-#undef VARARGS
-#undef VASTART
-#undef VAEND
 
 /* Free an error and its elements
  */
@@ -211,7 +189,7 @@ void libewf_error_free(
 	{
 		if( ( (libewf_internal_error_t *) *error )->message != NULL )
 		{
-			for( message_iterator = 0; message_iterator < ( (libewf_internal_error_t *) error )->amount_of_messages; message_iterator++ )
+			for( message_iterator = 0; message_iterator < ( (libewf_internal_error_t *) *error )->amount_of_messages; message_iterator++ )
 			{
 				if( ( (libewf_internal_error_t *) *error )->message[ message_iterator ] != NULL )
 				{
@@ -227,6 +205,26 @@ void libewf_error_free(
 
 		*error = NULL;
 	}
+}
+
+/* Determines if an error equals a certain error code of a domain
+ * Returns 1 if error matches or 0 if not
+ */
+int libewf_error_matches(
+     libewf_error_t *error,
+     int error_domain,
+     int error_code )
+{
+	if( error == NULL )
+	{
+		return( 0 );
+	}
+	if( ( ( (libewf_internal_error_t *) error )->domain == error_domain )
+	 && ( ( (libewf_internal_error_t *) error )->code == error_code ) )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 
 /* Prints a descriptive string of the error to the stream
@@ -245,24 +243,24 @@ void libewf_error_fprint(
 	{
 		return;
 	}
-	if( ( (libewf_internal_error_t *) *error )->message == NULL )
+	if( ( (libewf_internal_error_t *) error )->message == NULL )
 	{
 		return;
 	}
 	message_iterator = ( (libewf_internal_error_t *) error )->amount_of_messages - 1;
 
-	if( ( (libewf_internal_error_t *) *error )->message[ message_iterator ] != NULL )
+	if( ( (libewf_internal_error_t *) error )->message[ message_iterator ] != NULL )
 	{
 		fprintf(
 		 stream,
-		 "%s\n",
-		 ( (libewf_internal_error_t *) *error )->message[ message_iterator ] );
+		 "%s",
+		 ( (libewf_internal_error_t *) error )->message[ message_iterator ] );
 	}
 	else
 	{
 		fprintf(
 		 stream,
-		 "<missing>" );
+		 "<missing>\n" );
 	}
 }
 
@@ -282,24 +280,24 @@ void libewf_error_backtrace_fprint(
 	{
 		return;
 	}
-	if( ( (libewf_internal_error_t *) *error )->message == NULL )
+	if( ( (libewf_internal_error_t *) error )->message == NULL )
 	{
 		return;
 	}
 	for( message_iterator = 0; message_iterator < ( (libewf_internal_error_t *) error )->amount_of_messages; message_iterator++ )
 	{
-		if( ( (libewf_internal_error_t *) *error )->message[ message_iterator ] != NULL )
+		if( ( (libewf_internal_error_t *) error )->message[ message_iterator ] != NULL )
 		{
 			fprintf(
 			 stream,
-			 "%s\n",
-			 ( (libewf_internal_error_t *) *error )->message[ message_iterator ] );
+			 "%s",
+			 ( (libewf_internal_error_t *) error )->message[ message_iterator ] );
 		}
 		else
 		{
 			fprintf(
 			 stream,
-			 "<missing>" );
+			 "<missing>\n" );
 		}
 	}
 }
@@ -315,22 +313,22 @@ void libewf_error_backtrace_notify(
 	{
 		return;
 	}
-	if( ( (libewf_internal_error_t *) *error )->message == NULL )
+	if( ( (libewf_internal_error_t *) error )->message == NULL )
 	{
 		return;
 	}
 	for( message_iterator = 0; message_iterator < ( (libewf_internal_error_t *) error )->amount_of_messages; message_iterator++ )
 	{
-		if( ( (libewf_internal_error_t *) *error )->message[ message_iterator ] != NULL )
+		if( ( (libewf_internal_error_t *) error )->message[ message_iterator ] != NULL )
 		{
 			notify_printf(
-			 "%s\n",
-			 ( (libewf_internal_error_t *) *error )->message[ message_iterator ] );
+			 "%s",
+			 ( (libewf_internal_error_t *) error )->message[ message_iterator ] );
 		}
 		else
 		{
 			notify_printf(
-			 "<missing>" );
+			 "<missing>\n" );
 		}
 	}
 }

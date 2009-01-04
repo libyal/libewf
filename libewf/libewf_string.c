@@ -241,7 +241,8 @@ int libewf_string_split(
 				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 				 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: unable to create split value: %" PRIzd ".\n",
-				 function, split_value_iterator );
+				 function,
+				 split_value_iterator );
 
 				libewf_string_split_values_free(
 				 *split_values,
@@ -262,7 +263,8 @@ int libewf_string_split(
 				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 				 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 				 "%s: unable to set split value: %" PRIzd ".\n",
-				 function, split_value_iterator );
+				 function,
+				 split_value_iterator );
 
 				libewf_string_split_values_free(
 				 *split_values,
@@ -321,8 +323,10 @@ int libewf_string_split_values_free(
 #if defined( HAVE_VERBOSE_OUTPUT )
 		else
 		{
-			notify_verbose_printf( "%s: empty split value: %" PRIzd ".\n",
-			 function, split_value_iterator );
+			notify_verbose_printf(
+			 "%s: empty split value: %" PRIzd ".\n",
+			 function,
+			 split_value_iterator );
 		}
 #endif
 	}

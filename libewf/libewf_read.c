@@ -40,6 +40,7 @@
 #include "ewf_file_header.h"
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
+ * Sets the crc_mismatch value to 1 if the chunk CRC did not match the calculated CRC
  * Returns the amount of bytes of the processed chunk data or -1 on error
  */
 ssize_t libewf_read_process_chunk_data(
@@ -51,6 +52,7 @@ ssize_t libewf_read_process_chunk_data(
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
          int8_t read_crc,
+         uint8_t *crc_mismatch,
          libewf_error_t **error )
 {
 	uint8_t *chunk_data_crc  = NULL;
@@ -90,6 +92,19 @@ ssize_t libewf_read_process_chunk_data(
 
 		return( -1 );
 	}
+	if( crc_mismatch == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid CRC mismatch.\n",
+		 function );
+
+		return( -1 );
+	}
+	*crc_mismatch = 0;
+
 	if( is_compressed == 0 )
 	{
 		if( read_crc == 0 )
@@ -108,14 +123,15 @@ ssize_t libewf_read_process_chunk_data(
 
 		if( chunk_crc != calculated_crc )
 		{
-			libewf_error_set(
-			 error,
-			 LIBEWF_ERROR_DOMAIN_INPUT,
-			 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
-			 "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-			 function, chunk_crc, calculated_crc );
+#if defined( HAVE_VERBOSE_OUTPUT )
+			notify_verbose_printf(
+			 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+			 function,
+			 chunk_crc,
+			 calculated_crc );
+#endif
 
-			return( -1 );
+			*crc_mismatch = 1;
 		}
 		*uncompressed_chunk_data_size = chunk_data_size;
 	}
@@ -408,8 +424,10 @@ ssize_t libewf_raw_read_chunk(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: reading chunk at offset: %" PRIjd ".\n",
-	 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
+	notify_verbose_printf(
+	 "%s: reading chunk at offset: %" PRIjd ".\n",
+	 function,
+	 internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
 #endif
 
 	/* Read the chunk data
@@ -450,7 +468,8 @@ ssize_t libewf_raw_read_chunk(
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_READ_FAILED,
 			 "%s: error reading CRC of chunk: %" PRIu32 " from segment file.\n",
-			 function, chunk );
+			 function,
+			 chunk );
 
 			return( -1 );
 		}
@@ -467,8 +486,12 @@ ssize_t libewf_raw_read_chunk(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	notify_verbose_printf( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
-	 function, ( chunk + 1 ), internal_handle->offset_table->amount_of_chunk_offsets, chunk_type,
+	notify_verbose_printf(
+	 "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
+	 function,
+	 chunk + 1,
+	 internal_handle->offset_table->amount_of_chunk_offsets,
+	 chunk_type,
 	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
 	return( chunk_read_count );
@@ -496,6 +519,7 @@ ssize_t libewf_read_chunk_data(
 	size_t bytes_available     = 0;
 	uint32_t amount_of_sectors = 0;
 	int chunk_cache_data_used  = 0;
+	uint8_t crc_mismatch       = 0;
 	int8_t is_compressed       = 0;
 	int8_t read_crc            = 0;
 
@@ -603,8 +627,10 @@ ssize_t libewf_read_chunk_data(
 		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
-			 function, chunk_data_size );
+			notify_verbose_printf(
+			 "%s: reallocating chunk data size: %" PRIzu ".\n",
+			 function,
+			 chunk_data_size );
 #endif
 
 			if( libewf_chunk_cache_resize(
@@ -696,26 +722,36 @@ ssize_t libewf_read_chunk_data(
 		     is_compressed,
 		     chunk_crc,
 		     read_crc,
+		     &crc_mismatch,
 		     error ) == -1 )
+		{
+			libewf_error_set(
+			 error,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to process chunk data.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( crc_mismatch != 0 )
 		{
 			/* Wipe the chunk if nescessary
 			 */
-			if( internal_handle->read->wipe_on_error != 0 )
+			if( ( internal_handle->read->wipe_on_error != 0 )
+			 && ( memory_set(
+			       chunk_read,
+			       0,
+			       size ) == NULL ) )
 			{
-				if( memory_set(
-				     chunk_read,
-				     0,
-				     size ) == NULL )
-				{
-					libewf_error_set(
-					 error,
-					 LIBEWF_ERROR_DOMAIN_MEMORY,
-					 LIBEWF_MEMORY_ERROR_SET_FAILED,
-					 "%s: unable to wipe chunk data.\n",
-					 function );
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_MEMORY,
+				 LIBEWF_MEMORY_ERROR_SET_FAILED,
+				 "%s: unable to wipe chunk data.\n",
+				 function );
 
-					return( -1 );
-				}
+				return( -1 );
 			}
 			/* Add CRC error
 			 */
@@ -835,6 +871,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_raw_read_prepare_buffer";
 	ssize_t chunk_data_size                   = 0;
+	uint8_t crc_mismatch                      = 0;
 
 	if( handle == NULL )
 	{
@@ -913,6 +950,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 	                   is_compressed,
 	                   (ewf_crc_t) chunk_crc,
 	                   read_crc,
+	                   &crc_mismatch,
 	                   &error );
 
 	if( chunk_data_size <= -1 )
@@ -922,6 +960,22 @@ ssize_t libewf_raw_read_prepare_buffer(
 		 LIBEWF_ERROR_DOMAIN_CONVERSION,
 		 LIBEWF_CONVERSION_ERROR_INPUT_FAILED,
 		 "%s: unable to prepare chunk data.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( crc_mismatch != 0 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_INPUT,
+		 LIBEWF_INPUT_ERROR_CRC_MISMATCH,
+		 "%s: CRC mismatch for chunk data.\n",
 		 function );
 
 		libewf_error_backtrace_notify(
@@ -1147,8 +1201,10 @@ ssize_t libewf_read_buffer(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: reading size: %" PRIzu ".\n",
-	 function, size );
+	notify_verbose_printf(
+	 "%s: reading size: %" PRIzu ".\n",
+	 function,
+	 size );
 #endif
 
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
@@ -1159,8 +1215,10 @@ ssize_t libewf_read_buffer(
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: reallocating chunk data size: %" PRIzu ".\n",
-		 function, chunk_data_size );
+		notify_verbose_printf(
+		 "%s: reallocating chunk data size: %" PRIzu ".\n",
+		 function,
+		 chunk_data_size );
 #endif
 
 		if( libewf_chunk_cache_resize(

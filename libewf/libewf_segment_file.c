@@ -700,7 +700,8 @@ ssize_t libewf_segment_file_write_last_section(
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write %s section.\n",
-		 function, (char *) last_section_type );
+		 function,
+		 (char *) last_section_type );
 
 		return( -1 );
 	}
@@ -1367,8 +1368,10 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	/* Seek the start of the data chunks
 	*/
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
-	 function, chunks_section_offset );
+	notify_verbose_printf(
+	 "%s: setting file descriptor to start of chunks section offset: %" PRIu32 ".\n",
+	 function,
+	 chunks_section_offset );
 #endif
 
 	if( libewf_file_io_pool_seek_offset(
@@ -1391,8 +1394,11 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
-		 function, chunks_section_size, chunks_section_offset );
+		notify_verbose_printf(
+		 "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
+		 function,
+		 chunks_section_size,
+		 chunks_section_offset );
 #endif
 
 		/* Rewrite table section start
@@ -1418,7 +1424,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 			 LIBEWF_ERROR_DOMAIN_IO,
 			 LIBEWF_IO_ERROR_WRITE_FAILED,
 			 "%s: unable to rewrite %s section.\n",
-			 function, (char *) table_section_string );
+			 function,
+			 (char *) table_section_string );
 
 			return( -1 );
 		}
@@ -1426,8 +1433,11 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
-		 function, chunks_section_size, chunks_section_offset );
+		notify_verbose_printf(
+		 "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
+		 function,
+		 chunks_section_size,
+		 chunks_section_offset );
 #endif
 
 		/* Rewrite sectors section start
@@ -1454,8 +1464,10 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	/* Seek the end of the chunks section
 	 */
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf( "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
-	 function, last_segment_file_offset );
+	notify_verbose_printf(
+	 "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
+	 function,
+	 last_segment_file_offset );
 #endif
 
 	if( libewf_file_io_pool_seek_offset(
@@ -1929,7 +1941,8 @@ ssize_t libewf_segment_file_write_close(
 		 LIBEWF_ERROR_DOMAIN_IO,
 		 LIBEWF_IO_ERROR_CLOSE_FAILED,
 		 "%s: unable to close segment file: %" PRIu16 ".\n",
-		 function, segment_number );
+		 function,
+		 segment_number );
 
 		return( -1 );
 	}

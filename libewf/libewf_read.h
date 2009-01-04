@@ -47,6 +47,7 @@ ssize_t libewf_read_process_chunk_data(
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
          int8_t read_crc,
+         uint8_t *crc_mismatch,
          libewf_error_t **error );
 
 ssize_t libewf_raw_read_chunk(
