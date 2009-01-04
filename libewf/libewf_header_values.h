@@ -81,8 +81,8 @@ void libewf_header_values_free(
 int libewf_convert_timestamp(
      time_t timestamp,
      uint8_t date_format,
-     character_t **date_string,
-     size_t *date_string_length );
+     character_t *date_string,
+     size_t date_string_length );
 
 int libewf_convert_date_header_value(
      character_t *header_value,

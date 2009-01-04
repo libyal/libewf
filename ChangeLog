@@ -168,6 +168,8 @@ CLOSED
 
 Version: 20080312
 * Code clean up
+* ewftools implicitly link libcommon
+* fixed memory leak in header values for export to ewf
 
 Version: 20080309
 * Code clean up

@@ -119,14 +119,14 @@ int libewf_header_values_initialize(
 }
 
 /* Convert a timestamp into a date string
- * Sets date string and date string length
+ * The string must be at least 32 characters of length
  * Returns 1 if successful or -1 on error
  */
 int libewf_convert_timestamp(
      time_t timestamp, 
      uint8_t date_format,
-     character_t **date_string,
-     size_t *date_string_length )
+     character_t *date_string,
+     size_t date_string_length )
 {
 	struct tm *time_elements = NULL;
 	character_t *newline     = NULL;
@@ -140,31 +140,17 @@ int libewf_convert_timestamp(
 
 		return( -1 );
 	}
-	if( *date_string != NULL )
-	{
-		notify_warning_printf( "%s: date string already created.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( date_string_length == NULL )
+	if( date_string_length > (size_t) SSIZE_MAX )
 	{
 		notify_warning_printf( "%s: invalid date string length.\n",
 		 function );
 
 		return( -1 );
 	}
-	*date_string_length = 32;
-
-	*date_string = (character_t *) memory_allocate(
-	                                sizeof( character_t ) * *date_string_length );
-
-	if( *date_string == NULL )
+	if( date_string_length < 32 )
 	{
-		notify_warning_printf( "%s: unable to create date string.\n",
+		notify_warning_printf( "%s: date string too small.\n",
 		 function );
-
-		*date_string_length = 0;
 
 		return( -1 );
 	}
@@ -182,8 +168,8 @@ int libewf_convert_timestamp(
 	{
 		if( string_ctime(
 		     &timestamp,
-		     *date_string,
-		     *date_string_length ) == NULL )
+		     date_string,
+		     date_string_length ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to set ctime string.\n",
 			 function );
@@ -191,9 +177,9 @@ int libewf_convert_timestamp(
 			return( -1 );
 		}
 		newline = string_search(
-		           *date_string,
+		           date_string,
 		           (character_t) '\n',
-		           *date_string_length );
+		           date_string_length );
 
 		if( newline != NULL )
 		{
@@ -212,28 +198,11 @@ int libewf_convert_timestamp(
 
 			return( -1 );
 		}
-		*date_string_length = 20;
-
-		*date_string = (character_t *) memory_allocate(
-                                                sizeof( character_t ) * *date_string_length );
-
-		if( *date_string == NULL )
-		{
-			notify_warning_printf( "%s: unable to create date string.\n",
-			 function );
-
-			memory_free(
-			 time_elements );
-
-			*date_string_length = 0;
-
-			return( -1 );
-		}
 		if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 		{
 			print_count = string_snprintf(
-			               *date_string,
-			               *date_string_length,
+			               date_string,
+			               date_string_length,
 			               _CHARACTER_T_STRING( "%02d/%02d/%04d %02d:%02d:%02d" ),
 			               ( time_elements->tm_mon + 1 ),
 			               time_elements->tm_mday,
@@ -245,8 +214,8 @@ int libewf_convert_timestamp(
 		else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 		{
 			print_count = string_snprintf(
-			               *date_string,
-			               *date_string_length,
+			               date_string,
+			               date_string_length,
 			               _CHARACTER_T_STRING( "%02d/%02d/%04d %02d:%02d:%02d" ),
 			               time_elements->tm_mday,
 			               ( time_elements->tm_mon + 1 ),
@@ -258,8 +227,8 @@ int libewf_convert_timestamp(
 		else if( date_format == LIBEWF_DATE_FORMAT_ISO8601 )
 		{
 			print_count = string_snprintf(
-			               *date_string,
-			               *date_string_length,
+			               date_string,
+			               date_string_length,
 			               _CHARACTER_T_STRING( "%04d-%02d-%02dT%02d:%02d:%02d" ),
 			               ( time_elements->tm_year + 1900 ),
 			               ( time_elements->tm_mon + 1 ),
@@ -275,11 +244,6 @@ int libewf_convert_timestamp(
 
 			memory_free(
 			 time_elements );
-			memory_free(
-			 date_string );
-
-			*date_string        = NULL;
-			*date_string_length = 0;
 
 			return( -1 );
 		}
@@ -288,7 +252,7 @@ int libewf_convert_timestamp(
 
 		/* Make sure the string is terminated
 		 */
-		( *date_string )[ *date_string_length - 1 ] = (character_t) '\0';
+		date_string[ date_string_length - 1 ] = (character_t) '\0';
 	}
 	return( 1 );
 }
@@ -437,14 +401,34 @@ int libewf_convert_date_header_value(
 
 		return( -1 );
 	}
+	*date_string_length = 32;
+
+	*date_string = (character_t *) memory_allocate(
+	                                sizeof( character_t ) * *date_string_length );
+
+	if( *date_string == NULL )
+	{
+		notify_warning_printf( "%s: unable to create date string.\n",
+		 function );
+
+		*date_string_length = 0;
+
+		return( -1 );
+	}
 	if( libewf_convert_timestamp(
 	     timestamp,
 	     date_format,
-	     date_string,
-	     date_string_length ) != 1 )
+	     *date_string,
+	     *date_string_length ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to convert timestamp.\n",
 		 function );
+
+		memory_free(
+		 *date_string );
+
+		*date_string        = NULL;
+		*date_string_length = 0;
 
 		return( -1 );
 	}
@@ -572,14 +556,34 @@ int libewf_convert_date_header2_value(
 
 	/* TODO check for conversion error */
 
+	*date_string_length = 32;
+
+	*date_string = (character_t *) memory_allocate(
+	                                sizeof( character_t ) * *date_string_length );
+
+	if( *date_string == NULL )
+	{
+		notify_warning_printf( "%s: unable to create date string.\n",
+		 function );
+
+		*date_string_length = 0;
+
+		return( -1 );
+	}
 	if( libewf_convert_timestamp(
 	     timestamp,
 	     date_format,
-	     date_string,
-	     date_string_length ) != 1 )
+	     *date_string,
+	     *date_string_length ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to convert timestamp.\n",
 		 function );
+
+		memory_free(
+		 *date_string );
+
+		*date_string        = NULL;
+		*date_string_length = 0;
 
 		return( -1 );
 	}
@@ -4273,14 +4277,34 @@ int libewf_convert_date_xheader_value(
 
 			return( -1 );
 		}
+		*date_string_length = 32;
+
+		*date_string = (character_t *) memory_allocate(
+						sizeof( character_t ) * *date_string_length );
+
+		if( *date_string == NULL )
+		{
+			notify_warning_printf( "%s: unable to create date string.\n",
+			 function );
+
+			*date_string_length = 0;
+
+			return( -1 );
+		}
 		if( libewf_convert_timestamp(
 		     timestamp,
 		     date_format,
-		     date_string,
-		     date_string_length ) != 1 )
+		     *date_string,
+		     *date_string_length ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to convert timestamp.\n",
 			 function );
+
+			memory_free(
+			 *date_string );
+
+			*date_string        = NULL;
+			*date_string_length = 0;
 
 			return( -1 );
 		}
@@ -4342,6 +4366,12 @@ int libewf_generate_date_xheader_value(
 	{
 		notify_warning_printf( "%s: unable to set ctime string.\n",
 		 function );
+
+		memory_free(
+		 *date_string );
+
+		*date_string        = NULL;
+		*date_string_length = 0;
 
 		return( -1 );
 	}
