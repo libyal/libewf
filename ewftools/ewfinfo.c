@@ -68,15 +68,15 @@
  */
 void usage( void )
 {
-	fprintf( stderr, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
+	fprintf( stdout, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
 
-	fprintf( stderr, "\t-d: specify the date format, options: dm (day/month is default), md (month/day), iso8601\n" );
-	fprintf( stderr, "\t-e: only show EWF read error information\n" );
-	fprintf( stderr, "\t-h: shows this help\n" );
-	fprintf( stderr, "\t-i: only show EWF acquiry information\n" );
-	fprintf( stderr, "\t-m: only show EWF media information\n" );
-	fprintf( stderr, "\t-v: verbose output to stderr\n" );
-	fprintf( stderr, "\t-V: print version\n" );
+	fprintf( stdout, "\t-d: specify the date format, options: dm (day/month is default), md (month/day), iso8601\n" );
+	fprintf( stdout, "\t-e: only show EWF read error information\n" );
+	fprintf( stdout, "\t-h: shows this help\n" );
+	fprintf( stdout, "\t-i: only show EWF acquiry information\n" );
+	fprintf( stdout, "\t-m: only show EWF media information\n" );
+	fprintf( stdout, "\t-v: verbose output to stderr\n" );
+	fprintf( stdout, "\t-V: print version\n" );
 }
 
 /* The main program
@@ -116,7 +116,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, program );
+	ewfcommon_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:himvV" ) ) ) != (INT_T) -1 )
 	{
@@ -195,7 +195,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stderr );
+				ewfcommon_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}

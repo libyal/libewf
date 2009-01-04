@@ -141,9 +141,10 @@ TODO
 * remove libewf_set_media_values
 
 * allow to set the delta file path
+* change use of stdout and stderr in ewfaexport
 
 Version: 20070830
-* changed use of stdout and stderr in ewfacquirestream, ewfinfo
+* changed use of stdout and stderr in ewfacquirestream, ewfinfo, ewfalter
 * removed program: error output in ewfacquire, ewfverify
 
 Version: 20070829

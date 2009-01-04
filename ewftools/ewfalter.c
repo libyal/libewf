@@ -65,14 +65,14 @@
  */
 void usage( void )
 {
-	fprintf( stderr, "Usage: ewfalter [ -hsqvV ] ewf_files\n\n" );
+	fprintf( stdout, "Usage: ewfalter [ -hsqvV ] ewf_files\n\n" );
 
-	fprintf( stderr, "\t-h: shows this help\n" );
-	fprintf( stderr, "\t-q: quiet shows no status information\n" );
-	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-v: verbose output to stderr\n" );
-	fprintf( stderr, "\t-V: print version\n" );
+	fprintf( stdout, "\t-h: shows this help\n" );
+	fprintf( stdout, "\t-q: quiet shows no status information\n" );
+	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stdout, "\t-v: verbose output to stderr\n" );
+	fprintf( stdout, "\t-V: print version\n" );
 }
 
 /* The main program
@@ -105,9 +105,9 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	fprintf( stderr, "ewfalter is for expirimental usage only.\n" );
+	fprintf( stdout, "ewfalter is for expirimental usage only.\n" );
 
-	ewfcommon_version_fprint( stderr, program );
+	ewfcommon_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "hsqvV" ) ) ) != (INT_T) -1 )
 	{
@@ -140,7 +140,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stderr );
+				ewfcommon_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -233,17 +233,17 @@ int main( int argc, char * const argv[] )
 	}
 	/* Request the necessary case data
 	 */
-	fprintf( stderr, "Information for alter required, please provide the necessary input\n" );
+	fprintf( stdout, "Information for alter required, please provide the necessary input\n" );
 
 	alter_offset = ewfcommon_get_user_input_size_variable(
-	                stderr,
+	                stdout,
 	                _S_LIBEWF_CHAR( "Start altering at offset" ),
 	                0,
 	                media_size,
 	                0 );
 
 	alter_size = ewfcommon_get_user_input_size_variable(
-	              stderr,
+	              stdout,
 	              _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
 	              0,
 	              ( media_size - alter_offset ),
@@ -269,15 +269,20 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
+		libewf_common_free( buffer );
+
 		return( EXIT_FAILURE );
 	}
 	fprintf( stderr, "\n" );
 
 	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
+	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
+
+	libewf_common_free( buffer );
 
 	if( count <= -1 )
 	{
-		fprintf( stderr, "Alteration failed.\n" );
+		fprintf( stdout, "Alteration failed.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{
@@ -285,7 +290,7 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	fprintf( stderr, "Alteration completed.\n" );
+	fprintf( stdout, "Alteration completed.\n" );
 
 	if( libewf_close( handle ) != 0 )
 	{

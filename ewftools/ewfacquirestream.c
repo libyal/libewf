@@ -72,32 +72,32 @@
  */
 void usage( void )
 {
-	fprintf( stderr, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
-	fprintf( stderr, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -m media_type ] [ -M volume_type ] [ -N notes ]\n" );
-	fprintf( stderr, "                        [ -S segment_file_size ] [ -t target ] [ -hsvV ]\n\n" );
+	fprintf( stdout, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
+	fprintf( stdout, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -m media_type ] [ -M volume_type ] [ -N notes ]\n" );
+	fprintf( stdout, "                        [ -S segment_file_size ] [ -t target ] [ -hsvV ]\n\n" );
 
-	fprintf( stderr, "\tReads data from stdin\n\n" );
+	fprintf( stdout, "\tReads data from stdin\n\n" );
 
-	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
-	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stderr, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
-	fprintf( stderr, "\t-C: specify the case number (default is case_number).\n" );
-	fprintf( stderr, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stderr, "\t-D: specify the description (default is description).\n" );
-	fprintf( stderr, "\t-e: specify the examiner name (default is examiner_name).\n" );
-	fprintf( stderr, "\t-E: specify the evidence number (default is evidence_number).\n" );
-	fprintf( stderr, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
-	fprintf( stderr, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
-	fprintf( stderr, "\t-h: shows this help\n" );
-	fprintf( stderr, "\t-m: specify the media type, options: fixed (is default), removable\n" );
-	fprintf( stderr, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
-	fprintf( stderr, "\t-N: specify the notes (default is notes).\n" );
-	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n", (uint32_t) ( 650 * 1024 ) );
-	fprintf( stderr, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
-	fprintf( stderr, "\t-v: verbose output to stderr\n" );
-	fprintf( stderr, "\t-V: print version\n" );
+	fprintf( stdout, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
+	fprintf( stdout, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stdout, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stdout, "\t-C: specify the case number (default is case_number).\n" );
+	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stdout, "\t-D: specify the description (default is description).\n" );
+	fprintf( stdout, "\t-e: specify the examiner name (default is examiner_name).\n" );
+	fprintf( stdout, "\t-E: specify the evidence number (default is evidence_number).\n" );
+	fprintf( stdout, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
+	fprintf( stdout, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
+	fprintf( stdout, "\t-h: shows this help\n" );
+	fprintf( stdout, "\t-m: specify the media type, options: fixed (is default), removable\n" );
+	fprintf( stdout, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
+	fprintf( stdout, "\t-N: specify the notes (default is notes).\n" );
+	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stdout, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n", (uint32_t) ( 650 * 1024 ) );
+	fprintf( stdout, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
+	fprintf( stdout, "\t-v: verbose output to stderr\n" );
+	fprintf( stdout, "\t-V: print version\n" );
 }
 
 /* The main program
@@ -163,7 +163,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, program );
+	ewfcommon_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:c:C:d:D:e:E:f:hm:M:N:sS:t:vV" ) ) ) != (INT_T) -1 )
 	{
@@ -317,7 +317,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stderr );
+				ewfcommon_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -456,10 +456,10 @@ int main( int argc, char * const argv[] )
 	acquiry_operating_system = ewfcommon_determine_operating_system();
 	acquiry_software_version = LIBEWF_VERSION;
 
-	fprintf( stderr, "Using the following acquiry parameters:\n" );
+	fprintf( stdout, "Using the following acquiry parameters:\n" );
 
 	ewfcommon_acquiry_parameters_fprint(
-	 stderr,
+	 stdout,
 	 filenames[ 0 ],
 	 case_number,
 	 description,
@@ -746,21 +746,31 @@ int main( int argc, char * const argv[] )
 
 	if( time_string != NULL )
 	{
-		fprintf( stderr, "Acquiry started at: %" PRIs "\n", time_string );
+		fprintf( stdout, "Acquiry started at: %" PRIs "\n", time_string );
 
 		libewf_common_free( time_string );
 	}
 	else
 	{
-		fprintf( stderr, "Acquiry started.\n" );
+		fprintf( stdout, "Acquiry started.\n" );
 	}
 	if( callback != NULL )
 	{
-		ewfcommon_process_status_initialize( stderr, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
+		ewfcommon_process_status_initialize( stdout, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
 	}
-	fprintf( stderr, "This could take a while.\n\n" );
+	fprintf( stdout, "This could take a while.\n\n" );
 
-	count = ewfcommon_write_from_file_descriptor( handle, 0, acquiry_size, acquiry_offset, read_error_retry, sector_error_granularity, wipe_block_on_read_error, seek_on_error, calculate_sha1, callback );
+	count = ewfcommon_write_from_file_descriptor(
+	         handle,
+	         0,
+	         acquiry_size,
+	         acquiry_offset,
+	         read_error_retry,
+	         sector_error_granularity,
+	         wipe_block_on_read_error,
+	         seek_on_error,
+	         calculate_sha1,
+	         callback );
 
 	/* Done acquiring data
 	 */
@@ -810,13 +820,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( time_string != NULL )
 		{
-			fprintf( stderr, "Acquiry failed at: %" PRIs "\n", time_string );
+			fprintf( stdout, "Acquiry failed at: %" PRIs "\n", time_string );
 
 			libewf_common_free( time_string );
 		}
 		else
 		{
-			fprintf( stderr, "Acquiry failed.\n" );
+			fprintf( stdout, "Acquiry failed.\n" );
 		}
 		if( libewf_close( handle ) != 0 )
 		{
@@ -826,19 +836,19 @@ int main( int argc, char * const argv[] )
 	}
 	if( time_string != NULL )
 	{
-		fprintf( stderr, "Acquiry completed at: %" PRIs "\n", time_string );
+		fprintf( stdout, "Acquiry completed at: %" PRIs "\n", time_string );
 
 		libewf_common_free( time_string );
 	}
 	else
 	{
-		fprintf( stderr, "Acquiry completed.\n" );
+		fprintf( stdout, "Acquiry completed.\n" );
 	}
-	ewfcommon_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), count, timestamp_start, timestamp_end );
+	ewfcommon_process_summary_fprint( stdout, _S_LIBEWF_CHAR( "Written" ), count, timestamp_start, timestamp_end );
 
-	fprintf( stderr, "\n" );
+	fprintf( stdout, "\n" );
 
-	ewfcommon_acquiry_errors_fprint( stderr, handle );
+	ewfcommon_acquiry_errors_fprint( stdout, handle );
 
 	if( libewf_close( handle ) != 0 )
 	{
@@ -866,11 +876,11 @@ int main( int argc, char * const argv[] )
 	}
 	else if( result_md5_hash == 0 )
 	{
-		fprintf( stderr, "MD5 hash calculated over data: N/A\n" );
+		fprintf( stdout, "MD5 hash calculated over data: N/A\n" );
 	}
 	else
 	{
-		fprintf( stderr, "MD5 hash calculated over data: %" PRIs_EWF "\n", calculated_md5_hash_string );
+		fprintf( stdout, "MD5 hash calculated over data: %" PRIs_EWF "\n", calculated_md5_hash_string );
 	}
 	libewf_common_free( calculated_md5_hash_string );
 
@@ -886,11 +896,11 @@ int main( int argc, char * const argv[] )
 		}
 		else if( result_sha1_hash == 0 )
 		{
-			fprintf( stderr, "SHA1 hash calculated over data:\tN/A\n" );
+			fprintf( stdout, "SHA1 hash calculated over data:\tN/A\n" );
 		}
 		else
 		{
-			fprintf( stderr, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
+			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
 		}
 		libewf_common_free( calculated_sha1_hash_string );
 	}
