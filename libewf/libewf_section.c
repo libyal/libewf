@@ -1492,266 +1492,10 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 	return( read_count );
 }
 
-/* Reads an offset table from file
- * Returns 1 if successful, or -1 on error
- */
-int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, uint32_t *amount_of_chunks, off64_t section_offset, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
-{
-	uint8_t stored_crc_buffer[ 4 ];
-
-	EWF_TABLE *table          = NULL;
-	EWF_TABLE_OFFSET *offsets = NULL;
-	static char *function     = "libewf_offset_table_read";
-	EWF_CRC calculated_crc    = 0;
-	EWF_CRC stored_crc        = 0;
-	size_t offsets_size       = 0;
-	ssize_t read_count        = 0;
-	uint64_t base_offset      = 0;
-
-	if( segment_file == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_chunks == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks.\n",
-		 function );
-
-		return( -1 );
-	}
-	table = (EWF_TABLE *) libewf_common_alloc( EWF_TABLE_SIZE );
-
-	if( table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate table.\n",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libewf_segment_file_read(
-	              segment_file,
-	              table,
-	              EWF_TABLE_SIZE );
-	
-	if( read_count != (ssize_t) EWF_TABLE_SIZE )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read table.\n",
-		 function );
-
-		libewf_common_free( table );
-
-		return( -1 );
-	}
-	if( libewf_endian_convert_64bit( &base_offset, table->base_offset ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert base offset value.\n",
-		 function );
-
-		libewf_common_free( table );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding1, 4 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding2, 4 ); );
-#endif
-
-	/* The table size contains the size of the CRC (4 bytes)
-	 */
-	calculated_crc = ewf_crc_calculate( table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
-
-	if( libewf_endian_convert_32bit( &stored_crc, table->crc ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
-		 function );
-
-		libewf_common_free( table );
-
-		return( -1 );
-	}
-	if( stored_crc != calculated_crc )
-	{
-		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-		 function, stored_crc, calculated_crc );
-
-		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-		{
-			libewf_common_free( table );
-
-			return( -1 );
-		}
-	}
-	if( libewf_endian_convert_32bit( amount_of_chunks, table->amount_of_chunks ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
-		 function );
-
-		libewf_common_free( table );
-
-		return( -1 );
-	}
-	libewf_common_free( table );
-
-	LIBEWF_VERBOSE_PRINT( "%s: table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n",
-	 function, *amount_of_chunks, stored_crc, calculated_crc );
-
-	if( *amount_of_chunks == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: table contains no offsets.\n",
-		 function );
-
-		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-		{
-			return( -1 );
-		}
-	}
-	else
-	{
-		/* Check if the maximum amount of offsets is not exceeded
-		 */
-		if( *amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
-		{
-			LIBEWF_WARNING_PRINT( "%s: table contains more than %d offsets!.\n",
-			 function, EWF_MAXIMUM_OFFSETS_IN_TABLE );
-
-			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
-		offsets_size = EWF_TABLE_OFFSET_SIZE * *amount_of_chunks;
-		offsets      = (EWF_TABLE_OFFSET *) libewf_common_alloc( offsets_size );
-
-		if( offsets == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocated table offsets.\n",
-			 function );
-
-			return( -1 );
-		}
-		read_count = libewf_segment_file_read(
-		              segment_file,
-		              offsets,
-		              offsets_size );
-	
-		if( read_count != (ssize_t) offsets_size )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read table offsets.\n",
-			 function );
-
-			libewf_common_free( offsets );
-
-			return( -1 );
-		}
-		/* The EWF-S01 format does not contain a CRC after the offsets
-		 */
-		if( ewf_format != EWF_FORMAT_S01 )
-		{
-			/* Check if the offset table CRC matches
-			 */
-			calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
-
-			read_count = libewf_segment_file_read(
-			              segment_file,
-			              stored_crc_buffer,
-			              EWF_CRC_SIZE );
-
-			if( read_count != (ssize_t) EWF_CRC_SIZE )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
-				 function );
-
-				libewf_common_free( offsets );
-
-				return( -1 );
-			}
-			if( libewf_endian_convert_32bit( &stored_crc, stored_crc_buffer ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
-				 function );
-
-				libewf_common_free( offsets );
-
-				return( -1 );
-			}
-			if( stored_crc != calculated_crc )
-			{
-				LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-				 function, stored_crc, calculated_crc );
-
-				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					libewf_common_free( offsets );
-
-					return( -1 );
-				}
-			}
-		}
-		if( libewf_offset_table_fill(
-		     offset_table,
-		     (off64_t) base_offset,
-		     offsets,
-		     *amount_of_chunks,
-		     segment_file,
-		     error_tollerance ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to fill offset table.\n",
-			 function );
-
-			libewf_common_free( offsets );
-
-			return( -1 );
-		}
-		libewf_common_free( offsets );
-
-		if( libewf_offset_table_calculate_last_offset(
-		     offset_table,
-		     segment_file->section_list,
-		     error_tollerance ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to calculate last offset.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* Skip the chunk data within the section
-	 * for chunks after the table section
-	 */
-	section_offset += section_size;
-
-	if( section_offset != segment_file->file_offset )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: found data after table offsets.\n",
-		 function );
-
-		if( libewf_segment_file_seek_offset(
-		     segment_file,
-		     section_offset ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
 /* Reads a table section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t next_section_offset, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE **offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE **offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_TABLE table;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -1773,9 +1517,9 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t ne
 
 		return( -1 );
 	}
-	if( next_section_offset > (off64_t) INT64_MAX )
+	if( section_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid next section offset value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -1978,22 +1722,16 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t ne
 			return( -1 );
 		}
 	}
+	if( section_size < (size_t) section_read_count )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section size value too small.\n",
+		 function );
+	}
 	/* Skip the chunk data within the section
 	 * for chunks after the table section
 	 */
-	if( next_section_offset != segment_file->file_offset )
+	else if( section_size != (size_t) section_read_count )
 	{
-		read_count = next_section_offset - segment_file->file_offset;
-
-		if( read_count <= 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid next section offset.\n",
-			 function );
-
-			return( -1 );
-		}
-		section_read_count += read_count;
-
 		if( ( ewf_format != EWF_FORMAT_S01 )
 		 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 		{
@@ -2002,13 +1740,14 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t ne
 		}
 		if( libewf_segment_file_seek_offset(
 		     segment_file,
-		     next_section_offset ) == -1 )
+		     ( segment_file->file_offset + section_size - section_read_count ) ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 			 function );
 
 			return( -1 );
 		}
+		section_read_count = (ssize_t) section_size;
 	}
 	segment_file->amount_of_chunks += amount_of_chunks;
 
@@ -4285,7 +4024,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_table_read(
 		              segment_file,
-		              section_end_offset,
+		              (size_t) size,
 		              internal_handle->media_values->amount_of_chunks,
 		              &( internal_handle->secondary_offset_table ),
 		              internal_handle->format,
@@ -4299,7 +4038,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_table_read(
 		              segment_file,
-		              section_end_offset,
+		              (size_t) size,
 		              internal_handle->media_values->amount_of_chunks,
 		              &( internal_handle->offset_table ),
 		              internal_handle->format,
