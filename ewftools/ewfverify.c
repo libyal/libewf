@@ -99,6 +99,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	system_character_t time_string[ 32 ];
 
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                          = NULL;
@@ -111,7 +112,6 @@ int main( int argc, char * const argv[] )
 	character_t *program                     = _CHARACTER_T_STRING( "ewfverify" );
 
 	system_character_t *log_filename         = NULL;
-	system_character_t *time_string          = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         system_character_t *error_string         = NULL;
 #endif
@@ -356,20 +356,18 @@ int main( int argc, char * const argv[] )
 		/* Start verifying data
 		 */
 		timestamp_start = time( NULL );
-		time_string     = ewfcommon_ctime(
-		                   &timestamp_start );
 
-		if( time_string != NULL )
+		if( ewfcommon_ctime(
+		     &timestamp_start,
+		     time_string,
+		     32 ) == NULL )
 		{
-			fprintf( stdout, "Verify started at: %" PRIs_SYSTEM "\n",
-			 time_string );
-
-			memory_free(
-			 time_string );
+			fprintf( stdout, "Verify started.\n" );
 		}
 		else
 		{
-			fprintf( stdout, "Verify started.\n" );
+			fprintf( stdout, "Verify started at: %" PRIs_SYSTEM "\n",
+			 time_string );
 		}
 		if( callback != NULL )
 		{
@@ -403,22 +401,20 @@ int main( int argc, char * const argv[] )
 	if( ewfcommon_abort == 0 )
 	{
 		timestamp_end = time( NULL );
-		time_string   = ewfcommon_ctime(
-		                 &timestamp_end );
 
 		if( count <= -1 )
 		{
-			if( time_string != NULL )
+			if( ewfcommon_ctime(
+			     &timestamp_end,
+			     time_string,
+			     32 ) == NULL )
 			{
-				fprintf( stdout, "Verify failed at: %" PRIs_SYSTEM "\n",
-				 time_string );
-
-				memory_free(
-				 time_string );
+				fprintf( stdout, "Verify failed.\n" );
 			}
 			else
 			{
-				fprintf( stdout, "Verify failed.\n" );
+				fprintf( stdout, "Verify failed at: %" PRIs_SYSTEM "\n",
+				 time_string );
 			}
 			if( libewf_close(
 			     ewfcommon_libewf_handle ) != 0 )
@@ -441,17 +437,17 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( time_string != NULL )
+		if( ewfcommon_ctime(
+		     &timestamp_end,
+		     time_string,
+		     32 ) == NULL )
 		{
-			fprintf( stdout, "Verify completed at: %" PRIs_SYSTEM "\n",
-			 time_string );
-
-			memory_free(
-			 time_string );
+			fprintf( stdout, "Verify completed.\n" );
 		}
 		else
 		{
-			fprintf( stdout, "Verify completed.\n" );
+			fprintf( stdout, "Verify completed at: %" PRIs_SYSTEM "\n",
+			 time_string );
 		}
 		ewfoutput_process_summary_fprint(
 		 stdout,

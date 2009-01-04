@@ -63,8 +63,8 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define ewfcommon_ctime( timestamp ) \
-	libewf_date_time_wctime2( timestamp )
+#define ewfcommon_ctime( timestamp, string, length ) \
+	date_time_wctime( timestamp, string, length )
 
 #define ewfcommon_strerror( error_number ) \
 	error_string_wcserror( error_number )
@@ -73,8 +73,8 @@ extern "C" {
 	file_io_wfopen( filename, mode )
 
 #else
-#define ewfcommon_ctime( timestamp ) \
-	libewf_date_time_ctime2( timestamp )
+#define ewfcommon_ctime( timestamp, string, length ) \
+	date_time_ctime( timestamp, string, length )
 
 #define ewfcommon_strerror( error_number ) \
 	error_string_strerror( error_number )

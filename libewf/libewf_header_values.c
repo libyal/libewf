@@ -34,7 +34,6 @@
 #include <common.h>
 #include <character_string.h>
 #include <date_time.h>
-#include <date_time_string.h>
 #include <memory.h>
 #include <notify.h>
 
@@ -181,12 +180,12 @@ int libewf_convert_timestamp(
 	}
 	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		if( date_time_string_ctime(
+		if( string_ctime(
 		     &timestamp,
 		     *date_string,
 		     *date_string_length ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to create ctime string.\n",
+			notify_warning_printf( "%s: unable to set ctime string.\n",
 			 function );
 
 			return( -1 );
@@ -4336,12 +4335,12 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	if( date_time_string_ctime(
+	if( string_ctime(
 	     &timestamp,
 	     *date_string,
 	     *date_string_length ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to create ctime string.\n",
+		notify_warning_printf( "%s: unable to set ctime string.\n",
 		 function );
 
 		return( -1 );

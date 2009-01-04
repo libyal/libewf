@@ -35,6 +35,7 @@
 #define _CHARACTER_STRING_H
 
 #include "common.h"
+#include "date_time.h"
 #include "string_conversion.h"
 
 #if defined( HAVE_SRING_H )
@@ -340,6 +341,27 @@ uint64_t libewf_string_to_uint64(
 
 #define string_copy_to_char( destination, source, length ) \
 	( string_copy( destination, source, length ) == NULL ) ? -1 : 1
+
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_T )
+#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#define string_ctime( timestamp, string, length ) \
+	date_time_wctime( timestamp, string, length )
+
+#else
+character_t *libewf_string_ctime(
+              const time_t *timestamp,
+              character_t *string,
+              size_t length );
+
+#define string_ctime( timestamp, string, length ) \
+	libewf_string_ctime( timestamp, string, length )
+
+#endif
+#else
+#define string_ctime( timestamp, string, length ) \
+	date_time_ctime( timestamp, string, length )
 
 #endif
 

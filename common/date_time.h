@@ -82,24 +82,15 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define date_time_ctime_r( timestamp, string, size ) \
-	ctime_s( string, size, timestamp ) != 0 ? NULL : string
-
 #define date_time_ctime( timestamp, string, size ) \
 	ctime_s( string, size, timestamp ) != 0 ? NULL : string
 
 #elif defined( HAVE_CTIME_R )
 #if defined( HAVE_CTIME_R_SIZE )
-#define date_time_ctime_r( timestamp, string, size ) \
-	ctime_r( timestamp, string, size )
-
 #define date_time_ctime( timestamp, string, size ) \
 	ctime_r( timestamp, string, size )
 
 #else
-#define date_time_ctime_r( timestamp, string, size ) \
-	ctime_r( timestamp, string )
-
 #define date_time_ctime( timestamp, string, size ) \
 	ctime_r( timestamp, string )
 
@@ -141,16 +132,6 @@ struct tm *libewf_date_time_gmtime(
 
 #define date_time_gmtime( timestamp ) \
 	libewf_date_time_gmtime( timestamp )
-
-/* TODO refactor start */
-char *libewf_date_time_ctime2(
-       const time_t *timestamp );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_date_time_wctime2(
-          const time_t *timestamp );
-#endif
-/* TODO refactor end */
 
 #if defined( __cplusplus )
 }

@@ -168,6 +168,8 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	system_character_t time_string[ 32 ];
+
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                     = NULL;
 	int32_t glob_count                  = 0;
@@ -179,7 +181,6 @@ int main( int argc, char * const argv[] )
 	character_t *program                = _CHARACTER_T_STRING( "ewfexport" );
 
 	system_character_t *target_filename = NULL;
-	system_character_t *time_string     = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         system_character_t *error_string    = NULL;
 #endif
@@ -772,20 +773,18 @@ int main( int argc, char * const argv[] )
 		/* Start exporting data
 		 */
 		timestamp_start = time( NULL );
-		time_string     = ewfcommon_ctime(
-		                   &timestamp_start );
 
-		if( time_string != NULL )
+		if( ewfcommon_ctime(
+		     &timestamp_start,
+		     time_string,
+		     32 ) == NULL )
 		{
-			fprintf( stderr, "Export started at: %" PRIs_SYSTEM "\n",
-			 time_string );
-
-			memory_free(
-			 time_string );
+			fprintf( stderr, "Export started.\n" );
 		}
 		else
 		{
-			fprintf( stderr, "Export started.\n" );
+			fprintf( stderr, "Export started at: %" PRIs_SYSTEM "\n",
+			 time_string );
 		}
 		if( callback != NULL )
 		{
@@ -878,22 +877,20 @@ int main( int argc, char * const argv[] )
 			 target_filename );
 		}
 		timestamp_end = time( NULL );
-		time_string   = ewfcommon_ctime(
-		                 &timestamp_end );
 
 		if( count <= -1 )
 		{
-			if( time_string != NULL )
+			if( ewfcommon_ctime(
+			     &timestamp_end,
+			     time_string,
+			     32 ) == NULL )
 			{
-				fprintf( stderr, "Export failed at: %" PRIs_SYSTEM "\n",
-				 time_string );
-
-				memory_free(
-				 time_string );
+				fprintf( stderr, "Export failed.\n" );
 			}
 			else
 			{
-				fprintf( stderr, "Export failed.\n" );
+				fprintf( stderr, "Export failed at: %" PRIs_SYSTEM "\n",
+				 time_string );
 			}
 			if( libewf_close(
 			     ewfcommon_libewf_handle ) != 0 )
@@ -902,17 +899,17 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( time_string != NULL )
+		if( ewfcommon_ctime(
+		     &timestamp_end,
+		     time_string,
+		     32 ) == NULL )
 		{
-			fprintf( stderr, "Export completed at: %" PRIs_SYSTEM "\n",
-			 time_string );
-
-			memory_free(
-			 time_string );
+			fprintf( stderr, "Export completed.\n" );
 		}
 		else
 		{
-			fprintf( stderr, "Export completed.\n" );
+			fprintf( stderr, "Export completed at: %" PRIs_SYSTEM "\n",
+			 time_string );
 		}
 		ewfoutput_process_summary_fprint(
 		 stderr,

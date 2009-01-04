@@ -189,3 +189,71 @@ uint64_t libewf_string_to_uint64(
 	return( value );
 }
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+/* Sets ctime in the string
+ * The string must be at least 32 characters of length
+ * Returns the pointer to the string if successful or NULL on error
+ */
+character_t *libewf_string_ctime(
+              const time_t *timestamp,
+              character_t *string,
+              size_t length )
+{
+	char ctime_string[ 32 ];
+
+	static char *function = "libewf_string_ctime";
+
+	if( timestamp == NULL )
+	{
+		notify_warning_printf( "%s: invalid timestamp.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( string == NULL )
+	{
+		notify_warning_printf( "%s: invalid string.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( length > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid length.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( length < 32 )
+	{
+		notify_warning_printf( "%s: string too small.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( date_time_ctime(
+	     timestamp,
+	     ctime_string,
+	     32 ) == NULL )
+	{
+		notify_warning_printf( "%s: unable to set ctime string.\n",
+		 function );
+
+		return( NULL );
+	}
+	if( string_copy_char_to_wchar(
+	     string,
+	     ctime_string,
+	     32 ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set string.\n",
+		 function );
+
+		return( NULL );
+	}
+	return( string );
+}
+
+#endif
+

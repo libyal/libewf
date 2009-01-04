@@ -281,6 +281,8 @@ int main( int argc, char * const argv[] )
 {
 	struct stat input_file_stat;
 
+	system_character_t time_string[ 32 ];
+
 	system_character_t *filenames[ 1 ]       = { NULL };
 
 	character_t *calculated_md5_hash_string  = NULL;
@@ -297,7 +299,6 @@ int main( int argc, char * const argv[] )
 
 	system_character_t *filename             = NULL;
 	system_character_t *log_filename         = NULL;
-	system_character_t *time_string          = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	system_character_t *error_string         = NULL;
 #endif
@@ -966,20 +967,18 @@ int main( int argc, char * const argv[] )
 		/* Start acquiring data
 		 */
 		timestamp_start = time( NULL );
-		time_string     = ewfcommon_ctime(
-		                   &timestamp_start );
 
-		if( time_string != NULL )
+		if( ewfcommon_ctime(
+		     &timestamp_start,
+		     time_string,
+		     32 ) == NULL )
 		{
-			fprintf( stdout, "Acquiry started at: %" PRIs_SYSTEM "\n",
-			 time_string );
-
-			memory_free(
-			 time_string );
+			fprintf( stdout, "Acquiry started.\n" );
 		}
 		else
 		{
-			fprintf( stdout, "Acquiry started.\n" );
+			fprintf( stdout, "Acquiry started at: %" PRIs_SYSTEM "\n",
+			 time_string );
 		}
 		if( callback != NULL )
 		{
@@ -1037,22 +1036,20 @@ int main( int argc, char * const argv[] )
 	if( ewfcommon_abort == 0 )
 	{
 		timestamp_end = time( NULL );
-		time_string   = ewfcommon_ctime(
-		                 &timestamp_end );
 
 		if( write_count <= -1 )
 		{
-			if( time_string != NULL )
+			if( ewfcommon_ctime(
+			     &timestamp_end,
+			     time_string,
+			     32 ) == NULL )
 			{
-				fprintf( stdout, "Acquiry failed at: %" PRIs_SYSTEM "\n",
-				 time_string );
-
-				memory_free(
-				 time_string );
+				fprintf( stdout, "Acquiry failed.\n" );
 			}
 			else
 			{
-				fprintf( stdout, "Acquiry failed.\n" );
+				fprintf( stdout, "Acquiry failed at: %" PRIs_SYSTEM "\n",
+				 time_string );
 			}
 			if( libewf_close(
 			     ewfcommon_libewf_handle ) != 0 )
@@ -1071,17 +1068,17 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( time_string != NULL )
+		if( ewfcommon_ctime(
+		     &timestamp_end,
+		     time_string,
+		     32 ) == NULL )
 		{
-			fprintf( stdout, "Acquiry completed at: %" PRIs_SYSTEM "\n",
-			 time_string );
-
-			memory_free(
-			 time_string );
+			fprintf( stdout, "Acquiry completed.\n" );
 		}
 		else
 		{
-			fprintf( stdout, "Acquiry completed.\n" );
+			fprintf( stdout, "Acquiry completed at: %" PRIs_SYSTEM "\n",
+			 time_string );
 		}
 		ewfoutput_process_summary_fprint(
 		 stdout,
