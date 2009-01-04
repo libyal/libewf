@@ -521,7 +521,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 #endif
 
 		/* This is to compensate for the crappy >2Gb segment file
-		 * sollution in EnCase 6
+		 * solution in EnCase 6
 		 */
 		if( ( current_offset + chunk_size ) > (uint32_t) INT32_MAX )
 		{

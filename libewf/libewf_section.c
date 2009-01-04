@@ -1534,6 +1534,16 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 			return( -1 );
 		}
+		/* This is to compensate for the crappy >2Gb segment file
+		 * solution in EnCase 6
+		 */
+		if( ( offset32_value + offset_table->size[ offset_table_index + iterator ] ) > (uint32_t) INT32_MAX )
+		{
+			base_offset += offset32_value;
+
+			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround, new base: %" PRIu32 ".\n",
+			 function, base_offset );
+		}
 	}
 	section_write_count = libewf_section_start_write(
 	                       file_descriptor,

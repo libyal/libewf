@@ -1,8 +1,10 @@
 Roadmap:
 * add read/write support for > 2Gb segment file for EnCase 6.7
-  make sure offsets in table remain within 2Gb limit
 * add read/write support for session section
 * create iso2ewf tool
+* raw read/write
+* move md5 calculation out library ?
+
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -135,22 +137,22 @@ TODO
   move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
-* write >2Gb segment files
-  chunk offset must remain below 2Gb in relation to base offset
+* set errno in libewf open to fix
+  "Unable to open EWF file(s) with failure: Success."
 
 * remove libewf_set_media_values
 
 Version: 20070829
 * worked on read support for > 2Gb segment file for EnCase 6.7
+* worked on write support for > 2Gb segment file for EnCase 6.7
 * worked on session section support
+* corrected use of stdout and stderr in ewfverify
 
 Version: 20070828
 * worked on read support for > 2Gb segment file for EnCase 6.7
 * changed off_t to off64_t for Windows >2Gb segment file support
 * worked on write support for > 2Gb segment file for EnCase 6.7
 * corrected use of stdout and stderr in ewfacquire
-* set errno in libewf open to fix
-  "Unable to open EWF file(s) with failure: Success."
 
 Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy

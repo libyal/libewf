@@ -2046,6 +2046,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 {
 	EWF_CHAR *table_section_string = NULL;
 	static char *function          = "libewf_segment_file_write_chunks_correction";
+	off64_t base_offset            = 0;
 	ssize_t total_write_count      = 0;
 	ssize_t write_count            = 0;
 
@@ -2202,13 +2203,18 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 	if( ( internal_handle->ewf_format == EWF_FORMAT_E01 )
 	 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
 	{
+		if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
+		{
+			base_offset = chunks_section_offset;
+		}
 		/* Write table section start
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
-		               0,
+		               base_offset,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
@@ -2242,7 +2248,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		               internal_handle,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
-		               0,
+		               base_offset,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
