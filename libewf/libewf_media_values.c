@@ -28,44 +28,79 @@
 
 #include "ewf_definitions.h"
 
-/* Allocates memory for a new handle media struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the media values
+ * Returns 1 if successful or -1 on error
  */
-libewf_media_values_t *libewf_media_values_alloc(
-                        void )
+int libewf_media_values_initialize(
+     libewf_media_values_t **media_values )
 {
-	libewf_media_values_t *media_values = NULL;
-	static char *function               = "libewf_media_values_alloc";
-
-	media_values = (libewf_media_values_t *) memory_allocate(
-	                                          sizeof( libewf_media_values_t ) );
+	static char *function = "libewf_media_values_initialize";
 
 	if( media_values == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate media values.\n",
+		notify_warning_printf( "%s: invalid media values.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( memory_set(
-	     media_values,
-	     0,
-	     sizeof( libewf_media_values_t ) ) == NULL )
+	if( *media_values == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear media values.\n",
+		*media_values = (libewf_media_values_t *) memory_allocate(
+		                                             sizeof( libewf_media_values_t ) );
+
+		if( *media_values == NULL )
+		{
+			notify_warning_printf( "%s: unable to create media values.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *media_values,
+		     0,
+		     sizeof( libewf_media_values_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear media values.\n",
+			 function );
+
+			memory_free(
+			 *media_values );
+
+			*media_values = NULL;
+
+			return( -1 );
+		}
+		( *media_values )->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
+		( *media_values )->sectors_per_chunk = 64;
+		( *media_values )->bytes_per_sector  = 512;
+		( *media_values )->media_type        = 0;
+		( *media_values )->media_flags       = 0x01;
+	}
+	return( 1 );
+}
+
+/* Frees the media values including elements
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_media_values_free(
+     libewf_media_values_t **media_values )
+{
+        static char *function = "libewf_media_values_free";
+
+	if( media_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid media values.\n",
 		 function );
 
-		memory_free(
-		 media_values );
-
-		return( NULL );
+		return( -1 );
 	}
-	media_values->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
-	media_values->sectors_per_chunk = 64;
-	media_values->bytes_per_sector  = 512;
-	media_values->media_type        = 0;
-	media_values->media_flags       = 0x01;
+	if( *media_values != NULL )
+	{
+		memory_free(
+		 *media_values );
 
-	return( media_values );
+		*media_values = NULL;
+	}
+	return( 1 );
 }
 

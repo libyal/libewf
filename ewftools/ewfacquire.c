@@ -636,18 +636,16 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_FORMAT_TYPES_AMOUNT,
 		              EWFINPUT_FORMAT_TYPES_DEFAULT );
 
-		libewf_format = ewfinput_determine_libewf_format(
-		                 user_input );
-
-		memory_free(
-		 user_input );
-
-		if( libewf_format == 0 )
+		if( ewfinput_determine_libewf_format(
+		     user_input,
+		     &libewf_format ) != 1 )
 		{
 			fprintf( stderr, "Unsupported EWF file format type defaulting to: encase5.\n" );
 
 			libewf_format = LIBEWF_FORMAT_ENCASE5;
 		}
+		memory_free(
+		 user_input );
 
 		/* Size and offset of data to acquire
 		 */

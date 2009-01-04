@@ -164,9 +164,8 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		return( NULL );
 	}
-	internal_handle->media_values = libewf_media_values_alloc();
-
-	if( internal_handle->media_values == NULL )
+	if( libewf_media_values_initialize(
+	     &( internal_handle->media_values ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create media values.\n",
 		 function );
@@ -193,7 +192,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 function );
 
 		libewf_media_values_free(
-		 internal_handle->media_values );
+		 &( internal_handle->media_values ) );
 		libewf_chunk_cache_free(
 		 internal_handle->chunk_cache );
 		libewf_offset_table_free(
@@ -218,7 +217,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		libewf_header_sections_free(
 		 &( internal_handle->header_sections ) );
 		libewf_media_values_free(
-		 internal_handle->media_values );
+		 &( internal_handle->media_values ) );
 		libewf_chunk_cache_free(
 		 internal_handle->chunk_cache );
 		libewf_offset_table_free(
@@ -246,7 +245,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		libewf_header_sections_free(
 		 &( internal_handle->header_sections ) );
 		libewf_media_values_free(
-		 internal_handle->media_values );
+		 &( internal_handle->media_values ) );
 		libewf_chunk_cache_free(
 		 internal_handle->chunk_cache );
 		libewf_offset_table_free(
@@ -276,7 +275,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		libewf_header_sections_free(
 		 &( internal_handle->header_sections ) );
 		libewf_media_values_free(
-		 internal_handle->media_values );
+		 &( internal_handle->media_values ) );
 		libewf_chunk_cache_free(
 		 internal_handle->chunk_cache );
 		libewf_offset_table_free(
@@ -294,9 +293,8 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
-		internal_handle->read = libewf_internal_handle_read_alloc();
-
-		if( internal_handle->read == NULL )
+		if( libewf_internal_handle_subhandle_read_initialize(
+		     &( internal_handle->read ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create subhandle read.\n",
 			 function );
@@ -310,7 +308,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			libewf_header_sections_free(
 			 &( internal_handle->header_sections ) );
 			libewf_media_values_free(
-			 internal_handle->media_values );
+			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
 			 internal_handle->chunk_cache );
 			libewf_offset_table_free(
@@ -329,18 +327,14 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 	}
 	if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
-		internal_handle->write = libewf_internal_handle_write_alloc();
-
-		if( internal_handle->write == NULL )
+		if( libewf_internal_handle_subhandle_write_initialize(
+		     &( internal_handle->write ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create subhandle write.\n",
 			 function );
 
-			if( internal_handle->read != NULL )
-			{
-				libewf_internal_handle_read_free(
-				 internal_handle->read );
-			}
+			libewf_internal_handle_subhandle_read_free(
+			 &( internal_handle->read ) );
 			libewf_sector_table_free(
 			 internal_handle->acquiry_errors );
 			libewf_sector_table_free(
@@ -350,7 +344,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			libewf_header_sections_free(
 			 &( internal_handle->header_sections ) );
 			libewf_media_values_free(
-			 internal_handle->media_values );
+			 &( internal_handle->media_values ) );
 			libewf_chunk_cache_free(
 			 internal_handle->chunk_cache );
 			libewf_offset_table_free(
@@ -384,20 +378,23 @@ void libewf_internal_handle_free(
 
 		return;
 	}
-	if( internal_handle->media_values != NULL )
+	if( libewf_media_values_free(
+	     &( internal_handle->media_values ) ) != 1 )
 	{
-		libewf_media_values_free(
-		 internal_handle->media_values );
+		notify_warning_printf( "%s: unable to free media values.\n",
+		 function );
 	}
-	if( internal_handle->read != NULL )
+	if( libewf_internal_handle_subhandle_read_free(
+	     &( internal_handle->read ) ) != 1 )
 	{
-		libewf_internal_handle_read_free(
-		 internal_handle->read );
+		notify_warning_printf( "%s: unable to free subhandle read.\n",
+		 function );
 	}
-	if( internal_handle->write != NULL )
+	if( libewf_internal_handle_subhandle_write_free(
+	     &( internal_handle->write ) ) != 1 )
 	{
-		libewf_internal_handle_write_free(
-		 internal_handle->write );
+		notify_warning_printf( "%s: unable to free subhandle write.\n",
+		 function );
 	}
 	if( internal_handle->segment_table != NULL )
 	{
@@ -460,135 +457,181 @@ void libewf_internal_handle_free(
 	 internal_handle );
 }
 
-/* Allocates memory for a new handle read struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the subhandle read
+ * Returns 1 if successful or -1 on error
  */
-libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
-                                void )
+int libewf_internal_handle_subhandle_read_initialize(
+     libewf_internal_handle_read_t **subhandle_read )
 {
-	libewf_internal_handle_read_t *handle_read = NULL;
-	static char *function                      = "libewf_internal_handle_read_alloc";
+	static char *function = "libewf_internal_handle_subhandle_read_initialize";
 
-	handle_read = (libewf_internal_handle_read_t *) memory_allocate(
-	                                                 sizeof( libewf_internal_handle_read_t ) );
-
-	if( handle_read == NULL )
+	if( subhandle_read == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate handle read.\n",
+		notify_warning_printf( "%s: invalid subhandle read.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	handle_read->crc_errors = libewf_sector_table_alloc( 0 );
-
-	if( handle_read->crc_errors == NULL )
+	if( *subhandle_read == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate crc errors.\n",
-		 function );
+		*subhandle_read = (libewf_internal_handle_read_t *) memory_allocate(
+		                                                     sizeof( libewf_internal_handle_read_t ) );
 
-		memory_free(
-		 handle_read );
+		if( *subhandle_read == NULL )
+		{
+			notify_warning_printf( "%s: unable to create subhandle read.\n",
+			 function );
 
-		return( NULL );
+			return( -1 );
+		}
+		if( memory_set(
+		     *subhandle_read,
+		     0,
+		     sizeof( libewf_internal_handle_read_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear subhandle read.\n",
+			 function );
+
+			memory_free(
+			 *subhandle_read );
+
+			*subhandle_read = NULL;
+
+			return( -1 );
+		}
+		( *subhandle_read )->crc_errors = libewf_sector_table_alloc( 0 );
+
+		if( ( *subhandle_read )->crc_errors == NULL )
+		{
+			notify_warning_printf( "%s: unable to create crc errors.\n",
+			 function );
+
+			memory_free(
+			 *subhandle_read );
+
+			*subhandle_read = NULL;
+
+			return( -1 );
+		}
+		( *subhandle_read )->wipe_on_error = 1;
 	}
-	handle_read->wipe_on_error = 1;
-
-	return( handle_read );
+	return( 1 );
 }
 
-/* Frees memory of a handle read struct including elements
+/* Frees the subhandle read including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_internal_handle_read_free(
-      libewf_internal_handle_read_t *handle_read )
+int libewf_internal_handle_subhandle_read_free(
+     libewf_internal_handle_read_t **subhandle_read )
 {
-	static char *function = "libewf_internal_handle_read_free";
+	static char *function = "libewf_internal_subhandle_read_free";
 
-	if( handle_read == NULL )
+	if( subhandle_read == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle read.\n",
+		notify_warning_printf( "%s: invalid subhandle read.\n",
 		 function );
 
-		return;
+		return( 1 );
 	}
-	if( handle_read->crc_errors != NULL )
+	if( *subhandle_read != NULL )
 	{
-		libewf_sector_table_free( handle_read->crc_errors );
+		if( ( *subhandle_read )->crc_errors != NULL )
+		{
+			libewf_sector_table_free(
+			 ( *subhandle_read )->crc_errors );
+		}
+		memory_free(
+		 *subhandle_read );
+
+		*subhandle_read = NULL;
 	}
-	memory_free(
-	 handle_read );
+	return( 1 );
 }
 
-/* Allocates memory for a new handle write struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the subhandle write
+ * Returns 1 if successful or -1 on error
  */
-libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
+int libewf_internal_handle_subhandle_write_initialize(
+     libewf_internal_handle_write_t **subhandle_write )
 {
-	libewf_internal_handle_write_t *handle_write = NULL;
-	static char *function                        = "libewf_internal_handle_write_alloc";
+	static char *function = "libewf_internal_handle_subhandle_write_alloc";
 
-	handle_write = (libewf_internal_handle_write_t *) memory_allocate(
-	                                                   sizeof( libewf_internal_handle_write_t ) );
-
-	if( handle_write == NULL )
+	if( subhandle_write == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate handle write.\n",
+		notify_warning_printf( "%s: invalid subhandle write.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	handle_write->data_section                     = NULL;
-	handle_write->table_offsets                    = NULL;
-	handle_write->amount_of_table_offsets          = 0;
-	handle_write->input_write_count                = 0;
-	handle_write->write_count                      = 0;
-	handle_write->maximum_segment_file_size        = INT32_MAX;
-	handle_write->segment_file_size                = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-	handle_write->remaining_segment_file_size      = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-	handle_write->delta_segment_file_size          = INT64_MAX;
-	handle_write->maximum_amount_of_segments       = 0;
-	handle_write->chunks_section_write_count       = 0;
-	handle_write->amount_of_chunks                 = 0;
-	handle_write->chunks_per_segment               = 0;
-	handle_write->chunks_per_chunks_section        = 0;
-	handle_write->segment_amount_of_chunks         = 0;
-	handle_write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
-	handle_write->section_amount_of_chunks         = 0;
-	handle_write->chunks_section_offset            = 0;
-	handle_write->chunks_section_number            = 0;
-	handle_write->unrestrict_offset_amount         = 0;
-	handle_write->values_initialized               = 0;
-	handle_write->create_chunks_section            = 0;
-	handle_write->write_finalized                  = 0;
+	if( *subhandle_write == NULL )
+	{
+		*subhandle_write = (libewf_internal_handle_write_t *) memory_allocate(
+		                                                       sizeof( libewf_internal_handle_write_t ) );
 
-	return( handle_write );
+		if( subhandle_write == NULL )
+		{
+			notify_warning_printf( "%s: unable to create subhandle write.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *subhandle_write,
+		     0,
+		     sizeof( libewf_internal_handle_write_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear subhandle write.\n",
+			 function );
+
+			memory_free(
+			 *subhandle_write );
+
+			*subhandle_write = NULL;
+
+			return( -1 );
+		}
+		( *subhandle_write )->maximum_segment_file_size        = INT32_MAX;
+		( *subhandle_write )->segment_file_size                = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
+		( *subhandle_write )->remaining_segment_file_size      = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
+		( *subhandle_write )->delta_segment_file_size          = INT64_MAX;
+		( *subhandle_write )->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
+	}
+	return( 1 );
 }
 
-/* Frees memory of a handle write struct including elements
+/* Frees the subhandle write including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_internal_handle_write_free(
-      libewf_internal_handle_write_t *handle_write )
+int libewf_internal_handle_subhandle_write_free(
+     libewf_internal_handle_write_t **subhandle_write )
 {
-	static char *function = "libewf_internal_handle_write_free";
+	static char *function = "libewf_internal_handle_subhandle_write_free";
 
-	if( handle_write == NULL )
+	if( subhandle_write == NULL )
 	{
-		notify_warning_printf( "%s: invalid handle write.\n",
+		notify_warning_printf( "%s: invalid subhandle write.\n",
 		 function );
 
-		return;
+		return( 1 );
 	}
-	if( handle_write->data_section != NULL )
+	if( *subhandle_write != NULL )
 	{
+		if( ( *subhandle_write )->data_section != NULL )
+		{
+			memory_free(
+			 ( *subhandle_write )->data_section );
+		}
+		if( ( *subhandle_write )->table_offsets != NULL )
+		{
+			memory_free(
+			 ( *subhandle_write )->table_offsets );
+		}
 		memory_free(
-		 handle_write->data_section );
+		 *subhandle_write );
+
+		*subhandle_write = NULL;
 	}
-	if( handle_write->table_offsets != NULL )
-	{
-		memory_free(
-		 handle_write->table_offsets );
-	}
-	memory_free(
-	 handle_write );
+	return( 1 );
 }
 
 /* Retrieves the maximum amount of supported segment files to write

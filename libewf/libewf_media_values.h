@@ -78,11 +78,11 @@ struct libewf_media_values
         uint8_t guid[ 16 ];
 };
 
-libewf_media_values_t *libewf_media_values_alloc(
-                        void );
+int libewf_media_values_initialize(
+     libewf_media_values_t **media_values );
 
-#define libewf_media_values_free( media_values ) \
-	memory_free( media_values )
+int libewf_media_values_free(
+     libewf_media_values_t **media_values );
 
 #if defined( __cplusplus )
 }

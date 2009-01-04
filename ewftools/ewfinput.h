@@ -62,8 +62,9 @@ extern character_t *ewfinput_volume_types[ 2 ];
 extern character_t *ewfinput_sector_per_block_sizes[ 10 ];
 extern character_t *ewfinput_yes_no[ 2 ];
 
-uint8_t ewfinput_determine_libewf_format(
-         const character_t *argument );
+int ewfinput_determine_libewf_format(
+     const character_t *argument,
+     uint8_t *format );
 
 uint8_t ewfinput_determine_libewf_format_system_character(
          const system_character_t *argument );
@@ -85,6 +86,10 @@ int8_t ewfinput_determine_media_type(
 
 int8_t ewfinput_determine_volume_type(
         const character_t *argument );
+
+int ewfinput_determine_header_codepage_system_character(
+     const system_character_t *argument,
+     int *header_codepage );
 
 int8_t ewfinput_determine_yes_no(
         const character_t *argument );

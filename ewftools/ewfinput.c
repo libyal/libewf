@@ -101,89 +101,101 @@ character_t *ewfinput_yes_no[ 2 ] = \
    _CHARACTER_T_STRING( "no" ) };
 
 /* Determines the sectors per chunk value from an argument string
- * Returns the sectors per chunk value, or 0 on error
+ * Returns 1 if successful or -1 on error
  */
-uint8_t ewfinput_determine_libewf_format(
-         const character_t *argument )
+int ewfinput_determine_libewf_format(
+     const character_t *argument,
+     uint8_t *format )
 {
 	static char *function = "ewfinput_determine_libewf_format";
+	int result            = -1;
 
 	if( argument == NULL )
 	{
 		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "smart" ),
 	          3 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_SMART );
+		*format = LIBEWF_FORMAT_SMART;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "ftk" ),
 	          3 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_FTK );
+		*format = LIBEWF_FORMAT_FTK;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase1" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE1 );
+		*format = LIBEWF_FORMAT_ENCASE1;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase2" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE2 );
+		*format = LIBEWF_FORMAT_ENCASE2;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase3" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE3 );
+		*format = LIBEWF_FORMAT_ENCASE3;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase4" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE4 );
+		*format = LIBEWF_FORMAT_ENCASE4;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase5" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE5 );
+		*format = LIBEWF_FORMAT_ENCASE5;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "encase6" ),
 	          7 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_ENCASE6 );
+		*format = LIBEWF_FORMAT_ENCASE6;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "linen5" ),
 	          6 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_LINEN5 );
+		*format = LIBEWF_FORMAT_LINEN5;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "linen6" ),
 	          6 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_LINEN6 );
+		*format = LIBEWF_FORMAT_LINEN6;
+		result  = 1;
 	}
 	/* This check must before the check for "ewf"
 	 */
@@ -192,16 +204,18 @@ uint8_t ewfinput_determine_libewf_format(
 	          _CHARACTER_T_STRING( "ewfx" ),
 	          4 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_EWFX );
+		*format = LIBEWF_FORMAT_EWFX;
+		result  = 1;
 	}
 	else if( string_compare(
 	          argument,
 	          _CHARACTER_T_STRING( "ewf" ),
 	          3 ) == 0 )
 	{
-		return( LIBEWF_FORMAT_EWF );
+		*format = LIBEWF_FORMAT_EWF;
+		result  = 1;
 	}
-	return( 0 );
+	return( result );
 }
 
 /* Determines the sectors per chunk value from an argument string
@@ -633,6 +647,113 @@ int8_t ewfinput_determine_volume_type(
 		return( LIBEWF_VOLUME_TYPE_PHYSICAL );
 	}
 	return( -1 );
+}
+
+/* Determines the codepage from an argument string
+ * Returns 1 if successful or -1 on error
+ */
+int ewfinput_determine_header_codepage_system_character(
+     const system_character_t *argument,
+     int *header_codepage )
+{
+	static char *function = "ewfinput_determine_header_codepage_system_character";
+	int result            = -1;
+
+	if( argument == NULL )
+	{
+		notify_warning_printf( "%s: invalid argument string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( header_codepage == NULL )
+	{
+		notify_warning_printf( "%s: invalid byte stream codepage.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_compare(
+	     argument,
+	     _SYSTEM_CHARACTER_T_STRING( "ascii" ),
+	          4 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_ASCII;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1250" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1250;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1251" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1251;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1252" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1252;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1253" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1253;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1254" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1254;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1255" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1255;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1256" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1256;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1257" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1257;
+		result           = 1;
+	}
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "windows-1258" ),
+	          12 ) == 0 )
+	{
+		*header_codepage = LIBEWF_CODEPAGE_WINDOWS_1258;
+		result           = 1;
+	}
+	return( result );
 }
 
 /* Determines the yes or no value from an argument string

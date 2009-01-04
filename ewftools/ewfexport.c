@@ -327,6 +327,8 @@ int main( int argc, char * const argv[] )
 					if( libewf_format == 0 )
 					{
 						fprintf( stderr, "Unsupported file format type defaulting to: raw.\n" );
+
+						output_raw = 1;
 					}
 					else
 					{
@@ -572,23 +574,13 @@ int main( int argc, char * const argv[] )
 			}
 			else
 			{
-				libewf_format = ewfinput_determine_libewf_format(
-				                 user_input );
-
-				if( libewf_format == 0 )
+				if( ewfinput_determine_libewf_format(
+				     user_input,
+				     &libewf_format ) != 1 )
 				{
-					fprintf( stderr, "Unsupported file format.\n" );
+					fprintf( stderr, "Unsupported file format defaulting to: raw.\n" );
 
-					memory_free(
-					 user_input );
-
-					libewf_close(
-					 ewfcommon_libewf_handle );
-
-					memory_free(
-					 target_filename );
-
-					exit( EXIT_FAILURE );
+					output_raw = 1;
 				}
 				else
 				{

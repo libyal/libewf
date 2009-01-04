@@ -113,7 +113,8 @@ Code clean up
 Next release(s):
 
 * implement libuca
-  - handle codepage
+  - handle codepage in ewftools use -p option
+  - add '-p list' option? to list codepages
 
 * rewrite _alloc() functions into _initialize() functions
   with corresponding _free() functions
