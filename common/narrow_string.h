@@ -64,7 +64,7 @@ extern "C" {
 
 #elif defined( HAVE_MEMCPY )
 #define narrow_string_copy( destination, source, size ) \
-	(character_t *) memcpy( (void *) destination, (void *) source, size )
+	(char *) memcpy( (void *) destination, (void *) source, size )
 
 #elif defined( HAVE_STRCPY )
 #define narrow_string_copy( destination, source, size ) \
@@ -79,7 +79,7 @@ extern "C" {
 
 #elif defined( HAVE_MEMCHR )
 #define narrow_string_search( string, character, size ) \
-	(character_t *) memchr( (void *) string, (int) character, size )
+	(char *) memchr( (void *) string, (int) character, size )
 #endif
 
 /* String reverse search
@@ -90,7 +90,7 @@ extern "C" {
 
 #elif defined( HAVE_MEMRCHR ) && ( HAVE_DECL_MEMRCHR_ == 1 )
 #define narrow_string_search_reverse( string, character, size ) \
-	(character_t *) memrchr( (void *) string, (int) character, size )
+	(char *) memrchr( (void *) string, (int) character, size )
 #endif
 
 /* String formatted print (snprinf)

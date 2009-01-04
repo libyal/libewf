@@ -546,7 +546,7 @@ int libewf_values_table_set_value(
 		}
 		values_table->identifiers[ index ] = string_duplicate(
 		                                      identifier,
-		                                      string_length );
+		                                      string_length + 1 );
 
 		if( values_table->identifiers[ index ] == NULL )
 		{
@@ -582,7 +582,7 @@ int libewf_values_table_set_value(
 	}
 	values_table->values[ index ] = string_duplicate(
 	                                 value,
-	                                 length );
+	                                 length + 1 );
 
 	if( values_table->values[ index ] == NULL )
 	{

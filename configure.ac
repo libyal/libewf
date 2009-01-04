@@ -885,8 +885,7 @@ dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 dnl Set additional compiler flags
-dnl CFLAGS="$CFLAGS -Wall";
-CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
+CFLAGS="$CFLAGS -Wall";
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])

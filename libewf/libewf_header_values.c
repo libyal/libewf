@@ -50,80 +50,80 @@ int libewf_header_values_initialize(
 	}
 	header_values->identifiers[ 0 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "case_number" ),
-	                                   11 );
+	                                   12 );
 
 	header_values->identifiers[ 1 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "description" ),
-	                                   11 );
+	                                   12 );
 
 	header_values->identifiers[ 2 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "examiner_name" ),
-	                                   13 );
+	                                   14 );
 
 	header_values->identifiers[ 3 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "evidence_number" ),
-	                                   15 );
+	                                   16 );
 
 	header_values->identifiers[ 4 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "notes" ),
-	                                   5 );
+	                                   6 );
 
 	header_values->identifiers[ 5 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "acquiry_date" ),
-	                                   12 );
+	                                   13 );
 
 	header_values->identifiers[ 6 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "system_date" ),
-	                                   11 );
+	                                   12 );
 
 	header_values->identifiers[ 7 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "acquiry_operating_system" ),
-	                                   24 );
+	                                   25 );
 
 	header_values->identifiers[ 8 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "acquiry_software_version" ),
-	                                   24 );
+	                                   25 );
 
 	header_values->identifiers[ 9 ] = string_duplicate(
 	                                   _CHARACTER_T_STRING( "password" ),
-	                                   8 );
+	                                   9 );
 
 	header_values->identifiers[ 10 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "compression_type" ),
-	                                    16 );
+	                                    17 );
 
 	header_values->identifiers[ 11 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "model" ),
-	                                    5 );
+	                                    6 );
 
 	header_values->identifiers[ 12 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "serial_number" ),
-	                                    13 );
+	                                    14 );
 
 	header_values->identifiers[ 13 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "unknown_pid" ),
-	                                    11 );
+	                                    12 );
 
 	header_values->identifiers[ 14 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "unknown_dc" ),
-	                                    10 );
+	                                    11 );
 
 	header_values->identifiers[ 15 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "unknown_ext" ),
-	                                    11 );
+	                                    12 );
 
 	return( 1 );
 }
 
 /* Convert a timestamp into a date string
- * The string must be at least 32 characters of length
+ * The string must be at least 32 characters of size this includes the end of string character
  * Returns 1 if successful or -1 on error
  */
 int libewf_convert_timestamp(
      time_t timestamp, 
      uint8_t date_format,
      character_t *date_string,
-     size_t date_string_length )
+     size_t date_string_size )
 {
 	struct tm *time_elements = NULL;
 	character_t *newline     = NULL;
@@ -137,14 +137,14 @@ int libewf_convert_timestamp(
 
 		return( -1 );
 	}
-	if( date_string_length > (size_t) SSIZE_MAX )
+	if( date_string_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid date string length.\n",
+		notify_warning_printf( "%s: invalid date string size.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( date_string_length < 32 )
+	if( date_string_size < 32 )
 	{
 		notify_warning_printf( "%s: date string too small.\n",
 		 function );
@@ -166,7 +166,7 @@ int libewf_convert_timestamp(
 		if( string_ctime(
 		     &timestamp,
 		     date_string,
-		     date_string_length ) == NULL )
+		     date_string_size ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to set ctime string.\n",
 			 function );
@@ -176,7 +176,7 @@ int libewf_convert_timestamp(
 		newline = string_search(
 		           date_string,
 		           (character_t) '\n',
-		           date_string_length );
+		           date_string_size );
 
 		if( newline != NULL )
 		{
@@ -199,7 +199,7 @@ int libewf_convert_timestamp(
 		{
 			print_count = string_snprintf(
 			               date_string,
-			               date_string_length,
+			               date_string_size,
 			               _CHARACTER_T_STRING( "%02d/%02d/%04d %02d:%02d:%02d" ),
 			               ( time_elements->tm_mon + 1 ),
 			               time_elements->tm_mday,
@@ -212,7 +212,7 @@ int libewf_convert_timestamp(
 		{
 			print_count = string_snprintf(
 			               date_string,
-			               date_string_length,
+			               date_string_size,
 			               _CHARACTER_T_STRING( "%02d/%02d/%04d %02d:%02d:%02d" ),
 			               time_elements->tm_mday,
 			               ( time_elements->tm_mon + 1 ),
@@ -225,7 +225,7 @@ int libewf_convert_timestamp(
 		{
 			print_count = string_snprintf(
 			               date_string,
-			               date_string_length,
+			               date_string_size,
 			               _CHARACTER_T_STRING( "%04d-%02d-%02dT%02d:%02d:%02d" ),
 			               ( time_elements->tm_year + 1900 ),
 			               ( time_elements->tm_mon + 1 ),
@@ -249,13 +249,13 @@ int libewf_convert_timestamp(
 
 		/* Make sure the string is terminated
 		 */
-		date_string[ date_string_length - 1 ] = (character_t) '\0';
+		date_string[ date_string_size - 1 ] = (character_t) '\0';
 	}
 	return( 1 );
 }
 
 /* Convert a header value into a date string
- * Sets date string and date string length
+ * Sets date string and date string size
  * Returns 1 if successful or -1 on error
  */
 int libewf_convert_date_header_value(
@@ -267,10 +267,10 @@ int libewf_convert_date_header_value(
 {
 	struct tm time_elements;
 
-	character_t **date_elements = NULL;
-	static char *function       = "libewf_convert_date_header_value";
-	time_t timestamp            = 0;
-	uint32_t date_element_count = 0;
+	character_t **date_elements    = NULL;
+	static char *function          = "libewf_convert_date_header_value";
+	time_t timestamp               = 0;
+	size_t amount_of_date_elements = 0;
 
 	if( header_value == NULL )
 	{
@@ -289,27 +289,26 @@ int libewf_convert_date_header_value(
 
 		return( -1 );
 	}
-	date_elements = libewf_string_split(
-			 header_value,
-			 header_value_length,
-			 (character_t) ' ',
-			 &date_element_count );
-
-	if( date_elements == NULL )
+	if( libewf_string_split(
+	     header_value,
+	     header_value_length,
+	     (character_t) ' ',
+	     &date_elements,
+	     &amount_of_date_elements ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to split date elements in header value.\n",
+		notify_warning_printf( "%s: unable to split header value into date elements.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( date_element_count != 6 )
+	if( amount_of_date_elements != 6 )
 	{
 		notify_warning_printf( "%s: unsupported amount of date elements in header value.\n",
 		 function );
 
 		libewf_string_split_values_free(
 		 date_elements,
-		 date_element_count );
+		 amount_of_date_elements );
 
 		return( -1 );
 	}
@@ -387,10 +386,15 @@ int libewf_convert_date_header_value(
 	timestamp = date_time_mktime(
 	             &time_elements );
 
-	libewf_string_split_values_free(
-	 date_elements,
-	 date_element_count );
+	if( libewf_string_split_values_free(
+	     date_elements,
+	     amount_of_date_elements ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free split date elements.\n",
+		 function );
 
+		return( -1 );
+	}
 	if( timestamp == (time_t) -1 )
 	{
 		notify_warning_printf( "%s: unable to create timestamp.\n",
@@ -783,10 +787,10 @@ int libewf_header_values_parse_header_string(
 	size_t type_string_length  = 0;
 	size_t value_string_length = 0;
 	size_t date_string_length  = 0;
-	uint32_t line_count        = 0;
-	uint32_t type_count        = 0;
-	uint32_t value_count       = 0;
-	uint32_t iterator          = 0;
+	size_t amount_of_lines     = 0;
+	size_t amount_of_types     = 0;
+	size_t amount_of_values    = 0;
+	size_t iterator            = 0;
 	int result                 = 0;
 
 	if( header_values == NULL )
@@ -803,62 +807,71 @@ int libewf_header_values_parse_header_string(
 
 		return( -1 );
 	}
-	lines = libewf_string_split(
-	         header_string,
-	         length,
-	         (character_t) '\n',
-	         &line_count );
-
-	if( lines == NULL )
+	if( libewf_string_split(
+	     header_string,
+	     length,
+	     (character_t) '\n',
+	     &lines,
+	     &amount_of_lines ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to split lines in header string.\n",
+		notify_warning_printf( "%s: unable to split header string into lines.\n",
 		 function );
 
 		return( -1 );
 	}
-	types = libewf_string_split(
-	         lines[ 2 ],
-	         string_length(
-	          lines[ 2 ] ),
-	         (character_t) '\t',
-	         &type_count );
-
-	if( types == NULL )
+	if( libewf_string_split(
+	     lines[ 2 ],
+	     string_length(
+	     lines[ 2 ] ),
+	     (character_t) '\t',
+	     &types,
+	     &amount_of_types ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to split types in header string.\n",
+		notify_warning_printf( "%s: unable to split header string into types.\n",
 		 function );
 
 		libewf_string_split_values_free(
 		 lines,
-		 line_count );
+		 amount_of_lines );
 
 		return( -1 );
 	}
-	values = libewf_string_split(
-	          lines[ 3 ],
-	          string_length(
-	           lines[ 3 ] ),
-	          (character_t) '\t',
-	          &value_count );
-
-	if( values == NULL )
+	if(libewf_string_split(
+	    lines[ 3 ],
+	    string_length(
+	    lines[ 3 ] ),
+	    (character_t) '\t',
+	    &values,
+	    &amount_of_values ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to split values in header string.\n",
+		notify_warning_printf( "%s: unable to split header string into values.\n",
 		 function );
 
 		libewf_string_split_values_free(
 		 lines,
-		 line_count );
+		 amount_of_lines );
 		libewf_string_split_values_free(
 		 types,
-		 type_count );
+		 amount_of_types );
 
 		return( -1 );
 	}
-	libewf_string_split_values_free(
-	 lines,
-	 line_count );
+	if( libewf_string_split_values_free(
+	     lines,
+	     amount_of_lines ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free split lines.\n",
+		 function );
 
+		libewf_string_split_values_free(
+		 types,
+		 amount_of_types );
+		libewf_string_split_values_free(
+		 values,
+		 amount_of_values );
+
+		return( -1 );
+	}
 	*header_values = libewf_values_table_alloc(
 	                  LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
@@ -869,10 +882,10 @@ int libewf_header_values_parse_header_string(
 
 		libewf_string_split_values_free(
 		 types,
-		 type_count );
+		 amount_of_types );
 		libewf_string_split_values_free(
 		 values,
-		 value_count );
+		 amount_of_values );
 
 		return( -1 );
 	}
@@ -884,14 +897,14 @@ int libewf_header_values_parse_header_string(
 
 		libewf_string_split_values_free(
 		 types,
-		 type_count );
+		 amount_of_types );
 		libewf_string_split_values_free(
 		 values,
-		 value_count );
+		 amount_of_values );
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < type_count; iterator++ )
+	for( iterator = 0; iterator < amount_of_types; iterator++ )
 	{
 		if( ( values[ iterator ] == NULL )
 		 || ( values[ iterator ] == (character_t *) _CHARACTER_T_STRING( "" ) ) )
@@ -1273,21 +1286,36 @@ int libewf_header_values_parse_header_string(
 
 			libewf_string_split_values_free(
 			 types,
-			 type_count );
+			 amount_of_types );
 			libewf_string_split_values_free(
 			 values,
-			 value_count );
+			 amount_of_values );
 
 			return( -1 );
 		}
 	}
-	libewf_string_split_values_free(
-	 types,
-	 type_count );
-	libewf_string_split_values_free(
-	 values,
-	 value_count );
+	if( libewf_string_split_values_free(
+	     types,
+	     amount_of_types ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free split types.\n",
+		 function );
 
+		libewf_string_split_values_free(
+		 values,
+		 amount_of_values );
+
+		return( -1 );
+	}
+	if( libewf_string_split_values_free(
+	     values,
+	     amount_of_values ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free split values.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 
@@ -4153,10 +4181,10 @@ int libewf_convert_date_xheader_value(
 {
 	struct tm time_elements;
 
-	character_t **date_elements = NULL;
-	static char *function         = "libewf_convert_date_xheader_value";
-	time_t timestamp              = 0;
-	uint32_t date_element_count   = 0;
+	character_t **date_elements  = NULL;
+	static char *function          = "libewf_convert_date_xheader_value";
+	time_t timestamp               = 0;
+	size_t amount_of_date_elements = 0;
 
 	if( header_value == NULL )
 	{
@@ -4200,7 +4228,7 @@ int libewf_convert_date_xheader_value(
 	{
 		*date_string = string_duplicate(
 		                header_value,
-		                header_value_length );
+		                header_value_length + 1 );
 
 		if( *date_string == NULL )
 		{
@@ -4213,27 +4241,26 @@ int libewf_convert_date_xheader_value(
 	}
 	else
 	{
-		date_elements = libewf_string_split(
-				 header_value,
-				 header_value_length,
-				 (character_t) ' ',
-				 &date_element_count );
-
-		if( date_elements == NULL )
+		if( libewf_string_split(
+		     header_value,
+		     header_value_length,
+		     (character_t) ' ',
+		     &date_elements,
+		     &amount_of_date_elements ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to split date elements in header value.\n",
+			notify_warning_printf( "%s: unable to split header value into date elements.\n",
 			 function );
 
 			return( -1 );
 		}
-		if( date_element_count != 6 )
+		if( amount_of_date_elements != 6 )
 		{
 			notify_warning_printf( "%s: unsupported amount of date elements in header value.\n",
 			 function );
 
 			libewf_string_split_values_free(
 			 date_elements,
-			 date_element_count );
+			 amount_of_date_elements );
 
 			return( -1 );
 		}
@@ -4366,10 +4393,15 @@ int libewf_convert_date_xheader_value(
 		timestamp = date_time_mktime(
 		             &time_elements );
 
-		libewf_string_split_values_free(
-		 date_elements,
-		 date_element_count );
+		if( libewf_string_split_values_free(
+		     date_elements,
+		     amount_of_date_elements ) != 1 )
+		{
+			notify_warning_printf( "%s: unable to free split date elements.\n",
+			 function );
 
+			return( -1 );
+		}
 		if( timestamp == (time_t) -1 )
 		{
 			notify_warning_printf( "%s: unable to create timestamp.\n",
@@ -4509,7 +4541,7 @@ int libewf_header_values_parse_header_string_xml(
 	static char *function        = "libewf_header_values_parse_header_string_xml";
 	size_t string_length         = 0;
 	size_t date_string_length    = 0;
-	uint32_t line_count          = 0;
+	size_t amount_of_lines       = 0;
 	uint32_t iterator            = 0;
 
 	if( header_values == NULL )
@@ -4539,15 +4571,14 @@ int libewf_header_values_parse_header_string_xml(
 			return( -1 );
 		}
 	}
-	lines = libewf_string_split(
-	         header_string_xml,
-	         length,
-	         (character_t) '\n',
-	         &line_count );
-
-	if( lines == NULL )
+	if( libewf_string_split(
+	     header_string_xml,
+	     length,
+	     (character_t) '\n',
+	     &lines,
+	     &amount_of_lines ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to split lines in header string.\n",
+		notify_warning_printf( "%s: unable to split header string into lines.\n",
 		 function );
 
 		return( -1 );
@@ -4560,11 +4591,11 @@ int libewf_header_values_parse_header_string_xml(
 
 		libewf_string_split_values_free(
 		 lines,
-		 line_count );
+		 amount_of_lines );
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < line_count; iterator++ )
+	for( iterator = 0; iterator < amount_of_lines; iterator++ )
 	{
 		if( ( lines[ iterator ] == NULL )
 		 || ( lines[ iterator ] == (character_t *) _CHARACTER_T_STRING( "" ) ) )
@@ -4696,10 +4727,15 @@ int libewf_header_values_parse_header_string_xml(
 			}
 		}
 	}
-	libewf_string_split_values_free(
-	 lines,
-	 line_count );
+	if( libewf_string_split_values_free(
+	     lines,
+	     amount_of_lines ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free split lines.\n",
+		 function );
 
+		return( -1 );
+	}
 	return( 1 );
 }
 

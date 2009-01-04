@@ -39,15 +39,16 @@ extern "C" {
 #define LIBEWF_STRING_LITTLE_ENDIAN	(uint8_t) 'l'
 #define LIBEWF_STRING_BIG_ENDIAN	(uint8_t) 'b'
 
-character_t **libewf_string_split(
-               character_t *string,
-               size_t size,
-               character_t delimiter,
-               uint32_t *amount );
+int libewf_string_split(
+     character_t *string,
+     size_t size,
+     character_t delimiter,
+     character_t ***split_values,
+     size_t *amount_of_split_values );
 
-void libewf_string_split_values_free(
+int libewf_string_split_values_free(
       character_t **split_values,
-      uint32_t amount );
+      size_t amount_of_split_values );
 
 int libewf_string_copy_from_utf16(
      character_t *string,

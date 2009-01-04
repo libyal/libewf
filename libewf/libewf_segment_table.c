@@ -359,7 +359,7 @@ int libewf_segment_table_set_basename(
 	}
 	segment_table->basename = system_string_duplicate(
 	                           basename,
-	                           length );
+	                           length + 1 );
 
 	if( segment_table->basename == NULL )
 	{

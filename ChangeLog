@@ -117,6 +117,9 @@ Next release(s):
 
 * implement libuca
 
+* rename length into size, make sure string size contains end of string
+  character
+
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
@@ -140,8 +143,6 @@ Next release(s):
 * make compilation resilient for missing crypto library
   - remove the cryptographic options if crypto library is missing
 
-* refactor character string split to return int
-
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
@@ -150,7 +151,9 @@ Next release(s):
 
 * change libewf_system_string_to_(u)int64 to return 1 or -1
 
+WIN32
 * remove win crypto api from libewf_dll release configuration
+* update MSVSCPP files
 
 CLOSED
 * what about read+write and compression?
@@ -173,6 +176,7 @@ Version: 20080902
 * refactored process status
 * code clean up in ewftools
 * implemented ewfguid
+* refactored character string split to return int
 
 Version: 20080901
 * refactored ewfglob

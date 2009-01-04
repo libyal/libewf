@@ -34,209 +34,238 @@
 #include "ewf_char.h"
 
 /* Split a string into elements using a delimiter character
- * Returns a pointer to the new instance, NULL on error
+ * Returns 1 if successful or -1 on error
  */
-character_t **libewf_string_split(
-               character_t *string,
-               size_t size,
-               character_t delimiter,
-               uint32_t *amount )
+int libewf_string_split(
+     character_t *string,
+     size_t size,
+     character_t delimiter,
+     character_t ***split_values,
+     size_t *amount_of_split_values )
 {
-	character_t **lines     = NULL;
-	character_t *line_start = NULL;
-	character_t *line_end   = NULL;
-	character_t *string_end = NULL;
-	static char *function   = "libewf_string_split";
-	size_t size_string      = 0;
-	size_t line_size        = 0;
-	uint32_t iterator       = 0;
+	character_t *split_value_start = NULL;
+	character_t *split_value_end   = NULL;
+	character_t *string_end        = NULL;
+	static char *function          = "libewf_string_split";
+	size_t size_string             = 0;
+	size_t split_value_size        = 0;
+	size_t split_value_iterator    = 0;
 
 	if( string == NULL )
 	{
 		notify_warning_printf( "%s: invalid string.\n",
 		 function );
 
-		return( NULL );
-	}
-	if( amount == NULL )
-	{
-		notify_warning_printf( "%s: invalid amount.\n",
-		 function );
-
-		return( NULL );
+		return( -1 );
 	}
 	if( size == 0 )
 	{
 		notify_warning_printf( "%s: string is empty.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
 		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	size_string = size;
-	line_start  = string;
-	line_end    = string;
-	string_end  = &string[ size ];
+	if( split_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid split values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *split_values != NULL )
+	{
+		notify_warning_printf( "%s: split values already set.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_split_values == NULL )
+	{
+		notify_warning_printf( "%s: invalid amount of split values.\n",
+		 function );
+
+		return( -1 );
+	}
+	size_string        = size;
+	split_value_start  = string;
+	split_value_end    = string;
+	string_end         = &string[ size ];
 
 	do
 	{
-		line_end = (character_t *) string_search(
-		                            line_start,
-		                            delimiter,
-		                            size_string );
+		split_value_end = string_search(
+		                   split_value_start,
+		                   delimiter,
+		                   size_string );
 
-		iterator++;
+		split_value_iterator++;
 
-		if( line_end == NULL )
+		if( split_value_end == NULL )
 		{
 			break;
 		}
 		/* Include delimiter character
 		 */
-		size_string -= (size_t) ( line_end - line_start ) + 1;
+		size_string -= (size_t) ( split_value_end - split_value_start ) + 1;
 
-		if( line_end == line_start )
+		if( split_value_end == split_value_start )
 		{
-			line_start += 1;
+			split_value_start += 1;
 		}
-		else if( line_end != string )
+		else if( split_value_end != string )
 		{
-			line_start = line_end + 1;
+			split_value_start = split_value_end + 1;
 		}
 	}
-	while( line_end != NULL );
+	while( split_value_end != NULL );
 
-	*amount = iterator;
-	lines   = (character_t **) memory_allocate(
-	                            ( sizeof( character_t * ) * *amount ) );
+	*amount_of_split_values = split_value_iterator;
 
-	if( lines == NULL )
+	*split_values = (character_t **) memory_allocate(
+	                                  ( sizeof( character_t * ) * *amount_of_split_values ) );
+
+	if( *split_values == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate dynamic array lines.\n",
+		notify_warning_printf( "%s: unable to create split values.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( memory_set(
-	     lines,
+	     *split_values,
 	     0,
-	     *amount ) == NULL )
+	     sizeof( character_t * ) * *amount_of_split_values ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear dynamic array lines.\n",
+		notify_warning_printf( "%s: unable to clear split values.\n",
 		 function );
 
-		return( NULL );
-	}
-	size_string = size;
-	line_start  = string;
-	line_end    = string;
+		memory_free(
+		 *split_values );
 
-	for( iterator = 0; iterator < *amount; iterator++ )
+		*split_values = NULL;
+
+		return( -1 );
+	}
+	size_string        = size;
+	split_value_start  = string;
+	split_value_end    = string;
+
+	for( split_value_iterator = 0; split_value_iterator < *amount_of_split_values; split_value_iterator++ )
 	{
-		if( line_end != string )
+		if( split_value_end != string )
 		{
-			line_start = line_end + 1;
+			split_value_start = split_value_end + 1;
 		}
-		line_end = (character_t *) string_search(
-		                            line_start,
-		                            delimiter,
-		                            size_string );
+		split_value_end = string_search(
+		                   split_value_start,
+		                   delimiter,
+		                   size_string );
 
 		/* Check for last value
 		 */
-		if( line_end == NULL )
+		if( split_value_end == NULL )
 		{
-			line_size = (size_t) ( string_end - line_start );
+			split_value_size = (size_t) ( string_end - split_value_start );
 		}
 		else
 		{
-			line_size = (size_t) ( line_end - line_start );
+			split_value_size = (size_t) ( split_value_end - split_value_start );
 		}
 		/* Add 1 additional byte required for the end of string character
 		 */
-		line_size += 1;
+		split_value_size += 1;
 
-		lines[ iterator ] = (character_t *) memory_allocate(
-                                                     sizeof( character_t ) * line_size );
+		( *split_values )[ split_value_iterator ] = (character_t *) memory_allocate(
+                                                                             sizeof( character_t ) * split_value_size );
 
-		if( lines[ iterator ] == NULL )
+		if( ( *split_values )[ split_value_iterator ] == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate line string.\n",
-			 function );
+			notify_warning_printf( "%s: unable to create split value: %" PRIzd ".\n",
+			 function, split_value_iterator );
 
 			libewf_string_split_values_free(
-			 lines,
-			 ( iterator - 1 ) );
+			 *split_values,
+			 ( split_value_iterator - 1 ) );
 
-			return( NULL );
+			*split_values = NULL;
+
+			return( -1 );
 		}
 		if( string_copy(
-		     lines[ iterator ],
-		     line_start,
-		     line_size ) == NULL )
+		     ( *split_values )[ split_value_iterator ],
+		     split_value_start,
+		     split_value_size ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to set dynamic array lines.\n",
-			 function );
+			notify_warning_printf( "%s: unable to set split value: %" PRIzd ".\n",
+			 function, split_value_iterator );
 
 			libewf_string_split_values_free(
-			 lines,
-			 iterator );
+			 *split_values,
+			 split_value_iterator );
 
-			return( NULL );
+			*split_values = NULL;
+
+			return( -1 );
 		}
-		lines[ iterator ][ line_size - 1 ] = (character_t) '\0';
+		( *split_values )[ split_value_iterator ][ split_value_size - 1 ] = (character_t) '\0';
 
 		/* Include delimiter character
 		 */
-		size_string -= (size_t) ( line_end - line_start ) + 1;
+		size_string -= (size_t) ( split_value_end - split_value_start ) + 1;
 
 		/* Correct if first value is empty
 		 */
-		if( line_end == string )
+		if( split_value_end == string )
 		{
-			line_start += 1;
+			split_value_start += 1;
 		}
 	}
-	return( lines );
+	return( 1 );
 }
 
 /* Clears a split values array
+ * Returns 1 if successful or -1 on error
  */
-void libewf_string_split_values_free(
-      character_t **split_values,
-      uint32_t amount )
+int libewf_string_split_values_free(
+     character_t **split_values,
+     size_t amount_of_split_values )
 {
-	static char *function = "libewf_string_split_values_free";
-	uint32_t iterator     = 0;
+	static char *function       = "libewf_string_split_values_free";
+	size_t split_value_iterator = 0;
 
 	if( split_values == NULL )
 	{
 		notify_warning_printf( "%s: invalid split values array.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	for( iterator = 0; iterator < amount; iterator++ )
+	for( split_value_iterator = 0; split_value_iterator < amount_of_split_values; split_value_iterator++ )
 	{
-		if( split_values[ iterator ] == NULL )
-		{
-			notify_warning_printf( "%s: empty value.\n",
-			 function );
-		}
-		else
+		if( split_values[ split_value_iterator ] != NULL )
 		{
 			memory_free(
-			 split_values[ iterator ] );
+			 split_values[ split_value_iterator ] );
 		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		else
+		{
+			notify_warning_printf( "%s: empty split value: %" PRIzd ".\n",
+			 function, split_value_iterator );
+		}
+#endif
 	}
 	memory_free(
 	 split_values );
+
+	return( 1 );
 }
 
 /* Copies a multi byte UTF16 string to a single byte string

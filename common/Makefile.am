@@ -1,7 +1,5 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include
 
-MEMWATCH_FILES = memwatch.c memwatch.h
-
 noinst_LTLIBRARIES = libcommon.la
 
 libcommon_la_SOURCES = \
@@ -18,8 +16,7 @@ libcommon_la_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h \
 	types.h \
-	wide_string.h \
-	$(MEMWATCH_FILES)
+	wide_string.h
 
 distclean: clean
 	/bin/rm -f Makefile

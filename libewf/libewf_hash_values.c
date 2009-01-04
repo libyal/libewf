@@ -70,8 +70,8 @@ int libewf_hash_values_parse_hash_string_xml(
 	character_t *close_tag_end   = NULL;
 	static char *function        = "libewf_hash_values_parse_hash_string_xml";
 	size_t string_length         = 0;
-	uint32_t line_count          = 0;
-	uint32_t iterator            = 0;
+	size_t amount_of_lines       = 0;
+	size_t line_iterator         = 0;
 
 	if( hash_string_xml == NULL )
 	{
@@ -80,15 +80,14 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		return( -1 );
 	}
-	lines = libewf_string_split(
-	         (character_t *) hash_string_xml,
-	         length,
-	         (character_t) '\n',
-	         &line_count );
-
-	if( lines == NULL )
+	if( libewf_string_split(
+	     (character_t *) hash_string_xml,
+	     length,
+	     (character_t) '\n',
+	     &lines,
+	     &amount_of_lines ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to split lines in hash string.\n",
+		notify_warning_printf( "%s: unable to split hash string into lines.\n",
 		 function );
 
 		return( -1 );
@@ -103,7 +102,7 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		libewf_string_split_values_free(
 		 lines,
-		 line_count );
+		 amount_of_lines );
 
 		return( -1 );
 	}
@@ -115,19 +114,19 @@ int libewf_hash_values_parse_hash_string_xml(
 
 		libewf_string_split_values_free(
 		 lines,
-		 line_count );
+		 amount_of_lines );
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < line_count; iterator++ )
+	for( line_iterator = 0; line_iterator < amount_of_lines; line_iterator++ )
 	{
-		if( ( lines[ iterator ] == NULL )
-		 || ( lines[ iterator ] == (character_t *) _CHARACTER_T_STRING( "" ) ) )
+		if( ( lines[ line_iterator ] == NULL )
+		 || ( lines[ line_iterator ] == (character_t *) _CHARACTER_T_STRING( "" ) ) )
 		{
 			continue;
 		}
 		string_length = string_length(
-		                 lines[ iterator ] );
+		                 lines[ line_iterator ] );
 
 		/* Ignore empty lines
 		 */
@@ -136,7 +135,7 @@ int libewf_hash_values_parse_hash_string_xml(
 			continue;
 		}
 		open_tag_start = string_search(
-		                  lines[ iterator ],
+		                  lines[ line_iterator ],
 		                  (character_t) '<',
 		                  string_length );
 
@@ -147,7 +146,7 @@ int libewf_hash_values_parse_hash_string_xml(
 			continue;
 		}
 		open_tag_end = string_search(
-		                lines[ iterator ],
+		                lines[ line_iterator ],
 		                (character_t) '>',
 		                string_length );
 
@@ -159,7 +158,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		/* Ignore the first part of the xml string
 		 */
-		string_length -= (size_t) ( open_tag_end - lines[ iterator ] );
+		string_length -= (size_t) ( open_tag_end - lines[ line_iterator ] );
 
 		/* Ignore lines only containing a single tag
 		 */
@@ -209,10 +208,15 @@ int libewf_hash_values_parse_hash_string_xml(
 #endif
 		}
 	}
-	libewf_string_split_values_free(
-	 lines,
-	 line_count );
+	if( libewf_string_split_values_free(
+	     lines,
+	     amount_of_lines ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to free split lines.\n",
+		 function );
 
+		return( -1 );
+	}
 	return( 1 );
 }
 

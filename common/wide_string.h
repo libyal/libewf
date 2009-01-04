@@ -65,7 +65,7 @@ extern "C" {
 
 #elif defined( HAVE_WMEMCPY )
 #define wide_string_copy( destination, source, size ) \
-	(character_t *) wmemcpy( (void *) destination, (void *) source, size )
+	(wchar_t *) wmemcpy( (void *) destination, (void *) source, size )
 
 #elif defined( HAVE_WCSCPY )
 #define wide_string_copy( destination, source, size ) \
@@ -80,7 +80,7 @@ extern "C" {
 
 #elif defined( HAVE_WMEMCHR )
 #define wide_string_search( string, character, size ) \
-	(character_t *) wmemchr( (void *) string, (wchar_t) character, size )
+	(wchar_t *) wmemchr( (void *) string, (wchar_t) character, size )
 #endif
 
 /* String reverse search
@@ -91,7 +91,7 @@ extern "C" {
 
 #elif defined( HAVE_WMEMRCHR )
 #define wide_string_search_reverse( string, character, size ) \
-	(character_t *) wmemrchr( (void *) string, (wchar_t) character, size )
+	(wchar_t *) wmemrchr( (void *) string, (wchar_t) character, size )
 #endif
 
 /* String formatted print (snprinf)

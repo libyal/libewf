@@ -72,7 +72,7 @@ int libewf_convert_timestamp(
      time_t timestamp,
      uint8_t date_format,
      character_t *date_string,
-     size_t date_string_length );
+     size_t date_string_size );
 
 int libewf_convert_date_header_value(
      character_t *header_value,

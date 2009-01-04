@@ -76,7 +76,7 @@ character_t *libewf_string_duplicate(
 
 		return( NULL );
 	}
-	duplicate[ size ] = (character_t) '\0';
+	duplicate[ size - 1 ] = (character_t) '\0';
 
 	return( duplicate );
 }
