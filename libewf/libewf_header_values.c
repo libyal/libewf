@@ -237,28 +237,29 @@ int libewf_convert_timestamp(
 }
 
 /* Convert a header value into a date string
- * Returns a pointer to the new instance, NULL on error
+ * Sets date string and date string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_convert_date_header_value(
-                libewf_char_t *header_value,
-                size_t header_value_length,
-                uint8_t date_format )
+int libewf_convert_date_header_value(
+     libewf_char_t *header_value,
+     size_t header_value_length,
+     uint8_t date_format,
+     libewf_char_t **date_string,
+     size_t *date_string_length )
 {
 	struct tm time_elements;
 
 	libewf_char_t **date_elements = NULL;
-	libewf_char_t *date_string    = NULL;
 	static char *function         = "libewf_convert_date_header_value";
 	time_t timestamp              = 0;
 	uint32_t date_element_count   = 0;
-	size_t date_string_length     = 0;
 
 	if( header_value == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid header value.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( ( date_format != LIBEWF_DATE_FORMAT_CTIME )
 	 && ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH )
@@ -268,7 +269,7 @@ libewf_char_t *libewf_convert_date_header_value(
 		LIBEWF_WARNING_PRINT( "%s: unsupported date format.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	date_elements = libewf_string_split(
 			 header_value,
@@ -281,7 +282,7 @@ libewf_char_t *libewf_convert_date_header_value(
 		LIBEWF_WARNING_PRINT( "%s: unable to split date elements in header value.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( date_element_count != 6 )
 	{
@@ -292,7 +293,7 @@ libewf_char_t *libewf_convert_date_header_value(
 		 date_elements,
 		 date_element_count );
 
-		return( NULL );
+		return( -1 );
 	}
 	/* Set the year
 	 */
@@ -377,20 +378,20 @@ libewf_char_t *libewf_convert_date_header_value(
 		LIBEWF_WARNING_PRINT( "%s: unable to create timestamp.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( libewf_convert_timestamp(
 	     timestamp,
 	     date_format,
-	     &date_string,
-	     &date_string_length ) != 1 )
+	     date_string,
+	     date_string_length ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert timestamp.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	return( date_string );
+	return( 1 );
 }
 
 /* Generate date string within a header value
@@ -458,24 +459,25 @@ libewf_char_t *libewf_generate_date_header_value(
 }
 
 /* Convert a header2 value into a date string
- * Returns a pointer to the new instance, NULL on error
+ * Sets date string and date string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_convert_date_header2_value(
-                libewf_char_t *header_value,
-                size_t header_value_length,
-                uint8_t date_format )
+int libewf_convert_date_header2_value(
+     libewf_char_t *header_value,
+     size_t header_value_length,
+     uint8_t date_format,
+     libewf_char_t **date_string,
+     size_t *date_string_length )
 {
-	libewf_char_t *date_string = NULL;
-	static char *function      = "libewf_convert_date_header2_value";
-	time_t timestamp           = 0;
-	size_t date_string_length  = 0;
+	static char *function = "libewf_convert_date_header2_value";
+	time_t timestamp      = 0;
 
 	if( header_value == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid header value.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	timestamp = (time_t) libewf_string_to_int64(
 	                      header_value,
@@ -486,15 +488,15 @@ libewf_char_t *libewf_convert_date_header2_value(
 	if( libewf_convert_timestamp(
 	     timestamp,
 	     date_format,
-	     &date_string,
-	     &date_string_length ) != 1 )
+	     date_string,
+	     date_string_length ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert timestamp.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	return( date_string );
+	return( 1 );
 }
 
 /* Generate date string within a header2 value
@@ -643,10 +645,12 @@ int libewf_header_values_parse_header_string(
 	libewf_char_t *date_string = NULL;
 	static char *function      = "libewf_header_values_parse_header_string";
 	size_t string_length       = 0;
+	size_t date_string_length  = 0;
 	uint32_t line_count        = 0;
 	uint32_t type_count        = 0;
 	uint32_t value_count       = 0;
 	uint32_t iterator          = 0;
+	int result                 = 0;
 
 	if( header_values == NULL )
 	{
@@ -856,19 +860,23 @@ int libewf_header_values_parse_header_string(
 			     (libewf_char_t) ' ',
 			     string_length ) != NULL )
 			{
-				date_string = libewf_convert_date_header_value(
-				               values[ iterator ],
-				               string_length,
-				               date_format );
+				result = libewf_convert_date_header_value(
+				          values[ iterator ],
+				          string_length,
+				          date_format,
+				          &date_string,
+				          &date_string_length );
 			}
 			else
 			{
-				date_string = libewf_convert_date_header2_value(
-				               values[ iterator ],
-				               string_length,
-				               date_format );
+				result = libewf_convert_date_header2_value(
+				          values[ iterator ],
+				          string_length,
+				          date_format,
+				          &date_string,
+				          &date_string_length );
 			}
-			if( date_string == NULL )
+			if( result != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
 				 function );

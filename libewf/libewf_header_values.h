@@ -80,18 +80,22 @@ int libewf_convert_timestamp(
      libewf_char_t **date_string,
      size_t *date_string_length );
 
-libewf_char_t *libewf_convert_date_header_value(
-                libewf_char_t *header_value,
-                size_t header_value_length,
-                uint8_t date_format );
+int libewf_convert_date_header_value(
+     libewf_char_t *header_value,
+     size_t header_value_length,
+     uint8_t date_format,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 libewf_char_t *libewf_generate_date_header_value(
                 time_t timestamp );
 
-libewf_char_t *libewf_convert_date_header2_value(
-                libewf_char_t *header_value,
-                size_t header_value_length,
-                uint8_t date_format );
+int libewf_convert_date_header2_value(
+     libewf_char_t *header_value,
+     size_t header_value_length,
+     uint8_t date_format,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 libewf_char_t *libewf_generate_date_header2_value(
                 time_t timestamp );
