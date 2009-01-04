@@ -474,15 +474,15 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				}
 				chunk_data_size = amount_of_sectors * internal_handle->media->bytes_per_sector;
 			}
-		}
-		/* Flag that the chunk was cached
-		 */
-		if( chunk_data == internal_handle->chunk_cache->data )
-		{
-			internal_handle->chunk_cache->chunk  = chunk;
-			internal_handle->chunk_cache->amount = chunk_data_size;
-			internal_handle->chunk_cache->offset = 0;
-			internal_handle->chunk_cache->cached = 1;
+			/* Flag that the chunk was cached
+			 */
+			if( chunk_data == internal_handle->chunk_cache->data )
+			{
+				internal_handle->chunk_cache->chunk  = chunk;
+				internal_handle->chunk_cache->amount = chunk_data_size;
+				internal_handle->chunk_cache->offset = 0;
+				internal_handle->chunk_cache->cached = 1;
+			}
 		}
 	}
 	else if( ( raw_access != 0 )
