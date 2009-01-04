@@ -2501,8 +2501,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						 */
 						write_count = libewf_section_volume_s01_write(
 							       internal_handle,
-							       segment_file->file_descriptor,
-							       list_entry_iterator->start_offset );
+							       segment_file,
+							       1 );
 					}
 					else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
 					{
@@ -2510,8 +2510,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 						 */
 						write_count = libewf_section_volume_e01_write(
 							       internal_handle,
-							       segment_file->file_descriptor,
-							       list_entry_iterator->start_offset );
+							       segment_file,
+							       1 );
 					}
 					else
 					{

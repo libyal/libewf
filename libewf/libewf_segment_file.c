@@ -1225,8 +1225,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_section_volume_s01_write(
 					       internal_handle,
-				               segment_file->file_descriptor,
-					       segment_file->file_offset );
+					       segment_file,
+					       0 );
 			}
 			else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
 			{
@@ -1234,8 +1234,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_section_volume_e01_write(
 					       internal_handle,
-					       segment_file->file_descriptor,
-					       segment_file->file_offset );
+					       segment_file,
+					       0 );
 			}
 			else
 			{
@@ -1250,19 +1250,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 				return( -1 );
 			}
-			if( libewf_section_list_append(
-			     segment_file->section_list,
-			     (EWF_CHAR *) "volume",
-			     segment_file->file_offset,
-			     ( segment_file->file_offset + write_count ) ) == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to append volume section to section list.\n",
-				 function );
-
-				return( -1 );
-			}
-			segment_file->file_offset += write_count;
-			total_write_count         += write_count;
+			total_write_count += write_count;
 		}
 		else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
 		{

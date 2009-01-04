@@ -395,7 +395,7 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_fil
 	                       uncompressed_string_size,
 	                       segment_file->file_offset );
 
-	if( section_write_count == -1 )
+	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
@@ -852,13 +852,15 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 /* Writes an EWF-S01 (SMART) volume section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset )
+ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append )
 {
+	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
 	EWF_VOLUME_SMART *volume    = NULL;
 	static char *function       = "libewf_section_volume_s01_write";
 	EWF_CRC calculated_crc      = 0;
+	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
-	ssize_t volume_write_count  = 0;
+	ssize_t write_count         = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -874,13 +876,15 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( file_descriptor == -1 )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
+	section_offset = segment_file->file_offset;
+
 	volume = (EWF_VOLUME_SMART *) libewf_common_alloc( EWF_VOLUME_SMART_SIZE );
 
 	if( volume == NULL )
@@ -960,13 +964,13 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
 
 	section_write_count = libewf_section_start_write(
-	                       file_descriptor,
-	                       (EWF_CHAR *) "volume",
+	                       segment_file->file_descriptor,
+	                       section_type,
 	                       6,
 	                       EWF_VOLUME_SMART_SIZE,
-	                       start_offset );
+	                       segment_file->file_offset );
 
-	if( section_write_count == -1 )
+	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
@@ -975,21 +979,40 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	volume_write_count = libewf_common_write(
-	                      file_descriptor,
-	                      volume,
-	                      EWF_VOLUME_SMART_SIZE );
+	/* refactor */
+	segment_file->file_offset += section_write_count;
+
+	write_count = libewf_segment_file_write(
+	               segment_file,
+	               volume,
+	               EWF_VOLUME_SMART_SIZE );
 
 	libewf_common_free( volume );
 
-	if( volume_write_count != (ssize_t) EWF_VOLUME_SMART_SIZE )
+	if( write_count != (ssize_t) EWF_VOLUME_SMART_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write volume to file.\n",
 		 function );
 
 		return( -1 );
 	}
-	return( section_write_count + volume_write_count );
+	section_write_count += write_count;
+
+	if( no_section_append == 0 )
+	{
+		if( libewf_section_list_append(
+		     segment_file->section_list,
+		     section_type,
+		     section_offset,
+		     ( section_offset + section_write_count ) ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
+			 function, (char *) section_type );
+
+			return( -1 );
+		}
+	}
+	return( section_write_count );
 }
 
 /* Reads an EWF-E01 (EnCase) volume section from file
@@ -1199,13 +1222,15 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 /* Writes an EWF-E01 (EnCase) volume section to file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset )
+ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append )
 {
+	EWF_CHAR *section_type      = (EWF_CHAR *) "volume";
 	EWF_VOLUME *volume          = NULL;
 	static char *function       = "libewf_section_volume_e01_write";
 	EWF_CRC calculated_crc      = 0;
+	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
-	ssize_t volume_write_count  = 0;
+	ssize_t write_count         = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1221,13 +1246,15 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( file_descriptor == -1 )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
+	section_offset = segment_file->file_offset;
+
 	volume = (EWF_VOLUME *) libewf_common_alloc( EWF_VOLUME_SIZE );
 
 	if( volume == NULL )
@@ -1335,13 +1362,13 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
 
 	section_write_count = libewf_section_start_write(
-	                       file_descriptor,
-	                       (EWF_CHAR *) "volume",
+	                       segment_file->file_descriptor,
+	                       section_type,
 	                       6,
 	                       EWF_VOLUME_SIZE,
-	                       start_offset );
+	                       segment_file->file_offset );
 
-	if( section_write_count == -1 )
+	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
@@ -1350,21 +1377,40 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	volume_write_count = libewf_common_write(
-	                      file_descriptor,
-	                      volume,
-	                      EWF_VOLUME_SIZE );
+	/* refactor */
+	segment_file->file_offset += section_write_count;
+
+	write_count = libewf_segment_file_write(
+	               segment_file,
+	               volume,
+	               EWF_VOLUME_SIZE );
 
 	libewf_common_free( volume );
 
-	if( volume_write_count != (ssize_t) EWF_VOLUME_SIZE )
+	if( write_count != (ssize_t) EWF_VOLUME_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write volume to file.\n",
 		 function );
 
 		return( -1 );
 	}
-	return( section_write_count + volume_write_count );
+	section_write_count += write_count;
+
+	if( no_section_append == 0 )
+	{
+		if( libewf_section_list_append(
+		     segment_file->section_list,
+		     section_type,
+		     section_offset,
+		     ( section_offset + section_write_count ) ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
+			 function, (char *) section_type );
+
+			return( -1 );
+		}
+	}
+	return( section_write_count );
 }
 
 /* Reads a volume section from file
@@ -3891,7 +3937,7 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 	               section_size,
 	               start_offset );
 
-	if( write_count == -1 )
+	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
