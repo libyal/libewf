@@ -4,14 +4,17 @@ lib_LTLIBRARIES = libewf.la
 
 libewf_la_SOURCES = \
 	ewf_char.h \
+	ewf_chunk.h \
 	ewf_compress.c ewf_compress.h \
-	ewf_crc.h \
+	ewf_crc.c ewf_crc.h \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest_hash.h \
 	ewf_error2.h \
-	ewf_file_header.h \
+	ewf_file_header.c ewf_file_header.h \
 	ewf_hash.h \
+	ewf_header2.h \
+	ewf_header.h \
 	ewf_ltree.h \
 	ewf_section.h \
 	ewf_session.h \
@@ -40,7 +43,6 @@ libewf_la_SOURCES = \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \
-	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 
 libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0

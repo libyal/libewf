@@ -68,8 +68,6 @@
 #include <libewf.h>
 
 #include "../libewf/libewf_common.h"
-#include "../libewf/libewf_hash_values.h"
-#include "../libewf/libewf_header_values.h"
 #include "../libewf/libewf_notify.h"
 #include "../libewf/libewf_string.h"
 
@@ -499,11 +497,11 @@ void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF
  */
 void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	static char *function      = "ewfoutput_acquiry_errors_fprint";
-	off64_t sector             = 0;
-	uint32_t amount_of_errors  = 0;
-	uint32_t amount_of_sectors = 0;
-	uint32_t iterator          = 0;
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "ewfoutput_acquiry_errors_fprint";
+	uint64_t sector                         = 0;
+	uint32_t amount_of_sectors              = 0;
+	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
@@ -519,30 +517,27 @@ void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	if( libewf_get_amount_of_acquiry_errors( handle, &amount_of_errors ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
-		 function );
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-		return;
-	}
-	if( amount_of_errors > 0 )
+	if( internal_handle->acquiry_amount_of_errors > 0 )
 	{
-		fprintf( stream, "Read errors during acquiry:\n" );
-		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", amount_of_errors );
-		
-		for( iterator = 0; iterator < amount_of_errors; iterator++ )
+		if( internal_handle->acquiry_error_sectors == NULL )
 		{
-			if( libewf_get_acquiry_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
-				 function, iterator );
+			LIBEWF_WARNING_PRINT( "%s: missing acquiry read error sector list.\n",
+			 function );
 
-				sector            = 0;
-				amount_of_sectors = 0;
-			}
+			return;
+		}
+		fprintf( stream, "Read errors during acquiry:\n" );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", internal_handle->acquiry_amount_of_errors );
+		
+		for( iterator = 0; iterator < internal_handle->acquiry_amount_of_errors; iterator++ )
+		{
+			sector            = internal_handle->acquiry_error_sectors[ iterator ].sector;
+			amount_of_sectors = internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors;
+
 			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
+			 sector, ( sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}
@@ -552,11 +547,11 @@ void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	static char *function      = "ewfoutput_crc_errors_fprint";
-	off64_t sector             = 0;
-	uint32_t amount_of_errors  = 0;
-	uint32_t amount_of_sectors = 0;
-	uint32_t iterator          = 0;
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "ewfoutput_crc_errors_fprint";
+	uint64_t sector                         = 0;
+	uint32_t amount_of_sectors              = 0;
+	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
@@ -572,30 +567,33 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	if( libewf_get_amount_of_acquiry_errors( handle, &amount_of_errors ) == -1 )
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
 		 function );
 
 		return;
 	}
-	if( amount_of_errors > 0 )
+	if( internal_handle->read->crc_amount_of_errors > 0 )
 	{
-		fprintf( stream, "Sector validation errors:\n" );
-		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", amount_of_errors );
-
-		for( iterator = 0; iterator < amount_of_errors; iterator++ )
+		if( internal_handle->read->crc_error_sectors == NULL )
 		{
-			if( libewf_get_acquiry_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
-				 function, iterator );
+			LIBEWF_WARNING_PRINT( "%s: missing CRC error sector list.\n",
+			 function );
 
-				sector            = 0;
-				amount_of_sectors = 0;
-			}
-			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
+			return;
+		}
+		fprintf( stream, "Sector validation errors:\n" );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", internal_handle->read->crc_amount_of_errors );
+
+		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
+		{
+			sector            = internal_handle->read->crc_error_sectors[ iterator ].sector;
+			amount_of_sectors = internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors;
+
+			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n", sector, (sector + amount_of_sectors), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}
@@ -605,14 +603,12 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	LIBEWF_CHAR header_identifier[ 64 ];
 	LIBEWF_CHAR header_value[ 128 ];
 
-	static char *function           = "ewfoutput_header_values_fprint";
-	size_t header_identifier_length = 64;
-	size_t header_value_length      = 128;
-	uint32_t amount_of_values       = 0;
-	uint32_t iterator               = 0;
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "ewfoutput_header_values_fprint";
+	size_t header_value_length              = 128;
+	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
@@ -628,14 +624,9 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	if( libewf_get_amount_of_header_values( handle, &amount_of_values ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of header values.\n",
-		 function );
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-		return;
-	}
-	if( amount_of_values == 0 )
+	if( internal_handle->header_values == NULL )
 	{
 		fprintf( stream, "\tNo information found in file.\n" );
 
@@ -718,26 +709,15 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	{
 		fprintf( stream, "\tUnknown value dc:\t%" PRIs_EWF "\n", header_value );
 	}
-	if( amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	if( internal_handle->header_values->amount > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
 		fprintf( stream, "\n\tAdditional values:\n" );
 
-		for( iterator = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
+		for( iterator = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT; iterator < internal_handle->header_values->amount; iterator++ )
 		{
-			if( libewf_get_header_value_identifier( handle, iterator, header_identifier, header_identifier_length ) != 1 )
+			if( libewf_get_header_value( handle, internal_handle->header_values->identifiers[ iterator ], header_value, header_value_length ) == 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
-				 function, iterator );
-			}
-			else if( libewf_get_header_value( handle, header_identifier, header_value, header_value_length ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the header value for identifier: %" PRIs_EWF ".\n",
-				 function, header_identifier );
-			}
-			else
-			{
-				fprintf( stream, "\t%" PRIs_EWF ": %" PRIs_EWF "\n",
-				 header_identifier, header_value );
+				fprintf( stream, "\t%" PRIs_EWF ": %" PRIs_EWF "\n", internal_handle->header_values->identifiers[ iterator ], header_value );
 			}
 		}
 	}
@@ -747,16 +727,14 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	LIBEWF_CHAR hash_identifier[ 32 ];
 	LIBEWF_CHAR hash_value[ 128 ];
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
-	LIBEWF_CHAR *stored_md5_hash_string = NULL;
-	static char *function               = "ewfoutput_hash_values_fprint";
-	uint32_t hash_identifier_length     = 32;
-	uint32_t hash_value_length          = 128;
-	uint32_t amount_of_values           = 0;
-	uint32_t iterator                   = 0;
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	LIBEWF_CHAR *stored_md5_hash_string     = NULL;
+	static char *function                   = "ewfoutput_hash_values_fprint";
+	uint32_t hash_value_length              = 128;
+	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
@@ -772,7 +750,12 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	if( libewf_get_md5_hash( handle, md5_hash, EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( libewf_get_md5_hash(
+	     handle,
+	     md5_hash,
+	     EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to retrieve MD5 hash.\n",
 		 function );
@@ -797,38 +780,26 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	{
 		fprintf( stream, "\tMD5 hash in file:\tN/A\n" );
 	}
-	if( libewf_parse_hash_values( handle ) == 1 )
+	if( ( libewf_parse_hash_values( handle ) == 1 )
+	 && ( internal_handle->hash_values != NULL ) )
 	{
-		if( libewf_get_amount_of_hash_values( handle, &amount_of_values ) == -1 )
+		if( internal_handle->hash_values->amount > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to retrieve amount of hash values.\n",
-			 function );
+			fprintf( stream, "\n\tAdditional hash values:\n" );
 
-			return;
-		}
-		if( amount_of_values > 0 )
-		{
-			if( amount_of_values > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
+			for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT;
+			 iterator < internal_handle->hash_values->amount;
+			 iterator++ )
 			{
-				fprintf( stream, "\n\tAdditional hash values:\n" );
-
-				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
+				if( libewf_get_hash_value(
+				     handle,
+				     internal_handle->hash_values->identifiers[ iterator ],
+				     hash_value,
+				     hash_value_length ) == 1 )
 				{
-					if( libewf_get_hash_value_identifier( handle, iterator, hash_identifier, hash_identifier_length ) != 1 )
-					{
-						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
-						 function, iterator );
-					}
-					else if( libewf_get_hash_value( handle, hash_identifier, hash_value, hash_value_length ) != 1 )
-					{
-						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash value for identifier: %" PRIs_EWF ".\n",
-						 function, hash_identifier );
-					}
-					else
-					{
-						fprintf( stream, "\t%" PRIs_EWF ":\t%" PRIs_EWF "\n",
-						 hash_identifier, hash_value );
-					}
+					fprintf( stream, "\t%" PRIs_EWF ":\t%" PRIs_EWF "\n",
+					 internal_handle->hash_values->identifiers[ iterator ],
+					 hash_value );
 				}
 			}
 		}
@@ -886,12 +857,9 @@ void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t sec
 	}
 	if( seconds > 0 )
 	{
-		bytes_per_second = bytes / seconds;
+		bytes_per_second        = bytes / seconds;
+		bytes_per_second_string = ewfoutput_determine_human_readable_size_string( bytes_per_second );
 
-		if( bytes_per_second > 1024 )
-		{
-			bytes_per_second_string = ewfoutput_determine_human_readable_size_string( bytes_per_second );
-		}
 		fprintf( stream, " with" );
 
 		if( bytes_per_second_string != NULL )
@@ -920,10 +888,8 @@ void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes )
 	{
 		return;
 	}
-	if( bytes > 1024 )
-	{
-		bytes_string = ewfoutput_determine_human_readable_size_string( bytes );
-	}
+	bytes_string = ewfoutput_determine_human_readable_size_string( bytes );
+
 	if( bytes_string != NULL )
 	{
 		fprintf( stream, " %" PRIs_EWF " (%" PRIi64 " bytes)", bytes_string, bytes );

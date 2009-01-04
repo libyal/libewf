@@ -275,7 +275,7 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 /* Sets the values for a specific offset
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off64_t offset, size_t size, uint16_t segment_number, uint8_t dirty )
+int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off64_t offset, size_t size, uint16_t segment_number, uint8_t dirty )
 {
 	static char *function = "libewf_offset_table_set_values";
 

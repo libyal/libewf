@@ -43,15 +43,13 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 
-#include "ewf_compress.h"
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
-#include "ewf_string.h"
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
-ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *chunk_data, size_t chunk_data_size, EWF_CHAR *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed )
+ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK *chunk_data, size_t chunk_data_size, EWF_CHUNK *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed )
 {
 	static char *function  = "libewf_read_process_chunk_data";
 	EWF_CRC calculated_crc = 0;
@@ -80,8 +78,15 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( is_compressed == 0 )
 	{
-		buffer_size    = chunk_data_size;
-		calculated_crc = ewf_crc_calculate( chunk_data, buffer_size, 1 );
+		buffer_size = chunk_data_size;
+
+		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) chunk_data, buffer_size, 1 ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	else
 	{
@@ -108,7 +113,7 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 		}
 		buffer_size = *uncompressed_chunk_data_size;
 
-		if( ewf_uncompress( uncompressed_chunk_data, uncompressed_chunk_data_size, chunk_data, chunk_data_size ) != 1 )
+		if( ewf_chunk_uncompress( uncompressed_chunk_data, uncompressed_chunk_data_size, chunk_data, chunk_data_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to uncompressed chunk data.\n",
 			 function );
@@ -127,8 +132,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
-	EWF_CHAR *chunk_data      = NULL;
-	EWF_CHAR *chunk_read      = NULL;
+	EWF_CHUNK *chunk_data     = NULL;
+	EWF_CHUNK *chunk_read     = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
         char *chunk_type          = NULL;
 #endif
@@ -281,7 +286,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		 && ( chunk_offset == 0 )
 		 && ( size >= (size_t) internal_handle->media->chunk_size ) )
 		{
-			chunk_data = (EWF_CHAR *) buffer;
+			chunk_data = (EWF_CHUNK *) buffer;
 		}
 #endif
 		/* Determine if the chunk data should be directly read into chunk data buffer
@@ -313,7 +318,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		}
 		/* Read the chunk data
 		 */
-		chunk_read_count = ewf_string_read_to_buffer(
+		chunk_read_count = ewf_chunk_read(
 		                    chunk_read,
 		                    internal_handle->offset_table->file_descriptor[ chunk ],
 		                    chunk_data_size );
@@ -383,12 +388,9 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				}
 				chunk_data_size -= (uint32_t) EWF_CRC_SIZE;
 			}
+			chunk_type     = "UNCOMPRESSED";
 			*is_compressed = 0;
 			*read_crc      = 1;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-			chunk_type = "UNCOMPRESSED";
-#endif
 		}
 		/* Determine if the chunk is compressed
 		 */
@@ -396,12 +398,9 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		{
 			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
 
+			chunk_type     = "COMPRESSED";
 			*is_compressed = 1;
 			*read_crc      = 0;
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-			chunk_type  = "COMPRESSED";
-#endif
 		}
 		else
 		{
@@ -410,10 +409,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
-#if defined( HAVE_VERBOSE_OUTPUT )
 		LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s.\n",
 		 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
-#endif
 
 		if( raw_access == 0 )
 		{
@@ -704,9 +701,9 @@ ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, siz
 	}
 	chunk_data_size = libewf_read_process_chunk_data(
 	                   internal_handle,
-	                   (EWF_CHAR *) buffer,
+	                   (EWF_CHUNK *) buffer,
 	                   buffer_size,
-	                   (EWF_CHAR *) uncompressed_buffer,
+	                   (EWF_CHUNK *) uncompressed_buffer,
 	                   uncompressed_buffer_size,
 	                   is_compressed );
 

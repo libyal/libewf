@@ -59,8 +59,13 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 		return;
 	}
-	calculated_crc = ewf_crc_calculate( data, ( size - EWF_CRC_SIZE ), 1 );
+	if( ewf_crc_calculate( &calculated_crc, data, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
+		return;
+	}
 	libewf_dump_data( data, size );
 
 	if( libewf_common_memcpy( &stored_crc, &data[ size - EWF_CRC_SIZE ], EWF_CRC_SIZE ) == NULL )
@@ -196,8 +201,13 @@ void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
 
 		return;
 	}
-	calculated_crc = ewf_crc_calculate( section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
+		return;
+	}
 	if( libewf_endian_convert_32bit( &stored_crc, section->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -252,7 +262,7 @@ void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string
 
 /* Prints the header data to a stream
  */
-void libewf_debug_header_fprint( FILE *stream, EWF_CHAR *header, size_t size )
+void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
 {
 	LIBEWF_CHAR *header_string = NULL;
 	static char *function      = "libewf_debug_header_fprint";
@@ -289,7 +299,7 @@ void libewf_debug_header_fprint( FILE *stream, EWF_CHAR *header, size_t size )
 
 /* Prints the header2 data to a stream
  */
-void libewf_debug_header2_fprint( FILE *stream, EWF_CHAR *header2, size_t size )
+void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t size )
 {
 	LIBEWF_CHAR *header_string = NULL;
 	static char *function      = "libewf_debug_header2_fprint";
@@ -328,7 +338,7 @@ void libewf_debug_header2_fprint( FILE *stream, EWF_CHAR *header2, size_t size )
 
 /* Print the chunk data to a stream
  */
-void libewf_debug_chunk_fprint( FILE *stream, EWF_CHAR *chunk )
+void libewf_debug_chunk_fprint( FILE *stream, EWF_CHUNK *chunk )
 {
 	static char *function = "libewf_debug_chunk_fprint";
 

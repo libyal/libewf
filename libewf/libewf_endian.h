@@ -43,12 +43,12 @@ extern "C" {
 /* Note: the _convert and _revert function always convert to little endian
  * do not replace with endian byte swap functions
  */
-int libewf_endian_convert_16bit( uint16_t *value, uint8_t *bytes );
-int libewf_endian_convert_32bit( uint32_t *value, uint8_t *bytes );
-int libewf_endian_convert_64bit( uint64_t *value, uint8_t *bytes );
-int libewf_endian_revert_16bit( uint16_t value, uint8_t *bytes );
-int libewf_endian_revert_32bit( uint32_t value, uint8_t *bytes );
-int libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes );
+int8_t libewf_endian_convert_16bit( uint16_t *value, uint8_t *bytes );
+int8_t libewf_endian_convert_32bit( uint32_t *value, uint8_t *bytes );
+int8_t libewf_endian_convert_64bit( uint64_t *value, uint8_t *bytes );
+int8_t libewf_endian_revert_16bit( uint16_t value, uint8_t *bytes );
+int8_t libewf_endian_revert_32bit( uint32_t value, uint8_t *bytes );
+int8_t libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes );
 
 #if defined( __cplusplus )
 }

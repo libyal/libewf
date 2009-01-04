@@ -200,7 +200,7 @@ void *libewf_common_alloc_cleared( size_t size, int clear_value );
 void *libewf_common_realloc_full_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value );
 void *libewf_common_realloc_new_cleared( void *buffer, size_t previous_size, size_t new_size, int clear_value );
 
-int libewf_common_test_empty_block( uint8_t *block_buffer, size_t size );
+uint8_t libewf_common_test_empty_block( uint8_t *block_buffer, size_t size );
 
 struct tm *libewf_common_localtime( const time_t *timestamp );
 
@@ -211,9 +211,9 @@ wchar_t *libewf_common_wide_ctime( const time_t *timestamp );
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-int libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t length );
+int8_t libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t length );
 
-int libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t length );
+int8_t libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t length );
 #endif
 
 #if defined( __cplusplus )

@@ -36,7 +36,7 @@
 
 #include "libewf_includes.h"
 
-#include "ewf_char.h"
+#include "ewf_chunk.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -71,11 +71,11 @@ struct libewf_chunk_cache
 
 	/* The compressed data buffer
 	 */
-	EWF_CHAR *compressed;
+	EWF_CHUNK *compressed;
 
 	/* The data buffer
 	 */
-	EWF_CHAR *data;
+	EWF_CHUNK *data;
 };
 
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size );

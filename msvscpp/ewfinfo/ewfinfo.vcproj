@@ -283,6 +283,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_digest_context.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_notify.h"
 				>
 			</File>

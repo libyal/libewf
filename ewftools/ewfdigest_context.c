@@ -230,7 +230,7 @@ int ewfdigest_context_finalize( EWFDIGEST_CONTEXT* digest_context, EWFDIGEST_HAS
 	if( EVP_DigestFinal_ex(
 	     digest_context,
 	     (unsigned char *) digest_hash,
-	     (unsigned int *) size ) != 1 )
+	     (unsigned int *) size  ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to finalize digest hash.\n",
 		 function );

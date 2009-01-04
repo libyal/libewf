@@ -53,7 +53,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	size *= EWF_CHAR_SIZE;
+	size *= EWF_CHUNK_SIZE;
 
 	if( size > (size_t) SSIZE_MAX )
 	{
@@ -62,7 +62,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	chunk_cache->compressed = (EWF_CHAR *) libewf_common_alloc( size );
+	chunk_cache->compressed = (EWF_CHUNK *) libewf_common_alloc( size );
 
 	if( chunk_cache->compressed == NULL )
 	{
@@ -73,7 +73,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	chunk_cache->data = (EWF_CHAR *) libewf_common_alloc( size );
+	chunk_cache->data = (EWF_CHUNK *) libewf_common_alloc( size );
 
 	if( chunk_cache->data == NULL )
 	{
@@ -99,8 +99,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
  */
 int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 {
-	EWF_CHAR *reallocation = NULL;
-	static char *function  = "libewf_chunk_cache_realloc";
+	EWF_CHUNK *reallocation = NULL;
+	static char *function   = "libewf_chunk_cache_realloc";
 
 	if( chunk_cache == NULL )
 	{
@@ -109,7 +109,7 @@ int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 
 		return( -1 );
 	}
-	size *= EWF_CHAR_SIZE;
+	size *= EWF_CHUNK_SIZE;
 
 	if( size > (size_t) SSIZE_MAX )
 	{
