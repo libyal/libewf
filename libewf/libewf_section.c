@@ -3972,6 +3972,119 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 	return( section_write_count );
 }
 
+#if defined( HAVE_DEBUG_OUTPUT )
+
+/* Reads a section from file for debugging purposes
+ * Returns the amount of bytes read, or -1 on error
+ */
+ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size )
+{
+	uint8_t *data              = NULL;
+	uint8_t *uncompressed_data = NULL;
+	static char *function      = "libewf_debug_read_section";
+	ssize_t read_count         = 0;
+	size_t uncompressed_size   = 0;
+	int result                 = 0;
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_size > (size64_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	uncompressed_size = (size_t) ( section_size * 2 );
+
+	if( uncompressed_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: uncompressed size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	data = (uint8_t *) libewf_common_alloc( (size_t) section_size );
+
+	if( data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_segment_file_read(
+	              segment_file,
+	              data,
+	              section_size );
+
+	if( read_count != (ssize_t) section_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read section data.\n",
+		 function );
+
+		libewf_common_free( data );
+
+		return( -1 );
+	}
+	uncompressed_data = (uint8_t *) libewf_common_alloc( uncompressed_size );
+
+	if( uncompressed_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate uncompressed data.\n",
+		 function );
+
+		libewf_common_free( data );
+
+		return( -1 );
+	}
+	result = libewf_uncompress(
+	          uncompressed_data,
+	          &uncompressed_size,
+	          data,
+	          (size_t) section_size );
+
+	if( result == 0 )
+	{
+		fprintf( stderr, "%s: data is UNCOMPRESSED.\n",
+		 function );
+
+		libewf_debug_dump_data(
+		 data,
+		 (size_t) section_size );
+	}
+	else if( result == 1 )
+	{
+		fprintf( stderr, "%s: data is zlib COMPRESSED.\n",
+		 function );
+
+		libewf_debug_dump_data(
+		 uncompressed_data,
+		 uncompressed_size );
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to uncompress data.\n",
+		 function );
+
+		libewf_common_free( data );
+		libewf_common_free( uncompressed_data );
+
+		return( -1 );
+	}
+	libewf_common_free( data );
+	libewf_common_free( uncompressed_data );
+
+	return( read_count );
+}
+
+#endif
+
 /* Reads and processes a section
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
@@ -4308,17 +4421,15 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 
 			return( -1 );
 		}
-		LIBEWF_VERBOSE_EXEC( libewf_debug_read_section(
-		                      internal_handle,
-		                      segment_file->file_descriptor,
-		                      (size_t) size ); );
+		LIBEWF_VERBOSE_EXEC( read_count = libewf_section_debug_read(
+		                                   segment_file,
+		                                   (size_t) size ); );
 #else
 		/* Skip the data within the section
 		 */
-		if( libewf_common_lseek(
-		     segment_file->file_descriptor,
-		     size,
-		     SEEK_CUR ) == -1 )
+		if( libewf_segment_file_lseek(
+		     segment_file,
+		     *section_end_offset ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 			 function );
