@@ -1,4 +1,4 @@
-.Dd September 4, 2008
+.Dd September 7, 2008
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -11,10 +11,12 @@
 .Op Fl c Ar compression_type
 .Op Fl d Ar digest_type
 .Op Fl f Ar format
+.Op Fl l Ar log_filename
 .Op Fl o Ar offset
+.Op Fl p Ar process_buffer_size
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
-.Op Fl hsquvVw
+.Op Fl hqsuvVw
 .Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfexport
@@ -29,41 +31,39 @@ is a library to support the Expert Witness Compression Format (EWF).
 .Nm libewf
 supports both the SMART format (EWF-S01) and the EnCase format (EWF-E01).
 .Nm libewf
-currently does not support the Logical Volume format (EWF-L01).
-EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
+currently does not support the Logical Volume format (EWF-L01). EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
 .Nm libewf
 allows you to read and write media data in the EWF format.
 .Pp
 .Ar ewf_files
-are the EWF file(s) to read the meta data from.
+the first or the entire set of EWF segment files
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
 .It Fl b Ar amount_of_sectors
-the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768
-(not used for raw format)
+the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768 (not used for raw format)
 .It Fl B Ar amount_of_bytes
 the amount of bytes to export
 .It Fl c Ar compression_type
-the compression type, options: none (default), empty-block, fast, best
-(not used for raw format)
+the compression type, options: none (default), empty-block, fast, best (not used for raw format)
 .It Fl d Ar digest_type
-calculate additional digest (hash) types besides md5, options: sha1
-(not used for raw format)
+calculate additional digest (hash) types besides md5, options: sha1 (not used for raw format)
 .It Fl f Ar format
 the file format to write to, options: raw (default), ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx.
 .It Fl h
 shows this help
+.It Fl l Ar log_filename
+logs verification errors and the digest (hash) to the log filename
+.It Fl o Ar offset
+specify the offset to start the export (default is 0)
+.It Fl p Ar process_buffer_size
+specify the process buffer size (default is the chunk size)
 .It Fl s
-swap byte pairs of the media data (from AB to BA)
-(use this for big to little endian conversion and vice versa)
+swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB)
-(minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
-(not used for raw format)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats) (not used for raw format)
 .It Fl t Ar target
-specify the target file to export to, use - for stdout (default is export)
-stdout is only supported for the raw format
+specify the target file to export to, use - for stdout (default is export) stdout is only supported for the raw format
 .It Fl u
 unattended mode (disables user interaction)
 .It Fl v
@@ -82,7 +82,7 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20080904 (libewf 20080904, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfexport 20080907 (libewf 20080907, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Information for export required, please provide the necessary input
 Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
@@ -90,7 +90,7 @@ Target path and filename with extension or - for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 
-Export started at: Thu Sep  4 19:19:40 2008
+Export started at: Sun Sep  7 19:19:40 2008
 
 This could take a while.
 
@@ -103,21 +103,24 @@ Status: at 100%.
         exported 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
         completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Export completed at: Thu Sep  4 19:19:41 2008
+Export completed at: Sun Sep  7 19:19:41 2008
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
+MD5 hash calculated over data:  ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
-Verbose and debug output are only printed when enabled at compilation.
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
 .Sh BUGS
-Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
-http://libewf.sourceforge.net/
+Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website: http://libewf.sourceforge.net/
 .Sh AUTHOR
+.Pp
 These man pages were written by Kees Mastwijk.
+.Pp
 Alterations for distribution have been made by Joachim Metz.
 .Sh COPYRIGHT
+.Pp
 Copyright 2006-2008 Kees Mastwijk, Hoffmann Investigations <forensics@hoffmannbv.nl> and contributors.
+.Pp
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 .Xr ewfacquire 1 ,

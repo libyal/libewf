@@ -79,6 +79,7 @@ typedef size_t u64;
 
 #include <libewf.h>
 
+#include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
@@ -99,16 +100,19 @@ void usage_fprint(
 	{
 		return;
 	}
-	fprintf( stream, "Usage: ewfacquire [ -d digest_type ] [ -l filename ] [ -hqsvV ] source\n\n" );
+
+	fprintf( stream, "Usage: ewfacquire [ -d digest_type ] [ -l log_filename ]\n"
+	                 "                  [ -p process_buffer_size ] [ -hqsvV ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
 	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
-	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the filename\n" );
+	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
+	fprintf( stream, "\t-p:     specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:     quiet shows no status information\n" );
-	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stream, "\t        (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n"
+	                 "\t        (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 }
@@ -318,12 +322,14 @@ int main( int argc, char * const argv[] )
 
 	system_integer_t option                  = 0;
 	ssize64_t write_count                    = 0;
+	size_t string_length                     = 0;
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;
 	uint32_t amount_of_acquiry_errors        = 0;
 	uint64_t input_size_variable             = 0;
 	uint64_t input_size                      = 0;
 	uint64_t maximum_segment_file_size       = 0;
+	uint64_t process_buffer_size             = 0;
 	uint64_t segment_file_size               = 0;
 	uint32_t sector_error_granularity        = 0;
 	uint32_t sectors_per_chunk               = 0;
@@ -342,6 +348,7 @@ int main( int argc, char * const argv[] )
 	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
 	int error_abort                          = 0;
 	int file_descriptor                      = 0;
+	int result                               = 0;
 	int status                               = 0;
 
 	ewfoutput_version_fprint(
@@ -351,7 +358,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:qsvV" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:p:qsvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -388,6 +395,24 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'l':
 				log_filename = optarg;
 
+				break;
+
+			case (system_integer_t) 'p':
+				string_length = system_string_length(
+				                 optarg );
+
+				result = ewfbyte_size_string_convert_system_character(
+				          optarg,
+				          string_length,
+				          &process_buffer_size );
+
+				if( ( result != 1 )
+				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
+				{
+					process_buffer_size = 0;
+
+					fprintf( stderr, "Unsupported process buffer size defaulting to: chunk size.\n" );
+				}
 				break;
 
 			case (system_integer_t) 'q':
@@ -1126,8 +1151,6 @@ int main( int argc, char * const argv[] )
 			       512,
 			       read_error_retry,
 			       sector_error_granularity,
-			       wipe_chunk_on_error,
-			       seek_on_error,
 			       calculate_md5,
 			       calculated_md5_hash_string,
 			       EWFSTRING_DIGEST_HASH_LENGTH_MD5,
@@ -1135,6 +1158,9 @@ int main( int argc, char * const argv[] )
 			       calculated_sha1_hash_string,
 			       EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 			       swap_byte_pairs,
+			       wipe_chunk_on_error,
+			       seek_on_error,
+			       (size_t) process_buffer_size,
 			       callback );
 
 		if( write_count <= -1 )

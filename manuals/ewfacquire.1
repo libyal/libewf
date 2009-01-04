@@ -1,4 +1,4 @@
-.Dd September 4, 2008
+.Dd September 7, 2008
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -7,7 +7,8 @@
 .Sh SYNOPSIS
 .Nm ewfacquire
 .Op Fl d Ar digest_type
-.Op Fl l Ar filename
+.Op Fl l Ar log_filename
+.Op Fl p Ar process_buffer_size
 .Op Fl hqsvV
 .Ar source
 .Sh DESCRIPTION
@@ -16,11 +17,9 @@ is a utility to acquire media data from a
 .Ar source
 and store it in EWF format (Expert Witness Compression Format).
 .Nm ewfacquire
-acquires media data in a format equivalent to EnCase and FTK imager, including meta data.
-Under Linux, FreeBSD, NetBSD, OpenBSD, MacOS\-X/Darwin
+acquires media data in a format equivalent to EnCase and FTK imager, including meta data. Under Linux, FreeBSD, NetBSD, OpenBSD, MacOS\-X/Darwin
 .Nm ewfacquire
-supports reading directly from device files.
-On other platforms
+supports reading directly from device files. On other platforms
 .Nm ewfacquire
 can convert a raw (dd) image into the EWF format.
 .Pp
@@ -33,13 +32,12 @@ is a library to support the Expert Witness Compression Format (EWF).
 .Nm libewf
 supports both the SMART format (EWF-S01) and the EnCase format (EWF-E01).
 .Nm libewf
-currently does not support the Logical Volume format (EWF-L01).
-EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
+currently does not support the Logical Volume format (EWF-L01). EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
 .Nm libewf
 allows you to read and write media data in the EWF format.
 .Pp
 .Ar source
-is the source or device file to acquire data from.
+the source file or device
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -47,13 +45,14 @@ The options are as follows:
 calculate additional digest (hash) types besides md5, options: sha1
 .It Fl h
 shows this help
-.It Fl l Ar filename
-logs acquiry errors and the digest (hash) to the filename
+.It Fl l Ar log_filename
+logs acquiry errors and the digest (hash) to the log filename
+.It Fl p Ar process_buffer_size
+specify the process buffer size (default is the chunk size)
 .It Fl q
 quiet shows no status information
 .It Fl s
-swap byte pairs of the media data (from AB to BA)
-(use this for big to little endian conversion and vice versa)
+swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl v
 verbose output to stderr
 .It Fl V
@@ -61,12 +60,9 @@ print version
 .El
 .Pp
 .Nm ewfacquire
-will read from a file or device until it encounters a read error.
-On read error it will retry the amount of retries specified.
-If
+will read from a file or device until it encounters a read error. On read error it will retry the amount of retries specified. If
 .Nm ewfacquire
-still is unable to read and, if specified, it will zero (wipe) the the remainder of the amount of sectors specified as error granularity.
-If
+still is unable to read and, if specified, it will zero (wipe) the the remainder of the amount of sectors specified as error granularity. If
 .Nm ewfacquire
 should mimic EnCase it will wipe all of sectors specified as error granularity.
 .Pp
@@ -82,7 +78,7 @@ None
 will ask for the information it requires.
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20080904 (libewf 20080904, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfacquire 20080907 (libewf 20080907, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Information about acquiry required, please provide the necessary input
 Image path and filename without extension: floppy
@@ -124,7 +120,7 @@ Wipe sectors on read error:     no
 
 Continue acquiry with these values (yes, no) [yes]:
 
-Acquiry started at: Thu Sep  4 11:32:41 2008
+Acquiry started at: Sun Sep  7 11:32:41 2008
 
 This could take a while.
 
@@ -137,23 +133,25 @@ Status: at 100%.
         acquired 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
         completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Acquiry completed at: Thu Sep  4 11:32:42 2008
+Acquiry completed at: Sun Sep  7 11:32:42 2008
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
 MD5 hash calculated over data: ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
-Verbose and debug output are only printed when enabled at compilation.
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
 .Sh BUGS
-Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
-http://libewf.sourceforge.net/
+Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website: http://libewf.sourceforge.net/
 .Sh AUTHOR
+.Pp
 These man pages were written by Kees Mastwijk.
+.Pp
 Alterations for distribution have been made by Joachim Metz.
 .Sh COPYRIGHT
+.Pp
 Copyright 2006-2008 Kees Mastwijk, Hoffmann Investigations <forensics@hoffmannbv.nl> and contributors.
+.Pp
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 .Xr ewfacquirestream 1 ,

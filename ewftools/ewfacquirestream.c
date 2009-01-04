@@ -117,44 +117,53 @@ void usage_fprint(
 			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
 			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
-	fprintf( stream, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
-	fprintf( stream, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -l filename ] [ -m media_type ] [ -M volume_type ]\n" );
-	fprintf( stream, "                        [ -N notes ] [ -S segment_file_size ] [ -t target ] [ -hsvVw ]\n\n" );
+	fprintf( stream, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ]\n"
+	                 "                        [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
+	                 "                        [ -e examiner_name ] [ -E evidence_number ]\n"
+	                 "                        [ -f format ] [ -l log_filename ] [ -m media_type ]\n"
+	                 "                        [ -M volume_type ] [ -N notes ]\n"
+	                 "                        [ -p process_buffer_size ] [ -S segment_file_size ]\n"
+	                 "                        [ -t target ] [ -hqsvVw ]\n\n" );
 
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
-	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
-	fprintf( stream, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast, best\n" );
+	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options:\n"
+	                 "\t    64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast\n"
+	                 "\t    or best\n" );
 	fprintf( stream, "\t-C: specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-D: specify the description (default is description).\n" );
 	fprintf( stream, "\t-e: specify the examiner name (default is examiner_name).\n" );
 	fprintf( stream, "\t-E: specify the evidence number (default is evidence_number).\n" );
-	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
-	fprintf( stream, "\t    encase5 (default), encase6, linen5, linen6, ewfx\n" );
+	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3,\n"
+	                 "\t    encase4, encase5 (default), encase6, linen5, linen6, ewfx\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
-	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the filename\n" );
+	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-m: specify the media type, options: fixed (default), removable\n" );
 	fprintf( stream, "\t-M: specify the volume type, options: logical, physical (default)\n" );
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
-	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stream, "\t-p: specify the process buffer size (default is the chunk size)\n" );
+	fprintf( stream, "\t-q: quiet shows no status information\n" );
+	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n"
+	                 "\t    (use this for big to little endian conversion and vice versa)\n" );
 
 	if( result == 1 )
 	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIs ")\n",
-		 default_segment_file_size_string );
-		fprintf( stream, "\t    (minimum is %" PRIs ", maximum is %" PRIs " for encase6 format and %" PRIs " for other formats)\n",
+		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIs ")\n"
+		                 "\t    (minimum is %" PRIs ", maximum is %" PRIs " for encase6 format\n"
+		                 "\t    and %" PRIs " for other formats)\n",
+		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
 		 maximum_32bit_segment_file_size_string );
 	}
 	else
 	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIu32 ")\n",
-		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
-		fprintf( stream, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
+		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIu32 ")\n"
+		                 "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format\n"
+		                 "\t    and %" PRIu32 " for other formats)\n",
+		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
 		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
@@ -200,9 +209,10 @@ int main( int argc, char * const argv[] )
 	system_integer_t option                    = 0;
 	size_t string_length                       = 0;
 	int64_t write_count                        = 0;
-	uint64_t segment_file_size                 = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	uint64_t acquiry_offset                    = 0;
 	uint64_t acquiry_size                      = 0;
+	uint64_t process_buffer_size               = 0;
+	uint64_t segment_file_size                 = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	uint32_t amount_of_acquiry_errors          = 0;
 	uint32_t sectors_per_chunk                 = 64;
 	uint32_t sector_error_granularity          = 64;
@@ -244,7 +254,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "b:c:C:d:D:e:E:f:hl:m:M:N:sS:t:vVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "b:c:C:d:D:e:E:f:hl:m:M:N:p:qsS:t:vVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -367,8 +377,26 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'q':
+			case (system_integer_t) 'p':
+				string_length = system_string_length(
+				                 optarg );
 
+				result = ewfbyte_size_string_convert_system_character(
+				          optarg,
+				          string_length,
+				          &process_buffer_size );
+
+				if( ( result != 1 )
+				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
+				{
+					process_buffer_size = 0;
+
+					fprintf( stderr, "Unsupported process buffer size defaulting to: chunk size.\n" );
+				}
+				break;
+
+			case (system_integer_t) 'q':
+				callback = NULL;
 				break;
 
 			case (system_integer_t) 's':
@@ -388,14 +416,14 @@ int main( int argc, char * const argv[] )
 				if( ( result != 1 )
 				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
 				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-				{
-					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu32 ".\n",
-					 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 
-					segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+					segment_file_size = (uint64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+				{
+					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
+					 segment_file_size );
 				}
 				break;
 
@@ -800,8 +828,6 @@ int main( int argc, char * const argv[] )
 			       512,
 			       read_error_retry,
 			       sector_error_granularity,
-			       wipe_chunk_on_error,
-			       seek_on_error,
 			       calculate_md5,
 			       calculated_md5_hash_string,
 			       EWFSTRING_DIGEST_HASH_LENGTH_MD5,
@@ -809,6 +835,9 @@ int main( int argc, char * const argv[] )
 			       calculated_sha1_hash_string,
 			       EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 			       swap_byte_pairs,
+			       wipe_chunk_on_error,
+			       seek_on_error,
+			       (size_t) process_buffer_size,
 			       callback );
 
 		if( write_count <= -1 )

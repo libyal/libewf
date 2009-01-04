@@ -120,18 +120,18 @@ Known issues:
 
 Next release(s):
 
+* ewfacquirestream will not be killed by CTRL+C
+
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?
 
-* ewfacquire, ewfacquirestream, ewfexport, ewfverify: allow for variable read buffer size, this should allow performance testing
-* ewfexport: calculate the MD5 hash of exported data and validate this with the stored hash?
-* ewfexport: log hashes to file -l option
 * ewfverify: verify against all available hashes that can be verified, print others
 
 * have segment file number in libewf_raw_read_chunk for warning output?
 
 * remove file io pool from lower levels and pass file io handle ?
 
+* add export sha1 to automated tests
 * create floppy-table-errors.E01 for testing purpose
   - error in primary offset table
   - error in secondary offset table
@@ -161,7 +161,7 @@ Next release(s):
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
-* implement io pooling?
+* implement file io pooling?
   - add means to set open file handle limit
 
 * make compilation resilient for missing crypto library
@@ -192,6 +192,13 @@ CLOSED
 Version: 20080907
 * worked on refactoring functions in ewfinput, too large input is now flushed
 * refactored ewfcommon_determine_operating_system
+* ewftools: added process buffer size option
+  - this allows performance testing using different buffer sizes
+* ewftools: added missing in usage information
+* ewfexport: added -l option
+* ewfexport: added calculation of MD5 adn SHA1 hash of exported data
+* ewfexport: fixed bug exporting with SHA1 hash
+* ewftools: updated manuals
 
 Version: 20080906
 * refactored section list to use list type

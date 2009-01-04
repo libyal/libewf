@@ -56,12 +56,16 @@
 
 #include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
+#include "ewfdigest_context.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
 #include "ewfinput.h"
+#include "ewfmd5.h"
 #include "ewfoutput.h"
 #include "ewfprocess_status.h"
 #include "ewfsignal.h"
+#include "ewfsha1.h"
+#include "ewfstring.h"
 
 #define EWFEXPORT_INPUT_BUFFER_SIZE	64
 
@@ -111,51 +115,61 @@ void usage_fprint(
 			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
 			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
-	fprintf( stream, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -d digest_type ] [ -f format ]\n" );
-	fprintf( stream, "                 [ -o offset ] [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
+	fprintf( stream, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ]\n"
+	                 "                 [ -c compression_type ] [ -d digest_type ] [ -f format ]\n"
+	                 "                 [ -l log_filename ] [ -o offset ] [ -p process_buffer_size ]\n"
+	                 "                 [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] ewf_files\n\n" );
 
-	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
-	fprintf( stream, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t    (not used for raw format)\n" );
-	fprintf( stream, "\t-B: specify the amount of bytes to export (default is all bytes)\n" );
-	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast, best\n" );
-	fprintf( stream, "\t    (not used for raw format)\n" );
-	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stream, "\t    (not used for raw format)\n" );
-	fprintf( stream, "\t-f: specify the file format to write to, options: raw (default), ewf, smart,\n" );
-	fprintf( stream, "\t    encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx\n" );
-	fprintf( stream, "\t-h: shows this help\n" );
-	fprintf( stream, "\t-q: quiet shows no status information\n" );
-	fprintf( stream, "\t-o: specify the offset to start the export (default is 0)\n" );
-	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stream, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
-	fprintf( stream, "\t    stdout is only supported for the raw format\n" );
+	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
+
+	fprintf( stream, "\t-b:        specify the amount of sectors to read at once (per chunk), options:\n"
+	                 "\t           64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n"
+	                 "\t           (not used for raw format)\n" );
+	fprintf( stream, "\t-B:        specify the amount of bytes to export (default is all bytes)\n" );
+	fprintf( stream, "\t-c:        specify the compression type, options: none (default), empty-block,\n"
+	                 "\t           fast or best (not used for raw format)\n" );
+	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n"
+	                 "\t           (not used for raw format)\n" );
+	fprintf( stream, "\t-f:        specify the file format to write to, options: raw (default), ewf,\n"
+	                 "\t           smart, encase1, encase2, encase3, encase4, encase5, encase6, linen5,\n"
+	                 "\t           linen6, ewfx\n" );
+	fprintf( stream, "\t-h:        shows this help\n" );
+	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the log_filename\n" );
+	fprintf( stream, "\t-o:        specify the offset to start the export (default is 0)\n" );
+	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
+	fprintf( stream, "\t-q:        quiet shows no status information\n" );
+	fprintf( stream, "\t-s:        swap byte pairs of the media data (from AB to BA)\n"
+	                 "\t           (use this for big to little endian conversion and vice versa)\n" );
 
 	if( result == 1 )
 	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIs ")\n",
-		 default_segment_file_size_string );
-		fprintf( stream, "\t    (minimum is %" PRIs ", maximum is %" PRIs " for encase6 format and %" PRIs " for other formats)\n",
+		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIs ")\n"
+		                 "\t           (minimum is %" PRIs ", maximum is %" PRIs " for encase6 format\n"
+		                 "\t           and %" PRIs " for other formats)\n"
+		                 "\t           (not used for raw format)\n",
+		 default_segment_file_size_string,
 		 minimum_segment_file_size_string,
 		 maximum_64bit_segment_file_size_string,
 		 maximum_32bit_segment_file_size_string );
 	}
 	else
 	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIu32 ")\n",
-		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
-		fprintf( stream, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
+		fprintf( stream, "\t-S:        specify the segment file size in bytes (default is %" PRIu32 ")\n"
+		                 "\t           (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format\n"
+		                 "\t           and %" PRIu32 " for other formats)\n"
+		                 "\t           (not used for raw format)\n",
+		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
 		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
 		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
 	}
-	fprintf( stream, "\t    (not used for raw format)\n" );
 
-	fprintf( stream, "\t-u: unattended mode (disables user interaction)\n" );
-	fprintf( stream, "\t-v: verbose output to stderr\n" );
-	fprintf( stream, "\t-V: print version\n" );
-	fprintf( stream, "\t-w: wipe sectors on CRC error (mimic EnCase like behavior)\n" );
+	fprintf( stream, "\t-t:        specify the target file to export to, use - for stdout (default is\n"
+	                 "\t           export) stdout is only supported for the raw format\n" );
+	fprintf( stream, "\t-u:        unattended mode (disables user interaction)\n" );
+	fprintf( stream, "\t-v:        verbose output to stderr\n" );
+	fprintf( stream, "\t-V:        print version\n" );
+	fprintf( stream, "\t-w:        wipe sectors on CRC error (mimic EnCase like behavior)\n" );
 }
 
 /* The main program
@@ -176,21 +190,27 @@ int main( int argc, char * const argv[] )
 
 	libewf_handle_t *export_handle             = NULL;
 	character_t *acquiry_software_version      = NULL;
+	character_t *calculated_md5_hash_string    = NULL;
+	character_t *calculated_sha1_hash_string   = NULL;
 	character_t *fixed_string_variable         = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfexport" );
 
 	system_character_t * const *argv_filenames = NULL;
 	system_character_t **ewf_filenames         = NULL;
+	system_character_t *log_filename           = NULL;
 	system_character_t *target_filename        = NULL;
 
+	FILE *log_file_stream                      = NULL;
 	void *callback                             = &ewfprocess_status_update;
+
 	system_integer_t option                    = 0;
 	size64_t media_size                        = 0;
 	ssize64_t export_count                     = 0;
-	size_t target_filename_length              = 0;
-	uint64_t maximum_segment_file_size         = 0;
+	size_t string_length                       = 0;
 	uint64_t export_offset                     = 0;
 	uint64_t export_size                       = 0;
+	uint64_t maximum_segment_file_size         = 0;
+	uint64_t process_buffer_size               = 0;
 	uint64_t segment_file_size                 = 0;
 	uint32_t amount_of_crc_errors              = 0;
 	uint32_t sectors_per_chunk                 = 64;
@@ -250,7 +270,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "b:B:c:d:f:ho:qsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "b:B:c:d:f:hl:o:p:qsS:t:uvVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -354,6 +374,11 @@ int main( int argc, char * const argv[] )
 				}
 				return( EXIT_SUCCESS );
 
+			case (system_integer_t) 'l':
+				log_filename = optarg;
+
+				break;
+
 			case (system_integer_t) 'o':
 				export_offset = libewf_system_string_to_int64(
 				                 optarg,
@@ -362,6 +387,24 @@ int main( int argc, char * const argv[] )
 
 				argument_set_offset = 1;
 
+				break;
+
+			case (system_integer_t) 'p':
+				string_length = system_string_length(
+				                 optarg );
+
+				result = ewfbyte_size_string_convert_system_character(
+				          optarg,
+				          string_length,
+				          &process_buffer_size );
+
+				if( ( result != 1 )
+				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
+				{
+					process_buffer_size = 0;
+
+					fprintf( stderr, "Unsupported process buffer size defaulting to: chunk size.\n" );
+				}
 				break;
 
 			case (system_integer_t) 'q':
@@ -398,8 +441,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 't':
-				target_filename_length = system_string_length(
-				                          optarg );
+				string_length = system_string_length(
+				                 optarg );
 
 				if( target_filename != NULL )
 				{
@@ -407,7 +450,7 @@ int main( int argc, char * const argv[] )
 					 target_filename );
 				}
 				target_filename = (system_character_t *) memory_allocate(
-				                                          sizeof( system_character_t ) * ( target_filename_length + 1 ) );
+				                                          sizeof( system_character_t ) * ( string_length + 1 ) );
 
 				if( target_filename == NULL )
 				{
@@ -418,7 +461,7 @@ int main( int argc, char * const argv[] )
 				if( system_string_copy(
 				     target_filename,
 				     optarg,
-				     target_filename_length ) == NULL )
+				     string_length ) == NULL )
 				{
 					fprintf( stderr, "Unable to set target filename.\n" );
 
@@ -427,7 +470,7 @@ int main( int argc, char * const argv[] )
 
 					return( EXIT_FAILURE );
 				}
-				target_filename[ target_filename_length ] = 0;
+				target_filename[ string_length ] = 0;
 
 				break;
 
@@ -832,6 +875,41 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to attach signal handler.\n" );
 		}
 	}
+	if( calculate_md5 == 1 )
+	{
+		calculated_md5_hash_string = (character_t *) memory_allocate( 
+		                                              sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+
+		if( calculated_md5_hash_string == NULL )
+		{
+			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
+
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
+			return( EXIT_FAILURE );
+		}
+	}
+	if( calculate_sha1 == 1 )
+	{
+		calculated_sha1_hash_string = (character_t *) memory_allocate( 
+		                                               sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+
+		if( calculated_sha1_hash_string == NULL )
+		{
+			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
+
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
+			return( EXIT_FAILURE );
+		}
+	}
 	if( ewfcommon_abort == 0 )
 	{
 		if( target_filename == NULL )
@@ -846,6 +924,19 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to create target filename.\n" );
 
+				if( calculate_sha1 == 1 )
+				{
+					memory_free(
+					 calculated_sha1_hash_string );
+				}
+				if( calculate_md5 == 1 )
+				{
+					memory_free(
+					 calculated_md5_hash_string );
+				}
+				libewf_close(
+				 ewfcommon_libewf_handle );
+			
 				return( EXIT_FAILURE );
 			}
 			if( system_string_copy(
@@ -858,6 +949,19 @@ int main( int argc, char * const argv[] )
 				memory_free(
 				 target_filename );
 
+				if( calculate_sha1 == 1 )
+				{
+					memory_free(
+					 calculated_sha1_hash_string );
+				}
+				if( calculate_md5 == 1 )
+				{
+					memory_free(
+					 calculated_md5_hash_string );
+				}
+				libewf_close(
+				 ewfcommon_libewf_handle );
+			
 				return( EXIT_FAILURE );
 			}
 		}
@@ -872,12 +976,22 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to initialize process status.\n" );
 
-			libewf_close(
-			 ewfcommon_libewf_handle );
-			
 			memory_free(
 			 target_filename );
 
+			if( calculate_sha1 == 1 )
+			{
+				memory_free(
+				 calculated_sha1_hash_string );
+			}
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+			
 			return( EXIT_FAILURE );
 		}
 		if( ewfprocess_status_start(
@@ -888,11 +1002,21 @@ int main( int argc, char * const argv[] )
 			ewfprocess_status_free(
 			 &process_status );
 
-			libewf_close(
-			 ewfcommon_libewf_handle );
-
 			memory_free(
 			 target_filename );
+
+			if( calculate_sha1 == 1 )
+			{
+				memory_free(
+				 calculated_sha1_hash_string );
+			}
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
 
 			return( EXIT_FAILURE );
 		}
@@ -918,6 +1042,16 @@ int main( int argc, char * const argv[] )
 				ewfprocess_status_free(
 				 &process_status );
 
+				if( calculate_sha1 == 1 )
+				{
+					memory_free(
+					 calculated_sha1_hash_string );
+				}
+				if( calculate_md5 == 1 )
+				{
+					memory_free(
+					 calculated_md5_hash_string );
+				}
 				libewf_close(
 				 ewfcommon_libewf_handle );
 
@@ -944,9 +1078,14 @@ int main( int argc, char * const argv[] )
 			                export_offset,
 			                sectors_per_chunk,
 			                calculate_md5,
+			                calculated_md5_hash_string,
+			                EWFSTRING_DIGEST_HASH_LENGTH_MD5,
 			                calculate_sha1,
+			                calculated_sha1_hash_string,
+			                EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 			                swap_byte_pairs,
 			                wipe_chunk_on_error,
+			                (size_t) process_buffer_size,
 			                acquiry_operating_system,
 			                program,
 			                acquiry_software_version,
@@ -960,6 +1099,19 @@ int main( int argc, char * const argv[] )
 				ewfprocess_status_free(
 				 &process_status );
 
+				if( calculate_sha1 == 1 )
+				{
+					memory_free(
+					 calculated_sha1_hash_string );
+				}
+				if( calculate_md5 == 1 )
+				{
+					memory_free(
+					 calculated_md5_hash_string );
+				}
+				libewf_close(
+				 ewfcommon_libewf_handle );
+
 				return( EXIT_FAILURE );
 			}
 		}
@@ -970,8 +1122,15 @@ int main( int argc, char * const argv[] )
 			                target_filename,
 			                export_size,
 			                export_offset,
+			                calculate_md5,
+			                calculated_md5_hash_string,
+			                EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+			                calculate_sha1,
+			                calculated_sha1_hash_string,
+			                EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 			                swap_byte_pairs,
 			                wipe_chunk_on_error,
+			                (size_t) process_buffer_size,
 			                callback );
 
 			memory_free(
@@ -1000,6 +1159,16 @@ int main( int argc, char * const argv[] )
 		ewfprocess_status_free(
 		 &process_status );
 
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
 		libewf_close(
 		 ewfcommon_libewf_handle );
 
@@ -1010,6 +1179,16 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to free process status.\n" );
 
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
 		libewf_close(
 		 ewfcommon_libewf_handle );
 
@@ -1017,16 +1196,51 @@ int main( int argc, char * const argv[] )
 	}
 	if( status == EWFPROCESS_STATUS_COMPLETED )
 	{
+		if( log_filename != NULL )
+		{
+			log_file_stream = ewfcommon_fopen(
+					   log_filename,
+					   _SYSTEM_CHARACTER_T_STRING( "a" ) );
+
+			if( log_file_stream == NULL )
+			{
+				fprintf( stderr, "Unable to open log file: %s.\n",
+				 log_filename );
+			}
+		}
 		ewfoutput_crc_errors_fprint(
 		 stderr,
 		 ewfcommon_libewf_handle,
 		 &amount_of_crc_errors );
+
+		if( log_file_stream != NULL )
+		{
+			ewfoutput_crc_errors_fprint(
+			 log_file_stream,
+			 ewfcommon_libewf_handle,
+			 &amount_of_crc_errors );
+		}
 	}
 	if( libewf_close(
 	     ewfcommon_libewf_handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
+		if( log_file_stream != NULL )
+		{
+			file_stream_io_fclose(
+			 log_file_stream );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( ewfsignal_detach() != 1 )
@@ -1035,7 +1249,57 @@ int main( int argc, char * const argv[] )
 	}
 	if( status != EWFPROCESS_STATUS_COMPLETED )
 	{
+		if( log_file_stream != NULL )
+		{
+			file_stream_io_fclose(
+			 log_file_stream );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
 		return( EXIT_FAILURE );
+	}
+	if( calculate_md5 == 1 )
+	{
+		fprintf( stderr, "MD5 hash calculated over data:\t%" PRIs "\n",
+		 calculated_md5_hash_string );
+
+		if( log_file_stream != NULL )
+		{
+			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
+			 calculated_md5_hash_string );
+		}
+		memory_free(
+		 calculated_md5_hash_string );
+	}
+	if( calculate_sha1 == 1 )
+	{
+		fprintf( stderr, "SHA1 hash calculated over data:\t%" PRIs "\n",
+		 calculated_sha1_hash_string );
+
+		if( log_file_stream != NULL )
+		{
+			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
+			 calculated_sha1_hash_string );
+		}
+		memory_free(
+		 calculated_sha1_hash_string );
+	}
+	if( log_file_stream != NULL )
+	{
+		if( file_stream_io_fclose(
+		     log_file_stream ) != 0 )
+		{
+			fprintf( stderr, "Unable to close log file: %s.\n",
+			 log_filename );
+		}
 	}
 	return( EXIT_SUCCESS );
 }

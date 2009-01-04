@@ -1,4 +1,4 @@
-.Dd September 4, 2008
+.Dd September 7, 2008
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -7,7 +7,7 @@
 .Sh SYNOPSIS
 .Nm ewfinfo
 .Op Fl d Ar date_format
-.Op Fl himvV
+.Op Fl ehimvV
 .Ar ewf_files
 .Sh DESCRIPTION
 .Nm ewfinfo
@@ -22,13 +22,12 @@ is a library to support the Expert Witness Compression Format (EWF).
 .Nm libewf
 supports both the SMART format (EWF-S01) and the EnCase format (EWF-E01).
 .Nm libewf
-currently does not support the Logical Volume format (EWF-L01).
-EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
+currently does not support the Logical Volume format (EWF-L01). EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
 .Nm libewf
 allows you to read and write media data in the EWF format.
 .Pp
 .Ar ewf_files
-are the EWF file(s) to read the meta data from.
+the first or the entire set of EWF segment files
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
@@ -54,7 +53,7 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfinfo -d dm floppy.E01
-ewfinfo 20080904 (libewf 20080904, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfinfo 20080907 (libewf 20080907, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Acquiry information
         Case number:            1
@@ -79,16 +78,18 @@ Media information
         MD5 hash in file:       ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
-Verbose and debug output are only printed when enabled at compilation.
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
 .Sh BUGS
-Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
-http://libewf.sourceforge.net/
+Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website: http://libewf.sourceforge.net/
 .Sh AUTHOR
+.Pp
 These man pages were written by Kees Mastwijk.
+.Pp
 Alterations for distribution have been made by Joachim Metz.
 .Sh COPYRIGHT
+.Pp
 Copyright 2006-2008 Kees Mastwijk, Hoffmann Investigations <forensics@hoffmannbv.nl> and contributors.
+.Pp
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 .Xr ewfacquire 1 ,

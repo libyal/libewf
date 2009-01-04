@@ -1,4 +1,4 @@
-.Dd September 4, 2008
+.Dd September 7, 2008
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -14,20 +14,19 @@
 .Op Fl e Ar examiner_name
 .Op Fl E Ar evidence_number
 .Op Fl f Ar format
-.Op Fl l Ar filename
+.Op Fl l Ar log_filename
 .Op Fl m Ar media_type
 .Op Fl M Ar volume_type
 .Op Fl N Ar notes
+.Op Fl p Ar process_buffer_size
 .Op Fl S Ar segment_file_size
 .Op Fl t Ar target
-.Op Fl hsvVw
+.Op Fl hqsvVw
 .Sh DESCRIPTION
 .Nm ewfacquirestream
-is a utility to acquire media data from stdin
-and store it in EWF format (Expert Witness Format).
+is a utility to acquire media data from stdin and store it in EWF format (Expert Witness Format).
 .Nm ewfacquirestream
-acquires media data in a format equivalent to EnCase and FTK imager, including meta data.
-Under Linux, FreeBSD, NetBSD, OpenBSD, MacOS\-X/Darwin
+acquires media data in a format equivalent to EnCase and FTK imager, including meta data. Under Linux, FreeBSD, NetBSD, OpenBSD, MacOS\-X/Darwin
 .Pp
 .Nm ewfacquirestream
 is part of the
@@ -38,8 +37,7 @@ is a library to support the Expert Witness Compression Format (EWF).
 .Nm libewf
 supports both the SMART format (EWF-S01) and the EnCase format (EWF-E01).
 .Nm libewf
-currently does not support the Logical Volume format (EWF-L01).
-EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
+currently does not support the Logical Volume format (EWF-L01). EWF-X is an expirimental format intended for testing purposes to enhance the EWF format.
 .Nm libewf
 allows you to read and write media data in the EWF format.
 .Pp
@@ -65,20 +63,22 @@ the EWF file format to write to, options: ftk, encase2, encase3, encase4, encase
 does not support streamed writes for other EWF formats.
 .It Fl h
 shows this help
-.It Fl l Ar filename
-logs acquiry errors and the digest (hash) to the filename
+.It Fl l Ar log_filename
+logs acquiry errors and the digest (hash) to the log filename
 .It Fl m Ar media_type
 the media type, options: fixed (default), removable
 .It Fl M Ar volume_type
 the volume type, options: logical, physical (default)
 .It Fl N Ar notes
 the notes (default is notes)
+.It Fl p Ar process_buffer_size
+specify the process buffer size (default is the chunk size)
+.It Fl q
+quiet shows no status information
 .It Fl s
-swap byte pairs of the media data (from AB to BA)
-(use this for big to little endian conversion and vice versa)
+swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB)
-(minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
+the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
 .It Fl t Ar target
 the target file (without extension) to write to (default is stream)
 .It Fl v
@@ -101,7 +101,7 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfacquirestream -C 1 -D Floppy -E 1.1 -e 'John D.' -N 'Just a floppy in my system' -m removable -M physical -t floppy </dev/fd0
-ewfacquirestream 20080904 (libewf 20080904, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfacquirestream 20080907 (libewf 20080907, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Using the following acquiry parameters:
 Image path and filename:        floppy.E01
@@ -122,29 +122,29 @@ Error granularity:              64 sectors
 Retries on read error:          2
 Wipe sectors on read error:     no
 
-Acquiry started at: Thu Sep  4 11:32:41 2008
+Acquiry started at: Sun Sep  7 11:32:41 2008
 
 This could take a while.
 
 Status: acquired 1.4 MiB (1474560 bytes)
         in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Acquiry completed at: Thu Sep  4 11:32:42 2008
+Acquiry completed at: Sun Sep  7 11:32:42 2008
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
 MD5 hash calculated over data: ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ed
 .Sh DIAGNOSTICS
-Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.
-Verbose and debug output are only printed when enabled at compilation.
+Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.
 .Sh BUGS
-Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website:
-http://libewf.sourceforge.net/
+Please report bugs of any kind to <forensics@hoffmannbv.nl> or on the project website: http://libewf.sourceforge.net/
 .Sh AUTHOR
 These man pages were written by Joachim Metz.
 .Sh COPYRIGHT
+.Pp
 Copyright 2006-2008 Joachim Metz, Hoffmann Investigations <forensics@hoffmannbv.nl> and contributors.
+.Pp
 This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 .Sh SEE ALSO
 .Xr ewfacquire 1 ,
