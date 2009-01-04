@@ -63,12 +63,39 @@
 
 #include <time.h>
 
-#define PRI_jd_EWF	"jd"
-#define PRI_jd_EWF	"jd"
-#define PRI_jx_EWF	"jx"
-#define PRI_zd_EWF	"zd"
-#define PRI_zu_EWF	"zu"
-#define PRI_zx_EWF	"zx"
+#if defined( HAVE_PRINTF_JD )
+
+#define PRIjd_EWF	"jd"
+
+#elif SIZEOF_OFF_T == 8
+
+#define PRIjd_EWF	PRId64
+
+#else
+
+#define PRIjd_EWF	PRId32
+
+#endif
+
+#if defined( HAVE_PRINTF_ZD )
+
+#define PRIzd_EWF	"zd"
+#define PRIzu_EWF	"zu"
+#define PRIzx_EWF	"zx"
+
+#elif SIZEOF_SIZE_T == 8
+
+#define PRIzd_EWF	PRId32
+#define PRIzu_EWF	PRIu32
+#define PRIzx_EWF	PRIx32
+
+#else
+
+#define PRIzd_EWF	PRId32
+#define PRIzu_EWF	PRIu32
+#define PRIzx_EWF	PRIx32
+
+#endif
 
 #if defined( HAVE_STDARG_H )
 

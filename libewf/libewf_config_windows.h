@@ -58,6 +58,11 @@
 #undef HAVE_SYS_IOCTL_H
 #undef HAVE_SYS_UTSNAME_H
 
+/* Windows does not have printf "%jd" and "%zd"
+ */
+#undef HAVE_PRINTF_JD
+#undef HAVE_PRINTF_ZD
+
 /* Use Windows crypto API instead of libcrypto or equivalent
  */
 #undef HAVE_OPENSSL_MD5_H

@@ -43,7 +43,9 @@
  * Sets the filename and the file descriptor in the file io handle struct
  * Returns 1 if successful, or -1 on error
  */
-int libewf_file_io_handle_open( libewf_file_io_handle_t *file_io_handle, uint8_t flags )
+int libewf_file_io_handle_open(
+     libewf_file_io_handle_t *file_io_handle,
+     uint8_t flags )
 {
 	static char *function = "libewf_file_io_handle_open";
 
@@ -81,7 +83,10 @@ int libewf_file_io_handle_open( libewf_file_io_handle_t *file_io_handle, uint8_t
  * Updates the file io handle offset
  * Returns the amount of bytes read if successful, or -1 on errror
  */
-ssize_t libewf_file_io_handle_read( libewf_file_io_handle_t *file_io_handle, void *buffer, size_t size )
+ssize_t libewf_file_io_handle_read(
+         libewf_file_io_handle_t *file_io_handle,
+         void *buffer,
+         size_t size )
 {
 	static char *function = "libewf_file_io_handle_read";
 	ssize_t read_count    = 0;
@@ -142,7 +147,10 @@ ssize_t libewf_file_io_handle_read( libewf_file_io_handle_t *file_io_handle, voi
  * Updates the file io handle offset
  * Returns the amount of bytes written if successful, or -1 on errror
  */
-ssize_t libewf_file_io_handle_write( libewf_file_io_handle_t *file_io_handle, void *buffer, size_t size )
+ssize_t libewf_file_io_handle_write(
+         libewf_file_io_handle_t *file_io_handle,
+         void *buffer,
+         size_t size )
 {
 	static char *function = "libewf_file_io_handle_write";
 	ssize_t write_count   = 0;
@@ -202,7 +210,9 @@ ssize_t libewf_file_io_handle_write( libewf_file_io_handle_t *file_io_handle, vo
 /* Seeks a certain offset within the a file io handle
  * Returns 1 if the seek is successful, or -1 on error
  */
-off64_t libewf_file_io_handle_seek_offset( libewf_file_io_handle_t *file_io_handle, off64_t offset )
+off64_t libewf_file_io_handle_seek_offset(
+         libewf_file_io_handle_t *file_io_handle,
+         off64_t offset )
 {
 	static char *function = "libewf_file_io_handle_seek_offset";
 
@@ -236,7 +246,7 @@ off64_t libewf_file_io_handle_seek_offset( libewf_file_io_handle_t *file_io_hand
 	}
 	if( file_io_handle->file_offset != offset )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %jd in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd_EWF " in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
 		 function, offset, file_io_handle->filename, file_io_handle->file_descriptor );
 
 		if( libewf_common_lseek(
@@ -244,7 +254,7 @@ off64_t libewf_file_io_handle_seek_offset( libewf_file_io_handle_t *file_io_hand
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %jd in file io handle: %" PRIs_EWF_filename ".\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd_EWF " in file io handle: %" PRIs_EWF_filename ".\n",
 			 function, offset, file_io_handle->filename );
 
 			return( -1 );

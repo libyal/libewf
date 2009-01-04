@@ -20,6 +20,52 @@ AC_DEFUN([LIBEWF_TEST_ENABLE],
 	  [ac_libewf_enable_$2=$4])dnl
 ])
 
+dnl Function to detect if printf conversion specifier "%jd" is available
+AC_DEFUN([LIBEWF_PRINTF_JD],
+	[SAVE_CFLAGS="$CFLAGS"
+	 CFLAGS="$CFLAGS -Wall -Werror"
+	 AC_LANG_PUSH(C)
+	 AC_MSG_CHECKING(
+	  [if printf support the conversion specifier "%jd"])
+	 AC_LINK_IFELSE(
+		AC_LANG_PROGRAM(
+		 [[#include <stdio.h>]],
+		 [[printf( "%jd" ); ]]),
+		[AC_MSG_RESULT(
+		 [no])],
+		[AC_MSG_RESULT(
+		 [yes])
+		AC_DEFINE(
+		 [HAVE_PRINTF_JD],
+		 [1],
+		 [Define to 1 if printf supports the conversion specifier "%jd".] )] )
+	AC_LANG_POP(C)
+	CFLAGS="$SAVE_CFLAGS"]
+)
+
+dnl Function to detect if printf conversion specifier "%zd" is available
+AC_DEFUN([LIBEWF_PRINTF_ZD],
+	[SAVE_CFLAGS="$CFLAGS"
+	 CFLAGS="$CFLAGS -Wall -Werror"
+	 AC_LANG_PUSH(C)
+	 AC_MSG_CHECKING(
+	  [if printf support the conversion specifier "%zd"])
+	 AC_LINK_IFELSE(
+		AC_LANG_PROGRAM(
+		 [[#include <stdio.h>]],
+		 [[printf( "%zd" ); ]]),
+		[AC_MSG_RESULT(
+		 [no])],
+		[AC_MSG_RESULT(
+		 [yes])
+		AC_DEFINE(
+		 [HAVE_PRINTF_ZD],
+		 [1],
+		 [Define to 1 if printf supports the conversion specifier "%zd".] )] )
+	AC_LANG_POP(C)
+	CFLAGS="$SAVE_CFLAGS"]
+)
+
 dnl Function to detect if ctime_r is defined according to the POSIX standard
 AC_DEFUN([LIBEWF_FUNC_CTIME_R],
 	[AC_CHECK_FUNC(
@@ -294,6 +340,9 @@ AC_CHECK_TYPE(
 AC_CHECK_TYPE([ssize_t])
 AC_CHECK_TYPE([u64])
 
+AC_CHECK_SIZEOF([off_t])
+AC_CHECK_SIZEOF([size_t])
+
 dnl Check for functions
 AC_CHECK_FUNCS([atoll])
 AC_CHECK_FUNCS([ctime])
@@ -330,6 +379,10 @@ AC_FUNC_STRERROR_R
 AC_FUNC_VPRINTF
 
 LIBEWF_FUNC_CTIME_R
+
+dnl Check for printf conversion specifier support
+LIBEWF_PRINTF_JD
+LIBEWF_PRINTF_ZD
 
 dnl Check for enabling libcrypto EVP support
 AS_IF(

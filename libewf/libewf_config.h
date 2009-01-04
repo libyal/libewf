@@ -126,6 +126,12 @@
 /* Define to 1 if you have the <openssl/sha.h> header file. */
 /* #undef HAVE_OPENSSL_SHA_H */
 
+/* Define to 1 if printf supports the conversion specifier "%jd". */
+#define HAVE_PRINTF_JD 1
+
+/* Define to 1 if printf supports the conversion specifier "%zd". */
+#define HAVE_PRINTF_ZD 1
+
 /* Defines if libewf's read and write raw functionality should be used in the
    ewf tools */
 /* #undef HAVE_RAW_ACCESS */
@@ -233,7 +239,7 @@
 /* #undef HAVE_VARARGS_H */
 
 /* Defines if verbose output should be used */
-#define HAVE_VERBOSE_OUTPUT 1
+/* #undef HAVE_VERBOSE_OUTPUT */
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
@@ -318,6 +324,12 @@
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "20080305"
+
+/* The size of `size_t', as computed by sizeof. */
+#define SIZEOF_SIZE_T 4
+
+/* The size of `ssize_t', as computed by sizeof. */
+#define SIZEOF_SSIZE_T 4
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1

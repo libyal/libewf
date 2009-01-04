@@ -144,7 +144,6 @@ Next stable:
 * test abort
 * test session section R/W functionality
 
-* implement signal handling in ewfalter
 * fix signal handling for WIN32
 
 CLOSED
@@ -173,6 +172,7 @@ CLOSED
 Version: 20080305
 * worked on signal handling
 * fixed issues with date string in header
+* fixes for missing printf "%jd" and "%zd" under Cygwin and WIN32
 
 Version: 20080304
 * worked on signal handling
