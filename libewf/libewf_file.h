@@ -158,7 +158,7 @@ LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
 LIBEWF_EXTERN int libewf_get_acquiry_error(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
-                   off64_t *sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors  );
 
 LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
@@ -168,10 +168,8 @@ LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
 LIBEWF_EXTERN int libewf_get_crc_error(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
-                   off64_t *sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
-
-#if defined( LIBEWF_SESSION_SUPPORT )
 
 LIBEWF_EXTERN int libewf_get_amount_of_sessions(
                    LIBEWF_HANDLE *handle,
@@ -180,10 +178,8 @@ LIBEWF_EXTERN int libewf_get_amount_of_sessions(
 LIBEWF_EXTERN int libewf_get_session(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
-                   off64_t *sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
-
-#endif
 
 LIBEWF_EXTERN int libewf_get_write_amount_of_chunks(
                    LIBEWF_HANDLE *handle,
@@ -302,22 +298,18 @@ LIBEWF_EXTERN int libewf_parse_hash_values(
 
 LIBEWF_EXTERN int libewf_add_acquiry_error(
                    LIBEWF_HANDLE *handle,
-                   off64_t sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN int libewf_add_crc_error(
                    LIBEWF_HANDLE *handle,
-                   off64_t sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
-
-#if defined( LIBEWF_SESSION_SUPPORT )
 
 LIBEWF_EXTERN int libewf_add_session(
                    LIBEWF_HANDLE *handle,
-                   off64_t sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
-
-#endif
 
 LIBEWF_EXTERN int libewf_copy_header_values(
                    LIBEWF_HANDLE *destination_handle,

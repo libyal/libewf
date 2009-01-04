@@ -114,6 +114,10 @@ struct libewf_internal_handle
 	 */
 	libewf_sector_table_t *acquiry_errors;
 
+	/* The stored sessions information
+	 */
+	libewf_sector_table_t *sessions;
+
 	/* The current chunk
 	 */
 	uint32_t current_chunk;

@@ -174,7 +174,7 @@ void libewf_sector_table_free(
 int libewf_sector_table_get_sector(
      libewf_sector_table_t *sector_table,
      uint32_t index,
-     off64_t *sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
 	static char *function = "libewf_sector_table_get_sector";
@@ -197,9 +197,9 @@ int libewf_sector_table_get_sector(
 
 		return( -1 );
 	}
-	if( sector == NULL )
+	if( first_sector == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid first sector.\n",
 		 function );
 
 		return( -1 );
@@ -218,7 +218,7 @@ int libewf_sector_table_get_sector(
 
 		return( -1 );
 	}
-	*sector            = sector_table->sector[ index ].sector;
+	*first_sector      = sector_table->sector[ index ].first_sector;
 	*amount_of_sectors = sector_table->sector[ index ].amount_of_sectors;
 
 	return( 1 );
@@ -229,7 +229,7 @@ int libewf_sector_table_get_sector(
  */
 int libewf_sector_table_add_sector(
      libewf_sector_table_t *sector_table,
-     off64_t sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors,
      int merge_continious_entries )
 {
@@ -246,9 +246,9 @@ int libewf_sector_table_add_sector(
 
 		return( -1 );
 	}
-	if( sector < 0 )
+	if( first_sector < 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector value is below zero.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid first sector value is below zero.\n",
 		 function );
 
 		return( -1 );
@@ -260,15 +260,15 @@ int libewf_sector_table_add_sector(
 		 */
 		for( iterator = 0; iterator < sector_table->amount; iterator++ )
 		{
-			last_range_sector = sector_table->sector[ iterator ].sector
+			last_range_sector = sector_table->sector[ iterator ].first_sector
 			                  + sector_table->sector[ iterator ].amount_of_sectors;
 
-			if( ( sector >= sector_table->sector[ iterator ].sector )
-			 && ( sector <= last_range_sector ) )
+			if( ( first_sector >= sector_table->sector[ iterator ].first_sector )
+			 && ( first_sector <= last_range_sector ) )
 			{
 				/* Merge current sector with existing
 				 */
-				last_sector = sector + amount_of_sectors;
+				last_sector = first_sector + amount_of_sectors;
 
 				if( last_sector > last_range_sector )
 				{
@@ -293,7 +293,7 @@ int libewf_sector_table_add_sector(
 	}
 	sector_table->sector = reallocation;
 
-	sector_table->sector[ sector_table->amount ].sector            = sector;
+	sector_table->sector[ sector_table->amount ].first_sector      = first_sector;
 	sector_table->sector[ sector_table->amount ].amount_of_sectors = amount_of_sectors;
 
 	sector_table->amount += 1;

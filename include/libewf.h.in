@@ -365,7 +365,7 @@ LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
 LIBEWF_EXTERN int libewf_get_acquiry_error(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
-                   off64_t *sector,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
 
 /* Retrieves the amount of CRC errors
@@ -381,7 +381,23 @@ LIBEWF_EXTERN int libewf_get_amount_of_crc_errors(
 LIBEWF_EXTERN int libewf_get_crc_error(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
-                   off64_t *sector,
+                   off64_t *first_sector,
+                   uint32_t *amount_of_sectors );
+
+/* Retrieves the amount of sessions
+ * Returns 1 if successful, 0 if no sessions are present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_amount_of_sessions(
+                   LIBEWF_HANDLE *handle,
+                   uint32_t *amount_of_sessions );
+
+/* Retrieves the information of a session
+ * Returns 1 if successful, 0 if no sessions could be found or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_session(
+                   LIBEWF_HANDLE *handle,
+                   uint32_t index,
+                   off64_t *first_sector,
                    uint32_t *amount_of_sectors );
 
 /* Retrieves the amount of chunks written
@@ -966,7 +982,7 @@ LIBEWF_EXTERN int libewf_parse_hash_values(
  */
 LIBEWF_EXTERN int libewf_add_acquiry_error(
                    LIBEWF_HANDLE *handle,
-                   off64_t sector,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
 
 /* Add a CRC error
@@ -974,7 +990,15 @@ LIBEWF_EXTERN int libewf_add_acquiry_error(
  */
 LIBEWF_EXTERN int libewf_add_crc_error(
                    LIBEWF_HANDLE *handle,
-                   off64_t sector,
+                   off64_t first_sector,
+                   uint32_t amount_of_sectors );
+
+/* Add a session
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_add_session(
+                   LIBEWF_HANDLE *handle,
+                   off64_t first_sector,
                    uint32_t amount_of_sectors );
 
 /* Copies the header values from the source to the destination handle

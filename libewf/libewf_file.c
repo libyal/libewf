@@ -1288,7 +1288,7 @@ int libewf_get_amount_of_acquiry_errors(
 int libewf_get_acquiry_error(
      LIBEWF_HANDLE *handle,
      uint32_t index,
-     off64_t *sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
 	static char *function = "libewf_get_acquiry_error";
@@ -1300,17 +1300,10 @@ int libewf_get_acquiry_error(
 
 		return( -1 );
 	}
-	if( sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
 	return( libewf_sector_table_get_sector(
 	         ( (libewf_internal_handle_t *) handle )->acquiry_errors,
 	         index,
-	         sector,
+	         first_sector,
 	         amount_of_sectors ) );
 }
 
@@ -1365,7 +1358,7 @@ int libewf_get_amount_of_crc_errors(
 int libewf_get_crc_error(
      LIBEWF_HANDLE *handle,
      uint32_t index,
-     off64_t *sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -1390,11 +1383,9 @@ int libewf_get_crc_error(
 	return( libewf_sector_table_get_sector(
 	         internal_handle->read->crc_errors,
 	         index,
-	         sector,
+	         first_sector,
 	         amount_of_sectors ) );
 }
-
-#if defined( LIBEWF_SESSION_SUPPORT )
 
 /* Retrieves the amount of sessions
  * Returns 1 if successful or -1 on error
@@ -1440,11 +1431,10 @@ int libewf_get_amount_of_sessions(
 int libewf_get_session(
      LIBEWF_HANDLE *handle,
      uint32_t index,
-     off64_t *sector,
+     off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_get_session";
+	static char *function = "libewf_get_session";
 
 	if( handle == NULL )
 	{
@@ -1453,16 +1443,12 @@ int libewf_get_session(
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
 	return( libewf_sector_table_get_sector(
-	         internal_handle->sessions,
+	         ( (libewf_internal_handle_t *) handle )->sessions,
 	         index,
-	         sector,
+	         first_sector,
 	         amount_of_sectors ) );
 }
-
-#endif
 
 /* Retrieves the amount of chunks written
  * Returns 1 if successful or -1 on error
@@ -2669,7 +2655,7 @@ int libewf_parse_hash_values(
  */
 int libewf_add_acquiry_error(
      LIBEWF_HANDLE *handle,
-     off64_t sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors )
 {
 	static char *function = "libewf_add_acquiry_error";
@@ -2683,7 +2669,7 @@ int libewf_add_acquiry_error(
 	}
 	return( libewf_sector_table_add_sector(
 	         ( (libewf_internal_handle_t *) handle )->acquiry_errors,
-	         sector,
+	         first_sector,
 	         amount_of_sectors,
 	         1 ) );
 }
@@ -2693,7 +2679,7 @@ int libewf_add_acquiry_error(
  */
 int libewf_add_crc_error(
      LIBEWF_HANDLE *handle,
-     off64_t sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2717,23 +2703,20 @@ int libewf_add_crc_error(
 	}
 	return( libewf_sector_table_add_sector(
 	         internal_handle->read->crc_errors,
-	         sector,
+	         first_sector,
 	         amount_of_sectors,
 	         1 ) );
 }
 
-#if defined( LIBEWF_SESSION_SUPPORT )
-
-/* Add a CRC error
+/* Add a session
  * Returns 1 if successful or -1 on error
  */
-int libewf_add_crc_error(
+int libewf_add_session(
      LIBEWF_HANDLE *handle,
-     off64_t sector,
+     off64_t first_sector,
      uint32_t amount_of_sectors )
 {
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_add_crc_error";
+	static char *function = "libewf_add_session";
 
 	if( handle == NULL )
 	{
@@ -2742,23 +2725,12 @@ int libewf_add_crc_error(
 
 		return( -1 );
 	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->read == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
-		 function );
-
-		return( -1 );
-	}
 	return( libewf_sector_table_add_sector(
-	         internal_handle->read->crc_errors,
-	         sector,
+	         ( (libewf_internal_handle_t *) handle )->sessions,
+	         first_sector,
 	         amount_of_sectors,
 	         0 ) );
 }
-
-#endif
 
 /* Copies the header values from the source to the destination handle
  * Returns 1 if successful or -1 on error

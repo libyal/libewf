@@ -3202,16 +3202,16 @@ ssize_t libewf_section_error2_read(
 
 		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
-			if( libewf_endian_convert_32bit( &sector, error2_sectors[ iterator ].sector ) != 1 )
+			if( libewf_endian_convert_32bit( &sector, error2_sectors[ iterator ].first_sector ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to convert sector value.\n",
+				LIBEWF_WARNING_PRINT( "%s: unable to convert first sector value.\n",
 				 function );
 
 				libewf_common_free( error2_sectors );
 
 				return( -1 );
 			}
-			acquiry_errors->sector[ iterator ].sector = (uint64_t) sector;
+			acquiry_errors->sector[ iterator ].first_sector = (uint64_t) sector;
 
 			if( libewf_endian_convert_32bit(
 			     &( acquiry_errors->sector[ iterator ].amount_of_sectors ),
@@ -3305,10 +3305,10 @@ ssize_t libewf_section_error2_write(
 	for( iterator = 0; iterator < acquiry_errors->amount; iterator++ )
 	{
 		if( libewf_endian_revert_32bit(
-		     (uint32_t) acquiry_errors->sector[ iterator ].sector,
-		     error2_sectors[ iterator ].sector ) != 1 )
+		     (uint32_t) acquiry_errors->sector[ iterator ].first_sector,
+		     error2_sectors[ iterator ].first_sector ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to revert sector value.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to revert first sector value.\n",
 			 function );
 
 			libewf_common_free( error2_sectors );

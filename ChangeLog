@@ -164,7 +164,7 @@ CLOSED
 
 Version: 20080302
 * Code clean up
-* worked on session support currently protected by define LIBEWF_SESSION_SUPPORT
+* worked on session support
 
 Version: 20080301
 * Code clean up
