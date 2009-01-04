@@ -61,7 +61,10 @@ extern "C" {
 #define LIBEWF_COMPRESSIONTYPE_FAST "f"
 #define LIBEWF_COMPRESSIONTYPE_BEST "b"
 
-typedef struct libewf_header_values LIBEWF_HEADER_VALUES;
+#define LIBEWF_HEADER_VALUES libewf_header_values_t
+#define LIBEWF_HEADER_VALUES_SIZE sizeof( LIBEWF_HEADER_VALUES )
+
+typedef struct libewf_header_values libewf_header_values_t;
 
 struct libewf_header_values
 {
@@ -114,13 +117,13 @@ struct libewf_header_values
 	char *unknown_dc;
 };
 
-#define LIBEWF_HEADER_VALUES_SIZE sizeof( LIBEWF_HEADER_VALUES )
-
 LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void );
 char *libewf_header_value_string_alloc( uint32_t amount );
 void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values );
 
 char **libewf_split_string( char *string, int delimiter, uint32_t *amount );
+void libewf_split_values_free( char **split_values, uint32_t amount );
+
 char *libewf_convert_date_header_value( char *header_value, uint8_t date_format );
 char *libewf_generate_date_header_value( time_t timestamp );
 char *libewf_convert_date_header2_value( char *header_value, uint8_t date_format );

@@ -103,13 +103,15 @@ char *ewf_md5hash_to_string( EWF_MD5HASH *md5hash )
 {
 	/* An md5 hash consists of 32 characters + 1 end of string
 	 */
-	char *string          = (char *) libewf_alloc( 33 * sizeof( char ) );
+	char *string          = NULL;
 	unsigned char md5char = 0;
 	uint64_t iterator     = 0;
 
+	string = (char *) libewf_alloc( 33 * sizeof( char ) );
+
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "evf_md5hash_to_string: unable to allocate string.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_md5hash_to_string: unable to allocate string.\n" );
 
 		return( NULL );
 	}
@@ -117,7 +119,14 @@ char *ewf_md5hash_to_string( EWF_MD5HASH *md5hash )
 	{
 		md5char = *( md5hash + iterator );
 
-		snprintf( &string[ iterator * 2 ], 3, "%02x", md5char );
+		if( snprintf( &string[ iterator * 2 ], 3, "%02x", md5char ) <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "ewf_md5hash_to_string: unable to fill string.\n" );
+
+			libewf_free( string );
+
+			return( NULL );
+		}
 	}
 	return( string );
 }

@@ -162,7 +162,7 @@ uint32_t libewf_strlen( const char *string )
 
 /* Function to wrap strchr
  */
-char *libewf_strchr( const char *string, int character )
+char *libewf_strchr( const char *string, uint8_t character )
 {
 	if( string == NULL )
 	{
@@ -170,7 +170,26 @@ char *libewf_strchr( const char *string, int character )
 
 		return( NULL );
 	}
-	return( strchr( string, character ) );
+	return( strchr( string, (int) character ) );
+}
+
+/* Function to wrap strncmp
+ */
+uint8_t libewf_strncmp( const char *string1, const char *string2, uint32_t length )
+{
+	if( string1 == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_strncmp: invalid string1.\n" );
+
+		return( -1 );
+	}
+	if( string2 == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_strncmp: invalid string2.\n" );
+
+		return( -1 );
+	}
+	return( (uint8_t) strncmp( string1, string2, (size_t) length ) );
 }
 
 /* Function to wrap read

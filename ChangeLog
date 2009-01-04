@@ -9,7 +9,7 @@ To do/think about:
 * read: add functionality for byte swap in data for endian fix of data - test this
 * read: warn when maximum offsets in table of S01 format is exceeded
 * all: add LVF support - ltree section
-* all: make a more generic libewf_string (use this in ewf_header, ewf_ltree) also move ASCII and UTF code here
+* all: make a more generic libewf_string (use this in ewf_header, ewf_ltree) also move ASCII and UTF, split code here
 * write: reduce multiple successive error2 entries to a single
 * write: add additional data to file for different EWF formats
 * ewfacquire: make size input and output human friendly (support kM notation etc)
@@ -60,7 +60,8 @@ Finished:
   - ewf_volume_smart (c/h)
 
 To do:
-  - libewf_header_values (c/h)
+  - libewf_header_values (c/h) - refering code
+
   - libewf_offset_table (c/h)
   - libewf_section_list (c/h)
   - libewf_segment_table (c/h)
@@ -68,6 +69,10 @@ To do:
   - libewf_file_read (c/h)
   - libewf_file_write (c/h)
   - libewf_file (c/h)
+
+Version: 20060828
+* worked on code clean up and improved error handling
+* fixed bug - reminder do not free result from localtime()
 
 Version: 20060826
 * worked on code clean up and improved error handling
