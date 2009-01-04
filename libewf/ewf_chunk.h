@@ -53,9 +53,9 @@ extern "C" {
 	ewf_string_write_from_buffer( chunk, file_descriptor, length )
 
 #define ewf_chunk_compress( compressed_chunk, compressed_size, uncompressed_chunk, uncompressed_size, compression_level ) \
-	ewf_compress ( compressed_chunk, compressed_size, uncompressed_chunk, uncompressed_size, compression_level )
+	ewf_compress( compressed_chunk, compressed_size, uncompressed_chunk, uncompressed_size, compression_level )
 #define ewf_chunk_uncompress( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size ) \
-	ewf_uncompress ( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size )
+	ewf_uncompress( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size )
 
 #ifdef __cplusplus
 }

@@ -2099,20 +2099,22 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, uint64_t write_size, uint64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_sha1, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	EWFSHA1_CONTEXT sha1_context;
-#if defined( TEST_RAW_WRITE )
-	EWF_CRC chunk_crc             = 0;
-#endif
 
 	LIBEWF_CHAR *sha1_hash_string = NULL;
 #if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-	uint8_t *data                 = 0;
+	uint8_t *data                 = NULL;
 #endif
 	static char *function         = "ewfcommon_write_from_file_descriptor";
 	size_t buffer_size            = 0;
 	int64_t total_write_count     = 0;
 	int64_t write_count           = 0;
-	uint32_t chunk_size           = 0;
 	int32_t read_count            = 0;
+	uint32_t chunk_size           = 0;
+#if defined( TEST_RAW_WRITE )
+	uint32_t chunk_crc            = 0;
+	int8_t is_compressed          = 0;
+	int8_t write_crc              = 0;
+#endif
 
 	if( handle == NULL )
 	{
@@ -2260,17 +2262,24 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			break;
 		}
 #if defined( TEST_RAW_WRITE )
-		if( ewf_crc_calculate( &chunk_crc, data, read_count, 1 ) != 1 )
+		if( libewf_write_prepare_buffer(
+		     handle,
+		     data,
+		     read_count,
+		     NULL,
+		     0,
+		     &is_compressed,
+		     &chunk_crc,
+		     &write_crc ) <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "ERROR\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to prepare buffer.\n",
+			 function );
+
+#if ! defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
+			libewf_common_free( data );
+#endif
 			return( -1 );
 		}
-		if( libewf_endian_revert_32bit( chunk_crc, &( data[ read_count ] ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "ERROR\n" );
-			return( -1 );
-		}
-		read_count += EWF_CRC_SIZE;
 #endif
 		if( calculate_sha1 == 1 )
 		{

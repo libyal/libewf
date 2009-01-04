@@ -723,9 +723,9 @@ int main( int argc, char * const argv[] )
 	filenames[ 0 ] = filename;
 
 #if defined( TEST_RAW_WRITE )
-	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
-#else
 	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_RAW_WRITE );
+#else
+	handle = libewf_open( (CHAR_T * const *) filenames, 1, LIBEWF_OPEN_WRITE );
 #endif
 
 	if( handle == NULL )

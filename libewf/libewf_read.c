@@ -413,7 +413,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chu
 
 			if( stored_crc != calculated_crc )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_read_chunk: CRC does not match for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", chunk, stored_crc, calculated_crc );
+				LIBEWF_WARNING_PRINT( "libewf_read_chunk: CRC does not match for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", ( chunk + 1 ), stored_crc, calculated_crc );
 
 #ifdef WIPEONERROR
 				/* The chunk data is wiped

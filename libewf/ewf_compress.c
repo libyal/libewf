@@ -70,6 +70,13 @@ int8_t ewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t 
 
 		return( -1 );
 	}
+	if( compressed_data == uncompressed_data )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid uncompressed data buffer equals compressed data buffer.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( compressed_size == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid compressed size.\n",
@@ -102,7 +109,12 @@ int8_t ewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t 
 	}
 	safe_compressed_size = (uLongf) *compressed_size;
 
-	result = compress2( (Bytef *) compressed_data, &safe_compressed_size, (Bytef *) uncompressed_data, (uLong) uncompressed_size, zlib_compression_level );
+	result = compress2(
+	          (Bytef *) compressed_data,
+	          &safe_compressed_size,
+	          (Bytef *) uncompressed_data,
+	          (uLong) uncompressed_size,
+	          zlib_compression_level );
 
 	if( result == Z_OK )
 	{
@@ -166,6 +178,13 @@ int8_t ewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, ui
 
 		return( -1 );
 	}
+	if( uncompressed_data == compressed_data )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid compressed data buffer equals uncompressed data buffer.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( uncompressed_size == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid uncompressed size.\n",
@@ -175,7 +194,11 @@ int8_t ewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, ui
 	}
 	safe_uncompressed_size = (uLongf) *uncompressed_size;
 
-	result = uncompress( (Bytef *) uncompressed_data, &safe_uncompressed_size, (Bytef *) compressed_data, (uLong) compressed_size );
+	result = uncompress(
+	          (Bytef *) uncompressed_data,
+	          &safe_uncompressed_size,
+	          (Bytef *) compressed_data,
+	          (uLong) compressed_size );
 
 	if( result == Z_OK )
 	{

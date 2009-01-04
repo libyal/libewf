@@ -1,4 +1,4 @@
-.Dd Juny 13, 2007
+.Dd Juny 16, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -22,6 +22,10 @@
 .Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
 .Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset"
+.Ft ssize_t
+.Fn libewf_write_raw_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
+.Ft ssize_t
+.Fn libewf_write_raw_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
 .Ft ssize_t
 .Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
 .Ft int8_t
@@ -236,6 +240,11 @@ will the necessary correction to the set of EWF files.
 Note that certain information like the calculated MD5 has is not available if
 .Fn libewf_write_finalize
 has not been issued.
+.Pp
+The
+.Fn libewf_write_raw_prepare_buffer ,
+.Fn libewf_write_raw_buffer
+functions can be used to write 'raw' chunks to a set of EWF files.
 .Pp
 The
 .Fn libewf_get_*
