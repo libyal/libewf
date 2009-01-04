@@ -169,14 +169,14 @@ LIBEWF_EXTERN int libewf_get_amount_of_header_values(
 LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   char *value,
-                   size_t length );
+                   char *identifier,
+                   size_t identifier_length );
 
 LIBEWF_EXTERN int libewf_get_header_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    char *value,
-                   size_t length );
+                   size_t value_length );
 
 LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
                    libewf_handle_t *handle,
@@ -185,14 +185,14 @@ LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
 LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   char *value,
-                   size_t length );
+                   char *identifier,
+                   size_t identifier_length );
 
 LIBEWF_EXTERN int libewf_get_hash_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    char *value,
-                   size_t length );
+                   size_t value_length );
 
 LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
                    libewf_handle_t *handle,
@@ -281,13 +281,13 @@ LIBEWF_EXTERN int libewf_set_header_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    const char *value,
-                   size_t length );
+                   size_t value_length );
 
 LIBEWF_EXTERN int libewf_set_hash_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    const char *value,
-                   size_t length );
+                   size_t value_length );
 
 LIBEWF_EXTERN int libewf_parse_header_values(
                    libewf_handle_t *handle,

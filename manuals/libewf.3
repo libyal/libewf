@@ -145,9 +145,9 @@ Functions available for narrow character string support:
 .Ft int
 .Fn libewf_get_delta_segment_filename "libewf_handle_t *handle, char *filename, size_t size"
 .Ft int
-.Fn libewf_get_header_value_identifier "libewf_handle_t *handle, uint32_t index, char *value, size_t length"
+.Fn libewf_get_header_value_identifier "libewf_handle_t *handle, uint32_t index, char *identifier, size_t identifier_length"
 .Ft int
-.Fn libewf_get_header_value "libewf_handle_t *handle, const char *identifier, char *value, size_t length"
+.Fn libewf_get_header_value "libewf_handle_t *handle, const char *identifier, char *value, size_t value_length"
 .Ft int
 .Fn libewf_get_header_value_case_number "libewf_handle_t *handle, char *case_number, size_t length"
 .Ft int
@@ -171,9 +171,9 @@ Functions available for narrow character string support:
 .Ft int
 .Fn libewf_get_header_value_compression_type "libewf_handle_t *handle, char *compression_type, size_t length"
 .Ft int
-.Fn libewf_get_hash_value_identifier "libewf_handle_t *handle, uint32_t index, char *value, size_t length"
+.Fn libewf_get_hash_value_identifier "libewf_handle_t *handle, uint32_t index, char *identifier, size_t identifier_length"
 .Ft int
-.Fn libewf_get_hash_value "libewf_handle_t *handle, const char *identifier, char *value, size_t length"
+.Fn libewf_get_hash_value "libewf_handle_t *handle, const char *identifier, char *value, size_t value_length"
 .Ft int
 .Fn libewf_get_hash_value_md5 "libewf_handle_t *handle, char *value, size_t length"
 .Ft int
@@ -183,7 +183,7 @@ Functions available for narrow character string support:
 .Ft int
 .Fn libewf_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t size"
 .Ft int
-.Fn libewf_set_header_value "libewf_handle_t *handle, const char *identifier, const char *value, size_t length"
+.Fn libewf_set_header_value "libewf_handle_t *handle, const char *identifier, const char *value, size_t value_length"
 .Ft int
 .Fn libewf_set_header_value_case_number "libewf_handle_t *handle, const char *case_number, size_t length"
 .Ft int
@@ -211,7 +211,7 @@ Functions available for narrow character string support:
 .Ft int
 .Fn libewf_set_header_value_serial_number "libewf_handle_t *handle, const char *serial_number, size_t length"
 .Ft int
-.Fn libewf_set_hash_value "libewf_handle_t *handle, const char *identifier, const char *value, size_t length"
+.Fn libewf_set_hash_value "libewf_handle_t *handle, const char *identifier, const char *value, size_t value_length"
 .Ft int
 .Fn libewf_set_hash_value_md5 "libewf_handle_t *handle, const char *value, size_t length"
 .Ft int

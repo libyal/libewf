@@ -83,9 +83,9 @@ int libewf_get_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -101,9 +101,9 @@ int libewf_get_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -117,9 +117,9 @@ int libewf_get_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -133,9 +133,9 @@ int libewf_get_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -165,9 +165,9 @@ int libewf_get_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -183,9 +183,9 @@ int libewf_get_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -199,9 +199,9 @@ int libewf_get_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -215,9 +215,9 @@ int libewf_get_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -247,9 +247,9 @@ int libewf_get_amount_of_sectors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -265,9 +265,9 @@ int libewf_get_amount_of_sectors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -281,9 +281,9 @@ int libewf_get_amount_of_sectors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -297,9 +297,9 @@ int libewf_get_amount_of_sectors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -329,9 +329,9 @@ int libewf_get_chunk_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -347,9 +347,9 @@ int libewf_get_chunk_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -363,9 +363,9 @@ int libewf_get_chunk_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -379,9 +379,9 @@ int libewf_get_chunk_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -411,9 +411,9 @@ int libewf_get_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -429,9 +429,9 @@ int libewf_get_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -445,9 +445,9 @@ int libewf_get_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -461,9 +461,9 @@ int libewf_get_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -494,9 +494,9 @@ int libewf_get_compression_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -512,9 +512,9 @@ int libewf_get_compression_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -528,9 +528,9 @@ int libewf_get_compression_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -561,9 +561,9 @@ int libewf_get_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -579,9 +579,9 @@ int libewf_get_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -595,9 +595,9 @@ int libewf_get_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -616,9 +616,9 @@ int libewf_get_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -648,9 +648,9 @@ int libewf_get_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -666,9 +666,9 @@ int libewf_get_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -682,9 +682,9 @@ int libewf_get_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -698,9 +698,9 @@ int libewf_get_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -730,9 +730,9 @@ int libewf_get_media_flags(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -748,9 +748,9 @@ int libewf_get_media_flags(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -764,9 +764,9 @@ int libewf_get_media_flags(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -780,9 +780,9 @@ int libewf_get_media_flags(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -812,9 +812,9 @@ int libewf_get_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -830,9 +830,9 @@ int libewf_get_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -846,9 +846,9 @@ int libewf_get_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -884,9 +884,9 @@ int libewf_get_format(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -902,9 +902,9 @@ int libewf_get_format(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -918,9 +918,9 @@ int libewf_get_format(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -934,9 +934,9 @@ int libewf_get_format(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -967,9 +967,9 @@ int libewf_get_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -985,9 +985,9 @@ int libewf_get_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1001,9 +1001,9 @@ int libewf_get_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1017,9 +1017,9 @@ int libewf_get_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1036,9 +1036,9 @@ int libewf_get_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1067,9 +1067,9 @@ int libewf_get_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1085,9 +1085,9 @@ int libewf_get_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1128,9 +1128,9 @@ int libewf_get_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1144,9 +1144,9 @@ int libewf_get_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1163,9 +1163,9 @@ int libewf_get_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1196,9 +1196,9 @@ int libewf_get_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1214,9 +1214,9 @@ int libewf_get_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1269,9 +1269,9 @@ int libewf_get_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1287,9 +1287,9 @@ int libewf_get_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1342,9 +1342,9 @@ int libewf_get_delta_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1360,9 +1360,9 @@ int libewf_get_delta_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1415,9 +1415,9 @@ int libewf_get_delta_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1433,9 +1433,9 @@ int libewf_get_delta_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1485,9 +1485,9 @@ int libewf_get_amount_of_acquiry_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1503,9 +1503,9 @@ int libewf_get_amount_of_acquiry_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1519,9 +1519,9 @@ int libewf_get_amount_of_acquiry_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1553,9 +1553,9 @@ int libewf_get_acquiry_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1604,9 +1604,9 @@ int libewf_get_amount_of_crc_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1622,9 +1622,9 @@ int libewf_get_amount_of_crc_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1638,9 +1638,9 @@ int libewf_get_amount_of_crc_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1654,9 +1654,9 @@ int libewf_get_amount_of_crc_errors(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1689,9 +1689,9 @@ int libewf_get_crc_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1707,9 +1707,9 @@ int libewf_get_crc_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1758,9 +1758,9 @@ int libewf_get_amount_of_sessions(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1776,9 +1776,9 @@ int libewf_get_amount_of_sessions(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1792,9 +1792,9 @@ int libewf_get_amount_of_sessions(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1826,9 +1826,9 @@ int libewf_get_session(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1877,9 +1877,9 @@ int libewf_get_write_amount_of_chunks(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1895,9 +1895,9 @@ int libewf_get_write_amount_of_chunks(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1911,9 +1911,9 @@ int libewf_get_write_amount_of_chunks(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1943,9 +1943,9 @@ int libewf_get_header_codepage(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1961,9 +1961,9 @@ int libewf_get_header_codepage(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -1977,9 +1977,9 @@ int libewf_get_header_codepage(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2009,9 +2009,9 @@ int libewf_get_amount_of_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2027,9 +2027,9 @@ int libewf_get_amount_of_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2043,15 +2043,17 @@ int libewf_get_amount_of_header_values(
 }
 
 /* Retrieves the header value identifier specified by its index
+ * The strings are encoded in UTF-8
+ * The length should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_header_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
-     char *value,
-     size_t length )
+     char *identifier,
+     size_t identifier_length )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                    = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value_identifier";
 	int result                                = 0;
@@ -2066,9 +2068,9 @@ int libewf_get_header_value_identifier(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2081,8 +2083,8 @@ int libewf_get_header_value_identifier(
 	result = libewf_values_table_get_identifier(
 	          internal_handle->header_values,
 	          index,
-	          (libewf_character_t *) value,
-	          length,
+	          (libewf_character_t *) identifier,
+	          identifier_length,
 	          &error );
 
 	if( result == -1 )
@@ -2103,15 +2105,17 @@ int libewf_get_header_value_identifier(
 }
 
 /* Retrieves the header value specified by the identifier
+ * The strings are encoded in UTF-8
+ * The length should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_header_value(
      libewf_handle_t *handle,
      const char *identifier,
      char *value,
-     size_t length )
+     size_t value_length )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value";
 	size_t identifier_length                  = 0;
@@ -2127,9 +2131,9 @@ int libewf_get_header_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2145,9 +2149,9 @@ int libewf_get_header_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2161,9 +2165,9 @@ int libewf_get_header_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2179,7 +2183,7 @@ int libewf_get_header_value(
 	          (libewf_character_t *) identifier,
 	          identifier_length,
 	          (libewf_character_t *) value,
-	          length,
+	          value_length,
 	          &error );
 
 	if( result == -1 )
@@ -2220,9 +2224,9 @@ int libewf_get_amount_of_hash_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2238,9 +2242,9 @@ int libewf_get_amount_of_hash_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2254,15 +2258,17 @@ int libewf_get_amount_of_hash_values(
 }
 
 /* Retrieves the hash value identifier specified by its index
+ * The strings are encoded in UTF-8
+ * The length should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_hash_value_identifier(
      libewf_handle_t *handle,
      uint32_t index,
-     char *value,
-     size_t length )
+     char *identifier,
+     size_t identifier_length )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value_identifier";
 	int result                                = 0;
@@ -2277,9 +2283,9 @@ int libewf_get_hash_value_identifier(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2292,8 +2298,8 @@ int libewf_get_hash_value_identifier(
 	result = libewf_values_table_get_identifier(
 	          internal_handle->hash_values,
 	          index,
-	          (libewf_character_t *) value,
-	          length,
+	          (libewf_character_t *) identifier,
+	          identifier_length,
 	          &error );
 
 	if( result == -1 )
@@ -2314,13 +2320,15 @@ int libewf_get_hash_value_identifier(
 }
 
 /* Retrieves the hash value specified by the identifier
+ * The strings are encoded in UTF-8
+ * The length should include the end of string character
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_get_hash_value(
      libewf_handle_t *handle,
      const char *identifier,
      char *value,
-     size_t length )
+     size_t value_length )
 {
 	liberror_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2338,9 +2346,9 @@ int libewf_get_hash_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2356,9 +2364,9 @@ int libewf_get_hash_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2372,9 +2380,9 @@ int libewf_get_hash_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2420,7 +2428,7 @@ int libewf_get_hash_value(
 	          (libewf_character_t *) identifier,
 	          identifier_length,
 	          (libewf_character_t *) value,
-	          length,
+	          value_length,
 	          &error );
 
 	if( result == -1 )
@@ -2461,9 +2469,9 @@ int libewf_set_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2479,9 +2487,9 @@ int libewf_set_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2496,9 +2504,9 @@ int libewf_set_sectors_per_chunk(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2547,9 +2555,9 @@ int libewf_set_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2565,9 +2573,9 @@ int libewf_set_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2583,9 +2591,9 @@ int libewf_set_bytes_per_sector(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2634,9 +2642,9 @@ int libewf_set_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2652,9 +2660,9 @@ int libewf_set_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2669,9 +2677,9 @@ int libewf_set_error_granularity(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2702,9 +2710,9 @@ int libewf_set_compression_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2721,9 +2729,9 @@ int libewf_set_compression_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2739,9 +2747,9 @@ int libewf_set_compression_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2778,9 +2786,9 @@ int libewf_set_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2796,9 +2804,9 @@ int libewf_set_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2814,9 +2822,9 @@ int libewf_set_media_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2865,9 +2873,9 @@ int libewf_set_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2885,9 +2893,9 @@ int libewf_set_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2901,9 +2909,9 @@ int libewf_set_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2918,9 +2926,9 @@ int libewf_set_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2950,9 +2958,9 @@ int libewf_set_delta_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2969,9 +2977,9 @@ int libewf_set_delta_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -2985,9 +2993,9 @@ int libewf_set_delta_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3001,9 +3009,9 @@ int libewf_set_delta_segment_file_size(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3033,9 +3041,9 @@ int libewf_set_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3051,9 +3059,9 @@ int libewf_set_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3069,9 +3077,9 @@ int libewf_set_media_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3101,9 +3109,9 @@ int libewf_set_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3119,9 +3127,9 @@ int libewf_set_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3137,9 +3145,9 @@ int libewf_set_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3163,9 +3171,9 @@ int libewf_set_volume_type(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3193,9 +3201,9 @@ int libewf_set_format(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3213,9 +3221,9 @@ int libewf_set_format(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3263,9 +3271,9 @@ int libewf_set_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3281,9 +3289,9 @@ int libewf_set_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3297,9 +3305,9 @@ int libewf_set_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3313,9 +3321,9 @@ int libewf_set_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3331,9 +3339,9 @@ int libewf_set_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3350,9 +3358,9 @@ int libewf_set_guid(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3381,9 +3389,9 @@ int libewf_set_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3399,9 +3407,9 @@ int libewf_set_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3416,9 +3424,9 @@ int libewf_set_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3432,9 +3440,9 @@ int libewf_set_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3448,9 +3456,9 @@ int libewf_set_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3467,9 +3475,9 @@ int libewf_set_md5_hash(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3520,9 +3528,9 @@ int libewf_set_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3538,9 +3546,9 @@ int libewf_set_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3554,9 +3562,9 @@ int libewf_set_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3611,9 +3619,9 @@ int libewf_set_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3629,9 +3637,9 @@ int libewf_set_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3645,9 +3653,9 @@ int libewf_set_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3702,9 +3710,9 @@ int libewf_set_delta_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3720,9 +3728,9 @@ int libewf_set_delta_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3736,9 +3744,9 @@ int libewf_set_delta_segment_filename(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3793,9 +3801,9 @@ int libewf_set_delta_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3811,9 +3819,9 @@ int libewf_set_delta_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3827,9 +3835,9 @@ int libewf_set_delta_segment_filename_wide(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3884,9 +3892,9 @@ int libewf_set_read_wipe_chunk_on_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3902,9 +3910,9 @@ int libewf_set_read_wipe_chunk_on_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3934,9 +3942,9 @@ int libewf_set_header_codepage(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3952,9 +3960,9 @@ int libewf_set_header_codepage(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3975,9 +3983,9 @@ int libewf_set_header_codepage(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -3987,13 +3995,14 @@ int libewf_set_header_codepage(
 }
 
 /* Sets the header value specified by the identifier
+ * The strings are encoded in UTF-8
  * Returns 1 if successful or -1 on error
  */
 int libewf_set_header_value(
      libewf_handle_t *handle,
      const char *identifier,
      const char *value,
-     size_t length )
+     size_t value_length )
 {
 	liberror_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -4010,9 +4019,9 @@ int libewf_set_header_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4030,9 +4039,9 @@ int libewf_set_header_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4046,9 +4055,9 @@ int libewf_set_header_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4100,7 +4109,7 @@ int libewf_set_header_value(
 	     (libewf_character_t *) identifier,
 	     identifier_length,
 	     (libewf_character_t *) value,
-	     length,
+	     value_length,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -4121,13 +4130,14 @@ int libewf_set_header_value(
 }
 
 /* Sets the hash value specified by the identifier
+ * The strings are encoded in UTF-8
  * Returns 1 if successful or -1 on error
  */
 int libewf_set_hash_value(
      libewf_handle_t *handle,
      const char *identifier,
      const char *value,
-     size_t length )
+     size_t value_length )
 {
 	liberror_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -4144,9 +4154,9 @@ int libewf_set_hash_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4162,9 +4172,9 @@ int libewf_set_hash_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4178,9 +4188,9 @@ int libewf_set_hash_value(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4232,7 +4242,7 @@ int libewf_set_hash_value(
 	     (libewf_character_t *) identifier,
 	     identifier_length,
 	     (libewf_character_t *) value,
-	     length,
+	     value_length,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -4289,7 +4299,7 @@ int libewf_parse_header_values(
      libewf_handle_t *handle,
      uint8_t date_format )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_parse_header_values";
 
@@ -4303,9 +4313,9 @@ int libewf_parse_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4321,9 +4331,9 @@ int libewf_parse_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4349,9 +4359,9 @@ int libewf_parse_header_values(
 		/* TODO error_tollerance */
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4374,9 +4384,9 @@ int libewf_parse_header_values(
 		/* TODO error_tollerance */
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4400,9 +4410,9 @@ int libewf_parse_header_values(
 		/* TODO error_tollerance */
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4416,9 +4426,9 @@ int libewf_parse_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4456,9 +4466,9 @@ int libewf_parse_hash_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4474,9 +4484,9 @@ int libewf_parse_hash_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4554,9 +4564,9 @@ int libewf_add_acquiry_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4606,9 +4616,9 @@ int libewf_add_crc_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4624,9 +4634,9 @@ int libewf_add_crc_error(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4675,9 +4685,9 @@ int libewf_add_session(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4727,9 +4737,9 @@ int libewf_copy_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4743,9 +4753,9 @@ int libewf_copy_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4762,9 +4772,9 @@ int libewf_copy_header_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4852,9 +4862,9 @@ int libewf_copy_media_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4868,9 +4878,9 @@ int libewf_copy_media_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4887,9 +4897,9 @@ int libewf_copy_media_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4903,9 +4913,9 @@ int libewf_copy_media_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
@@ -4922,9 +4932,9 @@ int libewf_copy_media_values(
 		 function );
 
 		libewf_notify_error_backtrace(
-		error );
+		 error );
 		liberror_error_free(
-		&error );
+		 &error );
 
 		return( -1 );
 	}
