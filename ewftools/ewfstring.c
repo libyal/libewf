@@ -70,7 +70,7 @@ int ewfstring_copy_system_string_to_character_string(
 		{
 			destination[ iterator ] = (character_t) source[ iterator ];
 		}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
 			destination[ iterator ] = (character_t) btowc(
@@ -135,7 +135,7 @@ int ewfstring_copy_character_string_to_system_string(
 		{
 			destination[ iterator ] = (system_character_t) source[ iterator ];
 		}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
 			destination[ iterator ] = (system_character_t) wctob(

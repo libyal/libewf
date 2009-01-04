@@ -67,7 +67,7 @@ typedef wint_t system_integer_t;
 #define _SYSTEM_CHARACTER_T_STRING( string ) \
 	_SYSTEM_CHARACTER_T_STRING_INTERMEDIATE( string )
 
-#if defined( HAVE_WCSLEN )
+#if defined( HAVE_WCSLEN ) || defined( HAVE_WINDOWS_API )
 
 #define system_string_length( string ) \
 	wcslen( string )
@@ -75,7 +75,7 @@ typedef wint_t system_integer_t;
 #error Missing wide character string length function (wcslen)
 #endif
 
-#if defined( HAVE_WMEMCMP )
+#if defined( HAVE_WMEMCMP )  || defined( HAVE_WINDOWS_API )
 #define system_string_compare( string1, string2, size ) \
 	wmemcmp( (void *) string1, (void *) string2, size )
 
@@ -91,7 +91,7 @@ typedef wint_t system_integer_t;
 #error Missing wide character string compare function (wmemcmp, wcsncmp and wcscmp)
 #endif
 
-#if defined( HAVE_WMEMCPY )
+#if defined( HAVE_WMEMCPY ) || defined( HAVE_WINDOWS_API )
 #define system_string_copy( destination, source, size ) \
 	(system_character_t *) wmemcpy( (void *) destination, (void *) source, size )
 
@@ -107,7 +107,7 @@ typedef wint_t system_integer_t;
 #error Missing wide character string copy function (wmemcpy, wcsncpy and wcscpy)
 #endif
 
-#if defined( HAVE_WMEMCHR )
+#if defined( HAVE_WMEMCHR ) || defined( HAVE_WINDOWS_API )
 #define system_string_search( string, character, size ) \
 	(system_character_t *) wmemchr( (void *) string, (wchar_t) character, size )
 
@@ -119,7 +119,11 @@ typedef wint_t system_integer_t;
 #error Missing wide character string search function (wmemchr and wcschr)
 #endif
 
-#if defined( HAVE_WMEMRCHR )
+#if defined( HAVE_WINDOWS_API )
+#define system_string_search_reverse( string, character, size ) \
+	wcsrchr( string, (wchar_t) character )
+
+#elif defined( HAVE_WMEMRCHR )
 #define system_string_search_reverse( string, character, size ) \
 	(system_character_t *) wmemrchr( (void *) string, (wchar_t) character, size )
 
@@ -143,7 +147,7 @@ typedef wint_t system_integer_t;
 #error Missing swprintf
 #endif
 
-#if defined( HAVE_FGETWS )
+#if defined( HAVE_FGETWS ) || defined( HAVE_WINDOWS_API )
 #define system_string_get_from_stream( string, size, stream ) \
 	fgetws( string, size, stream )
 
@@ -186,14 +190,14 @@ typedef int system_integer_t;
 #define _SYSTEM_CHARACTER_T_STRING( string ) \
 	string
 
-#if defined( HAVE_STRLEN )
+#if defined( HAVE_STRLEN ) || defined( HAVE_WINDOWS_API )
 #define system_string_length( string ) \
 	strlen( string )
 #else
 #error Missing string length function (strlen)
 #endif
 
-#if defined( HAVE_MEMCMP )
+#if defined( HAVE_MEMCMP ) || defined( HAVE_WINDOWS_API )
 #define system_string_compare( string1, string2, size ) \
 	memcmp( (void *) string1, (void *) string2, size )
 
@@ -209,7 +213,7 @@ typedef int system_integer_t;
 #error Missing string compare function (memcmp, strncmp and strcmp)
 #endif
 
-#if defined( HAVE_MEMCPY )
+#if defined( HAVE_MEMCPY ) || defined( HAVE_WINDOWS_API )
 #define system_string_copy( destination, source, size ) \
 	(system_character_t *) memcpy( (void *) destination, (void *) source, size )
 
@@ -225,7 +229,7 @@ typedef int system_integer_t;
 #error Missing string copy function (memcpy, strncpy and strcpy)
 #endif
 
-#if defined( HAVE_MEMCHR )
+#if defined( HAVE_MEMCHR ) || defined( HAVE_WINDOWS_API )
 #define system_string_search( string, character, size ) \
 	(system_character_t *) memchr( (void *) string, (int) character, size )
 
@@ -237,7 +241,11 @@ typedef int system_integer_t;
 #error Missing string search function (memchr and strchr)
 #endif
 
-#if defined( HAVE_MEMRCHR ) && HAVE_DECL_MEMRCHR_ == 1
+#if defined( HAVE_WINDOWS_API )
+#define system_string_search_reverse( string, character, size ) \
+	strrchr( string, (int) character )
+
+#elif defined( HAVE_MEMRCHR ) && ( HAVE_DECL_MEMRCHR_ == 1 )
 #define system_string_search_reverse( string, character, size ) \
 	(system_character_t *) memrchr( (void *) string, (int) character, size )
 
@@ -265,7 +273,7 @@ typedef int system_integer_t;
 #error Missing snprintf and sprintf
 #endif
 
-#if defined( HAVE_WINDOWS_API ) || defined( HAVE_FGETS )
+#if defined( HAVE_FGETS ) || defined( HAVE_WINDOWS_API )
 #define system_string_get_from_stream( string, size, stream ) \
 	fgets( string, size, stream )
 

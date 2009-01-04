@@ -259,7 +259,7 @@ int libewf_string_copy_from_utf16(
      ewf_char_t *utf16_string,
      size_t size_utf16 )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
 #endif
 	static char *function  = "libewf_string_copy_from_utf16";
@@ -335,7 +335,7 @@ int libewf_string_copy_from_utf16(
 		}
 		utf16_iterator = 0;
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	if( memory_set(
 	     &conversion_state,
 	     0,
@@ -359,7 +359,7 @@ int libewf_string_copy_from_utf16(
 	 */
 	while( utf16_iterator < size_utf16 )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 		if( mbrtowc(
 		     &( string[ string_iterator ] ),
 		     (const char *) &( utf16_string[ utf16_iterator ] ),
@@ -415,7 +415,7 @@ int libewf_string_copy_to_utf16(
      size_t size_utf16,
      uint8_t byte_order )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
 #endif
 	static char *function  = "libewf_string_copy_to_utf16";
@@ -444,7 +444,7 @@ int libewf_string_copy_to_utf16(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	if( memory_set(
 	     &conversion_state,
 	     0,
@@ -496,7 +496,7 @@ int libewf_string_copy_to_utf16(
 	 */
 	while( string_iterator < size_string )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 		if( wcrtomb(
 		     (char *) &( utf16_string[ utf16_iterator ] ),
 		     string[ string_iterator ],

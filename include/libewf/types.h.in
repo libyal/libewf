@@ -86,8 +86,14 @@ typedef __int64			off64_t;
 #endif
 
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-
 #define LIBEWF_WIDE_CHARACTER_TYPE	1
+#endif
+
+#if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && ( @HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS@ || defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS ) )
+#define LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS	1
+#endif
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 
 #if @HAVE_WCHAR_H@ || defined( HAVE_WCHAR_H )
 
@@ -120,10 +126,6 @@ typedef __int64			off64_t;
 #else
 #error Missing wide character type definition (wchar.h)
 #endif
-
-#else
-
-#define LIBEWF_WIDE_CHARACTER_TYPE	0
 
 #endif
 

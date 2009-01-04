@@ -164,6 +164,8 @@ Version: 20080320
 * updated manuals
 * fix for %jd and %zd detection for OpenBSD
   because gcc throws a warning if %jd has no parameter but fails to print the parameter
+* implement usage of LIBEWF_WIDE_CHARACTER_TYPE instead of HAVE_WIDE_CHARACTER_TYPE in header and source files
+  except in common code
 
 Version: 20080319
 * refactored test write functions

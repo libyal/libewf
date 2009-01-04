@@ -1735,7 +1735,7 @@ int libewf_header_values_generate_header_string_type1(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,
@@ -2054,7 +2054,7 @@ int libewf_header_values_generate_header_string_type2(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,
@@ -2342,7 +2342,7 @@ int libewf_header_values_generate_header_string_type3(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,
@@ -2622,7 +2622,7 @@ int libewf_header_values_generate_header_string_type4(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,
@@ -2918,7 +2918,7 @@ int libewf_header_values_generate_header_string_type5(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,
@@ -3236,7 +3236,7 @@ int libewf_header_values_generate_header_string_type6(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,
@@ -3534,7 +3534,7 @@ int libewf_header_values_generate_header_string_type7(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 	print_count = string_snprintf(
 	               *header_string,
 	               *header_string_length,

@@ -199,7 +199,11 @@ When the library was compiled with narrow character support (default) the follow
 .Ft int
 .Fn libewf_set_hash_value_sha1 "LIBEWF_HANDLE *handle, char *value, size_t length"
 .Pp
-When the library was compiled with wide character support the following functions are available instead of the narrow character functions
+When the library was compiled with wide character support
+.Ar HAVE_WIDE_CHARACTER_TYPE
+, 
+.Ar LIBEWF_WIDE_CHARACTER_TYPE
+ is defined in libewf/types.h and the following functions are available instead of the narrow character functions
 .Ft const wchar_t *
 .Fn libewf_get_version "void"
 .Ft int
@@ -269,7 +273,9 @@ When the library was compiled with wide character support the following function
 .Pp
 When wide character support functions like wmain and wopen are present and libewf is compiled with
 .Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
-the following functions will replace their narrow character functions.
+,
+.Ar LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS
+ is defined in libewf/types.h and the following functions will replace their narrow character functions.
 .Ft int8_t
 .Fn libewf_check_file_signature "const wchar_t *filename"
 .Ft int

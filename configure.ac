@@ -567,6 +567,10 @@ AS_IF(
 	 [HAVE_WCHAR_H],
 	 [0])])
 
+AC_SUBST(
+ [HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS],
+ [0])
+
 dnl Check if ewftools should be build with raw read and write support
 AS_IF(
 	[test "x$ac_libewf_enable_raw_access" != xno ],

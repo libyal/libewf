@@ -34,11 +34,13 @@
 #if !defined( _LIBEWF_DEFINIONS_H )
 #define _LIBEWF_DEFINIONS_H
 
+#include <libewf/types.h>
+
 #define LIBEWF_VERSION				@VERSION@
 
 /* The libewf version string
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define LIBEWF_VERSION_STRING			L"@VERSION@"
 #else
 #define LIBEWF_VERSION_STRING			"@VERSION@"
@@ -116,7 +118,7 @@
 
 /* Libewf compression types
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define LIBEWF_COMPRESSION_TYPE_NONE		L"n"
 #define LIBEWF_COMPRESSION_TYPE_FAST		L"f"
 #define LIBEWF_COMPRESSION_TYPE_BEST		L"b"

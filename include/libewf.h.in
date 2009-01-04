@@ -48,7 +48,7 @@ extern "C" {
 
 /* Returns the library version
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN const wchar_t *libewf_get_version(
                               void );
 #else
@@ -74,7 +74,7 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_write(
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
  */
-#if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
 LIBEWF_EXTERN int libewf_check_file_signature(
                    const wchar_t *filename );
 #else
@@ -87,7 +87,7 @@ LIBEWF_EXTERN int libewf_check_file_signature(
  * otherwise the function will try to determine the format based on the extension
  * Returns the amount of filenames if successful or -1 on error
  */
-#if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
 LIBEWF_EXTERN int libewf_glob(
                    const wchar_t *filename,
                    size_t length,
@@ -112,7 +112,7 @@ LIBEWF_EXTERN int libewf_signal_abort(
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
  * Returns a pointer to the new instance of handle, NULL on error
  */
-#if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               wchar_t * const filenames[],
                               uint16_t amount_of_files,
@@ -340,7 +340,7 @@ LIBEWF_EXTERN int libewf_get_md5_hash(
 /* Retrieves the delta segment filename
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
 LIBEWF_EXTERN int libewf_get_delta_segment_filename(
                    LIBEWF_HANDLE *handle,
                    wchar_t *filename,
@@ -417,7 +417,7 @@ LIBEWF_EXTERN int libewf_get_amount_of_header_values(
 /* Retrieves the header value identifier specified by its index
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
@@ -434,7 +434,7 @@ LIBEWF_EXTERN int libewf_get_header_value_identifier(
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_get_header_value(
                    LIBEWF_HANDLE *handle,
                    wchar_t *identifier,
@@ -451,7 +451,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value case number
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_case_number( handle, value, length ) \
         libewf_get_header_value( handle, L"case_number", value, length )
 #else
@@ -462,7 +462,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value description
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_description( handle, value, length ) \
         libewf_get_header_value( handle, L"description", value, length )
 #else
@@ -473,7 +473,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value examiner name
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_examiner_name( handle, value, length ) \
         libewf_get_header_value( handle, L"examiner_name", value, length )
 #else
@@ -484,7 +484,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value evidence number
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_evidence_number( handle, value, length ) \
         libewf_get_header_value( handle, L"evidence_number", value, length )
 #else
@@ -495,7 +495,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value notes
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_notes( handle, value, length ) \
         libewf_get_header_value( handle, L"notes", value, length )
 #else
@@ -506,7 +506,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value acquiry date
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_acquiry_date( handle, value, length ) \
         libewf_get_header_value( handle, L"acquiry_date", value, length )
 #else
@@ -517,7 +517,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value system date
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_system_date( handle, value, length ) \
         libewf_get_header_value( handle, L"system_date", value, length )
 #else
@@ -528,7 +528,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value acquiry operating system
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_acquiry_operating_system( handle, value, length ) \
         libewf_get_header_value( handle, L"acquiry_operating_system", value, length )
 #else
@@ -539,7 +539,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value acquiry software version
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_acquiry_software_version( handle, value, length ) \
         libewf_get_header_value( handle, L"acquiry_software_version", value, length )
 #else
@@ -550,7 +550,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value password
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_password( handle, value, length ) \
         libewf_get_header_value( handle, L"password", value, length )
 #else
@@ -561,7 +561,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value compression type
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_compression_type( handle, value, length ) \
         libewf_get_header_value( handle, L"compression_type", value, length )
 #else
@@ -572,7 +572,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value model
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_model( handle, value, length ) \
         libewf_get_header_value( handle, L"model", value, length )
 #else
@@ -583,7 +583,7 @@ LIBEWF_EXTERN int libewf_get_header_value(
 /* Retrieves the header value serial number
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_header_value_serial_number( handle, value, length ) \
         libewf_get_header_value( handle, L"serial_number", value, length )
 #else
@@ -601,7 +601,7 @@ LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
 /* Retrieves the hash value identifier specified by its index
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    LIBEWF_HANDLE *handle,
                    uint32_t index,
@@ -618,7 +618,7 @@ LIBEWF_EXTERN int libewf_get_hash_value_identifier(
 /* Retrieves the hash value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_get_hash_value(
                    LIBEWF_HANDLE *handle,
                    wchar_t *identifier,
@@ -635,7 +635,7 @@ LIBEWF_EXTERN int libewf_get_hash_value(
 /* Retrieves the hash value MD5
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_hash_value_md5( handle, value, length ) \
         libewf_get_hash_value( handle, L"MD5", value, length )
 #else
@@ -646,7 +646,7 @@ LIBEWF_EXTERN int libewf_get_hash_value(
 /* Retrieves the hash value SHA1
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_get_hash_value_sha1( handle, value, length ) \
         libewf_get_hash_value( handle, L"SHA1", value, length )
 #else
@@ -744,7 +744,7 @@ LIBEWF_EXTERN int libewf_set_md5_hash(
 /* Sets the delta segment file
  * Returns 1 if successful or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS )
 LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    LIBEWF_HANDLE *handle,
                    wchar_t *filename,
@@ -767,7 +767,7 @@ LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
 /* Sets the header value specified by the identifier
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_set_header_value(
                    LIBEWF_HANDLE *handle,
                    wchar_t *identifier,
@@ -784,7 +784,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value case number
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_case_number( handle, value, length ) \
         libewf_set_header_value( handle, L"case_number", value, length )
 #else
@@ -795,7 +795,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value description
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_description( handle, value, length ) \
         libewf_set_header_value( handle, L"description", value, length )
 #else
@@ -806,7 +806,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value examiner name
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_examiner_name( handle, value, length ) \
         libewf_set_header_value( handle, L"examiner_name", value, length )
 #else
@@ -817,7 +817,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value evidence number
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_evidence_number( handle, value, length ) \
         libewf_set_header_value( handle, L"evidence_number", value, length )
 #else
@@ -828,7 +828,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value notes
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_notes( handle, value, length ) \
         libewf_set_header_value( handle, L"notes", value, length )
 #else
@@ -839,7 +839,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value acquiry date
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_acquiry_date( handle, value, length ) \
         libewf_set_header_value( handle, L"acquiry_date", value, length )
 #else
@@ -850,7 +850,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value system date
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_system_date( handle, value, length ) \
         libewf_set_header_value( handle, L"system_date", value, length )
 #else
@@ -861,7 +861,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value acquiry operating system
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_acquiry_operating_system( handle, value, length ) \
         libewf_set_header_value( handle, L"acquiry_operating_system", value, length )
 #else
@@ -872,7 +872,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value acquiry software version
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_acquiry_software_version( handle, value, length ) \
         libewf_set_header_value( handle, L"acquiry_software_version", value, length )
 #else
@@ -883,7 +883,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value password
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_password( handle, value, length ) \
         libewf_set_header_value( handle, L"password", value, length )
 #else
@@ -894,7 +894,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value compression type
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_compression_type( handle, value, length ) \
         libewf_set_header_value( handle, L"compression_type", value, length )
 #else
@@ -905,7 +905,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value model
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_model( handle, value, length ) \
         libewf_set_header_value( handle, L"model", value, length )
 #else
@@ -916,7 +916,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the header value serial number
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_header_value_serial_number( handle, value, length ) \
         libewf_set_header_value( handle, L"serial_number", value, length )
 #else
@@ -927,7 +927,7 @@ LIBEWF_EXTERN int libewf_set_header_value(
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 LIBEWF_EXTERN int libewf_set_hash_value(
                    LIBEWF_HANDLE *handle,
                    wchar_t *identifier,
@@ -944,7 +944,7 @@ LIBEWF_EXTERN int libewf_set_hash_value(
 /* Sets the hash value MD5
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_hash_value_md5( handle, value, length ) \
         libewf_set_hash_value( handle, L"MD5", value, length )
 #else
@@ -955,7 +955,7 @@ LIBEWF_EXTERN int libewf_set_hash_value(
 /* Sets the hash value SHA1
  * Returns 1 if successful or -1 on error
  */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
 #define libewf_set_hash_value_sha1( handle, value, length ) \
         libewf_set_hash_value( handle, L"SHA1", value, length )
 #else
