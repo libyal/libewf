@@ -156,6 +156,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080320
+* performance testing
+
 Version: 20080319
 * refactored test write functions
 * refactored the conversion from offset table to table offsets from section to

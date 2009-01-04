@@ -1091,6 +1091,11 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
+	if( ( format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( format == LIBEWF_FORMAT_LINEN6 ) )
+	{
+		base_offset = chunks_section_offset;
+	}
 	if( libewf_offset_table_fill_offsets(
 	     offset_table,
 	     ( amount_of_chunks - section_amount_of_chunks ),
@@ -1193,11 +1198,6 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	if( ( ewf_format == EWF_FORMAT_E01 )
 	 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		if( ( format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( format == LIBEWF_FORMAT_LINEN6 ) )
-		{
-			base_offset = chunks_section_offset;
-		}
 		/* Write table section start
 		 */
 		write_count = libewf_section_table_write(
