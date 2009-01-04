@@ -102,6 +102,7 @@ Next release:
 Version: 20070512
 * changed default order of physical and logical in ewfacquire - makes more sense this way
 * updated manuals
+* fixed error in example of ewfacquire manual page
 
 Version: 20070407
 * minor corrections for Win32 port
