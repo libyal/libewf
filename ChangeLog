@@ -143,6 +143,7 @@ Next release(s):
 * change libewf_notify_set_values in libewf_file.c to notify_set_values
 
 * implement features.h like libsmio
+* remove libewf_filename.[ch]
 
 CLOSED
 * what about read+write and compression?
@@ -160,6 +161,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080511
+* minor changes
 
 Version: 20080505
 * Consistency update in API for get and set media and volume type functions

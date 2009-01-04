@@ -1,5 +1,5 @@
 /*
- * libewf file io pool
+ * File Input/Output (IO) handle
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -211,7 +211,7 @@ ssize_t libewf_file_io_handle_write(
 }
 
 /* Seeks a certain offset within the a file io handle
- * Returns 1 if the seek is successful, or -1 on error
+ * Returns the offset if the seek is successful, or -1 on error
  */
 off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,
