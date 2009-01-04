@@ -34,8 +34,6 @@
 #include <common.h>
 #include <memory.h>
 
-#include "libewf_includes.h"
-
 #include "libewf_common.h"
 #include "libewf_notify.h"
 #include "libewf_sector_table.h"

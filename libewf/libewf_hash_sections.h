@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_HASH_SECTIONS_H )
 #define _LIBEWF_HASH_SECTIONS_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "libewf_values_table.h"
 
@@ -61,7 +63,7 @@ struct libewf_hash_sections
 
 	/* The MD5 hash of the data
 	 */
-	EWF_DIGEST_HASH md5_hash[ EWF_DIGEST_HASH_SIZE_MD5 ];
+	ewf_digest_hash_t md5_hash[ EWF_DIGEST_HASH_SIZE_MD5 ];
 
 	/* Value to indicate if the MD5 hash was set
 	 */

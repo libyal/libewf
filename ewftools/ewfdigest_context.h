@@ -34,7 +34,7 @@
 #if !defined( _EWFDIGEST_CONTEXT_H )
 #define _EWFDIGEST_CONTEXT_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 #include <openssl/evp.h>
@@ -44,6 +44,8 @@
 #else
 #error Unsupported cryptographic library.
 #endif
+
+#include <libewf/types.h>
 
 #include "ewfdigest_hash.h"
 

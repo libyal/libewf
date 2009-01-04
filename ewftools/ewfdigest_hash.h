@@ -34,7 +34,10 @@
 #if !defined( _EWFDIGEST_HASH_H )
 #define _EWFDIGEST_HASH_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
+
 #include "../libewf/libewf_char.h"
 
 #if defined( __cplusplus )

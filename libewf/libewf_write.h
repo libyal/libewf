@@ -34,17 +34,17 @@
 #if !defined( _LIBEWF_WRITE_H )
 #define _LIBEWF_WRITE_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf_extern.h
+ * before including libewf/extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
 #define LIBEWF_DLL_EXPORT
 #endif
 
-#include <libewf/libewf_extern.h>
-#include <libewf/libewf_handle.h>
+#include <libewf/extern.h>
+#include <libewf/handle.h>
 
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"

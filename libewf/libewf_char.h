@@ -34,7 +34,7 @@
 #if !defined( _LIBEWF_CHAR_H )
 #define _LIBEWF_CHAR_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #if defined( __cplusplus )
 extern "C" {

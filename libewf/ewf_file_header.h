@@ -34,7 +34,9 @@
 #if !defined( _EWF_FILE_HEADER_H )
 #define _EWF_FILE_HEADER_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

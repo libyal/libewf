@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_CHUNK_CACHE_H )
 #define _LIBEWF_CHUNK_CACHE_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "ewf_char.h"
 

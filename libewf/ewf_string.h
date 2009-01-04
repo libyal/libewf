@@ -34,7 +34,9 @@
 #if !defined( _EWF_STRING_H )
 #define _EWF_STRING_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( HAVE_STRING_H )
 #include <string.h>

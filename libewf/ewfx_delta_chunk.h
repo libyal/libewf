@@ -34,14 +34,13 @@
 #if !defined( _EWFX_DELTA_CHUNK_H )
 #define _EWFX_DELTA_CHUNK_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-
-#define EWFX_DELTA_CHUNK_HEADER ewfx_delta_chunk_header_t
-#define EWFX_DELTA_CHUNK_HEADER_SIZE sizeof( EWFX_DELTA_CHUNK_HEADER )
 
 typedef struct ewfx_delta_chunk_header ewfx_delta_chunk_header_t;
 

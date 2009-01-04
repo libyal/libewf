@@ -34,19 +34,19 @@
 #if !defined( _LIBEWF_FILE_H )
 #define _LIBEWF_FILE_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #include <stdio.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf_extern.h
+ * before including libewf/extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
 #define LIBEWF_DLL_EXPORT
 #endif
 
-#include <libewf/libewf_extern.h>
-#include <libewf/libewf_handle.h>
+#include <libewf/extern.h>
+#include <libewf/handle.h>
 
 #include "libewf_char.h"
 #include "libewf_filename.h"

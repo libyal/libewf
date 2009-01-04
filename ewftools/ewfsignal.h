@@ -34,7 +34,7 @@
 #if !defined( _EWFSIGNAL_H )
 #define _EWFSIGNAL_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_WINDOWS_API )
 #include <windows.h>
@@ -61,7 +61,7 @@ void ewfsignal_initialize_memory_debug( void );
 void ewfsignal_initialize( void );
 #else
 
-#define ewfsignal_initialize	/* ewfsignal_initialize */
+#error missing signal function
 #endif
 
 

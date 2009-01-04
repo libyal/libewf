@@ -36,7 +36,8 @@
 
 #include <common.h>
 #include <memory.h>
-#include <types.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

@@ -31,13 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "libewf_includes.h"
+#include <common.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
-#include <libewf/libewf_definitions.h>
+#include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_notify.h"

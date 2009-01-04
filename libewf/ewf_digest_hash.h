@@ -34,14 +34,15 @@
 #if !defined( _EWF_DIGEST_HASH_H )
 #define _EWF_DIGEST_HASH_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define EWF_DIGEST_HASH			ewf_digest_hash_t
-#define EWF_DIGEST_HASH_SIZE_MD5	(size_t) ( sizeof( EWF_DIGEST_HASH ) * 16 )
+#define EWF_DIGEST_HASH_SIZE_MD5	(size_t) ( sizeof( ewf_digest_hash_t ) * 16 )
 
 typedef uint8_t ewf_digest_hash_t;
 

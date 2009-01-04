@@ -35,7 +35,9 @@
 #if !defined( _EWFBYTE_SIZE_STRING_H )
 #define _EWFBYTE_SIZE_STRING_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "../libewf/libewf_char.h"
 

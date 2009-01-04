@@ -1,5 +1,5 @@
 /*
- * Common includes for libewf - wraps config
+ * The external handle, hides internal data structures
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,12 +31,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_INCLUDES_H )
-#define _LIBEWF_INCLUDES_H
+#if !defined( _LIBEWF_HANDLE_H )
+#define _LIBEWF_HANDLE_H
 
-#include <common.h>
-#include <libewf/libewf_types.h>
-#include <types.h>
+#include <libewf/types.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBEWF_HANDLE libewf_handle_t
+
+typedef intptr_t libewf_handle_t;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

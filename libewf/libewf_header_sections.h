@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_HEADER_SECTIONS_H )
 #define _LIBEWF_HEADER_SECTIONS_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "libewf_values_table.h"
 

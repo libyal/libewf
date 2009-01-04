@@ -34,7 +34,9 @@
 #if !defined( _EWF_SESSION_H )
 #define _EWF_SESSION_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

@@ -35,7 +35,7 @@
 #if !defined( _EWFMD5_H )
 #define _EWFMD5_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
 #include <openssl/md5.h>

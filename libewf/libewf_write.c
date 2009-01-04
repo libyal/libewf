@@ -31,15 +31,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "libewf_includes.h"
-
-#include <errno.h>
+#include <common.h>
+#include <memory.h>
+#include <types.h>
 
 #if defined( HAVE_STRING_H )
 #include <string.h>
 #endif
 
-#include <libewf/libewf_definitions.h>
+#include <libewf/definitions.h>
 
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"

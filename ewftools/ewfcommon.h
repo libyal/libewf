@@ -37,12 +37,11 @@
 
 #include <common.h>
 
-#include "../libewf/libewf_includes.h"
-
 #include <stdio.h>
 
-#include <libewf/libewf_definitions.h>
-#include <libewf/libewf_handle.h>
+#include <libewf/definitions.h>
+#include <libewf/handle.h>
+#include <libewf/types.h>
 
 #include "ewfdigest_context.h"
 #include "ewfmd5.h"

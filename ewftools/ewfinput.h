@@ -35,7 +35,9 @@
 #if !defined( _EWFINPUT_H )
 #define _EWFINPUT_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "../libewf/libewf_char.h"
 

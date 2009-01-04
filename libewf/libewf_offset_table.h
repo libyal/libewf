@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_OFFSET_TABLE_H )
 #define _LIBEWF_OFFSET_TABLE_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "libewf_chunk_offset.h"
 #include "libewf_section_list.h"

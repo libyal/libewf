@@ -35,7 +35,7 @@
 #if !defined( _EWFSTRING_H )
 #define _EWFSTRING_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #include "../libewf/libewf_char.h"
 

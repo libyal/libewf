@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_COMPRESS_H )
 #define _LIBEWF_COMPRESS_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

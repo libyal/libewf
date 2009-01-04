@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_CHUNK_OFFSET_H )
 #define _LIBEWF_CHUNK_OFFSET_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "libewf_segment_file_handle.h"
 

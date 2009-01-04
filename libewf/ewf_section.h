@@ -34,7 +34,9 @@
 #if !defined( _EWF_SECTION_H )
 #define _EWF_SECTION_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "ewf_char.h"
 #include "ewf_string.h"

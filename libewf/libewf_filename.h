@@ -37,7 +37,7 @@
 #include <common.h>
 #include <memory.h>
 
-#include "libewf_includes.h"
+#include <libewf/types.h>
 
 #include "libewf_common.h"
 

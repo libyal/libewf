@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+#include <types.h>
 
 #include "ewfdigest_context.h"
 
@@ -79,7 +79,10 @@ int ewfdigest_context_initialize(
 	{
 		digest_type = EVP_sha1();
 	}
-	if( EVP_DigestInit_ex( digest_context, digest_type, NULL ) != 1 )
+	if( EVP_DigestInit_ex(
+	     digest_context,
+	     digest_type,
+	     NULL ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to initialize context.\n",
 		 function );

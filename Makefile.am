@@ -52,8 +52,8 @@ DOCUMENT_FILES = \
 
 INCLUDE_FILES = \
 	include/libewf.h.in \
-	include/libewf/libewf_definitions.h.in \
-	include/libewf/libewf_types.h.in
+	include/libewf/definitions.h.in \
+	include/libewf/types.h.in
 
 MANUAL_FILES = \
 	manuals/ewfacquire.1 \
@@ -112,10 +112,10 @@ include_HEADERS = \
 	include/libewf.h
 
 pkginclude_HEADERS = \
-	include/libewf/libewf_definitions.h \
-	include/libewf/libewf_extern.h \
-	include/libewf/libewf_handle.h \
-	include/libewf/libewf_types.h
+	include/libewf/definitions.h \
+	include/libewf/extern.h \
+	include/libewf/handle.h \
+	include/libewf/types.h
 
 libtool: @LIBTOOL_DEPS@
 	cd $(srcdir) && $(SHELL) ./config.status --recheck

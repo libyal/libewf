@@ -35,7 +35,9 @@
 #if !defined( _EWFGLOB_H )
 #define _EWFGLOB_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "ewfcommon.h"
 

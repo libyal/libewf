@@ -34,7 +34,7 @@
 #if !defined( _LIBEWF_COMMON_H )
 #define _LIBEWF_COMMON_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_SYS_STAT_H )
 #include <sys/stat.h>
@@ -62,6 +62,8 @@
 #endif
 
 #include <time.h>
+
+#include <libewf/types.h>
 
 #include "libewf_char.h"
 

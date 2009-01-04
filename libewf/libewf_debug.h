@@ -34,9 +34,11 @@
 #if !defined( _LIBEWF_DEBUG_H )
 #define _LIBEWF_DEBUG_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #include <stdio.h>
+
+#include <libewf/types.h>
 
 #include "libewf_char.h"
 

@@ -35,7 +35,7 @@
 #if !defined( _EWFGETOPT_H )
 #define _EWFGETOPT_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #include "ewfcommon.h"
 
@@ -60,7 +60,10 @@ extern int optind;
  */
 extern INT_T optopt;
 
-INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHAR_T *options_string );
+INT_T ewfgetopt(
+       int argument_count,
+       CHAR_T * const argument_values[],
+       const CHAR_T *options_string );
 
 #endif
 

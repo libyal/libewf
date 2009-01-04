@@ -34,7 +34,10 @@
 #if !defined( _LIBEWF_VALUES_TABLE_H )
 #define _LIBEWF_VALUES_TABLE_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
+
 #include "libewf_char.h"
 
 #include "ewf_char.h"

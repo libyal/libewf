@@ -35,10 +35,10 @@
 #if !defined( _LIBEWF_H )
 #define _LIBEWF_H
 
-#include <libewf/libewf_definitions.h>
-#include <libewf/libewf_extern.h>
-#include <libewf/libewf_handle.h>
-#include <libewf/libewf_types.h>
+#include <libewf/definitions.h>
+#include <libewf/extern.h>
+#include <libewf/handle.h>
+#include <libewf/types.h>
 
 #include <stdio.h>
 

@@ -34,8 +34,7 @@
 
 #include <common.h>
 #include <memory.h>
-
-#include "../libewf/libewf_includes.h"
+#include <types.h>
 
 #include <errno.h>
 

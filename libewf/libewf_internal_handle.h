@@ -34,7 +34,10 @@
 #if !defined( _LIBEWF_INTERNAL_HANDLE_H )
 #define _LIBEWF_INTERNAL_HANDLE_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
+
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_hash_sections.h"

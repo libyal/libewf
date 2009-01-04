@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_SEGMENT_FILE_HANDLE_H )
 #define _LIBEWF_SEGMENT_FILE_HANDLE_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "libewf_filename.h"
 #include "libewf_section_list.h"

@@ -34,11 +34,13 @@
 #if !defined( _EWF_CRC_H )
 #define _EWF_CRC_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBZ )
 #include <zlib.h>
 #endif
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

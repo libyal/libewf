@@ -34,7 +34,9 @@
 #if !defined( _EWF_DEFINIONS_H )
 #define _EWF_DEFINIONS_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 /* The minimum chunk size is 32k (32 * 1024)
  * 64 * 512 (64 sectors)

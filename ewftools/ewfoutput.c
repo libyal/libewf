@@ -35,8 +35,6 @@
 #include <common.h>
 #include <memory.h>
 
-#include "../libewf/libewf_includes.h"
-
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif

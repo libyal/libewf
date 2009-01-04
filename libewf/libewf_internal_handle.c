@@ -34,11 +34,9 @@
 #include <common.h>
 #include <memory.h>
 
-#include "libewf_includes.h"
-
 #include <time.h>
 
-#include <libewf/libewf_definitions.h>
+#include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_header_values.h"

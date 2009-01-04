@@ -34,7 +34,9 @@
 #if !defined( _LIBEWF_FILE_IO_HANDLE_H )
 #define _LIBEWF_FILE_IO_HANDLE_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #include "libewf_filename.h"
 

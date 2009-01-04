@@ -34,7 +34,9 @@
 #if !defined( _EWF_ERROR2_H )
 #define _EWF_ERROR2_H
 
-#include "libewf_includes.h"
+#include <common.h>
+
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

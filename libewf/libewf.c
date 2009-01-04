@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_WINDOWS_API )
 

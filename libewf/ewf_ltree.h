@@ -34,10 +34,9 @@
 #if !defined( _EWF_LTREE_H )
 #define _EWF_LTREE_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
-#include "ewf_char.h"
-#include "ewf_string.h"
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

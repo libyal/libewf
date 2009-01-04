@@ -33,14 +33,13 @@
 
 #include <common.h>
 #include <memory.h>
-
-#include "libewf_includes.h"
+#include <types.h>
 
 #if defined( HAVE_STRING_H )
 #include <string.h>
 #endif
 
-#include <libewf/libewf_definitions.h>
+#include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_notify.h"

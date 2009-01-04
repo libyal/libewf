@@ -35,9 +35,8 @@
 #include <common.h>
 #include <memory.h>
 
-#include "../libewf/libewf_includes.h"
-
 #include <errno.h>
+
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
@@ -47,8 +46,6 @@
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
-
-#include <stdio.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf_extern.h

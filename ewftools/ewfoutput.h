@@ -35,11 +35,12 @@
 #if !defined( _EWFOUTPUT_H )
 #define _EWFOUTPUT_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #include <stdio.h>
 
-#include <libewf/libewf_handle.h>
+#include <libewf/handle.h>
+#include <libewf/types.h>
 
 #include "ewfstring.h"
 

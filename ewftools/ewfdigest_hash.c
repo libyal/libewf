@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+#include <types.h>
 
 #include "ewfdigest_hash.h"
 

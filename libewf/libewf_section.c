@@ -33,10 +33,9 @@
 
 #include <common.h>
 #include <memory.h>
+#include <types.h>
 
-#include "libewf_includes.h"
-
-#include <libewf/libewf_definitions.h>
+#include <libewf/definitions.h>
 
 #include "libewf_common.h"
 #include "libewf_compression.h"
@@ -3839,7 +3838,7 @@ ssize_t libewf_section_error2_write(
  */
 ssize_t libewf_section_hash_read(
          libewf_segment_file_handle_t *segment_file_handle,
-         EWF_DIGEST_HASH *md5_hash,
+         ewf_digest_hash_t *md5_hash,
          uint8_t error_tollerance )
 {
 	ewf_hash_t hash;
@@ -3919,7 +3918,7 @@ ssize_t libewf_section_hash_read(
  */
 ssize_t libewf_section_hash_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         EWF_DIGEST_HASH *md5_hash )
+         ewf_digest_hash_t *md5_hash )
 {
 	ewf_hash_t hash;
 
@@ -4396,7 +4395,7 @@ ssize_t libewf_section_delta_chunk_read(
          libewf_offset_table_t *secondary_offset_table,
          uint8_t error_tollerance )
 {
-	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
+	ewfx_delta_chunk_header_t delta_chunk_header;
 
 	static char *function    = "libewf_section_delta_chunk_read";
 	ewf_crc_t calculated_crc = 0;
@@ -4428,7 +4427,7 @@ ssize_t libewf_section_delta_chunk_read(
 	if( libewf_segment_file_handle_read(
 	     segment_file_handle,
 	     &delta_chunk_header,
-	     EWFX_DELTA_CHUNK_HEADER_SIZE ) == -1 )
+	     sizeof( ewfx_delta_chunk_header_t ) ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read delta chunk header.\n",
 		 function );
@@ -4437,7 +4436,7 @@ ssize_t libewf_section_delta_chunk_read(
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  &delta_chunk_header,
-	                  ( EWFX_DELTA_CHUNK_HEADER_SIZE - sizeof( ewf_crc_t ) ),
+	                  ( sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
 	if( libewf_endian_convert_32bit(
@@ -4488,7 +4487,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	if( chunk_size != ( section_size - EWFX_DELTA_CHUNK_HEADER_SIZE ) )
+	if( chunk_size != ( section_size - sizeof( ewfx_delta_chunk_header_t ) ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: chunk size does not match size of data in section.\n",
 		 function );
@@ -4497,7 +4496,7 @@ ssize_t libewf_section_delta_chunk_read(
 		{
 			return( -1 );
 		}
-		chunk_size = (uint32_t) ( section_size - EWFX_DELTA_CHUNK_HEADER_SIZE );
+		chunk_size = (uint32_t) ( section_size - sizeof( ewfx_delta_chunk_header_t ) );
 	}
 	/* Update the chunk data in the offset table
 	 */
@@ -4543,7 +4542,7 @@ ssize_t libewf_section_delta_chunk_write(
          uint8_t write_crc,
          uint8_t no_section_append )
 {
-	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
+	ewfx_delta_chunk_header_t delta_chunk_header;
 	uint8_t calculated_crc_buffer[ 4 ];
 
 	ewf_char_t *section_type    = (ewf_char_t *) "delta_chunk";
@@ -4575,7 +4574,7 @@ ssize_t libewf_section_delta_chunk_write(
 	if( memory_set(
 	     &delta_chunk_header,
 	     0,
-	     EWFX_DELTA_CHUNK_HEADER_SIZE ) == NULL )
+	     sizeof( ewfx_delta_chunk_header_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear delta chunk header.\n",
 		 function );
@@ -4614,7 +4613,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 	calculated_crc = ewf_crc_calculate(
 	                  &delta_chunk_header,
-	                  ( EWFX_DELTA_CHUNK_HEADER_SIZE - sizeof( ewf_crc_t ) ),
+	                  ( sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, delta_chunk_header.crc ) != 1 )
@@ -4624,7 +4623,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	section_size = EWFX_DELTA_CHUNK_HEADER_SIZE + chunk_data_size;
+	section_size = sizeof( ewfx_delta_chunk_header_t ) + chunk_data_size;
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file_handle,
@@ -4642,7 +4641,7 @@ ssize_t libewf_section_delta_chunk_write(
 	write_count = libewf_segment_file_handle_write(
 	               segment_file_handle,
 	               &delta_chunk_header,
-	               EWFX_DELTA_CHUNK_HEADER_SIZE );
+	               sizeof( ewfx_delta_chunk_header_t ) );
 
 	if( write_count <= -1 )
 	{

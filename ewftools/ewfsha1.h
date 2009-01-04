@@ -35,7 +35,7 @@
 #if !defined( _EWFSHA1_H )
 #define _EWFSHA1_H
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_SHA_H )
 #include <openssl/sha.h>

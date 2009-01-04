@@ -31,7 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../libewf/libewf_includes.h"
+#include <common.h>
+
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_notify.h"
 
