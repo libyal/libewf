@@ -2022,7 +2022,7 @@ void ewfcommon_process_summary_fprint( FILE *stream, LIBEWF_CHAR *string, ssize6
 /* Reads data from a file descriptor into the chunk cache
  * Returns the amount of bytes read, 0 if at end of input, or -1 on error
  */
-ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
+ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
 {
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	CHAR_T *error_string              = NULL;
@@ -2039,7 +2039,6 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 	size_t error_remaining_bytes      = 0;
 	int64_t chunk_amount              = 0;
 	int32_t read_amount_of_errors     = 0;
-	uint32_t bytes_per_sector         = 0;
 	uint32_t read_error_offset        = 0;
 	uint32_t error_skip_bytes         = 0;
 	uint32_t error_granularity_offset = 0;
@@ -2084,15 +2083,6 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 	if( total_read_count <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid total read count.\n",
-		 function );
-
-		return( -1 );
-	}
-	bytes_per_sector = libewf_get_bytes_per_sector( handle );
-
-	if( bytes_per_sector == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
 		 function );
 
 		return( -1 );
@@ -2571,6 +2561,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	ssize64_t total_write_count   = 0;
 	ssize64_t write_count         = 0;
 	ssize32_t read_count          = 0;
+	uint32_t bytes_per_sector     = 0;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *compressed_data      = NULL;
 	uint8_t *raw_write_data       = NULL;
@@ -2600,6 +2591,15 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	if( chunk_size == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk media.\n",
+		 function );
+
+		return( -1 );
+	}
+	bytes_per_sector = libewf_get_bytes_per_sector( handle );
+
+	if( bytes_per_sector == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
 		 function );
 
 		return( -1 );
@@ -2688,6 +2688,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		              data,
 		              buffer_size,
 		              chunk_size,
+		              bytes_per_sector,
 		              total_write_count,
 		              write_size,
 		              read_error_retry,

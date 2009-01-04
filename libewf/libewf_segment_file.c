@@ -200,6 +200,172 @@ int libewf_segment_file_exists( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	return( segment_table->file_descriptor[ segment_number ] != -1 );
 }
 
+/* Calculates an estimate of the amount of chunks that fit within a segment file
+ * Returns the size or 0 on error
+ */
+uint32_t libewf_segment_file_calculate_amount_of_chunks( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, size32_t segment_file_size, size32_t chunk_size )
+{
+	static char *function                 = "libewf_segment_file_calculate_amount_of_chunks";
+	ssize32_t available_segment_file_size = 0;
+	int32_t maximum_chunks_per_segment    = 0;
+	int32_t chunks_per_segment            = 0;
+	int32_t remaining_amount_of_chunks    = 0;
+	int32_t required_chunk_sections       = 1;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file offsets.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( segment_table->amount_of_chunks == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing amount of chunks.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( segment_table->file_offset[ segment_number ] > (off_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file offset value exceeds maximum.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( segment_file_size > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
+		 function );
+
+		return( 0 );
+	}
+	/* If the amount of chunks already have been determined
+	 */
+	if( segment_table->amount_of_chunks[ segment_number ] > 0 )
+	{
+		return( segment_table->amount_of_chunks[ segment_number ] );
+	}
+	/* Calculate the available segment file size
+	 */
+	available_segment_file_size = (ssize32_t) segment_file_size
+	                            - (ssize32_t) segment_table->file_offset[ segment_number ];
+
+	/* Leave space for the done or next section
+	 */
+	available_segment_file_size -= EWF_SECTION_SIZE;
+
+	/* Calculate the maximum amount of chunks within this segment file
+	 */
+	if( ewf_format == EWF_FORMAT_S01 )
+	{
+		/* The EWF-S01 format uses compression this will add 16 bytes on average
+		 */
+		maximum_chunks_per_segment = available_segment_file_size
+		                           / ( chunk_size + 16 );
+	}
+	else
+	{
+		maximum_chunks_per_segment = available_segment_file_size
+		                           / ( chunk_size + EWF_CRC_SIZE );
+	}
+	/* Determine the amount of required chunk sections
+	 */
+	if( internal_handle->write->unrestrict_offset_amount == 0 )
+	{
+		required_chunk_sections = maximum_chunks_per_segment
+		                        % EWF_MAXIMUM_OFFSETS_IN_TABLE;
+	}
+	if( ewf_format == EWF_FORMAT_S01 )
+	{
+		/* Leave space for the chunk section starts
+		 */
+		available_segment_file_size -= ( required_chunk_sections * EWF_SECTION_SIZE );
+
+		/* Leave space for the table offsets
+		 */
+		available_segment_file_size -= ( maximum_chunks_per_segment * EWF_TABLE_OFFSET_SIZE );
+	}
+	else if( format == LIBEWF_FORMAT_ENCASE1 )
+	{
+		/* Leave space for the chunk section starts and the offset table CRC
+		 */
+		available_segment_file_size -= ( required_chunk_sections * ( EWF_SECTION_SIZE + EWF_CRC_SIZE ) );
+
+		/* Leave space for the table offsets
+		 */
+		available_segment_file_size -= ( maximum_chunks_per_segment * EWF_TABLE_OFFSET_SIZE );
+	}
+	else
+	{
+		/* Leave space for the chunk, table and table2 section starts and the offset table CRC
+		 */
+		available_segment_file_size -= ( required_chunk_sections * ( ( 3 * EWF_SECTION_SIZE ) + EWF_CRC_SIZE ) );
+
+		/* Leave space for the table and table2 offsets
+		 */
+		available_segment_file_size -= 2 * ( maximum_chunks_per_segment * EWF_TABLE_OFFSET_SIZE );
+	}
+	/* Calculate the amount of chunks within this segment file
+	 */
+	if( ewf_format == EWF_FORMAT_S01 )
+	{
+		/* The EWF-S01 format uses compression this will add 16 bytes on average
+		 */
+		chunks_per_segment = available_segment_file_size
+		                   / ( chunk_size + 16 );
+	}
+	else
+	{
+		chunks_per_segment = available_segment_file_size
+		                   / ( chunk_size + EWF_CRC_SIZE );
+	}
+	/* If the input size is known
+	 */
+	if( internal_handle->write->input_write_size > 0 )
+	{
+		/* Calculate the amount of chunks that will remain
+		 */
+		remaining_amount_of_chunks = (int32_t) internal_handle->media->amount_of_chunks
+		                           - (int32_t) internal_handle->write->amount_of_chunks;
+
+		/* Check if the less chunks remain than the amount of chunks calculated
+		 */
+		if( remaining_amount_of_chunks < chunks_per_segment )
+		{
+			chunks_per_segment = remaining_amount_of_chunks;
+		}
+	}
+	/* Make sure to return the total amount of chunks per segment
+	 */
+	if( internal_handle->write->segment_amount_of_chunks > 0 )
+	{
+		chunks_per_segment += internal_handle->write->segment_amount_of_chunks;
+	}
+	return( (uint32_t) chunks_per_segment );
+}
+
 /* Determines an extension for a certain segment file
  * For EWF-E01, EWF-S01 segment file extension naming scheme
  * Returns 1 on success, -1 on error

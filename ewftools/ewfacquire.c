@@ -576,8 +576,8 @@ int main( int argc, char * const argv[] )
 		                stdout,
 		                _S_LIBEWF_CHAR( "Amount of bytes to acquire" ),
 		                0,
-		                input_size,
-		                input_size );
+		                ( input_size - acquiry_offset ),
+		                ( input_size - acquiry_offset ) );
 
 		/* Segment file size
 		 */

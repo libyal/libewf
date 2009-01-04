@@ -296,7 +296,8 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 	{
 		return( 0 );
 	}
-	else if( ( remaining_amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE ) && ( internal_handle->write->unrestrict_offset_amount == 0 ) )
+	else if( ( remaining_amount_of_chunks > EWF_MAXIMUM_OFFSETS_IN_TABLE )
+	 && ( internal_handle->write->unrestrict_offset_amount == 0 ) )
 	{
 		return( EWF_MAXIMUM_OFFSETS_IN_TABLE );
 	}
@@ -2140,8 +2141,6 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 	/* Write data remaining in the chunk cache to file
 	 */
-	/* TODO improve test for RW
-	 */
 	if( ( internal_handle->current_chunk_offset != 0 )
 	 && ( internal_handle->chunk_cache->amount != 0 )
 	 && ( internal_handle->chunk_cache->offset != 0 ) )
@@ -2175,8 +2174,6 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	file_descriptor = internal_handle->segment_table->file_descriptor[ segment_number ];
 
 	/* Check if the last segment file has been closed
-	 */
-	/* TODO improve test for RW
 	 */
 	if( file_descriptor != -1 )
 	{
@@ -2227,7 +2224,8 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 	/* Calculate the media values
 	 */
 	internal_handle->media->amount_of_chunks  = internal_handle->write->amount_of_chunks;
-	internal_handle->media->amount_of_sectors = (uint32_t) ( internal_handle->write->input_write_count / internal_handle->media->bytes_per_sector );
+	internal_handle->media->amount_of_sectors = (uint32_t) ( internal_handle->write->input_write_count
+	                                          / internal_handle->media->bytes_per_sector );
 
 	/* Correct the segment files
 	 */
@@ -2307,13 +2305,19 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				{
 					/* Write volume (SMART) section
 					 */
-					write_count = libewf_section_volume_s01_write( internal_handle, file_descriptor, list_entry_iterator->start_offset );
+					write_count = libewf_section_volume_s01_write(
+					               internal_handle,
+					               file_descriptor,
+					               list_entry_iterator->start_offset );
 				}
 				else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
 				{
 					/* Write volume section
 					 */
-					write_count = libewf_section_volume_e01_write( internal_handle, file_descriptor, list_entry_iterator->start_offset );
+					write_count = libewf_section_volume_e01_write(
+					               internal_handle,
+					               file_descriptor,
+					               list_entry_iterator->start_offset );
 				}
 				else
 				{
@@ -2332,7 +2336,10 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				LIBEWF_VERBOSE_PRINT( "%s: correcting data section.\n",
 				 function );
 
-				if( libewf_common_lseek( file_descriptor, list_entry_iterator->start_offset, SEEK_SET ) == -1 )
+				if( libewf_common_lseek(
+				     file_descriptor,
+				     list_entry_iterator->start_offset,
+				     SEEK_SET ) == -1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to find offset to data volume section.\n",
 					 function );
@@ -2341,7 +2348,10 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				}
 				/* Write data section
 				 */
-				write_count = libewf_section_data_write( internal_handle, file_descriptor, list_entry_iterator->start_offset );
+				write_count = libewf_section_data_write(
+				               internal_handle,
+				               file_descriptor,
+				               list_entry_iterator->start_offset );
 
 				if( write_count == -1 )
 				{

@@ -13,7 +13,7 @@ To do/think about:
 * all: check for race conditions especially on change of data elements
 * all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
-* all: allow in library message strings to be char and w_char - for language support - what about gettext?
+* all: allow for multiple language support - what about gettext?
 * all: implement signal handling - cancelation option in library?
 * file: add function/flag to open segments files progressively using only the basename (like write)
 * libewf_string: enhance UTF16 conversion code
@@ -94,10 +94,7 @@ Next release:
 * have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 * change section start to static definition in libewf_section_last_write and libewf_section_start_write
 * do not create human readable byte string if size <= 1024
-* use off_t for size values instead of uint64_t
-* check printf %jd and %zu for Cygwin
 
-* refactor some int64 to size64_t and off_t into off64_t
 * add maximum check to set functions in internal handle
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle
 * move any access to segment table in file, write and read to segment_file
@@ -124,16 +121,15 @@ TODO
 * remove libewf_write_finalize and libewf_write_chunk ?
 * check if chunk_cache_offset is still needed in write_new_chunk
   read is now in write_existing_chunk
-* "Amount of bytes to alter" correct for offset !!! also in ewfacquire?
-* ewfexport to export EWF format to merge delta file(s) and ewf file(s)
 * implement raw split support in ewfexport
 * change int8_t return values into int return values
 * update ewfexport man page
 * what about header values parsing with preservation of timestamps?
-* print detailed error information in ewftools for file errors
 
 Version: 20070821
 * worked on ewfexport exporting ewf formatted data for delta merge
+* print a more detailed error in ewftools for open errors
+* fixed amount of bytes to acquire in ewfacquire
 
 Version: 20070819
 * worked on restructuring to improve internal structure
