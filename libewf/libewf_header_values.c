@@ -777,7 +777,7 @@ int libewf_header_values_copy(
 int libewf_header_values_parse_header_string(
      libewf_values_table_t **header_values,
      character_t *header_string,
-     size_t length,
+     size_t header_string_size,
      uint8_t date_format )
 {
 	character_t **lines        = NULL;
@@ -810,7 +810,7 @@ int libewf_header_values_parse_header_string(
 	}
 	if( libewf_string_split(
 	     header_string,
-	     length,
+	     header_string_size,
 	     (character_t) '\n',
 	     &lines,
 	     &amount_of_lines ) != 1 )
@@ -1326,12 +1326,13 @@ int libewf_header_values_parse_header_string(
 int libewf_header_values_parse_header(
      libewf_values_table_t **header_values,
      uint8_t *header,
-     size_t size,
+     size_t header_size,
      uint8_t date_format )
 {
 	character_t *header_string = NULL;
-	static char *function       = "libewf_header_values_parse_header";
-	int result                  = 0;
+	static char *function      = "libewf_header_values_parse_header";
+	ssize_t header_string_size = 0;
+	int result                 = 0;
 
 	if( header == NULL )
 	{
@@ -1340,8 +1341,20 @@ int libewf_header_values_parse_header(
 
 		return( -1 );
 	}
+	header_string_size = string_size_from_byte_stream(
+	                      header,
+	                      header_size,
+	                      LIBUCA_CODEPAGE_ASCII );
+
+	if( header_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header string size.\n",
+		 function );
+
+		return( -1 );
+	}
 	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * ( size + 1 ) );
+	                                 sizeof( character_t ) * (size_t) header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -1350,12 +1363,14 @@ int libewf_header_values_parse_header(
 
 		return( -1 );
 	}
-	if( string_copy_from_char(
+	if( string_copy_from_byte_stream(
 	     header_string,
-	     (char *) header,
-	     size ) != 1 )
+	     (size_t) header_string_size,
+	     header,
+	     header_size,
+	     LIBUCA_CODEPAGE_ASCII ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy header to header string.\n",
+		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
 		memory_free(
@@ -1366,7 +1381,7 @@ int libewf_header_values_parse_header(
 	result = libewf_header_values_parse_header_string(
 	          header_values,
 	          header_string,
-	          size,
+	          (size_t) header_string_size,
 	          date_format );
 
 	memory_free(
@@ -4543,13 +4558,13 @@ int libewf_generate_date_xheader_value(
 	return( 1 );
 }
 
-/* Parse a xml header string for the values
+/* Parse a XML header string for the values
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_parse_header_string_xml(
      libewf_values_table_t **header_values,
      character_t *header_string_xml,
-     size_t length,
+     size_t header_string_xml_size,
      uint8_t date_format )
 {
 	character_t **lines          = NULL;
@@ -4593,7 +4608,7 @@ int libewf_header_values_parse_header_string_xml(
 	}
 	if( libewf_string_split(
 	     header_string_xml,
-	     length,
+	     header_string_xml_size,
 	     (character_t) '\n',
 	     &lines,
 	     &amount_of_lines ) != 1 )
@@ -4653,7 +4668,7 @@ int libewf_header_values_parse_header_string_xml(
 		{
 			continue;
 		}
-		/* Ignore the first part of the xml string
+		/* Ignore the first part of the XML string
 		 */
 		string_length -= (size_t) ( open_tag_end - lines[ iterator ] );
 
@@ -4685,7 +4700,7 @@ int libewf_header_values_parse_header_string_xml(
 		{
 			continue;
 		}
-		/* Ignore the second part of the xml string
+		/* Ignore the second part of the XML string
 		 */
 		string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
 
@@ -4765,11 +4780,12 @@ int libewf_header_values_parse_header_string_xml(
 int libewf_header_values_parse_xheader(
      libewf_values_table_t **header_values,
      uint8_t *xheader,
-     size_t size,
+     size_t xheader_size,
      uint8_t date_format )
 {
 	character_t *xml_header_string = NULL;
 	static char *function          = "libewf_header_values_parse_xheader";
+	ssize_t xml_header_string_size = 0;
 	int result                     = 0;
 
 	if( xheader == NULL )
@@ -4779,8 +4795,20 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
+	xml_header_string_size = string_size_from_byte_stream(
+	                          xheader,
+	                          xheader_size,
+	                          LIBUCA_CODEPAGE_ASCII );
+
+	if( xml_header_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine XML header string size.\n",
+		 function );
+
+		return( -1 );
+	}
 	xml_header_string = (character_t *) memory_allocate(
-	                                     sizeof( character_t ) * ( size + 1 ) );
+	                                     sizeof( character_t ) * (size_t) xml_header_string_size );
 
 	if( xml_header_string == NULL )
 	{
@@ -4789,12 +4817,14 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
-	if( string_copy_from_char(
+	if( string_copy_from_byte_stream(
              xml_header_string,
-             (char *) xheader,
-             size ) != 1 )
+             (size_t) xml_header_string_size,
+             xheader,
+             xheader_size,
+             LIBUCA_CODEPAGE_ASCII ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy xheader to xml header string.\n",
+		notify_warning_printf( "%s: unable to set XML header string.\n",
 		 function );
 
 		memory_free(
@@ -4805,12 +4835,12 @@ int libewf_header_values_parse_xheader(
 	result = libewf_header_values_parse_header_string_xml(
                   header_values,
                   xml_header_string,
-                  size,
+                  (size_t) xml_header_string_size,
                   date_format );
 
 	if( result != 1 )
 	{
-		notify_warning_printf( "%s: unable to parse xml header string.\n",
+		notify_warning_printf( "%s: unable to parse XML header string.\n",
 		 function );
 	}
 	memory_free(
@@ -4867,7 +4897,7 @@ int libewf_header_values_generate_header_string_xml(
 
 		return( -1 );
 	}
-	/* Add space for the xml data and an end of line
+	/* Add space for the XML data and an end of line
 	 */
 	*header_string_length = 1 + string_length(
 	                             xml_head );

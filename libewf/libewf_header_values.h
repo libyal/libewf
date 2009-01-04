@@ -102,13 +102,13 @@ int libewf_header_values_copy(
 int libewf_header_values_parse_header_string(
      libewf_values_table_t **header_values,
      character_t *header_string,
-     size_t length,
+     size_t header_string_size,
      uint8_t date_format );
 
 int libewf_header_values_parse_header(
      libewf_values_table_t **header_values,
      uint8_t *header,
-     size_t size,
+     size_t header_size,
      uint8_t date_format );
 
 int libewf_header_values_parse_header2(
@@ -266,7 +266,7 @@ int libewf_generate_date_xheader_value(
 int libewf_header_values_parse_header_string_xml(
      libewf_values_table_t **header_values,
      character_t *header_string_xml,
-     size_t length,
+     size_t header_string_xml_size,
      uint8_t date_format );
 
 int libewf_header_values_parse_xheader(

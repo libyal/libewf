@@ -253,7 +253,7 @@ int libewf_hash_values_parse_xhash(
 		return( -1 );
 	}
 	xml_hash_string = (character_t *) memory_allocate(
-	                                   sizeof( character_t ) * xml_hash_string_size );
+	                                   sizeof( character_t ) * (size_t) xml_hash_string_size );
 
 	if( xml_hash_string == NULL )
 	{
@@ -264,7 +264,7 @@ int libewf_hash_values_parse_xhash(
 	}
 	if( string_copy_from_byte_stream(
 	     xml_hash_string,
-	     xml_hash_string_size,
+	     (size_t) xml_hash_string_size,
 	     xhash,
 	     xhash_size,
 	     LIBUCA_CODEPAGE_ASCII ) != 1 )
@@ -280,7 +280,7 @@ int libewf_hash_values_parse_xhash(
 	result = libewf_hash_values_parse_hash_string_xml(
 	          hash_values,
 	          xml_hash_string,
-	          xml_hash_string_size );
+	          (size_t) xml_hash_string_size );
 
 	if( result != 1 )
 	{

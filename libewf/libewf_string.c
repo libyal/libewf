@@ -81,6 +81,12 @@ int libewf_string_split(
 
 		return( -1 );
 	}
+	/* Ignore the end of string character
+	 */
+	if( string[ string_size - 1 ] == 0 )
+	{
+		string_size -= 1;
+	}
 	/* Determine the amount of split values
 	 */
 	remaining_string_size = string_size;
