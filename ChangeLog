@@ -202,8 +202,11 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20081007
+* small adjustments to support
+
 Version: 20081005
-* small adjustment file io
+* small adjustments to file io
 
 Version: 20080928
 * worked on making ewftools code more gereneric
