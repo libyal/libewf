@@ -99,6 +99,9 @@ Next release:
 * use off_t for size values instead of uint64_t
 * check printf %jd and %zu for Cygwin
 
+Version: 20070526
+* worked on removing the advertisement clause from the license
+
 Version: 20070512
 * changed default order of physical and logical in ewfacquire - makes more sense this way
 * updated manuals
