@@ -41,7 +41,7 @@
 #include "ewf_md5hash.h"
 
 /* Allocates memory for a new ewf md5 hash
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_MD5HASH *ewf_md5hash_alloc( void )
 {
@@ -97,7 +97,7 @@ int32_t ewf_md5hash_write( EWF_MD5HASH *md5hash, int file_descriptor )
 }
 
 /* Converts the md5 hash to a printable string
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 char *ewf_md5hash_to_string( EWF_MD5HASH *md5hash )
 {

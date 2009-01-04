@@ -42,7 +42,7 @@
 #include "ewf_header.h"
 
 /* Allocates memory for a new ewf header struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header_alloc( uint32_t size )
 {
@@ -75,7 +75,7 @@ void ewf_header_free( EWF_HEADER *header )
 }
 
 /* Uncompresses the header
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header_uncompress( EWF_HEADER *compressed_header, uint32_t *size )
 {
@@ -123,7 +123,7 @@ EWF_HEADER *ewf_header_uncompress( EWF_HEADER *compressed_header, uint32_t *size
 }
 
 /* Compresses the header
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header_compress( EWF_HEADER *uncompressed_header, uint32_t *size, int8_t compression_level )
 {
@@ -171,7 +171,7 @@ EWF_HEADER *ewf_header_compress( EWF_HEADER *uncompressed_header, uint32_t *size
 }
 
 /* Reads the header from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header_read( int file_descriptor, uint32_t *size )
 {

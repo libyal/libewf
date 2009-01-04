@@ -33,8 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_OFFSETTABLE_H
-#define _LIBEWF_OFFSETTABLE_H
+#ifndef _LIBEWF_OFFSET_TABLE_H
+#define _LIBEWF_OFFSET_TABLE_H
+
+#include <inttypes.h>
 
 #include "ewf_table.h"
 
@@ -42,7 +44,14 @@
 extern "C" {
 #endif
 
-typedef struct libewf_offset_table LIBEWF_OFFSET_TABLE;
+#define LIBEWF_OFFSET_TABLE libewf_offset_table_t
+#define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
+#define LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE sizeof( int )
+#define LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE sizeof( uint8_t )
+#define LIBEWF_OFFSET_TABLE_OFFSET_SIZE sizeof( uint64_t )
+#define LIBEWF_OFFSET_TABLE_SIZE_SIZE sizeof( uint64_t )
+
+typedef struct libewf_offset_table libewf_offset_table_t;
 
 struct libewf_offset_table
 {
@@ -74,15 +83,8 @@ struct libewf_offset_table
 	uint64_t *size;
 };
 
-#define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
-#define LIBEWF_OFFSET_TABLE_FILE_DESCRIPTOR_SIZE sizeof( int )
-#define LIBEWF_OFFSET_TABLE_COMPRESSED_SIZE sizeof( uint8_t )
-#define LIBEWF_OFFSET_TABLE_OFFSET_SIZE sizeof( uint64_t )
-#define LIBEWF_OFFSET_TABLE_SIZE_SIZE sizeof( uint64_t )
-
-LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( void );
-LIBEWF_OFFSET_TABLE *libewf_offset_table_values_alloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t size );
-LIBEWF_OFFSET_TABLE *libewf_offset_table_values_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t size );
+LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t size );
+LIBEWF_OFFSET_TABLE *libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t size );
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
 LIBEWF_OFFSET_TABLE *libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, uint64_t offset, uint64_t size );
 

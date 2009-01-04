@@ -37,7 +37,6 @@
 #define _LIBEWF_HEADERVALUES_H
 
 #include <inttypes.h>
-#include <unistd.h>
 #include <time.h>
 
 #include "ewf_header.h"
@@ -57,12 +56,12 @@ extern "C" {
 #define LIBEWF_FORMAT_SMART   0x0E
 #define LIBEWF_FORMAT_FTK     0x0F
 
-#define LIBEWF_DATEFORMAT_DAYMONTH 0x01
-#define LIBEWF_DATEFORMAT_MONTHDAY 0x02
+#define LIBEWF_DATE_FORMAT_DAYMONTH 0x01
+#define LIBEWF_DATE_FORMAT_MONTHDAY 0x02
 
-#define LIBEWF_COMPRESSIONTYPE_NONE "n"
-#define LIBEWF_COMPRESSIONTYPE_FAST "f"
-#define LIBEWF_COMPRESSIONTYPE_BEST "b"
+#define LIBEWF_COMPRESSION_TYPE_NONE "n"
+#define LIBEWF_COMPRESSION_TYPE_FAST "f"
+#define LIBEWF_COMPRESSION_TYPE_BEST "b"
 
 #define LIBEWF_HEADER_VALUES libewf_header_values_t
 #define LIBEWF_HEADER_VALUES_SIZE sizeof( LIBEWF_HEADER_VALUES )

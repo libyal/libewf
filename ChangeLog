@@ -8,6 +8,7 @@ To do/think about:
 * read: correct for errors in the table or table2 section for EWF-E01
 * read: add functionality for byte swap in data for endian fix of data - test this
 * read: warn when maximum offsets in table of S01 format is exceeded
+* read: allocate secondairy offset table in handle for S01 format ?
 * all: add LVF support - ltree section
 * all: make a more generic libewf_string (use this in libewf_header_values, ewf_header, ewf_ltree) also move ASCII and UTF
 * all: make string functions safe to be char or uint8_t
@@ -46,7 +47,11 @@ Finished:
   - libewf_header_values (c/h)
   - libewf_notify (c/h)
   - libewf_md5 (c/h)
+  - libewf_offset_table (c/h)
+  - libewf_section_list (c/h)
+  - libewf_segment_table (c/h)
   - libewf_string (c/h)
+
   - ewf_compress (c/h)
   - ewf_crc (c/h)
   - ewf_data (c/h)
@@ -65,19 +70,18 @@ Finished:
 
 To do:
 
-  - libewf_offset_table (c/h)
-  * do I want current behavior of libewf_offset_table_values_alloc ? - or combine with libewf_offset_table_alloc ?
-
-  - libewf_section_list (c/h)
-  - libewf_segment_table (c/h)
   - libewf_handle (c/h)
   - libewf_file_read (c/h)
   - libewf_file_write (c/h)
   - libewf_file (c/h)
 
+  - check all realloc and set values calls at the upper levels that memory is freed
+    perhaps from surrounding code i.e. for the handle
+
 Version: 20060830
 * worked on code clean up and improved error handling
 * allow to set clean value in libewf_(re)alloc_cleared functions
+* note: realloc functions do not free the originally allocated memory on error
 
 Version: 20060829
 * worked on code clean up and improved error handling

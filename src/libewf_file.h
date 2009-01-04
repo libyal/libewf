@@ -37,7 +37,8 @@
 #define _LIBEWF_FILE_H
 
 #include "ewf_section.h"
-#include "handle.h"
+
+#include "libewf_handle.h"
 
 #ifdef __cplusplus
 extern "C" {

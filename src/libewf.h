@@ -41,17 +41,17 @@
 #include <config.h>
 #endif
 
+#include "ewf_compress.h"
+
 #include "libewf_common.h"
 #include "libewf_definitions.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
-
-#include "ewf_compress.h"
 #include "libewf_file.h"
+#include "libewf_file_read.h"
+#include "libewf_file_write.h"
+#include "libewf_handle.h"
 #include "libewf_header_values.h"
-#include "file_read.h"
-#include "file_write.h"
-#include "handle.h"
 
 #ifdef __cplusplus
 extern "C" {

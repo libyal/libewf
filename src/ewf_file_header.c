@@ -44,7 +44,7 @@ uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 
 uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
 /* Allocates memory for a new ewf file header struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_FILE_HEADER *ewf_file_header_alloc( void )
 {
@@ -103,7 +103,7 @@ uint8_t ewf_file_header_check_signature( uint8_t *signature )
 }
 
 /* Reads the file header from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_FILE_HEADER *ewf_file_header_read( int file_descriptor )
 {

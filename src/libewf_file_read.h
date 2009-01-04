@@ -38,9 +38,9 @@
 
 #include "ewf_section.h"
 #include "ewf_table.h"
-#include "handle.h"
+#include "libewf_handle.h"
 #include "libewf_offset_table.h"
-#include "section_list.h"
+#include "libewf_section_list.h"
 
 #ifdef __cplusplus
 extern "C" {

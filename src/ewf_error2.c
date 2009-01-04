@@ -43,7 +43,7 @@
 #include "ewf_error2.h"
 
 /* Allocates memory for a new ewf error2 struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_ERROR2 *ewf_error2_alloc( void )
 {
@@ -61,7 +61,7 @@ EWF_ERROR2 *ewf_error2_alloc( void )
 }
 
 /* Allocates memory for a buffer of ewf error2 sectors 
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_ERROR2_SECTOR *ewf_error2_sectors_alloc( uint32_t amount )
 {
@@ -81,7 +81,7 @@ EWF_ERROR2_SECTOR *ewf_error2_sectors_alloc( uint32_t amount )
 }
 
 /* Reallocates memory for a buffer of ewf error2 sectors 
- * Return a pointer to the instance, NULL on error
+ * Returns a pointer to the instance, NULL on error
  */
 EWF_ERROR2_SECTOR *ewf_error2_sectors_realloc( EWF_ERROR2_SECTOR *sectors, uint32_t previous_amount, uint32_t new_amount )
 {
@@ -132,7 +132,7 @@ void ewf_error2_sectors_free( EWF_ERROR2_SECTOR *sectors )
 }
 
 /* Reads the error2 from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_ERROR2 *ewf_error2_read( int file_descriptor )
 {
@@ -162,7 +162,7 @@ EWF_ERROR2 *ewf_error2_read( int file_descriptor )
 }
 
 /* Reads the ewf error2 sectors from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_ERROR2_SECTOR *ewf_error2_sectors_read( int file_descriptor, uint32_t amount )
 {

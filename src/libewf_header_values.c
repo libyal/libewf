@@ -43,7 +43,7 @@
 #include "libewf_notify.h"
 
 /* Allocates memory for a new header values struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 {
@@ -135,7 +135,7 @@ void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values )
 }
 
 /* Convert date string within a header value
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING *libewf_convert_date_header_value( LIBEWF_STRING *header_value, uint8_t date_format )
 {
@@ -150,7 +150,7 @@ LIBEWF_STRING *libewf_convert_date_header_value( LIBEWF_STRING *header_value, ui
 
 		return( NULL );
 	}
-	if( ( date_format != LIBEWF_DATEFORMAT_DAYMONTH ) && ( date_format != LIBEWF_DATEFORMAT_MONTHDAY ) )
+	if( ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH ) && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY ) )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_convert_date_header_value: unsupported date format.\n" );
 
@@ -182,7 +182,7 @@ LIBEWF_STRING *libewf_convert_date_header_value( LIBEWF_STRING *header_value, ui
 
 		return( NULL );
 	}
-	if( date_format == LIBEWF_DATEFORMAT_MONTHDAY )
+	if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	{
 		string_length = libewf_string_length( date_elements[ 1 ] );
 
@@ -227,7 +227,7 @@ LIBEWF_STRING *libewf_convert_date_header_value( LIBEWF_STRING *header_value, ui
 			date_string[ 4 ] = date_elements[ 2 ][ 1 ];
 		}
 	}
-	else if( date_format == LIBEWF_DATEFORMAT_DAYMONTH )
+	else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	{
 		string_length = libewf_string_length( date_elements[ 2 ] );
 
@@ -351,7 +351,7 @@ LIBEWF_STRING *libewf_convert_date_header_value( LIBEWF_STRING *header_value, ui
 }
 
 /* Generate date string within a header value
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING *libewf_generate_date_header_value( time_t timestamp )
 {
@@ -392,7 +392,7 @@ LIBEWF_STRING *libewf_generate_date_header_value( time_t timestamp )
 }
 
 /* Convert date string within a header2 value
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING *libewf_convert_date_header2_value( LIBEWF_STRING *header_value, uint8_t date_format )
 {
@@ -408,7 +408,7 @@ LIBEWF_STRING *libewf_convert_date_header2_value( LIBEWF_STRING *header_value, u
 
 		return( NULL );
 	}
-	if( ( date_format != LIBEWF_DATEFORMAT_DAYMONTH ) && ( date_format != LIBEWF_DATEFORMAT_MONTHDAY ) )
+	if( ( date_format != LIBEWF_DATE_FORMAT_DAYMONTH ) && ( date_format != LIBEWF_DATE_FORMAT_MONTHDAY ) )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_convert_date_header2_value: unsupported date format.\n" );
 
@@ -431,11 +431,11 @@ LIBEWF_STRING *libewf_convert_date_header2_value( LIBEWF_STRING *header_value, u
 
 		return( NULL );
 	}
-	if( date_format == LIBEWF_DATEFORMAT_MONTHDAY )
+	if( date_format == LIBEWF_DATE_FORMAT_MONTHDAY )
 	{
 		result = strftime( (char *) date_string, 20, "%m/%d/%Y %H:%M:%S", time_elements );
 	}
-	else if( date_format == LIBEWF_DATEFORMAT_DAYMONTH )
+	else if( date_format == LIBEWF_DATE_FORMAT_DAYMONTH )
 	{
 		result = strftime( (char *) date_string, 20, "%d/%m/%Y %H:%M:%S", time_elements );
 	}
@@ -451,7 +451,7 @@ LIBEWF_STRING *libewf_convert_date_header2_value( LIBEWF_STRING *header_value, u
 }
 
 /* Generate date string within a header2 value
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING *libewf_generate_date_header2_value( time_t timestamp )
 {
@@ -481,7 +481,7 @@ LIBEWF_STRING *libewf_generate_date_header2_value( time_t timestamp )
 }
 
 /* Set a header value
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING *libewf_header_values_set_value( LIBEWF_STRING* header_value, char *value )
 {
@@ -530,7 +530,7 @@ LIBEWF_STRING *libewf_header_values_set_value( LIBEWF_STRING* header_value, char
 }
 
 /* Parse an EWF header for the values
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_HEADER *header, uint8_t date_format )
 {
@@ -753,15 +753,15 @@ void libewf_header_values_fprint( FILE *stream, LIBEWF_HEADER_VALUES *header_val
 	}
 	if( header_values->compression_type != NULL )
 	{
-		if( libewf_string_compare( header_values->compression_type, (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_NONE, 1 ) == 1 )
+		if( libewf_string_compare( header_values->compression_type, (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_NONE, 1 ) == 1 )
 		{
 			fprintf( stream, "\tCompression type:\tno compression\n" );
 		}
-		else if( libewf_string_compare( header_values->compression_type, (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_FAST, 1 ) == 1 )
+		else if( libewf_string_compare( header_values->compression_type, (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_FAST, 1 ) == 1 )
 		{
 			fprintf( stream, "\tCompression type:\tgood (fast) compression\n" );
 		}
-		else if( libewf_string_compare( header_values->compression_type, (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_BEST, 1 ) == 1 )
+		else if( libewf_string_compare( header_values->compression_type, (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_BEST, 1 ) == 1 )
 		{
 			fprintf( stream, "\tCompression type:\tbest compression\n" );
 		}
@@ -777,7 +777,7 @@ void libewf_header_values_fprint( FILE *stream, LIBEWF_HEADER_VALUES *header_val
 }
 
 /* Generate an Encase3 header
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, uint8_t compression_level )
 {
@@ -901,15 +901,15 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_NONE;
+			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_NONE;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_FAST;
+			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_FAST;
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_BEST;
+			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_BEST;
 		}
 		size += libewf_string_length( compression_type );
 	}
@@ -962,7 +962,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 }
 
 /* Generate an Encase4 header
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp )
 {
@@ -1119,7 +1119,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 }
 
 /* Generate an Encase4 header2
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp )
 {
@@ -1271,7 +1271,7 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_
 }
 
 /* Generate an Encase5 header2
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp )
 {
@@ -1434,7 +1434,7 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_
 }
 
 /* Generate an FTK Imager header
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, uint8_t compression_level )
 {
@@ -1558,15 +1558,15 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_NONE;
+			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_NONE;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_FAST;
+			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_FAST;
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSIONTYPE_BEST;
+			compression_type = (LIBEWF_STRING *) LIBEWF_COMPRESSION_TYPE_BEST;
 		}
 		size += libewf_string_length( compression_type );
 	}

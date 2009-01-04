@@ -42,7 +42,7 @@
 #include "ewf_sectors.h"
 
 /* Allocates memory for a new ewf sectors_chunk 
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( uint32_t size )
 {
@@ -62,7 +62,7 @@ EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( uint32_t size )
 }
 
 /* Reallocates memory for a ewf sectors_chunk
- * Return a pointer to the instance, NULL on error
+ * Returns a pointer to the instance, NULL on error
  */
 EWF_SECTORS_CHUNK *ewf_sectors_chunk_realloc( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t previous_size, uint32_t new_size )
 {
@@ -93,7 +93,7 @@ EWF_SECTORS_CHUNK *ewf_sectors_chunk_realloc( EWF_SECTORS_CHUNK *sectors_chunk, 
 }
 
 /* Wipes memory for a ewf sectors_chunk
- * Return a pointer to the instance, NULL on error
+ * Returns a pointer to the instance, NULL on error
  */
 EWF_SECTORS_CHUNK *ewf_sectors_chunk_wipe( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t size )
 {

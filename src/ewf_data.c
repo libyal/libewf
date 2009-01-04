@@ -43,7 +43,7 @@
 #include "ewf_data.h"
 
 /* Allocates memory for a new ewf data struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_DATA *ewf_data_alloc( void )
 {
@@ -82,7 +82,7 @@ void ewf_data_free( EWF_DATA *data )
 }
 
 /* Reads the data from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_DATA *ewf_data_read( int file_descriptor )
 {

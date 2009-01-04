@@ -79,7 +79,7 @@ int main( int argc, const char **argv )
 	LIBEWF_HEADER_VALUES *header_values  = NULL;
 	LIBEWF_HEADER_VALUES *header2_values = NULL;
 	int option                           = 0;
-	int date_format                      = LIBEWF_DATEFORMAT_DAYMONTH;
+	int date_format                      = LIBEWF_DATE_FORMAT_DAYMONTH;
 	uint32_t iterator                    = 0;
 	uint32_t sector                      = 0;
 	uint32_t sector_count                = 0;
@@ -95,7 +95,7 @@ int main( int argc, const char **argv )
 				usage();
 
 			case 'd':
-				date_format = LIBEWF_DATEFORMAT_MONTHDAY;
+				date_format = LIBEWF_DATE_FORMAT_MONTHDAY;
 				break;
 
 			case 'e':

@@ -43,7 +43,7 @@
 #include "ewf_table.h"
 
 /* Allocates memory for a new ewf table struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_TABLE *ewf_table_alloc( void )
 {
@@ -61,7 +61,7 @@ EWF_TABLE *ewf_table_alloc( void )
 }
 
 /* Allocates memory for a buffer of ewf table offsets 
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_TABLE_OFFSET *ewf_table_offsets_alloc( uint32_t amount )
 {
@@ -81,7 +81,7 @@ EWF_TABLE_OFFSET *ewf_table_offsets_alloc( uint32_t amount )
 }
 
 /* Reallocates memory for a buffer of ewf table offsets 
- * Return a pointer to the instance, NULL on error
+ * Returns a pointer to the instance, NULL on error
  */
 EWF_TABLE_OFFSET *ewf_table_offsets_realloc( EWF_TABLE_OFFSET *offsets, uint32_t previous_amount, uint32_t new_amount )
 {
@@ -132,7 +132,7 @@ void ewf_table_offsets_free( EWF_TABLE_OFFSET *offsets )
 }
 
 /* Reads the table from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_TABLE *ewf_table_read( int file_descriptor )
 {
@@ -161,7 +161,7 @@ EWF_TABLE *ewf_table_read( int file_descriptor )
 }
 
 /* Reads the ewf table offsets from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_TABLE_OFFSET *ewf_table_offsets_read( int file_descriptor, uint32_t amount )
 {

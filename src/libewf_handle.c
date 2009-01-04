@@ -33,15 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-
-#include "libewf_common.h"
-#include "libewf_definitions.h"
-#include "libewf_header_values.h"
-#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 #include "ewf_crc.h"
@@ -49,8 +41,12 @@
 #include "ewf_file_header.h"
 #include "ewf_md5hash.h"
 #include "ewf_sectors.h"
-#include "handle.h"
-#include "segment_table.h"
+
+#include "libewf_common.h"
+#include "libewf_definitions.h"
+#include "libewf_header_values.h"
+#include "libewf_notify.h"
+#include "libewf_handle.h"
 
 /* Allocates memory for a new handle struct
  */
@@ -60,7 +56,7 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to allocate ewf_handle.\n" );
+		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to allocate handle.\n" );
 	}
 	/* 32k is the default chunk size
 	 */
@@ -74,9 +70,9 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 	 */
 	handle->ewf_file_size             = 650000000;
 	handle->chunks_per_file           = ( 650000000 - EWF_FILE_HEADER_SIZE - EWF_DATA_SIZE ) / EWF_MINIMUM_CHUNK_SIZE;
-	handle->segment_table             = libewf_segment_table_alloc( segment_amount );
-	handle->offset_table              = libewf_offset_table_alloc();
-	handle->secondary_offset_table    = libewf_offset_table_alloc();
+	handle->segment_table             = NULL;
+	handle->offset_table              = NULL;
+	handle->secondary_offset_table    = NULL;
 	handle->error_granularity_sectors = 64;
 	handle->error2_error_count        = 0;
 	handle->error2_sectors            = NULL;
@@ -95,6 +91,13 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 	handle->cached_chunk              = 0;
 	handle->cached_data_size          = 0;
 	handle->media_type                = 0;
+
+	handle->segment_table = libewf_segment_table_alloc( segment_amount );
+
+	if( handle->segment_table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to create segment table.\n" );
+	}
 
 	handle = libewf_handle_cache_alloc( handle, ( handle->chunk_size + EWF_CRC_SIZE ) );
 

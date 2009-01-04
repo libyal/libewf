@@ -44,7 +44,7 @@
 #include "ewf_hash.h"
 
 /* Allocates memory for a new ewf hash struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HASH *ewf_hash_alloc( void )
 {
@@ -86,7 +86,7 @@ void ewf_hash_free( EWF_HASH *hash )
 }
 
 /* Reads the hash from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HASH *ewf_hash_read( int file_descriptor )
 {

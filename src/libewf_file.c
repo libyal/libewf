@@ -57,11 +57,10 @@
 #include "ewf_volume.h"
 #include "ewf_table.h"
 #include "libewf_file.h"
-#include "file_read.h"
-#include "handle.h"
+#include "libewf_file_read.h"
 #include "libewf_offset_table.h"
-#include "section_list.h"
-#include "segment_table.h"
+#include "libewf_section_list.h"
+#include "libewf_segment_table.h"
 
 /* Detects if a file is an EWF file
  * Returns 1 if true, 0 otherwise
@@ -102,7 +101,7 @@ uint8_t libewf_check_file_signature( const char *filename )
 /* Opens an EWF file
  * For reading files should contain all filenames that make up an EWF image
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Return a pointer to the new instance of handle, NULL on error
+ * Returns a pointer to the new instance of handle, NULL on error
  */
 LIBEWF_HANDLE *libewf_open( const char **filenames, uint32_t file_amount, uint8_t flags )
 {
@@ -170,6 +169,10 @@ LIBEWF_HANDLE *libewf_open_read( LIBEWF_HANDLE *handle, const char *filename )
 
 	handle->segment_table = libewf_segment_table_set_values( handle->segment_table, fields_segment, filename, file_descriptor );
 
+	if( handle->segment_table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_open_read: unable to set value of segment table.\n" );
+	}
 	ewf_file_header_free( file_header );
 
 	LIBEWF_VERBOSE_PRINT( "libewf_open_read: open successful.\n" );
@@ -187,6 +190,10 @@ LIBEWF_HANDLE *libewf_open_write( LIBEWF_HANDLE *handle, const char *filename )
 	}
 	handle->segment_table = libewf_segment_table_set_values( handle->segment_table, 0, filename, -1 );
 
+	if( handle->segment_table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_open_write: unable to set value of segment table.\n" );
+	}
 	LIBEWF_VERBOSE_PRINT( "libewf_open_write: open successful.\n" );
 
 	return( handle );

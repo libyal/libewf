@@ -40,7 +40,7 @@
 #include "libewf_string.h"
 
 /* Allocates memory for a new ewf string struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING *libewf_string_alloc( uint32_t size )
 {
@@ -122,14 +122,10 @@ int8_t libewf_string_compare( LIBEWF_STRING *string1, LIBEWF_STRING *string2, ui
 	{
 		if( string1[ iterator ] == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_string_compare: premature end of string1 detected.\n" );
-
 			return( -1 );
 		}
 		if( string2[ iterator ] == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_string_compare: premature end of string2 detected.\n" );
-
 			return( -1 );
 		}
 		if( string1[ iterator ] != string2[ iterator ] )
@@ -141,7 +137,7 @@ int8_t libewf_string_compare( LIBEWF_STRING *string1, LIBEWF_STRING *string2, ui
 }
 
 /* Split a string into elements using a delimiter character
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_STRING **libewf_string_split( LIBEWF_STRING *string, uint8_t delimiter, uint32_t *amount )
 {

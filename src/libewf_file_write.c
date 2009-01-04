@@ -33,22 +33,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <inttypes.h>
+#include <errno.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <string.h>
 #include <time.h>
-#include <zlib.h>
-#include <errno.h>
-
-#include "libewf_common.h"
-#include "libewf_endian.h"
-#include "libewf_notify.h"
-#include "libewf_md5.h"
 
 #include "ewf_compress.h"
 #include "ewf_crc.h"
@@ -63,11 +54,15 @@
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
 #include "ewf_table.h"
-#include "file_write.h"
-#include "handle.h"
-#include "section_list.h"
+
+#include "libewf_common.h"
+#include "libewf_endian.h"
+#include "libewf_notify.h"
+#include "libewf_md5.h"
+#include "libewf_file_write.h"
 #include "libewf_offset_table.h"
-#include "segment_table.h"
+#include "libewf_section_list.h"
+#include "libewf_segment_table.h"
 
 /* Check for empty block, a block that contains the same value for every byte
  * Returns 1 if block is empty
@@ -119,7 +114,7 @@ int64_t libewf_section_write( LIBEWF_HANDLE *handle, int file_descriptor, char *
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_write: section type is too long.\n" );
 	}
-	memcpy( (uint8_t *) section->type, (uint8_t *) section_type, section_type_size );
+	libewf_memcpy( (uint8_t *) section->type, (uint8_t *) section_type, section_type_size );
 
 	revert_64bit( section_size, section->size );
 	revert_64bit( section_offset, section->next );
@@ -164,7 +159,7 @@ int64_t libewf_last_section_write( LIBEWF_HANDLE *handle, int file_descriptor, c
 	{
 		LIBEWF_FATAL_PRINT( "libewf_last_section_write: section type is too long.\n" );
 	}
-	memcpy( (uint8_t *) section->type, (uint8_t *) section_type, section_type_size );
+	libewf_memcpy( (uint8_t *) section->type, (uint8_t *) section_type, section_type_size );
 
 	revert_64bit( section_size, section->size );
 	revert_64bit( section_offset, section->next );
@@ -524,7 +519,7 @@ int64_t libewf_section_hash_write( LIBEWF_HANDLE *handle, int file_descriptor, u
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_hash_write: unable to create hash.\n" );
 	}
-	memcpy( (uint8_t *) hash->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
+	libewf_memcpy( (uint8_t *) hash->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
 
 	section_write_count = libewf_section_write( handle, file_descriptor, "hash", size, start_offset );
 
@@ -880,10 +875,19 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 			/* One additional entry in the segment table is needed,
 			 * because the 0 entry is used to store the base filename
 			 */
-			handle->segment_table = libewf_segment_table_values_realloc( handle->segment_table, ( segment + 1 ) );
+			handle->segment_table = libewf_segment_table_realloc( handle->segment_table, ( segment + 1 ) );
+
+			if( handle->segment_table == NULL )
+			{
+				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to reallocate segment table.\n" );
+			}
 		}
 		handle->segment_table = libewf_segment_table_set_values( handle->segment_table, segment, filename, -1 );
 
+		if( handle->segment_table == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to set value of segment table.\n" );
+		}
 		LIBEWF_VERBOSE_PRINT( ".\nlibewf_write_from_file_descriptor: segment file to write: %" PRIu32 " with name: %s.\n", segment, filename );
 
 		if( segment != 1 )
@@ -1240,7 +1244,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 					write_size  = compressed_data_size;
 					write_count = ewf_sectors_chunk_write( handle->chunk_data, handle->segment_table->file_descriptor[ segment ], write_size );
 
-					memcpy( (uint8_t *) &crc, (uint8_t *) &handle->chunk_data[ compressed_data_size - EWF_CRC_SIZE ], EWF_CRC_SIZE );
+					libewf_memcpy( (uint8_t *) &crc, (uint8_t *) &handle->chunk_data[ compressed_data_size - EWF_CRC_SIZE ], EWF_CRC_SIZE );
 
 					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: writing COMPRESSED chunk: %d at offset: %" PRIu64 " with size: %" PRIu64 ", with CRC: %" PRIu32 ".\n", chunk_amount, segment_file_offset, write_size, crc );
 
@@ -1250,6 +1254,10 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 						offsets = ewf_table_offsets_realloc( offsets, sectors_chunk_amount, ( chunk_amount + 1 ) );
 
+						if( offsets == NULL )
+						{
+							LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to reallocate offsets.\n" );
+						}
 						sectors_chunk_amount = chunk_amount + 1;
 					}
 					revert_32bit( ( segment_file_offset | EWF_OFFSET_COMPRESSED_WRITE_MASK ), offsets[ chunk_amount ].offset );
@@ -1276,6 +1284,10 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 						offsets = ewf_table_offsets_realloc( offsets, sectors_chunk_amount, ( chunk_amount + 1 ) );
 
+						if( offsets == NULL )
+						{
+							LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to reallocate offsets.\n" );
+						}
 						sectors_chunk_amount = chunk_amount + 1;
 					}
 					revert_32bit( segment_file_offset, offsets[ chunk_amount ].offset );

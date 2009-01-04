@@ -40,7 +40,7 @@
 #include "ewf_crc.h"
 
 /* Allocates memory for a new ewf crc
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_CRC *ewf_crc_alloc( void )
 {
@@ -71,7 +71,7 @@ void ewf_crc_free( EWF_CRC *crc )
 }
 
 /* Reads the CRC from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_CRC *ewf_crc_read( int file_descriptor )
 {
@@ -136,7 +136,7 @@ int32_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
 }
 
 /* Calculates the EWF CRC
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  *
  * The original algorithm was taken from the ASR data web site
  * When calling this function to start a new CRC "previous_key" should be 1

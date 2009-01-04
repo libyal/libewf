@@ -33,22 +33,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 
+#include "libewf_common.h"
 #include "libewf_notify.h"
-
-#include "section_list.h"
+#include "libewf_section_list.h"
 
 /* Allocates memory for a new section list entry struct
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_SECTION_LIST_ENTRY *libewf_section_list_entry_alloc( void )
 {
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = (LIBEWF_SECTION_LIST_ENTRY *) malloc( LIBEWF_SECTION_LIST_ENTRY_SIZE );
+	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
+
+	section_list_entry = (LIBEWF_SECTION_LIST_ENTRY *) libewf_alloc( LIBEWF_SECTION_LIST_ENTRY_SIZE );
 
 	if( section_list_entry == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_list_entry_alloc: unable to allocate section_list_entry.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_section_list_entry_alloc: unable to allocate section_list_entry.\n" );
+
+		return( NULL );
 	}
 	section_list_entry->file_descriptor = -1;
 	section_list_entry->start_offset    = 0;
@@ -59,14 +63,19 @@ LIBEWF_SECTION_LIST_ENTRY *libewf_section_list_entry_alloc( void )
 }
 
 /* Allocates memory for a new section list struct
+ * Returns a pointer to the new instance, NULL on error
  */
 LIBEWF_SECTION_LIST *libewf_section_list_alloc( void )
 {
-	LIBEWF_SECTION_LIST *section_list = (LIBEWF_SECTION_LIST *) malloc( LIBEWF_SECTION_LIST_SIZE );
+	LIBEWF_SECTION_LIST *section_list = NULL;
+
+	section_list = (LIBEWF_SECTION_LIST *) libewf_alloc( LIBEWF_SECTION_LIST_SIZE );
 
 	if( section_list == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_list_alloc: unable to allocate section_list.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_section_list_alloc: unable to allocate section_list.\n" );
+
+		return( NULL );
 	}
 	section_list->first = NULL;
 	section_list->last = NULL;
@@ -78,37 +87,48 @@ LIBEWF_SECTION_LIST *libewf_section_list_alloc( void )
  */
 void libewf_section_list_free( LIBEWF_SECTION_LIST *section_list )
 {
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry;
+	LIBEWF_SECTION_LIST_ENTRY *section_list_entry         = NULL;
+	LIBEWF_SECTION_LIST_ENTRY *current_section_list_entry = NULL;
 
 	if( section_list == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_list_free: invalid section list.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_section_list_free: invalid section list.\n" );
+
+		return;
 	}
 	section_list_entry = section_list->first;
 
 	while( section_list_entry != NULL )
 	{
-		LIBEWF_SECTION_LIST_ENTRY *current_section_list_entry = section_list_entry;
+		current_section_list_entry = section_list_entry;
+		section_list_entry         = section_list_entry->next;
 
-		section_list_entry = section_list_entry->next;
-
-		free( current_section_list_entry );
+		libewf_free( current_section_list_entry );
 	}
-	free( section_list );
+	libewf_free( section_list );
 }
 
 /* Append an entry to the section list
+ * Returns a pointer to the instance, NULL on error
  */
 LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint32_t start_offset, uint32_t end_offset )
 {
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry;
+	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
 
 	if( section_list == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_list_append: invalid section list.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_section_list_append: invalid section list.\n" );
+
+		return( NULL );
 	}
 	section_list_entry = libewf_section_list_entry_alloc();
 
+	if( section_list_entry == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_section_list_append: unable to create entry.\n" );
+
+		return( NULL );
+	}
 	section_list_entry->file_descriptor = file_descriptor;
 	section_list_entry->start_offset    = start_offset;
 	section_list_entry->end_offset      = end_offset;
@@ -125,3 +145,4 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 	return( section_list );
 }
+

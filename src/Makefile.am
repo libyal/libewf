@@ -21,17 +21,16 @@ libewf_a_SOURCES = \
 	libewf_definitions.h \
 	libewf_endian.c libewf_endian.h \
 	libewf_file.c libewf_file.h \
+	libewf_file_read.c libewf_file_read.h \
+	libewf_file_write.c libewf_file_write.h \
+	libewf_handle.c libewf_handle.h \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_md5.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_offset_table.c libewf_offset_table.h \
-	libewf_string.c libewf_string.h \
-	\
-	handle.c handle.h \
-	file_read.c file_read.h \
-	file_write.c file_write.h \
-	section_list.c section_list.h \
-	segment_table.c segment_table.h
+	libewf_section_list.c libewf_section_list.h \
+	libewf_segment_table.c libewf_segment_table.h \
+	libewf_string.c libewf_string.h
 
 #libewf_a_LDADD = -lz -lcrypto
 libewf_a_CFLAGS = -Wall

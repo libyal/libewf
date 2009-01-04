@@ -41,7 +41,7 @@
 #include "ewf_header2.h"
 
 /* Convert the UTF16 ewf header2 into an ASCII ewf header format
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, uint32_t size_utf16 )
 {
@@ -127,7 +127,7 @@ EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, uint32
 }
 
 /* Convert the ASCII ewf header into an UTF16 ewf header format
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, uint32_t size_ascii, uint8_t byte_order )
 {
@@ -197,7 +197,7 @@ EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, uint32
 }
 
 /* Reads the header2 from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header2_read( int file_descriptor, uint32_t size )
 {

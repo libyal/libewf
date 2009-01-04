@@ -38,7 +38,7 @@
 
 #include "ewf_header.h"
 #include "libewf_header_values.h"
-#include "handle.h"
+#include "libewf_handle.h"
 
 #ifdef __cplusplus
 extern "C" {

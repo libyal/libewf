@@ -46,7 +46,7 @@ void *libewf_alloc( uint32_t size )
 {
 	if( size > 0x80000000 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_malloc: invalid size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_alloc: invalid size only values below 2^32 are supported.\n" );
 
 		return( NULL );
 	}
@@ -57,6 +57,8 @@ void *libewf_alloc( uint32_t size )
  */
 void *libewf_realloc( void *buffer, uint32_t size )
 {
+	void *reallocated_buffer = NULL;
+
 	if( buffer == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_realloc: invalid buffer.\n" );
@@ -69,7 +71,15 @@ void *libewf_realloc( void *buffer, uint32_t size )
 
 		return( NULL );
 	}
-	return( realloc( buffer, (size_t) size ) );
+	reallocated_buffer = realloc( buffer, (size_t) size );
+
+	if( reallocated_buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_realloc: unable to reallocate buffer.\n" );
+
+		return( NULL );
+	}
+	return( reallocated_buffer );
 }
 
 /* Function to wrap free

@@ -44,7 +44,7 @@
 #include "ewf_crc.h"
 
 /* Allocates memory for a new ewf section struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_SECTION *ewf_section_alloc( void )
 {
@@ -75,7 +75,7 @@ void ewf_section_free( EWF_SECTION *section )
 }
 
 /* Reads the section from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_SECTION *ewf_section_read( int file_descriptor )
 {

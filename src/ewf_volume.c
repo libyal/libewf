@@ -43,7 +43,7 @@
 #include "ewf_volume.h"
 
 /* Allocates memory for a new ewf volume struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_VOLUME *ewf_volume_alloc( void )
 {
@@ -82,7 +82,7 @@ void ewf_volume_free( EWF_VOLUME *volume )
 }
 
 /* Reads the volume from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_VOLUME *ewf_volume_read( int file_descriptor )
 {

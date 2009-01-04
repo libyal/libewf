@@ -33,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SECTIONLIST_H
-#define _SECTIONLIST_H
+#ifndef _LIBEWF_SECTION_LIST_H
+#define _LIBEWF_SECTION_LIST_H
 
 #include <inttypes.h>
 
@@ -42,7 +42,14 @@
 extern "C" {
 #endif
 
-typedef struct libewf_section_list_entry LIBEWF_SECTION_LIST_ENTRY;
+#define LIBEWF_SECTION_LIST_ENTRY libewf_section_list_entry_t
+#define LIBEWF_SECTION_LIST_ENTRY_SIZE sizeof( LIBEWF_SECTION_LIST_ENTRY )
+
+#define LIBEWF_SECTION_LIST libewf_section_list_t
+#define LIBEWF_SECTION_LIST_SIZE sizeof( LIBEWF_SECTION_LIST )
+
+typedef struct libewf_section_list_entry libewf_section_list_entry_t;
+typedef struct libewf_section_list libewf_section_list_t;
 
 struct libewf_section_list_entry
 {
@@ -63,16 +70,16 @@ struct libewf_section_list_entry
 	LIBEWF_SECTION_LIST_ENTRY *next;
 };
 
-#define LIBEWF_SECTION_LIST_ENTRY_SIZE sizeof( LIBEWF_SECTION_LIST_ENTRY )
-
-typedef struct libewf_section_list LIBEWF_SECTION_LIST;
-
 struct libewf_section_list
 {
-	LIBEWF_SECTION_LIST_ENTRY *first, *last;
-};
+	/* The first entry in the list
+	 */
+	LIBEWF_SECTION_LIST_ENTRY *first;
 
-#define LIBEWF_SECTION_LIST_SIZE sizeof( LIBEWF_SECTION_LIST )
+	/* The last entry in the list
+	 */
+	LIBEWF_SECTION_LIST_ENTRY *last;
+};
 
 LIBEWF_SECTION_LIST_ENTRY *libewf_section_list_entry_alloc( void );
 LIBEWF_SECTION_LIST *libewf_section_list_alloc( void );

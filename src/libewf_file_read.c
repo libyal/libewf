@@ -33,18 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/stat.h>
-#include <inttypes.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "libewf_common.h"
-#include "libewf_endian.h"
-#include "libewf_notify.h"
-#include "libewf_md5.h"
 
 #include "ewf_compress.h"
 #include "ewf_crc.h"
@@ -61,9 +50,14 @@
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
 #include "ewf_table.h"
+
+#include "libewf_common.h"
+#include "libewf_endian.h"
+#include "libewf_notify.h"
+#include "libewf_md5.h"
 #include "libewf_file.h"
-#include "handle.h"
-#include "segment_table.h"
+#include "libewf_file_read.h"
+#include "libewf_segment_table.h"
 
 /* Prints a dump of section data
  */
@@ -80,7 +74,7 @@ void libewf_dump_section_data( uint8_t *data, size_t size )
 	}
 	libewf_dump_data( data, size );
 
-	memcpy( (uint8_t *) &stored_crc, (uint8_t *) ( data + size - EWF_CRC_SIZE ), EWF_CRC_SIZE );
+	libewf_memcpy( (uint8_t *) &stored_crc, (uint8_t *) ( data + size - EWF_CRC_SIZE ), EWF_CRC_SIZE );
 
 	fprintf( stderr, "libewf_dump_section_data: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
 
@@ -253,7 +247,7 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 
 		LIBEWF_VERBOSE_PRINT( "libewf_section_volume_read: this volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n", volume_chunk_count, bytes_per_chunk, stored_crc, *calculated_crc );
 
-		memcpy( (uint8_t *) handle->guid, (uint8_t *) volume->guid, 16 );
+		libewf_memcpy( (uint8_t *) handle->guid, (uint8_t *) volume->guid, 16 );
 
 		ewf_volume_free( volume );
 		ewf_crc_free( calculated_crc );
@@ -314,25 +308,35 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 
 		volume_chunk_count = 1;
 	}
-	handle->offset_table           = libewf_offset_table_values_alloc( handle->offset_table, volume_chunk_count );
-	handle->secondary_offset_table = libewf_offset_table_values_alloc( handle->secondary_offset_table, volume_chunk_count );
+	handle->offset_table = libewf_offset_table_alloc( volume_chunk_count );
+
+	if( handle->offset_table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_volume_read: unable to create offset table.\n" );
+	}
+	handle->secondary_offset_table = libewf_offset_table_alloc( volume_chunk_count );
+
+	if( handle->secondary_offset_table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_volume_read: unable to create secondairy offset table.\n" );
+	}
 }
 
 /* Fills the offset table
  */
 LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table, EWF_TABLE_OFFSET *offsets, uint32_t chunk_amount, int file_descriptor )
 {
-	uint32_t size_of_chunks = 0;
-	uint32_t raw_offset     = 0;
 	uint64_t chunk_size     = 0;
 	uint64_t iterator       = 0;
 	uint64_t current_offset = 0;
 	uint64_t next_offset    = 0;
+	uint32_t size_of_chunks = 0;
+	uint32_t raw_offset     = 0;
 	uint8_t compressed      = 0;
 
 	if( offset_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_fill_offset_table: invalid offset_table.\n" );
+		LIBEWF_FATAL_PRINT( "libewf_fill_offset_table: invalid offset table.\n" );
 	}
 	/* Correct the last offset, to fill the table it should point to the first empty entry
 	 * the the last filled entry
@@ -348,7 +352,12 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	 */
 	if( offset_table->amount < size_of_chunks )
 	{
-		offset_table = libewf_offset_table_values_realloc( offset_table, size_of_chunks );
+		offset_table = libewf_offset_table_realloc( offset_table, size_of_chunks );
+
+		if( offset_table == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_fill_offset_table: unable to reallocate offset table.\n" );
+		}
 	}
 	/* Read the offsets from file
 	 */
@@ -366,6 +375,10 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		offset_table = libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, compressed, current_offset, chunk_size );
 
+		if( offset_table == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_fill_offset_table: unable to set value in offset table.\n" );
+		}
 		offset_table->last++;
 
 		if( compressed == 0 )
@@ -386,6 +399,10 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
 	offset_table   = libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, compressed, current_offset, 0 );
 
+	if( offset_table == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_fill_offset_table: unable to set value in offset table.\n" );
+	}
 	return( offset_table );
 }
 
@@ -418,6 +435,10 @@ LIBEWF_OFFSET_TABLE *libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_t
 
 			offset_table = libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, offset_table->compressed[ offset_table->last ], last_offset, chunk_size );
 
+			if( offset_table == NULL )
+			{
+				LIBEWF_FATAL_PRINT( "libewf_fill_offset_table: unable to set value in offset table.\n" );
+			}
 			LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: last chunk %" PRIu64 " calculated with offset %" PRIu64 " and size %" PRIu64 ".\n", ( offset_table->last + 1 ), last_offset, chunk_size );
 
 			break;
@@ -895,12 +916,13 @@ void libewf_section_data_read_segment( LIBEWF_HANDLE *handle, uint32_t segment, 
  */
 EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segment )
 {
-	EWF_SECTION *section    = NULL;
-	EWF_CRC *calculated_crc = NULL;
-	char *filename          = NULL;
-	EWF_CRC stored_crc      = 0;
-	uint64_t offset_end     = 0;
-	int file_descriptor     = 0;
+	EWF_SECTION *section          = NULL;
+	EWF_CRC *calculated_crc       = NULL;
+	LIBEWF_SECTION_LIST *data_set = NULL;
+	char *filename                = NULL;
+	EWF_CRC stored_crc            = 0;
+	uint64_t offset_end           = 0;
+	int file_descriptor           = 0;
 
 	/* The first offset is directly after the file header (13 byte)
 	 */
@@ -917,6 +939,10 @@ EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segme
 	}
 	file_descriptor = libewf_segment_table_get_file_descriptor( handle->segment_table, segment );
 
+	if( file_descriptor <= -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: invalid file descriptor.\n" );
+	}
 	while( 1 )
 	{
 		section = ewf_section_read( file_descriptor );
@@ -948,9 +974,12 @@ EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segme
 #endif
 
 		offset_end = previous_offset + convert_64bit( section->size );
+		data_set   = libewf_section_list_append( handle->segment_table->section_list[ segment ], file_descriptor, previous_offset, offset_end );
 
-		libewf_section_list_append( handle->segment_table->section_list[ segment ], file_descriptor, previous_offset, offset_end );
-
+		if( data_set == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: unable to append value.\n" );
+		}
 		libewf_section_data_read_segment( handle, segment, section, file_descriptor, handle->segment_table->section_list[ segment ] );
 
 		/* Check if the section alignment is correct.
@@ -1143,7 +1172,7 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 				( chunk + 1 ), handle->offset_table->amount,
 				(int) ( ( handle->offset_table->last > 0 ) ? ( ( chunk * 100 ) / handle->offset_table->last ) : 1 ) ) ;
 
-				memcpy( (uint8_t *) handle->raw_data, (uint8_t *) handle->chunk_data, chunk_data_size );
+				libewf_memcpy( (uint8_t *) handle->raw_data, (uint8_t *) handle->chunk_data, chunk_data_size );
 
 				handle->cached_data_size = chunk_data_size;
 			}
@@ -1163,7 +1192,7 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 
 		/* Copy the relevant data to buffer
 		 */
-		memcpy( (uint8_t *) ( buffer + count_read ), (uint8_t *) ( handle->raw_data + buffer_offset ), available );
+		libewf_memcpy( (uint8_t *) ( buffer + count_read ), (uint8_t *) ( handle->raw_data + buffer_offset ), available );
 
 		size          -= available;
 		count_read    += available;
@@ -1255,7 +1284,7 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 
 		LIBEWF_VERBOSE_PRINT( "libewf_read_to_file_descriptor: MD5 hash stored: %s, calculated: %s.\n", stored_md5hash_string, calculated_md5hash_string );
 
-		if( memcmp( calculated_md5hash, handle->md5hash, 16 ) != 0 )
+		if( libewf_memcmp( calculated_md5hash, handle->md5hash, 16 ) != 0 )
 		{
 			LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: MD5 hash does not match.\n" );
 		}

@@ -44,7 +44,7 @@
 #include "ewf_ltree.h"
 
 /* Allocates memory for a new ewf ltree struct
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_LTREE *ewf_ltree_alloc( void )
 {
@@ -75,7 +75,7 @@ void ewf_ltree_free( EWF_LTREE *ltree )
 }
 
 /* Reads the ltree from a file descriptor
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_LTREE *ewf_ltree_read( int file_descriptor )
 {
@@ -146,7 +146,7 @@ int32_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 
 /* Reads the tree data from a file descriptor
  * Test function
- * Return a pointer to the new instance, NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_tree_data_read( int file_descriptor, uint32_t size )
 {

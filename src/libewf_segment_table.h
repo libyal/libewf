@@ -33,16 +33,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_SEGMENTTABLE_H
-#define _LIBEWF_SEGMENTTABLE_H
+#ifndef _LIBEWF_SEGMENT_TABLE_H
+#define _LIBEWF_SEGMENT_TABLE_H
 
-#include "section_list.h"
+#include <inttypes.h>
+
+#include "libewf_section_list.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct libewf_segment_table LIBEWF_SEGMENT_TABLE;
+#define LIBEWF_SEGMENT_TABLE libewf_segment_table_t
+#define LIBEWF_SEGMENT_TABLE_SIZE sizeof( LIBEWF_SEGMENT_TABLE )
+#define LIBEWF_SEGMENT_TABLE_FILENAME_SIZE sizeof( char* )
+#define LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE sizeof( int )
+#define LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE sizeof( LIBEWF_SECTION_LIST )
+
+typedef struct libewf_segment_table libewf_segment_table_t;
 
 struct libewf_segment_table
 {
@@ -64,14 +72,8 @@ struct libewf_segment_table
         LIBEWF_SECTION_LIST **section_list;
 };
 
-#define LIBEWF_SEGMENT_TABLE_SIZE sizeof( LIBEWF_SEGMENT_TABLE )
-#define LIBEWF_SEGMENT_TABLE_FILENAME_SIZE sizeof( char* )
-#define LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE sizeof( int )
-#define LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE sizeof( LIBEWF_SECTION_LIST )
-
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint32_t initial_table_size );
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_alloc( LIBEWF_SEGMENT_TABLE *segment_table, uint32_t size );
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint32_t size );
+LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint32_t size );
+LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint32_t size );
 void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_set_values( LIBEWF_SEGMENT_TABLE *segment_table, uint32_t segment, const char *filename, int file_descriptor );
 uint8_t libewf_segment_table_values_is_set( LIBEWF_SEGMENT_TABLE *segment_table, uint32_t segment );

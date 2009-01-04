@@ -36,7 +36,7 @@
 #ifndef _LIBEWF_HANDLE_H
 #define _LIBEWF_HANDLE_H
 
-#include <unistd.h>
+#include <inttypes.h>
 
 #include "ewf_error2.h"
 #include "ewf_header.h"
@@ -45,7 +45,7 @@
 #include "ewf_sectors.h"
 
 #include "libewf_offset_table.h"
-#include "segment_table.h"
+#include "libewf_segment_table.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,7 +54,10 @@ extern "C" {
 #define EWF_FORMAT_E01	0x01
 #define EWF_FORMAT_S01	0x02
 
-typedef struct libewf_handle LIBEWF_HANDLE;
+#define LIBEWF_HANDLE libewf_handle_t
+#define LIBEWF_HANDLE_SIZE sizeof( LIBEWF_HANDLE )
+
+typedef struct libewf_handle libewf_handle_t;
 
 struct libewf_handle
 {
@@ -185,8 +188,6 @@ struct libewf_handle
 	 */
 	uint8_t guid[16];
 };
-
-#define LIBEWF_HANDLE_SIZE sizeof( LIBEWF_HANDLE )
 
 LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount );
 LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size );
