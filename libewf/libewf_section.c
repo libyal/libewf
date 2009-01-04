@@ -2106,7 +2106,10 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &table, ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &table,
+	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
 	if( libewf_endian_revert_32bit(
 	     calculated_crc,
