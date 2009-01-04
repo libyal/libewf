@@ -52,11 +52,6 @@ struct ewfx_delta_chunk_header
 	 */
 	uint8_t chunk[ 4 ];
 
-	/* The size of the chunk
-	 * consists of 4 bytes (32 bits)
-	 */
-	uint8_t chunk_size[ 4 ];
-
 	/* Padding
 	 * some padding reserved for future use
 	 * consists of 6 bytes

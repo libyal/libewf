@@ -37,9 +37,9 @@
 /* The libewf version
  */
 #if 0
-#define LIBEWF_VERSION				L"20071123"
+#define LIBEWF_VERSION				L"20071121"
 #else
-#define LIBEWF_VERSION				"20071123"
+#define LIBEWF_VERSION				"20071121"
 #endif
 
 /* The libewf file access
@@ -98,8 +98,6 @@
  */
 #define LIBEWF_MEDIA_TYPE_REMOVABLE		0x00
 #define LIBEWF_MEDIA_TYPE_FIXED			0x01
-
-#define LIBEWF_MEDIA_TYPE_CDROM			0x03
 
 /* Libewf volume type definitions
  */

@@ -47,47 +47,16 @@ typedef struct ewf_session ewf_session_t;
 
 struct ewf_session
 {
-	/* Amount of sessions
-	 * consists of 4 bytes
-	 */
-	uint8_t amount_of_sessions[ 4 ];
-
 	/* Unknown
-	 * consists of 28 bytes
-	 * contains 0x00
+	 * consists of 68 bytes
 	 */
-	uint8_t unknown1[ 28 ];
+	uint8_t unknown[ 68 ];
 
 	/* The section crc of all (previous) session data
 	 * consists of 4 bytes (32 bits)
 	 * starts with offset 76
 	 */
 	uint8_t crc[ 4 ];
-};
-
-#define EWF_SESSION_ENTRY ewf_session_entry_t
-#define EWF_SESSION_ENTRY_SIZE sizeof( EWF_SESSION_ENTRY )
-
-typedef struct ewf_session_entry ewf_session_entry_t;
-
-struct ewf_session_entry
-{
-	/* Unknown
-	 * contains 0x00
-	 * consists of 4 bytes
-	 */
-	uint8_t unknown1[ 4 ];
-
-	/* The first sector of the session
-	 * consists of 4 bytes
-	 */
-	uint8_t first_sector[ 4 ];
-
-	/* Unknown
-	 * consists of 24 bytes
-	 * contains 0x00
-	 */
-	uint8_t unknown2[ 24 ];
 };
 
 #if defined( __cplusplus )

@@ -84,7 +84,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->header_values             = NULL;
 	internal_handle->hash_values               = NULL;
 	internal_handle->acquiry_error_sectors     = NULL;
-	internal_handle->amount_of_acquiry_errors  = 0;
+	internal_handle->acquiry_amount_of_errors  = 0;
 	internal_handle->current_chunk             = 0;
 	internal_handle->current_chunk_offset      = 0;
 	internal_handle->compression_level         = EWF_COMPRESSION_UNKNOWN;

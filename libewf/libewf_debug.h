@@ -39,6 +39,7 @@
 #include <stdio.h>
 
 #include "libewf_char.h"
+#include "libewf_internal_handle.h"
 
 #include "ewf_char.h"
 #include "ewf_section.h"
@@ -49,6 +50,7 @@ extern "C" {
 #endif
 
 void libewf_debug_dump_data( uint8_t *data, size_t size );
+void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size64_t size );
 
 void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section );
 void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string );

@@ -41,6 +41,11 @@
  */
 #define EWF_MINIMUM_CHUNK_SIZE			32768
 
+/* The EWF-E01 and EWF-L01 volume and data section media type definitions
+ */
+#define EWF_MEDIA_TYPE_REMOVABLE		0x00
+#define EWF_MEDIA_TYPE_FIXED			0x01
+
 /* The EWF-E01 media flags definitions
  */
 #define EWF_MEDIA_FLAGS_IS_PHYSICAL		0x02

@@ -983,7 +983,7 @@ int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount
 	{
 		return( 0 );
 	}
-	*amount_of_errors = internal_handle->amount_of_acquiry_errors;
+	*amount_of_errors = internal_handle->acquiry_amount_of_errors;
 
 	return( 1 );
 }
@@ -1005,7 +1005,7 @@ int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *se
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->amount_of_acquiry_errors == 0 )
+	if( internal_handle->acquiry_amount_of_errors == 0 )
 	{
 		return( 0 );
 	}
@@ -1030,7 +1030,7 @@ int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *se
 
 		return( -1 );
 	}
-	if( index >= internal_handle->amount_of_acquiry_errors )
+	if( index >= internal_handle->acquiry_amount_of_errors )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
 		 function );
@@ -2125,7 +2125,7 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 	{
 		/* Check if acquiry read error sector is already in list
 		 */
-		for( iterator = 0; iterator < internal_handle->amount_of_acquiry_errors; iterator++ )
+		for( iterator = 0; iterator < internal_handle->acquiry_amount_of_errors; iterator++ )
 		{
 			if( internal_handle->acquiry_error_sectors[ iterator ].sector == sector )
 			{
@@ -2134,7 +2134,7 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 		}
 		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
 		                         internal_handle->acquiry_error_sectors,
-		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->amount_of_acquiry_errors + 1 ) ) );
+		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->acquiry_amount_of_errors + 1 ) ) );
 	}
 	if( acquiry_error_sectors == NULL )
 	{
@@ -2145,10 +2145,10 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 	}
 	internal_handle->acquiry_error_sectors = acquiry_error_sectors;
 
-	internal_handle->acquiry_error_sectors[ internal_handle->amount_of_acquiry_errors ].sector            = sector;
-	internal_handle->acquiry_error_sectors[ internal_handle->amount_of_acquiry_errors ].amount_of_sectors = amount_of_sectors;
+	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].sector            = sector;
+	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].amount_of_sectors = amount_of_sectors;
 
-	internal_handle->amount_of_acquiry_errors++;
+	internal_handle->acquiry_amount_of_errors++;
 
 	return( 1 );
 }

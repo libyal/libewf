@@ -82,21 +82,12 @@ EWFGLOB *ewfglob_alloc( void )
 	EWFGLOB *glob         = NULL;
 	static char *function = "ewfglob_alloc";
 
-	glob = (EWFGLOB *) libewf_common_alloc( EWFGLOB_SIZE );
+	glob = (EWFGLOB *) libewf_common_alloc_cleared( EWFGLOB_SIZE, 0 );
 
 	if( glob == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate glob.\n",
 		 function );
-
-		return( NULL );
-	}
-	if( libewf_common_memset( glob, 0, EWFGLOB_SIZE ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
-		 function );
-
-		libewf_common_free( glob );
 
 		return( NULL );
 	}
@@ -132,8 +123,7 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 	}
 	new_size = EWFGLOB_RESULT_SIZE * new_amount;
 
-	if( ( previous_size > (size_t) SSIZE_MAX )
-	 || ( new_size > (size_t) SSIZE_MAX ) )
+	if( ( previous_size > (size_t) SSIZE_MAX ) || ( new_size > (size_t) SSIZE_MAX ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
@@ -142,12 +132,12 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 	}
 	if( glob->amount == 0 )
 	{
-		reallocation = (CHAR_T **) libewf_common_alloc( new_size );
+		reallocation = (CHAR_T **) libewf_common_alloc_cleared( new_size, 0 );
 	}
 	else
 	{
 		previous_size = glob->amount * EWFGLOB_RESULT_SIZE;
-		reallocation  = (CHAR_T **) libewf_common_realloc( glob->results, new_size );
+		reallocation  = (CHAR_T **) libewf_common_realloc_new_cleared( glob->results, previous_size, new_size, 0 );
 	}
 	if( reallocation == NULL )
 	{
@@ -157,17 +147,6 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 		return( NULL );
 	}
 	glob->results = reallocation;
-
-	if( libewf_common_memset(
-	     &( glob->results[ glob->amount ] ),
-	     0,
-	     ( new_size - previous_size ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
-		 function );
-
-		return( NULL );
-	}
 	glob->amount  = new_amount;
 
 	return( glob );

@@ -131,22 +131,20 @@ Next release:
 
 * make buffer passthrough default behavior?
 * work on TODO in write
-* API function get current chunk size? for raw read?
+* API function get current chunk size?
 * do not finalize on write error?
 
 * offset table dirty still needed?
-  only needed for write
-  need to determine if a chunks is stored in a delta segment file
-  what about adding the segment file type to the segment file struct?
-
+* store length segment filename in segment file
+* move libewf_section_list_append to section write functions?
+  - for some sections not useful
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
-* move libewf_section_read to segment file
-
-* libewf_filename_create set string and length as parameters?
-
-* Try to correct the table
-  - add error flag
+* remove ewf_compress and ewf_string.c
+* libewf_section_list_append add section_type length parameter
+* pass media values struct to section volume/data functions
+* section make sure read count is returned instead of section_size
+* section remove passing of internal handle
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -161,21 +159,6 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
-
-Version: 20071123
-* worked on refactoring code
-* moved libewf_offset_table_compare after the full index build
-  in libewf_segment_file_read_open
-* added chunk size to delta chunk for redundancy
-* removed internal handle from most functions in section
-* ewfexport added argument set detection for interactive mode
-* section read count is returned instead of section size when possible
-* fixed win32 support solution file and ewfglob
-* added section type length to section list entry
-* added length filename in segment file struct
-* fixed error in error2 section regarding debug
-* worked on session section
-* added CD-ROM media type
 
 Version: 20071121
 * worked on refactoring code

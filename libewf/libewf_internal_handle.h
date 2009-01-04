@@ -151,7 +151,7 @@ struct libewf_internal_handle
 
 	/* The amount of the acquiry read error sectors
 	 */
-	uint32_t amount_of_acquiry_errors;
+	uint32_t acquiry_amount_of_errors;
 
 	/* The current chunk
 	 */

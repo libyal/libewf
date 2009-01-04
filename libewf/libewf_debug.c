@@ -40,7 +40,6 @@
 #include "libewf_debug.h"
 #include "libewf_endian.h"
 #include "libewf_notify.h"
-#include "libewf_segment_file.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
@@ -74,6 +73,103 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 		fprintf( stderr, "%s: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
 		 function, stored_crc, calculated_crc );
 	}
+}
+
+/* Reads section data
+ */
+void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size64_t size )
+{
+	static char *function      = "libewf_debug_read_section";
+	uint8_t *data              = NULL;
+	uint8_t *uncompressed_data = NULL;
+	ssize_t read_count         = 0;
+	size_t uncompressed_size   = 0;
+	int result                 = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return;
+	}
+	size *= sizeof( uint8_t );
+
+	if( size > (size64_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return;
+	}
+	data = (uint8_t *) libewf_common_alloc( (size_t) size );
+
+	if( data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
+		 function );
+
+		return;
+	}
+	read_count = libewf_common_read( file_descriptor, data, size );
+
+	if( read_count < (ssize_t) size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read section data.\n",
+		 function );
+
+		libewf_common_free( data );
+
+		return;
+	}
+	uncompressed_size = (size_t) ( size + 1024 );
+
+	if( uncompressed_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: uncompressed size value exceeds maximum.\n",
+		 function );
+
+		return;
+	}
+	uncompressed_data = (uint8_t *) libewf_common_alloc( uncompressed_size );
+
+	if( uncompressed_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate uncompressed data.\n",
+		 function );
+
+		libewf_common_free( data );
+
+		return;
+	}
+	result = libewf_uncompress( uncompressed_data, &uncompressed_size, data, (size_t) size );
+
+	if( result == 0 )
+	{
+		fprintf( stderr, "%s: data is UNCOMPRESSED.\n",
+		 function );
+
+		libewf_debug_dump_data( data, (size_t) size );
+	}
+	else if( result == 1 )
+	{
+		fprintf( stderr, "%s: data is zlib COMPRESSED.\n",
+		 function );
+
+		libewf_debug_dump_data( uncompressed_data, uncompressed_size );
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to uncompress data.\n",
+		 function );
+
+		libewf_common_free( data );
+		libewf_common_free( uncompressed_data );
+
+		return;
+	}
+	libewf_common_free( data );
+	libewf_common_free( uncompressed_data );
 }
 
 /* Prints the section data to a stream

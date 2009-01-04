@@ -52,13 +52,9 @@ typedef struct libewf_section_list libewf_section_list_t;
 struct libewf_section_list_entry
 {
         /* The section type string
-         * consists of 16 bytes at the most
+         * consists of 16 bytes
          */
         uint8_t type[ 16 ];
-
-	/* The section type string length
-	 */
-	size_t type_length;
 
 	/* The start offset of the section
 	 */
@@ -88,7 +84,7 @@ struct libewf_section_list
 	LIBEWF_SECTION_LIST_ENTRY *last;
 };
 
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset );
+LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off64_t start_offset, off64_t end_offset );
 int libewf_section_list_remove_last( LIBEWF_SECTION_LIST *section_list );
 
 #if defined( __cplusplus )

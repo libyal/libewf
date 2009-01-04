@@ -39,7 +39,7 @@
 /* Append an entry to the section list
  * Returns a pointer to the instance, NULL on error
  */
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset )
+LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off64_t start_offset, off64_t end_offset )
 {
 	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
 	static char *function                         = "libewf_section_list_append";
@@ -58,20 +58,6 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 		return( NULL );
 	}
-	if( type_length == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid type length value cannot be zero.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( type_length >= 16 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid type length value exceeds maximum.\n",
-		 function );
-
-		return( NULL );
-	}
 	section_list_entry = (LIBEWF_SECTION_LIST_ENTRY *) libewf_common_alloc( LIBEWF_SECTION_LIST_ENTRY_SIZE );
 
 	if( section_list_entry == NULL )
@@ -81,22 +67,7 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
-	     section_list_entry,
-	     0,
-	     LIBEWF_SECTION_LIST_ENTRY_SIZE ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear section list entry.\n",
-		 function );
-
-		libewf_common_free( section_list_entry );
-
-		return( NULL );
-	}
-	if( libewf_common_memcpy(
-	     section_list_entry->type,
-	     type,
-	     type_length ) == NULL )
+	if( libewf_common_memcpy( section_list_entry->type, type, 16 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set section list entry type.\n",
 		 function );
@@ -105,7 +76,6 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 		return( NULL );
 	}
-	section_list_entry->type_length  = type_length;
 	section_list_entry->start_offset = start_offset;
 	section_list_entry->end_offset   = end_offset;
 	section_list_entry->next         = NULL;
