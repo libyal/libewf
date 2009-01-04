@@ -357,6 +357,7 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 
 		return( NULL );
 	}
+	handle_write->data_section               = NULL;
 	handle_write->input_write_count          = 0;
 	handle_write->write_count                = 0;
 	handle_write->input_write_size           = 0;
@@ -377,6 +378,23 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 	handle_write->write_finalized            = 0;
 
 	return( handle_write );
+}
+
+/* Frees memory of a handle write struct including elements
+ */
+void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_write )
+{
+	static char *function = "libewf_internal_handle_write_free";
+
+	if( handle_write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle write.\n",
+		 function );
+
+		return;
+	}
+	libewf_common_free( handle_write->data_section );
+	libewf_common_free( handle_write );
 }
 
 /* Reallocates the handle chunk cache

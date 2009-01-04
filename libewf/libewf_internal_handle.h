@@ -44,6 +44,7 @@
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
 
+#include "ewf_data.h"
 #include "ewf_digest_hash.h"
 #include "ewf_error2.h"
 #include "ewf_header.h"
@@ -267,6 +268,10 @@ struct libewf_internal_handle_read
  */
 struct libewf_internal_handle_write
 {
+	/* A cached version of the data section
+	 */
+	EWF_DATA *data_section;
+
 	/* The amount of bytes of the input written
 	 */
 	ssize64_t input_write_count;
@@ -352,7 +357,7 @@ LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void );
 void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read );
 
 LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void );
-#define libewf_internal_handle_write_free( handle_write )	free( handle_write )
+void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_write );
 
 LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTERNAL_HANDLE *internal_handle, size_t size );
 

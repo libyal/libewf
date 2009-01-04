@@ -2286,7 +2286,6 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
  */
 ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
 {
-	EWF_DATA *data              = NULL;
 	static char *function       = "libewf_section_data_write";
 	ssize_t section_write_count = 0;
 	ssize_t data_write_count    = 0;
@@ -2306,103 +2305,106 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
-	data = (EWF_DATA *) libewf_common_alloc( size );
-
-	if( data == NULL )
+	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create data.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_common_memset( data, 0, size ) == NULL )
+	/* Check if the data section was already created
+	 */
+	if( internal_handle->write->data_section == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear data.\n",
-		 function );
+		internal_handle->write->data_section = (EWF_DATA *) libewf_common_alloc( size );
 
-		libewf_common_free( data );
-
-		return( -1 );
-	}
-	if( internal_handle->format == LIBEWF_FORMAT_FTK )
-	{
-		data->media_type = 0x01;
-	}
-	else
-	{
-		data->media_type = internal_handle->media->media_type;
-	}
-	data->media_flags = internal_handle->media->media_flags;
-
-	if( libewf_endian_revert_32bit(
-	     internal_handle->media->amount_of_chunks,
-	     data->amount_of_chunks ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
-		 function );
-
-		libewf_common_free( data );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     internal_handle->media->sectors_per_chunk,
-	     data->sectors_per_chunk ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
-		 function );
-
-		libewf_common_free( data );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     internal_handle->media->bytes_per_sector,
-	     data->bytes_per_sector ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
-		 function );
-
-		libewf_common_free( data );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     internal_handle->media->amount_of_sectors,
-	     data->amount_of_sectors ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
-		 function );
-
-		libewf_common_free( data );
-
-		return( -1 );
-	}
-	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN5 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 )
-	 || ( internal_handle->format == LIBEWF_FORMAT_EWFX ) )
-	{
-		data->compression_level = (uint8_t) internal_handle->compression_level;
-
-		if( libewf_common_memcpy( data->guid, internal_handle->guid, 16 ) == NULL )
+		if( internal_handle->write->data_section == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create data.\n",
 			 function );
-
-			libewf_common_free( data );
 
 			return( -1 );
 		}
-		if( libewf_endian_revert_32bit( internal_handle->media->error_granularity, data->error_granularity ) != 1 )
+		if( libewf_common_memset( internal_handle->write->data_section, 0, size ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to clear data.\n",
 			 function );
 
-			libewf_common_free( data );
+			return( -1 );
+		}
+		if( internal_handle->format == LIBEWF_FORMAT_FTK )
+		{
+			internal_handle->write->data_section->media_type = 0x01;
+		}
+		else
+		{
+			internal_handle->write->data_section->media_type = internal_handle->media->media_type;
+		}
+		internal_handle->write->data_section->media_flags = internal_handle->media->media_flags;
+
+		if( libewf_endian_revert_32bit(
+		     internal_handle->media->amount_of_chunks,
+		     internal_handle->write->data_section->amount_of_chunks ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
+			 function );
 
 			return( -1 );
+		}
+		if( libewf_endian_revert_32bit(
+		     internal_handle->media->sectors_per_chunk,
+		     internal_handle->write->data_section->sectors_per_chunk ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_endian_revert_32bit(
+		     internal_handle->media->bytes_per_sector,
+		     internal_handle->write->data_section->bytes_per_sector ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_endian_revert_32bit(
+		     internal_handle->media->amount_of_sectors,
+		     internal_handle->write->data_section->amount_of_sectors ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE5 )
+		 || ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		 || ( internal_handle->format == LIBEWF_FORMAT_LINEN5 )
+		 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 )
+		 || ( internal_handle->format == LIBEWF_FORMAT_EWFX ) )
+		{
+			internal_handle->write->data_section->compression_level = (uint8_t) internal_handle->compression_level;
+
+			if( libewf_common_memcpy(
+			     internal_handle->write->data_section->guid,
+			     internal_handle->guid,
+			     16 ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( libewf_endian_revert_32bit(
+			     internal_handle->media->error_granularity,
+			     internal_handle->write->data_section->error_granularity ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
+				 function );
+
+				return( -1 );
+			}
 		}
 	}
 	section_write_count = libewf_section_start_write(
@@ -2416,13 +2418,9 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
 
-		libewf_common_free( data );
-
 		return( -1 );
 	}
-	data_write_count = ewf_data_write( data, file_descriptor );
-
-	libewf_common_free( data );
+	data_write_count = ewf_data_write( internal_handle->write->data_section, file_descriptor );
 
 	if( data_write_count == -1 )
 	{

@@ -136,6 +136,7 @@ Version: 20070818
 * completed refactoring of PRINT( "libewf and PRINT( "ewf
   function names
 * changed warning strings with 2^ values to value exceeds maximum
+* added write optimalisation: the data section is cached
 
 Version: 20070816
 * worked on restructuring to improve internal structure
