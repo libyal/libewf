@@ -4434,9 +4434,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 #else
 		/* Skip the data within the section
 		 */
-		if( libewf_segment_file_lseek(
+		if( libewf_segment_file_seek_offset(
 		     segment_file,
-		     *section_end_offset ) == -1 )
+		     section_end_offset ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 			 function );

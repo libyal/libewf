@@ -648,7 +648,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( chunk_data_size > (size_t) internal_handle->media_values->chunk_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data size value exceeds chunk size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk data size value exceeds media values chunk size.\n",
 		 function );
 
 		return( -1 );
