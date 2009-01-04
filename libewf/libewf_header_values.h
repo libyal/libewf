@@ -63,58 +63,210 @@ extern "C" {
 #define LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER		12
 #define LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC			13
 
-int libewf_header_values_initialize( libewf_values_table_t *header_values );
+int libewf_header_values_initialize(
+     libewf_values_table_t *header_values );
 
-int libewf_header_values_realloc( libewf_values_table_t *header_values, uint32_t previous_amount, uint32_t new_amount );
-void libewf_header_values_free( libewf_values_table_t *header_values );
+int libewf_header_values_realloc(
+     libewf_values_table_t *header_values,
+     uint32_t previous_amount,
+     uint32_t new_amount );
 
-libewf_char_t *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_format );
+void libewf_header_values_free(
+      libewf_values_table_t *header_values );
 
-libewf_char_t *libewf_convert_date_header_value( libewf_char_t *header_value, size_t header_value_length, uint8_t date_format );
-libewf_char_t *libewf_generate_date_header_value( time_t timestamp );
-libewf_char_t *libewf_convert_date_header2_value( libewf_char_t *header_value, size_t header_value_length, uint8_t date_format );
-libewf_char_t *libewf_generate_date_header2_value( time_t timestamp );
+libewf_char_t *libewf_convert_date_timestamp(
+                time_t timestamp,
+                uint8_t date_format );
 
-int libewf_header_values_copy( libewf_values_table_t *destination_header_values, libewf_values_table_t *source_header_values );
+libewf_char_t *libewf_convert_date_header_value(
+                libewf_char_t *header_value,
+                size_t header_value_length,
+                uint8_t date_format );
 
-libewf_values_table_t *libewf_header_values_parse_header_string( libewf_char_t *header_string, size_t length, uint8_t date_format );
-libewf_values_table_t *libewf_header_values_parse_header( ewf_char_t *header, size_t size, uint8_t date_format );
-libewf_values_table_t *libewf_header_values_parse_header2( ewf_char_t *header2, size_t size, uint8_t date_format );
+libewf_char_t *libewf_generate_date_header_value(
+                time_t timestamp );
 
-ewf_char_t *libewf_header_values_convert_header_string_to_header( libewf_char_t *header_string, size_t string_length, size_t *header_length );
-ewf_char_t *libewf_header_values_convert_header_string_to_header2( libewf_char_t *header_string, size_t string_length, size_t *header2_length );
+libewf_char_t *libewf_convert_date_header2_value(
+                libewf_char_t *header_value,
+                size_t header_value_length,
+                uint8_t date_format );
 
-libewf_char_t *libewf_header_values_generate_header_string_type1( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
-libewf_char_t *libewf_header_values_generate_header_string_type2( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
-libewf_char_t *libewf_header_values_generate_header_string_type3( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
-libewf_char_t *libewf_header_values_generate_header_string_type4( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
-libewf_char_t *libewf_header_values_generate_header_string_type5( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
-libewf_char_t *libewf_header_values_generate_header_string_type6( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
-libewf_char_t *libewf_header_values_generate_header_string_type7( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length );
+libewf_char_t *libewf_generate_date_header2_value(
+                time_t timestamp );
 
-ewf_char_t *libewf_header_values_generate_header_string_ewf( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header_string_encase1( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header_string_ftk( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header_string_encase2( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header_string_encase4( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header_string_encase5_linen( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header_string_encase6_linen( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length );
+int libewf_header_values_copy(
+     libewf_values_table_t *destination_header_values,
+     libewf_values_table_t *source_header_values );
 
-ewf_char_t *libewf_header_values_generate_header2_string_encase4( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length );
-ewf_char_t *libewf_header_values_generate_header2_string_encase5( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length );
-ewf_char_t *libewf_header_values_generate_header2_string_encase6( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length );
+libewf_values_table_t *libewf_header_values_parse_header_string(
+                        libewf_char_t *header_string,
+                        size_t length,
+                        uint8_t date_format );
 
-libewf_char_t *libewf_convert_date_xheader_value( libewf_char_t *header_value, size_t header_value_length, uint8_t date_format );
-libewf_char_t *libewf_generate_date_xheader_value( time_t timestamp );
+libewf_values_table_t *libewf_header_values_parse_header(
+                        ewf_char_t *header,
+                        size_t size,
+                        uint8_t date_format );
 
-libewf_values_table_t *libewf_header_values_parse_header_string_xml( libewf_char_t *header_string_xml, size_t length, uint8_t date_format );
-libewf_values_table_t *libewf_header_values_parse_xheader( ewf_char_t *xheader, size_t size, uint8_t date_format );
+libewf_values_table_t *libewf_header_values_parse_header2(
+                        ewf_char_t *header2,
+                        size_t size,
+                        uint8_t date_format );
 
-libewf_char_t *libewf_header_values_generate_header_string_xml( libewf_values_table_t *header_values, time_t timestamp, size_t *string_length );
+ewf_char_t *libewf_header_values_convert_header_string_to_header(
+             libewf_char_t *header_string,
+             size_t string_length,
+             size_t *header_length );
 
-ewf_char_t *libewf_header_values_generate_header_string_ewfx( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_header2_string_ewfx( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length );
-ewf_char_t *libewf_header_values_generate_xheader_string_ewfx( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length );
+ewf_char_t *libewf_header_values_convert_header_string_to_header2(
+             libewf_char_t *header_string,
+             size_t string_length,
+             size_t *header2_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type1(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                int8_t compression_level,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type2(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                int8_t compression_level,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type3(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type4(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type5(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type6(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+libewf_char_t *libewf_header_values_generate_header_string_type7(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                libewf_char_t *header_string_head,
+                libewf_char_t *header_string_tail,
+                size_t *string_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_ewf(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             int8_t compression_level,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_encase1(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             int8_t compression_level,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_ftk(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             int8_t compression_level,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_encase2(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             int8_t compression_level,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_encase4(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_encase5_linen(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_encase6_linen(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header2_string_encase4(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header2_length );
+
+ewf_char_t *libewf_header_values_generate_header2_string_encase5(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header2_length );
+
+ewf_char_t *libewf_header_values_generate_header2_string_encase6(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header2_length );
+
+libewf_char_t *libewf_convert_date_xheader_value(
+                libewf_char_t *header_value,
+                size_t header_value_length,
+                uint8_t date_format );
+
+libewf_char_t *libewf_generate_date_xheader_value(
+                time_t timestamp );
+
+int libewf_header_values_parse_header_string_xml(
+     libewf_char_t *header_string_xml,
+     size_t length,
+     uint8_t date_format,
+     libewf_values_table_t **header_values );
+
+int libewf_header_values_parse_xheader(
+     ewf_char_t *xheader,
+     size_t size,
+     uint8_t date_format,
+     libewf_values_table_t **header_values );
+
+libewf_char_t *libewf_header_values_generate_header_string_xml(
+                libewf_values_table_t *header_values,
+                time_t timestamp,
+                size_t *string_length );
+
+ewf_char_t *libewf_header_values_generate_header_string_ewfx(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_header2_string_ewfx(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header_length );
+
+ewf_char_t *libewf_header_values_generate_xheader_string_ewfx(
+             libewf_values_table_t *header_values,
+             time_t timestamp,
+             size_t *header_length );
 
 #if defined( __cplusplus )
 }

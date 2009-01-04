@@ -106,8 +106,15 @@ Code clean up
   - most of the internal library code has been removed
 * check unused parameters gcc -Wextra
 
-Next release:
+Next release(s):
 * implement low memory usage option
+* implement session section write
+* ewfverify: verify against all available hashes that can be verified
+
+* Try to correct the table
+  - add error flag
+
+* create libewf_create_handle and libewf_destroy_handle functions?
 
 Next stable:
 * full platform test
@@ -121,11 +128,10 @@ Next stable:
 * work on TODO in write
 * do not finalize on write error?
 
-* Try to correct the table
-  - add error flag
-
-* libewf_parse_header_values refactor to check if header values are already
-  set and pass header values reference as parameter
+* libewf_header_values.h
+  - code clean
+  - libewf_parse_header_values refactor to pass header values reference as parameter
+    libewf_header_values_parse_header2, libewf_header_values_parse_header
 
 * merge alloc and realloc blocks
 
@@ -133,17 +139,14 @@ Next stable:
 * change ewf_char/string into byte_char/string
 * create common functions i.e. for libewf_char/string
 
-TODO
 * test abort
 
-* create libewf_create_handle and libewf_destroy_handle functions?
 * refactor write initialize into seperate functions
 * rename/move libewf_internal_handle_determine_format and 
   libewf_internal_handle_get_write_maximum_amount_of_segments
 * create internal value to limit memory use
   - for write only offset table is not needed etc.
 * what about open read write and set functions?
-* check >16375 chunks offset table in encase 4 and earlier formats?
 
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
@@ -154,6 +157,9 @@ TODO
   need to determine if a chunks is stored in a delta segment file
   what about adding the segment file type to the segment file struct?
   - reduces memory usage
+
+* Patches by David Loveall
+* ewfacquire(stream), ewfexport, ewfverify log hashes to file -l option
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -168,6 +174,11 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20080221
+* fixed logical error in libewf_write_test_chunks_section_full
+  changed section_amount_of_chunks > maximum_section_amount_of_chunks to >=
+  solves >16375 chunks offset table issue
 
 Version: 20080220
 * Worked on refactoring chunk dirty to segment file type

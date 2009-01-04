@@ -2421,7 +2421,7 @@ int libewf_set_hash_value(
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, 0 if already parsed, or -1 on error
  */
 int libewf_parse_header_values(
      LIBEWF_HANDLE *handle,
@@ -2447,12 +2447,21 @@ int libewf_parse_header_values(
 
 		return( -1 );
 	}
-	if( internal_handle->header_sections->xheader != NULL )
+	if( internal_handle->header_values != NULL )
 	{
-		header_values = libewf_header_values_parse_xheader(
-		                 internal_handle->header_sections->xheader,
-		                 internal_handle->header_sections->xheader_size,
-		                 date_format );
+		return( 0 );
+	}
+	if( ( internal_handle->header_sections->xheader != NULL )
+	 && ( libewf_header_values_parse_xheader(
+	       internal_handle->header_sections->xheader,
+	       internal_handle->header_sections->xheader_size,
+	       date_format,
+	       &( internal_handle->header_values ) ) != 1 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to parse xheader.\n",
+		 function );
+
+		return( -1 );
 	}
 	if( ( header_values == NULL )
 	 && internal_handle->header_sections->header2 != NULL )
@@ -2461,6 +2470,8 @@ int libewf_parse_header_values(
 		                 internal_handle->header_sections->header2,
 		                 internal_handle->header_sections->header2_size,
 		                 date_format );
+
+		internal_handle->header_values = header_values;
 	}
 	if( ( header_values == NULL )
 	 && ( internal_handle->header_sections->header != NULL ) )
@@ -2469,22 +2480,16 @@ int libewf_parse_header_values(
 		                 internal_handle->header_sections->header,
 		                 internal_handle->header_sections->header_size,
 		                 date_format );
+
+		internal_handle->header_values = header_values;
 	}
-	if( header_values == NULL )
+	if( internal_handle->header_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to parse header(s) for values.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->header_values != NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: header values already set in handle - cleaning up previous ones.\n",
-		 function );
-
-		libewf_values_table_free( internal_handle->header_values );
-	}
-	internal_handle->header_values = header_values;
 
 	/* refactor code below to other location */
 
@@ -2492,8 +2497,8 @@ int libewf_parse_header_values(
 	 * only the acquiry software version provides insight in which version of EnCase was used
 	 */
 	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE2 )
-	 && ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
-	 && ( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ][ 0 ] == '3' ) )
+	 && ( internal_handle->header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
+	 && ( internal_handle->header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ][ 0 ] == '3' ) )
  	{
 		internal_handle->format = LIBEWF_FORMAT_ENCASE3;
 	}
@@ -2501,7 +2506,7 @@ int libewf_parse_header_values(
 }
 
 /* Parses the hash values from the xhash section
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, 0 if already parsed, or -1 on error
  */
 int libewf_parse_hash_values(
      LIBEWF_HANDLE *handle )

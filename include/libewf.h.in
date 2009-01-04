@@ -942,14 +942,14 @@ LIBEWF_EXTERN int libewf_set_hash_value(
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, 0 if already parsed, or -1 on error
  */
 LIBEWF_EXTERN int libewf_parse_header_values(
                    LIBEWF_HANDLE *handle,
                    uint8_t date_format );
 
 /* Parses the hash values from the xhash section
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, 0 if already parsed, or -1 on error
  */
 LIBEWF_EXTERN int libewf_parse_hash_values(
                    LIBEWF_HANDLE *handle );
