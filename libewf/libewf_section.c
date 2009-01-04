@@ -1454,8 +1454,6 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 		if( libewf_offset_table_calculate_last_offset(
 		     offset_table,
 		     section_list,
-		     file_descriptor,
-		     segment_number,
 		     error_tollerance ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to calculate last offset.\n",
@@ -3428,24 +3426,13 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	/* Update the chunk data in the offset table
 	 */
-	if( libewf_offset_table_set_values(
-	     internal_handle->offset_table,
-	     chunk,
-	     segment_number,
-	     file_descriptor,
-	     (off64_t) ( start_offset + EWFX_DELTA_CHUNK_HEADER_SIZE ),
-	     ( size - EWFX_DELTA_CHUNK_HEADER_SIZE ),
-	     0,
-	     1 ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-		 function );
+	internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
+	internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = file_descriptor;
+	internal_handle->offset_table->chunk_offset[ chunk ].file_offset     = (off64_t) ( start_offset + EWFX_DELTA_CHUNK_HEADER_SIZE );
+	internal_handle->offset_table->chunk_offset[ chunk ].size            = size - EWFX_DELTA_CHUNK_HEADER_SIZE;
+	internal_handle->offset_table->chunk_offset[ chunk ].compressed      = 0;
+	internal_handle->offset_table->chunk_offset[ chunk ].dirty           = 1;
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-		{
-			return( -1 );
-		}
-	}
 	return( (ssize_t) size );
 }
 

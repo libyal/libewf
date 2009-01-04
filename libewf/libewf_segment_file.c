@@ -1549,7 +1549,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc, uint32_t amount_of_chunks )
+ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 
@@ -1630,21 +1630,12 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	}
 	/* Set the values in the offset table
 	 */
-	if( libewf_offset_table_set_values(
-	     internal_handle->offset_table,
-	     amount_of_chunks,
-	     segment_number,
-	     segment_file->file_descriptor,
-	     segment_file->file_offset,
-	     chunk_size,
-	     is_compressed,
-	     0 ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set offset value in offset table.\n",
-		 function );
+	internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
+	internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = segment_file->file_descriptor;
+	internal_handle->offset_table->chunk_offset[ chunk ].file_offset     = segment_file->file_offset;
+	internal_handle->offset_table->chunk_offset[ chunk ].size            = chunk_size;
+	internal_handle->offset_table->chunk_offset[ chunk ].compressed      = is_compressed;
 
-		return( -1 );
-	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	/* Print a verbose notification
 	 */

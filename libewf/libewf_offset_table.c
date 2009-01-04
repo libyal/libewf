@@ -153,44 +153,6 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 	libewf_common_free( offset_table );
 }
 
-/* Sets the values for a specific offset
- * Returns 1 if successful, or -1 on error
- */
-int libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, uint16_t segment_number, int file_descriptor, off64_t file_offset, size_t size, uint8_t compressed, uint8_t dirty )
-{
-	static char *function = "libewf_offset_table_set_values";
-
-	if( offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->chunk_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk > offset_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: chunk: %" PRIu32 " not in offset table.\n",
-		 function, chunk );
-
-		return( -1 );
-	}
-	offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
-	offset_table->chunk_offset[ chunk ].file_descriptor = file_descriptor;
-	offset_table->chunk_offset[ chunk ].file_offset     = file_offset;
-	offset_table->chunk_offset[ chunk ].size            = size;
-	offset_table->chunk_offset[ chunk ].compressed      = compressed;
-	offset_table->chunk_offset[ chunk ].dirty           = dirty;
-
-	return( 1 );
-}
-
 /* Fills the offset table
  * Returns 1 if successful, or -1 on error
  */
@@ -321,24 +283,12 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 
 			return( -1 );
 		}
-		if( libewf_offset_table_set_values(
-		     offset_table,
-		     offset_table->last,
-		     segment_number,
-		     file_descriptor,
-		     (off64_t) ( base_offset + current_offset ),
-		     (size_t) chunk_size,
-		     compressed,
-		     0 ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-			 function );
+		offset_table->chunk_offset[ offset_table->last ].segment_number  = segment_number;
+		offset_table->chunk_offset[ offset_table->last ].file_descriptor = file_descriptor;
+		offset_table->chunk_offset[ offset_table->last ].file_offset     = (off64_t) ( base_offset + current_offset );
+		offset_table->chunk_offset[ offset_table->last ].size            = (size_t) chunk_size;
+		offset_table->chunk_offset[ offset_table->last ].compressed      = compressed;
 
-			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
 		offset_table->last++;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -383,25 +333,11 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	{
 		current_offset = raw_offset;
 	}
+	offset_table->chunk_offset[ offset_table->last ].segment_number  = segment_number;
+	offset_table->chunk_offset[ offset_table->last ].file_descriptor = file_descriptor;
+	offset_table->chunk_offset[ offset_table->last ].file_offset     = (off64_t) ( base_offset + current_offset );
+	offset_table->chunk_offset[ offset_table->last ].compressed      = compressed;
 
-	if( libewf_offset_table_set_values(
-	     offset_table,
-	     offset_table->last,
-	     segment_number,
-	     file_descriptor,
-	     (off64_t) ( base_offset + current_offset ),
-	     0,
-	     compressed,
-	     0 ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-		 function );
-
-		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-		{
-			return( -1 );
-		}
-	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( compressed == 0 )
 	{
@@ -421,7 +357,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 /* Calculate the last offset
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance )
+int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance )
 {
 	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
 	static char *function                         = "libewf_offset_table_calculate_last_offset";
@@ -493,24 +429,8 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 
 				return( -1 );
 			}
-			if( libewf_offset_table_set_values(
-			     offset_table,
-			     offset_table->last,
-			     segment_number,
-			     file_descriptor,
-			     last_offset,
-			     (size_t) chunk_size,
-			     offset_table->chunk_offset[ offset_table->last ].compressed,
-			     0 ) == -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-				 function );
+			offset_table->chunk_offset[ offset_table->last ].size = (size_t) chunk_size;
 
-				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
 			LIBEWF_VERBOSE_PRINT( "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %zu.\n",
 			 function, ( offset_table->last + 1 ), last_offset, (size_t) chunk_size );
 

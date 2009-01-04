@@ -137,7 +137,6 @@ Next release:
 * refactor chunk offset segment_number and file_descriptor to
   reference of segment_file struct
   - dirty still needed?
-  - remove libewf_offset_table_set_values?
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -159,6 +158,7 @@ Version: 20071117
 * worked on IO pool
 * removed common alloc/realloc cleared functions
 * libewf_segment_file_write_open is now used by libewf_open
+* removed libewf_offset_table_set_values
 
 Version: 20071114
 * worked on refactoring segment files functions

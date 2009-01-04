@@ -1073,8 +1073,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		       chunk_size,
 		       is_compressed,
 		       &chunk_crc,
-		       write_crc,
-		       internal_handle->write->amount_of_chunks );
+		       write_crc );
 
 	if( write_count <= -1 )
 	{
