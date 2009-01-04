@@ -359,18 +359,15 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section(
  */
 int libewf_write_test_segment_file_full(
      libewf_internal_handle_t *internal_handle,
-     size64_t segment_file_size,
-     size64_t maximum_segment_file_size,
+     ssize64_t remaining_segment_file_size,
      uint32_t segment_amount_of_chunks,
      libewf_media_values_t *media_values,
-     off64_t segment_file_offset,
      uint32_t section_amount_of_chunks,
      uint32_t current_amount_of_chunks,
      uint8_t format,
      uint8_t ewf_format )
 {
-	static char *function                = "libewf_write_test_segment_file_full";
-	size64_t remaining_segment_file_size = 0;
+	static char *function = "libewf_write_test_segment_file_full";
 
 	if( internal_handle == NULL )
 	{
@@ -386,51 +383,12 @@ int libewf_write_test_segment_file_full(
 
 		return( -1 );
 	}
-	if( segment_file_size == 0 )
-	{
-		notify_warning_printf( "%s: invalid segment file size value.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( maximum_segment_file_size == 0 )
-	{
-		notify_warning_printf( "%s: invalid maximum segment file size value.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( segment_file_size > maximum_segment_file_size )
-	{
-		notify_warning_printf( "%s: invalid segment file size value exceeds maximum.\n",
-		 function );
-
-		return( 0 );
-	}
 	if( media_values == NULL )
 	{
 		notify_warning_printf( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
-	}
-	if( segment_file_offset > (off64_t) INT64_MAX )
-	{
-		notify_warning_printf( "%s: invalid segment file offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if a chunks segment file has been opened
-	 */
-	if( segment_file_offset == 0 )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: no segment file has been created.\n",
-		 function );
-#endif
-
-		return( 0 );
 	}
 	/* Check if the maximum amount of chunks has been reached
 	 */
@@ -473,29 +431,21 @@ int libewf_write_test_segment_file_full(
 	}
 	else
 	{
-		/* Calculate the remaining segment file size
-		 */
-		remaining_segment_file_size = segment_file_offset;
-
 		/* Leave space for the done or next section
 		 */
-		remaining_segment_file_size += sizeof( ewf_section_t );
+		remaining_segment_file_size -= sizeof( ewf_section_t );
 
 		/* Leave space for the table and table2 sections
 		 */
-		remaining_segment_file_size += 2
+		remaining_segment_file_size -= 2
 		                             * ( sizeof( ewf_section_t )
 		                               + ( section_amount_of_chunks
 		                                 * sizeof( ewf_table_offset_t ) )
 		                               + sizeof( ewf_crc_t ) );
 
-		/* Leave space for an additional chunk
-		 */
-		remaining_segment_file_size += media_values->chunk_size + sizeof( ewf_crc_t );
-
 		/* Determine if a chunk would fit in the segment file
 		 */
-		if( remaining_segment_file_size > segment_file_size )
+		if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( ewf_crc_t ) ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: no space left for additional chunk - file size exceeded.\n",
@@ -518,8 +468,7 @@ int libewf_write_test_segment_file_full(
  */
 int libewf_write_test_chunks_section_full(
      libewf_internal_handle_t *internal_handle,
-     size64_t segment_file_size,
-     size64_t maximum_segment_file_size,
+     ssize64_t remaining_segment_file_size,
      libewf_media_values_t *media_values,
      off64_t segment_file_offset,
      uint32_t maximum_section_amount_of_chunks,
@@ -528,8 +477,7 @@ int libewf_write_test_chunks_section_full(
      uint8_t ewf_format,
      uint8_t unrestrict_offset_amount )
 {
-	static char *function                = "libewf_write_test_chunks_section_full";
-	size64_t remaining_segment_file_size = 0;
+	static char *function = "libewf_write_test_chunks_section_full";
 
 	if( internal_handle == NULL )
 	{
@@ -544,27 +492,6 @@ int libewf_write_test_chunks_section_full(
 		 function );
 
 		return( -1 );
-	}
-	if( segment_file_size == 0 )
-	{
-		notify_warning_printf( "%s: invalid segment file size value.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( maximum_segment_file_size == 0 )
-	{
-		notify_warning_printf( "%s: invalid maximum segment file size value.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( segment_file_size > maximum_segment_file_size )
-	{
-		notify_warning_printf( "%s: invalid segment file size value exceeds maximum.\n",
-		 function );
-
-		return( 0 );
 	}
 	if( media_values == NULL )
 	{
@@ -673,30 +600,21 @@ int libewf_write_test_chunks_section_full(
 	}
 	else
 	{
-		/* Calculate the remaining segment file size
-		 */
-		remaining_segment_file_size = segment_file_offset;
-
 		/* Leave space for the done or next section
 		 */
-		remaining_segment_file_size += sizeof( ewf_section_t );
+		remaining_segment_file_size -= sizeof( ewf_section_t );
 
 		/* Leave space for the table and table2 sections
 		 */
-		remaining_segment_file_size += 2
+		remaining_segment_file_size -= 2
 		                             * ( sizeof( ewf_section_t )
 		                               + ( section_amount_of_chunks
 		                                 * sizeof( ewf_table_offset_t ) )
 		                               + sizeof( ewf_crc_t ) );
 
-		/* Leave space for an additional chunk
-		 */
-		remaining_segment_file_size += media_values->chunk_size
-		                             + sizeof( ewf_crc_t );
-
 		/* Determine if a chunk would fit in the segment file
 		 */
-		if( remaining_segment_file_size > segment_file_size )
+		if( remaining_segment_file_size < (ssize64_t) ( media_values->chunk_size + sizeof( ewf_crc_t ) ) )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: no space left for additional chunk - file size exceeded.\n",
@@ -1160,6 +1078,8 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
+		internal_handle->write->remaining_segment_file_size = internal_handle->write->segment_file_size;
+
 		/* Write the start of the segment file
 		 * like the file header, the header, volume and/or data section, etc.
 		 */
@@ -1181,8 +1101,9 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
-		total_write_count                   += write_count;
-		internal_handle->write->write_count += write_count;
+		total_write_count                                   += write_count;
+		internal_handle->write->write_count                 += write_count;
+		internal_handle->write->remaining_segment_file_size -= write_count;
 
 		internal_handle->write->chunks_per_segment = libewf_write_calculate_chunks_per_segment_file(
 		                                              internal_handle->segment_table->segment_file_handle[ segment_number ],
@@ -1292,8 +1213,9 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
-		total_write_count                   += write_count;
-		internal_handle->write->write_count += write_count;
+		total_write_count                                   += write_count;
+		internal_handle->write->write_count                 += write_count;
+		internal_handle->write->remaining_segment_file_size -= write_count;
 	}
 	/* Write the chunk data
 	 */
@@ -1319,20 +1241,20 @@ ssize_t libewf_raw_write_chunk_new(
 
 		return( -1 );
 	}
-	total_write_count                                  += write_count;
-	internal_handle->write->input_write_count          += chunk_data_size;
-	internal_handle->write->write_count                += write_count;
-	internal_handle->write->chunks_section_write_count += write_count;
-	internal_handle->write->segment_amount_of_chunks   += 1;
-	internal_handle->write->section_amount_of_chunks   += 1;
-	internal_handle->write->amount_of_chunks           += 1;
+	total_write_count                                   += write_count;
+	internal_handle->write->input_write_count           += chunk_data_size;
+	internal_handle->write->write_count                 += write_count;
+	internal_handle->write->chunks_section_write_count  += write_count;
+	internal_handle->write->remaining_segment_file_size -= write_count;
+	internal_handle->write->segment_amount_of_chunks    += 1;
+	internal_handle->write->section_amount_of_chunks    += 1;
+	internal_handle->write->amount_of_chunks            += 1;
 
 	/* Check if the current chunks section is full, if so close the current section
 	 */
 	result = libewf_write_test_chunks_section_full(
 	          internal_handle,
-	          internal_handle->write->segment_file_size,
-	          internal_handle->write->maximum_segment_file_size,
+	          internal_handle->write->remaining_segment_file_size,
 	          internal_handle->media_values,
 	          internal_handle->segment_table->segment_file_handle[ segment_number ]->file_offset,
 	          internal_handle->write->maximum_section_amount_of_chunks,
@@ -1374,20 +1296,19 @@ ssize_t libewf_raw_write_chunk_new(
 
 			return( -1 );
 		}
-		total_write_count                             += write_count;
-		internal_handle->write->write_count           += write_count;
-		internal_handle->write->create_chunks_section  = 1;
-		internal_handle->write->chunks_section_offset  = 0;
+		total_write_count                                   += write_count;
+		internal_handle->write->write_count                 += write_count;
+		internal_handle->write->remaining_segment_file_size -= write_count;
+		internal_handle->write->create_chunks_section        = 1;
+		internal_handle->write->chunks_section_offset        = 0;
 	}
 	/* Check if the current segment file is full, if so close the current segment file
 	 */
 	result = libewf_write_test_segment_file_full(
 	          internal_handle,
-	          internal_handle->write->segment_file_size,
-	          internal_handle->write->maximum_segment_file_size,
+	          internal_handle->write->remaining_segment_file_size,
 	          internal_handle->write->segment_amount_of_chunks,
 	          internal_handle->media_values,
-	          internal_handle->segment_table->segment_file_handle[ segment_number ]->file_offset,
 	          internal_handle->write->section_amount_of_chunks,
 	          internal_handle->write->amount_of_chunks,
 	          internal_handle->format,
@@ -1436,8 +1357,9 @@ ssize_t libewf_raw_write_chunk_new(
 
 				return( -1 );
 			}
-			total_write_count                   += write_count;
-			internal_handle->write->write_count += write_count;
+			total_write_count                                   += write_count;
+			internal_handle->write->write_count                 += write_count;
+			internal_handle->write->remaining_segment_file_size -= write_count;
 		}
 	}
 	return( total_write_count );

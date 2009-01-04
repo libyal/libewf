@@ -81,11 +81,9 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section(
 
 int libewf_write_test_segment_file_full(
      libewf_internal_handle_t *internal_handle,
-     size64_t segment_file_size,
-     size64_t maximum_segment_file_size,
+     ssize64_t remaining_segment_file_size,
      uint32_t segment_amount_of_chunks,
      libewf_media_values_t *media_values,
-     off64_t segment_file_offset,
      uint32_t section_amount_of_chunks,
      uint32_t current_amount_of_chunks,
      uint8_t format,
@@ -93,8 +91,7 @@ int libewf_write_test_segment_file_full(
 
 int libewf_write_test_chunks_section_full(
      libewf_internal_handle_t *internal_handle,
-     size64_t segment_file_size,
-     size64_t maximum_segment_file_size,
+     ssize64_t remaining_segment_file_size,
      libewf_media_values_t *media_values,
      off64_t segment_file_offset,
      uint32_t maximum_section_amount_of_chunks,
