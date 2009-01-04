@@ -965,33 +965,59 @@ int libewf_string_copy_to_header2(
 }
 
 /* Generate ctime string
- * Returns a pointer to the new instance, NULL on error
+ * Sets ctime string and ctime string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_string_ctime(
-                const time_t *timestamp )
+int libewf_string_ctime(
+     const time_t *timestamp,
+     libewf_char_t **ctime_string,
+     size_t *ctime_string_length )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-        char *narrow_ctime_string   = NULL;
+        char *narrow_ctime_string = NULL;
 #endif
-        libewf_char_t *ctime_string = NULL;
-        static char *function       = "libewf_string_ctime";
+        static char *function     = "libewf_string_ctime";
 
 	if( timestamp == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
+	}
+	if( ctime_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid ctime string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ctime_string != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: ctime string already created.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ctime_string_length == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid ctime string length.\n",
+		 function );
+
+		return( -1 );
 	}
         /* The libewf_common_ctime function returns a string of length 32
 	 */
+	*ctime_string_length = 32;
+
 #if !defined( HAVE_WIDE_CHARACTER_TYPE )
-        ctime_string = libewf_common_ctime(
-	                timestamp );
+        *ctime_string = libewf_common_ctime(
+	                 timestamp );
 
 #elif defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-        ctime_string = libewf_common_wide_ctime(
-	                timestamp );
+        *ctime_string = libewf_common_wide_ctime(
+	                 timestamp );
+
 #else
         narrow_ctime_string = libewf_common_ctime(
 	                       timestamp );
@@ -1001,12 +1027,12 @@ libewf_char_t *libewf_string_ctime(
                 LIBEWF_WARNING_PRINT( "%s: unable to create narrow ctime string.\n",
                  function );
 
-                return( NULL );
+                return( -1 );
         }
-        ctime_string = (libewf_char_t *) libewf_common_alloc(
-                                          sizeof( libewf_char_t ) * 32 );
+        *ctime_string = (libewf_char_t *) libewf_common_alloc(
+                                           sizeof( libewf_char_t ) * *ctime_string_length );
 
-        if( ctime_string == NULL )
+        if( *ctime_string == NULL )
         {
                 LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
                  function );
@@ -1014,12 +1040,14 @@ libewf_char_t *libewf_string_ctime(
 		libewf_common_free(
 		 narrow_ctime_string );
 
-                return( NULL );
+		*ctime_string_length = 0;
+
+                return( -1 );
         }
         if( libewf_common_copy_char_to_wchar(
-	     ctime_string,
+	     *ctime_string,
 	     narrow_ctime_string,
-	     32 ) != 1 )
+	     *ctime_string_length ) != 1 )
         {
                 LIBEWF_WARNING_PRINT( "%s: unable to copy narrow ctime string to ctime string.\n",
                  function );
@@ -1027,13 +1055,16 @@ libewf_char_t *libewf_string_ctime(
 		libewf_common_free(
 		 narrow_ctime_string );
 		libewf_common_free(
-		 ctime_string );
+		 *ctime_string );
 
-                return( NULL );
+		*ctime_string        = NULL;
+		*ctime_string_length = 0;
+
+                return( -1 );
         }
 	libewf_common_free(
 	 narrow_ctime_string );
 #endif
-	return( ctime_string );
+	return( 1 );
 }
 

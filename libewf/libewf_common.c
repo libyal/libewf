@@ -240,7 +240,8 @@ int libewf_common_test_empty_block(
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-struct tm *libewf_common_localtime( const time_t *timestamp )
+struct tm *libewf_common_localtime(
+            const time_t *timestamp )
 {
 #if !defined( libewf_common_localtime_r ) && defined( HAVE_LOCALTIME )
 	struct tm *static_time_elements = NULL;

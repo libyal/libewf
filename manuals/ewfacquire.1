@@ -1,4 +1,4 @@
-.Dd Februari 24, 2008
+.Dd March 2, 2008
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -98,10 +98,10 @@ Compress empty blocks (yes, no) [no]:
 Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [encase5]:
 Start to acquire at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to acquire (0 >= value >= 1474560) [1474560]:
-Evidence segment file size in kibibytes (KiB) (1440 >= value >= 2097152) [1536000]:
-The amount of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096) [64]:
-The amount of sectors to be used as error granularity (1 >= value >= 64) [64]:
-The amount of retries when a read error occurs (0 >= value >= 255) [2]:
+Evidence segment file size in bytes (1.4 MiB >= value >= 1.9 GiB) [1.4 GiB]:
+The amount of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768) [64]: 
+The amount of sectors to be used as error granularity (1 >= value >= 64) [64]: 
+The amount of retries when a read error occurs (0 >= value >= 255) [2]: 
 Wipe sectors on read error (mimic EnCase like behavior) (yes, no) [no]:
 
 The following information was provided:
@@ -117,8 +117,8 @@ Compression used:               none
 Compress empty blocks:          no
 EWF file format:                Encase 5
 Acquiry start offet:            0
-Amount of bytes to acquire:     1474560
-Evidence segment file size:     1536000 kibibytes (KiB)
+Amount of bytes to acquire:     1.4 MiB (1474560 bytes)
+Evidence segment file size:     1.4 GiB (1572864000 bytes)
 Block size:                     64 sectors
 Error granularity:              64 sectors
 Retries on read error:          2

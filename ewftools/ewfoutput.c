@@ -73,6 +73,7 @@
 #include "../libewf/libewf_notify.h"
 #include "../libewf/libewf_string.h"
 
+#include "ewfbyte_size_string.h"
 #include "ewfdigest_context.h"
 #include "ewfmd5.h"
 #include "ewfsha1.h"
@@ -156,118 +157,6 @@ struct tm *ewfoutput_gmtime(
 #endif
 }
 
-/* Determines the units strings of a certain factor value
- * http://nl.wikipedia.org/wiki/Mebibyte
- */
-libewf_char_t *ewfoutput_determine_units_string(
-                int factor )
-{
-	switch( factor )
-	{
-		case 0:
-			return( _S_LIBEWF_CHAR( "B" ) );
-		case 1:
-			return( _S_LIBEWF_CHAR( "KiB" ) );
-		case 2:
-			return( _S_LIBEWF_CHAR( "MiB" ) );
-		case 3:
-			return( _S_LIBEWF_CHAR( "GiB" ) );
-		case 4:
-			return( _S_LIBEWF_CHAR( "TiB" ) );
-		case 5:
-			return( _S_LIBEWF_CHAR( "PiB" ) );
-		case 6:
-			return( _S_LIBEWF_CHAR( "EiB" ) );
-		case 7:
-			return( _S_LIBEWF_CHAR( "ZiB" ) );
-		case 8:
-			return( _S_LIBEWF_CHAR( "YiB" ) );
-		default :
-			break;
-	}
-	return( NULL );
-}
-
-/* Determines the human readable size as a string
- * Returns a pointer to the new instance, NULL on error
- */
-libewf_char_t *ewfoutput_determine_human_readable_size_string(
-                uint64_t size )
-{
-	libewf_char_t *size_string  = NULL;
-	libewf_char_t *units_string = NULL;
-	static char *function       = "ewfoutput_determine_human_readable_size_string";
-	int8_t remainder            = -1;
-	uint8_t factor              = 0;
-	uint64_t new_size           = 0;
-
-	while( size >= 1024 )
-	{
-		factor++;
-
-		new_size = size / 1024;
-
-		if( new_size < 10 )
-		{
-			remainder = (uint8_t) ( ( size % 1024 ) / 100 );
-		}
-		size = new_size;
-	}
-	if( factor > 8 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: a size with a factor larger than 8 currently not supported.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* The string has a maximum of 8 characters + end of string '\0'
-	 */
-	size_string = (libewf_char_t *) libewf_common_alloc(
-	                                 sizeof( libewf_char_t ) * 9 );
-
-	if( size_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create size string.\n",
-		 function );
-
-		return( NULL );
-	}
-	units_string = ewfoutput_determine_units_string( (int) factor );
-
-	if( units_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create uints string.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( remainder > 9 )
-	{
-		remainder = 9;
-	}
-	if( remainder >= 0 )
-	{
-		libewf_string_snprintf(
-		 size_string,
-		 9,
-		 _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 ) _S_LIBEWF_CHAR( ".%" )
-		 _S_LIBEWF_CHAR( PRIu8 ) _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF ),
-		 size,
-		 remainder,
-		 units_string );
-	}
-	else
-	{
-		libewf_string_snprintf(
-		 size_string,
-		 9,
-		 _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu64 ) _S_LIBEWF_CHAR( " %" ) _S_LIBEWF_CHAR( PRIs_EWF ),
-		 size,
-		 units_string );
-	}
-	return( size_string );
-}
-
 /* Print the version information to a stream
  */
 void ewfoutput_version_fprint(
@@ -318,7 +207,8 @@ void ewfoutput_copyright_fprint(
 
 		return;
 	}
-	fprintf( stream, "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n", PACKAGE_BUGREPORT );
+	fprintf( stream, "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n",
+	 PACKAGE_BUGREPORT );
 	fprintf( stream, "This is free software; see the source for copying conditions. There is NO\n" );
 	fprintf( stream, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 }
@@ -346,7 +236,11 @@ void ewfoutput_acquiry_parameters_fprint(
       uint8_t read_error_retry,
       uint8_t wipe_block_on_read_error )
 {
+	libewf_char_t acquiry_size_string[ 16 ];
+	libewf_char_t segment_file_size_string[ 16 ];
+
 	static char *function = "ewfoutput_acquiry_parameters_fprint";
+	int result            = 0;
 
 	if( stream == NULL )
 	{
@@ -355,7 +249,8 @@ void ewfoutput_acquiry_parameters_fprint(
 
 		return;
 	}
-	fprintf( stream, "Image path and filename:\t%" PRIs ".", filename );
+	fprintf( stream, "Image path and filename:\t%" PRIs ".",
+	 filename );
 
 	if( libewf_format == LIBEWF_FORMAT_SMART )
 	{
@@ -369,7 +264,8 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( case_number != NULL )
 	{
-		fprintf( stream, "%" PRIs_EWF "", case_number );
+		fprintf( stream, "%" PRIs_EWF "",
+		 case_number );
 	}
 	fprintf( stream, "\n" );
 
@@ -377,7 +273,8 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( description != NULL )
 	{
-		fprintf( stream, "%" PRIs_EWF "", description );
+		fprintf( stream, "%" PRIs_EWF "",
+		 description );
 	}
 	fprintf( stream, "\n" );
 
@@ -385,7 +282,8 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( evidence_number != NULL )
 	{
-		fprintf( stream, "%" PRIs_EWF "", evidence_number );
+		fprintf( stream, "%" PRIs_EWF "",
+		 evidence_number );
 	}
 	fprintf( stream, "\n" );
 
@@ -393,7 +291,8 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( examiner_name != NULL )
 	{
-		fprintf( stream, "%" PRIs_EWF "", examiner_name );
+		fprintf( stream, "%" PRIs_EWF "",
+		 examiner_name );
 	}
 	fprintf( stream, "\n" );
 
@@ -401,7 +300,8 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( notes != NULL )
 	{
-		fprintf( stream, "%" PRIs_EWF "", notes );
+		fprintf( stream, "%" PRIs_EWF "",
+		 notes );
 	}
 	fprintf( stream, "\n" );
 
@@ -504,19 +404,60 @@ void ewfoutput_acquiry_parameters_fprint(
 	{
 		fprintf( stream, "\n" );
 	}
-	fprintf( stream, "Acquiry start offet:\t\t%" PRIi64 "\n", acquiry_offset );
-	fprintf( stream, "Amount of bytes to acquire:\t%" PRIu64 "", acquiry_size );
+	fprintf( stream, "Acquiry start offet:\t\t%" PRIi64 "\n",
+	 acquiry_offset );
+
+	result = ewfbyte_size_string_create(
+	          acquiry_size_string,
+	          16,
+	          acquiry_size,
+	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+
+	fprintf( stream, "Amount of bytes to acquire:\t" );
 
 	if( acquiry_size == 0 )
 	{
-		fprintf( stream, " (until end of input)" );
+		fprintf( stream, "%" PRIu64 " (until end of input)",
+		 acquiry_size );
+	}
+	else if( result == 1 )
+	{
+		fprintf( stream, "%" PRIs_EWF " (%" PRIu64 " bytes)",
+		 acquiry_size_string, acquiry_size );
+	}
+	else
+	{
+		fprintf( stream, "%" PRIu64 " bytes",
+		 acquiry_size );
 	}
 	fprintf( stream, "\n" );
 
-	fprintf( stream, "Evidence segment file size:\t%" PRIu64 " kibibytes (KiB)\n", ( segment_file_size / 1024 ) );
-	fprintf( stream, "Block size:\t\t\t%" PRIu32 " sectors\n", sectors_per_chunk );
-	fprintf( stream, "Error granularity:\t\t%" PRIu32 " sectors\n", sector_error_granularity );
-	fprintf( stream, "Retries on read error:\t\t%" PRIu8 "\n", read_error_retry );
+	result = ewfbyte_size_string_create(
+	          segment_file_size_string,
+	          16,
+	          segment_file_size,
+	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+
+	fprintf( stream, "Evidence segment file size:\t" );
+
+	if( result == 1 )
+	{
+		fprintf( stream, "%" PRIs_EWF " (%" PRIu64 " bytes)",
+		 segment_file_size_string, segment_file_size );
+	}
+	else
+	{
+		fprintf( stream, "%" PRIu64 " bytes",
+		 segment_file_size );
+	}
+	fprintf( stream, "\n" );
+
+	fprintf( stream, "Block size:\t\t\t%" PRIu32 " sectors\n",
+	 sectors_per_chunk );
+	fprintf( stream, "Error granularity:\t\t%" PRIu32 " sectors\n",
+	 sector_error_granularity );
+	fprintf( stream, "Retries on read error:\t\t%" PRIu8 "\n",
+	 read_error_retry );
 
 	fprintf( stream, "Wipe sectors on read error:\t" );
 
@@ -539,7 +480,7 @@ void ewfoutput_acquiry_errors_fprint(
       uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_acquiry_errors_fprint";
-	off64_t sector             = 0;
+	off64_t first_sector       = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t iterator          = 0;
 
@@ -584,17 +525,17 @@ void ewfoutput_acquiry_errors_fprint(
 			if( libewf_get_acquiry_error(
 			     handle,
 			     iterator,
-			     &sector,
+			     &first_sector,
 			     &amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
 				 function, iterator );
 
-				sector            = 0;
+				first_sector      = 0;
 				amount_of_sectors = 0;
 			}
 			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
+			 (uint64_t) first_sector, (uint64_t) ( first_sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}
@@ -608,7 +549,7 @@ void ewfoutput_crc_errors_fprint(
       uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_crc_errors_fprint";
-	off64_t sector             = 0;
+	off64_t first_sector       = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t iterator          = 0;
 
@@ -637,7 +578,7 @@ void ewfoutput_crc_errors_fprint(
 	     handle,
 	     amount_of_errors ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of CRC errors.\n",
 		 function );
 
 		return;
@@ -649,16 +590,88 @@ void ewfoutput_crc_errors_fprint(
 
 		for( iterator = 0; iterator < *amount_of_errors; iterator++ )
 		{
-			if( libewf_get_crc_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
+			if( libewf_get_crc_error(
+			     handle,
+			     iterator,
+			     &first_sector,
+			     &amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
 				 function, iterator );
 
-				sector            = 0;
+				first_sector      = 0;
 				amount_of_sectors = 0;
 			}
 			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
+			 (uint64_t) first_sector, (uint64_t) ( first_sector + amount_of_sectors ), amount_of_sectors );
+		}
+		fprintf( stream, "\n" );
+	}
+}
+
+/* Print the sessions to a stream
+ */
+void ewfoutput_sessions_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_sessions )
+{
+	static char *function      = "ewfoutput_sessions_fprint";
+	off64_t first_sector       = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t iterator          = 0;
+
+	if( stream == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
+
+		return;
+	}
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return;
+	}
+	if( amount_of_sessions == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of sessions.\n",
+		 function );
+
+		return;
+	}
+	if( libewf_get_amount_of_sessions(
+	     handle,
+	     amount_of_sessions ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of sessions.\n",
+		 function );
+
+		return;
+	}
+	if( *amount_of_sessions > 0 )
+	{
+		fprintf( stream, "Sessions:\n" );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", *amount_of_sessions );
+
+		for( iterator = 0; iterator < *amount_of_sessions; iterator++ )
+		{
+			if( libewf_get_session(
+			     handle,
+			     iterator,
+			     &first_sector,
+			     &amount_of_sectors ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
+				 function, iterator );
+
+				first_sector      = 0;
+				amount_of_sectors = 0;
+			}
+			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 (uint64_t) first_sector, (uint64_t) ( first_sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}
@@ -968,8 +981,10 @@ void ewfoutput_bytes_per_second_fprint(
       size64_t bytes,
       time_t seconds )
 {
-	libewf_char_t *bytes_per_second_string = NULL;
-	size64_t bytes_per_second              = 0;
+	libewf_char_t bytes_per_second_string[ 16 ];
+
+	size64_t bytes_per_second = 0;
+	int result                = 0;
 
 	if( stream == NULL )
 	{
@@ -981,22 +996,22 @@ void ewfoutput_bytes_per_second_fprint(
 
 		if( bytes_per_second > 1024 )
 		{
-			bytes_per_second_string = ewfoutput_determine_human_readable_size_string(
-			                           bytes_per_second );
+			result = ewfbyte_size_string_create(
+			          bytes_per_second_string,
+			          10,
+			          bytes_per_second,
+			          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 		}
 		fprintf(
 		 stream,
 		 " with" );
 
-		if( bytes_per_second_string != NULL )
+		if( result == 1 )
 		{
 			fprintf(
 			 stream,
 			 " %" PRIs_EWF "/s (%" PRIu64 " bytes/second)",
 			 bytes_per_second_string, bytes_per_second );
-
-			libewf_common_free(
-			 bytes_per_second_string );
 		}
 		else
 		{
@@ -1015,7 +1030,9 @@ void ewfoutput_bytes_fprint(
       FILE *stream,
       size64_t bytes )
 {
-	libewf_char_t *bytes_string = NULL;
+	libewf_char_t bytes_string[ 16 ];
+
+	int result = 0;
 
 	if( stream == NULL )
 	{
@@ -1023,18 +1040,18 @@ void ewfoutput_bytes_fprint(
 	}
 	if( bytes > 1024 )
 	{
-		bytes_string = ewfoutput_determine_human_readable_size_string(
-		                bytes );
+		result = ewfbyte_size_string_create(
+		          bytes_string,
+		          10,
+		          bytes,
+		          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
-	if( bytes_string != NULL )
+	if( result == 1 )
 	{
 		fprintf(
 		 stream,
 		 " %" PRIs_EWF " (%" PRIi64 " bytes)",
 		 bytes_string, bytes );
-
-		libewf_common_free(
-		 bytes_string );
 	}
 	else
 	{

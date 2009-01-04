@@ -1,5 +1,4 @@
 Roadmap:
-* add read/write support for CD/DVD session section - partial read support
 * create iso2ewf tool?
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
@@ -25,21 +24,15 @@ To do/think about:
 * all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
 * all: allow for multiple language support - what about gettext?
-* all: implement signal handling - cancelation option in library?
-  - mainly for read/writes of large buffers
-* file: add function/flag to open segments files progressively using only the basename (like write)
 * libewf_string: enhance UTF16 conversion code
 * read: correct for errors in the table or table2 section for EWF-E01
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
   - use io pooling
-* make compilation resilient for missing crypto library
-  - remove the cryptographic options if crypto library is missing
 * implement raw split support in ewfexport and ewfacquire?
 * add function to retrieve the segment file names and amount?
 
 * ewftools: add getoptlong
-* ewfacquire: make size input and output human friendly (support kM notation etc)
 * ewfacquire: restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
 * ewfacquire: warn if values exceed maximum segment count
 * ewfacquire: add native Windows support for accessing devices
@@ -50,7 +43,6 @@ To do/think about:
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
   - make a generic media access solution also useable for revit?
-* ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
 * ewfdebug: create a tool to analyse a single segment file
@@ -117,11 +109,6 @@ Next release(s):
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
 
-* implement session section
-  - internal storage type
-  - write
-  - api functions
-
 * Try to correct the offset table
   - add error flag
 
@@ -134,6 +121,18 @@ Next release(s):
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
+* retrieve md5 hash in md5 hash value function?
+
+* implement io pooling?
+
+* all: implement signal handling - cancelation option in library?
+  - mainly for read/writes of large buffers
+
+* make compilation resilient for missing crypto library
+  - remove the cryptographic options if crypto library is missing
+
+* refactor time/date string functions to only set the string not allocate it?
+
 Next stable:
 * full platform test
 
@@ -141,6 +140,7 @@ Next stable:
   - allow to set maximum delta file size default 4 GiB?
 
 * test abort
+* test session section R/W functionality
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -159,6 +159,20 @@ CLOSED
   no, does not add any additional value
   if a write error did occur the library should not make any guesses about if
   this is write or wrong
+* file: add function/flag to open segments files progressively using only the basename (like write)
+  no the glob function provides for a way to determine segment filenames using
+  the basename
+* ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
+  - no
+
+Version: 20080302
+* Code clean up
+* worked on session support
+* ewfinfo will now output session information if present part of media information
+* worked on byte size string
+* added byte size string to ewfacquire, ewfacquirestream and ewfexport
+  segment file size, not to acquiry size due to possible rounding errors
+* updated manuals of ewfacquire, ewfacquirestream and ewfexport
 
 Version: 20080301
 * Code clean up

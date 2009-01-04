@@ -73,10 +73,10 @@ struct ewf_error2
 
 struct ewf_error2_sector
 {
-	/* A error2 sector
+	/* The first error2 sector
 	 * consists of 4 bytes (32 bits)
 	 */
-	uint8_t sector[ 4 ];
+	uint8_t first_sector[ 4 ];
 
 	/* The amount of sectors
 	 * consists of 4 bytes (32 bits)

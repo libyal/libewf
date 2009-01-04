@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20080301], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20080302], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20080301])
+AM_INIT_AUTOMAKE([libewf], [20080302])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -365,23 +365,63 @@ AS_IF(
 ])
 
 dnl Check for enabling libuuid support
-AS_IF([test "x$ac_libewf_have_libuuid" != xno],
+AS_IF(
+	[test "x$ac_libewf_have_libuuid" != xno],
 	[AC_CHECK_HEADERS([uuid/uuid.h])
 	AC_MSG_NOTICE([Support for libuuid will be build.])
 	ac_libewf_have_libuuid=yes ])
 
 dnl Check if libewf should be build with wide character type support
-AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
-	[AC_DEFINE([HAVE_WIDE_CHARACTER_TYPE],[1],[Defines if wide character type should be used])
-	AC_CHECK_FUNCS([btowc fgetws mbsinit mbrtowc swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcrtomb wcstoll wcstoull])
-	AC_CHECK_HEADERS([wchar.h],
-		[AC_DEFINE([HAVE_WCHAR_H],[1],[Define to 1 if you have the <wchar.h> header file.])
-		AC_SUBST([HAVE_WCHAR_H],[1])],
-		[AC_SUBST([HAVE_WCHAR_H],[0])])
-	AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[1])
+AS_IF(
+	[test "x$ac_libewf_enable_wide_character_type" != xno ],
+	[AC_DEFINE(
+	 [HAVE_WIDE_CHARACTER_TYPE],
+	 [1],
+	 [Defines if wide character type should be used])
+	AC_CHECK_FUNCS([btowc])
+	AC_CHECK_FUNCS([fgetws])
+	AC_CHECK_FUNCS([mbsinit])
+	AC_CHECK_FUNCS([mbrtowc])
+	AC_CHECK_FUNCS([swprintf])
+	AC_CHECK_FUNCS([wmain])
+	AC_CHECK_FUNCS([wmemchr])
+	AC_CHECK_FUNCS([wmemcmp])
+	AC_CHECK_FUNCS([wmemcpy])
+	AC_CHECK_FUNCS([wmemrchr])
+	AC_CHECK_FUNCS([wctob])
+	AC_CHECK_FUNCS([wcschr])
+	AC_CHECK_FUNCS([wcscmp])
+	AC_CHECK_FUNCS([wcscpy])
+	AC_CHECK_FUNCS([wcsdup])
+	AC_CHECK_FUNCS([wcslen])
+	AC_CHECK_FUNCS([wcsncmp])
+	AC_CHECK_FUNCS([wcsncpy])
+	AC_CHECK_FUNCS([wcsrchr])
+	AC_CHECK_FUNCS([wcrtomb])
+	AC_CHECK_FUNCS([wcstoll])
+	AC_CHECK_FUNCS([wcstoull])
+	AC_CHECK_HEADERS(
+	 [wchar.h],
+	 [AC_DEFINE(
+	  [HAVE_WCHAR_H],
+	  [1],
+	  [Define to 1 if you have the <wchar.h> header file.])
+	 AC_SUBST(
+	  [HAVE_WCHAR_H],
+	  [1])],
+	 [AC_SUBST(
+	  [HAVE_WCHAR_H],
+	  [0])])
+	AC_SUBST(
+	 [HAVE_WIDE_CHARACTER_TYPE],
+	 [1])
 	ac_libewf_enable_wide_character_type=yes],
-	[AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[0])
-	AC_SUBST([HAVE_WCHAR_H],[0])])
+	[AC_SUBST(
+	 [HAVE_WIDE_CHARACTER_TYPE],
+	 [0])
+	AC_SUBST(
+	 [HAVE_WCHAR_H],
+	 [0])])
 
 dnl Check if ewftools should be build with raw read and write support
 AS_IF(
@@ -422,14 +462,23 @@ AS_IF(
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
-CFLAGS="$CFLAGS -Wall";
+CFLAGS="$CFLAGS -Wall"
 
 dnl Have configure make the Makefiles
-AC_CONFIG_FILES([Makefile libewf/Makefile ewftools/Makefile manuals/Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([libewf/Makefile])
+AC_CONFIG_FILES([ewftools/Makefile])
+AC_CONFIG_FILES([manuals/Makefile])
 dnl Have configure make the include files
-AC_CONFIG_FILES([include/libewf.h include/libewf/libewf_definitions.h include/libewf/libewf_types.h])
+AC_CONFIG_FILES([include/libewf.h])
+AC_CONFIG_FILES([include/libewf/libewf_definitions.h])
+AC_CONFIG_FILES([include/libewf/libewf_types.h])
 dnl Have configure make distribution specific files
-AC_CONFIG_FILES([debian/changelog debian/shlibs.local.ex macosx/Introduction.rtf libewf.pc libewf.spec])
+AC_CONFIG_FILES([debian/changelog])
+AC_CONFIG_FILES([debian/shlibs.local.ex])
+AC_CONFIG_FILES([macosx/Introduction.rtf])
+AC_CONFIG_FILES([libewf.pc])
+AC_CONFIG_FILES([libewf.spec])
 
 AC_CONFIG_HEADERS([libewf/libewf_config.h])
 

@@ -264,8 +264,10 @@ int libewf_string_copy_to_header2(
      ewf_char_t *header2,
      size_t size_header2 );
 
-libewf_char_t *libewf_string_ctime(
-                const time_t *timestamp );
+int libewf_string_ctime(
+     const time_t *timestamp,
+     libewf_char_t **ctime_string,
+     size_t *ctime_string_length );
 
 #if defined( __cplusplus )
 }

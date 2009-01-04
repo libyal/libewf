@@ -1,5 +1,6 @@
 /*
- * Error sector definition for CRC and acquiry read errrors
+ * ewfbyte_size_string
+ * Byte size string functions for the libewf tools
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,27 +32,46 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_ERROR_SECTOR_H )
-#define _LIBEWF_ERROR_SECTOR_H
+#if !defined( _EWFBYTE_SIZE_STRING_H )
+#define _EWFBYTE_SIZE_STRING_H
 
-#include "libewf_includes.h"
+#include "../libewf/libewf_includes.h"
+
+#include "../libewf/libewf_char.h"
+
+#include "ewfstring.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libewf_error_sector libewf_error_sector_t;
+#define EWFBYTE_SIZE_STRING_UNIT_MEGABYTE		1000
+#define EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE		1024
 
-struct libewf_error_sector
-{
-	/* The first sector where the error occurred
-	 */
-	off64_t sector;
+const libewf_char_t *ewfbyte_size_string_get_factor_string(
+                      int8_t factor );
 
-	/* The amount of sectors
-	 */
-	uint32_t amount_of_sectors;
-};
+int8_t ewfbyte_size_string_get_factor(
+        libewf_char_t factor );
+
+int ewfbyte_size_string_create(
+     libewf_char_t *byte_size_string,
+     size_t byte_size_string_length,
+     uint64_t size,
+     int units );
+
+int ewfbyte_size_string_convert(
+     libewf_char_t *byte_size_string,
+     size_t byte_size_string_length,
+     uint64_t *size );
+
+int8_t ewfbyte_size_string_get_factor_char_t(
+        CHAR_T factor );
+
+int ewfbyte_size_string_convert_char_t(
+     CHAR_T *byte_size_string,
+     size_t byte_size_string_length,
+     uint64_t *size );
 
 #if defined( __cplusplus )
 }
