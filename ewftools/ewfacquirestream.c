@@ -99,7 +99,7 @@ void usage_fprint(
 	fprintf( stream, "\t-f: specify the EWF file format to write to, options: ftk, encase2, encase3, encase4,\n" );
 	fprintf( stream, "\t    encase5 (is default), encase6, linen5, linen6, ewfx\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
-	fprintf( stream, "\t-l: logs the digest (hash) to the filename\n" );
+	fprintf( stream, "\t-l: logs acquiry errors and the digest (hash) to the filename\n" );
 	fprintf( stream, "\t-m: specify the media type, options: fixed (is default), removable\n" );
 	fprintf( stream, "\t-M: specify the volume type, options: logical, physical (is default)\n" );
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
@@ -830,11 +830,30 @@ int main( int argc, char * const argv[] )
 
 	fprintf( stdout, "\n" );
 
+	if( log_filename != NULL )
+	{
+		log_file_stream = fopen(
+		                   log_filename,
+		                   "w" );
+
+		if( log_file_stream == NULL )
+		{
+			fprintf( stderr, "Unable to open log file: %s.\n",
+			 log_filename );
+		}
+	}
 	ewfoutput_acquiry_errors_fprint(
 	 stdout,
 	 handle,
 	 &amount_of_acquiry_errors );
 
+	if( log_file_stream == NULL )
+	{
+		ewfoutput_acquiry_errors_fprint(
+		 log_file_stream,
+		 handle,
+		 &amount_of_acquiry_errors );
+	}
 	if( libewf_close( handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
@@ -849,19 +868,10 @@ int main( int argc, char * const argv[] )
 			libewf_common_free(
 			 calculated_sha1_hash_string );
 		}
-		return( EXIT_FAILURE );
-	}
-	if( log_filename != NULL )
-	{
-		log_file_stream = fopen(
-		                   log_filename,
-		                   "w" );
+		fclose(
+		 log_file_stream );
 
-		if( log_file_stream == NULL )
-		{
-			fprintf( stderr, "Unable to open log file: %s.\n",
-			 log_filename );
-		}
+		return( EXIT_FAILURE );
 	}
 	if( calculate_md5 == 1 )
 	{

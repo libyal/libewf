@@ -82,7 +82,7 @@ void usage_fprint(
 
 	fprintf( stream, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-h: shows this help\n" );
-	fprintf( stream, "\t-l: logs the digest (hash) to the filename\n" );
+	fprintf( stream, "\t-l: logs verification errors and the digest (hash) to the filename\n" );
 	fprintf( stream, "\t-q: quiet shows no status information\n" );
 	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
@@ -545,12 +545,32 @@ int main( int argc, char * const argv[] )
 			return( EXIT_FAILURE );
 		}
 	}
+	if( log_filename != NULL )
+	{
+		log_file_stream = fopen(
+		                   log_filename,
+		                   "w" );
+
+		if( log_file_stream == NULL )
+		{
+			fprintf( stderr, "Unable to open log file: %s.\n",
+			 log_filename );
+		}
+	}
 	ewfoutput_crc_errors_fprint(
 	 stdout,
 	 handle,
 	 &amount_of_crc_errors );
 
-	if( libewf_close( handle ) != 0 )
+	if( log_file_stream != NULL )
+	{
+		ewfoutput_crc_errors_fprint(
+		 log_file_stream,
+		 handle,
+		 &amount_of_crc_errors );
+	}
+	if( libewf_close(
+	     handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
@@ -568,19 +588,10 @@ int main( int argc, char * const argv[] )
 			libewf_common_free(
 			 calculated_sha1_hash_string );
 		}
-		return( EXIT_FAILURE );
-	}
-	if( log_filename != NULL )
-	{
-		log_file_stream = fopen(
-		                   log_filename,
-		                   "w" );
+		fclose(
+		 log_file_stream );
 
-		if( log_file_stream == NULL )
-		{
-			fprintf( stderr, "Unable to open log file: %s.\n",
-			 log_filename );
-		}
+		return( EXIT_FAILURE );
 	}
 	if( calculate_md5 == 1 )
 	{

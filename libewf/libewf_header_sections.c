@@ -41,6 +41,8 @@
 #include "libewf_notify.h"
 #include "libewf_string.h"
 
+#include "ewf_definitions.h"
+
 /* Allocates memory for a new header sections struct
  * Returns a pointer to the new instance, NULL on error
  */

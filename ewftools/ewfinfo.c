@@ -46,6 +46,8 @@
 #include <stdlib.h>
 #endif
 
+#include <stdio.h>
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
  * before including libewf.h
  */
@@ -68,17 +70,22 @@
 
 /* Prints the executable usage information
  */
-void usage( void )
+void usage_fprint(
+      FILE *stream )
 {
-	fprintf( stdout, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
+	if( stream == NULL )
+	{
+		return;
+	}
+	fprintf( stream, "Usage: ewfinfo [ -d date_format ] [ -himvV ] ewf_files\n\n" );
 
-	fprintf( stdout, "\t-d: specify the date format, options: ctime (is default), dm (day/month), md (month/day), iso8601\n" );
-	fprintf( stdout, "\t-e: only show EWF read error information\n" );
-	fprintf( stdout, "\t-h: shows this help\n" );
-	fprintf( stdout, "\t-i: only show EWF acquiry information\n" );
-	fprintf( stdout, "\t-m: only show EWF media information\n" );
-	fprintf( stdout, "\t-v: verbose output to stderr\n" );
-	fprintf( stdout, "\t-V: print version\n" );
+	fprintf( stream, "\t-d: specify the date format, options: ctime (is default), dm (day/month), md (month/day), iso8601\n" );
+	fprintf( stream, "\t-e: only show EWF read error information\n" );
+	fprintf( stream, "\t-h: shows this help\n" );
+	fprintf( stream, "\t-i: only show EWF acquiry information\n" );
+	fprintf( stream, "\t-m: only show EWF media information\n" );
+	fprintf( stream, "\t-v: verbose output to stderr\n" );
+	fprintf( stream, "\t-V: print version\n" );
 }
 
 /* The main program
@@ -120,17 +127,24 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfoutput_version_fprint( stdout, program );
+	ewfoutput_version_fprint(
+	 stdout,
+	 program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:ehimvV" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt(
+	                   argc,
+	                   argv,
+	                   _S_CHAR_T( "d:ehimvV" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
 			case (INT_T) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs "\n", argv[ optind ] );
+				fprintf( stderr, "Invalid argument: %" PRIs "\n",
+				 argv[ optind ] );
 
-				usage();
+				usage_fprint(
+				 stdout );
 
 				return( EXIT_FAILURE );
 
@@ -156,9 +170,11 @@ int main( int argc, char * const argv[] )
 			case (INT_T) 'e':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n", option, info_option );
+					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n",
+					 option, info_option );
 
-					usage();
+					usage_fprint(
+					 stdout );
 
 					return( EXIT_FAILURE );
 				}
@@ -167,16 +183,19 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'h':
-				usage();
+				usage_fprint(
+				 stdout );
 
 				return( EXIT_SUCCESS );
 
 			case (INT_T) 'i':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n", option, info_option );
+					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n",
+					 option, info_option );
 
-					usage();
+					usage_fprint(
+					 stdout );
 
 					return( EXIT_FAILURE );
 				}
@@ -187,9 +206,11 @@ int main( int argc, char * const argv[] )
 			case (INT_T) 'm':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n", option, info_option );
+					fprintf( stderr, "Conflicting options: %" PRIc " and %c\n",
+					 option, info_option );
 
-					usage();
+					usage_fprint(
+					 stdout );
 
 					return( EXIT_FAILURE );
 				}
@@ -203,7 +224,8 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfoutput_copyright_fprint( stdout );
+				ewfoutput_copyright_fprint(
+				 stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -212,7 +234,8 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Missing EWF image file(s).\n" );
 
-		usage();
+		usage_fprint(
+		 stdout );
 
 		return( EXIT_FAILURE );
 	}
@@ -353,24 +376,31 @@ int main( int argc, char * const argv[] )
 				break;
 
 		}
-		fprintf( stdout, "File format:\t\t\t%s\n\n", file_format_string );
+		fprintf( stdout, "File format:\t\t\t%s\n\n",
+		 file_format_string );
 	}
-	if( ( info_option == 'a' ) || ( info_option == 'i' ) )
+	if( ( info_option == 'a' )
+	 || ( info_option == 'i' ) )
 	{
 		fprintf( stdout, "Acquiry information\n" );
 
-		ewfoutput_header_values_fprint( stdout, handle );
+		ewfoutput_header_values_fprint(
+		 stdout,
+		 handle );
 
 		fprintf( stdout, "\n" );
 	}
-	if( ( info_option == 'a' ) || ( info_option == 'm' ) )
+	if( ( info_option == 'a' )
+	 || ( info_option == 'm' ) )
 	{
 		fprintf( stdout, "Media information\n" );
 
 		if( ( format != LIBEWF_FORMAT_EWF )
 		 && ( format != LIBEWF_FORMAT_SMART ) )
 		{
-			if( libewf_get_media_type( handle, &media_type ) != 1 )
+			if( libewf_get_media_type(
+			     handle,
+			     &media_type ) != 1 )
 			{
 				fprintf( stderr, "Unable to determine media type.\n" );
 			}
@@ -388,17 +418,23 @@ int main( int argc, char * const argv[] )
 			}
 			else
 			{
-				fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n", media_type );
+				fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
+				 media_type );
 			}
-			if( libewf_get_media_flags( handle, &media_flags ) != 1 )
+			if( libewf_get_media_flags(
+			     handle,
+			     &media_flags ) != 1 )
 			{
 				fprintf( stderr, "Unable to determine media flags.\n" );
 			}
 			else if( verbose == 1 )
 			{
-				fprintf( stdout, "\tMedia flags:\t\t0x%" PRIx8 "\n", media_flags );
+				fprintf( stdout, "\tMedia flags:\t\t0x%" PRIx8 "\n",
+				 media_flags );
 			}
-			if( libewf_get_volume_type( handle, &volume_type ) != 1 )
+			if( libewf_get_volume_type(
+			     handle,
+			     &volume_type ) != 1 )
 			{
 				fprintf( stderr, "Unable to determine volume type.\n" );
 			}
@@ -412,28 +448,38 @@ int main( int argc, char * const argv[] )
 			}
 			else
 			{
-				fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n", volume_type );
+				fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n",
+				 volume_type );
 			}
 		}
-		if( libewf_get_amount_of_sectors( handle, &amount_of_sectors ) == 1 )
+		if( libewf_get_amount_of_sectors(
+		     handle,
+		     &amount_of_sectors ) == 1 )
 		{
-			fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n", amount_of_sectors );
+			fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n",
+			 amount_of_sectors );
 		}
 		else
 		{
 			fprintf( stderr, "Unable to determine amount of sectors.\n" );
 		}
-		if( libewf_get_bytes_per_sector( handle, &bytes_per_sector ) == 1 )
+		if( libewf_get_bytes_per_sector(
+		     handle,
+		     &bytes_per_sector ) == 1 )
 		{
-			fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n", bytes_per_sector );
+			fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n",
+			 bytes_per_sector );
 		}
 		else
 		{
 			fprintf( stderr, "Unable to determine bytes per sector.\n" );
 		}
-		if( libewf_get_media_size( handle, &media_size ) == 1 )
+		if( libewf_get_media_size(
+		     handle,
+		     &media_size ) == 1 )
 		{
-			fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n", media_size );
+			fprintf( stdout, "\tMedia size:\t\t%" PRIu64 "\n",
+			 media_size );
 		}
 		else
 		{
@@ -445,15 +491,21 @@ int main( int argc, char * const argv[] )
 		 || ( format == LIBEWF_FORMAT_LINEN6 )
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
-			if( libewf_get_error_granularity( handle, &error_granularity ) == 1 )
+			if( libewf_get_error_granularity(
+			     handle,
+			     &error_granularity ) == 1 )
 			{
-				fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n", error_granularity );
+				fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n",
+				 error_granularity );
 			}
 			else
 			{
 				fprintf( stderr, "Unable to determine error granularity.\n" );
 			}
-			if( libewf_get_compression_values( handle, &compression_level, &compress_empty_block ) == 1 )
+			if( libewf_get_compression_values(
+			     handle,
+			     &compression_level,
+			     &compress_empty_block ) == 1 )
 			{
 				if( compression_level == LIBEWF_COMPRESSION_NONE )
 				{
@@ -476,17 +528,22 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to determine compression level.\n" );
 			}
-			if( libewf_get_guid( handle, guid, 16 ) == 1 )
+			if( libewf_get_guid(
+			     handle,
+			     guid,
+			     16 ) == 1 )
 			{
 				fprintf( stdout, "\tGUID:\t\t\t%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
 				                 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
 				                 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
-					guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ], guid[ 4 ], guid[ 5 ], guid[ 6 ], guid[ 7 ],
-					guid[ 8 ], guid[ 9 ], guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ]
+				 guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ], guid[ 4 ], guid[ 5 ], guid[ 6 ], guid[ 7 ],
+				 guid[ 8 ], guid[ 9 ], guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ]
 				);
 			}
 		}
-		ewfoutput_hash_values_fprint( stdout, handle );
+		ewfoutput_hash_values_fprint(
+		 stdout,
+		 handle );
 
 		fprintf( stdout, "\n" );
 	}
@@ -498,7 +555,8 @@ int main( int argc, char * const argv[] )
 		 handle,
 		 &amount_of_acquiry_errors );
 	}
-	if( libewf_close( handle ) != 0 )
+	if( libewf_close(
+	     handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 

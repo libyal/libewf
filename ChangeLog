@@ -176,6 +176,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080224
+* Added error output to the log
+
 Version: 20080223
 * worked on logging of digest hashes to log file
 * refactored ewfacquire, ewfacquirestream, ewfexport, ewfverify
