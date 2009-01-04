@@ -610,8 +610,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		}
 	}
 	return( total_read_count );
-
-	return( 0 );
 }
 
 /* Reads 'raw' data from the curent offset into a buffer

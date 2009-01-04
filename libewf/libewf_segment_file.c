@@ -1988,6 +1988,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
+		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
 		               internal_handle->offset_table,
@@ -2289,6 +2290,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
+		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               chunks_section_offset,
 		               internal_handle->offset_table,
@@ -2370,6 +2372,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
+		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
 		               internal_handle->offset_table,
@@ -2403,6 +2406,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
+		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
 		               internal_handle->offset_table,

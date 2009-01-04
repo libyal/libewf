@@ -1412,7 +1412,7 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 /* Writes a table or table2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_header, size_t additional_size )
+ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_header, size_t additional_size )
 {
 	EWF_TABLE *table                  = NULL;
 	EWF_TABLE_OFFSET *offsets         = NULL;
@@ -1428,6 +1428,13 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( base_offset <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid base offset.\n",
 		 function );
 
 		return( -1 );
@@ -1464,6 +1471,24 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
+	if( libewf_endian_revert_32bit( amount_of_offsets, table->amount_of_chunks ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
+		 function );
+
+		libewf_common_free( table );
+
+		return( -1 );
+	}
+	if( libewf_endian_revert_64bit( base_offset, table->base_offset ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert base offset value.\n",
+		 function );
+
+		libewf_common_free( table );
+
+		return( -1 );
+	}
 	offsets = (EWF_TABLE_OFFSET *) libewf_common_alloc( EWF_TABLE_OFFSET_SIZE * amount_of_offsets );
 
 	if( offsets == NULL )
@@ -1472,16 +1497,6 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		 function );
 
 		libewf_common_free( table );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit( amount_of_offsets, table->amount_of_chunks ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
-		 function );
-
-		libewf_common_free( table );
-		libewf_common_free( offsets );
 
 		return( -1 );
 	}
@@ -2963,7 +2978,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 			return( -1 );
 		}
 	}
-	return( size );
+	return( (ssize_t) size );
 }
 
 /* Writes a delta chunk section to file
