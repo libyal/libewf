@@ -43,6 +43,11 @@
 extern "C" {
 #endif
 
+/* The length of hash strings
+ */
+#define EWFSTRING_DIGEST_HASH_LENGTH_MD5	33
+#define EWFSTRING_DIGEST_HASH_LENGTH_SHA1	41
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
 /* Have wide character support for the functions:

@@ -789,14 +789,14 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( ( stored_md5_hash_string != NULL )
 	 && ( ewfdigest_copy_to_string(
 	       md5_hash,
 	       EWFDIGEST_HASH_SIZE_MD5,
 	       stored_md5_hash_string,
-	       LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
+	       EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
 	{
 		fprintf( stream, "\tMD5 hash in file:\t%" PRIs_EWF "\n",
 		 stored_md5_hash_string );

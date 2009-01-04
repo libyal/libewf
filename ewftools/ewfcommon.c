@@ -1743,8 +1743,8 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
-	LIBEWF_CHAR md5_hash_string[ LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ];
-	LIBEWF_CHAR sha1_hash_string[ LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ];
+	LIBEWF_CHAR md5_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_MD5 ];
+	LIBEWF_CHAR sha1_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ];
 
 	uint8_t *data                  = NULL;
 	uint8_t *uncompressed_data     = NULL;
@@ -1755,9 +1755,9 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	size_t buffer_size             = 0;
 	ssize64_t total_read_count     = 0;
 	size_t md5_hash_size           = EWFDIGEST_HASH_SIZE_MD5;
-	size_t md5_hash_string_length  = LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5;
+	size_t md5_hash_string_length  = EWFSTRING_DIGEST_HASH_LENGTH_MD5;
 	size_t sha1_hash_size          = EWFDIGEST_HASH_SIZE_SHA1;
-	size_t sha1_hash_string_length = LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1;
+	size_t sha1_hash_string_length = EWFSTRING_DIGEST_HASH_LENGTH_SHA1;
 	ssize_t read_count             = 0;
 	ssize_t write_count            = 0;
 	uint8_t read_all               = 0;

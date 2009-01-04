@@ -242,7 +242,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+		stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( stored_md5_hash_string == NULL )
 		{
@@ -250,7 +250,7 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -263,7 +263,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		stored_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
+		stored_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( stored_sha1_hash_string == NULL )
 		{
@@ -276,7 +276,7 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
+		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{
@@ -327,10 +327,10 @@ int main( int argc, char * const argv[] )
 	         handle,
 	         calculate_md5,
 	         calculated_md5_hash_string,
-	         LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5,
+	         EWFSTRING_DIGEST_HASH_LENGTH_MD5,
 	         calculate_sha1,
 	         calculated_sha1_hash_string,
-	         LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
+	         EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 	         swap_byte_pairs,
 	         wipe_chunk_on_error,
 	         callback );
@@ -414,7 +414,7 @@ int main( int argc, char * const argv[] )
 		     md5_hash,
 		     EWFDIGEST_HASH_SIZE_MD5,
 		     stored_md5_hash_string,
-		     LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
+		     EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
 		{
 			fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
 
@@ -439,7 +439,7 @@ int main( int argc, char * const argv[] )
 		                           handle,
 		                           _S_LIBEWF_CHAR( "SHA1" ),
 		                           stored_sha1_hash_string,
-		                           LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
+		                           EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( stored_sha1_hash_result == -1 )
 		{
@@ -493,7 +493,7 @@ int main( int argc, char * const argv[] )
 		match_md5_hash = ( libewf_string_compare(
 		                    stored_md5_hash_string,
 		                    calculated_md5_hash_string,
-		                    LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
+		                    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
 
 		libewf_common_free( stored_md5_hash_string );
 		libewf_common_free( calculated_md5_hash_string );
@@ -513,7 +513,7 @@ int main( int argc, char * const argv[] )
 		match_sha1_hash = ( libewf_string_compare(
 		                     stored_sha1_hash_string,
 		                     calculated_sha1_hash_string,
-		                     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
+		                     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
 
 		libewf_common_free( stored_sha1_hash_string );
 		libewf_common_free( calculated_sha1_hash_string );

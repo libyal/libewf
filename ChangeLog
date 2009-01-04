@@ -151,8 +151,11 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071227
+* moved hash string length from libewf definitions to ewfstring
+
 Version: 20071222
-* small changes
+* changed CDROM media type into CD media type
 
 Version: 20071209
 * minor changes to debian package files

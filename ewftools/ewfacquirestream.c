@@ -744,7 +744,7 @@ int main( int argc, char * const argv[] )
 #endif
 	if( calculate_md5 == 1 )
 	{
-		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+		calculated_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
 		{
@@ -759,7 +759,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
+		calculated_sha1_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )
 		{
@@ -806,10 +806,10 @@ int main( int argc, char * const argv[] )
 	               seek_on_error,
 	               calculate_md5,
 	               calculated_md5_hash_string,
-	               LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5,
+	               EWFSTRING_DIGEST_HASH_LENGTH_MD5,
 	               calculate_sha1,
 	               calculated_sha1_hash_string,
-	               LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
+	               EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 	               swap_byte_pairs,
 	               callback );
 

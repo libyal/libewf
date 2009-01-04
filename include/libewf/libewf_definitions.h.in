@@ -134,10 +134,5 @@
 #define LIBEWF_SEGMENT_FILE_TYPE_EWF		(uint8_t) 'E'
 #define LIBEWF_SEGMENT_FILE_TYPE_LWF		(uint8_t) 'L'
 
-/* The length of hash strings
- */
-#define LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5	33
-#define LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1	41
-
 #endif
 
