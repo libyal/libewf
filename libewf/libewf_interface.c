@@ -23,7 +23,6 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 
 #include "libewf_definitions.h"
 #include "libewf_error.h"
@@ -1176,7 +1175,7 @@ int libewf_get_md5_hash(
  */
 int libewf_get_segment_filename(
      libewf_handle_t *handle,
-     system_character_t *filename,
+     char *filename,
      size_t length )
 {
 	libewf_error_t *error                     = NULL;
@@ -1240,6 +1239,9 @@ int libewf_get_segment_filename(
 	}
 	return( result );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+#endif
 
 /* Retrieves the delta segment filename
  * Returns 1 if successful, 0 if value not present or -1 on error

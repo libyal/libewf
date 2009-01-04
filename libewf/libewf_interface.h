@@ -24,13 +24,13 @@
 #define _LIBEWF_INTERFACE_H
 
 #include <common.h>
-#include <system_string.h>
+#include <narrow_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include <libewf/handle.h>
 
 #include "libewf_extern.h"
-#include "libewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -102,13 +102,27 @@ LIBEWF_EXTERN int libewf_get_md5_hash(
 
 LIBEWF_EXTERN int libewf_get_segment_filename(
                    libewf_handle_t *handle,
-                   system_character_t *filename,
+                   char *filename,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_get_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_get_delta_segment_filename(
                    libewf_handle_t *handle,
-                   system_character_t *filename,
+                   char *filename,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_get_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors(
                    libewf_handle_t *handle,
@@ -155,14 +169,30 @@ LIBEWF_EXTERN int libewf_get_amount_of_header_values(
 LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   libewf_character_t *value,
+                   char *value,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_get_header_value_identifier_wide(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   wchar_t *value,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_get_header_value(
                    libewf_handle_t *handle,
-                   libewf_character_t *identifier,
-                   libewf_character_t *value,
+                   char *identifier,
+                   char *value,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_get_header_value_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *identifier,
+                   wchar_t *value,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
                    libewf_handle_t *handle,
@@ -171,14 +201,30 @@ LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
 LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
-                   libewf_character_t *value,
+                   char *value,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_get_hash_value_identifier_wide(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   wchar_t *value,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_get_hash_value(
                    libewf_handle_t *handle,
-                   libewf_character_t *identifier,
-                   libewf_character_t *value,
+                   char *identifier,
+                   char *value,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_get_hash_value_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *identifier,
+                   wchar_t *value,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
                    libewf_handle_t *handle,
@@ -233,13 +279,27 @@ LIBEWF_EXTERN int libewf_set_md5_hash(
 
 LIBEWF_EXTERN int libewf_set_segment_filename(
                    libewf_handle_t *handle,
-                   system_character_t *filename,
+                   char *filename,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_set_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    libewf_handle_t *handle,
-                   system_character_t *filename,
+                   char *filename,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
                    libewf_handle_t *handle,
@@ -251,15 +311,31 @@ LIBEWF_EXTERN int libewf_set_header_codepage(
 
 LIBEWF_EXTERN int libewf_set_header_value(
                    libewf_handle_t *handle,
-                   libewf_character_t *identifier,
-                   libewf_character_t *value,
+                   char *identifier,
+                   char *value,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_set_header_value_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *identifier,
+                   wchar_t *value,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_set_hash_value(
                    libewf_handle_t *handle,
-                   libewf_character_t *identifier,
-                   libewf_character_t *value,
+                   char *identifier,
+                   char *value,
                    size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_set_hash_value_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *identifier,
+                   wchar_t *value,
+                   size_t length );
+#endif
 
 LIBEWF_EXTERN int libewf_parse_header_values(
                    libewf_handle_t *handle,
