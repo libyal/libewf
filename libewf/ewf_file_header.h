@@ -40,6 +40,7 @@
 extern "C" {
 #endif
 
+extern const uint8_t dvf_file_signature[];
 extern const uint8_t evf_file_signature[];
 extern const uint8_t lvf_file_signature[];
 

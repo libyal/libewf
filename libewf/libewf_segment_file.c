@@ -1252,6 +1252,73 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 	return( total_write_count );
 }
 
+/* Write the last section at the end of the segment file
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_segment_file_write_last_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, LIBEWF_SECTION_LIST *section_list, off_t start_offset, int last_segment_file )
+{
+	EWF_CHAR *last_section = NULL;
+	static char *function  = "libewf_segment_file_write_last_section";
+	ssize_t write_count    = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( last_segment_file == 0 )
+	{
+		last_section = (EWF_CHAR *) "next";
+	}
+	else
+	{
+		last_section = (EWF_CHAR *) "done";
+	}
+	/* Write next or done section
+	 */
+	write_count = libewf_section_last_write(
+		       internal_handle,
+		       file_descriptor,
+		       last_section,
+		       start_offset );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write %s section.\n",
+		 function, (char *) last_section );
+
+		return( -1 );
+	}
+	if( libewf_section_list_append(
+	     section_list,
+	     last_section
+	     start_offset,
+	     ( start_offset + write_count ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to append %s section to section list.\n",
+		 function, (char *) last_section );
+
+		return( -1 );
+	}
+	return( write_count );
+}
+
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
@@ -1657,6 +1724,91 @@ ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 		total_write_count += write_count;
 	}
 	return( total_write_count );
+}
+
+/* Write the necessary sections at the start of the delta segment file
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_segment_delta_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int file_descriptor, LIBEWF_SECTION_LIST *section_list )
+{
+	EWF_FILE_HEADER file_header;
+
+	static char *function = "libewf_segment_delta_file_write_start";
+	ssize_t write_count   = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number > internal_handle->delta_segment_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		 function );
+
+		return( -1 );
+	}
+
+	if( libewf_common_memcpy( file_header.signature, dvf_file_signature, 8 ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_endian_revert_16bit( segment_number, file_header.fields_segment ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert segment number.\n",
+		 function );
+
+		return( -1 );
+	}
+	file_header.fields_start    = 1;
+	file_header.fields_end[ 0 ] = 0;
+	file_header.fields_end[ 1 ] = 0;
+
+	write_count = ewf_file_header_write(
+	               &file_header,
+	               file_descriptor );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write file header to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( write_count );
 }
 
 /* Write the necessary sections before the actual data chunks to file

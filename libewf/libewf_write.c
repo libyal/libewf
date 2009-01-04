@@ -1376,6 +1376,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 {
 	EWF_CHUNK *chunk_data   = NULL;
 	static char *function   = "libewf_write_existing_chunk";
+	ssize_t write_count     = 0;
 	size_t read_size        = 0;
 	size_t chunk_data_size  = 0;
 	uint16_t segment_number = 0;
@@ -1398,6 +1399,13 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	if( internal_handle->media == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
 		 function );
 
 		return( -1 );
@@ -1507,7 +1515,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	/* Swap bytes if necessary
 	 */
 	if( ( internal_handle->swap_byte_pairs == 1 )
-	 && ( libewf_endian_swap_byte_pairs( *chunk_data, chunk_data_size ) != 1 ) )
+	 && ( libewf_endian_swap_byte_pairs( (uint8_t *) chunk_data, chunk_data_size ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 		 function );
@@ -1516,7 +1524,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	}
 	/* Calculate the new CRC
 	 */
-	if( ewf_crc_calculate( chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
+	if( ewf_crc_calculate( &chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: unable to calculate CRC.\n",
 		 function );
@@ -1529,6 +1537,13 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	{
 		/* Write the chunk to a delta segment file
 		 */
+		segment_number = internal_handle->delta_segment_table->amount;
+
+		if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
+		    + chunk_data_size + EWF_CRC_SIZE ) > internal_handle->write->segment_file_size )
+		{
+		}
+
 		/* TODO */
 
 		internal_handle->offset_table->dirty[ chunk ] = 1;
@@ -1552,25 +1567,27 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 			return( -1 );
 		}
-		/* Overwrite the chunk in the delta segment file
-		 */
-		if( libewf_section_delta_chunk_write(
-		     internal_handle, 
-		     internal_handle->offset_table->file_descriptor[ chunk ],
-		     internal_handle->delta_segment_table->file_offset[ segment_number ],
-		     chunk, 
-		     chunk_data, 
-		     chunk_crc ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write delta chunk data.\n",
-			 function );
+	}
+	/* Write the chunk in the delta segment file
+	 */
+	write_count = libewf_section_delta_chunk_write(
+		       internal_handle, 
+		       internal_handle->offset_table->file_descriptor[ chunk ],
+		       internal_handle->delta_segment_table->file_offset[ segment_number ],
+		       chunk, 
+		       chunk_data, 
+		       &chunk_crc );
 
-			return( -1 );
-		}
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write delta chunk data.\n",
+		 function );
+
+		return( -1 );
 	}
 	/* Report the amount of chunk data written
 	 */
-	return( (ssize_t) write_size );
+	return( (ssize_t) chunk_data_size );
 }
 
 /* Writes a chunk of data in EWF format from a buffer at the current offset
