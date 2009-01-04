@@ -66,34 +66,42 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
-	internal_handle->media                     = NULL;
-	internal_handle->read                      = NULL;
-	internal_handle->write                     = NULL;
-	internal_handle->segment_table             = NULL;
-	internal_handle->delta_segment_table       = NULL;
-	internal_handle->offset_table              = NULL;
-	internal_handle->secondary_offset_table    = NULL;
-	internal_handle->chunk_cache               = NULL;
-	internal_handle->header                    = NULL;
-	internal_handle->header_size               = 0;
-	internal_handle->header2                   = NULL;
-	internal_handle->header2_size              = 0;
-	internal_handle->xheader                   = NULL;
-	internal_handle->xheader_size              = 0;
-	internal_handle->xhash                     = NULL;
-	internal_handle->xhash_size                = 0;
-	internal_handle->header_values             = NULL;
-	internal_handle->hash_values               = NULL;
-	internal_handle->acquiry_error_sectors     = NULL;
-	internal_handle->acquiry_amount_of_errors  = 0;
-	internal_handle->current_chunk             = 0;
-	internal_handle->current_chunk_offset      = 0;
-	internal_handle->compression_level         = EWF_COMPRESSION_UNKNOWN;
-	internal_handle->md5_hash_set              = 0;
-	internal_handle->amount_of_header_sections = 0;
-	internal_handle->format                    = LIBEWF_FORMAT_UNKNOWN;
-	internal_handle->ewf_format                = EWF_FORMAT_UNKNOWN;
-	internal_handle->error_tollerance          = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
+	internal_handle->media                         = NULL;
+	internal_handle->read                          = NULL;
+	internal_handle->write                         = NULL;
+/* refactor */
+	internal_handle->segment_filename              = NULL;
+	internal_handle->segment_files                 = NULL;
+	internal_handle->amount_of_segment_files       = 0;
+	internal_handle->delta_segment_filename        = NULL;
+	internal_handle->delta_segment_files           = NULL;
+	internal_handle->amount_of_delta_segment_files = 0;
+/* refactor */
+	internal_handle->segment_table                 = NULL;
+	internal_handle->delta_segment_table           = NULL;
+	internal_handle->offset_table                  = NULL;
+	internal_handle->secondary_offset_table        = NULL;
+	internal_handle->chunk_cache                   = NULL;
+	internal_handle->header                        = NULL;
+	internal_handle->header_size                   = 0;
+	internal_handle->header2                       = NULL;
+	internal_handle->header2_size                  = 0;
+	internal_handle->xheader                       = NULL;
+	internal_handle->xheader_size                  = 0;
+	internal_handle->xhash                         = NULL;
+	internal_handle->xhash_size                    = 0;
+	internal_handle->header_values                 = NULL;
+	internal_handle->hash_values                   = NULL;
+	internal_handle->acquiry_error_sectors         = NULL;
+	internal_handle->acquiry_amount_of_errors      = 0;
+	internal_handle->current_chunk                 = 0;
+	internal_handle->current_chunk_offset          = 0;
+	internal_handle->compression_level             = EWF_COMPRESSION_UNKNOWN;
+	internal_handle->md5_hash_set                  = 0;
+	internal_handle->amount_of_header_sections     = 0;
+	internal_handle->format                        = LIBEWF_FORMAT_UNKNOWN;
+	internal_handle->ewf_format                    = EWF_FORMAT_UNKNOWN;
+	internal_handle->error_tollerance              = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 
 	/* The segment table is initially filled with a single entry
 	 */

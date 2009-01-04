@@ -98,7 +98,7 @@ struct libewf_internal_handle
 
 	/* The amount of segment files in the dynamic array
 	 */
-	uint32_t amount_of_segment_files;
+	uint16_t amount_of_segment_files;
 
 	/* The delta segment filename without extension
 	 */
@@ -114,7 +114,7 @@ struct libewf_internal_handle
 
 	/* The amount of delta segment files in the dynamic array
 	 */
-	uint32_t amount_of_delta_segment_files;
+	uint16_t amount_of_delta_segment_files;
 /* TODO refactor */
 
 	/* The list of segment files
