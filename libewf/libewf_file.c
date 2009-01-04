@@ -1059,7 +1059,7 @@ int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *se
 
 		return( -1 );
 	}
-	if( index > internal_handle->acquiry_amount_of_errors )
+	if( index >= internal_handle->acquiry_amount_of_errors )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
 		 function );
@@ -1161,7 +1161,7 @@ int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector
 
 		return( -1 );
 	}
-	if( index > internal_handle->read->crc_amount_of_errors )
+	if( index >= internal_handle->read->crc_amount_of_errors )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
 		 function );
@@ -1248,7 +1248,27 @@ int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_
  */
 int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
 {
-	return( 1 );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_header_value_identifier";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->header_values == NULL )
+	{
+		return( 0 );
+	}
+	return( libewf_values_table_get_identifier(
+	         internal_handle->header_values,
+	         index,
+	         value,
+	         length ) );
 }
 
 /* Retrieves the header value specified by the identifier
@@ -1339,7 +1359,15 @@ int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIB
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	return( 1 );
+	if( internal_handle->hash_values == NULL )
+	{
+		return( 0 );
+	}
+	return( libewf_values_table_get_identifier(
+	         internal_handle->hash_values,
+	         index,
+	         value,
+	         length ) );
 }
 
 /* Retrieves the hash value specified by the identifier

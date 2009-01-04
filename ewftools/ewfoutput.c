@@ -605,14 +605,14 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
+	LIBEWF_CHAR header_identifier[ 64 ];
 	LIBEWF_CHAR header_value[ 128 ];
 
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-
-	static char *function      = "ewfoutput_header_values_fprint";
-	size_t header_value_length = 128;
-	uint32_t amount_of_values  = 0;
-	uint32_t iterator          = 0;
+	static char *function           = "ewfoutput_header_values_fprint";
+	size_t header_identifier_length = 64;
+	size_t header_value_length      = 128;
+	uint32_t amount_of_values       = 0;
+	uint32_t iterator               = 0;
 
 	if( stream == NULL )
 	{
@@ -720,16 +720,24 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	}
 	if( amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
 	{
-		internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
 		fprintf( stream, "\n\tAdditional values:\n" );
 
 		for( iterator = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 		{
-			if( libewf_get_header_value( handle, internal_handle->header_values->identifiers[ iterator ], header_value, header_value_length ) == 1 )
+			if( libewf_get_header_value_identifier( handle, iterator, header_identifier, header_identifier_length ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
+				 function, iterator );
+			}
+			else if( libewf_get_header_value( handle, header_identifier, header_value, header_value_length ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the header value for identifier: %" PRIs_EWF ".\n",
+				 function, header_identifier );
+			}
+			else
 			{
 				fprintf( stream, "\t%" PRIs_EWF ": %" PRIs_EWF "\n",
-				 internal_handle->header_values->identifiers[ iterator ], header_value );
+				 header_identifier, header_value );
 			}
 		}
 	}
@@ -739,13 +747,13 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
+	LIBEWF_CHAR hash_identifier[ 32 ];
 	LIBEWF_CHAR hash_value[ 128 ];
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-
 	LIBEWF_CHAR *stored_md5_hash_string = NULL;
 	static char *function               = "ewfoutput_hash_values_fprint";
+	uint32_t hash_identifier_length     = 32;
 	uint32_t hash_value_length          = 128;
 	uint32_t amount_of_values           = 0;
 	uint32_t iterator                   = 0;
@@ -798,8 +806,6 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 			return;
 		}
-		internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
 		if( amount_of_values > 0 )
 		{
 			if( amount_of_values > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
@@ -808,15 +814,20 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 				{
-					if( libewf_get_hash_value(
-					     handle,
-					     internal_handle->hash_values->identifiers[ iterator ],
-					     hash_value,
-					     hash_value_length ) == 1 )
+					if( libewf_get_header_value_identifier( handle, iterator, hash_identifier, hash_identifier_length ) != 1 )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
+						 function, iterator );
+					}
+					else if( libewf_get_hash_value( handle, hash_identifier, hash_value, hash_value_length ) != 1 )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash value for identifier: %" PRIs_EWF ".\n",
+						 function, hash_identifier );
+					}
+					else
 					{
 						fprintf( stream, "\t%" PRIs_EWF ":\t%" PRIs_EWF "\n",
-						 internal_handle->hash_values->identifiers[ iterator ],
-						 hash_value );
+						 hash_identifier, hash_value );
 					}
 				}
 			}

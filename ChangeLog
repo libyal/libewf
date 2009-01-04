@@ -179,6 +179,7 @@ Version: 20071027
 * Wrote api functions to rid ewfcommon of internal_handle for acquiry and
   CRC errors, header and hash values
 * Moved duplicate code for handling header and hash values into libewf_values_table
+* Removed internal_handle from ewfoutput
 
 Version: 20071016
 * Worked on cleaning up ewf struct read and write functions
