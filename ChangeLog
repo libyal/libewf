@@ -147,6 +147,7 @@ TODO
   ewf_section.c
   ewf_session.c
   ewf_table.c
+  ewf_ltree.c
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -159,6 +160,9 @@ CLOSED
   - does this work with application and library memory space?
   - if so remove libewf_string include from ewfacquire
   not needed
+
+Version: 20071016
+* Worked on cleaning up ewf struct read and write functions
 
 Version: 20071015
 * Worked on file io handler

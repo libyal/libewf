@@ -1933,10 +1933,18 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	EWF_LTREE *ltree          = NULL;
 	EWF_LTREE_DATA *tree_data = NULL;
 	static char *function     = "libewf_section_ltree_read";
+	ssize_t read_count        = 0;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
@@ -1962,7 +1970,9 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
-	if( ewf_ltree_read( ltree, file_descriptor ) <= -1 )
+	read_count = libewf_common_read( file_descriptor, ltree, EWF_LTREE_SIZE );
+	
+	if( read_count != (ssize_t) EWF_LTREE_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read ltree.\n",
 		 function );
