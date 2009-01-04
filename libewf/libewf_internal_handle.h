@@ -322,7 +322,7 @@ struct libewf_internal_handle_write
 
 	/* The offset of the chunks section within the current segment file
 	 */
-	off_t chunks_section_offset;
+	off64_t chunks_section_offset;
 
 	/* The current chunks section number
 	 */

@@ -124,7 +124,7 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
 
 		return( 0 );
 	}
-	if( internal_handle->segment_table->file_offset[ segment_number ] > (off_t) INT32_MAX )
+	if( internal_handle->segment_table->file_offset[ segment_number ] > (off64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file offset value exceeds maximum.\n",
 		 function );
@@ -307,7 +307,7 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDL
 /* Tests if the current segment file is full
  * Returns 1 if full, 0 if not, -1 on error
  */
-int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off_t segment_file_offset )
+int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset )
 {
 	static char *function               = "libewf_write_test_segment_file_full";
 	int32_t remaining_segment_file_size = 0;
@@ -333,7 +333,7 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( segment_file_offset > (off_t) INT32_MAX )
+	if( segment_file_offset > (off64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file offset value exceeds maximum.\n",
 		 function );
@@ -430,7 +430,7 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Tests if the current chunks section is full
  * Returns 1 if full, 0 if not, -1 on error
  */
-int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off_t segment_file_offset )
+int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset )
 {
 	static char *function               = "libewf_write_test_chunks_section_full";
 	int32_t remaining_segment_file_size = 0;
@@ -456,7 +456,7 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		return( -1 );
 	}
-	if( segment_file_offset > (off_t) INT32_MAX )
+	if( segment_file_offset > (off64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file offset value exceeds maximum.\n",
 		 function );

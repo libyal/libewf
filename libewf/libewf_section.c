@@ -118,7 +118,7 @@ ssize_t libewf_section_start_read( int file_descriptor, EWF_SECTION *section, ui
 /* Writes a section start to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type, size_t section_data_size, off_t start_offset )
+ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type, size_t section_data_size, off64_t start_offset )
 {
 	EWF_SECTION section;
 
@@ -199,7 +199,7 @@ ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type,
 /* Writes a compressed string section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_CHAR *section_type, EWF_CHAR *uncompressed_string, size_t size, int8_t compression_level )
+ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *section_type, EWF_CHAR *uncompressed_string, size_t size, int8_t compression_level )
 {
 	EWF_CHAR *compressed_string = NULL;
 	static char *function       = "libewf_section_compressed_string_write";
@@ -334,7 +334,7 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 /* Writes a header section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_HEADER *header, size_t size, int8_t compression_level )
+ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_HEADER *header, size_t size, int8_t compression_level )
 {
 	ssize_t section_write_count = 0;
 
@@ -411,7 +411,7 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 /* Writes a header2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_HEADER2 *header2, size_t size, int8_t compression_level )
+ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_HEADER2 *header2, size_t size, int8_t compression_level )
 {
 	ssize_t section_write_count = 0;
 
@@ -592,7 +592,7 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 /* Writes an EWF-S01 (SMART) volume section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
+ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset )
 {
 	EWF_VOLUME_SMART *volume    = NULL;
 	static char *function       = "libewf_section_volume_s01_write";
@@ -948,7 +948,7 @@ ssize_t libewf_section_volume_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 /* Writes an EWF-E01 (EnCase) volume section to file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
+ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset )
 {
 	EWF_VOLUME *volume          = NULL;
 	static char *function       = "libewf_section_volume_e01_write";
@@ -1093,283 +1093,6 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	return( section_write_count + volume_write_count );
 }
 
-/* Fills the offset table
- * Returns 1 if successful, or -1 on error
- */
-int libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance )
-{
-	static char *function   = "libewf_fill_offset_table";
-	uint32_t chunk_size     = 0;
-	uint32_t current_offset = 0;
-	uint32_t next_offset    = 0;
-	uint32_t raw_offset     = 0;
-	uint32_t iterator       = 0;
-	uint8_t compressed      = 0;
-
-	if( offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Correct the last offset, to fill the table it should point to the first empty entry
-	 * the the last filled entry
-	 */
-	if( offset_table->last > 0 )
-	{
-		offset_table->last++;
-	}
-	/* Allocate additional entries in the offset table if needed
-	 * - a single reallocation saves processing time
-	 */
-	if( offset_table->amount < ( offset_table->last + amount_of_chunks ) )
-	{
-		if( libewf_offset_table_realloc(
-		     offset_table,
-		     ( offset_table->last + amount_of_chunks ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* Read the offsets from file
-	 */
-	if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator ].offset ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* The size of the last chunk must be determined differently
-	 */
-	while( iterator < ( amount_of_chunks - 1 ) )
-	{
-		compressed     = (uint8_t) ( raw_offset >> 31 );
-		current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
-
-		if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator + 1 ].offset ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
-			 function );
-
-			return( -1 );
-		}
-		next_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
-
-		if( next_offset < current_offset )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset larger than next.\n",
-			 function );
-
-			return( -1 );
-		}
-		chunk_size = next_offset - current_offset;
-
-		if( current_offset > (uint32_t) INT32_MAX )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( chunk_size == 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk size - size is zero.\n",
-			 function );
-
-			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
-		if( chunk_size > (uint32_t) INT32_MAX )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_offset_table_set_values(
-		     offset_table,
-		     offset_table->last,
-		     file_descriptor,
-		     compressed,
-		     (off_t) current_offset,
-		     (size_t) chunk_size,
-		     segment_number,
-		     0 ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-			 function );
-
-			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
-		offset_table->last++;
-
-		if( compressed == 0 )
-		{
-			LIBEWF_VERBOSE_PRINT( "%s: uncompressed chunk %" PRIu32 " read with offset %" PRIu32 " and size %" PRIu32 ".\n",
-			 function, offset_table->last, current_offset, chunk_size );
-		}
-		else
-		{
-			LIBEWF_VERBOSE_PRINT( "%s: compressed chunk %" PRIu32 " read with offset %" PRIu32 " and size %" PRIu32 ".\n",
-			 function, offset_table->last, current_offset, chunk_size );
-		}
-		current_offset = next_offset;
-
-		iterator++;
-	}
-	if( libewf_endian_convert_32bit( &raw_offset, offsets[ iterator ].offset ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to convert raw offset value.\n",
-		 function );
-
-		return( -1 );
-	}
-	compressed     = (uint8_t) ( raw_offset >> 31 );
-	current_offset = raw_offset & EWF_OFFSET_COMPRESSED_READ_MASK;
-
-	if( current_offset > (uint32_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_offset_table_set_values(
-	     offset_table,
-	     offset_table->last,
-	     file_descriptor,
-	     compressed,
-	     current_offset,
-	     0,
-	     segment_number,
-	     0 ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-		 function );
-
-		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-		{
-			return( -1 );
-		}
-	}
-	if( compressed == 0 )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: uncompressed last chunk %" PRIu32 " read with offset %" PRIu32 ".\n",
-		 function, ( offset_table->last + 1 ), current_offset );
-	}
-	else
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: compressed last chunk %" PRIu32 " read with offset %" PRIu64 ".\n",
-		 function, ( offset_table->last + 1 ), current_offset );
-	}
-	return( 1 );
-}
-
-/* Calculate the last offset
- * Returns 1 if successful, or -1 on error
- */
-int libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance )
-{
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
-	static char *function                         = "libewf_calculate_last_offset";
-	off_t last_offset                             = 0;
-	off_t chunk_size                              = 0;
-
-	if( offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
-		 function );
-
-		return( -1 );
-	}
-	/*
-	 * There is no indication how large the last chunk is. The only thing known is where it starts.
-	 * However it can be determined where the next section starts within the file.
-	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
-	 */
-	section_list_entry = section_list->first;
-	last_offset        = offset_table->offset[ offset_table->last ];
-
-	while( section_list_entry != NULL )
-	{
-#if defined( HAVE_DEBUG_OUTPUT )
-		LIBEWF_VERBOSE_PRINT( "%s: start offset: %jd last offset: %jd.\n",
-		 function, section_list_entry->start_offset, last_offset );
-#endif
-
-		if( ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
-		{
-			chunk_size = section_list_entry->end_offset - last_offset;
-
-			if( last_offset > (off_t) INT32_MAX )
-			{
-				LIBEWF_WARNING_PRINT( "%s: invalid last chunk offset value exceeds maximum.\n",
-				 function );
-
-				return( -1 );
-			}
-			if( chunk_size == 0 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: invalid chunk size - size is zero.\n",
-				 function );
-
-				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
-			if( chunk_size > (off_t) INT32_MAX )
-			{
-				LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_offset_table_set_values(
-			     offset_table,
-			     offset_table->last,
-			     file_descriptor,
-			     offset_table->compressed[ offset_table->last ],
-			     last_offset,
-			     (size_t) chunk_size,
-			     segment_number,
-			     0 ) == -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set value in offset table.\n",
-				 function );
-
-				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
-			LIBEWF_VERBOSE_PRINT( "%s: last chunk %" PRIu32 " calculated with offset: %jd and size %zu.\n",
-			 function, ( offset_table->last + 1 ), last_offset, (size_t) chunk_size );
-
-			break;
-		}
-		section_list_entry = section_list_entry->next;
-	}
-	return( 1 );
-}
-
 /* Reads an offset table from file
  * Returns 1 if successful, or -1 on error
  */
@@ -1378,6 +1101,7 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 	EWF_TABLE *table          = NULL;
 	EWF_TABLE_OFFSET *offsets = NULL;
 	static char *function     = "libewf_offset_table_read";
+	uint64_t base_offset      = 0;
 	EWF_CRC calculated_crc    = 0;
 	EWF_CRC stored_crc        = 0;
 
@@ -1420,13 +1144,26 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 
 		return( -1 );
 	}
+	if( libewf_endian_convert_64bit( &base_offset, table->base_offset ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to convert base offset value.\n",
+		 function );
+
+		libewf_common_free( table );
+
+		return( -1 );
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding, 16 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding, 8 ); );
 #endif
 
 	/* The table size contains the size of the CRC (4 bytes)
 	 */
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
+	if( ewf_crc_calculate(
+	     &calculated_crc,
+	     (uint8_t *) table,
+	     ( EWF_TABLE_SIZE - EWF_CRC_SIZE ),
+	     1 ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
 		 function );
@@ -1554,8 +1291,9 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 			}
 			size -= EWF_CRC_SIZE;
 		}
-		if( libewf_fill_offset_table(
+		if( libewf_offset_table_fill(
 		     offset_table,
+		     (off64_t) base_offset,
 		     offsets,
 		     *amount_of_chunks,
 		     file_descriptor,
@@ -1571,7 +1309,7 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 		}
 		libewf_common_free( offsets );
 
-		if( libewf_calculate_last_offset(
+		if( libewf_offset_table_calculate_last_offset(
 		     offset_table,
 		     section_list,
 		     file_descriptor,
@@ -1603,9 +1341,9 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 /* Compare the offsets in tabel and table2 sections
  * Returns 1 if tables match, 0 if table differ, or -1 on error
  */
-int libewf_compare_offset_tables( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 )
+int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 )
 {
-	static char *function = "libewf_compare_offset_tables";
+	static char *function = "libewf_offset_table_compare";
 	uint64_t iterator     = 0;
 
 	if( ( offset_table1 == NULL )
@@ -1713,7 +1451,7 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 /* Writes a table or table2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_header, size_t additional_size )
+ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_header, size_t additional_size )
 {
 	EWF_TABLE *table                  = NULL;
 	EWF_TABLE_OFFSET *offsets         = NULL;
@@ -1788,7 +1526,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	for( iterator = 0; iterator < amount_of_offsets; iterator++ )
 	{
-		if( offset_table->offset[ offset_table_index + iterator ] > (off_t) INT32_MAX )
+		if( offset_table->offset[ offset_table_index + iterator ] > (off64_t) INT64_MAX )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
 			 function );
@@ -1912,7 +1650,7 @@ ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-	result = libewf_compare_offset_tables(
+	result = libewf_offset_table_compare(
 	          internal_handle->offset_table,
 	          internal_handle->secondary_offset_table );
 
@@ -2294,7 +2032,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 /* Writes a data section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
+ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset )
 {
 	static char *function       = "libewf_section_data_write";
 	ssize_t section_write_count = 0;
@@ -2651,7 +2389,7 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 /* Writes a error2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors )
+ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors )
 {
 	EWF_ERROR2 *error2                 = NULL;
 	EWF_ERROR2_SECTOR *error2_sectors  = NULL;
@@ -2880,7 +2618,7 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 /* Writes a hash section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_DIGEST_HASH *md5_hash )
+ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_DIGEST_HASH *md5_hash )
 {
 	EWF_HASH *hash              = NULL;
 	static char *function       = "libewf_section_hash_write";
@@ -2955,7 +2693,7 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
  * This is used for the next and done sections, these sections point back towards themselves
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_CHAR *section_type, off_t start_offset )
+ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_CHAR *section_type, off64_t start_offset )
 {
 	EWF_SECTION *section     = NULL;
 	static char *function    = "libewf_section_last_write";
@@ -3122,7 +2860,7 @@ ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 /* Writes a xheader section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_CHAR *xheader, size_t size, int8_t compression_level )
+ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *xheader, size_t size, int8_t compression_level )
 {
 	ssize_t section_write_count = 0;
 
@@ -3197,7 +2935,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size, uint16_t segment_number, off_t start_offset )
+ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size, uint16_t segment_number, off64_t start_offset )
 {
 	EWF_CHAR buffer[ 4 ];
 
@@ -3251,7 +2989,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 	     chunk,
 	     file_descriptor,
 	     0,
-	     (off_t) ( start_offset + sizeof( uint32_t ) ),
+	     (off64_t) ( start_offset + sizeof( uint32_t ) ),
 	     (size_t) ( size - sizeof( uint32_t ) ),
 	     segment_number,
 	     1 ) == -1 )
@@ -3270,7 +3008,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( int file_descriptor, off_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
 {
 	EWF_CHAR buffer[ 4 ];
 
@@ -3346,13 +3084,13 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off_t start_offse
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
  */
-int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off_t *section_start_offset )
+int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off64_t *section_start_offset )
 {
-	static char *function    = "libewf_section_read";
-	off_t section_end_offset = 0;
-	ssize_t count            = 0;
-	uint64_t size            = 0;
-	uint64_t next_offset     = 0;
+	static char *function      = "libewf_section_read";
+	off64_t section_end_offset = 0;
+	ssize_t count              = 0;
+	uint64_t size              = 0;
+	uint64_t next_offset       = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -3382,7 +3120,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 
 		return( -1 );
 	}
-	if( *section_start_offset > (off_t) INT32_MAX )
+	if( *section_start_offset > (off64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section start offset value exceeds maximum.\n",
 		 function );
@@ -3403,7 +3141,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 
 		return( -1 );
 	}
-	if( size > (uint64_t) INT32_MAX )
+	if( size > (uint64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
@@ -3417,16 +3155,16 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 
 		return( -1 );
 	}
-	if( next_offset > (uint64_t) INT32_MAX )
+	if( next_offset > (uint64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid next offset value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	section_end_offset = *section_start_offset + (off_t) size;
+	section_end_offset = *section_start_offset + (off64_t) size;
 
-	if( section_end_offset > (off_t) INT32_MAX )
+	if( section_end_offset > (off64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section end offset value exceeds maximum.\n",
 		 function );
@@ -3452,7 +3190,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	{
 		size -= EWF_SECTION_SIZE;
 	}
-	if( size > (uint64_t) INT32_MAX )
+	if( size > (uint64_t) INT64_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
@@ -3624,7 +3362,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 
 		return( -1 );
 	}
-	*section_start_offset += (off_t) count;
+	*section_start_offset += (off64_t) count;
 
 	if( count != (ssize_t) size )
 	{

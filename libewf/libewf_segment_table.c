@@ -91,7 +91,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->file_offset = (off_t *) libewf_common_alloc_cleared(
+	segment_table->file_offset = (off64_t *) libewf_common_alloc_cleared(
 	                              ( amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ),
 	                              0 );
 
@@ -243,7 +243,7 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 		return( -1 );
 	}
-	segment_table->file_offset = (off_t *) reallocation;
+	segment_table->file_offset = (off64_t *) reallocation;
 	reallocation               = libewf_common_realloc_new_cleared(
 	                              segment_table->amount_of_chunks,
 	                              ( segment_table->amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ),

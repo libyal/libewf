@@ -39,7 +39,7 @@
 /* Append an entry to the section list
  * Returns a pointer to the instance, NULL on error
  */
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off_t start_offset, off_t end_offset )
+LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off64_t start_offset, off64_t end_offset )
 {
 	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
 	static char *function                         = "libewf_section_list_append";

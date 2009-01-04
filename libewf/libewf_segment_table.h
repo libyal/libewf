@@ -53,7 +53,7 @@ extern "C" {
 #endif
 
 #define LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE	sizeof( int )
-#define LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE		sizeof( off_t )
+#define LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE		sizeof( off64_t )
 #define LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE	sizeof( uint32_t )
 #define LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE		sizeof( LIBEWF_SECTION_LIST )
 
@@ -79,7 +79,7 @@ struct libewf_segment_table
 
 	/* A dynamic array containting the file offsets
 	 */
-	off_t *file_offset;
+	off64_t *file_offset;
 
 	/* A dynamic array containting the amount of chunks per segment file
 	 */

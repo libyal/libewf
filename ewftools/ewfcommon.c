@@ -2635,7 +2635,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			if( libewf_common_lseek(
 			     input_file_descriptor,
 			     write_offset,
-			     SEEK_SET ) != (off_t) write_offset )
+			     SEEK_SET ) != (off64_t) write_offset )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to find write offset.\n",
 				 function );

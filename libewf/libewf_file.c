@@ -1121,7 +1121,7 @@ int libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	uint8_t *data                           = NULL;
 	static char *function                   = "libewf_calculate_md5_hash";
-	off_t offset                            = 0;
+	off64_t offset                          = 0;
 	ssize_t count                           = 0;
 	uint32_t iterator                       = 0;
 	int result                              = 0;

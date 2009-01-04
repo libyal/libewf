@@ -230,7 +230,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
-		internal_handle->segment_table->file_offset[ segment_number ] += (off_t) chunk_read_count;
+		internal_handle->segment_table->file_offset[ segment_number ] += (off64_t) chunk_read_count;
 
 		/* Determine if the chunk is not compressed
 		 */
@@ -265,7 +265,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 					}
 					return( -1 );
 				}
-				internal_handle->segment_table->file_offset[ segment_number ] += (off_t) crc_read_count;
+				internal_handle->segment_table->file_offset[ segment_number ] += (off64_t) crc_read_count;
 			}
 			/* Otherwise convert the last 4 bytes of the chunk cache
 			 */

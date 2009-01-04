@@ -1,4 +1,5 @@
 Roadmap:
+* add write support for > 2Gb segment file for EnCase 6.7
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -127,8 +128,12 @@ TODO
 * change int8_t return values into int return values
 * change libewf_get and libewf_set functions for api consistency
   move functions from internal handle to file
+* change off_t to off64_t for windows >2Gb segment file support
 
 * remove libewf_set_media_values
+
+Version: 20070828
+* added read support for > 2Gb segment file for EnCase 6.7
 
 Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy

@@ -58,11 +58,11 @@ struct libewf_section_list_entry
 
 	/* The start offset of the section
 	 */
-	off_t start_offset;
+	off64_t start_offset;
 
 	/* The end offset of the section
 	 */
-	off_t end_offset;
+	off64_t end_offset;
 
 	/* The next section list entry
 	 */
@@ -80,7 +80,7 @@ struct libewf_section_list
 	LIBEWF_SECTION_LIST_ENTRY *last;
 };
 
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off_t start_offset, off_t end_offset );
+LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off64_t start_offset, off64_t end_offset );
 
 #if defined( __cplusplus )
 }
