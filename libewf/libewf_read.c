@@ -53,19 +53,20 @@
  */
 ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size )
 {
-	EWF_CHUNK *chunk_data    = NULL;
-	EWF_CHUNK *chunk_read    = NULL;
-	EWF_CRC calculated_crc   = 0;
-	EWF_CRC stored_crc       = 0;
-	static char *function    = "libewf_read_chunk";
-	ssize_t chunk_read_count = 0;
-	ssize_t crc_read_count   = 0;
-	size_t chunk_data_size   = 0;
-	size_t bytes_available   = 0;
-	size_t md5_hash_size     = 0;
-	uint16_t segment_number  = 0;
-	int file_descriptor      = 0;
-	int result               = 0;
+	EWF_CHUNK *chunk_data     = NULL;
+	EWF_CHUNK *chunk_read     = NULL;
+	EWF_CRC calculated_crc    = 0;
+	EWF_CRC stored_crc        = 0;
+	static char *function     = "libewf_read_chunk";
+	ssize_t chunk_read_count  = 0;
+	ssize_t crc_read_count    = 0;
+	size_t chunk_data_size    = 0;
+	size_t bytes_available    = 0;
+	size_t md5_hash_size      = 0;
+	uint16_t segment_number   = 0;
+	int chunk_cache_data_used = 0;
+	int file_descriptor       = 0;
+	int result                = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -130,10 +131,9 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 		return( -1 );
 	}
-	if( ( buffer == internal_handle->chunk_cache->data )
-	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	if( buffer == internal_handle->chunk_cache->compressed )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache compressed.\n",
 		 function );
 
 		return( -1 );
@@ -152,6 +152,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
 		segment_number  = internal_handle->offset_table->segment_number[ chunk ];
 
+		chunk_cache_data_used = (int) ( buffer == internal_handle->chunk_cache->data );
+
 		/* Determine the size of the chunk including the CRC
 		 */
 		chunk_data_size = internal_handle->offset_table->size[ chunk ];
@@ -169,6 +171,13 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				 function );
 
 				return( -1 );
+			}
+			/* Adjust chunk data buffer if necessary
+			 */
+			if( ( chunk_cache_data_used == 1 )
+			 && ( buffer != internal_handle->chunk_cache->data ) )
+			{
+				buffer = internal_handle->chunk_cache->data;
 			}
 		}
 		chunk_data = internal_handle->chunk_cache->data;

@@ -169,6 +169,37 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	return( read_count );
 }
 
+/* Check if the segment file exists according to the information in the segment table
+ * Return 1 if exists, 0 if not, or -1 on error
+ */
+int libewf_segment_file_exists( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number )
+{
+	static char *function = "libewf_segment_file_exists";
+
+	if( segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number > segment_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number value out of range.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( segment_table->file_descriptor[ segment_number ] != -1 );
+}
+
 /* Determines an extension for a certain segment file
  * For EWF-E01, EWF-S01 segment file extension naming scheme
  * Returns 1 on success, -1 on error
@@ -2311,6 +2342,7 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_tab
 		       segment_table->file_offset[ segment_number ],
 		       chunk, 
 		       chunk_data, 
+		       chunk_size, 
 		       chunk_crc );
 
 	if( write_count == -1 )
@@ -2648,6 +2680,25 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 #endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	if( libewf_segment_table_set_wide_filename(
+	     internal_handle->delta_segment_table,
+	     0,
+	     filenames[ 0 ],
+	     ( filename_length - 4 ) ) != 1 )
+#else
+	if( libewf_segment_table_set_filename(
+	     internal_handle->delta_segment_table,
+	     0,
+	     filenames[ iterator ],
+	     ( filename_length - 4 ) ) != 1 )
+#endif
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set filename in delta segment table.\n",
 		 function );
 
 		return( -1 );

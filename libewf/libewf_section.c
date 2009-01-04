@@ -40,6 +40,7 @@
 #include "libewf_endian.h"
 #include "libewf_header_values.h"
 #include "libewf_notify.h"
+#include "libewf_section.h"
 #include "libewf_segment_table.h"
 
 #include "ewf_chunk.h"
@@ -3205,7 +3206,7 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off_t start_offse
 
 	if( chunk_size > (size_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size only value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -3330,7 +3331,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 	if( size > (uint64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size only value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
