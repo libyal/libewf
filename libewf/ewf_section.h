@@ -37,6 +37,7 @@
 #include "libewf_includes.h"
 
 #include "ewf_char.h"
+#include "ewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -74,48 +75,6 @@ struct ewf_section
 	 */
 	uint8_t crc[ 4 ];
 };
-
-ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor );
-
-int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );
-
-#define ewf_section_is_type_header( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "header" )
-#define ewf_section_is_type_header2( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "header2" )
-#define ewf_section_is_type_volume( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "volume" )
-#define ewf_section_is_type_disk( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "disk" )
-#define ewf_section_is_type_table( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "table" )
-#define ewf_section_is_type_table2( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "table2" )
-#define ewf_section_is_type_sectors( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "sectors" )
-#define ewf_section_is_type_hash( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "hash" )
-#define ewf_section_is_type_done( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "done" )
-#define ewf_section_is_type_next( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "next" )
-#define ewf_section_is_type_data( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "data" )
-#define ewf_section_is_type_error2( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "error2" )
-
-#define ewf_section_is_type_ltree( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "ltree" )
-#define ewf_section_is_type_session( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "session" )
-
-#define ewf_section_is_type_xheader( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "xheader" )
-#define ewf_section_is_type_xhash( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "xhash" )
-
-#define ewf_section_is_type_delta_chunk( section ) \
-	ewf_section_is_type( section, (EWF_CHAR *) "delta_chunk" )
 
 #if defined( __cplusplus )
 }

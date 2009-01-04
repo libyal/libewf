@@ -874,13 +874,13 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 
 			return( -1 );
 		}
-		/* The done and next sections point back at themselves
+		/* The next and done sections point back at themselves
 		 */
-		if( ewf_section_is_type_next( &section ) == 1 )
+		if( ewf_string_compare( section.type, "next", 5 ) == 0 )
 		{
 			return( 1 );
 		}
-		else if( ewf_section_is_type_done( &section ) == 1 )
+		else if( ewf_string_compare( section.type, "done", 5 ) == 0 )
 		{
 			*last_segment_file = 1;
 

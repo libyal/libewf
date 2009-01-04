@@ -3580,9 +3580,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 
 	/* Nothing to do for the next and done section
+	 * The \0 byte is included in the compare
 	 */
-	if( ( ewf_section_is_type_next( section ) == 1 )
-	 || ( ewf_section_is_type_done( section ) == 1 ) )
+	if( ( ewf_string_compare( section->type, "next", 5 ) == 0 )
+	 || ( ewf_string_compare( section->type, "done", 5 ) == 0 ) )
 	{
 		/* Determine the size of the largest segment file for read and write mode only
 		 */
@@ -3593,8 +3594,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		}
 	}
 	/* Read the header2 section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_header2( section ) == 1 )
+	else if( ewf_string_compare( section->type, "header2", 8 ) == 0 )
 	{
 		count = libewf_section_header2_read(
 		         internal_handle,
@@ -3602,8 +3604,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the header section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_header( section ) == 1 )
+	else if( ewf_string_compare( section->type, "header", 7 ) == 0 )
 	{
 		count = libewf_section_header_read(
 		         internal_handle,
@@ -3611,8 +3614,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the xheader section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_xheader( section ) == 1 )
+	else if( ewf_string_compare( section->type, "xheader", 8 ) == 0 )
 	{
 		count = libewf_section_xheader_read(
 		         internal_handle,
@@ -3620,9 +3624,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the volume or disk section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ( ewf_section_is_type_volume( section ) == 1 )
-	 || ( ewf_section_is_type_disk( section ) == 1 ) )
+	else if( ( ewf_string_compare( section->type, "volume", 7 ) == 0 )
+	 || ( ewf_string_compare( section->type, "disk", 5 ) == 0 ) )
 	{
 		count = libewf_section_volume_read(
 		         internal_handle,
@@ -3630,8 +3635,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the table2 section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_table2( section ) == 1 )
+	else if( ewf_string_compare( section->type, "table2", 7 ) == 0 )
 	{
 		count = libewf_section_table2_read(
 		         internal_handle,
@@ -3641,8 +3647,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         segment_number );
 	}
 	/* Read the table section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_table( section ) == 1 )
+	else if( ewf_string_compare( section->type, "table", 6 ) == 0 )
 	{
 		count = libewf_section_table_read(
 		         internal_handle,
@@ -3652,17 +3659,19 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         segment_number );
 	}
 	/* Read the sectors section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_sectors( section ) == 1 )
+	else if( ewf_string_compare( section->type, "sectors", 8 ) == 0 )
 	{
 		count = libewf_section_sectors_read(
 		         internal_handle,
 		         file_descriptor,
 		         (size_t) size );
 	}
-	/* Read the dtchunk section
+	/* Read the delta_chunk section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_delta_chunk( section ) == 1 )
+	else if( ewf_string_compare( section->type, "delta_chunk", 12 ) == 0 )
 	{
 		count = libewf_section_delta_chunk_read(
 		         internal_handle,
@@ -3672,8 +3681,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
  		         *section_start_offset );
 	}
 	/* Read the ltree section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_ltree( section ) == 1 )
+	else if( ewf_string_compare( section->type, "ltree", 6 ) == 0 )
 	{
 		count = libewf_section_ltree_read(
 		         internal_handle,
@@ -3681,8 +3691,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the session section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_session( section ) == 1 )
+	else if( ewf_string_compare( section->type, "session", 8 ) == 0 )
 	{
 		count = libewf_section_session_read(
 		         internal_handle,
@@ -3690,8 +3701,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the data section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_data( section ) == 1 )
+	else if( ewf_string_compare( section->type, "data", 5 ) == 0 )
 	{
 		count = libewf_section_data_read(
 		         internal_handle,
@@ -3699,8 +3711,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the hash section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_hash( section ) == 1 )
+	else if( ewf_string_compare( section->type, "hash", 5 ) == 0 )
 	{
 		count = libewf_section_hash_read(
 		         internal_handle,
@@ -3708,8 +3721,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the xhash section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_xhash( section ) == 1 )
+	else if( ewf_string_compare( section->type, "xhash", 6 ) == 0 )
 	{
 		count = libewf_section_xhash_read(
 		         internal_handle,
@@ -3717,8 +3731,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		         (size_t) size );
 	}
 	/* Read the error2 section
+	 * The \0 byte is included in the compare
 	 */
-	else if( ewf_section_is_type_error2( section ) == 1 )
+	else if( ewf_string_compare( section->type, "error2", 7 ) == 0 )
 	{
 		count = libewf_section_error2_read(
 		         internal_handle,

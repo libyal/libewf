@@ -16,7 +16,7 @@ libewf_la_SOURCES = \
 	ewf_header2.h \
 	ewf_header.h \
 	ewf_ltree.c ewf_ltree.h \
-	ewf_section.c ewf_section.h \
+	ewf_section.h \
 	ewf_session.h \
 	ewf_string.c ewf_string.h \
 	ewf_table.h \
