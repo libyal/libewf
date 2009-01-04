@@ -3,22 +3,29 @@ To do/think about:
 * ewfinfo: generate CRC list
 * header2: enhance UTF16 conversion code
 * header2: enhance utf conversion routine
-* read: always compare a data section with the volume/disk section for EWF-E01
+* read: always compare a data section with the volume/disk section for EWF-E01 - TODO add more values
 * read: build in additional constraints
 * read: correct for errors in the table or table2 section for EWF-E01
 * read: add functionality for byte swap in data for endian fix of data - test this
 * read: warn when maximum offsets in table of S01 format is exceeded
-* read: allocate secondairy offset table in handle for S01 format ?
+* read: look at libewf_section_volume_read: volume chunk count is 0 - compensating
+* read: add check for next and done segment
+  - realy the last segment in the file
+  - offset pointing at them selves
+  - correct size
 * all: add LVF support - ltree section
 * all: make a more generic libewf_string (use this in libewf_header_values, ewf_header, ewf_ltree) also move ASCII and UTF
 * all: make string functions safe to be char or uint8_t
-* all: prepend endian functions with libewf
+* all: check for race conditions especially on change of data elements
 * write: reduce multiple successive error2 entries to a single
 * write: add additional data to file for different EWF formats
 * ewfacquire: make size input and output human friendly (support kM notation etc)
 * ewfacquire: warn before hand if segment file amount exceeds limit
+* ewfacquire: ask for media type
 * ewf_header_compress: is there a better way to determine the size of the uncompressed buffer
-* ewf_header_compress: ask for media type
+* general: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
+  - can the values in data be used to correct a corrupted volume ?
+* general: redesign handle, refactor certain aspects to sub structs like chunk_cache
 
 * more integration with autoconf/automake config.h
 
@@ -36,16 +43,14 @@ Code clean up:
 * all: Enhance error handling - no program exit but a nice return - nicer prints - return error in sector message
 * all: use typedefs instead of defines
 * all: due to 20060505 fix give all value definitions a default value - looks nicer
-* read: remove file descriptor check in last_offset calculation?
-  if( ( section_list_entry->file_descriptor == file_descriptor ) && ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
 * all: wrap basic library calls in preperation of thread safety of library calls
 * all: remove unrequired includes
-* all: check for race conditions especially on change of data elements
 
 Finished:
   - libewf_chunck_cache (c/h)
   - libewf_common (c/h)
   - libewf_endian (c/h)
+  - libewf_handle (c/h)
   - libewf_header_values (c/h)
   - libewf_notify (c/h)
   - libewf_md5 (c/h)
@@ -72,13 +77,28 @@ Finished:
 
 To do:
 
-  - libewf_handle (c/h)
   - libewf_file_read (c/h)
   - libewf_file_write (c/h)
   - libewf_file (c/h)
 
   - check all realloc and set values calls at the upper levels that memory is freed
     perhaps from surrounding code i.e. for the handle
+  - recheck all realloc - do not overwrite in struct allocation pointers until sure
+    memory is successfully reallocated
+    grep [-][\>].\*realloc\( *
+  - do the same check for wipe/memset functions
+    grep [-][\>].\*memcpy\( *
+    grep [-][\>].\*wipe\( *
+    grep [-][\>].\*memset\( *
+
+Version: 20060902
+* worked on code clean up and improved error handling
+* libewf_handle_cache_realloc removed from read volume section function
+* endian functions are prepended with libewf_endian_
+* the secondairy offset table in handle for S01 format will no longer be allocated for read
+* started on error tollerance levels for recovery
+* moved file descriptor check in last_offset calculation to do one check per section list
+  - section list was altered to be used for a single segment file only - reduces memory requirements
 
 Version: 20060831
 * worked on code clean up and improved error handling

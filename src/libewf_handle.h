@@ -44,6 +44,7 @@
 #include "ewf_md5hash.h"
 #include "ewf_sectors.h"
 
+#include "libewf_chunk_cache.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
 
@@ -51,8 +52,13 @@
 extern "C" {
 #endif
 
-#define EWF_FORMAT_E01	0x01
-#define EWF_FORMAT_S01	0x02
+/* The levels are ordered from zero tollerance to full tollerance of non fatal errors
+ * fatal error cannot be tollerated
+ */
+#define LIBEWF_ERROR_TOLLERANCE_NONE		0x00
+#define LIBEWF_ERROR_TOLLERANCE_DATA_ONLY	0x03
+#define LIBEWF_ERROR_TOLLERANCE_COMPENSATE	0x0C
+#define LIBEWF_ERROR_TOLLERANCE_NON_FATAL	0x0F
 
 #define LIBEWF_HANDLE libewf_handle_t
 #define LIBEWF_HANDLE_SIZE sizeof( LIBEWF_HANDLE )
@@ -166,6 +172,10 @@ struct libewf_handle
 	 */
 	uint8_t index_build;
 
+	/* value to indicate the level of error tollerance
+	 */
+	uint8_t error_tollerance;
+
 	/* the amount of retries on read error
 	 */
 	uint8_t read_error_retry;
@@ -173,11 +183,7 @@ struct libewf_handle
 	/* A simple cache is implemented here to avoid having to read and decompress the
 	 * same chunk while reading the data.
 	 */
-	EWF_SECTORS_CHUNK *raw_data;
-	EWF_SECTORS_CHUNK *chunk_data;
-	uint64_t allocated_chunk_data_size;
-	uint32_t cached_chunk;
-	uint64_t cached_data_size;
+	LIBEWF_CHUNK_CACHE *chunk_cache;
 
 	/* The media type
 	 */
@@ -190,9 +196,6 @@ struct libewf_handle
 };
 
 LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount );
-LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size );
-LIBEWF_HANDLE *libewf_handle_cache_realloc( LIBEWF_HANDLE *handle, uint32_t size );
-LIBEWF_HANDLE *libewf_handle_cache_wipe( LIBEWF_HANDLE *handle );
 void libewf_handle_free( LIBEWF_HANDLE *handle );
 uint8_t libewf_handle_is_set_header( LIBEWF_HANDLE *handle );
 uint8_t libewf_handle_is_set_header2( LIBEWF_HANDLE *handle );

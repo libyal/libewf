@@ -18,6 +18,7 @@ libewf_a_SOURCES = \
 	ewf_volume.c ewf_volume.h \
 	ewf_volume_smart.c ewf_volume_smart.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
+	libewf_debug.c libewf_debug.h \
 	libewf_common.c libewf_common.h \
 	libewf_definitions.h \
 	libewf_endian.c libewf_endian.h \

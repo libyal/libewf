@@ -54,10 +54,9 @@ LIBEWF_SECTION_LIST_ENTRY *libewf_section_list_entry_alloc( void )
 
 		return( NULL );
 	}
-	section_list_entry->file_descriptor = -1;
-	section_list_entry->start_offset    = 0;
-	section_list_entry->end_offset      = 0;
-	section_list_entry->next            = NULL;
+	section_list_entry->start_offset = 0;
+	section_list_entry->end_offset   = 0;
+	section_list_entry->next         = NULL;
 
 	return( section_list_entry );
 }
@@ -77,8 +76,9 @@ LIBEWF_SECTION_LIST *libewf_section_list_alloc( void )
 
 		return( NULL );
 	}
-	section_list->first = NULL;
-	section_list->last = NULL;
+	section_list->file_descriptor = -1;
+	section_list->first           = NULL;
+	section_list->last            = NULL;
 
 	return( section_list );
 }
@@ -121,6 +121,16 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 		return( NULL );
 	}
+	if( section_list->file_descriptor <= -1 )
+	{
+		section_list->file_descriptor = file_descriptor;
+	}
+	else if( section_list->file_descriptor != file_descriptor )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_section_list_append: unable to append section information to list with different file descriptor.\n" );
+
+		return( NULL );
+	}
 	section_list_entry = libewf_section_list_entry_alloc();
 
 	if( section_list_entry == NULL )
@@ -129,9 +139,8 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 		return( NULL );
 	}
-	section_list_entry->file_descriptor = file_descriptor;
-	section_list_entry->start_offset    = start_offset;
-	section_list_entry->end_offset      = end_offset;
+	section_list_entry->start_offset = start_offset;
+	section_list_entry->end_offset   = end_offset;
 
 	if( section_list->first == NULL )
 	{

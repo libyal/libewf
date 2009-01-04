@@ -100,7 +100,7 @@ EWF_CRC *ewf_crc_read( int file_descriptor )
 
 		return( NULL );
 	}
-	*crc = convert_32bit( buffer );
+	*crc = libewf_endian_convert_32bit( buffer );
 
 	return( crc );
 }
@@ -121,7 +121,7 @@ int32_t ewf_crc_write( EWF_CRC *crc, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, buffer );
+	libewf_endian_revert_32bit( *crc, buffer );
 
 	size  = EWF_CRC_SIZE;
 	count = libewf_write( file_descriptor, buffer, size );

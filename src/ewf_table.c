@@ -214,7 +214,7 @@ int32_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, table->crc );
+	libewf_endian_revert_32bit( *crc, table->crc );
 
 	ewf_crc_free( crc );
 

@@ -215,7 +215,7 @@ int32_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, error2->crc );
+	libewf_endian_revert_32bit( *crc, error2->crc );
 
 	ewf_crc_free( crc );
 

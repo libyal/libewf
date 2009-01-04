@@ -46,22 +46,24 @@
 extern "C" {
 #endif
 
-void libewf_section_print_data_dump( uint8_t *data, size_t size );
-void libewf_section_read_data( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_header_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_header2_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table, EWF_TABLE_OFFSET *offsets, uint32_t chunk_amount, int file_descriptor );
-LIBEWF_OFFSET_TABLE *libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor );
-LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, size_t size, uint8_t ewf_format );
+int32_t libewf_section_header_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_header2_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_volume_s01_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_volume_e01_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table, EWF_TABLE_OFFSET *offsets, uint32_t chunk_amount, int file_descriptor, uint8_t error_tollerance );
+LIBEWF_OFFSET_TABLE *libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint8_t error_tollerance );
+LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint32_t size, uint8_t ewf_format, uint8_t error_tollerance );
 uint8_t libewf_compare_offset_tables( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
-void libewf_section_table_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size, LIBEWF_SECTION_LIST *section_list );
-void libewf_section_table2_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size, LIBEWF_SECTION_LIST *section_list );
-void libewf_section_sectors_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_ltree_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_data_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
-void libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
+int32_t libewf_section_table_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size, LIBEWF_SECTION_LIST *section_list );
+int32_t libewf_section_table2_s01_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size, LIBEWF_SECTION_LIST *section_list );
+int32_t libewf_section_table2_e01_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size, LIBEWF_SECTION_LIST *section_list );
+int32_t libewf_section_table2_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size, LIBEWF_SECTION_LIST *section_list );
+int32_t libewf_section_sectors_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_ltree_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_data_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
+int32_t libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
 void libewf_section_data_read_segment( LIBEWF_HANDLE *handle, uint32_t segment, EWF_SECTION *section, int file_descriptor, LIBEWF_SECTION_LIST *section_list );
 EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segment );
 

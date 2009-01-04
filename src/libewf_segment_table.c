@@ -130,7 +130,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint32_t size )
  */
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint32_t size )
 {
-	uint32_t iterator = 0;
+	void *reallocation = NULL;
+	uint32_t iterator  = 0;
 
 	if( segment_table == NULL )
 	{
@@ -138,30 +139,34 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 
 		return( NULL );
 	}
-	segment_table->filename = (char **) libewf_realloc_new_cleared( segment_table->filename, segment_table->amount, ( size * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ), (intptr_t) NULL );
+	reallocation = libewf_realloc_new_cleared( segment_table->filename, segment_table->amount, ( size * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ), (intptr_t) NULL );
 
-	if( segment_table->filename == NULL )
+	if( reallocation == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to allocate dynamic filename array.\n" );
 
 		return( NULL );
 	}
-	segment_table->file_descriptor = (int *) libewf_realloc_new_cleared( segment_table->file_descriptor, segment_table->amount, ( size * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ), -1 );
+	segment_table->filename = (char **) reallocation;
+	reallocation            = libewf_realloc_new_cleared( segment_table->file_descriptor, segment_table->amount, ( size * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ), -1 );
 
-	if( segment_table->file_descriptor == NULL )
+	if( reallocation == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to allocate dynamic file descriptor array.\n" );
 
 		return( NULL );
 	}
-	segment_table->section_list = (LIBEWF_SECTION_LIST **) libewf_realloc_new_cleared( segment_table->section_list, segment_table->amount, ( size * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ), (intptr_t) NULL );
+	segment_table->file_descriptor = (int *) reallocation;
+	reallocation                   = libewf_realloc_new_cleared( segment_table->section_list, segment_table->amount, ( size * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ), (intptr_t) NULL );
 
-	if( segment_table->section_list == NULL )
+	if( reallocation == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to allocate dynamic section list array.\n" );
 
 		return( NULL );
 	}
+	segment_table->section_list = (LIBEWF_SECTION_LIST **) reallocation;
+
 	for( iterator = segment_table->amount; iterator < size; iterator++ )
 	{
 		if( segment_table->section_list[ iterator ] == NULL )

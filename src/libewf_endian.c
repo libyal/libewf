@@ -37,7 +37,7 @@
 
 /* Converts a byte array into a 16bit little endian value
  */
-uint16_t convert_16bit( uint8_t *bytes )
+uint16_t libewf_endian_convert_16bit( uint8_t *bytes )
 {
 	uint16_t value = 0;
 
@@ -50,7 +50,7 @@ uint16_t convert_16bit( uint8_t *bytes )
 
 /* Converts a byte array into a 32bit little endian value
  */
-uint32_t convert_32bit( uint8_t *bytes )
+uint32_t libewf_endian_convert_32bit( uint8_t *bytes )
 {
 	uint32_t value = 0;
 
@@ -67,7 +67,7 @@ uint32_t convert_32bit( uint8_t *bytes )
 
 /* Converts a byte array into a 64bit little endian value
  */
-uint64_t convert_64bit( uint8_t *bytes )
+uint64_t libewf_endian_convert_64bit( uint8_t *bytes )
 {
 	uint64_t value = 0;
 
@@ -92,7 +92,7 @@ uint64_t convert_64bit( uint8_t *bytes )
 
 /* Reverts a 16bit value into a little endian byte array
  */
-void revert_16bit( uint16_t value,  uint8_t *bytes )
+void libewf_endian_revert_16bit( uint16_t value,  uint8_t *bytes )
 {
 	bytes[ 0 ] = ( uint8_t ) ( value & 0x0ff );
 	value    >>= 8;
@@ -101,7 +101,7 @@ void revert_16bit( uint16_t value,  uint8_t *bytes )
 
 /* Reverts a 32bit value into a little endian byte array
  */
-void revert_32bit( uint32_t value,  uint8_t *bytes )
+void libewf_endian_revert_32bit( uint32_t value,  uint8_t *bytes )
 {
 	bytes[ 0 ] = ( uint8_t ) ( value & 0x0ff );
 	value    >>= 8;
@@ -114,7 +114,7 @@ void revert_32bit( uint32_t value,  uint8_t *bytes )
 
 /* Reverts a 64bit value into a little endian byte array
  */
-void revert_64bit( uint64_t value,  uint8_t *bytes )
+void libewf_endian_revert_64bit( uint64_t value,  uint8_t *bytes )
 {
 	bytes[ 0 ] = ( uint8_t ) ( value & 0x0ff );
 	value    >>= 8;
@@ -135,7 +135,7 @@ void revert_64bit( uint64_t value,  uint8_t *bytes )
 
 /* Swaps the byte order of byte pairs within a buffer of a certain size
  */
-void swap_byte_pairs( uint8_t *buffer, uint64_t size )
+void libewf_endian_swap_byte_pairs( uint8_t *buffer, uint64_t size )
 {
 	uint8_t byte      = 0;
 	uint64_t iterator = 0;

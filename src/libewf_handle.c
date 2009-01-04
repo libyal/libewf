@@ -88,9 +88,8 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 	handle->format                    = LIBEWF_FORMAT_UNKNOWN;
 	handle->ewf_format                = EWF_FORMAT_E01;
 	handle->index_build               = 0;
+	handle->error_tollerance          = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 	handle->read_error_retry          = 0;
-	handle->cached_chunk              = 0;
-	handle->cached_data_size          = 0;
 	handle->media_type                = 0;
 
 	handle->segment_table = libewf_segment_table_alloc( segment_amount );
@@ -103,88 +102,17 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 
 		return( NULL );
 	}
+	handle->chunk_cache = libewf_chunk_cache_alloc( EWF_MINIMUM_CHUNK_SIZE + EWF_CRC_SIZE );
 
-	handle = libewf_handle_cache_alloc( handle, ( EWF_MINIMUM_CHUNK_SIZE + EWF_CRC_SIZE ) );
-
-	return( handle );
-}
-
-/* Allocates memory for the handle cache
- * Returns a pointer to the new instance, NULL on error
- */
-LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size )
-{
-	if( handle == NULL )
+	if( handle->chunk_cache == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_handle_alloc: unable to create chunk cache.\n" );
+
+		libewf_segment_table_free( handle->segment_table );
+		libewf_free( handle );
+
+		return( NULL );
 	}
-	handle->raw_data = ewf_sectors_chunk_alloc( size - EWF_CRC_SIZE );
-
-	if( handle->raw_data == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: unable to create sectors chunk (raw data).\n" );
-	}
-	handle->chunk_data = ewf_sectors_chunk_alloc( size );
-
-	if( handle->chunk_data == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: unable to create sectors chunk (chunk data).\n" );
-	}
-	handle->allocated_chunk_data_size = size;
-	handle->cached_chunk              = -1;
-
-	return( handle );
-}
-
-/* Reallocates and wipes memory for the handle cache
- * Returns a pointer to the new instance, NULL on error
- */
-LIBEWF_HANDLE *libewf_handle_cache_realloc( LIBEWF_HANDLE *handle, uint32_t size )
-{
-	if( handle == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: invalid handle.\n" );
-	}
-	handle->raw_data = ewf_sectors_chunk_realloc( handle->raw_data, handle->allocated_chunk_data_size, ( size - EWF_CRC_SIZE ) );
-
-	if( handle->raw_data == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to realloc sectors chunk (raw data).\n" );
-	}
-	handle->chunk_data = ewf_sectors_chunk_realloc( handle->chunk_data, handle->allocated_chunk_data_size, size );
-
-	if( handle->chunk_data == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to realloc sectors chunk (chunk data).\n" );
-	}
-	handle->allocated_chunk_data_size = size;
-	handle->cached_chunk              = -1;
-
-	return( handle );
-}
-
-/* Wipes memory for the handle cache
- */
-LIBEWF_HANDLE *libewf_handle_cache_wipe( LIBEWF_HANDLE *handle )
-{
-	if( handle == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_wipe: invalid handle.\n" );
-	}
-	handle->raw_data = ewf_sectors_chunk_wipe( handle->raw_data, ( handle->allocated_chunk_data_size - EWF_CRC_SIZE ) );
-
-	if( handle->raw_data == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to wipe sectors chunk (raw data).\n" );
-	}
-	handle->chunk_data = ewf_sectors_chunk_wipe( handle->chunk_data, handle->allocated_chunk_data_size );
-
-	if( handle->chunk_data == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: unable to wipe sectors chunk (chunk data).\n" );
-	}
-	handle->cached_chunk = -1;
-
 	return( handle );
 }
 
@@ -194,12 +122,22 @@ void libewf_handle_free( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_free: invalid handle.\n" );
-	}
-	libewf_segment_table_free( handle->segment_table );
-	libewf_offset_table_free( handle->offset_table );
-	libewf_offset_table_free( handle->secondary_offset_table );
+		LIBEWF_WARNING_PRINT( "libewf_handle_free: invalid handle.\n" );
 
+		return;
+	}
+	if( handle->segment_table != NULL )
+	{
+		libewf_segment_table_free( handle->segment_table );
+	}
+	if( handle->offset_table != NULL )
+	{
+		libewf_offset_table_free( handle->offset_table );
+	}
+	if( handle->secondary_offset_table != NULL )
+	{
+		libewf_offset_table_free( handle->secondary_offset_table );
+	}
 	if( handle->error2_sectors != NULL )
 	{
 		ewf_error2_sectors_free( handle->error2_sectors );
@@ -216,10 +154,11 @@ void libewf_handle_free( LIBEWF_HANDLE *handle )
 	{
 		ewf_md5hash_free( handle->md5hash );
 	}
-	free( handle->raw_data );
-	free( handle->chunk_data );
-
-	free( handle );
+	if( handle->chunk_cache != NULL )
+	{
+		libewf_chunk_cache_free( handle->chunk_cache );
+	}
+	libewf_free( handle );
 }
 
 /* Check if the header value is set
@@ -229,7 +168,9 @@ uint8_t libewf_handle_is_set_header( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_is_set_header: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_is_set_header: invalid handle.\n" );
+
+		return( 0 );
 	}
 	return( handle->header != NULL );
 }
@@ -241,7 +182,9 @@ uint8_t libewf_handle_is_set_header2( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_is_set_header2: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_is_set_header2: invalid handle.\n" );
+
+		return( 0 );
 	}
 	return( handle->header2 != NULL );
 }
@@ -252,7 +195,9 @@ void libewf_handle_set_header( LIBEWF_HANDLE *handle, EWF_HEADER *header )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_header: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_set_header: invalid handle.\n" );
+
+		return;
 	}
 	handle->header = header;
 }
@@ -263,7 +208,9 @@ void libewf_handle_set_header2( LIBEWF_HANDLE *handle, EWF_HEADER *header2 )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_header2: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_set_header2: invalid handle.\n" );
+
+		return;
 	}
 	handle->header2 = header2;
 }
@@ -276,19 +223,27 @@ void libewf_handle_set_md5hash( LIBEWF_HANDLE *handle, EWF_MD5HASH *md5hash )
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_set_md5hash: invalid handle.\n" );
+
+		return;
 	}
 	handle->md5hash = ewf_md5hash_alloc();
 
 	if( handle->md5hash == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: unable to create MD5 hash.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_set_md5hash: unable to create MD5 hash.\n" );
+
+		return;
 	}
-	data_set = (EWF_MD5HASH *) libewf_memcpy( (uint8_t *) handle->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
+	data_set = (EWF_MD5HASH *) libewf_memcpy( (void *) handle->md5hash, (void *) md5hash, EWF_MD5HASH_SIZE );
 
 	if( data_set == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: unable to set MD5 hash.\n" );
+		LIBEWF_WARNING_PRINT( "libewf_handle_set_md5hash: unable to set MD5 hash.\n" );
+
+		ewf_md5hash_free( data_set );
+
+		return;
 	}
 }
 

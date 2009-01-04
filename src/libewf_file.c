@@ -115,6 +115,10 @@ LIBEWF_HANDLE *libewf_open( const char **filenames, uint32_t file_amount, uint8_
 		 */
 		handle = libewf_handle_alloc( file_amount + 1 );
 
+		if( handle == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_open: unable to create handle.\n" );
+		}
 		for( iterator = 0; iterator < file_amount; iterator++ )
 		{
 			libewf_open_read( handle, filenames[ iterator ] );
@@ -128,6 +132,10 @@ LIBEWF_HANDLE *libewf_open( const char **filenames, uint32_t file_amount, uint8_
 		 */
 		handle = libewf_handle_alloc( 2 );
 
+		if( handle == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_open: unable to create handle.\n" );
+		}
 		libewf_open_write( handle, filenames[ 0 ] );
 	}
 	else
@@ -143,9 +151,9 @@ LIBEWF_HANDLE *libewf_open( const char **filenames, uint32_t file_amount, uint8_
  */
 LIBEWF_HANDLE *libewf_open_read( LIBEWF_HANDLE *handle, const char *filename )
 {
-	int file_descriptor;
-	EWF_FILE_HEADER *file_header;
-	uint16_t fields_segment;
+	EWF_FILE_HEADER *file_header = NULL;
+	uint16_t fields_segment      = 0;
+	int file_descriptor          = 0;
 
 	if( handle == NULL )
 	{
@@ -163,7 +171,7 @@ LIBEWF_HANDLE *libewf_open_read( LIBEWF_HANDLE *handle, const char *filename )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_open_read: incorrect file header in: %s.\n", filename );
 	}
-	fields_segment = convert_16bit( file_header->fields_segment );
+	fields_segment = libewf_endian_convert_16bit( file_header->fields_segment );
 
 	LIBEWF_VERBOSE_PRINT( "libewf_open_read: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n", filename, file_descriptor, fields_segment );
 

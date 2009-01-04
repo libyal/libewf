@@ -1,5 +1,5 @@
 /*
- * libewf chunk cache
+ * libewf debug
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -33,49 +33,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_CHUNK_CACHE_H
-#define _LIBEWF_CHUNK_CACHE_H
+#ifndef _LIBEWF_DEBUG_H
+#define _LIBEWF_DEBUG_H
 
 #include <inttypes.h>
 
-#include "ewf_sectors.h"
+#include "libewf_handle.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define LIBEWF_CHUNK_CACHE libewf_chunk_cache_t
-#define LIBEWF_CHUNK_CACHE_SIZE sizeof( LIBEWF_CHUNK_CACHE )
-
-typedef struct libewf_chunk_cache libewf_chunk_cache_t;
-
-struct libewf_chunk_cache
-{
-	/* The amount of data in the chunk
-	 */
-	uint32_t amount;
-
-	/* The read buffer
-	 */
-	EWF_SECTORS_CHUNK *read;
-
-	/* The data buffer
-	 */
-	EWF_SECTORS_CHUNK *data;
-
-	/* The identifier of the cached chunk
-	 */
-	uint32_t identifier;
-
-	/* The allocated size of the cached chunk
-	 */
-	uint64_t allocated_size;
-};
-
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( uint32_t size );
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, uint32_t size );
-void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache );
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_wipe( LIBEWF_CHUNK_CACHE *chunk_cache );
+void libewf_debug_dump_data( uint8_t *data, uint32_t size );
+void libewf_debug_read_section( LIBEWF_HANDLE *handle, int file_descriptor, uint32_t size );
 
 #ifdef __cplusplus
 }

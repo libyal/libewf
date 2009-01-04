@@ -127,7 +127,7 @@ int32_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, section->crc );
+	libewf_endian_revert_32bit( *crc, section->crc );
 
 	ewf_crc_free( crc );
 
@@ -269,9 +269,9 @@ void ewf_section_fprint( FILE *stream, EWF_SECTION *section )
 
 		return;
 	}
-	stored_crc = convert_32bit( section->crc );
-	next       = convert_64bit( section->next );
-	size       = convert_64bit( section->size );
+	stored_crc = libewf_endian_convert_32bit( section->crc );
+	next       = libewf_endian_convert_64bit( section->next );
+	size       = libewf_endian_convert_64bit( section->size );
 
 	fprintf( stream, "Section:\n" );
 	fprintf( stream, "type: %s\n", section->type );

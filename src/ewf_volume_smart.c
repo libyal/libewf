@@ -133,7 +133,7 @@ int32_t ewf_volume_smart_write( EWF_VOLUME_SMART *volume, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, volume->crc );
+	libewf_endian_revert_32bit( *crc, volume->crc );
 
 	ewf_crc_free( crc );
 
@@ -162,8 +162,8 @@ int32_t ewf_volume_smart_calculate_chunk_size( EWF_VOLUME_SMART *volume )
 
 		return( -1 );
 	}
-	sectors_per_chunk = convert_32bit( volume->sectors_per_chunk );
-	bytes_per_sector  = convert_32bit( volume->bytes_per_sector );
+	sectors_per_chunk = libewf_endian_convert_32bit( volume->sectors_per_chunk );
+	bytes_per_sector  = libewf_endian_convert_32bit( volume->bytes_per_sector );
 
 	return( sectors_per_chunk * bytes_per_sector );
 }

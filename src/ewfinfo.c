@@ -327,8 +327,8 @@ int main( int argc, const char **argv )
 			
 			for( iterator = 0; iterator < handle->error2_error_count; iterator++ )
 			{
-				sector       = convert_32bit( handle->error2_sectors[ iterator ].sector );
-				sector_count = convert_32bit( handle->error2_sectors[ iterator ].sector_count );
+				sector       = libewf_endian_convert_32bit( handle->error2_sectors[ iterator ].sector );
+				sector_count = libewf_endian_convert_32bit( handle->error2_sectors[ iterator ].sector_count );
 
 				fprintf( stdout, "\tin sector(s): %" PRIu32 " - %" PRIu32 " amount: %" PRIu32 "\n", sector, ( sector + sector_count ), sector_count );
 			}

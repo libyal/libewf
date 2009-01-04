@@ -53,10 +53,6 @@ typedef struct libewf_section_list libewf_section_list_t;
 
 struct libewf_section_list_entry
 {
-	/* The file descriptor of the section
-	 */
-	int file_descriptor;
-
 	/* The start offset of the section
 	 */
 	uint64_t start_offset;
@@ -72,6 +68,10 @@ struct libewf_section_list_entry
 
 struct libewf_section_list
 {
+	/* The file descriptor of the section
+	 */
+	int file_descriptor;
+
 	/* The first entry in the list
 	 */
 	LIBEWF_SECTION_LIST_ENTRY *first;

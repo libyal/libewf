@@ -134,7 +134,7 @@ int32_t ewf_data_write( EWF_DATA *data, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, data->crc );
+	libewf_endian_revert_32bit( *crc, data->crc );
 
 	ewf_crc_free( crc );
 	

@@ -39,8 +39,15 @@
 #include <inttypes.h>
 
 /* The minimum chunk size is 32k (32 * 1024)
+ * 64 * 512 (64 sectors)
  */
 #define EWF_MINIMUM_CHUNK_SIZE 32768
+
+/* The possible EWF file formats
+ */
+#define EWF_FORMAT_E01	'e'
+#define EWF_FORMAT_L01	'l'
+#define EWF_FORMAT_S01	's'
 
 /* Fix for systems without PRI definitions
  */

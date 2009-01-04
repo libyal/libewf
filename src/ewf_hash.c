@@ -138,7 +138,7 @@ int32_t ewf_hash_write( EWF_HASH *hash, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, hash->crc );
+	libewf_endian_revert_32bit( *crc, hash->crc );
 
 	ewf_crc_free( crc );
 

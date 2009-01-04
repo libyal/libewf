@@ -130,7 +130,7 @@ int32_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 
 		return( -1 );
 	}
-	revert_32bit( *crc, ltree->crc );
+	libewf_endian_revert_32bit( *crc, ltree->crc );
 
 	ewf_crc_free( crc );
 */

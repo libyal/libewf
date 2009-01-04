@@ -54,19 +54,30 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( uint32_t size )
 
 		return( NULL );
 	}
+	chunk_cache->read = ewf_sectors_chunk_alloc( size );
+
+	if( chunk_cache->read == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_alloc: unable to create sectors chunk (read).\n" );
+
+		libewf_free( chunk_cache );
+
+		return( NULL );
+	}
 	chunk_cache->data = ewf_sectors_chunk_alloc( size );
 
 	if( chunk_cache->data == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_alloc: unable to create sectors chunk (data).\n" );
 
+		ewf_sectors_chunk_free( chunk_cache->read );
 		libewf_free( chunk_cache );
 
 		return( NULL );
 	}
-	chunk_cache->amount     = 0;
-	chunk_cache->identifier = -1;
-	chunk_cache->size       = size;
+	chunk_cache->amount         = 0;
+	chunk_cache->identifier     = -1;
+	chunk_cache->allocated_size = size;
 
 	return( chunk_cache );
 }
@@ -76,23 +87,35 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( uint32_t size )
  */
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, uint32_t size )
 {
+	EWF_SECTORS_CHUNK *reallocation = NULL;
+
 	if( chunk_cache == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: invalid chunk cache.\n" );
 
 		return( NULL );
 	}
-	chunk_cache->data = ewf_sectors_chunk_realloc( chunk_cache->data, chunk_cache->size, size );
+	reallocation = ewf_sectors_chunk_realloc( chunk_cache->read, chunk_cache->allocated_size, size );
 
-	if( chunk_cache->data == NULL )
+	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to realloc sectors chunk (raw data).\n" );
+		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to realloc sectors chunk (read).\n" );
 
 		return( NULL );
 	}
-	chunk_cache->amount     = 0;
-	chunk_cache->identifier = -1;
-	chunk_cache->size       = size;
+	chunk_cache->read = reallocation;
+	reallocation      = ewf_sectors_chunk_realloc( chunk_cache->data, chunk_cache->allocated_size, size );
+
+	if( reallocation == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to realloc sectors chunk (data).\n" );
+
+		return( NULL );
+	}
+	chunk_cache->data           = reallocation;
+	chunk_cache->amount         = 0;
+	chunk_cache->identifier     = -1;
+	chunk_cache->allocated_size = size;
 
 	return( chunk_cache );
 }
@@ -107,6 +130,10 @@ void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache )
 
 		return;
 	}
+	if( chunk_cache->read != NULL )
+	{
+		libewf_free( chunk_cache->read );
+	}
 	if( chunk_cache->data != NULL )
 	{
 		libewf_free( chunk_cache->data );
@@ -119,20 +146,32 @@ void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache )
  */
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_wipe( LIBEWF_CHUNK_CACHE *chunk_cache )
 {
+	EWF_SECTORS_CHUNK *ewf_sectors = NULL;
+
 	if( chunk_cache == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_wipe: invalid chunk cache.\n" );
 
 		return( NULL );
 	}
-	chunk_cache->data = ewf_sectors_chunk_wipe( chunk_cache->data, chunk_cache->size );
+	ewf_sectors = ewf_sectors_chunk_wipe( chunk_cache->read, chunk_cache->allocated_size );
 
-	if( chunk_cache->data == NULL )
+	if( ewf_sectors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to wipe sectors chunk (read).\n" );
+
+		return( NULL );
+	}
+	chunk_cache->read = ewf_sectors;
+	ewf_sectors       = ewf_sectors_chunk_wipe( chunk_cache->data, chunk_cache->allocated_size );
+
+	if( ewf_sectors == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to wipe sectors chunk (data).\n" );
 
 		return( NULL );
 	}
+	chunk_cache->data       = ewf_sectors;
 	chunk_cache->amount     = 0;
 	chunk_cache->identifier = -1;
 

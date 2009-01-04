@@ -42,13 +42,13 @@
 extern "C" {
 #endif
 
-uint16_t convert_16bit( uint8_t *bytes );
-uint32_t convert_32bit( uint8_t *bytes );
-uint64_t convert_64bit( uint8_t *bytes );
-void revert_16bit( uint16_t value, uint8_t *bytes );
-void revert_32bit( uint32_t value, uint8_t *bytes );
-void revert_64bit( uint64_t value, uint8_t *bytes );
-void swap_byte_pairs( uint8_t *buffer, uint64_t size );
+uint16_t libewf_endian_convert_16bit( uint8_t *bytes );
+uint32_t libewf_endian_convert_32bit( uint8_t *bytes );
+uint64_t libewf_endian_convert_64bit( uint8_t *bytes );
+void libewf_endian_revert_16bit( uint16_t value, uint8_t *bytes );
+void libewf_endian_revert_32bit( uint32_t value, uint8_t *bytes );
+void libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes );
+void libewf_endian_swap_byte_pairs( uint8_t *buffer, uint64_t size );
 
 #ifdef __cplusplus
 }
