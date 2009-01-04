@@ -100,6 +100,7 @@ AC_CHECK_LIB(
   [1])])
 
 dnl Check for headers
+dnl Headers included in libewf/types.h
 AC_CHECK_HEADER(
  [sys/types.h],
  [AC_DEFINE(
@@ -139,26 +140,40 @@ AC_CHECK_HEADER(
   [HAVE_STDINT_H],
   [0])])
 
-AC_CHECK_HEADERS([cygwin/fs.h])
-AC_CHECK_HEADERS([fcntl.h])
-AC_CHECK_HEADERS([glob.h])
+dnl Headers included in common/types.h
 AC_CHECK_HEADERS([limits.h])
-AC_CHECK_HEADERS([linux/fs.h])
-AC_CHECK_HEADERS([openssl/opensslv.h])
-AC_CHECK_HEADERS([signal.h])
-AC_CHECK_HEADERS([stdarg.h])
-AC_CHECK_HEADERS([stdlib.h])
+
+dnl Headers included in common/directory_io.h and common/file_io.h
+AC_CHECK_HEADERS([sys/stat.h])
+
+dnl Headers included in common/file_io.h
+AC_CHECK_HEADERS([fcntl.h])
+AC_CHECK_HEADERS([unistd.h])
+
+dnl Headers included in common/narrow_string.h
 AC_CHECK_HEADERS([string.h])
+
+dnl Headers included in common/memory.h
+AC_CHECK_HEADERS([stdlib.h])
+
+dnl Headers included in common/notify.c
+AC_CHECK_HEADERS([stdarg.h])
+AC_CHECK_HEADERS([varargs.h])
+
+dnl Other headers
+AC_CHECK_HEADERS([glob.h])
+AC_CHECK_HEADERS([signal.h])
+AC_CHECK_HEADERS([sys/signal.h])
+AC_CHECK_HEADERS([sys/utsname.h])
+
+AC_CHECK_HEADERS([openssl/opensslv.h])
+AC_CHECK_HEADERS([zlib.h])
+
+AC_CHECK_HEADERS([cygwin/fs.h])
+AC_CHECK_HEADERS([linux/fs.h])
 AC_CHECK_HEADERS([sys/disk.h])
 AC_CHECK_HEADERS([sys/disklabel.h])
 AC_CHECK_HEADERS([sys/ioctl.h])
-AC_CHECK_HEADERS([sys/signal.h])
-AC_CHECK_HEADERS([sys/utsname.h])
-AC_CHECK_HEADERS([unistd.h])
-AC_CHECK_HEADERS([varargs.h])
-AC_CHECK_HEADERS([zlib.h])
-
-AC_HEADER_STDC
 
 dnl Check for type definitions
 AC_STRUCT_TM

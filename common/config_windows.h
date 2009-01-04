@@ -48,6 +48,12 @@
 #undef HAVE_INTTYPES_H
 #undef HAVE_STDINT_H
 
+#define HAVE_SIZE32_T	0
+#define HAVE_SSIZE32_T	0
+#define HAVE_SIZE64_T	0
+#define HAVE_SSIZE64_T	0
+#define HAVE_OFF64_T	0
+
 /* Windows does not have %jd and %zd printf conversion specifiers
  */
 #undef HAVE_PRINTF_JD
