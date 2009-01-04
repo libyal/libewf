@@ -26,7 +26,6 @@
 #include <file_io.h>
 #include <file_stream_io.h>
 #include <memory.h>
-#include <notify.h>
 #include <system_string.h>
 #include <types.h>
 
@@ -79,7 +78,6 @@ typedef size_t u64;
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
@@ -89,163 +87,61 @@ typedef size_t u64;
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
-#define EWFACQUIRE_INPUT_BUFFER_SIZE	64
-
 /* Prints the executable usage information to the stream
  */
 void usage_fprint(
       FILE *stream )
 {
-	character_t default_segment_file_size_string[ 16 ];
-	character_t minimum_segment_file_size_string[ 16 ];
-	character_t maximum_32bit_segment_file_size_string[ 16 ];
-	character_t maximum_64bit_segment_file_size_string[ 16 ];
-
-	int result = 0;
-
 	if( stream == NULL )
 	{
 		return;
 	}
-	result = ewfbyte_size_string_create(
-	          default_segment_file_size_string,
-	          16,
-	          EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-
-	if( result == 1 )
-	{
-		result = ewfbyte_size_string_create(
-			  minimum_segment_file_size_string,
-			  16,
-			  EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-	}
-	if( result == 1 )
-	{
-		result = ewfbyte_size_string_create(
-			  maximum_32bit_segment_file_size_string,
-			  16,
-			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-	}
-	if( result == 1 )
-	{
-		result = ewfbyte_size_string_create(
-			  maximum_64bit_segment_file_size_string,
-			  16,
-			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-	}
-	fprintf( stream, "Usage: ewfacquire [ -b amount_of_sectors ] [ -B amount_of_bytes ]\n"
-	                 "                  [ -c compression_type ] [ -C case_number ] [ -d digest_type ]\n"
-	                 "                  [ -D description ] [ -e examiner_name ] [ -E evidence_number ]\n"
-	                 "                  [ -f format ] [ -g amount_of_sectors ] [ -l log_filename ]\n"
-	                 "                  [ -m media_type ] [ -M volume_type ] [ -N notes ] [ -o offset ]\n"
-	                 "                  [ -p process_buffer_size ] [ -r read_error_retries ]\n"
-	                 "                  [ -S segment_file_size ] [ -t target ] [ -hqsuvVw ] source\n\n" );
+	fprintf( stream, "Usage: ewfacquire [ -d digest_type ] [ -l filename ] [ -hqsvV ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file or device\n\n" );
 
-	fprintf( stream, "\t-b:     specify the amount of sectors to read at once (per chunk), options:\n"
-	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-B:     specify the amount of bytes to acquire (default is all bytes)\n" );
-	fprintf( stream, "\t-c:     specify the compression type, options: none (default), empty-block, fast\n"
-	                 "\t        or best\n" );
-	fprintf( stream, "\t-C:     specify the case number (default is case_number).\n" );
 	fprintf( stream, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stream, "\t-D:     specify the description (default is description).\n" );
-	fprintf( stream, "\t-e:     specify the examiner name (default is examiner_name).\n" );
-	fprintf( stream, "\t-E:     specify the evidence number (default is evidence_number).\n" );
-	fprintf( stream, "\t-g      specify the amount of sectors to be used as error granularity, options:\n"
-	                 "\t        64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
-	fprintf( stream, "\t-f:     specify the EWF file format to write to, options: ewf, smart, ftk,\n"
-	                 "\t        encase2, encase3, encase4, encase5 (default), encase6, linen5, linen6,\n"
-	                 "\t        ewfx\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
-	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the log_filename\n" );
-	fprintf( stream, "\t-m:     specify the media type, options: fixed (default), removable\n" );
-	fprintf( stream, "\t-M:     specify the volume type, options: logical, physical (default)\n" );
-	fprintf( stream, "\t-N:     specify the notes (default is notes).\n" );
-	fprintf( stream, "\t-o:     specify the offset to start to acquire (default is 0)\n" );
-	fprintf( stream, "\t-p:     specify the process buffer size (default is the chunk size)\n" );
+	fprintf( stream, "\t-l:     logs acquiry errors and the digest (hash) to the filename\n" );
 	fprintf( stream, "\t-q:     quiet shows no status information\n" );
-	fprintf( stream, "\t-r:     specify the amount of retries when a read error occurs (default is 2)\n" );
-	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n"
-	                 "\t        (use this for big to little endian conversion and vice versa)\n" );
-
-	if( result == 1 )
-	{
-		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIs ")\n"
-		                 "\t        (minimum is %" PRIs ", maximum is %" PRIs " for encase6 format\n"
-		                 "\t        and %" PRIs " for other formats)\n",
-		 default_segment_file_size_string,
-		 minimum_segment_file_size_string,
-		 maximum_64bit_segment_file_size_string,
-		 maximum_32bit_segment_file_size_string );
-	}
-	else
-	{
-		fprintf( stream, "\t-S:     specify the segment file size in bytes (default is %" PRIu32 ")\n"
-		                 "\t        (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format\n"
-		                 "\t        and %" PRIu32 " for other formats)\n",
-		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
-		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
-	}
-
-	fprintf( stream, "\t-t:     specify the target file (without extension) to write to (default is acquire)\n" );
-	fprintf( stream, "\t-u:     unattended mode (disables user interaction)\n" );
+	fprintf( stream, "\t-s:     swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stream, "\t        (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
-	fprintf( stream, "\t-w:     wipe sectors on read error (mimic EnCase like behavior)\n" );
 }
 
-/* Prints an overview of the acquiry parameters and asks the for confirmation
- * Return 1 if confirmed by user, 0 otherwise or -1 on error
+/* Prints an overview of the user provided input
+ * and asks the user for confirmation
+ * Return 1 if confirmed by user, 0 otherwise
  */
-int8_t confirm_acquiry_parameters(
-        FILE *output_stream,
-        character_t *input_buffer,
-        size_t input_buffer_size,
-        system_character_t *target_filename,
-        character_t *case_number,
-        character_t *description,
-        character_t *evidence_number,
-        character_t *examiner_name,
-        character_t *notes,
-        uint8_t media_type,
-        uint8_t volume_type,
-        int8_t compression_level,
-        uint8_t compress_empty_block,
-        uint8_t libewf_format,
-        off64_t acquiry_offset,
-        size64_t acquiry_size,
-        size64_t segment_file_size,
-        uint32_t sectors_per_chunk,
-        uint32_t sector_error_granularity,
-        uint8_t read_error_retry,
-        uint8_t wipe_chunk_on_error )
+int confirm_input(
+     system_character_t *filename,
+     character_t *case_number,
+     character_t *description,
+     character_t *evidence_number,
+     character_t *examiner_name,
+     character_t *notes,
+     uint8_t media_type,
+     uint8_t volume_type,
+     int8_t compression_level,
+     uint8_t compress_empty_block,
+     uint8_t libewf_format,
+     off64_t acquiry_offset,
+     size64_t acquiry_size,
+     size64_t segment_file_size,
+     uint32_t sectors_per_chunk,
+     uint32_t sector_error_granularity,
+     uint8_t read_error_retry,
+     uint8_t wipe_chunk_on_error )
 {
-	character_t *fixed_string_variable = NULL;
-	static char *function              = "confirm_acquiry_parameters";
-	int8_t input_confirmed             = -1;
+	character_t *user_input = NULL;
+	int8_t input_confirmed  = -1;
 
-	if( output_stream == NULL )
-	{
-		notify_warning_printf( "%s: invalid output stream.\n",
-		 function );
-
-		return( -1 );
-	}
-	fprintf(
-	 output_stream,
-	 "The following acquiry parameters were provided:\n" );
+	fprintf( stdout, "The following acquiry parameters were provided:\n" );
 
 	ewfoutput_acquiry_parameters_fprint(
-	 output_stream,
-	 target_filename,
+	 stdout,
+	 filename,
 	 case_number,
 	 description,
 	 evidence_number,
@@ -268,34 +164,25 @@ int8_t confirm_acquiry_parameters(
 	 */
 	while( input_confirmed == -1 )
 	{
-		if( ewfinput_get_fixed_string_variable(
-		     output_stream,
-		     input_buffer,
-		     input_buffer_size,
-		     _CHARACTER_T_STRING( "Continue acquiry with these values" ),
-		     ewfinput_yes_no,
-		     2,
-		     0,
-		     &fixed_string_variable ) == -1 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "Continue acquiry with these values" ),
+		              ewfinput_yes_no,
+		              2,
+		              0 );
+
+		if( ewfinput_determine_yes_no(
+		     user_input,
+		     (uint8_t *) &input_confirmed ) != 1 )
 		{
-			fprintf(
-			 output_stream,
-			 "Unable to determine answer.\n" );
-		}
-		else if( ewfinput_determine_yes_no(
-		          fixed_string_variable,
-		          (uint8_t *) &input_confirmed ) != 1 )
-		{
-			fprintf(
-			 output_stream,
-			 "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
+			fprintf( stdout, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
 
 			input_confirmed = -1;
 		}
+		memory_free(
+		 user_input );
 	}
-	fprintf(
-	 output_stream,
-	 "\n" );
+	fprintf( stdout, "\n" );
 
 	return( input_confirmed );
 }
@@ -381,78 +268,56 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	character_t acquiry_operating_system[ 32 ];
-	character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
+	character_t input_buffer[ 64 ];
 
 	struct stat input_file_stat;
 
-	system_character_t *target_filenames[ 1 ]  = { NULL };
+	system_character_t *filenames[ 1 ]       = { NULL };
 
-	character_t *acquiry_software_version      = NULL;
-	character_t *calculated_md5_hash_string    = NULL;
-	character_t *calculated_sha1_hash_string   = NULL;
-	character_t *case_number                   = NULL;
-	character_t *description                   = NULL;
-	character_t *evidence_number               = NULL;
-	character_t *examiner_name                 = NULL;
-	character_t *fixed_string_variable         = NULL;
-	character_t *notes                         = NULL;
-	character_t *program                       = _CHARACTER_T_STRING( "ewfacquire" );
+	character_t *calculated_md5_hash_string  = NULL;
+	character_t *calculated_sha1_hash_string = NULL;
+	character_t *user_input                  = NULL;
+	character_t *case_number                 = NULL;
+	character_t *description                 = NULL;
+	character_t *evidence_number             = NULL;
+	character_t *examiner_name               = NULL;
+	character_t *notes                       = NULL;
+	character_t *acquiry_operating_system    = NULL;
+	character_t *acquiry_software_version    = NULL;
+	character_t *program                     = _CHARACTER_T_STRING( "ewfacquire" );
 
-	system_character_t *log_filename           = NULL;
-	system_character_t *option_case_number     = NULL;
-	system_character_t *option_description     = NULL;
-	system_character_t *option_examiner_name   = NULL;
-	system_character_t *option_evidence_number = NULL;
-	system_character_t *option_notes           = NULL;
-	system_character_t *option_target_filename = NULL;
-	system_character_t *target_filename        = NULL;
+	system_character_t *filename             = NULL;
+	system_character_t *log_filename         = NULL;
 
-	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfprocess_status_update;
+	FILE *log_file_stream                    = NULL;
+	void *callback                           = &ewfprocess_status_update;
 
-	system_integer_t option                    = 0;
-	ssize64_t write_count                      = 0;
-	size_t string_length                       = 0;
-	uint64_t acquiry_offset                    = 0;
-	uint64_t acquiry_size                      = 0;
-	uint64_t input_size_variable               = 0;
-	uint64_t input_size                        = 0;
-	uint64_t maximum_segment_file_size         = 0;
-	uint64_t process_buffer_size               = 0;
-	uint64_t segment_file_size                 = 0;
-	uint32_t amount_of_acquiry_errors          = 0;
-	uint32_t sector_error_granularity          = 0;
-	uint32_t sectors_per_chunk                 = 0;
-	uint8_t calculate_md5                      = 1;
-	uint8_t calculate_sha1                     = 0;
-	uint8_t compress_empty_block               = 0;
-	uint8_t libewf_format                      = LIBEWF_FORMAT_ENCASE5;
-	uint8_t media_type                         = LIBEWF_MEDIA_TYPE_FIXED;
-	uint8_t read_error_retry                   = 2;
-	uint8_t swap_byte_pairs                    = 0;
-	uint8_t seek_on_error                      = 1;
-	uint8_t verbose                            = 0;
-	uint8_t volume_type                        = LIBEWF_VOLUME_TYPE_LOGICAL;
-	uint8_t wipe_chunk_on_error                = 0;
-	int8_t acquiry_parameters_confirmed        = 0;
-	int8_t compression_level                   = LIBEWF_COMPRESSION_NONE;
-	int argument_set_compression               = 0;
-	int argument_set_format                    = 0;
-	int argument_set_media_type                = 0;
-	int argument_set_offset                    = 0;
-	int argument_set_read_error_retry          = 0;
-	int argument_set_sector_error_granularity  = 0;
-	int argument_set_sectors_per_chunk         = 0;
-	int argument_set_segment_file_size         = 0;
-	int argument_set_size                      = 0;
-	int argument_set_volume_type               = 0;
-	int argument_set_wipe_chunk_on_error       = 0;
-	int error_abort                            = 0;
-	int file_descriptor                        = 0;
-	int interactive_mode                       = 1;
-	int result                                 = 0;
-	int status                                 = 0;
+	system_integer_t option                  = 0;
+	ssize64_t write_count                    = 0;
+	uint64_t acquiry_offset                  = 0;
+	uint64_t acquiry_size                    = 0;
+	uint32_t amount_of_acquiry_errors        = 0;
+	uint64_t input_size_variable             = 0;
+	uint64_t input_size                      = 0;
+	uint64_t maximum_segment_file_size       = 0;
+	uint64_t segment_file_size               = 0;
+	uint32_t sector_error_granularity        = 0;
+	uint32_t sectors_per_chunk               = 0;
+	uint8_t calculate_md5                    = 1;
+	uint8_t calculate_sha1                   = 0;
+	uint8_t compress_empty_block             = 0;
+	uint8_t libewf_format                    = LIBEWF_FORMAT_UNKNOWN;
+	uint8_t media_type                       = LIBEWF_MEDIA_TYPE_FIXED;
+	uint8_t read_error_retry                 = 2;
+	uint8_t swap_byte_pairs                  = 0;
+	uint8_t seek_on_error                    = 1;
+	uint8_t verbose                          = 0;
+	uint8_t volume_type                      = LIBEWF_VOLUME_TYPE_LOGICAL;
+	uint8_t wipe_chunk_on_error              = 0;
+	int8_t compression_level                 = LIBEWF_COMPRESSION_NONE;
+	int file_descriptor                      = 0;
+	int error_abort                          = 0;
+	int status                               = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -461,7 +326,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "b:B:c:C:d:D:e:E:f:g:hl:m:M:N:o:p:qr:sS:t:uvVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:qsvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -474,55 +339,6 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_FAILURE );
-
-			case (system_integer_t) 'b':
-				if( ewfinput_determine_sectors_per_chunk_system_character(
-				     optarg,
-				     &sector_error_granularity ) != 1 )
-				{
-					fprintf( stderr, "Unsuported amount of sector error granularity defaulting to: 64.\n" );
-
-					sector_error_granularity = 64;
-				}
-				else
-				{
-					argument_set_sector_error_granularity = 1;
-				}
-				break;
-
-			case (system_integer_t) 'B':
-				string_length = system_string_length(
-				                 optarg );
-
-				acquiry_size = libewf_system_string_to_uint64(
-				                optarg,
-				                string_length );
-
-				argument_set_size = 1;
-
-				break;
-
-			case (system_integer_t) 'c':
-				if( ewfinput_determine_compression_level_system_character(
-				     optarg,
-				     &compression_level,
-				     &compress_empty_block ) != 1 )
-				{
-					fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
-
-					compression_level    = LIBEWF_COMPRESSION_NONE;
-					compress_empty_block = 0;
-				}
-				else
-				{
-					argument_set_compression = 1;
-				}
-				break;
-
-			case (system_integer_t) 'C':
-				option_case_number = optarg;
-
-				break;
 
 			case (system_integer_t) 'd':
 				if( system_string_compare(
@@ -538,51 +354,6 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
-			case (system_integer_t) 'D':
-				option_description = optarg;
-
-				break;
-
-			case (system_integer_t) 'e':
-				option_examiner_name = optarg;
-
-				break;
-
-			case (system_integer_t) 'E':
-				option_evidence_number = optarg;
-
-				break;
-
-			case (system_integer_t) 'f':
-				if( ewfinput_determine_libewf_format_system_character(
-				     optarg,
-				     &libewf_format ) != 1 )
-				{
-					fprintf( stderr, "Unsupported EWF file format type defaulting to: encase5.\n" );
-
-					libewf_format = LIBEWF_FORMAT_ENCASE5;
-				}
-				else
-				{
-					argument_set_format = 1;
-				}
-				break;
-
-			case (system_integer_t) 'g':
-				if( ewfinput_determine_sectors_per_chunk_system_character(
-				     optarg,
-				     &sectors_per_chunk ) != 1 )
-				{
-					fprintf( stderr, "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
-
-					sectors_per_chunk = 64;
-				}
-				else
-				{
-					argument_set_sectors_per_chunk = 1;
-				}
-				break;
-
 			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
@@ -594,134 +365,13 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 'm':
-				if( ewfinput_determine_media_type_system_character(
-				     optarg,
-				     &media_type ) != 1 )
-				{
-					fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
-
-					media_type = LIBEWF_MEDIA_TYPE_FIXED;
-				}
-				else
-				{
-					argument_set_media_type = 1;
-				}
-				break;
-
-			case (system_integer_t) 'M':
-				if( ewfinput_determine_volume_type_system_character(
-				     optarg,
-				     &volume_type ) != 1 )
-				{
-					fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
-
-					volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-				}
-				else
-				{
-					argument_set_volume_type = 1;
-				}
-				break;
-
-			case (system_integer_t) 'N':
-				option_notes = optarg;
-
-				break;
-
-			case (system_integer_t) 'o':
-				string_length = system_string_length(
-				                 optarg );
-
-				acquiry_offset = libewf_system_string_to_int64(
-				                  optarg,
-				                  string_length );
-
-				argument_set_offset = 1;
-
-				break;
-
-			case (system_integer_t) 'p':
-				string_length = system_string_length(
-				                 optarg );
-
-				result = ewfbyte_size_string_convert_system_character(
-				          optarg,
-				          string_length,
-				          &process_buffer_size );
-
-				if( ( result != 1 )
-				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
-				{
-					process_buffer_size = 0;
-
-					fprintf( stderr, "Unsupported process buffer size defaulting to: chunk size.\n" );
-				}
-				break;
-
 			case (system_integer_t) 'q':
 				callback = NULL;
 
 				break;
 
-			case (system_integer_t) 'r':
-				string_length = system_string_length(
-				                 optarg );
-
-				acquiry_offset = libewf_system_string_to_int64(
-				                  optarg,
-				                  input_size_variable );
-
-				if( input_size_variable > 255 )
-				{
-					input_size_variable = 2;
-
-					fprintf( stderr, "Unsupported amount of read error retries defaulting to: %" PRIu64 ".\n",
-					 input_size_variable );
-				}
-				read_error_retry = (uint8_t) input_size_variable;
-
-				argument_set_read_error_retry = 1;
-
-				break;
-
 			case (system_integer_t) 's':
 				swap_byte_pairs = 1;
-
-				break;
-
-			case (system_integer_t) 'S':
-				string_length = system_string_length(
-				                 optarg );
-
-				result = ewfbyte_size_string_convert_system_character(
-				          optarg,
-				          string_length,
-				          &segment_file_size );
-
-				argument_set_segment_file_size = 1;
-
-				if( ( result != 1 )
-				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
-				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
-				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
-				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-				{
-					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
-					 segment_file_size );
-				}
-				break;
-
-			case (system_integer_t) 't':
-				option_target_filename = optarg;
-
-				break;
-
-			case (system_integer_t) 'u':
-				interactive_mode = 0;
 
 				break;
 
@@ -735,13 +385,6 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
-
-			case (system_integer_t) 'w':
-				wipe_chunk_on_error = 1;
-
-				argument_set_wipe_chunk_on_error = 1;
-
-				break;
 		}
 	}
 	if( optind == argc )
@@ -818,284 +461,10 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( ( acquiry_size == 0 )
-	 || ( acquiry_size > ( input_size - acquiry_offset ) ) )
-	{
-		acquiry_size = input_size - acquiry_offset;
-	}
-	/* Create the input buffers
-	 */
-	if( option_target_filename != NULL )
-	{
-		string_length = system_string_length(
-				 option_target_filename );
+	acquiry_operating_system = ewfcommon_determine_operating_system();
+	acquiry_software_version = LIBEWF_VERSION_STRING;
 
-		if( string_length > 0 )
-		{
-			string_length  += 1;
-			target_filename = (character_t *) memory_allocate(
-			                                   sizeof( character_t ) * string_length );
-
-			if( target_filename == NULL )
-			{
-				fprintf( stderr, "Unable to create target filename string.\n" );
-
-				error_abort = 1;
-			}
-			else if( ewfstring_copy_system_string_to_character_string(
-				  target_filename,
-				  option_target_filename,
-				  string_length ) != 1 )
-			{
-				fprintf( stderr, "Unable to set target filename string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	else
-	{
-		target_filename = (system_character_t *) memory_allocate(
-		                                          sizeof( system_character_t ) * 1024 );
-
-		if( target_filename == NULL )
-		{
-			fprintf( stderr, "Unable to create target filename string.\n" );
-
-			error_abort = 1;
-		}
-		/* Make sure to set the target filename if in unattended mode
-		 */
-		else if( interactive_mode == 0 )
-		{
-			if( string_copy(
-			     target_filename,
-			     _CHARACTER_T_STRING( "acquiry" ),
-			     7 ) == NULL )
-			{
-				fprintf( stderr, "Unable to set target filename string.\n" );
-
-				error_abort = 1;
-			}
-			target_filename[ 7 ] = 0;
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_case_number != NULL )
-		{
-			string_length = system_string_length(
-					 option_case_number );
-
-			if( string_length > 0 )
-			{
-				string_length += 1;
-				case_number    = (character_t *) memory_allocate(
-								  sizeof( character_t ) * string_length );
-
-				if( case_number == NULL )
-				{
-					fprintf( stderr, "Unable to create case number string.\n" );
-
-					error_abort = 1;
-				}
-				else if( ewfstring_copy_system_string_to_character_string(
-					  case_number,
-					  option_case_number,
-					  string_length ) != 1 )
-				{
-					fprintf( stderr, "Unable to set case number string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			case_number = (character_t *) memory_allocate(
-						       sizeof( character_t ) * 256 );
-
-			if( case_number == NULL )
-			{
-				fprintf( stderr, "Unable to create case number string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_description != NULL )
-		{
-			string_length = system_string_length(
-					 option_description );
-
-			if( string_length > 0 )
-			{
-				string_length += 1;
-				description    = (character_t *) memory_allocate(
-								  sizeof( character_t ) * string_length );
-
-				if( description == NULL )
-				{
-					fprintf( stderr, "Unable to create description string.\n" );
-
-					error_abort = 1;
-				}
-				else if( ewfstring_copy_system_string_to_character_string(
-					  description,
-					  option_description,
-					  string_length ) != 1 )
-				{
-					fprintf( stderr, "Unable to set description string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			description = (character_t *) memory_allocate(
-						       sizeof( character_t ) * 256 );
-
-			if( description == NULL )
-			{
-				fprintf( stderr, "Unable to create description string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_examiner_name != NULL )
-		{
-			string_length = system_string_length(
-					 option_examiner_name );
-
-			if( string_length > 0 )
-			{
-				string_length += 1;
-				examiner_name  = (character_t *) memory_allocate(
-								  sizeof( character_t ) * string_length );
-
-				if( examiner_name == NULL )
-				{
-					fprintf( stderr, "Unable to create examiner name string.\n" );
-
-					error_abort = 1;
-				}
-				else if( ewfstring_copy_system_string_to_character_string(
-					  examiner_name,
-					  option_examiner_name,
-					  string_length ) != 1 )
-				{
-					fprintf( stderr, "Unable to set examiner name string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			evidence_number = (character_t *) memory_allocate(
-							   sizeof( character_t ) * 256 );
-
-			if( evidence_number == NULL )
-			{
-				fprintf( stderr, "Unable to create evidence number string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_evidence_number != NULL )
-		{
-			string_length = system_string_length(
-					 option_evidence_number );
-
-			if( string_length > 0 )
-			{
-				string_length  += 1;
-				evidence_number = (character_t *) memory_allocate(
-								   sizeof( character_t ) * string_length );
-
-				if( evidence_number == NULL )
-				{
-					fprintf( stderr, "Unable to create evidence number string.\n" );
-
-					error_abort = 1;
-				}
-				else if( ewfstring_copy_system_string_to_character_string(
-					  evidence_number,
-					  option_evidence_number,
-					  string_length ) != 1 )
-				{
-					fprintf( stderr, "Unable to set evidence number string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			examiner_name = (character_t *) memory_allocate(
-							 sizeof( character_t ) * 256 );
-
-			if( examiner_name == NULL )
-			{
-				fprintf( stderr, "Unable to create examiner name string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort == 0 )
-	{
-		if( option_notes != NULL )
-		{
-			string_length = system_string_length(
-					 option_notes );
-
-			if( string_length > 0 )
-			{
-				string_length += 1;
-				notes          = (character_t *) memory_allocate(
-								  sizeof( character_t ) * string_length );
-
-				if( notes == NULL )
-				{
-					fprintf( stderr, "Unable to create notes string.\n" );
-
-					error_abort = 1;
-				}
-				else if( ewfstring_copy_system_string_to_character_string(
-					  notes,
-					  option_notes,
-					  string_length ) != 1 )
-				{
-					fprintf( stderr, "Unable to set notes string.\n" );
-
-					error_abort = 1;
-				}
-			}
-		}
-		else
-		{
-			notes = (character_t *) memory_allocate(
-						 sizeof( character_t ) * 256 );
-
-			if( notes == NULL )
-			{
-				fprintf( stderr, "Unable to create notes string.\n" );
-
-				error_abort = 1;
-			}
-		}
-	}
-	if( error_abort != 0 )
+	do
 	{
 		if( case_number != NULL )
 		{
@@ -1107,442 +476,435 @@ int main( int argc, char * const argv[] )
 			memory_free(
 			 description );
 		}
-		if( examiner_name != NULL )
-		{
-			memory_free(
-			 examiner_name );
-		}
 		if( evidence_number != NULL )
 		{
 			memory_free(
 			 evidence_number );
+		}
+		if( examiner_name != NULL )
+		{
+			memory_free(
+			 examiner_name );
 		}
 		if( notes != NULL )
 		{
 			memory_free(
 			 notes );
 		}
-		if( target_filename != NULL )
-		{
-			memory_free(
-			 target_filename );
-		}
-		return( EXIT_FAILURE );
-	}
-	/* Request the necessary case data
-	 */
-	while( ( interactive_mode == 1 )
-	 && ( acquiry_parameters_confirmed == 0 ) )
-	{
+
+		/* Request the necessary case data
+		 */
 		fprintf( stdout, "Acquiry parameters required, please provide the necessary input\n" );
 
-		/* Target filename
+		/* Output filename
 		 */
-		if( option_target_filename == NULL )
+		filename = (character_t *) memory_allocate(
+		                            1024 );
+
+		if( filename == NULL )
 		{
-			while( ewfinput_get_string_variable_system_character(
-				stdout,
-				_CHARACTER_T_STRING( "Image path and filename without extension" ),
-				target_filename,
-				1024 ) != 1 )
-			{
-				fprintf( stdout, "Filename is required, please try again or terminate using Ctrl^C.\n" );
-			}
+			fprintf( stderr, "Unable to create output filename string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		while( ewfinput_get_string_variable_system_character(
+			stdout,
+			_CHARACTER_T_STRING( "Image path and filename without extension" ),
+			filename,
+			1024 ) != 1 )
+		{
+			fprintf( stdout, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 		}
 		/* Case number
 		 */
-		if( ( option_case_number == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _CHARACTER_T_STRING( "Case number" ),
-		       case_number,
-		       256 ) == -1 ) )
-		{
-			fprintf( stdout, "Unable to set case number string.\n" );
+		case_number = (character_t *) memory_allocate(
+		                               256 );
 
-			case_number[ 0 ] = 0;
+		if( case_number == NULL )
+		{
+			fprintf( stderr, "Unable to create case number string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_string_variable(
+		     stdout,
+		     _CHARACTER_T_STRING( "Case number" ),
+		     case_number,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set case number string.\n" );
+
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
 		}
 		/* Description
 		 */
-		if( ( option_description == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _CHARACTER_T_STRING( "Description" ),
-		       description,
-		       256 ) == -1 ) )
-		{
-			fprintf( stdout, "Unable to set description string.\n" );
+		description = (character_t *) memory_allocate(
+		                               256 );
 
-			description[ 0 ] = 0;
+		if( description == NULL )
+		{
+			fprintf( stderr, "Unable to create description string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_string_variable(
+		     stdout,
+		     _CHARACTER_T_STRING( "Description" ),
+		     description,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set description string.\n" );
+
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
 		}
 		/* Evidence number
 		 */
-		if( ( option_evidence_number == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _CHARACTER_T_STRING( "Evidence number" ),
-		       evidence_number,
-		       256 ) == -1 ) )
-		{
-			fprintf( stdout, "Unable to set evidence number string.\n" );
+		evidence_number = (character_t *) memory_allocate(
+		                                   256 );
 
-			evidence_number[ 0 ] = 0;
+		if( evidence_number == NULL )
+		{
+			fprintf( stderr, "Unable to create evidence number string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_string_variable(
+		     stdout,
+		     _CHARACTER_T_STRING( "Evidence number" ),
+		     evidence_number,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set evidence number string.\n" );
+
+			memory_free(
+			 evidence_number );
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
 		}
 		/* Examiner name
 		 */
-		if( ( option_examiner_name == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _CHARACTER_T_STRING( "Examiner name" ),
-		       examiner_name,
-		       256 ) == -1 ) )
-		{
-			fprintf( stdout, "Unable to set examiner name string.\n" );
+		examiner_name = (character_t *) memory_allocate(
+		                                 256 );
 
-			examiner_name[ 0 ] = 0;
+		if( examiner_name == NULL )
+		{
+			fprintf( stderr, "Unable to create examiner name string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_string_variable(
+		     stdout,
+		     _CHARACTER_T_STRING( "Examiner name" ),
+		     examiner_name,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set examiner name string.\n" );
+
+			memory_free(
+			 examiner_name );
+			memory_free(
+			 evidence_number );
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
 		}
 		/* Notes
 		 */
-		if( ( option_notes == NULL )
-		 && ( ewfinput_get_string_variable(
-		       stdout,
-		       _CHARACTER_T_STRING( "Notes" ),
-		       notes,
-		       256 ) == -1 ) )
-		{
-			fprintf( stdout, "Unable to set notes string.\n" );
+		notes = (character_t *) memory_allocate(
+		                         256 );
 
-			notes[ 0 ] = 0;
+		if( notes == NULL )
+		{
+			fprintf( stderr, "Unable to create notes string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_string_variable(
+		     stdout,
+		     _CHARACTER_T_STRING( "Notes" ),
+		     notes,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set notes string.\n" );
+
+			memory_free(
+			 notes );
+			memory_free(
+			 examiner_name );
+			memory_free(
+			 evidence_number );
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
 		}
 		/* Media type
 		 */
-		if( argument_set_media_type == 0 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "Media type" ),
+		              ewfinput_media_types,
+		              EWFINPUT_MEDIA_TYPES_AMOUNT,
+		              EWFINPUT_MEDIA_TYPES_DEFAULT );
+
+		if( ewfinput_determine_media_type(
+		     user_input,
+		     &media_type ) != 1 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Media type" ),
-			     ewfinput_media_types,
-			     EWFINPUT_MEDIA_TYPES_AMOUNT,
-			     EWFINPUT_MEDIA_TYPES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf( stdout, "Unable to determine media type defaulting to: fixed.\n" );
+			fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
 
-				media_type = LIBEWF_MEDIA_TYPE_FIXED;
-			}
-			else if( ewfinput_determine_media_type(
-				  fixed_string_variable,
-				  &media_type ) != 1 )
-			{
-				fprintf( stdout, "Unsupported media type defaulting to: fixed.\n" );
-
-				media_type = LIBEWF_MEDIA_TYPE_FIXED;
-			}
+			media_type = LIBEWF_MEDIA_TYPE_FIXED;
 		}
+		memory_free(
+		 user_input );
+
 		/* Volume type
 		 */
-		if( argument_set_volume_type == 0 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "Volume type" ),
+		              ewfinput_volume_types,
+		              EWFINPUT_VOLUME_TYPES_AMOUNT,
+		              EWFINPUT_VOLUME_TYPES_DEFAULT );
+
+		if( ewfinput_determine_volume_type(
+		     user_input,
+		     &volume_type ) != 1 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Volume type" ),
-			     ewfinput_volume_types,
-			     EWFINPUT_VOLUME_TYPES_AMOUNT,
-			     EWFINPUT_VOLUME_TYPES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf( stdout, "Unable to determine volume type defaulting to: logical.\n" );
+			fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
 
-				volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-			}
-			else if( ewfinput_determine_volume_type(
-				  fixed_string_variable,
-				  &volume_type ) != 1 )
-			{
-				fprintf( stdout, "Unsupported volume type defaulting to: logical.\n" );
-
-				volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-			}
+			volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 		}
+		memory_free(
+		 user_input );
+
 		/* Compression
 		 */
-		if( argument_set_compression == 0 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "Use compression" ),
+		              ewfinput_compression_levels,
+		              EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+		              EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
+
+		if( ewfinput_determine_compression_level(
+		     user_input,
+		     &compression_level,
+		     &compress_empty_block ) != 1 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Use compression" ),
-			     ewfinput_compression_levels,
-			     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-			     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf( stdout, "Unable to determine compression type defaulting to: none.\n" );
+			fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
-				compression_level    = LIBEWF_COMPRESSION_NONE;
-				compress_empty_block = 0;
-			}
-			else if( ewfinput_determine_compression_level(
-				  fixed_string_variable,
-				  &compression_level,
-				  &compress_empty_block ) != 1 )
-			{
-				fprintf( stdout, "Unsupported compression type defaulting to: none.\n" );
-
-				compression_level    = LIBEWF_COMPRESSION_NONE;
-				compress_empty_block = 0;
-			}
+			compression_level    = LIBEWF_COMPRESSION_NONE;
+			compress_empty_block = 0;
 		}
+		memory_free(
+		 user_input );
+
 		/* File format
 		 */
-		if( argument_set_format == 0 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "Use EWF file format" ),
+		              ewfinput_format_types,
+		              EWFINPUT_FORMAT_TYPES_AMOUNT,
+		              EWFINPUT_FORMAT_TYPES_DEFAULT );
+
+		if( ewfinput_determine_libewf_format(
+		     user_input,
+		     &libewf_format ) != 1 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Use EWF file format" ),
-			     ewfinput_format_types,
-			     EWFINPUT_FORMAT_TYPES_AMOUNT,
-			     EWFINPUT_FORMAT_TYPES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf( stdout, "Unable to determine EWF file format type defaulting to: encase5.\n" );
+			fprintf( stderr, "Unsupported EWF file format type defaulting to: encase5.\n" );
 
-				libewf_format = LIBEWF_FORMAT_ENCASE5;
-			}
-			else if( ewfinput_determine_libewf_format(
-				  fixed_string_variable,
-				  &libewf_format ) != 1 )
-			{
-				fprintf( stdout, "Unsupported EWF file format type defaulting to: encase5.\n" );
-
-				libewf_format = LIBEWF_FORMAT_ENCASE5;
-			}
+			libewf_format = LIBEWF_FORMAT_ENCASE5;
 		}
-		/* Offset of data to acquire
+		memory_free(
+		 user_input );
+
+		/* Size and offset of data to acquire
 		 */
-		if( ( argument_set_offset == 0 )
-		 && ( ewfinput_get_size_variable(
-		       stdout,
-		       input_buffer,
-		       EWFACQUIRE_INPUT_BUFFER_SIZE,
-		       _CHARACTER_T_STRING( "Start to acquire at offset" ),
-		       0,
-		       input_size,
-		       0,
-		       &acquiry_offset ) == -1 ) )
+		if( ewfinput_get_size_variable(
+		     stdout,
+		     input_buffer,
+		     64,
+		     _CHARACTER_T_STRING( "Start to acquire at offset" ),
+		     0,
+		     input_size,
+		     0,
+		     &acquiry_offset ) != 1 )
 		{
 			acquiry_offset = 0;
 
-			fprintf( stdout, "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
+			fprintf( stderr, "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
 			 acquiry_offset );
 		}
-		/* Size of data to acquire
-		 */
-		if( ( argument_set_size == 0 )
-		 && ( ewfinput_get_size_variable(
-		       stdout,
-		       input_buffer,
-		       EWFACQUIRE_INPUT_BUFFER_SIZE,
-		       _CHARACTER_T_STRING( "Amount of bytes to acquire" ),
-		       0,
-		       ( input_size - acquiry_offset ),
-		       ( input_size - acquiry_offset ),
-		       &acquiry_size ) == -1 ) )
+		if( ewfinput_get_size_variable(
+		     stdout,
+		     input_buffer,
+		     64,
+		     _CHARACTER_T_STRING( "Amount of bytes to acquire" ),
+		     0,
+		     ( input_size - acquiry_offset ),
+		     ( input_size - acquiry_offset ),
+		     &acquiry_size ) != 1 )
 		{
 			acquiry_size = input_size - acquiry_offset;
 
-			fprintf( stdout, "Unable to determine input size defaulting to: %" PRIu64 ".\n",
+			fprintf( stderr, "Unable to determine input size defaulting to: %" PRIu64 ".\n",
 			 acquiry_size );
 		}
 		/* Segment file size
 		 */
-		if( argument_set_segment_file_size == 0 )
+		if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 		{
-			if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
-			{
-				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
-			}
-			else
-			{
-				maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
-			}
-			if( ewfinput_get_byte_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
-			     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE ),
-			     ( maximum_segment_file_size ),
-			     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE ),
-			     &segment_file_size ) == -1 )
-			{
-				segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
-
-				fprintf( stdout, "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
-				 segment_file_size );
-			}
-			/* Make sure the segment file size is smaller than or equal to the maximum
-			 */
-			if( segment_file_size > maximum_segment_file_size )
-			{
-				segment_file_size = maximum_segment_file_size;
-			}
+			maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
 		}
+		else
+		{
+			maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+		}
+		segment_file_size = ewfinput_get_byte_size_variable(
+		                     stdout,
+		                     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
+		                     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE ),
+		                     ( maximum_segment_file_size ),
+		                     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE ) );
+
+		/* Make sure the segment file size is smaller than or equal to the maximum
+		 */
+		if( segment_file_size > maximum_segment_file_size )
+		{
+			segment_file_size = maximum_segment_file_size;
+		}
+
 		/* Chunk size (sectors per block)
 		 */
-		if( argument_set_sectors_per_chunk == 0 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "The amount of sectors to read at once" ),
+		              ewfinput_sector_per_block_sizes,
+		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+
+		if( ewfinput_determine_sectors_per_chunk(
+		     user_input,
+		     &sectors_per_chunk ) != 1 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "The amount of sectors to read at once" ),
-			     ewfinput_sector_per_block_sizes,
-			     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-			     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf( stdout, "Unable to determine sectors per chunk defaulting to: 64.\n" );
+			fprintf( stderr, "Unsupported sectors per chunk defaulting to: 64.\n" );
 
-				sectors_per_chunk = 64;
-			}
-			else if( ewfinput_determine_sectors_per_chunk(
-				  fixed_string_variable,
-				  &sectors_per_chunk ) != 1 )
-			{
-				fprintf( stdout, "Unsupported sectors per chunk defaulting to: 64.\n" );
-
-				sectors_per_chunk = 64;
-			}
+			sectors_per_chunk = 64;
 		}
+		memory_free(
+		 user_input );
+
 		/* Error granularity
 		 */
-		if( argument_set_sector_error_granularity == 0 )
+		if( ewfinput_get_size_variable(
+		     stdout,
+		     input_buffer,
+		     64,
+		     _CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
+		     1,
+		     (uint64_t) sectors_per_chunk,
+		     64,
+		     &input_size_variable ) != 1 )
 		{
-			if( ewfinput_get_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "The amount of sectors to be used as error granularity" ),
-			     1,
-			     (uint64_t) sectors_per_chunk,
-			     64,
-			     &input_size_variable ) == -1 )
-			{
-				input_size_variable = 64;
+			input_size_variable = 64;
 
-				fprintf( stdout, "Unable to determine sector error granularity defaulting to: %" PRIu64 ".\n",
-				 input_size_variable );
-			}
-			sector_error_granularity = (uint32_t) input_size_variable;
+			fprintf( stderr, "Unable to determine error granularity defaulting to: %" PRIu64 ".\n",
+			 input_size_variable );
 		}
+		sector_error_granularity = (uint32_t) input_size_variable;
+
 		/* The amount of read error retry
 		 */
-		if( argument_set_read_error_retry == 0 )
+		if( ewfinput_get_size_variable(
+		     stdout,
+		     input_buffer,
+		     64,
+		     _CHARACTER_T_STRING( "The amount of retries when a read error occurs" ),
+		     0,
+		     255,
+		     2,
+		     &input_size_variable ) != 1 )
 		{
-			if( ewfinput_get_size_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "The amount of retries when a read error occurs" ),
-			     0,
-			     255,
-			     2,
-			     &input_size_variable ) == -1 )
-			{
-				input_size_variable = 2;
+			input_size_variable = 2;
 
-				fprintf( stdout, "Unable to determine read error retry defaulting to: %" PRIu64 ".\n",
-				 input_size_variable );
-			}
-			read_error_retry = (uint8_t) input_size_variable;
+			fprintf( stderr, "Unable to determine read error retry defaulting to: %" PRIu64 ".\n",
+			 input_size_variable );
 		}
+		read_error_retry = (uint8_t) input_size_variable;
+
 		/* Wipe the sector on error
 		 */
-		if( argument_set_wipe_chunk_on_error == 0 )
+		user_input = ewfinput_get_fixed_value(
+		              stdout,
+		              _CHARACTER_T_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
+		              ewfinput_yes_no,
+		              2,
+		              1 );
+
+		if( ewfinput_determine_yes_no(
+		     user_input,
+		     &wipe_chunk_on_error ) != 1 )
 		{
-			if( ewfinput_get_fixed_string_variable(
-			     stdout,
-			     input_buffer,
-			     EWFACQUIRE_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Wipe sectors on read error (mimic EnCase like behavior)" ),
-			     ewfinput_yes_no,
-			     2,
-			     1,
-			     &fixed_string_variable ) == -1 )
-			{
-				fprintf( stdout, "Unable to determine wipe chunk on error defaulting to: no.\n" );
+			fprintf( stderr, "Unsupported wipe chunk on error defaulting to: no.\n" );
 
-				wipe_chunk_on_error = 0;
-			}
-			else if( ewfinput_determine_yes_no(
-				  fixed_string_variable,
-				  &wipe_chunk_on_error ) != 1 )
-			{
-				fprintf( stdout, "Unsupported wipe chunk on error defaulting to: no.\n" );
-
-				wipe_chunk_on_error = 0;
-			}
+			wipe_chunk_on_error = 0;
 		}
+		memory_free(
+		 user_input );
+
 		fprintf( stdout, "\n" );
-
-		/* Check if user is content with the acquiry parameters
-		 */
-		acquiry_parameters_confirmed = confirm_acquiry_parameters(
-		                                stdout,
-		                                input_buffer,
-		                                EWFACQUIRE_INPUT_BUFFER_SIZE,
-		                                target_filename,
-		                                case_number,
-		                                description,
-		                                evidence_number,
-		                                examiner_name,
-		                                notes,
-		                                media_type,
-		                                volume_type,
-		                                compression_level,
-		                                compress_empty_block,
-		                                libewf_format,
-		                                (off64_t) acquiry_offset,
-		                                (size64_t) acquiry_size,
-		                                (size64_t) segment_file_size,
-		                                sectors_per_chunk,
-		                                sector_error_granularity,
-		                                read_error_retry,
-		                                wipe_chunk_on_error );
-
-		if( acquiry_parameters_confirmed == -1 )
-		{
-			fprintf( stdout, "Unable to determine if acquiry parameters are correct aborting.\n" );
-
-			ewfcommon_abort = 1;
-
-			break;
-		}
-		/* Reset all parameters provided as command line arguments
-		 */
-		else if( acquiry_parameters_confirmed == 0 )
-		{
-			argument_set_compression              = 0;
-			argument_set_format                   = 0;
-			argument_set_media_type               = 0;
-			argument_set_offset                   = 0;
-			argument_set_read_error_retry         = 0;
-			argument_set_sector_error_granularity = 0;
-			argument_set_sectors_per_chunk        = 0;
-			argument_set_segment_file_size        = 0;
-			argument_set_size                     = 0;
-			argument_set_volume_type              = 0;
-			argument_set_wipe_chunk_on_error      = 0;
-		}
 	}
+	/* Check if user is content with values
+	 */
+	while( confirm_input(
+	        filename,
+	        case_number,
+	        description,
+	        evidence_number,
+	        examiner_name,
+	        notes,
+	        media_type,
+	        volume_type,
+	        compression_level,
+	        compress_empty_block,
+	        libewf_format,
+	        (off64_t) acquiry_offset,
+	        (size64_t) acquiry_size,
+	        (size64_t) segment_file_size,
+	        sectors_per_chunk,
+	        sector_error_granularity,
+	        read_error_retry,
+	        wipe_chunk_on_error ) == 0 );
+
 	if( ewfsignal_attach(
 	     ewfcommon_signal_handler ) != 1 )
 	{
@@ -1550,24 +912,17 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		if( ewfcommon_determine_operating_system_string(
-		     acquiry_operating_system,
-		     32 ) != 1 )
-		{
-			fprintf( stdout, "Unable to determine operating system string.\n" );
-
-			acquiry_operating_system[ 0 ] = 0;
-		}
-		acquiry_software_version = LIBEWF_VERSION_STRING;
-
 		/* Set up the libewf handle
 		 */
-		target_filenames[ 0 ] = target_filename;
+		filenames[ 0 ] = filename;
 
 		ewfcommon_libewf_handle = libewf_open(
-			                   (system_character_t * const *) target_filenames,
+			                   (system_character_t * const *) filenames,
 			                   1,
 			                   LIBEWF_OPEN_WRITE );
+
+		memory_free(
+		 filename );
 
 		if( ewfcommon_libewf_handle == NULL )
 		{
@@ -1599,19 +954,36 @@ int main( int argc, char * const argv[] )
 			error_abort = 1;
 		}
 	}
-	memory_free(
-	 notes );
-	memory_free(
-	 examiner_name );
-	memory_free(
-	 evidence_number );
-	memory_free(
-	 description );
-	memory_free(
-	 case_number );
-	memory_free(
-	 target_filename );
-
+	if( case_number != NULL )
+	{
+		memory_free(
+		 case_number );
+	}
+	if( description != NULL )
+	{
+		memory_free(
+		 description );
+	}
+	if( evidence_number != NULL )
+	{
+		memory_free(
+		 evidence_number );
+	}
+	if( examiner_name != NULL )
+	{
+		memory_free(
+		 examiner_name );
+	}
+	if( notes != NULL )
+	{
+		memory_free(
+		 notes );
+	}
+	if( acquiry_operating_system != NULL )
+	{
+		memory_free(
+		 acquiry_operating_system );
+	}
 	if( error_abort != 0 )
 	{
 		libewf_close(
@@ -1727,6 +1099,8 @@ int main( int argc, char * const argv[] )
 			       512,
 			       read_error_retry,
 			       sector_error_granularity,
+			       wipe_chunk_on_error,
+			       seek_on_error,
 			       calculate_md5,
 			       calculated_md5_hash_string,
 			       EWFSTRING_DIGEST_HASH_LENGTH_MD5,
@@ -1734,9 +1108,6 @@ int main( int argc, char * const argv[] )
 			       calculated_sha1_hash_string,
 			       EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 			       swap_byte_pairs,
-			       wipe_chunk_on_error,
-			       seek_on_error,
-			       (size_t) process_buffer_size,
 			       callback );
 
 		if( write_count <= -1 )

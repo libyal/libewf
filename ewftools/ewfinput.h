@@ -134,25 +134,19 @@ int ewfinput_get_size_variable(
      uint64_t default_value,
      uint64_t *size_variable );
 
-int ewfinput_get_byte_size_variable(
-     FILE *stream,
-     character_t *input_buffer,
-     size_t input_buffer_size,
-     character_t *request_string,
-     uint64_t minimum,
-     uint64_t maximum,
-     uint64_t default_value,
-     uint64_t *byte_size_variable );
+uint64_t ewfinput_get_byte_size_variable(
+          FILE *stream,
+          character_t *request_string,
+          uint64_t minimum,
+          uint64_t maximum,
+          uint64_t default_value );
 
-int ewfinput_get_fixed_string_variable(
-     FILE *stream,
-     character_t *input_buffer,
-     size_t input_buffer_size,
-     character_t *request_string,
-     character_t **values,
-     uint8_t amount_of_values,
-     uint8_t default_value,
-     character_t **fixed_string_variable );
+character_t *ewfinput_get_fixed_value(
+              FILE *stream,
+              character_t *request_string,
+              character_t **values,
+              uint8_t amount,
+              uint8_t default_value );
 
 #if defined( __cplusplus )
 }

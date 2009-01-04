@@ -123,7 +123,7 @@ int ewfbyte_size_string_create(
 
 		return( -1 );
 	}
-	/* Minimum of 4 digits and separator, space, 3 letter unit, end of string
+	/* Minimum of 4 digits and seperator, space, 3 letter unit, end of string
 	 */
 	if( byte_size_string_length < 9 )
 	{
@@ -267,16 +267,15 @@ int ewfbyte_size_string_convert(
 
 			byte_size_string_iterator++;
 		}
-		remainder *= 10;
-
 		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
 		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
 		{
+			remainder *= 10;
 			remainder += ( byte_size_string[ byte_size_string_iterator ] - '0' );
 
 			byte_size_string_iterator++;
 		}
-		/* Ignore more than 2 digits after separator
+		/* Ignore more than 2 digits after seperator
 		 */
 		while( byte_size_string_iterator < byte_size_string_length )
 		{
@@ -332,7 +331,7 @@ int ewfbyte_size_string_convert(
 
 			factor--;
 
-			byte_size += ( remainder * 10 );
+			byte_size += ( remainder * 100 );
 		}
 		for( ; factor > 0; factor-- )
 		{
@@ -446,16 +445,15 @@ int ewfbyte_size_string_convert_system_character(
 
 			byte_size_string_iterator++;
 		}
-		remainder *= 10;
-
 		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
 		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
 		{
+			remainder *= 10;
 			remainder += ( byte_size_string[ byte_size_string_iterator ] - '0' );
 
 			byte_size_string_iterator++;
 		}
-		/* Ignore more than 2 digits after separator
+		/* Ignore more than 2 digits after seperator
 		 */
 		while( byte_size_string_iterator < byte_size_string_length )
 		{
@@ -511,7 +509,7 @@ int ewfbyte_size_string_convert_system_character(
 
 			factor--;
 
-			byte_size += ( remainder * 10 );
+			byte_size += ( remainder * 100 );
 		}
 		for( ; factor > 0; factor-- )
 		{

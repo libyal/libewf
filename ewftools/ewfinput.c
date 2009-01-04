@@ -366,7 +366,7 @@ int ewfinput_determine_sectors_per_chunk(
 		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
 	if( sectors_per_chunk == NULL )
 	{
@@ -473,7 +473,7 @@ int ewfinput_determine_sectors_per_chunk_system_character(
 		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
 	if( sectors_per_chunk == NULL )
 	{
@@ -1068,7 +1068,7 @@ int ewfinput_determine_yes_no(
 }
 
 /* Get a string variable
- * Returns 1 if successful, 0 if no input was provided or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int ewfinput_get_string_variable(
      FILE *stream, 
@@ -1079,7 +1079,7 @@ int ewfinput_get_string_variable(
 	character_t *end_of_input  = NULL;
 	character_t *result_string = NULL;
 	static char *function      = "ewfinput_get_variabl_string";
-	ssize_t input_length       = 0;
+	ssize_t input_size         = 0;
 
 	if( stream == NULL )
 	{
@@ -1095,23 +1095,9 @@ int ewfinput_get_string_variable(
 
 		return( -1 );
 	}
-	if( string_variable == NULL )
-	{
-		notify_warning_printf( "%s: invalid string variable.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_variable_size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid string variable size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* Safe guard the end of the input string
 	 */
-	string_variable[ string_variable_size - 1 ] = 0;
+	string_variable[ string_variable_size ] = 0;
 
 	while( 1 )
 	{
@@ -1132,55 +1118,32 @@ int ewfinput_get_string_variable(
 			                (character_t) '\n',
 			                string_variable_size );
 
-			/* Input was larger than size of buffer
-			 */
 			if( end_of_input == NULL )
 			{
-				/* Flush the stdin stream
-				 */
-				while( end_of_input == NULL )
-				{
-					result_string = string_get_from_stream(
-					                 string_variable,
-					                 string_variable_size - 1,
-					                 stdin );
-
-					end_of_input = string_search(
-					                string_variable,
-					                (character_t) '\n',
-					                string_variable_size );
-
-				}
 				return( -1 );
 			}
-			input_length = (ssize_t) ( end_of_input - string_variable );
+			input_size = (ssize_t) ( end_of_input - string_variable );
 
-			if( input_length < 0 )
+			if( input_size <= 0 )
 			{
 				return( -1 );
 			}
 			/* Make sure the string is terminated with an end of string character
 			 */
-			string_variable[ input_length ] = 0;
+			string_variable[ input_size ] = 0;
 
 			break;
 		}
 		else
 		{
-			fprintf(
-			 stream,
-			 "Error reading input, please try again or terminate using Ctrl^C.\n" );
+			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
 		}
-	}
-	if( input_length == 0 )
-	{
-		return( 0 );
 	}
 	return( 1 );
 }
 
 /* Get a string variable
- * Returns 1 if successful, 0 if no input was provided or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int ewfinput_get_string_variable_system_character(
      FILE *stream,
@@ -1190,7 +1153,6 @@ int ewfinput_get_string_variable_system_character(
 {
 	system_character_t *result_string = NULL;
 	static char *function             = "ewfinput_get_string_variable_system_character";
-	int result                        = 0;
 
 	if( sizeof( system_character_t ) != sizeof( character_t ) )
 	{
@@ -1209,13 +1171,11 @@ int ewfinput_get_string_variable_system_character(
 	{
 		result_string = string_variable;
 	}
-	result = ewfinput_get_string_variable(
-	          stream,
-	          request_string,
-	          result_string,
-	          string_variable_size );
-
-	if( result == -1 )
+	if( ewfinput_get_string_variable(
+	     stream,
+	     request_string,
+	     result_string,
+	     string_variable_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to get string variable.\n",
 		 function );
@@ -1227,8 +1187,7 @@ int ewfinput_get_string_variable_system_character(
 		}
 		return( -1 );
 	}
-	else if( ( result == 1 )
-	      && ( sizeof( system_character_t ) != sizeof( character_t ) ) )
+	if( sizeof( system_character_t ) != sizeof( character_t ) )
 	{
 		if( ewfstring_copy_character_string_to_system_string(
 		     string_variable,
@@ -1246,11 +1205,11 @@ int ewfinput_get_string_variable_system_character(
 		memory_free(
 		 result_string );
 	}
-	return( result );
+	return( 1 );
 }
 
 /* Get a size variable
- * Returns 1 if successful, 0 if no input was provided or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int ewfinput_get_size_variable(
      FILE *stream,
@@ -1265,7 +1224,7 @@ int ewfinput_get_size_variable(
 	character_t *end_of_input  = NULL;
 	character_t *result_string = NULL;
 	static char *function      = "ewfinput_get_size_variable";
-	ssize_t input_length       = 0;
+	ssize_t input_size         = 0;
 
 	if( stream == NULL )
 	{
@@ -1304,7 +1263,7 @@ int ewfinput_get_size_variable(
 	}
 	/* Safe guard the end of the input buffer
 	 */
-	input_buffer[ input_buffer_size - 1 ] = 0;
+	input_buffer[ input_buffer_size ] = 0;
 
 	while( 1 )
 	{
@@ -1328,47 +1287,22 @@ int ewfinput_get_size_variable(
 			                (character_t) '\n',
 			                input_buffer_size );
 
-			/* Input was larger than size of buffer
-			 */
 			if( end_of_input == NULL )
 			{
-				/* Flush the stdin stream
-				 */
-				while( end_of_input == NULL )
-				{
-					result_string = string_get_from_stream(
-					                 input_buffer,
-					                 input_buffer_size - 1,
-					                 stdin );
-
-					end_of_input = string_search(
-					                input_buffer,
-					                (character_t) '\n',
-					                input_buffer_size );
-
-				}
 				return( -1 );
 			}
-			input_length = (ssize_t) ( end_of_input - input_buffer );
+			input_size = (ssize_t) ( end_of_input - input_buffer );
 
-			if( input_length < 0 )
+			if( input_size <= 0 )
 			{
-				return( -1 );
-			}
-			else if( input_length == 0 )
-			{
-				*size_variable = default_value;
-
-				return( 0 );
+				return( default_value );
 			}
 			if( string_to_uint64(
 			     input_buffer,
-			     input_length,
+			     input_size,
 			     size_variable ) != 1 )
 			{
-				fprintf(
-				 stream,
-				 "Unable to convert value into number, please try again or terminate using Ctrl^C.\n" );
+				fprintf( stream, "Unable to convert value into number, please try again or terminate using Ctrl^C.\n" );
 			}
 			else if( ( *size_variable >= minimum )
 			      && ( *size_variable <= maximum ) )
@@ -1377,77 +1311,50 @@ int ewfinput_get_size_variable(
 			}
 			else
 			{
-				fprintf(
-				 stream,
-				 "Value not within specified range, please try again or terminate using Ctrl^C.\n" );
+				fprintf( stream, "Value not within specified range, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
 		else
 		{
-			fprintf(
-			 stream,
-			 "Error reading input, please try again or terminate using Ctrl^C.\n" );
+			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
 		}
 	}
 	return( 1 );
 }
 
-/* Get a byte size variable
- * Returns 1 if successful, 0 if no input was provided or -1 on error
+/* Get variable containing a byte size definition input from the user
+ * with a maximum of 1023 characters
  */
-int ewfinput_get_byte_size_variable(
-     FILE *stream,
-     character_t *input_buffer,
-     size_t input_buffer_size,
-     character_t *request_string,
-     uint64_t minimum,
-     uint64_t maximum,
-     uint64_t default_value,
-     uint64_t *byte_size_variable )
+uint64_t ewfinput_get_byte_size_variable(
+          FILE *stream,
+          character_t *request_string,
+          uint64_t minimum,
+          uint64_t maximum,
+          uint64_t default_value )
 {
 	character_t minimum_size_string[ 16 ];
 	character_t maximum_size_string[ 16 ];
 	character_t default_size_string[ 16 ];
+	character_t user_input_buffer[ 1024 ];
 
-	character_t *end_of_input  = NULL;
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_byte_size_variable";
-	ssize_t input_length       = 0;
+	character_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
+	static char *function              = "ewfinput_get_byte_size_variable";
+	size_t input_length                = 0;
+	uint64_t size_value                = 0;
 
 	if( stream == NULL )
 	{
 		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( input_buffer == NULL )
-	{
-		notify_warning_printf( "%s: invalid input buffer.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( input_buffer_size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
+		return( 0 );
 	}
 	if( request_string == NULL )
 	{
 		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( byte_size_variable == NULL )
-	{
-		notify_warning_printf( "%s: invalid byte size variable.\n",
-		 function );
-
-		return( -1 );
+		return( 0 );
 	}
 	if( ewfbyte_size_string_create(
 	     minimum_size_string,
@@ -1458,7 +1365,7 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: unable to create minimum byte size string.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
 	if( ewfbyte_size_string_create(
 	     default_size_string,
@@ -1469,7 +1376,7 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: unable to create default byte size string.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
 	if( ewfbyte_size_string_create(
 	     maximum_size_string,
@@ -1480,262 +1387,217 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: unable to create maximum byte size string.\n",
 		 function );
 
-		return( -1 );
+		return( 0 );
 	}
-	/* Safe guard the end of the input buffer
-	 */
-	input_buffer[ input_buffer_size - 1 ] = 0;
-
 	while( 1 )
 	{
-		fprintf(
-		 stream,
-		 "%" PRIs " (%" PRIs " >= value >= %" PRIs ") [%" PRIs "]: ",
-		 request_string,
-		 minimum_size_string,
-		 maximum_size_string,
-		 default_size_string );
+		fprintf( stream, "%" PRIs " (%" PRIs " >= value >= %" PRIs ") [%" PRIs "]: ",
+		 request_string, minimum_size_string, maximum_size_string, default_size_string );
 
-		result_string = string_get_from_stream(
-		                 input_buffer,
-		                 input_buffer_size - 1,
-		                 stdin );
+		user_input_buffer_ptr = string_get_from_stream(
+		                         user_input_buffer_ptr,
+		                         1023,
+		                         stdin );
 
-		if( result_string != NULL )
+		if( user_input_buffer_ptr != NULL )
 		{
-			end_of_input = string_search(
-			                input_buffer,
-			                (character_t) '\n',
-			                input_buffer_size );
-
-			/* Input was larger than size of buffer
+			/* Remove the trailing newline character
 			 */
-			if( end_of_input == NULL )
+			input_length = string_length(
+			                user_input_buffer_ptr ) - 1;
+
+			if( input_length <= 0 )
 			{
-				/* Flush the stdin stream
-				 */
-				while( end_of_input == NULL )
-				{
-					result_string = string_get_from_stream(
-					                 input_buffer,
-					                 input_buffer_size - 1,
-					                 stdin );
-
-					end_of_input = string_search(
-					                input_buffer,
-					                (character_t) '\n',
-					                input_buffer_size );
-
-				}
-				return( -1 );
-			}
-			input_length = (ssize_t) ( end_of_input - input_buffer );
-
-			if( input_length < 0 )
-			{
-				return( -1 );
-			}
-			else if( input_length == 0 )
-			{
-				*byte_size_variable = default_value;
-
-				return( 0 );
+				return( default_value );
 			}
 			if( ewfbyte_size_string_convert(
-			     input_buffer,
-			     (size_t) input_length,
-			     byte_size_variable ) != 1 )
+			     user_input_buffer_ptr,
+			     input_length,
+			     &size_value ) != 1 )
 			{
-				fprintf(
-				 stream,
-				 "Invalid value, please try again or terminate using Ctrl^C.\n" );
+				fprintf( stream, "Invalid value, please try again or terminate using Ctrl^C.\n" );
 			}
-			else if( ( *byte_size_variable >= minimum )
-			      && ( *byte_size_variable <= maximum ) )
+			else if( ( size_value >= minimum )
+			 && ( size_value <= maximum ) )
 			{
 				break;
 			}
 			else
 			{
-				fprintf(
-				 stream,
-				 "Value not within specified range, please try again or terminate using Ctrl^C.\n" );
+				fprintf( stream, "Value not within specified range, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
 		else
 		{
-			fprintf(
-			 stream,
-			 "Error reading input, please try again or terminate using Ctrl^C.\n" );
+			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
 		}
 	}
-	return( 1 );
+	return( size_value );
 }
 
-/* Get a fixed value string variable
- * Returns 1 if successful, 0 if no input was provided or -1 on error
+/* Get fixed value input from the user
+ * The first value is considered the default value
  */
-int ewfinput_get_fixed_string_variable(
-     FILE *stream,
-     character_t *input_buffer,
-     size_t input_buffer_size,
-     character_t *request_string,
-     character_t **values,
-     uint8_t amount_of_values,
-     uint8_t default_value,
-     character_t **fixed_string_variable )
+character_t *ewfinput_get_fixed_value(
+              FILE *stream,
+              character_t *request_string,
+              character_t **values,
+              uint8_t amount,
+              uint8_t default_value )
 {
+	character_t user_input_buffer[ 1024 ];
 
-	character_t *end_of_input  = NULL;
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_fixed_value";
-	size_t value_length        = 0;
-	ssize_t input_length       = 0;
-	uint8_t value_iterator     = 0;
+	character_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
+	character_t *user_input            = NULL;
+	static char *function              = "ewfinput_get_fixed_value";
+	size_t input_length                = 0;
+	size_t value_length                = 0;
+	uint8_t iterator                   = 0;
+	uint8_t value_match                = 0;
 
 	if( stream == NULL )
 	{
 		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( input_buffer == NULL )
-	{
-		notify_warning_printf( "%s: invalid input buffer.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( input_buffer_size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
+		return( NULL );
 	}
 	if( request_string == NULL )
 	{
 		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
-	if( default_value >= amount_of_values )
+	if( default_value >= amount )
 	{
 		notify_warning_printf( "%s: default value exceeds amount.\n",
 		 function );
 
-		return( -1 );
-	}
-	if( fixed_string_variable == NULL )
-	{
-		notify_warning_printf( "%s: invalid fixed string variable.\n",
-		 function );
-
-		return( -1 );
+		return( NULL );
 	}
 	while( 1 )
 	{
-		fprintf(
-		 stream,
-		 "%" PRIs " (",
-		 request_string );
+		fprintf( stream, "%" PRIs " (", request_string );
 
-		for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
+		for( iterator = 0; iterator < amount; iterator++ )
 		{
-			if( value_iterator > 0 )
+			if( iterator > 0 )
 			{
-				fprintf(
-				 stream,
-				 ", " );
+				fprintf( stream, ", " );
 			}
-			fprintf(
-			 stream,
-			 "%" PRIs "",
-			 values[ value_iterator ] );
+			fprintf( stream, "%" PRIs "", values[ iterator ] );
 		}
-		fprintf(
-		 stream,
-		 ") [%" PRIs "]: ",
-		 values[ default_value ] );
+		fprintf( stream, ") [%" PRIs "]: ", values[ default_value ] );
 
-		result_string = string_get_from_stream(
-		                 input_buffer,
-		                 input_buffer_size - 1,
-		                 stdin );
+		user_input_buffer_ptr = string_get_from_stream(
+		                         user_input_buffer_ptr,
+		                         1023,
+		                         stdin );
 
-		if( result_string != NULL )
+		if( user_input_buffer_ptr != NULL )
 		{
-			end_of_input = string_search(
-			                input_buffer,
-			                (character_t) '\n',
-			                input_buffer_size );
+			iterator = 0;
 
-			/* Input was larger than size of buffer
+			/* Remove the trailing newline character
 			 */
-			if( end_of_input == NULL )
+			input_length = string_length(
+			                user_input_buffer_ptr ) - 1;
+
+			/* Check if the default value was selected
+			 */
+			if( input_length == 0 )
 			{
-				/* Flush the stdin stream
-				 */
-				while( end_of_input == NULL )
+				iterator = default_value;
+
+				input_length = string_length(
+				                values[ iterator ] );
+
+				value_match  = 1;
+			}
+			else
+			{
+				while( iterator < amount )
 				{
-					result_string = string_get_from_stream(
-					                 input_buffer,
-					                 input_buffer_size - 1,
-					                 stdin );
+					value_length = string_length(
+					                values[ iterator ] );
 
-					end_of_input = string_search(
-					                input_buffer,
-					                (character_t) '\n',
-					                input_buffer_size );
+					if( string_compare(
+					     user_input_buffer_ptr,
+					     values[ iterator ],
+					     value_length ) == 0 )
+					{
+						/* Make sure no trailing characters were given
+						 */
+						if( user_input_buffer_ptr[ value_length ] == (character_t) '\n' )
+						{
+							value_match = 1;
 
-				}
-				return( -1 );
-			}
-			input_length = (ssize_t) ( end_of_input - input_buffer );
-
-			if( input_length < 0 )
-			{
-				return( -1 );
-			}
-			else if( input_length == 0 )
-			{
-				*fixed_string_variable = values[ default_value ];
-
-				return( 0 );
-			}
-			for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
-			{
-				value_length = string_length(
-						values[ value_iterator ] );
-
-				if( ( value_length == (size_t) input_length )
-				 && ( string_compare(
-				       input_buffer,
-				       values[ value_iterator ],
-				       value_length ) == 0 ) )
-				{
-					break;
+							break;
+						}
+					}
+					iterator++;
 				}
 			}
-			if( value_iterator < amount_of_values )
-			{
-				*fixed_string_variable = values[ value_iterator ];
-
-				break;
-			}
-			fprintf(
-			 stream,
-			 "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
 		}
 		else
 		{
-			fprintf(
-			 stream,
-			 "Error reading input, please try again or terminate using Ctrl^C.\n" );
+			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
+		}
+		if( value_match == 1 )
+		{
+			value_length = string_length(
+			                values[ iterator ] );
+
+#if defined( MEMWATCH )
+			/* One additional character required for end of string
+			 */
+			user_input = memory_allocate(
+			              sizeof( character_t ) * ( value_length + 1 ) );
+
+			if( user_input == NULL )
+			{
+				notify_warning_printf( "%s: unable to create string.\n",
+				 function );
+
+				return( NULL );
+			}
+			if( string_copy(
+			     user_input,
+			     values[ iterator ],
+			     value_length ) == NULL  )
+			{
+				notify_warning_printf( "%s: unable to copy string.\n",
+				 function );
+
+				memory_free(
+				 user_input );
+
+				return( NULL );
+			}
+			/* Make sure the string is terminated with an end of string character
+			 */
+			user_input[ input_length ] = 0;
+#else
+			user_input = string_duplicate(
+			              values[ iterator ],
+			              value_length + 1 );
+
+			if( user_input == NULL )
+			{
+				notify_warning_printf( "%s: unable to create string.\n",
+				 function );
+
+				return( NULL );
+			}
+#endif
+			break;
+		}
+		else
+		{
+			fprintf( stream, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
 		}
 	}
-	return( 1 );
+	return( user_input );
 }
 
