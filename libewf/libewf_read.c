@@ -383,9 +383,12 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				}
 				chunk_data_size -= (uint32_t) EWF_CRC_SIZE;
 			}
-			chunk_type     = "UNCOMPRESSED";
 			*is_compressed = 0;
 			*read_crc      = 1;
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+			chunk_type = "UNCOMPRESSED";
+#endif
 		}
 		/* Determine if the chunk is compressed
 		 */
@@ -393,9 +396,12 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		{
 			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
 
-			chunk_type     = "COMPRESSED";
 			*is_compressed = 1;
 			*read_crc      = 0;
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+			chunk_type  = "COMPRESSED";
+#endif
 		}
 		else
 		{
@@ -404,8 +410,10 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
+#if defined( HAVE_VERBOSE_OUTPUT )
 		LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s.\n",
 		 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
+#endif
 
 		if( raw_access == 0 )
 		{

@@ -572,8 +572,8 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	size32_t chunk_size        = 0;
 	size_t buffer_size         = 0;
 	size_t read_size           = 0;
-	size_t md5_hash_size       = 0;
-	size_t sha1_hash_size      = 0;
+	size_t md5_hash_size       = EWFDIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size      = EWFDIGEST_HASH_SIZE_SHA1;
 	ssize64_t total_read_count = 0;
 	ssize_t read_count         = 0;
 #if defined( HAVE_RAW_ACCESS )
@@ -892,8 +892,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	static char *function       = "ewfcommon_write_from_file_descriptor";
 	size32_t chunk_size         = 0;
 	size_t buffer_size          = 0;
-	size_t md5_hash_size       = 0;
-	size_t sha1_hash_size      = 0;
+	size_t md5_hash_size        = EWFDIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size       = EWFDIGEST_HASH_SIZE_SHA1;
 	ssize64_t total_write_count = 0;
 	ssize64_t write_count       = 0;
 	ssize32_t read_count        = 0;

@@ -888,7 +888,7 @@ void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t sec
 	{
 		bytes_per_second = bytes / seconds;
 
-		if( bytes_per_second <= 1024 )
+		if( bytes_per_second > 1024 )
 		{
 			bytes_per_second_string = ewfoutput_determine_human_readable_size_string( bytes_per_second );
 		}
@@ -920,7 +920,7 @@ void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes )
 	{
 		return;
 	}
-	if( bytes <= 1024 )
+	if( bytes > 1024 )
 	{
 		bytes_string = ewfoutput_determine_human_readable_size_string( bytes );
 	}
