@@ -134,9 +134,12 @@ LIBEWF_CHAR *ewfcommon_determine_operating_system( void )
  */
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format )
 {
+	static char *function = "ewfcommon_determine_guid";
+
 	if( guid == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_determine_guid: invalid GUID.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid GUID.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -264,18 +267,21 @@ LIBEWF_CHAR *ewfcommon_determine_human_readable_size_string( uint64_t size )
  */
 int8_t ewfcommon_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const CHAR_T *source, size_t length )
 {
-	ssize_t conversion = (ssize_t) ( sizeof( LIBEWF_CHAR ) - sizeof( CHAR_T ) );
-	size_t iterator    = 0;
+	static char *function = "ewfcommon_copy_libewf_char_from_char_t";
+	ssize_t conversion    = (ssize_t) ( sizeof( LIBEWF_CHAR ) - sizeof( CHAR_T ) );
+	size_t iterator       = 0;
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_copy_libewf_char_from_char_t: invalid source.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_copy_libewf_char_from_char_t: invalid destination.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -304,7 +310,8 @@ int8_t ewfcommon_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const C
 #endif
 		else
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_copy_libewf_char_from_char_t: unsupported converstion.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unsupported conversion.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -320,18 +327,21 @@ int8_t ewfcommon_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const C
  */
 int8_t ewcommon_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *destination, size_t length )
 {
-	ssize_t conversion = (ssize_t) ( sizeof( LIBEWF_CHAR ) - sizeof( CHAR_T ) );
-	size_t iterator    = 0;
+	static char *function = "ewcommon_copy_libewf_char_to_char_t";
+	ssize_t conversion    = (ssize_t) ( sizeof( LIBEWF_CHAR ) - sizeof( CHAR_T ) );
+	size_t iterator       = 0;
 
 	if( source == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewcommon_copy_libewf_char_to_char_t: invalid source.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid source.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( destination == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewcommon_copy_libewf_char_to_char_t: invalid destination.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid destination.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -360,7 +370,8 @@ int8_t ewcommon_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *d
 #endif
 		else
 		{
-			LIBEWF_WARNING_PRINT( "ewcommon_copy_libewf_char_to_char_t: unsupported converstion.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unsupported conversion.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -380,17 +391,20 @@ LIBEWF_CHAR *ewfcommon_get_user_input_variable( FILE *stream, LIBEWF_CHAR *reque
 	LIBEWF_CHAR *user_input_buffer_ptr = &user_input_buffer[ 0 ];
 	LIBEWF_CHAR *user_input            = NULL;
 	LIBEWF_CHAR *end_of_input          = NULL;
+	static char *function              = "ewfcommon_get_user_input_variable";
 	size_t input_length                = 0;
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_variable: Invalid output stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_variable: Invalid request string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -420,7 +434,8 @@ LIBEWF_CHAR *ewfcommon_get_user_input_variable( FILE *stream, LIBEWF_CHAR *reque
 
 			if( user_input == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_variable: unable to create string.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				 function );
 
 				return( NULL );
 			}
@@ -441,6 +456,7 @@ CHAR_T *ewfcommon_get_user_input_variable_char_t( FILE *stream, LIBEWF_CHAR *req
 {
 	LIBEWF_CHAR *user_input   = NULL;
 	CHAR_T *user_input_char_t = NULL;
+	static char *function     = NULL;
 	size_t user_input_length  = 0;
 
 	user_input = ewfcommon_get_user_input_variable( stream, request_string );
@@ -456,19 +472,22 @@ CHAR_T *ewfcommon_get_user_input_variable_char_t( FILE *stream, LIBEWF_CHAR *req
 
 		if( user_input_char_t == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_variable_char_t: unable to create conversion string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create conversion string.\n",
+			 function );
 
 			return( NULL );
 		}
 		if( ewcommon_copy_libewf_char_to_char_t( user_input, user_input_char_t, ( user_input_length + 1 ) ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_variable_char_t: unable to set conversion string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set conversion string.\n",
+			 function );
 
 			return( NULL );
 		}
 		return( user_input_char_t );
 	}
-	LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_variable_char_t: character conversion unsupported.\n" );
+	LIBEWF_WARNING_PRINT( "%s: character conversion unsupported.\n",
+	 function );
 
 	return( NULL );
 }
@@ -486,13 +505,13 @@ uint64_t ewfcommon_get_user_input_size_variable( FILE *stream, LIBEWF_CHAR *requ
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_size_variable: Invalid output stream.\n" );
+		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_size_variable: invalid output stream.\n" );
 
 		return( 0 );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_size_variable: Invalid request string.\n" );
+		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_size_variable: invalid request string.\n" );
 
 		return( 0 );
 	}
@@ -547,13 +566,13 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: Invalid output stream.\n" );
+		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: invalid output stream.\n" );
 
 		return( NULL );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: Invalid request string.\n" );
+		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: invalid request string.\n" );
 
 		return( NULL );
 	}
@@ -1571,25 +1590,25 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 #else
 				if( errno == ESPIPE )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: Invalid seek.\n" );
+					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: invalid seek.\n" );
 
 					return( -1 );
 				}
 				else if( errno == EPERM )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: Operation not permitted.\n" );
+					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: operation not permitted.\n" );
 
 					return( -1 );
 				}
 				else if( errno == ENXIO )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: No such device or address.\n" );
+					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: no such device or address.\n" );
 
 					return( -1 );
 				}
 				else if( errno == ENODEV )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: No such device.\n" );
+					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: no such device.\n" );
 
 					return( -1 );
 				}
@@ -2373,7 +2392,10 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 
 				return( -1 );
 			}
-			if( ewfcommon_get_sha1_hash( &sha1_context, sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
+			if( ewfcommon_get_sha1_hash(
+			     &sha1_context,
+			     sha1_hash_string,
+			     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
 				 function );
@@ -2384,7 +2406,11 @@ int64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_f
 			}
 			/* The SHA1 hash must be set before write finalized is used
 			 */
-			if( libewf_set_hash_value( handle, _S_LIBEWF_CHAR( "SHA1" ), sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
+			if( libewf_set_hash_value(
+			     handle,
+			     _S_LIBEWF_CHAR( "SHA1" ),
+			     sha1_hash_string,
+			     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string in handle.\n",
 				 function );

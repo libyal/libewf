@@ -68,24 +68,12 @@ const LIBEWF_CHAR *libewf_get_version( void )
 	return( (const LIBEWF_CHAR *) LIBEWF_VERSION );
 }
 
-#if defined( LIBEWF_DLL_IMPORT )
-
-/* Return if libewf was build as a DLL
- * the function will not be build otherwise
- */
-int libewf_is_dll( void )
-{
-	return( 1 );
-}
-
-#endif
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
  */
-int8_t libewf_check_file_signature( const wchar_t *filename )
+int libewf_check_file_signature( const wchar_t *filename )
 {
 	uint8_t signature[ 8 ];
 
@@ -162,7 +150,7 @@ int8_t libewf_check_file_signature( const wchar_t *filename )
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
  */
-int8_t libewf_check_file_signature( const char *filename )
+int libewf_check_file_signature( const char *filename )
 {
 	uint8_t signature[ 8 ];
 
@@ -781,12 +769,12 @@ off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk
  * It will set the related file offset to the specific chunk offset
  * Returns the offset if seek is successful, or -1 on error
  */
-off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
+off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_seek_offset";
-	uint32_t chunk                          = 0;
-	uint32_t chunk_offset                   = 0;
+	uint64_t chunk                          = 0;
+	uint64_t chunk_offset                   = 0;
 
 	if( handle == NULL )
 	{
@@ -800,20 +788,6 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 	if( internal_handle->media == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -832,7 +806,7 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 
 		return( -1 );
 	}
-	if( offset >= (off_t) internal_handle->media->media_size )
+	if( offset >= (off64_t) internal_handle->media->media_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: attempting to read past the end of the file.\n",
 		 function );
@@ -841,9 +815,16 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 	}
 	/* Determine the chunk that is requested
 	 */
-	chunk = (uint32_t) ( offset / internal_handle->media->chunk_size );
+	chunk = offset / internal_handle->media->chunk_size;
 
-	if( libewf_seek_chunk( internal_handle, chunk ) == -1 )
+	if( chunk >= (uint64_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_seek_chunk( internal_handle, (uint32_t) chunk ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
 		 function );
@@ -852,9 +833,16 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
 	}
 	/* Determine the offset within the decompressed chunk that is requested
 	 */
-	chunk_offset = (uint32_t) ( offset % internal_handle->media->chunk_size );
+	chunk_offset = offset % internal_handle->media->chunk_size;
 
-	internal_handle->current_chunk_offset = chunk_offset;
+	if( chunk_offset >= (uint64_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->current_chunk_offset = (uint32_t) chunk_offset;
 
 	return( offset );
 }
@@ -863,84 +851,98 @@ off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset )
  */
 int32_t libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_bytes_per_sector( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_bytes_per_sector(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the amount of sectors from the media information, 0 if not set, -1 on error
  */
 int32_t libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_amount_of_sectors( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_amount_of_sectors(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the chunk size from the media information, 0 if not set, -1 on error
  */
-int32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle )
+ssize32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_chunk_size( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_chunk_size(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the error granularity from the media information, 0 if not set, -1 on error
  */
 int32_t libewf_get_error_granularity( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_error_granularity( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_error_granularity(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the compression level value, or -1 on error
  */
 int8_t libewf_get_compression_level( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_compression_level( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_compression_level(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the size of the contained media data, 0 if not set, -1 on error
  */
-int64_t libewf_get_media_size( LIBEWF_HANDLE *handle )
+ssize64_t libewf_get_media_size( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_size( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_size(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the media type value, or -1 on error
  */
 int8_t libewf_get_media_type( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_type( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_type(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the media flags value, or -1 on error
  */
 int8_t libewf_get_media_flags( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_media_flags( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_media_flags(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the volume type value, or -1 on error
  */
 int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_volume_type( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_volume_type(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns the format value, or -1 on error
  */
 int8_t libewf_get_format( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_format( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_format(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Returns 1 if the GUID is set, or -1 on error
  */
 int8_t libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 {
-	return( libewf_internal_handle_get_guid( (LIBEWF_INTERNAL_HANDLE *) handle, guid, size ) );
+	return( libewf_internal_handle_get_guid(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         guid,
+	         size ) );
 }
 
 /* Returns the amount of chunks written, 0 if no chunks have been written, or -1 on error
  */
 int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle )
 {
-	return( libewf_internal_handle_get_write_amount_of_chunks( (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	return( libewf_internal_handle_get_write_amount_of_chunks(
+	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
 /* Retrieves the header value specified by the identifier
@@ -948,7 +950,11 @@ int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle )
  */
 int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
-	return( libewf_internal_handle_get_header_value( (LIBEWF_INTERNAL_HANDLE *) handle, identifier, value, length ) );
+	return( libewf_internal_handle_get_header_value(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         identifier,
+	         value,
+	         length ) );
 }
 
 /* Retrieves the hash value specified by the identifier
@@ -956,7 +962,11 @@ int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, 
  */
 int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
-	return( libewf_internal_handle_get_hash_value( (LIBEWF_INTERNAL_HANDLE *) handle, identifier, value, length ) );
+	return( libewf_internal_handle_get_hash_value(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         identifier,
+	         value,
+	         length ) );
 }
 
 /* Sets the media values
@@ -964,22 +974,30 @@ int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LI
  */
 int8_t libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector )
 {
-	return( libewf_internal_handle_set_media_values( (LIBEWF_INTERNAL_HANDLE *) handle, sectors_per_chunk, bytes_per_sector ) );
+	return( libewf_internal_handle_set_media_values(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         sectors_per_chunk,
+	         bytes_per_sector ) );
 }
 
 /* Returns 1 if the GUID is set, or -1 on error
  */
 int8_t libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 {
-	return( libewf_internal_handle_set_guid( (LIBEWF_INTERNAL_HANDLE *) handle, guid, size ) );
+	return( libewf_internal_handle_set_guid(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         guid,
+	         size ) );
 }
 
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, uint32_t segment_file_size )
+int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size )
 {
-	return( libewf_internal_handle_set_write_segment_file_size( (LIBEWF_INTERNAL_HANDLE *) handle, segment_file_size ) );
+	return( libewf_internal_handle_set_write_segment_file_size(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         segment_file_size ) );
 }
 
 /* Sets the write error granularity
@@ -987,7 +1005,9 @@ int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, uint32_t segme
  */
 int8_t libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity )
 {
-	return( libewf_internal_handle_set_write_error_granularity( (LIBEWF_INTERNAL_HANDLE *) handle, error_granularity ) );
+	return( libewf_internal_handle_set_write_error_granularity(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         error_granularity ) );
 }
 
 /* Sets the write compression values
@@ -995,7 +1015,10 @@ int8_t libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error
  */
 int8_t libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block )
 {
-	return( libewf_internal_handle_set_write_compression_values( (LIBEWF_INTERNAL_HANDLE *) handle, compression_level, compress_empty_block ) );
+	return( libewf_internal_handle_set_write_compression_values(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         compression_level,
+	         compress_empty_block ) );
 }
 
 /* Sets the media type
@@ -1003,7 +1026,10 @@ int8_t libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compre
  */
 int8_t libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type )
 {
-	return( libewf_internal_handle_set_write_media_type( (LIBEWF_INTERNAL_HANDLE *) handle, media_type, volume_type ) );
+	return( libewf_internal_handle_set_write_media_type(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         media_type,
+	         volume_type ) );
 }
 
 /* Sets the write output format
@@ -1011,15 +1037,19 @@ int8_t libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, u
  */
 int8_t libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format )
 {
-	return( libewf_internal_handle_set_write_format( (LIBEWF_INTERNAL_HANDLE *) handle, format ) );
+	return( libewf_internal_handle_set_write_format(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         format ) );
 }
 
 /* Sets the write input size
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, uint64_t input_write_size )
+int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size )
 {
-	return( libewf_internal_handle_set_write_input_write_size( (LIBEWF_INTERNAL_HANDLE *) handle, input_write_size ) );
+	return( libewf_internal_handle_set_write_input_write_size(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         input_write_size ) );
 }
 
 /* Sets the header value specified by the identifier
@@ -1027,7 +1057,11 @@ int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, uint64_t input_write_
  */
 int8_t libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
-	return( libewf_internal_handle_set_header_value( (LIBEWF_INTERNAL_HANDLE *) handle, identifier, value, length ) );
+	return( libewf_internal_handle_set_header_value(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         identifier,
+	         value,
+	         length ) );
 }
 
 /* Sets the hash value specified by the identifier
@@ -1035,7 +1069,11 @@ int8_t libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, 
  */
 int8_t libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
-	return( libewf_internal_handle_set_hash_value( (LIBEWF_INTERNAL_HANDLE *) handle, identifier, value, length ) );
+	return( libewf_internal_handle_set_hash_value(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         identifier,
+	         value,
+	         length ) );
 }
 
 /* Sets the swap byte pairs, used by both read and write
@@ -1043,7 +1081,9 @@ int8_t libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LI
  */
 int8_t libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs )
 {
-	return( libewf_internal_handle_set_swap_byte_pairs( (LIBEWF_INTERNAL_HANDLE *) handle, swap_byte_pairs ) );
+	return( libewf_internal_handle_set_swap_byte_pairs(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         swap_byte_pairs ) );
 }
 
 /* Calculates the MD5 hash and creates a printable string of the calculated md5 hash
@@ -1070,6 +1110,13 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 	if( internal_handle->media == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
 		 function );
 
 		return( -1 );
@@ -1109,7 +1156,11 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 		for( iterator = 0; iterator <= internal_handle->offset_table->last; iterator++ )
 		{
 			offset = iterator * internal_handle->media->chunk_size;
-			count  = libewf_read_random( handle, data, internal_handle->media->chunk_size, offset );
+			count  = libewf_read_random(
+			          handle,
+			          data,
+			          internal_handle->media->chunk_size,
+			          offset );
 
 			if( count == -1 )
 			{
@@ -1120,9 +1171,9 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 
 				return( -1 );
 			}
-			if( count > (ssize_t) INT32_MAX )
+			if( count > (ssize_t) SSIZE_MAX )
 			{
-				LIBEWF_WARNING_PRINT( "%s: invalid count - only values below 2^32 supported.\n",
+				LIBEWF_WARNING_PRINT( "%s: invalid count value exceeds maximum.\n",
 				 function );
 
 				libewf_common_free( data );
@@ -1137,7 +1188,11 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 		LIBEWF_VERBOSE_PRINT( "%s: MD5 hash already calculated.\n",
 		 function );
 	}
-	if( libewf_string_copy_from_digest_hash( string, length, internal_handle->calculated_md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+	if( libewf_string_copy_from_digest_hash(
+	     string,
+	     length,
+	     internal_handle->calculated_md5_hash,
+	     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
 		 function );
@@ -1172,7 +1227,11 @@ int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, s
 
 		return( 0 );
 	}
-	result = libewf_string_copy_from_digest_hash( string, length, internal_handle->stored_md5_hash, EWF_DIGEST_HASH_SIZE_MD5 );
+	result = libewf_string_copy_from_digest_hash(
+	          string,
+	          length,
+	          internal_handle->stored_md5_hash,
+	          EWF_DIGEST_HASH_SIZE_MD5 );
 
 	if( result == -1 )
 	{
@@ -1200,7 +1259,11 @@ int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *strin
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	result = libewf_string_copy_from_digest_hash( string, length, internal_handle->calculated_md5_hash, EWF_DIGEST_HASH_SIZE_MD5 );
+	result = libewf_string_copy_from_digest_hash(
+	          string,
+	          length,
+	          internal_handle->calculated_md5_hash,
+	          EWF_DIGEST_HASH_SIZE_MD5 );
 
 	if( result == -1 )
 	{
@@ -1231,15 +1294,24 @@ int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 
 	if( internal_handle->xheader != NULL )
 	{
-		header_values = libewf_header_values_parse_xheader( internal_handle->xheader, internal_handle->xheader_size, date_format );
+		header_values = libewf_header_values_parse_xheader(
+		                 internal_handle->xheader,
+		                 internal_handle->xheader_size,
+		                 date_format );
 	}
 	if( ( header_values == NULL ) && internal_handle->header2 != NULL )
 	{
-		header_values = libewf_header_values_parse_header2( internal_handle->header2, internal_handle->header2_size, date_format );
+		header_values = libewf_header_values_parse_header2(
+		                 internal_handle->header2,
+		                 internal_handle->header2_size,
+		                 date_format );
 	}
 	if( ( header_values == NULL ) && ( internal_handle->header != NULL ) )
 	{
-		header_values = libewf_header_values_parse_header( internal_handle->header, internal_handle->header_size, date_format );
+		header_values = libewf_header_values_parse_header(
+		                 internal_handle->header,
+		                 internal_handle->header_size,
+		                 date_format );
 	}
 	if( header_values == NULL )
 	{
@@ -1289,7 +1361,9 @@ int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 
 	if( internal_handle->xhash != NULL )
 	{
-		hash_values = libewf_hash_values_parse_xhash( internal_handle->xhash, internal_handle->xhash_size );
+		hash_values = libewf_hash_values_parse_xhash(
+		               internal_handle->xhash,
+		               internal_handle->xhash_size );
 	}
 	if( hash_values == NULL )
 	{
@@ -1315,7 +1389,10 @@ int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
  */
 int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, uint64_t sector, uint32_t amount_of_sectors )
 {
-	return( libewf_internal_handle_add_acquiry_error_sector( (LIBEWF_INTERNAL_HANDLE *) handle, sector, amount_of_sectors ) );
+	return( libewf_internal_handle_add_acquiry_error_sector(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         sector,
+	         amount_of_sectors ) );
 }
 
 /* Set the notify values
@@ -1324,3 +1401,4 @@ void libewf_set_notify_values( FILE *stream, uint8_t verbose )
 {
 	libewf_notify_set_values( stream, verbose );
 }
+

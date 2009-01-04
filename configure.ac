@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070717], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20070721], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20070717])
+AM_INIT_AUTOMAKE([libewf], [20070721])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -158,6 +158,11 @@ AC_STRUCT_TM
 AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
+AC_CHECK_TYPE([size32_t],[AC_SUBST([HAVE_SIZE32_T],[1])],[AC_SUBST([HAVE_SIZE32_T],[0])])
+AC_CHECK_TYPE([ssize32_t],[AC_SUBST([HAVE_SSIZE32_T],[1])],[AC_SUBST([HAVE_SSIZE32_T],[0])])
+AC_CHECK_TYPE([size64_t],[AC_SUBST([HAVE_SIZE64_T],[1])],[AC_SUBST([HAVE_SIZE64_T],[0])])
+AC_CHECK_TYPE([ssize64_t],[AC_SUBST([HAVE_SSIZE64_T],[1])],[AC_SUBST([HAVE_SSIZE64_T],[0])])
+AC_CHECK_TYPE([off64_t],[AC_SUBST([HAVE_OFF64_T],[1])],[AC_SUBST([HAVE_OFF64_T],[0])])
 AC_CHECK_TYPES([ssize_t, u64])
 
 dnl Check for functions

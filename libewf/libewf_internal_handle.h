@@ -211,11 +211,11 @@ struct libewf_internal_handle_media
 {
 	/* The media size
 	 */
-	uint64_t media_size;
+	size64_t media_size;
 
 	/* The size of an individual chunk
 	 */
-	uint32_t chunk_size;
+	size32_t chunk_size;
 
 	/* The amount of sectors per chunk
 	 */
@@ -269,19 +269,19 @@ struct libewf_internal_handle_write
 {
 	/* The amount of bytes of the input written
 	 */
-	int64_t input_write_count;
+	ssize64_t input_write_count;
 
 	/* The total amount of bytes written
 	 */
-	int64_t write_count;
+	ssize64_t write_count;
 
 	/* The amount of bytes to write
 	 */
-	uint64_t input_write_size;
+	size64_t input_write_size;
 
 	/* The segment file size
 	 */
-	uint32_t segment_file_size;
+	size32_t segment_file_size;
 
 	/* The maximum amount of segments
 	 */
@@ -289,7 +289,7 @@ struct libewf_internal_handle_write
 
 	/* The amount of bytes written to a section containing chunks
 	 */
-	int32_t chunks_section_write_count;
+	ssize32_t chunks_section_write_count;
 
         /* The amount of chunks written
          */
@@ -364,10 +364,10 @@ int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_han
 int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int32_t libewf_internal_handle_get_media_bytes_per_sector( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int32_t libewf_internal_handle_get_media_amount_of_sectors( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int32_t libewf_internal_handle_get_media_chunk_size( LIBEWF_INTERNAL_HANDLE *internal_handle );
+ssize32_t libewf_internal_handle_get_media_chunk_size( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int32_t libewf_internal_handle_get_media_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_compression_level( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int64_t libewf_internal_handle_get_media_size( LIBEWF_INTERNAL_HANDLE *internal_handle );
+ssize64_t libewf_internal_handle_get_media_size( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_volume_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
@@ -420,13 +420,13 @@ int8_t libewf_internal_handle_set_media_values( LIBEWF_INTERNAL_HANDLE *internal
 
 int8_t libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
 
-int8_t libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t segment_file_size );
+int8_t libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size32_t segment_file_size );
 int8_t libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
 int8_t libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );
 int8_t libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_type, uint8_t volume_type );
 int8_t libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_flags );
 int8_t libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t format );
-int8_t libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, uint64_t input_write_size );
+int8_t libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size );
 
 int8_t libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 #define libewf_internal_handle_set_header_value_case_number( handle, value, length ) \

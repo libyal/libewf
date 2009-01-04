@@ -45,7 +45,7 @@
 
 /* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict if types are already defined
  */
-#if !defined( LIBEWF_DEFINITION_INTEGER_TYPES )
+#if ! defined( LIBEWF_DEFINITION_INTEGER_TYPES )
 
 #define LIBEWF_DEFINITION_INTEGER_TYPES
 
@@ -65,11 +65,9 @@ typedef unsigned __int32	uint32_t;
 typedef __int64			int64_t;
 typedef unsigned __int64	uint64_t;
 typedef int			ssize_t;
-
-/* Make sure Windows use 64 bit off_t values
- */
-typedef __int64			_off_t;
-typedef __int64			off_t;
+typedef unsigned __int64	size64_t;
+typedef __int64			ssize64_t;
+typedef __int64			off64_t;
 
 #ifdef __cplusplus
 }
@@ -93,7 +91,7 @@ typedef __int64			off_t;
 
 /* __USE_ISOC99 is required to add swprintf definition
  */
-#if !defined( __USE_ISOC99 )
+#if ! defined( __USE_ISOC99 )
 #define __USE_ISOC99
 #define LIBEWF_DEFINITION_ISOC99
 #endif
@@ -109,6 +107,34 @@ typedef __int64			off_t;
 #error Missing wide character type definition (wchar.h)
 #endif
 
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if ! @HAVE_SIZE32_T@ || ! HAVE_SIZE32_T
+typedef uint32_t size32_t;
+#endif
+
+#if ! @HAVE_SSIZE32_T@ || ! HAVE_SSIZE32_T
+typedef int32_t ssize32_t;
+#endif
+
+#if ! @HAVE_SIZE64_T@ || ! HAVE_SIZE64_T
+typedef uint64_t size64_t;
+#endif
+
+#if ! @HAVE_SSIZE64_T@ || ! HAVE_SSIZE64_T
+typedef int64_t ssize64_t;
+#endif
+
+#if ! @HAVE_OFF64_T@ || ! HAVE_OFF64_T
+typedef int64_t off64_t;
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

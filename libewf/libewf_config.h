@@ -229,7 +229,7 @@
 /* #undef HAVE_VARARGS_H */
 
 /* Defines if verbose output should be used */
-#define HAVE_VERBOSE_OUTPUT 1
+/* #undef HAVE_VERBOSE_OUTPUT */
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
@@ -307,13 +307,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20070717"
+#define PACKAGE_STRING "libewf 20070721"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20070717"
+#define PACKAGE_VERSION "20070721"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -325,7 +325,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20070717"
+#define VERSION "20070721"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64

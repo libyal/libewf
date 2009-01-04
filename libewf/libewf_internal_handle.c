@@ -346,16 +346,19 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTERNAL_HANDLE *internal_handle, size_t size )
 {
 	LIBEWF_CHUNK_CACHE *chunk_cache = NULL;
+	static char *function           = "libewf_internal_handle_chunk_cache_realloc";
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_chunk_cache_realloc: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( internal_handle->chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_chunk_cache_realloc: invalid handle - missing chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -363,7 +366,8 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTER
 
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_chunk_cache_realloc: unable to reallocate chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -377,9 +381,12 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTER
  */
 int8_t libewf_internal_handle_is_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_is_set_header";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_is_set_header: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -391,9 +398,12 @@ int8_t libewf_internal_handle_is_set_header( LIBEWF_INTERNAL_HANDLE *internal_ha
  */
 int8_t libewf_internal_handle_is_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_is_set_header2";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_is_set_header2: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -405,9 +415,12 @@ int8_t libewf_internal_handle_is_set_header2( LIBEWF_INTERNAL_HANDLE *internal_h
  */
 int8_t libewf_internal_handle_is_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_is_set_xheader";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_is_set_xheader: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -419,9 +432,12 @@ int8_t libewf_internal_handle_is_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_h
  */
 int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_is_set_xhash";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_is_set_xhash: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -432,21 +448,26 @@ int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_han
  */
 int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_sectors_per_chunk";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_sectors_per_chunk: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_sectors_per_chunk: invalid handle - missing media subhandle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media subhandle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_sectors_per_chunk: invalid sector per chunk only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid sector per chunk only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -457,21 +478,26 @@ int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HAND
  */
 int32_t libewf_internal_handle_get_media_bytes_per_sector( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_bytes_per_sector";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_bytes_per_sector: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_bytes_per_sector: invalid handle - missing media subhandle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media subhandle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_bytes_per_sector: invalid bytes per sector only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -482,21 +508,26 @@ int32_t libewf_internal_handle_get_media_bytes_per_sector( LIBEWF_INTERNAL_HANDL
  */
 int32_t libewf_internal_handle_get_media_amount_of_sectors( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_amount_of_sectors";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_amount_of_sectors: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_amount_of_sectors: invalid handle - missing media subhandle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media subhandle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->amount_of_sectors > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_amount_of_sectors: invalid amount of sectors only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -505,23 +536,28 @@ int32_t libewf_internal_handle_get_media_amount_of_sectors( LIBEWF_INTERNAL_HAND
 
 /* Returns the chunk size from the media information, 0 if not set, -1 on error
  */
-int32_t libewf_internal_handle_get_media_chunk_size( LIBEWF_INTERNAL_HANDLE *internal_handle )
+ssize32_t libewf_internal_handle_get_media_chunk_size( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_chunk_size";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_chunk_size: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_chunk_size: invalid handle - missing media subhandle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media subhandle.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->media->chunk_size > (uint32_t) INT32_MAX )
+	if( internal_handle->media->chunk_size > (size32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_chunk_size: invalid chunk size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -532,21 +568,26 @@ int32_t libewf_internal_handle_get_media_chunk_size( LIBEWF_INTERNAL_HANDLE *int
  */
 int32_t libewf_internal_handle_get_media_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_error_granularity";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_error_granularity: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_error_granularity: invalid handle - missing media subhandle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media subhandle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->error_granularity > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_error_granularity: invalid error granularity only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid error granularity only values below 2^32 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -557,21 +598,26 @@ int32_t libewf_internal_handle_get_media_error_granularity( LIBEWF_INTERNAL_HAND
  */
 int8_t libewf_internal_handle_get_compression_level( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_compression_level";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_compression_level: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_compression_level: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->compression_level <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_compression_level: invalid compression level only positive values are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid compression level only positive values are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -580,52 +626,63 @@ int8_t libewf_internal_handle_get_compression_level( LIBEWF_INTERNAL_HANDLE *int
 
 /* Returns the size of the contained media data, 0 if not set, -1 on error
  */
-int64_t libewf_internal_handle_get_media_size( LIBEWF_INTERNAL_HANDLE *internal_handle )
+ssize64_t libewf_internal_handle_get_media_size( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_size";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_size: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_size: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->media_size == 0 )
 	{
-		internal_handle->media->media_size = (uint64_t) internal_handle->media->amount_of_sectors * (uint64_t) internal_handle->media->bytes_per_sector;
+		internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
+		                                   * (size64_t) internal_handle->media->bytes_per_sector;
 	}
-	if( internal_handle->media->media_size > (uint64_t) INT64_MAX )
+	if( internal_handle->media->media_size > (ssize64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_size: invalid media size only values below 2^64 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
-	return( internal_handle->media->media_size );
+	return( (ssize64_t) internal_handle->media->media_size );
 }
 
 /* Returns the media type value, or -1 on error
  */
 int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_type";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_type: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_type: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->media_type > (uint8_t) INT8_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_type: invalid media type only values below 2^8 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid media type only values below 2^8 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -636,21 +693,26 @@ int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_h
  */
 int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_media_flags";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_flags: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_flags: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->media_flags > (uint8_t) INT8_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_media_flags: invalid media flags only values below 2^8 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid media flags only values below 2^8 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -661,15 +723,19 @@ int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_
  */
 int8_t libewf_internal_handle_get_volume_type( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_volume_type";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_volume_type: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_volume_type: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -677,31 +743,33 @@ int8_t libewf_internal_handle_get_volume_type( LIBEWF_INTERNAL_HANDLE *internal_
 	{
 		return( (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL );
 	}
-	else
-	{
-		return( (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL );
-	}
+	return( (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL );
 }
 
 /* Returns the format value, or -1 on error
  */
 int8_t libewf_internal_handle_get_format( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static char *function = "libewf_internal_handle_get_format";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_format: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_format: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->format > (uint8_t) INT8_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_get_format: invalid format only values below 2^8 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid format only values below 2^8 are supported.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1032,29 +1100,36 @@ int8_t libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle,
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t segment_file_size )
+int8_t libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size32_t segment_file_size )
 {
+	static char *function = "libewf_internal_handle_set_write_segment_file_size";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_segment_file_size: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_segment_file_size: invalid handle - missing subhandle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write->values_initialized != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_segment_file_size: write values were initialized and cannot be changed anymore.\n" );
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( segment_file_size == 0 ) || ( segment_file_size > (uint32_t) INT32_MAX ) )
+	if( ( segment_file_size == 0 )
+	 || ( segment_file_size > (size32_t) INT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_segment_file_size: invalid value segment file size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid value segment file value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1202,23 +1277,35 @@ int8_t libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal
 /* Sets the write input write size
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, uint64_t input_write_size )
+int8_t libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size )
 {
+	static char *function = "libewf_internal_handle_set_write_input_write_size";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_input_write_size: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_input_write_size: invalid handle - missing subhandle write.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write->values_initialized != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_write_input_write_size: write values were initialized and cannot be changed anymore.\n" );
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( input_write_size > (size64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}

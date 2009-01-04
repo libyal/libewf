@@ -12,16 +12,16 @@
 .Fn libewf_check_file_signature "const char *filename"
 .Ft LIBEWF_HANDLE *
 .Fn libewf_open "char * const filenames[], uint16_t file_amount, uint8_t flags"
-.Ft off_t
-.Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off_t offset"
+.Ft off64_t
+.Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off64_t offset"
 .Ft ssize_t
 .Fn libewf_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
-.Fn libewf_read_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset"
+.Fn libewf_read_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
 .Ft ssize_t
 .Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
-.Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset"
+.Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
 .Ft ssize_t
 .Fn libewf_write_raw_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
 .Ft ssize_t
@@ -34,13 +34,13 @@
 .Fn libewf_get_bytes_per_sector "LIBEWF_HANDLE *handle"
 .Ft int32_t
 .Fn libewf_get_amount_of_sectors "LIBEWF_HANDLE *handle"
-.Ft int32_t
+.Ft ssize32_t
 .Fn libewf_get_chunk_size "LIBEWF_HANDLE *handle"
 .Ft int32_t
 .Fn libewf_get_error_granularity "LIBEWF_HANDLE *handle"
 .Ft int8_t
 .Fn libewf_get_compression_level "LIBEWF_HANDLE *handle"
-.Ft int64_t
+.Ft ssize64_t
 .Fn libewf_get_media_size "LIBEWF_HANDLE *handle"
 .Ft int8_t
 .Fn libewf_get_media_type "LIBEWF_HANDLE *handle"
@@ -59,7 +59,7 @@
 .Ft int8_t
 .Fn libewf_set_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
 .Ft int8_t
-.Fn libewf_set_write_segment_file_size "LIBEWF_HANDLE *handle, uint32_t segment_file_size"
+.Fn libewf_set_write_segment_file_size "LIBEWF_HANDLE *handle, size32_t segment_file_size"
 .Ft int8_t
 .Fn libewf_set_write_compression_values "LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block"
 .Ft int8_t

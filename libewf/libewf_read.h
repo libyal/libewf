@@ -62,7 +62,7 @@ EWF_SECTION *libewf_read_sections_from_segment( LIBEWF_INTERNAL_HANDLE *internal
 ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size );
 
 LIBEWF_EXTERN ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
-LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset );
+LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
 #ifdef __cplusplus
 }

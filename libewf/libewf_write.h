@@ -95,7 +95,7 @@ LIBEWF_EXTERN ssize_t libewf_write_raw_prepare_buffer( LIBEWF_HANDLE *handle, vo
 LIBEWF_EXTERN ssize_t libewf_write_raw_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc );
 
 LIBEWF_EXTERN ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
-LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset );
+LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
 LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
 

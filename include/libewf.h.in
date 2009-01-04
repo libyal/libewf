@@ -58,9 +58,9 @@ LIBEWF_EXTERN const char *libewf_get_version( void );
  * Returns 1 if true, 0 if not, or -1 on error
  */
 #if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-LIBEWF_EXTERN int8_t libewf_check_file_signature( const wchar_t *filename );
+LIBEWF_EXTERN int libewf_check_file_signature( const wchar_t *filename );
 #else
-LIBEWF_EXTERN int8_t libewf_check_file_signature( const char *filename );
+LIBEWF_EXTERN int libewf_check_file_signature( const char *filename );
 #endif
 
 /* Opens EWF file(s)
@@ -78,7 +78,7 @@ LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t fil
  * It will set the related file offset to the specific chunk offset
  * Returns the offset if seek is successful, or -1 on error
  */
-LIBEWF_EXTERN off_t libewf_seek_offset( LIBEWF_HANDLE *handle, off_t offset );
+LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
 
 /* Reads data from the curent offset into a buffer
  * This function swaps byte pairs if specified and not in raw mode
@@ -90,7 +90,7 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, s
  * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of bytes read, or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset );
+LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
 /* Writes data in EWF format from a buffer, the necessary settings of the write values must have been made
  * This function swaps byte pairs if specified and not in raw mode
@@ -103,7 +103,7 @@ LIBEWF_EXTERN ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, 
  * This function swaps byte pairs and not in raw mode
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off_t offset );
+LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
 /* Finalizes the write by correcting the EWF the meta data in the segment files
  * This function is required after writing from stream
@@ -139,7 +139,7 @@ LIBEWF_EXTERN int32_t libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle );
 
 /* Returns the chunk size from the media information, 0 if not set, -1 on error
  */
-LIBEWF_EXTERN int32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN ssize32_t libewf_get_chunk_size( LIBEWF_HANDLE *handle );
 
 /* Returns the error granularity from the media information, 0 if not set, -1 on error
  */
@@ -151,7 +151,7 @@ LIBEWF_EXTERN int8_t libewf_get_compression_level( LIBEWF_HANDLE *handle );
 
 /* Returns the size of the contained media data, 0 if not set, -1 on error
  */
-LIBEWF_EXTERN int64_t libewf_get_media_size( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN ssize64_t libewf_get_media_size( LIBEWF_HANDLE *handle );
 
 /* Returns the media type value, or -1 on error
  */
@@ -350,7 +350,7 @@ LIBEWF_EXTERN int8_t libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, uint32_t segment_file_size );
+LIBEWF_EXTERN int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size );
 
 /* Sets the write error granularity
  * Returns 1 if successful, -1 on error
@@ -375,7 +375,7 @@ LIBEWF_EXTERN int8_t libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t for
 /* Sets the write input size
  * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, uint64_t input_write_size );
+LIBEWF_EXTERN int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size );
 
 /* Sets the header value specified by the identifier
  * Returns 1 if successful, -1 on error
