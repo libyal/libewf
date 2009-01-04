@@ -70,6 +70,10 @@ struct libewf_segment_file_handle
         /* The list of all the sections
          */
         libewf_section_list_t *section_list;
+
+	/* The segment file type
+	 */
+	uint8_t file_type;
 };
 
 libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(

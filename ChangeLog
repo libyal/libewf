@@ -107,6 +107,9 @@ Code clean up
 * check unused parameters gcc -Wextra
 
 Next release:
+* implement low memory usage option
+
+Next stable:
 * full platform test
 
 * what about header values parsing with preservation of timestamps?
@@ -117,11 +120,6 @@ Next release:
 
 * work on TODO in write
 * do not finalize on write error?
-
-* offset table dirty still needed?
-  only needed for write
-  need to determine if a chunks is stored in a delta segment file
-  what about adding the segment file type to the segment file struct?
 
 * Try to correct the table
   - add error flag
@@ -137,9 +135,6 @@ Next release:
 
 TODO
 * test abort
-* build in crc check before write to tackle corruption issue !
-
-* implement low memory usage
 
 * create libewf_create_handle and libewf_destroy_handle functions?
 * refactor write initialize into seperate functions
@@ -154,6 +149,12 @@ TODO
   function
   - functions basically use libewf_section_compressed_string_read
 
+* offset table dirty still needed?
+  only needed for write
+  need to determine if a chunks is stored in a delta segment file
+  what about adding the segment file type to the segment file struct?
+  - reduces memory usage
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -167,6 +168,9 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20080220
+* Worked on refactoring chunk dirty to segment file type
 
 Version: 20080219
 * removed corruption detection test in libewf_segment_file_write_chunks_data
