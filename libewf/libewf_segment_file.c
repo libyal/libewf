@@ -657,15 +657,21 @@ int libewf_segment_file_create_extension( LIBEWF_INTERNAL_HANDLE *internal_handl
 }
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Creates a wide character filename for a certain segment file
+/* Creates a filename for a certain segment file
  * Returns the pointer to the filename, NULL on error
  */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 wchar_t *libewf_segment_file_create_wide_filename( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int16_t maximum_amount_of_segments, wchar_t* basename )
+#else
+char *libewf_segment_file_create_filename( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int16_t maximum_amount_of_segments, char* basename )
+#endif
 {
-	wchar_t *filename     = NULL;
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	static char *function = "libewf_segment_file_create_wide_filename";
+#else
+	static char *function = "libewf_segment_file_create_filename";
+#endif
+	char *filename        = NULL;
 	size_t length         = 0;
 
 	if( internal_handle == NULL )
@@ -689,7 +695,11 @@ wchar_t *libewf_segment_file_create_wide_filename( LIBEWF_INTERNAL_HANDLE *inter
 
 		return( NULL );
 	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	length = libewf_common_wide_string_length( basename );
+#else
+	length = libewf_common_string_length( basename );
+#endif
 
 	if( length == 0 )
 	{
@@ -700,7 +710,11 @@ wchar_t *libewf_segment_file_create_wide_filename( LIBEWF_INTERNAL_HANDLE *inter
 	}
 	/* The actual filename also contain a . 3 character extension and a end of string byte
 	 */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	filename = libewf_common_alloc( ( length + 5 ) * sizeof( wchar_t ) );
+#else
+	filename = libewf_common_alloc( ( length + 5 ) * sizeof( char ) );
+#endif
 
 	if( filename == NULL )
 	{
@@ -711,7 +725,11 @@ wchar_t *libewf_segment_file_create_wide_filename( LIBEWF_INTERNAL_HANDLE *inter
 	}
 	/* Add one additional character for the end of line
 	 */
-	if( libewf_common_wide_string_copy( filename, basename, ( length + 1 ) ) == NULL )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	if( libewf_common_wide_memcpy( filename, basename, ( length + 1 ) ) == NULL )
+#else
+	if( libewf_common_memcpy( filename, basename, ( length + 1 ) ) == NULL )
+#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to copy basename.\n",
 		 function );
@@ -722,91 +740,19 @@ wchar_t *libewf_segment_file_create_wide_filename( LIBEWF_INTERNAL_HANDLE *inter
 	}
 	filename[ length ] = '.';
 
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	if( libewf_segment_file_create_wide_extension(
 	     internal_handle,
 	     segment_number,
 	     maximum_amount_of_segments,
 	     &filename[ length + 1 ] ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine extension.\n",
-		 function );
-
-		libewf_common_free( filename );
-
-		return( NULL );
-	}
-	return( filename );
-}
 #else
-
-/* Creates a filename for a certain segment file
- * Returns the pointer to the filename, NULL on error
- */
-char *libewf_segment_file_create_filename( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int16_t maximum_amount_of_segments, char* basename )
-{
-	char *filename        = NULL;
-	static char *function = "libewf_segment_file_create_filename";
-	size_t length         = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( basename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid basename.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( segment_number == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment 0.\n",
-		 function );
-
-		return( NULL );
-	}
-	length = libewf_common_string_length( basename );
-
-	if( length == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: basename is empty.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* The actual filename also contain a . 3 character extension and a end of string byte
-	 */
-	filename = libewf_common_alloc( ( length + 5 ) * sizeof( char ) );
-
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate filename.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* Add one additional character for the end of line
-	 */
-	if( libewf_common_string_copy( filename, basename, ( length + 1 ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy basename.\n",
-		 function );
-
-		libewf_common_free( filename );
-
-		return( NULL );
-	}
-	filename[ length ] = '.';
-
 	if( libewf_segment_file_create_extension(
 	     internal_handle,
 	     segment_number,
 	     maximum_amount_of_segments,
 	     &filename[ length + 1 ] ) != 1 )
+#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to determine extension.\n",
 		 function );
@@ -817,7 +763,6 @@ char *libewf_segment_file_create_filename( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	return( filename );
 }
-#endif
 
 /* Creates a new segment file entry within the segment table
  * Returns 1 on success, -1 on error
