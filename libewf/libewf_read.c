@@ -911,6 +911,10 @@ ssize_t libewf_read_buffer(
 
 			return( -1 );
 		}
+		if( internal_handle->abort == 1 )
+		{
+			break;
+		}
 	}
 	return( total_read_count );
 }

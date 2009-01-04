@@ -823,7 +823,6 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		return( -1 );
 	}
-
 	/* The segment_chunk_amount contains the estimated amount of chunks for this section
 	 */
 	if( offset_table->amount < ( total_chunk_amount + segment_chunk_amount ) )

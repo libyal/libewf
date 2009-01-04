@@ -157,10 +157,6 @@ struct libewf_internal_handle_read
 	 */
 	libewf_sector_table_t *crc_errors;
 
-	/* Value to indicate the write values were initialized
-	 */
-	uint8_t values_initialized;
-
 	/* A value to indicate if a chunk should be wiped on error
 	 */
 	uint8_t wipe_on_error;

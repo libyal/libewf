@@ -1587,7 +1587,14 @@ ssize_t libewf_section_volume_read(
 /* Reads a table section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_table_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, uint32_t media_amount_of_chunks, libewf_offset_table_t *offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_table_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         uint32_t media_amount_of_chunks,
+         libewf_offset_table_t *offset_table,
+         uint8_t format,
+         uint8_t ewf_format,
+         uint8_t error_tollerance )
 {
 	ewf_table_t table;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -1852,7 +1859,18 @@ ssize_t libewf_section_table_read( libewf_segment_file_handle_t *segment_file_ha
 /* Writes a table or table2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_table_write( libewf_segment_file_handle_t *segment_file_handle, off64_t base_offset, libewf_offset_table_t *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, ewf_char_t *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append )
+ssize_t libewf_section_table_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         off64_t base_offset,
+         libewf_offset_table_t *offset_table,
+         uint32_t offset_table_index,
+         uint32_t amount_of_offsets,
+         ewf_char_t *section_type,
+         size_t section_type_length,
+         size_t additional_size,
+         uint8_t format,
+         uint8_t ewf_format,
+         uint8_t no_section_append )
 {
 	ewf_table_t table;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -2110,7 +2128,11 @@ ssize_t libewf_section_table_write( libewf_segment_file_handle_t *segment_file_h
 /* Reads a sectors section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize64_t libewf_section_sectors_read( libewf_segment_file_handle_t *segment_file_handle, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize64_t libewf_section_sectors_read(
+           libewf_segment_file_handle_t *segment_file_handle,
+           size64_t section_size,
+           uint8_t ewf_format,
+           uint8_t error_tollerance )
 {
 	static char *function = "libewf_section_sectors_read";
 
@@ -2158,7 +2180,10 @@ ssize64_t libewf_section_sectors_read( libewf_segment_file_handle_t *segment_fil
  * Does not write the actual data in the sectors section
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_sectors_write( libewf_segment_file_handle_t *segment_file_handle, size64_t sectors_data_size, uint8_t no_section_append )
+ssize_t libewf_section_sectors_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size64_t sectors_data_size,
+         uint8_t no_section_append )
 {
 	ewf_char_t *section_type    = (ewf_char_t *) "sectors";
 	static char *function       = "libewf_section_sectors_write";
@@ -2209,7 +2234,11 @@ ssize_t libewf_section_sectors_write( libewf_segment_file_handle_t *segment_file
 /* Reads a ltree section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_ltree_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, uint8_t *ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_ltree_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         uint8_t *ewf_format,
+         uint8_t error_tollerance )
 {
 	ewf_ltree_t *ltree         = NULL;
 	ewf_char_t *ltree_data     = NULL;
@@ -2321,7 +2350,11 @@ ssize_t libewf_section_ltree_read( libewf_segment_file_handle_t *segment_file_ha
 /* Reads a session section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_session_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_session_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         uint8_t ewf_format,
+         uint8_t error_tollerance )
 {
 	ewf_session_t session;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -2493,7 +2526,12 @@ ssize_t libewf_section_session_read( libewf_segment_file_handle_t *segment_file_
 /* Reads a data section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_data_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, libewf_media_values_t *media_values, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_data_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         libewf_media_values_t *media_values,
+         uint8_t ewf_format,
+         uint8_t error_tollerance )
 {
 	ewf_data_t *data           = NULL;
 	static char *function      = "libewf_section_data_read";
@@ -2744,7 +2782,13 @@ ssize_t libewf_section_data_read( libewf_segment_file_handle_t *segment_file_han
 /* Writes a data section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_data_write( libewf_segment_file_handle_t *segment_file_handle, libewf_media_values_t *media_values, int8_t compression_level, uint8_t format, ewf_data_t **cached_data_section, uint8_t no_section_append )
+ssize_t libewf_section_data_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_media_values_t *media_values,
+         int8_t compression_level,
+         uint8_t format,
+         ewf_data_t **cached_data_section,
+         uint8_t no_section_append )
 {
 	ewf_char_t *section_type    = (ewf_char_t *) "data";
 	static char *function       = "libewf_section_data_write";
@@ -2871,7 +2915,10 @@ ssize_t libewf_section_data_write( libewf_segment_file_handle_t *segment_file_ha
 				return( -1 );
 			}
 		}
-		calculated_crc = ewf_crc_calculate( *cached_data_section, ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ), 1 );
+		calculated_crc = ewf_crc_calculate(
+		                  *cached_data_section,
+		                  ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ),
+		                  1 );
 
 		if( libewf_endian_revert_32bit(
 		     calculated_crc,
@@ -2931,7 +2978,11 @@ ssize_t libewf_section_data_write( libewf_segment_file_handle_t *segment_file_ha
 /* Reads a error2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_handle, libewf_sector_table_t *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_error2_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_sector_table_t *acquiry_errors,
+         uint8_t ewf_format,
+         uint8_t error_tollerance )
 {
 	ewf_error2_t error2;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -3150,7 +3201,9 @@ ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_h
 /* Writes a error2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_handle, libewf_sector_table_t *acquiry_errors )
+ssize_t libewf_section_error2_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_sector_table_t *acquiry_errors )
 {
 	ewf_error2_t error2;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -3330,7 +3383,10 @@ ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_
 /* Reads a hash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_hash_read( libewf_segment_file_handle_t *segment_file_handle, EWF_DIGEST_HASH *md5_hash, uint8_t error_tollerance )
+ssize_t libewf_section_hash_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         EWF_DIGEST_HASH *md5_hash,
+         uint8_t error_tollerance )
 {
 	ewf_hash_t hash;
 
@@ -3507,7 +3563,12 @@ ssize_t libewf_section_hash_write(
  * This is used for the next and done sections, these sections point back towards themselves
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_last_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_section_last_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         ewf_char_t *section_type,
+         size_t section_type_length,
+         uint8_t format,
+         uint8_t ewf_format )
 {
 	ewf_section_t section;
 
@@ -3624,7 +3685,11 @@ ssize_t libewf_section_last_write( libewf_segment_file_handle_t *segment_file_ha
 /* Reads a xheader section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xheader_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, ewf_char_t **cached_xheader, size_t *cached_xheader_size )
+ssize_t libewf_section_xheader_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         ewf_char_t **cached_xheader,
+         size_t *cached_xheader_size )
 {
 	ewf_char_t *xheader   = NULL;
 	static char *function = "libewf_section_xheader_read";
@@ -3699,7 +3764,11 @@ ssize_t libewf_section_xheader_read( libewf_segment_file_handle_t *segment_file_
 /* Writes a xheader section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xheader_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *xheader, size_t xheader_size, int8_t compression_level )
+ssize_t libewf_section_xheader_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         ewf_char_t *xheader,
+         size_t xheader_size,
+         int8_t compression_level )
 {
 	static char *function       = "libewf_section_xheader_write";
 	ssize_t section_write_count = 0;
@@ -3737,7 +3806,11 @@ ssize_t libewf_section_xheader_write( libewf_segment_file_handle_t *segment_file
 /* Reads a xhash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xhash_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, ewf_char_t **cached_xhash, size_t *cached_xhash_size )
+ssize_t libewf_section_xhash_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         ewf_char_t **cached_xhash,
+         size_t *cached_xhash_size )
 {
 	ewf_char_t *xhash     = NULL;
 	static char *function = "libewf_section_xhash_read";
@@ -3812,7 +3885,11 @@ ssize_t libewf_section_xhash_read( libewf_segment_file_handle_t *segment_file_ha
 /* Writes a xhash section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xhash_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *xhash, size_t xhash_size, int8_t compression_level )
+ssize_t libewf_section_xhash_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         ewf_char_t *xhash,
+         size_t xhash_size,
+         int8_t compression_level )
 {
 	static char *function       = "libewf_section_xhash_write";
 	ssize_t section_write_count = 0;
@@ -3850,7 +3927,12 @@ ssize_t libewf_section_xhash_write( libewf_segment_file_handle_t *segment_file_h
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, libewf_offset_table_t *offset_table, libewf_offset_table_t *secondary_offset_table, uint8_t error_tollerance )
+ssize_t libewf_section_delta_chunk_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size_t section_size,
+         libewf_offset_table_t *offset_table,
+         libewf_offset_table_t *secondary_offset_table,
+         uint8_t error_tollerance )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 
@@ -3891,9 +3973,14 @@ ssize_t libewf_section_delta_chunk_read( libewf_segment_file_handle_t *segment_f
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &delta_chunk_header, ( EWFX_DELTA_CHUNK_HEADER_SIZE - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &delta_chunk_header,
+	                  ( EWFX_DELTA_CHUNK_HEADER_SIZE - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_convert_32bit( &stored_crc, delta_chunk_header.crc ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &stored_crc,
+	     delta_chunk_header.crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
@@ -3912,7 +3999,9 @@ ssize_t libewf_section_delta_chunk_read( libewf_segment_file_handle_t *segment_f
 	}
 	/* The chunk value is stored + 1 count in the file
 	 */
-	if( libewf_endian_convert_32bit( &chunk, delta_chunk_header.chunk ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &chunk,
+	     delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk value.\n",
 		 function );
@@ -3928,7 +4017,9 @@ ssize_t libewf_section_delta_chunk_read( libewf_segment_file_handle_t *segment_f
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( &chunk_size, delta_chunk_header.chunk_size ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &chunk_size,
+	     delta_chunk_header.chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk size value.\n",
 		 function );
@@ -3983,7 +4074,14 @@ ssize_t libewf_section_delta_chunk_read( libewf_segment_file_handle_t *segment_f
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( libewf_segment_file_handle_t *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, ewf_crc_t *chunk_crc, uint8_t write_crc, uint8_t no_section_append )
+ssize_t libewf_section_delta_chunk_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint32_t chunk,
+         ewf_char_t *chunk_data,
+         size_t chunk_size,
+         ewf_crc_t *chunk_crc,
+         uint8_t write_crc,
+         uint8_t no_section_append )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -4152,7 +4250,9 @@ ssize_t libewf_section_delta_chunk_write( libewf_segment_file_handle_t *segment_
 /* Reads a section from file for debugging purposes
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_debug_read( libewf_segment_file_handle_t *segment_file_handle, size64_t section_size )
+ssize_t libewf_section_debug_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         size64_t section_size )
 {
 	uint8_t *data              = NULL;
 	uint8_t *uncompressed_data = NULL;
@@ -4264,7 +4364,21 @@ ssize_t libewf_section_debug_read( libewf_segment_file_handle_t *segment_file_ha
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
  */
-int libewf_section_read( libewf_segment_file_handle_t *segment_file_handle, libewf_header_sections_t *header_sections, libewf_hash_sections_t *hash_sections, libewf_media_values_t *media_values, libewf_offset_table_t *offset_table, libewf_offset_table_t *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, ewf_section_t *section, off64_t *section_start_offset, uint8_t error_tollerance )
+int libewf_section_read(
+     libewf_segment_file_handle_t *segment_file_handle,
+     libewf_header_sections_t *header_sections,
+     libewf_hash_sections_t *hash_sections,
+     libewf_media_values_t *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_offset_table_t *secondary_offset_table,
+     libewf_sector_table_t *acquiry_errors,
+     int8_t *compression_level,
+     uint8_t *format,
+     uint8_t *ewf_format,
+     size64_t *segment_file_size,
+     ewf_section_t *section,
+     off64_t *section_start_offset,
+     uint8_t error_tollerance )
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;

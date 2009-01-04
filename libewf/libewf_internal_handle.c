@@ -380,8 +380,7 @@ libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
 
 		return( NULL );
 	}
-	handle_read->values_initialized = 0;
-	handle_read->wipe_on_error      = 1;
+	handle_read->wipe_on_error = 1;
 
 	return( handle_read );
 }

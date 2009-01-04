@@ -119,8 +119,6 @@ Next release:
 * API function get current chunk size? for raw read?
 * do not finalize on write error?
 
-* what to do with libewf_filename_get and libewf_filename_set
-
 * offset table dirty still needed?
   only needed for write
   need to determine if a chunks is stored in a delta segment file
@@ -136,20 +134,23 @@ Next release:
   set and pass header values reference as parameter
 
 * set crc errors in raw access verify
-* merge alloc an realloc blocks
+* merge alloc and realloc blocks
 
 * change uppercase type definitions to lowercase _t type definitions
 * change ewf_char/string into byte_char/string
 * create common functions i.e. for libewf_char/string
 
 TODO
+* test abort
+* implement low memory usage
+
 * create libewf_create_handle and libewf_destroy_handle functions?
 * refactor write initialize into seperate functions
 * rename/move libewf_internal_handle_determine_format and 
   libewf_internal_handle_get_write_maximum_amount_of_segments
-* implement abort
 * create internal value to limit memory use
   - for write only offset table is not needed etc.
+* what about open read write and set functions?
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -164,6 +165,13 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20080214
+* worked on abort
+* worked on low memory usage
+* code cleanup
+* rmoved libewf_filename_get and libewf_filename_set
+
 
 Version: 20080212
 * fixed ewfverify the EWF file can be verified without the integrity hash

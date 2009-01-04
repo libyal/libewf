@@ -2367,6 +2367,10 @@ ssize_t libewf_write_buffer(
 
 			return( -1 );
 		}
+		if( internal_handle->abort == 1 )
+		{
+			break;
+		}
 	}
 	return( total_write_count );
 }

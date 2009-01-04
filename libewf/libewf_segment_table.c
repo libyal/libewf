@@ -44,7 +44,8 @@
 /* Allocates memory for a segment table struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_segment_table_t *libewf_segment_table_alloc( uint16_t amount )
+libewf_segment_table_t *libewf_segment_table_alloc(
+                         uint16_t amount )
 {
 	libewf_segment_table_t *segment_table = NULL;
 	static char *function                 = "libewf_segment_table_alloc";
@@ -192,7 +193,8 @@ int libewf_segment_table_build(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance )
+     uint8_t error_tollerance,
+     int *abort )
 {
 	static char *function   = "libewf_segment_table_build";
 	uint16_t segment_number = 0;
@@ -249,6 +251,10 @@ int libewf_segment_table_build(
 
 			return( 0 );
 		}
+		if( *abort == 1 )
+		{
+			break;
+		}
 	}
 	/* Check to see if the done section has been found in the last segment file
 	 */
@@ -281,7 +287,8 @@ int libewf_segment_table_read_open(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance )
+     uint8_t error_tollerance,
+     int *abort )
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_segment_table_read_open";
@@ -539,7 +546,8 @@ int libewf_segment_table_read_open(
 	     format,
 	     ewf_format,
 	     segment_file_size,
-	     error_tollerance ) != 1 )
+	     error_tollerance,
+	     abort ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to build segment table.\n",
 		 function );
@@ -559,7 +567,8 @@ int libewf_segment_table_read_open(
 	       format,
 	       ewf_format,
 	       segment_file_size,
-	       error_tollerance ) != 1 ) )
+	       error_tollerance,
+	       abort ) != 1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to build delta segment table.\n",
 		 function );

@@ -83,6 +83,9 @@
 /* Define to 1 if you have the `localtime_r' function. */
 #undef HAVE_LOCALTIME_R
 
+/* Defines if libewf should be build with low memory usage */
+#undef HAVE_LOW_MEMORY_USAGE
+
 /* Define to 1 if you have the `mbsinit' function. */
 #undef HAVE_MBSINIT
 

@@ -84,6 +84,9 @@
 /* Define to 1 if you have the `localtime_r' function. */
 #define HAVE_LOCALTIME_R 1
 
+/* Defines if libewf should be build with low memory usage */
+/* #undef HAVE_LOW_MEMORY_USAGE */
+
 /* Define to 1 if you have the `mbsinit' function. */
 /* #undef HAVE_MBSINIT */
 
@@ -314,13 +317,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20080212"
+#define PACKAGE_STRING "libewf 20080214"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20080212"
+#define PACKAGE_VERSION "20080214"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -332,7 +335,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20080212"
+#define VERSION "20080214"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64

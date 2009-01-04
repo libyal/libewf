@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20080212], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20080214], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20080212])
+AM_INIT_AUTOMAKE([libewf], [20080214])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -84,6 +84,7 @@ AC_SYS_LARGEFILE
 dnl Check for configure arguments
 LIBEWF_TEST_ENABLE([wide-character-type], [wide_character_type], [enable wide character type support], [no])
 LIBEWF_TEST_ENABLE([raw-access], [raw_access], [use libewf's raw read and write functionality in the ewf tools], [no])
+LIBEWF_TEST_ENABLE([low-memory-usage], [low_memory_usage], [enable low memory usage], [no])
 LIBEWF_TEST_ENABLE([verbose-output], [verbose_output], [enable verbose output], [no])
 LIBEWF_TEST_ENABLE([debug-output], [debug_output], [enable debug output], [no])
 
@@ -219,6 +220,11 @@ AS_IF([test "x$ac_libewf_enable_raw_access" != xno ],
 	[AC_DEFINE( [HAVE_RAW_ACCESS], [1], [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
 	ac_libewf_enable_raw_access=yes])
 
+dnl Check if libewf should be build with reduced memory usage
+AS_IF([test "x$ac_libewf_enable_low_memory_usage" != xno ],
+	[AC_DEFINE( [HAVE_LOW_MEMORY_USAGE], [1], [Defines if libewf should be build with low memory usage] )
+	ac_libewf_enable_low_memory_usage=yes])
+
 dnl Check if libewf should be build with verbose output
 AS_IF([test "x$ac_libewf_enable_verbose_output" != xno ],
 	[AC_DEFINE( [HAVE_VERBOSE_OUTPUT], [1], [Defines if verbose output should be used] )
@@ -256,6 +262,7 @@ Building:
 Features:
    Wide character type support:             $ac_libewf_enable_wide_character_type
    ewftools use raw read and write support: $ac_libewf_enable_raw_access
+   Low memory usage:                        $ac_libewf_enable_low_memory_usage
    Verbose output:                          $ac_libewf_enable_verbose_output
    Debug output:                            $ac_libewf_enable_debug_output
 ]);

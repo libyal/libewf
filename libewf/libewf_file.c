@@ -418,7 +418,8 @@ LIBEWF_HANDLE *libewf_open(
 		     &( internal_handle->format ),
 		     &( internal_handle->ewf_format ),
 		     segment_file_size,
-		     internal_handle->error_tollerance ) != 1 )
+		     internal_handle->error_tollerance,
+		     &( internal_handle->abort ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
 			 function );
@@ -2485,7 +2486,7 @@ int libewf_parse_header_values(
 	}
 	internal_handle->header_values = header_values;
 
-	/* refactor code below to other loction */
+	/* refactor code below to other location */
 
 	/* The EnCase2 and EnCase3 format are the same
 	 * only the acquiry software version provides insight in which version of EnCase was used

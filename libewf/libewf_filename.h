@@ -74,18 +74,6 @@ typedef char libewf_filename_t;
 
 #endif
 
-#ifdef REFACTOR
-int libewf_filename_get(
-     libewf_filename_t *internal_filename,
-     libewf_filename_t *external_filename,
-     size_t length_external_filename );
-
-int libewf_filename_set(
-     libewf_filename_t **internal_filename,
-     const libewf_filename_t *external_filename,
-     size_t length_external_filename );
-#endif
-
 int libewf_filename_set_extension(
      libewf_filename_t *extension,
      uint16_t segment_number,
