@@ -310,10 +310,10 @@ int main( int argc, char * const argv[] )
 	count = ewfcommon_read_verify(
 	         handle,
 	         calculate_md5,
-	         stored_md5_hash_string,
+	         calculated_md5_hash_string,
 	         LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5,
 	         calculate_sha1,
-	         stored_sha1_hash_string,
+	         calculated_sha1_hash_string,
 	         LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1,
 	         callback );
 

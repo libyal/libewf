@@ -62,7 +62,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	ssize_t crc_read_count    = 0;
 	size_t chunk_data_size    = 0;
 	size_t bytes_available    = 0;
-	size_t md5_hash_size      = 0;
 	uint16_t segment_number   = 0;
 	int chunk_cache_data_used = 0;
 	int file_descriptor       = 0;
@@ -367,54 +366,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
-		/* Check if the MD5 of the chunk needs to be calculated
-		 */
-		if( ( internal_handle->calculate_md5 != 0 )
-		 && ( internal_handle->offset_table->hashed[ chunk ] != 1 ) )
-		{
-			if( libewf_md5_update( &internal_handle->md5_context, chunk_data, chunk_data_size ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
-				 function );
-
-				if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
-			internal_handle->offset_table->hashed[ chunk ] = 1;
-		}
-		/* Check if the last chunk was processed and finalize MD5 hash
-		 */
-		if( chunk == ( internal_handle->offset_table->amount - 1 ) )
-		{
-			md5_hash_size = EWF_DIGEST_HASH_SIZE_MD5;
-
-			if( internal_handle->calculated_md5_hash == NULL )
-			{
-				internal_handle->calculated_md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( md5_hash_size );
-
-				if( internal_handle->calculated_md5_hash == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to created calculated MD5 hash.\n",
-					 function );
-
-					return( -1 );
-				}
-			}
-			if( ( libewf_md5_finalize( &internal_handle->md5_context, internal_handle->calculated_md5_hash, &md5_hash_size ) != 1 )
-			 || ( md5_hash_size != EWF_DIGEST_HASH_SIZE_MD5 ) )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to finalize MD5 context.\n",
-				 function );
-
-				if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
-		}
-		/* Swap bytes after MD5 calculation
+		/* Swap bytes
 		 */
 		if( ( internal_handle->swap_byte_pairs != 0 )
 		 && ( libewf_endian_swap_byte_pairs( chunk_data, chunk_data_size ) != 1 ) )

@@ -1,9 +1,11 @@
 Roadmap:
 * add read/write support for > 2Gb segment file for EnCase 6.7
+* raw read/write
+* move md5 calculation out library into ewftools
+* move byte swap out library into ewftools
+
 * add read/write support for session section
 * create iso2ewf tool
-* raw read/write
-* move md5 calculation out library ?
 
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
@@ -139,12 +141,16 @@ TODO
 * fix libewf_debug_read_section to handle a size of size64_t
 
 * remove libewf_set_media_values
+* remove get calculated md5 hash function
 
 * allow to set the delta file path
 * change use of stdout and stderr in ewfaexport
 
 Version: 20070905
 * worked on remove of MD5 calculation from library
+  - removed MD5 calculation from read
+  - implemented MD5 calculation in ewfcommon for ewfverify
+  - removed hashed flags in offset table
 
 Version: 20070830
 * changed use of stdout and stderr in ewfacquirestream, ewfinfo, ewfalter

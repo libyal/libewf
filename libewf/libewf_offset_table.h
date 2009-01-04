@@ -85,11 +85,6 @@ struct libewf_offset_table
 	 */
 	size_t *size;
 
-	/* Dynamic array of boolean that definines
-	 * if the chunk has been processed in the hash calculation
-	 */
-	uint8_t *hashed;
-
 	/* Dynamic array of the segment numbers
 	 */
 	uint16_t *segment_number;

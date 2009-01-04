@@ -109,21 +109,6 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 
 		return( NULL );
 	}
-	offset_table->hashed = (uint8_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_HASHED_SIZE ), -1 );
-
-	if( offset_table->hashed == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate hashed flags.\n",
-		 function );
-
-		libewf_common_free( offset_table->size );
-		libewf_common_free( offset_table->file_descriptor );
-		libewf_common_free( offset_table->compressed );
-		libewf_common_free( offset_table->offset );
-		libewf_common_free( offset_table );
-
-		return( NULL );
-	}
 	offset_table->segment_number = (uint16_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ), 0 );
 
 	if( offset_table->segment_number == NULL )
@@ -135,7 +120,6 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 		libewf_common_free( offset_table->file_descriptor );
 		libewf_common_free( offset_table->compressed );
 		libewf_common_free( offset_table->offset );
-		libewf_common_free( offset_table->hashed );
 		libewf_common_free( offset_table );
 
 		return( NULL );
@@ -151,7 +135,6 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 		libewf_common_free( offset_table->file_descriptor );
 		libewf_common_free( offset_table->compressed );
 		libewf_common_free( offset_table->offset );
-		libewf_common_free( offset_table->hashed );
 		libewf_common_free( offset_table->segment_number );
 		libewf_common_free( offset_table );
 
@@ -233,26 +216,12 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 
 		return( -1 );
 	}
-	offset_table->size   = (size_t *) reallocation;
-	reallocation         = libewf_common_realloc_new_cleared(
-	                        offset_table->hashed,
-	                        ( offset_table->amount * LIBEWF_OFFSET_TABLE_HASHED_SIZE ),
-	                        ( amount * LIBEWF_OFFSET_TABLE_HASHED_SIZE ),
-	                        -1 );
-
-	if( reallocation == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate hashed flags.\n",
-		 function );
-
-		return( -1 );
-	}
-	offset_table->hashed = (uint8_t *) reallocation;
-	reallocation         = libewf_common_realloc_new_cleared(
-	                        offset_table->segment_number,
-	                        ( offset_table->amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ),
-	                        ( amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ),
-	                        0 );
+	offset_table->size = (size_t *) reallocation;
+	reallocation       = libewf_common_realloc_new_cleared(
+	                      offset_table->segment_number,
+	                      ( offset_table->amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ),
+	                      ( amount * LIBEWF_OFFSET_TABLE_SEGMENT_NUMBER_SIZE ),
+	                      0 );
 
 	if( reallocation == NULL )
 	{
@@ -298,7 +267,6 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 	libewf_common_free( offset_table->compressed );
 	libewf_common_free( offset_table->offset );
 	libewf_common_free( offset_table->size );
-	libewf_common_free( offset_table->hashed );
 	libewf_common_free( offset_table->segment_number );
 	libewf_common_free( offset_table->dirty );
 	libewf_common_free( offset_table );
@@ -530,6 +498,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 		 */
 		if( next_offset < current_offset )
 		{
+fprintf( stderr, "D: 0x%08" PRIx32 "\n", raw_offset );
 			base_offset += current_offset;
 
 			LIBEWF_VERBOSE_PRINT( "%s: chunk offset wrap arround new base %" PRIu32 ".\n",
