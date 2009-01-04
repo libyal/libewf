@@ -669,7 +669,7 @@ ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, L
 	/* refactor */
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write header to file.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to write header2 to file.\n",
 		 function );
 
 		return( -1 );
@@ -3605,23 +3605,62 @@ ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 /* Writes a xheader section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *xheader, size_t size, int8_t compression_level )
+ssize_t libewf_section_xheader_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *xheader, size_t size, int8_t compression_level )
 {
+	EWF_CHAR *section_type      = (EWF_CHAR *) "xheader";
+	static char *function       = "libewf_section_xheader_write";
+	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_offset = segment_file->file_offset;
 
 	section_write_count = libewf_section_compressed_string_write(
 	                       internal_handle,
-	                       file_descriptor,
-	                       start_offset,
-	                       (EWF_CHAR *) "xheader",
+	                       segment_file->file_descriptor,
+	                       segment_file->file_offset,
+	                       section_type,
 	                       7,
 	                       xheader,
 	                       size,
 	                       compression_level );
 
-	if( section_write_count != -1 )
+	/* refactor */
+	if( section_write_count == -1 )
 	{
-		internal_handle->amount_of_header_sections++;
+		LIBEWF_WARNING_PRINT( "%s: unable to write xheader to file.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* refactor */
+	segment_file->file_offset += section_write_count;
+
+	internal_handle->amount_of_header_sections++;
+
+	if( libewf_section_list_append(
+	     segment_file->section_list,
+	     section_type,
+	     section_offset,
+	     ( section_offset + section_write_count ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
+		 function, (char *) section_type );
+
+		return( -1 );
 	}
 	return( section_write_count );
 }

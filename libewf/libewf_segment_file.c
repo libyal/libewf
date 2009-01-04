@@ -976,8 +976,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_xheader_write(
 		               internal_handle,
-		               segment_file->file_descriptor,
-		               segment_file->file_offset,
+		               segment_file,
 		               internal_handle->xheader,
 		               xheader_size,
 		               EWF_COMPRESSION_DEFAULT );
@@ -989,19 +988,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 			return( -1 );
 		}
-		if( libewf_section_list_append(
-		     segment_file->section_list,
-		     (EWF_CHAR *) "xheader",
-		     segment_file->file_offset,
-		     ( segment_file->file_offset + write_count ) ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to append first xheader section to section list.\n",
-			 function );
-
-			return( -1 );
-		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 
 		/* The header2 should be written once
 		 * the default compression is used
