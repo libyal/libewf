@@ -121,11 +121,16 @@ TODO
   use memcpy instead
 * remove libewf_write_process_chunk_data ?
   move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
+* have compound reallocation functions return an integer as result
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
   chunk data and CRC
 * read dirty chunk from delta segment file
+
+Version: 20070816
+* worked on restructuring to improve internal structure
+* worked on improved rewrite using delta segment files
 
 Version: 20070815
 * worked on restructuring to improve internal structure
