@@ -297,6 +297,13 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 			{
 				chunk_data_size -= EWF_CRC_SIZE;
 			}
+			if( chunk_data_size > size )
+			{
+				LIBEWF_WARNING_PRINT( "%s: buffer of size: %zd too small needed: %zd.\n",
+				 function, size, chunk_data_size );
+
+				return( -1 );
+			}
 		}
 #if defined( HAVE_BUFFER_PASSTHROUGH )
 		/* Determine if the chunk data should be put directly in the buffer
@@ -421,8 +428,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		 */
 		else if( internal_handle->offset_table->compressed[ chunk ] == 1 )
 		{
-			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
-
 			*is_compressed = 1;
 			*read_crc      = 0;
 
@@ -446,6 +451,10 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		 */
 		if( raw_access == 0 )
 		{
+			if( internal_handle->offset_table->compressed[ chunk ] == 1 )
+			{
+				chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
+			}
 			if( libewf_read_process_chunk_data(
 			     internal_handle,
 			     chunk_read,
@@ -672,21 +681,33 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		{
 			break;
 		}
-		size                                  -= chunk_read_count;
-		total_read_count                      += chunk_read_count;
-		internal_handle->current_chunk_offset += (uint32_t) chunk_read_count;
+		size             -= chunk_read_count;
+		total_read_count += chunk_read_count;
 
-		if( internal_handle->current_chunk_offset == internal_handle->media->chunk_size )
+		if( raw_access == 0 )
 		{
-			internal_handle->current_chunk_offset = 0;
-			internal_handle->current_chunk       += 1;
+			internal_handle->current_chunk_offset += (uint32_t) chunk_read_count;
+
+			if( internal_handle->current_chunk_offset == internal_handle->media->chunk_size )
+			{
+				internal_handle->current_chunk_offset = 0;
+				internal_handle->current_chunk       += 1;
+			}
+			else if( internal_handle->current_chunk_offset > internal_handle->media->chunk_size )
+			{
+				LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
+				 function );
+
+				return( -1 );
+			}
 		}
-		else if( internal_handle->current_chunk_offset > internal_handle->media->chunk_size )
+		else
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
-			 function );
+			internal_handle->current_chunk += 1;
 
-			return( -1 );
+			/* TODO Check if safeguard is necessary
+			 */
+			break;
 		}
 	}
 	return( total_read_count );

@@ -564,29 +564,30 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
-	uint8_t *data              = NULL;
-	uint8_t *uncompressed_data = NULL;
-	static char *function      = "ewfcommon_read_verify";
-	off64_t read_offset        = 0;
-	size64_t media_size        = 0;
-	size32_t chunk_size        = 0;
-	size_t buffer_size         = 0;
-	size_t read_size           = 0;
-	size_t md5_hash_size       = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size      = EWFDIGEST_HASH_SIZE_SHA1;
-	ssize64_t total_read_count = 0;
-	ssize_t read_count         = 0;
+	uint8_t *data               = NULL;
+	uint8_t *uncompressed_data  = NULL;
+	static char *function       = "ewfcommon_read_verify";
+	off64_t read_offset         = 0;
+	size64_t media_size         = 0;
+	size32_t chunk_size         = 0;
+	size_t buffer_size          = 0;
+	size_t read_size            = 0;
+	size_t md5_hash_size        = EWFDIGEST_HASH_SIZE_MD5;
+	size_t sha1_hash_size       = EWFDIGEST_HASH_SIZE_SHA1;
+	ssize64_t total_read_count  = 0;
+	ssize_t read_count          = 0;
 #if defined( HAVE_RAW_ACCESS )
-	uint8_t *raw_read_data     = NULL;
-	off64_t sector             = 0;
-	ssize_t raw_read_count     = 0;
-	size_t uncompressed_size   = 0;
-	uint32_t chunk_crc         = 0;
-	uint32_t amount_of_sectors = 0;
-	uint32_t sectors_per_chunk = 0;
-	uint32_t bytes_per_sector  = 0;
-	int8_t is_compressed       = 0;
-	int8_t read_crc            = 0;
+	uint8_t *raw_read_data      = NULL;
+	off64_t sector              = 0;
+	ssize_t raw_read_count      = 0;
+	size_t uncompressed_size    = 0;
+	size_t raw_read_buffer_size = 0;
+	uint32_t chunk_crc          = 0;
+	uint32_t amount_of_sectors  = 0;
+	uint32_t sectors_per_chunk  = 0;
+	uint32_t bytes_per_sector   = 0;
+	int8_t is_compressed        = 0;
+	int8_t read_crc             = 0;
 #endif
 
 	if( handle == NULL )
@@ -678,7 +679,10 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		return( -1 );
 	} 
 #if defined( HAVE_RAW_ACCESS )
-	raw_read_data = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
+	/* The EWF-S01 format uses compression this will add 16 bytes on average
+	 */
+	raw_read_buffer_size = buffer_size + 16;
+	raw_read_data        = (uint8_t *) libewf_common_alloc( raw_read_buffer_size * sizeof( uint8_t ) );
 
 	if( raw_read_data == NULL )
 	{
@@ -733,7 +737,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		raw_read_count = libewf_raw_read_buffer(
 		                  handle,
 		                  (void *) raw_read_data,
-		                  (size_t) buffer_size,
+		                  (size_t) raw_read_buffer_size,
 		                  &is_compressed,
 		                  &chunk_crc,
 		                  &read_crc );
@@ -774,6 +778,9 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 					 LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
 					 function );
 
+					libewf_common_free( data );
+					libewf_common_free( raw_read_data );
+
 					return( -1 );
 				}
 			}
@@ -791,6 +798,9 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 				 LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
 				 function );
 
+				libewf_common_free( data );
+				libewf_common_free( raw_read_data );
+
 				return( -1 );
 			}
 			is_compressed     = 0;
@@ -804,6 +814,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 		else
 		{
 			uncompressed_data = raw_read_data;
+			uncompressed_size = read_count;
 		}
 		if( read_size != uncompressed_size )
 		{

@@ -1843,9 +1843,8 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 	}
 	while( data_size > 0 )
 	{
-		/* The write is forced when the raw access mode is set
-		 */
 		/* Check if chunk has already been created within a segment file
+		 * The write is forced when the raw access mode is set
 		 */
 		if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
 		 && ( internal_handle->offset_table->file_descriptor[ internal_handle->current_chunk ] != -1 ) )
@@ -1892,7 +1891,6 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 		total_write_count += chunk_write_count;
 		data_size         -= chunk_write_count;
 
-		/* Refactor */
 		if( raw_access == 0 )
 		{
 			internal_handle->current_chunk_offset += (uint32_t) chunk_write_count;
@@ -1913,6 +1911,10 @@ ssize_t libewf_write_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t
 		else
 		{
 			internal_handle->current_chunk += 1;
+
+			/* TODO Check if safeguard is necessary
+			 */
+			break;
 		}
 	}
 	return( total_write_count );
