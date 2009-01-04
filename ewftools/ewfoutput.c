@@ -497,11 +497,11 @@ void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF
  */
 void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "ewfoutput_acquiry_errors_fprint";
-	uint64_t sector                         = 0;
-	uint32_t amount_of_sectors              = 0;
-	uint32_t iterator                       = 0;
+	static char *function      = "ewfoutput_acquiry_errors_fprint";
+	off64_t sector             = 0;
+	uint32_t amount_of_errors  = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t iterator          = 0;
 
 	if( stream == NULL )
 	{
@@ -517,27 +517,30 @@ void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->acquiry_amount_of_errors > 0 )
+	if( libewf_get_amount_of_acquiry_errors( handle, &amount_of_errors ) != 1 )
 	{
-		if( internal_handle->acquiry_error_sectors == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: missing acquiry read error sector list.\n",
-			 function );
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
+		 function );
 
-			return;
-		}
+		return;
+	}
+	if( amount_of_errors > 0 )
+	{
 		fprintf( stream, "Read errors during acquiry:\n" );
-		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", internal_handle->acquiry_amount_of_errors );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", amount_of_errors );
 		
-		for( iterator = 0; iterator < internal_handle->acquiry_amount_of_errors; iterator++ )
+		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
-			sector            = internal_handle->acquiry_error_sectors[ iterator ].sector;
-			amount_of_sectors = internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors;
+			if( libewf_get_acquiry_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
+				 function, iterator );
 
+				sector            = 0;
+				amount_of_sectors = 0;
+			}
 			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 sector, ( sector + amount_of_sectors ), amount_of_sectors );
+			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}
@@ -547,11 +550,11 @@ void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
  */
 void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "ewfoutput_crc_errors_fprint";
-	uint64_t sector                         = 0;
-	uint32_t amount_of_sectors              = 0;
-	uint32_t iterator                       = 0;
+	static char *function      = "ewfoutput_crc_errors_fprint";
+	off64_t sector             = 0;
+	uint32_t amount_of_errors  = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t iterator          = 0;
 
 	if( stream == NULL )
 	{
@@ -567,33 +570,30 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 		return;
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->read == NULL )
+	if( libewf_get_amount_of_acquiry_errors( handle, &amount_of_errors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
 		 function );
 
 		return;
 	}
-	if( internal_handle->read->crc_amount_of_errors > 0 )
+	if( amount_of_errors > 0 )
 	{
-		if( internal_handle->read->crc_error_sectors == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: missing CRC error sector list.\n",
-			 function );
-
-			return;
-		}
 		fprintf( stream, "Sector validation errors:\n" );
-		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", internal_handle->read->crc_amount_of_errors );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", amount_of_errors );
 
-		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
+		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
-			sector            = internal_handle->read->crc_error_sectors[ iterator ].sector;
-			amount_of_sectors = internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors;
+			if( libewf_get_acquiry_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
+				 function, iterator );
 
-			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n", sector, (sector + amount_of_sectors), amount_of_sectors );
+				sector            = 0;
+				amount_of_sectors = 0;
+			}
+			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}

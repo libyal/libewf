@@ -94,6 +94,11 @@ LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t 
 LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filename, size_t length );
 
+LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors );
+LIBEWF_EXTERN int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors  );
+LIBEWF_EXTERN int libewf_get_amount_of_crc_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors );
+LIBEWF_EXTERN int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors );
+
 LIBEWF_EXTERN int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks );
 
 LIBEWF_EXTERN int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );

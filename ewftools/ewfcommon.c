@@ -214,6 +214,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 	uint32_t error_skip_bytes         = 0;
 	uint32_t error_granularity_offset = 0;
 	uint32_t error2_amount_of_sectors = 0;
+	uint32_t acquiry_amount_of_errors = 0;
 	uint32_t byte_error_granularity   = 0;
 
 	if( handle == NULL )
@@ -478,9 +479,10 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 
 					return( -1 );
 				}
+				acquiry_amount_of_errors++;
+
 				LIBEWF_VERBOSE_PRINT( "%s: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
-				 function, ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_amount_of_errors,
-				 error2_sector, error2_amount_of_sectors );
+				 function, acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
 
 				LIBEWF_VERBOSE_PRINT( "%s: skipping %" PRIu32 " bytes.\n",
 				 function, error_skip_bytes );

@@ -124,8 +124,7 @@ TODO
 * change libewf_get and libewf_set functions for api consistency
   move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
-
-* change use of stdout and stderr in ewfexport
+  - change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
@@ -133,8 +132,6 @@ TODO
 * ewfexport: non interactive mode?
 
 * write api functions to rid ewfcommon of internal_handle
-  - acquiry errors
-  - CRC read errors
   - the header values amount
   - the hash values amount
 
@@ -174,6 +171,8 @@ CLOSED
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions
 * Cleanup of set/get functions in internal handle
+* Added libewf_get_amount_of_acquiry_errors
+* Wrote api functions to rid ewfcommon of internal_handle for acquiry and CRC errors
 
 Version: 20071016
 * Worked on cleaning up ewf struct read and write functions
