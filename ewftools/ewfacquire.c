@@ -1094,9 +1094,9 @@ int main( int argc, char * const argv[] )
 
 		if( log_filename != NULL )
 		{
-			log_file_stream = fopen(
+			log_file_stream = ewfstring_fopen(
 					   log_filename,
-					   "w" );
+					   _SYSTEM_CHARACTER_T_STRING( "w" ) );
 
 			if( log_file_stream == NULL )
 			{
@@ -1134,7 +1134,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			fclose(
+			file_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1160,7 +1160,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( log_file_stream != NULL )
 		{
-			fclose(
+			file_io_fclose(
 			 log_file_stream );
 		}
 		return( EXIT_FAILURE );
@@ -1193,7 +1193,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( log_file_stream != NULL )
 	{
-		if( fclose(
+		if( file_io_fclose(
 		     log_file_stream ) != 0 )
 		{
 			fprintf( stderr, "Unable to close log file: %s.\n",

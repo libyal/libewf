@@ -58,6 +58,8 @@
 #include <unistd.h>
 #endif
 
+#include <stdio.h>
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -133,6 +135,17 @@ int libewf_file_io_wopen(
 	close( file_descriptor )
 
 #endif
+
+#define file_io_fopen( filename, mode ) \
+	fopen( filename, mode )
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#define file_io_wfopen( filename, mode ) \
+	_wfopen( filename, mode )
+#endif
+
+#define file_io_fclose( file_stream ) \
+	fclose( file_stream )
 
 #if defined( __cplusplus )
 }

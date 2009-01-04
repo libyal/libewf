@@ -39,6 +39,7 @@
 #include <character_string.h>
 #include <date_time.h>
 #include <error_string.h>
+#include <file_io.h>
 #include <system_string.h>
 
 #if defined( __cplusplus )
@@ -67,6 +68,16 @@ extern "C" {
 #else
 #define ewfstring_strerror( error_number ) \
 	error_string_strerror( error_number )
+
+#endif
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#define ewfstring_fopen( filename, mode ) \
+	file_io_wfopen( filename, mode )
+
+#else
+#define ewfstring_fopen( filename, mode ) \
+	file_io_fopen( filename, mode )
 
 #endif
 

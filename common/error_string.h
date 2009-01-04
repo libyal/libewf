@@ -82,11 +82,11 @@ char *libewf_error_string_strerror(
 	libewf_error_string_strerror( error_number )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_error_string_wcerror(
+wchar_t *libewf_error_string_wcserror(
           int error_number );
 
 #define error_string_wcserror( error_number ) \
-	libewf_error_string_wcrerror( error_number )
+	libewf_error_string_wcserror( error_number )
 
 #endif
 
