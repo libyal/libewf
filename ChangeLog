@@ -132,6 +132,7 @@ Next release:
 * ewfalter allow to set delta segment file path/basename
   test if no delta files were added before change
 * add ewfx_delta_chunk.h to MSVC++ project
+* remove compression from delta chunk
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -145,9 +146,11 @@ CLOSED
   - if so remove libewf_string include from ewfacquire
   not needed
 
+Version: 20071107
+* worked on delta file
+
 Version: 20071106
-* worked on adding compression support to delta file
-  added compression value and CRC to section
+* worked on delta file
   delta chunk header data is now 'protected' by a CRC
 * ewfacquire(stream) added check if last segment file is closed
   before telling acquiry was completed, by moving close

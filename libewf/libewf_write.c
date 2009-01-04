@@ -1286,6 +1286,13 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
+	if( is_compressed != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk compression cannot be used.\n",
+		 function );
+
+		return( -1 );
+	}
 	LIBEWF_VERBOSE_PRINT( "%s: writing delta chunk of size: %zu with data of size: %zd.\n",
 	 function, chunk_size, chunk_data_size );
 
@@ -1452,7 +1459,6 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		       chunk, 
 		       chunk_buffer, 
 		       chunk_size, 
-	               is_compressed,
 		       &chunk_crc,
 	               write_crc );
 
@@ -1488,7 +1494,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		internal_handle->offset_table->file_descriptor[ chunk ] = internal_handle->delta_segment_table->file_descriptor[ segment_number ];
 		internal_handle->offset_table->segment_number[ chunk ]  = segment_number;
-		internal_handle->offset_table->compressed[ chunk ]      = is_compressed;
+		internal_handle->offset_table->compressed[ chunk ]      = 0;
 		internal_handle->offset_table->dirty[ chunk ]           = 1;
 	}
 	return( total_write_count );
@@ -1719,17 +1725,12 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
  */
 ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t force_write )
 {
-	EWF_CHAR *chunk_data              = NULL;
-	static char *function             = "libewf_write_chunk_data_existing";
-	EWF_CRC chunk_crc                 = 0;
-	ssize_t chunk_data_size           = 0;
-	ssize_t read_count                = 0;
-	ssize_t write_count               = 0;
-	size_t write_size                 = 0;
-	size_t compressed_chunk_data_size = 0;
-	int chunk_cache_data_used         = 0;
-	int8_t is_compressed              = 0;
-	int8_t write_crc                  = 0;
+	EWF_CHAR *chunk_data  = NULL;
+	static char *function = "libewf_write_chunk_data_existing";
+	EWF_CRC chunk_crc     = 0;
+	ssize_t read_count    = 0;
+	ssize_t write_count   = 0;
+	size_t write_size     = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1904,55 +1905,21 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 		chunk_data = internal_handle->chunk_cache->data;
 		write_size = (size_t) read_count;
 	}
-	chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
+	/* Calculate the new CRC
+         */
+        chunk_crc = ewf_crc_calculate( chunk_data, write_size, 1 );
 
-	/* The compressed data size contains the maximum allowed buffer size
-	 */
-	compressed_chunk_data_size = internal_handle->chunk_cache->allocated_size;
-
-	/* Compress the chunk if necessary and determine its CRC
-	 */
-	chunk_data_size = libewf_write_process_chunk_data(
-			   internal_handle, 
-			   chunk_data,
-			   write_size,
-			   internal_handle->chunk_cache->compressed,
-			   &compressed_chunk_data_size,
-			   &is_compressed,
-			   &chunk_crc,
-			   &write_crc );
-
-	if( chunk_data_size <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to process chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Make sure to update the chunk_data pointer if 
-	 * internal_handle->chunk_cache->data has been reallocated by
-	 * libewf_write_process_chunk_data()
-	 */
-	if( ( chunk_cache_data_used == 1 )
-	 && ( chunk_data != internal_handle->chunk_cache->data ) )
-	{
-		chunk_data = internal_handle->chunk_cache->data;
-	}
-	if( is_compressed != 0 )
-	{
-		chunk_data = internal_handle->chunk_cache->compressed;
-	}
 	write_count = libewf_raw_write_chunk_existing(
 	               internal_handle,
 	               chunk,
 	               chunk_data,
-	               chunk_data_size,
 	               write_size,
-	               is_compressed,
+	               write_size,
+	               0,
 	               chunk_crc,
-	               write_crc );
+	               1 );
 
-	if( write_count == -1 )
+	if( write_count <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write delta chunk.\n",
 		 function );

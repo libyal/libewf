@@ -3416,7 +3416,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 	     internal_handle->offset_table,
 	     chunk,
 	     file_descriptor,
-	     delta_chunk_header.compressed,
+	     0,
 	     (off64_t) ( start_offset + EWFX_DELTA_CHUNK_HEADER_SIZE ),
 	     ( size - EWFX_DELTA_CHUNK_HEADER_SIZE ),
 	     segment_number,
@@ -3436,7 +3436,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, uint8_t is_compressed, EWF_CRC *chunk_crc, uint8_t write_crc )
+ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -3467,7 +3467,11 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 
 		return( -1 );
 	}
-	delta_chunk_header.compressed = is_compressed;
+	delta_chunk_header.padding[ 0 ] = (uint8_t) 'D';
+	delta_chunk_header.padding[ 1 ] = (uint8_t) 'E';
+	delta_chunk_header.padding[ 2 ] = (uint8_t) 'L';
+	delta_chunk_header.padding[ 3 ] = (uint8_t) 'T';
+	delta_chunk_header.padding[ 4 ] = (uint8_t) 'A';
 
 	calculated_crc = ewf_crc_calculate(
 	                  &delta_chunk_header,

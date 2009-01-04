@@ -52,18 +52,12 @@ struct ewfx_delta_chunk_header
 	 */
 	uint8_t chunk[ 4 ];
 
-	/* Compression value
-	 * consists of 1 byte
-	 * value is 0x00 if not compressed
-	 * or 0x01 if compressed
-	 */
-	uint8_t compressed;
-
 	/* Padding
 	 * some padding reserved for future use
-	 * consists of 5 bytes
+	 * consists of 6 bytes
+	 * "DELTA\x00"
 	 */
-	uint8_t padding[ 5 ];
+	uint8_t padding[ 6 ];
 
 	/* The section crc of all (previous) delta chunk section data
 	 * consists of 4 bytes
