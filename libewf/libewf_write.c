@@ -819,8 +819,8 @@ ssize_t libewf_write_process_chunk_data(
 			{
 				libewf_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_CONVERSION,
-				 LIBEWF_CONVERSION_ERROR_GENERIC,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
 				 "%s: unable to resize chunk cache.\n",
 				 function );
 
@@ -1029,8 +1029,8 @@ ssize_t libewf_raw_write_chunk_new(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize offset table.\n",
 			 function );
 
@@ -1201,10 +1201,7 @@ ssize_t libewf_raw_write_chunk_new(
 		internal_handle->write->remaining_segment_file_size -= sizeof( ewf_section_t );
 
 		/* Write the start of the segment file
-		 * like the file header,
-		 the header,
-		 volume and/or data section,
-		 etc.
+		 * like the file header, the header, volume and/or data section, etc.
 		 */
 		write_count = libewf_segment_file_write_start(
 		               internal_handle->segment_table->segment_file_handle[ segment_number ],
@@ -1857,8 +1854,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			{
 				libewf_error_set(
 				 error,
-				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-				 LIBEWF_ARGUMENT_ERROR_INVALID,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: invalid segment file.\n",
 				 function );
 
@@ -1917,24 +1914,22 @@ ssize_t libewf_raw_write_chunk_existing(
 			}
 			/* Make sure the current segment file offset points to the start of the last section
 			 */
-			if( segment_file_offset != last_section_start_offset )
+			if( ( segment_file_offset != last_section_start_offset )
+			 && ( libewf_file_io_pool_seek_offset(
+			       internal_handle->file_io_pool,
+			       segment_file_handle->file_io_pool_entry,
+			       last_section_start_offset,
+			       SEEK_SET ) == -1 ) )
 			{
-				if( libewf_file_io_pool_seek_offset(
-				     internal_handle->file_io_pool,
-				     segment_file_handle->file_io_pool_entry,
-				     last_section_start_offset,
-				     SEEK_SET ) == -1 )
-				{
-					libewf_error_set(
-					 error,
-					 LIBEWF_ERROR_DOMAIN_OUTPUT,
-					 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
-					 "%s: cannot find offset: %" PRIjd ".\n",
-					 function,
-					 last_section_start_offset );
+				libewf_error_set(
+				 error,
+				 LIBEWF_ERROR_DOMAIN_OUTPUT,
+				 LIBEWF_OUTPUT_ERROR_SEEK_FAILED,
+				 "%s: cannot find offset: %" PRIjd ".\n",
+				 function,
+				 last_section_start_offset );
 
-					return( -1 );
-				}
+				return( -1 );
 			}
 			segment_file_offset = last_section_start_offset + chunk_size + sizeof( ewf_crc_t ) + sizeof( ewf_section_t );
 
@@ -2064,10 +2059,12 @@ ssize_t libewf_raw_write_chunk_existing(
 	}
 	else
 	{
+		segment_file_offset = internal_handle->offset_table->chunk_offset[ chunk ].file_offset - sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_section_t );
+
 		if( libewf_file_io_pool_seek_offset(
 		     internal_handle->file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
-		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset - sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_section_t ),
+		     segment_file_offset,
 		     SEEK_SET ) == -1 )
 		{
 			libewf_error_set(
@@ -2587,7 +2584,8 @@ ssize_t libewf_write_chunk_data_existing(
 		              chunk,
 		              0,
 		              internal_handle->chunk_cache->data,
-		              internal_handle->chunk_cache->allocated_size );
+		              internal_handle->chunk_cache->allocated_size,
+		              error );
 
 		if( read_count <= -1 )
 		{
@@ -2971,8 +2969,8 @@ ssize_t libewf_raw_write_buffer(
 		{
 			libewf_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_INVALID,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
 			 "%s: cannot rewrite existing chunk.\n",
 			 function );
 
@@ -3198,8 +3196,8 @@ ssize_t libewf_write_buffer(
 		{
 			libewf_error_set(
 			 &error,
-			 LIBEWF_ERROR_DOMAIN_CONVERSION,
-			 LIBEWF_CONVERSION_ERROR_GENERIC,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_RESIZE_FAILED,
 			 "%s: unable to resize chunk cache.\n",
 			 function );
 
@@ -3223,8 +3221,8 @@ ssize_t libewf_write_buffer(
 			{
 				libewf_error_set(
 				 &error,
-				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-				 LIBEWF_ARGUMENT_ERROR_INVALID,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_VALUE_MISSING,
 				 "%s: cannot rewrite existing chunk.\n",
 				 function );
 

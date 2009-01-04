@@ -28,6 +28,7 @@
 
 #include <libewf/handle.h>
 
+#include "libewf_error.h"
 #include "libewf_extern.h"
 #include "libewf_handle.h"
 
@@ -45,7 +46,8 @@ ssize_t libewf_read_process_chunk_data(
          size_t *uncompressed_chunk_data_size,
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
-         int8_t read_crc );
+         int8_t read_crc,
+         libewf_error_t **error );
 
 ssize_t libewf_raw_read_chunk(
          libewf_internal_handle_t *internal_handle,
@@ -54,14 +56,16 @@ ssize_t libewf_raw_read_chunk(
          size_t chunk_size,
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
-         int8_t *read_crc );
+         int8_t *read_crc,
+         libewf_error_t **error );
 
 ssize_t libewf_read_chunk_data(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
          uint32_t chunk_offset,
          uint8_t *buffer,
-         size_t size );
+         size_t size,
+         libewf_error_t **error );
 
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        libewf_handle_t *handle,
