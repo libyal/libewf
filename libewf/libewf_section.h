@@ -37,6 +37,7 @@
 #include "libewf_includes.h"
 #include "libewf_error_sector.h"
 #include "libewf_internal_handle.h"
+#include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_table.h"
@@ -63,11 +64,11 @@ ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR
 ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_header2, size_t *cached_header2_size );
 ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *header2, size_t header2_size, int8_t compression_level );
 
-ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint32_t *amount_of_chunks, uint32_t *sectors_per_chunk, uint32_t *bytes_per_sector, uint32_t *amount_of_sectors, uint8_t *format, uint8_t error_tollerance );
+ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t *format, uint8_t error_tollerance );
 ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append );
-ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint32_t *amount_of_chunks, uint32_t *sectors_per_chunk, uint32_t *bytes_per_sector, uint32_t *amount_of_sectors, uint32_t *error_granularity, uint8_t *media_type, uint8_t *media_flags, int8_t *compression_level, uint8_t *guid, uint8_t error_tollerance );
+ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t error_tollerance );
 ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint8_t no_section_append );
-ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint32_t *amount_of_chunks, uint32_t *sectors_per_chunk, uint32_t *bytes_per_sector, uint32_t *amount_of_sectors, uint32_t *chunk_size, uint32_t *error_granularity, uint8_t *media_type, uint8_t *media_flags, int8_t *compression_level, uint8_t *guid, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance );
+ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance );
 
 int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, uint32_t *amount_of_chunks, off64_t section_offset, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
 

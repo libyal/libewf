@@ -709,7 +709,7 @@ ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHA
 /* Reads an EWF-S01 (SMART) volume section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint32_t *amount_of_chunks, uint32_t *sectors_per_chunk, uint32_t *bytes_per_sector, uint32_t *amount_of_sectors, uint8_t *format, uint8_t error_tollerance )
+ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, uint8_t *format, uint8_t error_tollerance )
 {
 	EWF_VOLUME_SMART *volume = NULL;
 	static char *function    = "libewf_section_volume_s01_read";
@@ -724,30 +724,9 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( amount_of_chunks == NULL )
+	if( media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sectors_per_chunk == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -811,7 +790,9 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown3, 45 ); );
 #endif
 
-	if( libewf_endian_convert_32bit( amount_of_chunks, volume->amount_of_chunks ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->amount_of_chunks ),
+	     volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
 		 function );
@@ -820,7 +801,9 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->sectors_per_chunk ),
+	     volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
 		 function );
@@ -829,7 +812,9 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( bytes_per_sector, volume->bytes_per_sector ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->bytes_per_sector ),
+	     volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
 		 function );
@@ -838,7 +823,9 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( amount_of_sectors, volume->amount_of_sectors ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->amount_of_sectors ),
+	     volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
 		 function );
@@ -915,7 +902,9 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	volume->unknown1[ 0 ] = 1;
 
-	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_chunks, volume->amount_of_chunks ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->amount_of_chunks,
+	     volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
@@ -924,7 +913,9 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media_values->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->sectors_per_chunk,
+	     volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
 		 function );
@@ -933,7 +924,9 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media_values->bytes_per_sector, volume->bytes_per_sector ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->bytes_per_sector,
+	     volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
 		 function );
@@ -942,7 +935,9 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_sectors, volume->amount_of_sectors ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->amount_of_sectors,
+	     volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 		 function );
@@ -1025,7 +1020,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Reads an EWF-E01 (EnCase) volume section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint32_t *amount_of_chunks, uint32_t *sectors_per_chunk, uint32_t *bytes_per_sector, uint32_t *amount_of_sectors, uint32_t *error_granularity, uint8_t *media_type, uint8_t *media_flags, int8_t *compression_level, uint8_t *guid, uint8_t error_tollerance )
+ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t error_tollerance )
 {
 	EWF_VOLUME *volume     = NULL;
 	static char *function  = "libewf_section_volume_e01_read";
@@ -1040,51 +1035,9 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( amount_of_chunks == NULL )
+	if( media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sectors_per_chunk == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( error_granularity == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid error granularity.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( media_type == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media type.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( media_flags == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media flags.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -1092,13 +1045,6 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 	if( compression_level == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid compression level.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( guid == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid GUID.\n",
 		 function );
 
 		return( -1 );
@@ -1160,7 +1106,9 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->signature, 5 ); );
 #endif
 
-	if( libewf_endian_convert_32bit( amount_of_chunks, volume->amount_of_chunks ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->amount_of_chunks ),
+	     volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
 		 function );
@@ -1169,7 +1117,9 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->sectors_per_chunk ),
+	     volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
 		 function );
@@ -1178,7 +1128,9 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( bytes_per_sector, volume->bytes_per_sector ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->bytes_per_sector ),
+	     volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
 		 function );
@@ -1187,7 +1139,9 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( amount_of_sectors, volume->amount_of_sectors ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->amount_of_sectors ),
+	     volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
 		 function );
@@ -1196,7 +1150,9 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( error_granularity, volume->error_granularity ) != 1 )
+	if( libewf_endian_convert_32bit(
+	     &( media_values->error_granularity ),
+	     volume->error_granularity ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert error granularity value.\n",
 		 function );
@@ -1205,11 +1161,14 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE *segment_file, uint3
 
 		return( -1 );
 	}
-	*media_type        = volume->media_type;
-	*media_flags       = volume->media_flags;
-	*compression_level = (int8_t) volume->compression_level;
+	media_values->media_type  = volume->media_type;
+	media_values->media_flags = volume->media_flags;
+	*compression_level        = (int8_t) volume->compression_level;
 
-	if( libewf_common_memcpy( guid, volume->guid, 16 ) == NULL )
+	if( libewf_common_memcpy(
+	     media_values->guid,
+	     volume->guid,
+	     16 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
 		 function );
@@ -1290,7 +1249,9 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	volume->media_flags = internal_handle->media_values->media_flags;
 
-	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_chunks, volume->amount_of_chunks ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->amount_of_chunks,
+	     volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
@@ -1299,7 +1260,9 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media_values->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->sectors_per_chunk,
+	     volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
 		 function );
@@ -1308,7 +1271,9 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media_values->bytes_per_sector, volume->bytes_per_sector ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->bytes_per_sector,
+	     volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
 		 function );
@@ -1317,7 +1282,9 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_sectors, volume->amount_of_sectors ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media_values->amount_of_sectors,
+	     volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 		 function );
@@ -1334,7 +1301,10 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	{
 		volume->compression_level = (uint8_t) internal_handle->compression_level;
 
-		if( libewf_common_memcpy( volume->guid, internal_handle->media_values->guid, 16 ) == NULL )
+		if( libewf_common_memcpy(
+		     volume->guid,
+		     internal_handle->media_values->guid,
+		     16 ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
 			 function );
@@ -1343,7 +1313,9 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			return( -1 );
 		}
-		if( libewf_endian_revert_32bit( internal_handle->media_values->error_granularity, volume->error_granularity ) != 1 )
+		if( libewf_endian_revert_32bit(
+		     internal_handle->media_values->error_granularity,
+		     volume->error_granularity ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
 			 function );
@@ -1419,7 +1391,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Reads a volume section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint32_t *amount_of_chunks, uint32_t *sectors_per_chunk, uint32_t *bytes_per_sector, uint32_t *amount_of_sectors, uint32_t *chunk_size, uint32_t *error_granularity, uint8_t *media_type, uint8_t *media_flags, int8_t *compression_level, uint8_t *guid, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance )
 {
 	static char *function    = "libewf_section_volume_read";
 	ssize_t read_count       = 0;
@@ -1432,37 +1404,9 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 
 		return( -1 );
 	}
-	if( amount_of_chunks == NULL )
+	if( media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sectors_per_chunk == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -1486,10 +1430,7 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 		*ewf_format = EWF_FORMAT_S01;
 		read_count  = libewf_section_volume_s01_read(
 		               segment_file,
-		               amount_of_chunks,
-		               sectors_per_chunk,
-		               bytes_per_sector,
-		               amount_of_sectors,
+		               media_values,
 		               format,
 		               error_tollerance );
 	}
@@ -1498,15 +1439,8 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 		*ewf_format = EWF_FORMAT_E01;
 		read_count  = libewf_section_volume_e01_read(
 		               segment_file,
-		               amount_of_chunks,
-		               sectors_per_chunk,
-		               bytes_per_sector,
-		               amount_of_sectors,
-		               error_granularity,
-		               media_type,
-		               media_flags,
+		               media_values,
 		               compression_level,
-		               guid,
 		               error_tollerance );
 	}
 	else
@@ -1523,21 +1457,22 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 
 		return( -1 );
 	}
-	if( *sectors_per_chunk > (uint32_t) INT32_MAX )
+	if( media_values->sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( *bytes_per_sector > (uint32_t) INT32_MAX )
+	if( media_values->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	bytes_per_chunk = (size64_t) *sectors_per_chunk * (size64_t) *bytes_per_sector;
+	bytes_per_chunk = (size64_t) media_values->sectors_per_chunk
+	                * (size64_t) media_values->bytes_per_sector;
 
 	if( bytes_per_chunk > (size64_t) INT32_MAX )
 	{
@@ -1548,19 +1483,19 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE *segment_file, size_t se
 		{
 			return( -1 );
 		}
-		*chunk_size = EWF_MINIMUM_CHUNK_SIZE;
+		media_values->chunk_size = EWF_MINIMUM_CHUNK_SIZE;
 	}
 	else
 	{
-		*chunk_size = (uint32_t) bytes_per_chunk;
+		media_values->chunk_size = (uint32_t) bytes_per_chunk;
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes each.\n",
-	 function, *amount_of_chunks, *chunk_size );
+	 function, media_values->amount_of_chunks, media_values->chunk_size );
 
 	LIBEWF_VERBOSE_PRINT( "%s: volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
-	 function, *amount_of_sectors, *bytes_per_sector );
+	 function, media_values->amount_of_sectors, media_values->bytes_per_sector );
 
-	if( *amount_of_chunks == 0 )
+	if( media_values->amount_of_chunks == 0 )
 	{
 		*ewf_format = EWF_FORMAT_L01;
 	}
@@ -4227,16 +4162,8 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_volume_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->media_values->amount_of_chunks ),
-		              &( internal_handle->media_values->sectors_per_chunk ),
-		              &( internal_handle->media_values->bytes_per_sector ),
-		              &( internal_handle->media_values->amount_of_sectors ),
-		              &( internal_handle->media_values->chunk_size ),
-		              &( internal_handle->media_values->error_granularity ),
-		              &( internal_handle->media_values->media_type ),
-		              &( internal_handle->media_values->media_flags ),
+		              internal_handle->media_values,
 		              &( internal_handle->compression_level ),
-		              internal_handle->media_values->guid,
 		              &( internal_handle->format ),
 		              &( internal_handle->ewf_format ),
 		              internal_handle->error_tollerance );
