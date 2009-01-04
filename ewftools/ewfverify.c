@@ -611,7 +611,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		fprintf( stdout, "%" PRIs_SYSTEM ": ABORTED\n",
+		fprintf( stdout, "%" PRIs ": ABORTED\n",
 		 program );
 
 		if( calculate_md5 == 1 )
@@ -648,21 +648,21 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
+			fprintf( stdout, "MD5 hash stored in file:\t%" PRIs "\n",
 			 stored_md5_hash_string );
 
 			if( log_file_stream != NULL )
 			{
-				fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
+				fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs "\n",
 				 stored_md5_hash_string );
 			}
 		}
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs "\n",
 		 calculated_md5_hash_string );
 
 		if( log_file_stream != NULL )
 		{
-			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
 			 calculated_md5_hash_string );
 		}
 		match_md5_hash = ( string_compare(
@@ -688,21 +688,21 @@ int main( int argc, char * const argv[] )
 		}
 		else
 		{
-			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
+			fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs "\n",
 			 stored_sha1_hash_string );
 
 			if( log_file_stream != NULL )
 			{
-				fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
+				fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs "\n",
 				 stored_sha1_hash_string );
 			}
 		}
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs "\n",
 		 calculated_sha1_hash_string );
 
 		if( log_file_stream != NULL )
 		{
-			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
 			 calculated_sha1_hash_string );
 		}
 		match_sha1_hash = ( string_compare(
@@ -734,14 +734,14 @@ int main( int argc, char * const argv[] )
 	  || ( stored_sha1_hash_result == 0 )
 	  || match_sha1_hash ) )
 	{
-		fprintf( stdout, "\n%" PRIs_SYSTEM ": SUCCESS\n",
+		fprintf( stdout, "\n%" PRIs ": SUCCESS\n",
 		 program );
 
 		result = EXIT_SUCCESS;
 	}
 	else
 	{
-		fprintf( stdout, "\n%" PRIs_SYSTEM ": FAILURE\n",
+		fprintf( stdout, "\n%" PRIs ": FAILURE\n",
 		 program );
 
 		result = EXIT_FAILURE;

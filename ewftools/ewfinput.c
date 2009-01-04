@@ -810,8 +810,8 @@ system_character_t *ewfinput_get_variable_char_t(
 			return( NULL );
 		}
 		if( ewfstring_copy_character_string_to_system_string(
-		     user_input,
 		     user_input_char_t,
+		     user_input,
 		     ( user_input_length + 1 ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set conversion string.\n",

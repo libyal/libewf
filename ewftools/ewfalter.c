@@ -114,7 +114,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	fprintf( stdout, "%s is for testing purposes only.\n",
+	fprintf( stdout, "%" PRIs " is for testing purposes only.\n",
 	 program );
 
 	while( ( option = ewfgetopt(
