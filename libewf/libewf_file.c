@@ -102,13 +102,13 @@ int libewf_glob(
      system_character_t **filenames[] )
 {
 	system_character_t *segment_filename = NULL;
-	void *reallocation                  = NULL;
-	static char *function               = "libewf_glob";
-	size_t additional_length            = 4;
-	int amount_of_files                 = 0;
-	int file_descriptor                 = 0;
-	uint8_t segment_file_type           = 0;
-	uint8_t ewf_format                  = 0;
+	void *reallocation                   = NULL;
+	static char *function                = "libewf_glob";
+	size_t additional_length             = 4;
+	int amount_of_files                  = 0;
+	int file_descriptor                  = 0;
+	uint8_t segment_file_type            = 0;
+	uint8_t ewf_format                   = 0;
 
 	if( filename == NULL )
 	{
@@ -159,19 +159,19 @@ int libewf_glob(
 		}
 		additional_length = 0;
 
-		if( filename[ length - 3 ] != (system_character_t) 'E' )
+		if( filename[ length - 3 ] == (system_character_t) 'E' )
 		{
 			format = LIBEWF_FORMAT_ENCASE5;
 		}
-		else if( filename[ length - 3 ] != (system_character_t) 'e' )
+		else if( filename[ length - 3 ] == (system_character_t) 'e' )
 		{
 			format = LIBEWF_FORMAT_EWF;
 		}
-		else if( filename[ length - 3 ] != (system_character_t) 'L' )
+		else if( filename[ length - 3 ] == (system_character_t) 'L' )
 		{
 			format = LIBEWF_FORMAT_LVF;
 		}
-		else if( filename[ length - 3 ] != (system_character_t) 's' )
+		else if( filename[ length - 3 ] == (system_character_t) 's' )
 		{
 			format = LIBEWF_FORMAT_SMART;
 		}

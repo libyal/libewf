@@ -88,30 +88,34 @@ int main( int argc, char * const argv[] )
 	character_t media_size_string[ 16 ];
 	uint8_t guid[ 16 ];
 
-	character_t *program              = _CHARACTER_T_STRING( "ewfinfo" );
+	character_t *program                       = _CHARACTER_T_STRING( "ewfinfo" );
+
+	system_character_t * const *argv_filenames = NULL;
+	system_character_t **ewf_filenames         = NULL;
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                   = NULL;
-	int32_t glob_count                = 0;
+	ewfglob_t *glob                            = NULL;
+	int32_t glob_count                         = 0;
 #endif
-	char *file_format_string          = NULL;
-	system_integer_t option           = 0;
-	size64_t media_size               = 0;
-	uint32_t bytes_per_sector         = 0;
-	uint32_t amount_of_sectors        = 0;
-	uint32_t error_granularity        = 0;
-	uint32_t amount_of_acquiry_errors = 0;
-	uint32_t amount_of_sessions       = 0;
-	int8_t compression_level          = 0;
-	uint8_t compress_empty_block      = 0;
-	uint8_t media_type                = 0;
-	uint8_t media_flags               = 0;
-	uint8_t volume_type               = 0;
-	uint8_t format                    = 0;
-	uint8_t verbose                   = 0;
-	uint8_t date_format               = LIBEWF_DATE_FORMAT_CTIME;
-	char info_option                  = 'a';
-	int result                        = 0;
+	char *file_format_string                   = NULL;
+	system_integer_t option                    = 0;
+	size64_t media_size                        = 0;
+	uint32_t bytes_per_sector                  = 0;
+	uint32_t amount_of_sectors                 = 0;
+	uint32_t error_granularity                 = 0;
+	uint32_t amount_of_acquiry_errors          = 0;
+	uint32_t amount_of_sessions                = 0;
+	int8_t compression_level                   = 0;
+	uint8_t compress_empty_block               = 0;
+	uint8_t media_type                         = 0;
+	uint8_t media_flags                        = 0;
+	uint8_t volume_type                        = 0;
+	uint8_t format                             = 0;
+	uint8_t verbose                            = 0;
+	uint8_t date_format                        = LIBEWF_DATE_FORMAT_CTIME;
+	char info_option                           = 'a';
+	int amount_of_filenames                    = 0;
+	int result                                 = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -261,7 +265,8 @@ int main( int argc, char * const argv[] )
 	              &argv[ optind ],
 	              ( argc - optind ) );
 
-	if( glob_count <= 0 )
+	if( ( glob_count <= 0 )
+	 || ( glob_count > (int32_t) UINT16_MAX ) )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
@@ -270,20 +275,53 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	ewfcommon_libewf_handle = libewf_open(
-	                           glob->results,
-	                           glob->amount,
-	                           LIBEWF_OPEN_READ );
-
-	ewfglob_free(
-	 glob );
+	amount_of_filenames = (int) glob_count;
+	argv_filenames      = glob->results;
 #else
-	ewfcommon_libewf_handle = libewf_open(
-	                           &argv[ optind ],
-	                           ( argc - optind ),
-	                           LIBEWF_OPEN_READ );
+	amount_of_filenames = argc - optind;
+	argv_filenames      = &argv[ optind ];
 #endif
 
+	if( amount_of_filenames == 1 )
+	{
+		amount_of_filenames = libewf_glob(
+		                       argv_filenames[ 0 ],
+		                       system_string_length(
+		                        argv_filenames[ 0 ] ),
+		                       LIBEWF_FORMAT_UNKNOWN,
+		                       &ewf_filenames );
+
+		if( amount_of_filenames <= 0 )
+		{
+			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
+
+#if !defined( HAVE_GLOB_H )
+			ewfglob_free(
+			 glob );
+#endif
+
+			return( EXIT_FAILURE );
+		}
+		argv_filenames = (system_character_t * const *) ewf_filenames;
+	}
+	ewfcommon_libewf_handle = libewf_open(
+	                           argv_filenames,
+	                           amount_of_filenames,
+	                           LIBEWF_OPEN_READ );
+#if !defined( HAVE_GLOB_H )
+	ewfglob_free(
+	 glob );
+#endif
+	if( ewf_filenames != NULL )
+	{
+		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		{
+			memory_free(
+			 ewf_filenames[ amount_of_filenames - 1 ] );
+		}
+		memory_free(
+		 ewf_filenames );
+	}
 	if( ( ewfcommon_abort == 0 )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{

@@ -134,8 +134,10 @@ int libewf_file_io_open(
 	if( file_descriptor == -1 )
 #endif
 	{
+#if defined( HAVE_DEBUG_OUTPUT )
 		notify_warning_printf( "%s: error opening file: %s.\n",
 		 function, filename );
+#endif
 
 		return( -1 );
 	}
@@ -168,8 +170,10 @@ int libewf_file_io_wopen(
 	     _SH_DENYRW,
 	     ( _S_IREAD | _S_IWRITE ) ) != 0 )
 	{
+#if defined( HAVE_DEBUG_OUTPUT )
 		notify_warning_printf( "%s: error opening file: %s.\n",
 		 function, filename );
+#endif
 
 		return( -1 );
 	}

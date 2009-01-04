@@ -160,46 +160,49 @@ int main( int argc, char * const argv[] )
 	system_character_t time_string[ 32 ];
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                     = NULL;
-	int32_t glob_count                  = 0;
+	ewfglob_t *glob                            = NULL;
+	int32_t glob_count                         = 0;
 #endif
-	system_character_t *filenames[ 1 ]  = { NULL };
+	system_character_t *filenames[ 1 ]         = { NULL };
 
-	LIBEWF_HANDLE *export_handle        = NULL;
-	character_t *user_input             = NULL;
-	character_t *program                = _CHARACTER_T_STRING( "ewfexport" );
+	LIBEWF_HANDLE *export_handle               = NULL;
+	character_t *user_input                    = NULL;
+	character_t *program                       = _CHARACTER_T_STRING( "ewfexport" );
 
-	system_character_t *target_filename = NULL;
+	system_character_t * const *argv_filenames = NULL;
+	system_character_t **ewf_filenames         = NULL;
+	system_character_t *target_filename        = NULL;
 
-	void *callback                      = &ewfoutput_process_status_fprint;
-	system_integer_t option             = 0;
-	size64_t media_size                 = 0;
-	time_t timestamp_start              = 0;
-	time_t timestamp_end                = 0;
-	uint64_t maximum_segment_file_size  = 0;
-	uint64_t segment_file_size          = 0;
-	uint64_t export_offset              = 0;
-	uint64_t export_size                = 0;
-	uint64_t sectors_per_chunk          = 64;
-	uint32_t amount_of_crc_errors       = 0;
-	int64_t count                       = 0;
-	uint8_t libewf_format               = LIBEWF_FORMAT_ENCASE5;
-	uint8_t swap_byte_pairs             = 0;
-	uint8_t wipe_chunk_on_error         = 0;
-	uint8_t verbose                     = 0;
-	int8_t compression_level            = LIBEWF_COMPRESSION_NONE;
-	int8_t compress_empty_block         = 0;
-	int argument_set_compression        = 0;
-	int argument_set_format             = 0;
-	int argument_set_offset             = 0;
-	int argument_set_sectors_per_chunk  = 0;
-	int argument_set_segment_file_size  = 0;
-	int argument_set_size               = 0;
-	int interactive_mode                = 1;
-	uint8_t calculate_md5               = 1;
-	uint8_t calculate_sha1              = 0;
-	int output_raw                      = 1;
-	int result                          = 1;
+	void *callback                             = &ewfoutput_process_status_fprint;
+	system_integer_t option                    = 0;
+	size64_t media_size                        = 0;
+	time_t timestamp_start                     = 0;
+	time_t timestamp_end                       = 0;
+	uint64_t maximum_segment_file_size         = 0;
+	uint64_t segment_file_size                 = 0;
+	uint64_t export_offset                     = 0;
+	uint64_t export_size                       = 0;
+	uint64_t sectors_per_chunk                 = 64;
+	uint32_t amount_of_crc_errors              = 0;
+	int64_t count                              = 0;
+	uint8_t libewf_format                      = LIBEWF_FORMAT_ENCASE5;
+	uint8_t swap_byte_pairs                    = 0;
+	uint8_t wipe_chunk_on_error                = 0;
+	uint8_t verbose                            = 0;
+	int8_t compression_level                   = LIBEWF_COMPRESSION_NONE;
+	int8_t compress_empty_block                = 0;
+	int argument_set_compression               = 0;
+	int argument_set_format                    = 0;
+	int argument_set_offset                    = 0;
+	int argument_set_sectors_per_chunk         = 0;
+	int argument_set_segment_file_size         = 0;
+	int argument_set_size                      = 0;
+	int interactive_mode                       = 1;
+	uint8_t calculate_md5                      = 1;
+	uint8_t calculate_sha1                     = 0;
+	int amount_of_filenames                    = 0;
+	int output_raw                             = 1;
+	int result                                 = 1;
 
 	character_t *ewfexport_format_types[ 13 ] = \
 	 { _CHARACTER_T_STRING( "raw" ),
@@ -455,7 +458,8 @@ int main( int argc, char * const argv[] )
 	              &argv[ optind ],
 	              ( argc - optind ) );
 
-	if( glob_count <= 0 )
+	if( ( glob_count <= 0 )
+	 || ( glob_count > (int32_t) UINT16_MAX ) )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
@@ -466,20 +470,55 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	ewfcommon_libewf_handle = libewf_open(
-	                           glob->results,
-	                           glob->amount,
-	                           LIBEWF_OPEN_READ );
-
-	ewfglob_free(
-	 glob );
+	amount_of_filenames = (int) glob_count;
+	argv_filenames      = glob->results;
 #else
-	ewfcommon_libewf_handle = libewf_open(
-	                           &argv[ optind ],
-	                           ( argc - optind ),
-	                           LIBEWF_OPEN_READ );
+	amount_of_filenames = argc - optind;
+	argv_filenames      = &argv[ optind ];
 #endif
 
+	if( amount_of_filenames == 1 )
+	{
+		amount_of_filenames = libewf_glob(
+		                       argv_filenames[ 0 ],
+		                       system_string_length(
+		                        argv_filenames[ 0 ] ),
+		                       LIBEWF_FORMAT_UNKNOWN,
+		                       &ewf_filenames );
+
+		if( amount_of_filenames <= 0 )
+		{
+			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
+
+#if !defined( HAVE_GLOB_H )
+			ewfglob_free(
+			 glob );
+#endif
+			memory_free(
+			 target_filename );
+
+			return( EXIT_FAILURE );
+		}
+		argv_filenames = (system_character_t * const *) ewf_filenames;
+	}
+	ewfcommon_libewf_handle = libewf_open(
+	                           argv_filenames,
+	                           amount_of_filenames,
+	                           LIBEWF_OPEN_READ );
+#if !defined( HAVE_GLOB_H )
+	ewfglob_free(
+	 glob );
+#endif
+	if( ewf_filenames != NULL )
+	{
+		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		{
+			memory_free(
+			 ewf_filenames[ amount_of_filenames - 1 ] );
+		}
+		memory_free(
+		 ewf_filenames );
+	}
 	if( ( ewfcommon_abort == 0 )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
