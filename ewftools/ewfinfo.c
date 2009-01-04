@@ -103,7 +103,7 @@ int main( int argc, char * const argv[] )
 	libewf_char_t *program            = _S_LIBEWF_CHAR( "ewfinfo" );
 
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob                     = NULL;
+	ewfglob_t *glob                   = NULL;
 	int32_t glob_count                = 0;
 #endif
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )

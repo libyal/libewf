@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -198,7 +201,7 @@ int libewf_convert_timestamp(
 		}
 		*date_string_length = 20;
 
-		*date_string = (libewf_char_t *) libewf_common_alloc(
+		*date_string = (libewf_char_t *) memory_allocate(
                                                   sizeof( libewf_char_t ) * *date_string_length );
 
 		if( *date_string == NULL )
@@ -480,7 +483,7 @@ int libewf_generate_date_header_value(
 	}
 	*date_string_length = 20;
 
-	*date_string = (libewf_char_t *) libewf_common_alloc(
+	*date_string = (libewf_char_t *) memory_allocate(
 	                                  sizeof( libewf_char_t ) * *date_string_length );
 
 	if( *date_string == NULL )
@@ -604,7 +607,7 @@ int libewf_generate_date_header2_value(
 	}
 	*date_string_length = 11;
 
-	*date_string = (libewf_char_t *) libewf_common_alloc(
+	*date_string = (libewf_char_t *) memory_allocate(
 	                                  sizeof( libewf_char_t ) * *date_string_length );
 
 	if( *date_string == NULL )
@@ -1189,7 +1192,7 @@ int libewf_header_values_parse_header(
 
 		return( -1 );
 	}
-	header_string = (libewf_char_t *) libewf_common_alloc(
+	header_string = (libewf_char_t *) memory_allocate(
 	                                   sizeof( libewf_char_t ) * ( size + 1 ) );
 
 	if( header_string == NULL )
@@ -1252,7 +1255,7 @@ int libewf_header_values_parse_header2(
 		return( -1 );
 	}
 	header_size   = ( size - 2 ) / 2;
-	header_string = (libewf_char_t *) libewf_common_alloc(
+	header_string = (libewf_char_t *) memory_allocate(
 	                                   sizeof( libewf_char_t ) * ( header_size + 1 ) );
 
 	if( header_string == NULL )
@@ -1333,7 +1336,7 @@ int libewf_header_values_convert_header_string_to_header(
 
 		return( -1 );
 	}
-	*header = (ewf_char_t *) libewf_common_alloc(
+	*header = (ewf_char_t *) memory_allocate(
 	                          sizeof( ewf_char_t ) * header_string_length );
 
 	if( *header == NULL )
@@ -1411,7 +1414,7 @@ int libewf_header_values_convert_header_string_to_header2(
 	 */
 	*header2_length = ( header_string_length + 1 ) * 2;
 
-	*header2 = (ewf_char_t *) libewf_common_alloc(
+	*header2 = (ewf_char_t *) memory_allocate(
 	                           sizeof( ewf_char_t ) * *header2_length );
 
 	if( *header2 == NULL )
@@ -1657,7 +1660,7 @@ int libewf_header_values_generate_header_string_type1(
 	 */
 	*header_string_length += 11;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -1974,7 +1977,7 @@ int libewf_header_values_generate_header_string_type2(
 	 */
 	*header_string_length += 11;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -2260,7 +2263,7 @@ int libewf_header_values_generate_header_string_type3(
 	 */
 	*header_string_length += 10;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -2538,7 +2541,7 @@ int libewf_header_values_generate_header_string_type4(
 	 */
 	*header_string_length += 10;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -2832,7 +2835,7 @@ int libewf_header_values_generate_header_string_type5(
 	 */
 	*header_string_length += 11;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -3148,7 +3151,7 @@ int libewf_header_values_generate_header_string_type6(
 	 */
 	*header_string_length += 13;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -3444,7 +3447,7 @@ int libewf_header_values_generate_header_string_type7(
 	 */
 	*header_string_length += 11;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )
@@ -4544,7 +4547,7 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
-	xml_header_string = (libewf_char_t *) libewf_common_alloc(
+	xml_header_string = (libewf_char_t *) memory_allocate(
 	                                       sizeof( libewf_char_t ) * ( size + 1 ) );
 
 	if( xml_header_string == NULL )
@@ -4691,7 +4694,7 @@ int libewf_header_values_generate_header_string_xml(
 	 */
 	*header_string_length += 2;
 
-	*header_string = (libewf_char_t *) libewf_common_alloc(
+	*header_string = (libewf_char_t *) memory_allocate(
 	                                    sizeof( libewf_char_t ) * *header_string_length );
 
 	if( *header_string == NULL )

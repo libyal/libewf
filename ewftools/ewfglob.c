@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -77,12 +80,14 @@
 /* Allocates memory for a new glob struct
  * Returns a pointer to the new instance, NULL on error
  */
-EWFGLOB *ewfglob_alloc( void )
+ewfglob_t *ewfglob_alloc(
+            void )
 {
-	EWFGLOB *glob         = NULL;
+	ewfglob_t *glob         = NULL;
 	static char *function = "ewfglob_alloc";
 
-	glob = (EWFGLOB *) libewf_common_alloc( EWFGLOB_SIZE );
+	glob = (ewfglob_t *) memory_allocate(
+	                      sizeof( ewfglob_t ) );
 
 	if( glob == NULL )
 	{
@@ -91,7 +96,7 @@ EWFGLOB *ewfglob_alloc( void )
 
 		return( NULL );
 	}
-	if( libewf_common_memset( glob, 0, EWFGLOB_SIZE ) == NULL )
+	if( libewf_common_memset( glob, 0, sizeof( ewfglob_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
 		 function );
@@ -109,7 +114,9 @@ EWFGLOB *ewfglob_alloc( void )
 /* Reallocates memory for a glob
  * Returns a pointer to the instance, NULL on error
  */
-EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
+ewfglob_t *ewfglob_realloc(
+            ewfglob_t *glob,
+            uint16_t new_amount )
 {
 	CHAR_T **reallocation = NULL;
 	static char *function = "ewfglob_realloc";
@@ -130,7 +137,8 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 
 		return( NULL );
 	}
-	new_size = EWFGLOB_RESULT_SIZE * new_amount;
+	previous_size = sizeof( CHAR_T* ) * glob->amount;
+	new_size      = sizeof( CHAR_T* ) * new_amount;
 
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (size_t) SSIZE_MAX ) )
@@ -142,12 +150,14 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 	}
 	if( glob->amount == 0 )
 	{
-		reallocation = (CHAR_T **) libewf_common_alloc( new_size );
+		reallocation = (CHAR_T **) memory_allocate(
+		                            new_size );
 	}
 	else
 	{
-		previous_size = glob->amount * EWFGLOB_RESULT_SIZE;
-		reallocation  = (CHAR_T **) libewf_common_realloc( glob->results, new_size );
+		reallocation  = (CHAR_T **) libewf_common_realloc(
+		                             glob->results,
+		                             new_size );
 	}
 	if( reallocation == NULL )
 	{
@@ -175,7 +185,8 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 
 /* Frees memory of a glob
  */
-void ewfglob_free( EWFGLOB *glob )
+void ewfglob_free(
+      ewfglob_t *glob )
 {
 	static char *function = "ewfglob_free";
 	uint16_t iterator     = 0;
@@ -193,18 +204,24 @@ void ewfglob_free( EWFGLOB *glob )
 		{
 			if( glob->results[ iterator ] != NULL )
 			{
-				libewf_common_free( glob->results[ iterator ] );
+				libewf_common_free(
+				 glob->results[ iterator ] );
 			}
 		}
-		libewf_common_free( glob->results );
+		libewf_common_free(
+		 glob->results );
 	}
-	libewf_common_free( glob );
+	libewf_common_free(
+	 glob );
 }
 
 /* Resolves filenames with wildcards (globs)
  * Returns the amount of result if successful, -1 on error
  */
-int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amount_of_patterns )
+int32_t ewfglob_resolve(
+         ewfglob_t *glob,
+         CHAR_T * const patterns[],
+         uint32_t amount_of_patterns )
 {
 #if defined( HAVE_WINDOWS_API )
 	struct ewfglob_finddata_t find_data;
@@ -217,10 +234,10 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 
 	intptr_t find_handle  = 0;
 #endif
-	EWFGLOB *reallocation = NULL;
-	static char *function = "ewfglob_resolve";
-	int32_t globs_found   = 0;
-	uint32_t iterator     = 0;
+	ewfglob_t *reallocation = NULL;
+	static char *function   = "ewfglob_resolve";
+	int32_t globs_found     = 0;
+	uint32_t iterator       = 0;
 
 	if( glob == NULL )
 	{

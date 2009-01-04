@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #if defined( HAVE_STDLIB_H )
@@ -107,7 +110,8 @@ struct tm *ewfoutput_gmtime(
 
 		return( NULL );
 	}
-	time_elements = (struct tm *) libewf_common_alloc( sizeof( struct tm ) );
+	time_elements = (struct tm *) memory_allocate(
+	                               sizeof( struct tm ) );
 
 	if( time_elements == NULL )
 	{
@@ -859,7 +863,7 @@ void ewfoutput_hash_values_fprint(
 
 		return;
 	}
-	stored_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
+	stored_md5_hash_string = (libewf_char_t *) memory_allocate(
 	                                            sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( ( stored_md5_hash_string != NULL )

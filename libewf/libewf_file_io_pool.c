@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -49,7 +52,7 @@ libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount )
 	static char *function               = "libewf_file_io_pool_alloc";
 	size_t iterator                     = 0;
 
-	file_io_pool = (libewf_file_io_pool_t *) libewf_common_alloc(
+	file_io_pool = (libewf_file_io_pool_t *) memory_allocate(
 	                                          sizeof( libewf_file_io_pool_t ) );
 
 	if( file_io_pool == NULL )
@@ -59,7 +62,7 @@ libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount )
 
 		return( NULL );
 	}
-	file_io_pool->handle = (libewf_file_io_handle_t *) libewf_common_alloc(
+	file_io_pool->handle = (libewf_file_io_handle_t *) memory_allocate(
 	                                                    sizeof( libewf_file_io_handle_t ) * amount );
 
 	if( file_io_pool->handle == NULL )

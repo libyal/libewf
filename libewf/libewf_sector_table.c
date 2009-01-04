@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include "libewf_common.h"
@@ -46,7 +49,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 	libewf_sector_table_t *sector_table = NULL;
 	static char *function               = "libewf_sector_table_alloc";
 
-	sector_table = (libewf_sector_table_t *) libewf_common_alloc(
+	sector_table = (libewf_sector_table_t *) memory_allocate(
 	                                          sizeof( libewf_sector_table_t ) );
 
 	if( sector_table == NULL )
@@ -60,7 +63,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 	if( amount > 0 )
 	{
-		sector_table->sector = (libewf_sector_table_entry_t *) libewf_common_alloc(
+		sector_table->sector = (libewf_sector_table_entry_t *) memory_allocate(
 		                                                        sizeof( libewf_sector_table_entry_t ) * amount );
 
 		if( sector_table->sector == NULL )

@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -57,7 +60,7 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 
 		return( NULL );
 	}
-	segment_table = (libewf_segment_table_t *) libewf_common_alloc(
+	segment_table = (libewf_segment_table_t *) memory_allocate(
 	                                            sizeof( libewf_segment_table_t ) );
 
 	if( segment_table == NULL )
@@ -67,7 +70,7 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 
 		return( NULL );
 	}
-	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) libewf_common_alloc(
+	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) memory_allocate(
 	                                      ( amount * sizeof( libewf_segment_file_handle_t * ) ) );
 
 	if( segment_table->segment_file_handle == NULL )

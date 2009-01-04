@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #if defined( HAVE_STDLIB_H )
@@ -719,7 +722,7 @@ libewf_char_t *ewfinput_get_variable(
 #if defined( MEMWATCH )
 			/* One additional character required for end of string
 			 */
-			user_input = libewf_common_alloc(
+			user_input = memory_allocate(
 			              sizeof( libewf_char_t ) * ( input_length + 1 ) );
 
 			if( user_input == NULL )
@@ -793,7 +796,7 @@ CHAR_T *ewfinput_get_variable_char_t(
 		user_input_length = libewf_string_length(
 		                     user_input );
 
-		user_input_char_t = libewf_common_alloc(
+		user_input_char_t = memory_allocate(
 		                     sizeof( CHAR_T ) * ( user_input_length + 1 ) );
 
 		if( user_input_char_t == NULL )
@@ -1136,7 +1139,7 @@ libewf_char_t *ewfinput_get_fixed_value(
 #if defined( MEMWATCH )
 			/* One additional character required for end of string
 			 */
-			user_input = libewf_common_alloc(
+			user_input = memory_allocate(
 			              sizeof( libewf_char_t ) * ( value_length + 1 ) );
 
 			if( user_input == NULL )

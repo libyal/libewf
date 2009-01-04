@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -91,7 +94,7 @@ char *ewfstring_strerror(
 	char *error_string        = NULL;
 	size_t error_string_size  = 256;
 
-	error_string = (char *) libewf_common_alloc(
+	error_string = (char *) memory_allocate(
 	                         sizeof( char ) * error_string_size );
 
 	if( error_string == NULL )
@@ -175,8 +178,8 @@ wchar_t *ewfstring_wide_strerror(
 	wchar_t *error_string      = NULL;
 	uint16_t error_string_size = 256;
 
-	error_string = (wchar_t *) libewf_common_alloc(
-	                         sizeof( wchar_t ) * error_string_size );
+	error_string = (wchar_t *) memory_allocate(
+	                            sizeof( wchar_t ) * error_string_size );
 
 	if( error_string == NULL )
 	{

@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 #include "libewf_common.h"
 #include "libewf_notify.h"
@@ -77,7 +80,7 @@ libewf_section_list_t *libewf_section_list_append(
 
 		return( NULL );
 	}
-	section_list_entry = (libewf_section_list_entry_t *) libewf_common_alloc(
+	section_list_entry = (libewf_section_list_entry_t *) memory_allocate(
 	                                                      sizeof( libewf_section_list_entry_t ) );
 
 	if( section_list_entry == NULL )

@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -199,7 +202,7 @@ void libewf_debug_header_fprint(
 
 		return;
 	}
-	header_string = (libewf_char_t *) libewf_common_alloc(
+	header_string = (libewf_char_t *) memory_allocate(
 	                                   sizeof( libewf_char_t ) * size );
 
 	if( header_string == NULL )
@@ -249,7 +252,7 @@ void libewf_debug_header2_fprint(
 		return;
 	}
 	header_size   = ( size - 1 ) / 2;
-	header_string = (libewf_char_t *) libewf_common_alloc(
+	header_string = (libewf_char_t *) memory_allocate(
 	                                   sizeof( libewf_char_t ) * header_size );
 
 	if( header_string == NULL )

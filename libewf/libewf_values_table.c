@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -52,7 +55,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 	static char *function               = "libewf_values_table_alloc";
 	size_t values_table_size            = 0;
 
-	values_table = (libewf_values_table_t *) libewf_common_alloc(
+	values_table = (libewf_values_table_t *) memory_allocate(
 	                                          sizeof( libewf_values_table_t ) );
 
 	if( values_table == NULL )
@@ -73,7 +76,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	values_table->identifiers = (libewf_char_t **) libewf_common_alloc(
+	values_table->identifiers = (libewf_char_t **) memory_allocate(
 	                                                values_table_size );
 
 	if( values_table->identifiers == NULL )
@@ -98,7 +101,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	values_table->values = (libewf_char_t **) libewf_common_alloc(
+	values_table->values = (libewf_char_t **) memory_allocate(
 	                                           values_table_size );
 
 	if( values_table->values == NULL )

@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <time.h>
@@ -57,7 +60,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_internal_handle_alloc";
 
-	internal_handle = (libewf_internal_handle_t *) libewf_common_alloc(
+	internal_handle = (libewf_internal_handle_t *) memory_allocate(
 	                                                sizeof( libewf_internal_handle_t ) );
 
 	if( internal_handle == NULL )
@@ -480,7 +483,7 @@ libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
 	libewf_internal_handle_read_t *handle_read = NULL;
 	static char *function                      = "libewf_internal_handle_read_alloc";
 
-	handle_read = (libewf_internal_handle_read_t *) libewf_common_alloc(
+	handle_read = (libewf_internal_handle_read_t *) memory_allocate(
 	                                                 sizeof( libewf_internal_handle_read_t ) );
 
 	if( handle_read == NULL )
@@ -535,7 +538,7 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 	libewf_internal_handle_write_t *handle_write = NULL;
 	static char *function                        = "libewf_internal_handle_write_alloc";
 
-	handle_write = (libewf_internal_handle_write_t *) libewf_common_alloc(
+	handle_write = (libewf_internal_handle_write_t *) memory_allocate(
 	                                                   sizeof( libewf_internal_handle_write_t ) );
 
 	if( handle_write == NULL )

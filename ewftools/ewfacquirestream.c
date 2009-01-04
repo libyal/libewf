@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -461,7 +464,7 @@ int main( int argc, char * const argv[] )
 		if( string_length > 0 )
 		{
 			string_length += 1;
-			case_number    = (libewf_char_t *) libewf_common_alloc(
+			case_number    = (libewf_char_t *) memory_allocate(
 			                                    sizeof( libewf_char_t ) * string_length );
 
 			if( case_number == NULL )
@@ -490,7 +493,7 @@ int main( int argc, char * const argv[] )
 		if( string_length > 0 )
 		{
 			string_length += 1;
-			description    = (libewf_char_t *) libewf_common_alloc(
+			description    = (libewf_char_t *) memory_allocate(
 			                                    sizeof( libewf_char_t ) * string_length );
 
 			if( description == NULL )
@@ -519,7 +522,7 @@ int main( int argc, char * const argv[] )
 		if( string_length > 0 )
 		{
 			string_length += 1;
-			examiner_name  = (libewf_char_t *) libewf_common_alloc(
+			examiner_name  = (libewf_char_t *) memory_allocate(
 			                                    sizeof( libewf_char_t ) * string_length );
 
 			if( examiner_name == NULL )
@@ -548,7 +551,7 @@ int main( int argc, char * const argv[] )
 		if( string_length > 0 )
 		{
 			string_length  += 1;
-			evidence_number = (libewf_char_t *) libewf_common_alloc(
+			evidence_number = (libewf_char_t *) memory_allocate(
 			                                     sizeof( libewf_char_t ) * string_length );
 
 			if( evidence_number == NULL )
@@ -577,7 +580,7 @@ int main( int argc, char * const argv[] )
 		if( string_length > 0 )
 		{
 			string_length += 1;
-			notes          = (libewf_char_t *) libewf_common_alloc(
+			notes          = (libewf_char_t *) memory_allocate(
 			                                    sizeof( libewf_char_t ) * string_length );
 
 			if( notes == NULL )
@@ -747,7 +750,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		calculated_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
+		calculated_md5_hash_string = (libewf_char_t *) memory_allocate(
 		                                                sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
@@ -764,7 +767,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		calculated_sha1_hash_string = (libewf_char_t *) libewf_common_alloc(
+		calculated_sha1_hash_string = (libewf_char_t *) memory_allocate(
 		                                                 sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )

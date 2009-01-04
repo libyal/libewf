@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #if defined( HAVE_STRING_H )
@@ -256,7 +259,7 @@ struct tm *libewf_common_localtime(
 
 		return( NULL );
 	}
-	time_elements = (struct tm *) libewf_common_alloc(
+	time_elements = (struct tm *) memory_allocate(
 	                               sizeof( struct tm ) );
 
 	if( time_elements == NULL )
@@ -353,7 +356,7 @@ char *libewf_common_ctime(
 
 		return( NULL );
 	}
-	time_string = (char *) libewf_common_alloc(
+	time_string = (char *) memory_allocate(
 	                        sizeof( char ) * time_string_size );
 
 	if( time_string == NULL )
@@ -444,7 +447,7 @@ wchar_t *libewf_common_wide_ctime(
 
 		return( NULL );
 	}
-	time_string = (wchar_t *) libewf_common_alloc(
+	time_string = (wchar_t *) memory_allocate(
 	                           sizeof( wchar_t ) * time_string_size );
 
 	if( time_string == NULL )

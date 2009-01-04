@@ -34,7 +34,7 @@
 #if !defined( _MEMORY_H )
 #define _MEMORY_H
 
-#include "libewf_includes.h"
+#include <common.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>

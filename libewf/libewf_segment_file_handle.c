@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include "libewf_common.h"
@@ -47,7 +50,7 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	static char *function                             = "libewf_segment_file_handle_alloc";
 
-	segment_file_handle = (libewf_segment_file_handle_t *) libewf_common_alloc(
+	segment_file_handle = (libewf_segment_file_handle_t *) memory_allocate(
 	                                                        sizeof( libewf_segment_file_handle_t ) );
 
 	if( segment_file_handle == NULL )
@@ -57,7 +60,7 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
 
 		return( NULL );
 	}
-	segment_file_handle->section_list = (libewf_section_list_t *) libewf_common_alloc(
+	segment_file_handle->section_list = (libewf_section_list_t *) memory_allocate(
 	                                                               sizeof( libewf_section_list_t ) );
 
 	if( segment_file_handle->section_list == NULL )
@@ -224,7 +227,7 @@ int libewf_segment_file_handle_set_filename(
 	}
 	/* One additional byte for the end of string character is needed
 	 */
-	segment_file_handle->filename = (libewf_filename_t *) libewf_common_alloc(
+	segment_file_handle->filename = (libewf_filename_t *) memory_allocate(
 	                                                       sizeof( libewf_filename_t ) * ( length_filename + 1 ) );
 
 	if( segment_file_handle->filename == NULL )

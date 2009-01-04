@@ -4,6 +4,10 @@ SUBDIRS = \
 	ewftools \
 	manuals
 
+CONFIG_FILE = \
+	common/config.h \
+	common/config_windows.h
+
 DEBIAN_FILES = \
 	debian/changelog \
 	debian/changelog.in \
@@ -40,6 +44,16 @@ DEBIAN_FILES = \
 	debian/shlibs.local.ex \
 	debian/shlibs.local.ex.in \
 	debian/watch.ex
+
+DOCUMENT_FILES = \
+	doc/header.txt \
+	doc/header2.txt \
+	doc/tests.txt
+
+INCLUDE_FILES = \
+	include/libewf.h.in \
+	include/libewf/libewf_definitions.h.in \
+	include/libewf/libewf_types.h.in
 
 MANUAL_FILES = \
 	manuals/ewfacquire.1 \
@@ -78,21 +92,16 @@ REDHAT_FILES = \
 	libewf.spec.in
 
 EXTRA_DIST = \
+	$(CONFIG_FILES) \
 	$(DEBIAN_FILES) \
+	$(DOCUMENT_FILES) \
+	$(INCLUDE_FILES) \
 	$(MANUAL_FILES) \
 	$(MSVCPP_FILES) \
 	$(MACOSX_FILES) \
 	$(REDHAT_FILES) \
-	doc/header.txt \
-	doc/header2.txt \
-	include/libewf.h.in \
-	include/libewf/libewf_definitions.h.in \
-	include/libewf/libewf_types.h.in \
-	libewf/libewf_config.h \
-	libewf/libewf_config_windows.h \
 	libewf.pc \
-	libewf.pc.in \
-	TESTS
+	libewf.pc.in
 
 pkgconfigdir = $(libdir)/pkgconfig
 

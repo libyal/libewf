@@ -171,7 +171,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob                      = NULL;
+	ewfglob_t *glob                    = NULL;
 	int32_t glob_count                 = 0;
 #endif
 	CHAR_T *filenames[ 1 ]             = { NULL };

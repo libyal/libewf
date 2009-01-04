@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -171,7 +174,7 @@ libewf_char_t *ewfcommon_determine_operating_system(
 	length = (uint32_t) strlen(
 	                     operating_system ) + 1;
 
-	string = (libewf_char_t *) libewf_common_alloc(
+	string = (libewf_char_t *) memory_allocate(
 	                            sizeof( libewf_char_t ) * length );
 
 	if( ( string != NULL )
@@ -1280,7 +1283,7 @@ ssize64_t ewfcommon_read_verify(
 #else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-	data = (uint8_t *) libewf_common_alloc(
+	data = (uint8_t *) memory_allocate(
 	                    sizeof( uint8_t ) * buffer_size );
 
 	if( data == NULL )
@@ -1294,7 +1297,7 @@ ssize64_t ewfcommon_read_verify(
 	/* The EWF-S01 format uses compression this will add bytes
 	 */
 	raw_read_buffer_size = buffer_size * 2;
-	raw_read_data        = (uint8_t *) libewf_common_alloc(
+	raw_read_data        = (uint8_t *) memory_allocate(
 	                                    sizeof( uint8_t ) * raw_read_buffer_size );
 
 	if( raw_read_data == NULL )
@@ -1629,8 +1632,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 #else
 	data_buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-	data_buffer = (uint8_t *) libewf_common_alloc(
-	                           data_buffer_size * sizeof( uint8_t ) );
+	data_buffer = (uint8_t *) memory_allocate(
+	                           sizeof( uint8_t ) * data_buffer_size );
 
 	if( data_buffer == NULL )
 	{
@@ -1641,8 +1644,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	}
 #if defined( HAVE_RAW_ACCESS )
 	raw_data_buffer_size = data_buffer_size * 2;
-	raw_data_buffer      = (uint8_t *) libewf_common_alloc(
-	                                    raw_data_buffer_size * sizeof( uint8_t ) );
+	raw_data_buffer      = (uint8_t *) memory_allocate(
+	                                    sizeof( uint8_t ) * raw_data_buffer_size );
 
 	if( raw_data_buffer == NULL )
 	{
@@ -2019,8 +2022,8 @@ ssize64_t ewfcommon_export_raw(
 #else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-	data = (uint8_t *) libewf_common_alloc(
-	                    buffer_size * sizeof( uint8_t ) );
+	data = (uint8_t *) memory_allocate(
+	                    sizeof( uint8_t ) * buffer_size );
 
 	if( data == NULL )
 	{
@@ -2033,8 +2036,8 @@ ssize64_t ewfcommon_export_raw(
 	/* The EWF-S01 format uses compression this will add bytes
 	 */
 	raw_read_buffer_size = buffer_size * 2;
-	raw_read_data        = (uint8_t *) libewf_common_alloc(
-	                                    raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_read_data        = (uint8_t *) memory_allocate(
+	                                    sizeof( uint8_t ) * raw_read_buffer_size );
 
 	if( raw_read_data == NULL )
 	{
@@ -2438,7 +2441,7 @@ ssize64_t ewfcommon_export_ewf(
 #else
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 #endif
-	data = (uint8_t *) libewf_common_alloc(
+	data = (uint8_t *) memory_allocate(
 	                    sizeof( uint8_t ) * buffer_size );
 
 	if( data == NULL )
@@ -2452,8 +2455,8 @@ ssize64_t ewfcommon_export_ewf(
 	/* The EWF-S01 format uses compression this will add bytes
 	 */
 	raw_read_buffer_size = buffer_size * 2;
-	raw_read_data        = (uint8_t *) libewf_common_alloc(
-	                                    raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_read_data        = (uint8_t *) memory_allocate(
+	                                    sizeof( uint8_t ) * raw_read_buffer_size );
 
 	if( raw_read_data == NULL )
 	{
@@ -2466,8 +2469,8 @@ ssize64_t ewfcommon_export_ewf(
 		return( -1 );
 	}
 	raw_write_buffer_size = buffer_size * 2;
-	raw_write_data        = (uint8_t *) libewf_common_alloc(
-	                                     raw_read_buffer_size * sizeof( uint8_t ) );
+	raw_write_data        = (uint8_t *) memory_allocate(
+	                                     sizeof( uint8_t ) * raw_read_buffer_size );
 
 	if( raw_read_data == NULL )
 	{

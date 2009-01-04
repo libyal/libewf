@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -102,7 +105,7 @@ int main( int argc, char * const argv[] )
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob                              = NULL;
+	ewfglob_t *glob                            = NULL;
 	int32_t glob_count                         = 0;
 #endif
 	libewf_char_t *stored_md5_hash_string      = NULL;
@@ -292,7 +295,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		stored_md5_hash_string = (libewf_char_t *) libewf_common_alloc(
+		stored_md5_hash_string = (libewf_char_t *) memory_allocate(
 		                                            sizeof( libewf_char_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( stored_md5_hash_string == NULL )
@@ -301,7 +304,7 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		calculated_md5_hash_string = (libewf_char_t *) libewf_common_alloc( 
+		calculated_md5_hash_string = (libewf_char_t *) memory_allocate( 
 		                                                sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
 		if( calculated_md5_hash_string == NULL )
@@ -316,7 +319,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		stored_sha1_hash_string = (libewf_char_t *) libewf_common_alloc( 
+		stored_sha1_hash_string = (libewf_char_t *) memory_allocate( 
 		                                             sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( stored_sha1_hash_string == NULL )
@@ -332,7 +335,7 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		calculated_sha1_hash_string = (libewf_char_t *) libewf_common_alloc( 
+		calculated_sha1_hash_string = (libewf_char_t *) memory_allocate( 
 		                                                 sizeof( libewf_char_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
 		if( calculated_sha1_hash_string == NULL )

@@ -1,5 +1,5 @@
 /*
- * libewf hash sections
+ * Common include file
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,65 +31,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <common.h>
-#include <memory.h>
+#if !defined( _COMMON_H )
+#define _COMMON_H
 
-#include "libewf_includes.h"
+#if defined( HAVE_CONFIG_H )
+#include <config.h>
+#endif
 
-#include "libewf_common.h"
-#include "libewf_hash_sections.h"
-#include "libewf_notify.h"
+#if defined( HAVE_CONFIG_WINDOWS_H )
+#include <config_windows.h>
+#endif
 
-/* Allocates memory for a new hash sections struct
- * Returns a pointer to the new instance, NULL on error
- */
-libewf_hash_sections_t *libewf_hash_sections_alloc( void )
-{
-	libewf_hash_sections_t *hash_sections = NULL;
-	static char *function                 = "libewf_hash_sections_alloc";
-
-	hash_sections = (libewf_hash_sections_t *) memory_allocate(
-	                                            sizeof( libewf_hash_sections_t ) );
-
-	if( hash_sections == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate hash sections.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( libewf_common_memset(
-	     hash_sections,
-	     0,
-	     sizeof( libewf_hash_sections_t ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear hash sections.\n",
-		 function );
-
-		libewf_common_free( hash_sections );
-
-		return( NULL );
-	}
-	return( hash_sections );
-}
-
-/* Frees memory of a hash sections struct including elements
- */
-void libewf_hash_sections_free( libewf_hash_sections_t *hash_sections )
-{
-        static char *function = "libewf_hash_sections_free";
-
-	if( hash_sections == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid hash sections.\n",
-		 function );
-
-		return;
-	}
-	if( hash_sections->xhash != NULL )
-	{
-		libewf_common_free( hash_sections->xhash );
-	}
-	libewf_common_free( hash_sections );
-}
+#endif
 

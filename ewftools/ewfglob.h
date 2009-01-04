@@ -45,10 +45,6 @@ extern "C" {
 
 #if !defined( HAVE_GLOB_H )
 
-#define EWFGLOB ewfglob_t
-#define EWFGLOB_SIZE sizeof( EWFGLOB )
-#define EWFGLOB_RESULT_SIZE sizeof( CHAR_T* )
-
 typedef struct ewfglob ewfglob_t;
 
 struct ewfglob
@@ -62,10 +58,20 @@ struct ewfglob
 	CHAR_T **results;
 };
 
-EWFGLOB *ewfglob_alloc( void );
-EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount );
-void ewfglob_free( EWFGLOB *glob );
-int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amount_of_patterns );
+ewfglob_t *ewfglob_alloc(
+            void );
+
+ewfglob_t *ewfglob_realloc(
+            ewfglob_t *glob,
+            uint16_t new_amount );
+
+void ewfglob_free(
+      ewfglob_t *glob );
+
+int32_t ewfglob_resolve(
+         ewfglob_t *glob,
+         CHAR_T * const patterns[],
+         uint32_t amount_of_patterns );
 
 #endif
 

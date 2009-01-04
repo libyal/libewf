@@ -129,9 +129,6 @@
 extern "C" {
 #endif
 
-#define libewf_common_alloc( size ) \
-	malloc( size )
-
 #define libewf_common_realloc( buffer, size ) \
 	realloc( (void *) buffer, size )
 

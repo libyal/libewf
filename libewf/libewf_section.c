@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -292,7 +295,7 @@ ssize_t libewf_section_compressed_string_read(
 
 		return( -1 );
 	}
-	compressed_string = (ewf_char_t *) libewf_common_alloc(
+	compressed_string = (ewf_char_t *) memory_allocate(
 	                                    sizeof( ewf_char_t ) * compressed_string_size );
 
 	if( compressed_string == NULL )
@@ -322,7 +325,7 @@ ssize_t libewf_section_compressed_string_read(
 
 	/* Add a byte for the end of string
 	 */
-	uncompressed = (ewf_char_t *) libewf_common_alloc(
+	uncompressed = (ewf_char_t *) memory_allocate(
 	                               sizeof( ewf_char_t ) * ( *uncompressed_string_size + 1 ) );
 
 	if( uncompressed == NULL )
@@ -429,7 +432,7 @@ ssize_t libewf_section_write_compressed_string(
 	}
 	section_offset         = segment_file_handle->file_offset;
 	compressed_string_size = uncompressed_string_size;
-	compressed_string      = (ewf_char_t *) libewf_common_alloc(
+	compressed_string      = (ewf_char_t *) memory_allocate(
 	                                         sizeof( ewf_char_t ) * compressed_string_size );
 
 	if( compressed_string == NULL )
@@ -804,7 +807,7 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	volume = (ewf_volume_smart_t *) libewf_common_alloc(
+	volume = (ewf_volume_smart_t *) memory_allocate(
 	                                 sizeof( ewf_volume_smart_t ) );
 
 	if( volume == NULL )
@@ -956,7 +959,7 @@ ssize_t libewf_section_volume_s01_write(
 	}
 	section_offset = segment_file_handle->file_offset;
 
-	volume = (ewf_volume_smart_t *) libewf_common_alloc(
+	volume = (ewf_volume_smart_t *) memory_allocate(
 	                                 sizeof( ewf_volume_smart_t ) );
 
 	if( volume == NULL )
@@ -1138,7 +1141,7 @@ ssize_t libewf_section_volume_e01_read(
 
 		return( -1 );
 	}
-	volume = (ewf_volume_t *) libewf_common_alloc(
+	volume = (ewf_volume_t *) memory_allocate(
 	                           sizeof( ewf_volume_t ) );
 
 	if( volume == NULL )
@@ -1315,7 +1318,7 @@ ssize_t libewf_section_volume_e01_write(
 	}
 	section_offset = segment_file_handle->file_offset;
 
-	volume = (ewf_volume_t *) libewf_common_alloc(
+	volume = (ewf_volume_t *) memory_allocate(
 	                           sizeof( ewf_volume_t ) );
 
 	if( volume == NULL )
@@ -1756,7 +1759,8 @@ ssize_t libewf_section_table_read(
 			}
 		}
 		offsets_size = sizeof( ewf_table_offset_t ) * amount_of_chunks;
-		offsets      = (ewf_table_offset_t *) libewf_common_alloc( offsets_size );
+		offsets      = (ewf_table_offset_t *) memory_allocate(
+		                                       offsets_size );
 
 		if( offsets == NULL )
 		{
@@ -1987,7 +1991,8 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	offsets = (ewf_table_offset_t *) libewf_common_alloc( offsets_size );
+	offsets = (ewf_table_offset_t *) memory_allocate(
+	                                  offsets_size );
 
 	if( offsets == NULL )
 	{
@@ -2311,7 +2316,7 @@ ssize_t libewf_section_ltree_read(
 	}
 	*ewf_format = EWF_FORMAT_L01;
 
-	ltree = (ewf_ltree_t *) libewf_common_alloc(
+	ltree = (ewf_ltree_t *) memory_allocate(
 	                         sizeof( ewf_ltree_t ) );
 
 	if( ltree == NULL )
@@ -2345,7 +2350,7 @@ ssize_t libewf_section_ltree_read(
 
 	ltree_data_size = section_size - sizeof( ewf_ltree_t );
 
-	ltree_data = (ewf_char_t *) libewf_common_alloc(
+	ltree_data = (ewf_char_t *) memory_allocate(
                                      sizeof( ewf_char_t ) * ltree_data_size );
 
 	if( ltree_data == NULL )
@@ -2497,7 +2502,7 @@ ssize_t libewf_section_session_read(
 	{
 		ewf_sessions_size = sizeof( ewf_session_entry_t ) * amount_of_ewf_sessions;
 
-		ewf_sessions = (ewf_session_entry_t *) libewf_common_alloc(
+		ewf_sessions = (ewf_session_entry_t *) memory_allocate(
 		                                        ewf_sessions_size );
 
 		if( ewf_sessions == NULL )
@@ -2584,7 +2589,7 @@ ssize_t libewf_section_session_read(
 
 			sessions->amount = 0;
 		}
-		sessions->sector = (libewf_sector_table_entry_t *) libewf_common_alloc(
+		sessions->sector = (libewf_sector_table_entry_t *) memory_allocate(
 		                                                    sizeof( libewf_sector_table_entry_t ) * amount_of_ewf_sessions );
 
 		if( sessions->sector == NULL )
@@ -2698,7 +2703,7 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	ewf_sessions = (ewf_session_entry_t *) libewf_common_alloc(
+	ewf_sessions = (ewf_session_entry_t *) memory_allocate(
 	                                        ewf_sessions_size );
 
 	if( ewf_sessions == NULL )
@@ -2868,7 +2873,8 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	data = (ewf_data_t *) libewf_common_alloc( sizeof( ewf_data_t ) );
+	data = (ewf_data_t *) memory_allocate(
+	                       sizeof( ewf_data_t ) );
 
 	if( data == NULL )
 	{
@@ -3118,7 +3124,8 @@ ssize_t libewf_section_data_write(
 	 */
 	if( *cached_data_section == NULL )
 	{
-		*cached_data_section = (ewf_data_t *) libewf_common_alloc( sizeof( ewf_data_t ) );
+		*cached_data_section = (ewf_data_t *) memory_allocate(
+		                                       sizeof( ewf_data_t ) );
 
 		if( *cached_data_section == NULL )
 		{
@@ -3386,7 +3393,7 @@ ssize_t libewf_section_error2_read(
 	}
 	else
 	{
-		error2_sectors = (ewf_error2_sector_t *) libewf_common_alloc(
+		error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 		                                          sectors_size );
 
 		if( error2_sectors == NULL )
@@ -3473,7 +3480,7 @@ ssize_t libewf_section_error2_read(
 
 			acquiry_errors->amount = 0;
 		}
-		acquiry_errors->sector = (libewf_sector_table_entry_t *) libewf_common_alloc(
+		acquiry_errors->sector = (libewf_sector_table_entry_t *) memory_allocate(
 		                                                          sizeof( libewf_sector_table_entry_t ) * amount_of_errors );
 
 		if( acquiry_errors->sector == NULL )
@@ -3596,7 +3603,7 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	error2_sectors = (ewf_error2_sector_t *) libewf_common_alloc(
+	error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 	                                          sectors_size );
 
 	if( error2_sectors == NULL )
@@ -4628,7 +4635,7 @@ ssize_t libewf_section_debug_read(
 
 		return( -1 );
 	}
-	data = (uint8_t *) libewf_common_alloc(
+	data = (uint8_t *) memory_allocate(
 	                    (size_t) section_size );
 
 	if( data == NULL )
@@ -4652,7 +4659,7 @@ ssize_t libewf_section_debug_read(
 
 		return( -1 );
 	}
-	uncompressed_data = (uint8_t *) libewf_common_alloc(
+	uncompressed_data = (uint8_t *) memory_allocate(
 	                                 uncompressed_size );
 
 	if( uncompressed_data == NULL )

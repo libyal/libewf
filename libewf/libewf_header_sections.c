@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -52,7 +55,7 @@ libewf_header_sections_t *libewf_header_sections_alloc(
 	libewf_header_sections_t *header_sections = NULL;
 	static char *function                     = "libewf_header_sections_alloc";
 
-	header_sections = (libewf_header_sections_t *) libewf_common_alloc(
+	header_sections = (libewf_header_sections_t *) memory_allocate(
 	                                                sizeof( libewf_header_sections_t ) );
 
 	if( header_sections == NULL )

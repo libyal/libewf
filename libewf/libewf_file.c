@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #if HAVE_UNISTD_H
@@ -254,7 +257,7 @@ int libewf_glob(
 	}
 	while( amount_of_files < (int) UINT16_MAX )
 	{
-		segment_filename = libewf_common_alloc(
+		segment_filename = memory_allocate(
 			            sizeof( libewf_filename_t ) * ( length + additional_length + 1 ) );
 
 		if( segment_filename == NULL )

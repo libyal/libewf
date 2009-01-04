@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_COMMON_H )
-#define _LIBEWF_COMMON_H
+#if !defined( _STRING_H )
+#define _STRING_H
 
 #include "libewf_includes.h"
 

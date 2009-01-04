@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -207,7 +210,7 @@ int libewf_filename_create(
 	}
 	/* The actual filename also contains a '.', 3 character extension and a end of string byte
 	 */
-	new_filename = libewf_common_alloc(
+	new_filename = memory_allocate(
 	                sizeof( libewf_filename_t ) * ( length_basename + 5 ) );
 
 	if( new_filename == NULL )

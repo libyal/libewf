@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -88,7 +91,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( HAVE_GLOB_H )
-	EWFGLOB *glob           = NULL;
+	ewfglob_t *glob         = NULL;
 	int32_t glob_count      = 0;
 #endif
 
@@ -278,7 +281,7 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		buffer = libewf_common_alloc(
+		buffer = memory_allocate(
 		          alter_size );
 
 		if( buffer == NULL )

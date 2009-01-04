@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -51,7 +54,7 @@ libewf_offset_table_t *libewf_offset_table_alloc(
 	libewf_offset_table_t *offset_table = NULL;
 	static char *function               = "libewf_offset_table_alloc";
 
-	offset_table = (libewf_offset_table_t *) libewf_common_alloc(
+	offset_table = (libewf_offset_table_t *) memory_allocate(
 	                                          sizeof( libewf_offset_table_t ) );
 
 	if( offset_table == NULL )
@@ -65,7 +68,7 @@ libewf_offset_table_t *libewf_offset_table_alloc(
 
 	if( amount > 0 )
 	{
-		offset_table->chunk_offset = (libewf_chunk_offset_t *) libewf_common_alloc(
+		offset_table->chunk_offset = (libewf_chunk_offset_t *) memory_allocate(
 		                                                        sizeof( libewf_chunk_offset_t ) * amount );
 
 		if( offset_table->chunk_offset == NULL )

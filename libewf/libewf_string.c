@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -70,7 +73,7 @@ libewf_char_t *libewf_string_duplicate(
 	 */
 	size += 1;
 
-	duplicate = (libewf_char_t *) libewf_common_alloc(
+	duplicate = (libewf_char_t *) memory_allocate(
 	                               sizeof( libewf_char_t ) * size );
 
 	if( duplicate == NULL )
@@ -337,7 +340,7 @@ libewf_char_t **libewf_string_split(
 	while( line_end != NULL );
 
 	*amount = iterator;
-	lines   = (libewf_char_t **) libewf_common_alloc(
+	lines   = (libewf_char_t **) memory_allocate(
 	                              ( sizeof( libewf_char_t * ) * *amount ) );
 
 	if( lines == NULL )
@@ -386,7 +389,7 @@ libewf_char_t **libewf_string_split(
 		 */
 		line_size += 1;
 
-		lines[ iterator ] = (libewf_char_t *) libewf_common_alloc(
+		lines[ iterator ] = (libewf_char_t *) memory_allocate(
                                                        sizeof( libewf_char_t ) * line_size );
 
 		if( lines[ iterator ] == NULL )
@@ -1029,7 +1032,7 @@ int libewf_string_ctime(
 
                 return( -1 );
         }
-        *ctime_string = (libewf_char_t *) libewf_common_alloc(
+        *ctime_string = (libewf_char_t *) memory_allocate(
                                            sizeof( libewf_char_t ) * *ctime_string_length );
 
         if( *ctime_string == NULL )

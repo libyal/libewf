@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include <libewf/libewf_definitions.h>
@@ -242,7 +245,7 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
-	xml_hash_string = (libewf_char_t *) libewf_common_alloc(
+	xml_hash_string = (libewf_char_t *) memory_allocate(
 	                                     sizeof( libewf_char_t ) * ( size + 1 ) );
 
 	if( xml_hash_string == NULL )
@@ -330,7 +333,7 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 		return( -1 );
 	}
-	*hash = (ewf_char_t *) libewf_common_alloc(
+	*hash = (ewf_char_t *) memory_allocate(
 	                        sizeof( ewf_char_t ) * hash_string_length );
 
 	if( *hash == NULL )
@@ -446,7 +449,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	 */
 	*hash_string_length += 2;
 
-	*hash_string = (libewf_char_t *) libewf_common_alloc(
+	*hash_string = (libewf_char_t *) memory_allocate(
                                          sizeof( libewf_char_t ) * *hash_string_length );
 
 	if( *hash_string == NULL )

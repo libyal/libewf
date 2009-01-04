@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_common.h"
@@ -45,7 +48,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 	libewf_chunk_cache_t *chunk_cache = NULL;
 	static char *function             = "libewf_chunk_cache_alloc";
 
-	chunk_cache = (libewf_chunk_cache_t *) libewf_common_alloc(
+	chunk_cache = (libewf_chunk_cache_t *) memory_allocate(
 	                                        sizeof( libewf_chunk_cache_t ) );
 
 	if( chunk_cache == NULL )
@@ -64,7 +67,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 		return( NULL );
 	}
-	chunk_cache->compressed = (ewf_char_t *) libewf_common_alloc(
+	chunk_cache->compressed = (ewf_char_t *) memory_allocate(
 	                                          size );
 
 	if( chunk_cache->compressed == NULL )
@@ -76,7 +79,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 		return( NULL );
 	}
-	chunk_cache->data = (ewf_char_t *) libewf_common_alloc(
+	chunk_cache->data = (ewf_char_t *) memory_allocate(
 	                                    size );
 
 	if( chunk_cache->data == NULL )

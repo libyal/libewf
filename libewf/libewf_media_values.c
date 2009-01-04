@@ -31,6 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include "libewf_common.h"
@@ -48,7 +51,7 @@ libewf_media_values_t *libewf_media_values_alloc(
 	libewf_media_values_t *media_values = NULL;
 	static char *function               = "libewf_media_values_alloc";
 
-	media_values = (libewf_media_values_t *) libewf_common_alloc(
+	media_values = (libewf_media_values_t *) memory_allocate(
 	                                          sizeof( libewf_media_values_t ) );
 
 	if( media_values == NULL )
