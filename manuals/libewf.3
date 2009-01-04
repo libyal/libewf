@@ -86,6 +86,8 @@
 .Fn libewf_parse_hash_values "LIBEWF_HANDLE *handle"
 .Ft int8_t
 .Fn libewf_add_acquiry_error "LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors"
+.Ft int
+.Fn libewf_copy_header_values "LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle"
 .Ft void
 .Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
 .Pp
@@ -300,6 +302,13 @@ function can be used to parse the values in the hash string within a set of EWF 
 The
 .Fn libewf_add_acquiry_error
 function can be used to add an acquiry error (a read error during acquiry) to be written into a set of EWF files.
+.Pp
+The
+.Fn libewf_copy_*
+functions copy information from the
+.Ar source_handle
+to the 
+.Ar destination_handle.
 .Pp
 The
 .Fn libewf_set_notify_values

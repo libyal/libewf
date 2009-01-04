@@ -208,7 +208,7 @@ void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values )
 /* Sets a 2 digit value for a certain index in the date element at the start of the date string
  * Returns 1 if successful, -1 otherwise
  */
-int8_t libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
+int libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
 {
 	static char *function = "libewf_date_string_set_2digit_value";
 	size_t string_length  = 0;
@@ -252,7 +252,7 @@ int8_t libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHA
 /* Sets a 4 digit value for a certain index in the date element at the start of the date string
  * Returns 1 if successful, -1 otherwise
  */
-int8_t libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
+int libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
 {
 	static char *function = "libewf_date_string_set_4digit_value";
 	size_t string_length  = 0;
@@ -854,7 +854,7 @@ int32_t libewf_header_values_get_index( LIBEWF_HEADER_VALUES *header_values, LIB
  * Length should contain the amount of characters in the string
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int8_t libewf_header_values_get_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_header_values_get_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	static char *function      = "libewf_header_values_get_value";
 	size_t header_value_length = 0;
@@ -920,7 +920,7 @@ int8_t libewf_header_values_get_value( LIBEWF_HEADER_VALUES *header_values, LIBE
  * Frees the previous header value if necessary
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_header_values_set_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_header_values_set_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	static char *function = "libewf_header_values_set_value";
 	size_t string_length  = 0;
@@ -1004,6 +1004,94 @@ int8_t libewf_header_values_set_value( LIBEWF_HEADER_VALUES *header_values, LIBE
 	return( 1 );
 }
 
+/* Copies the header values from the source to the destination
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_header_values_copy( LIBEWF_HEADER_VALUES *destination_header_values, LIBEWF_HEADER_VALUES *source_header_values )
+{
+	static char *function = "libewf_header_values_copy";
+	size_t string_length  = 0;
+	int32_t index         = 0;
+
+	if( destination_header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid destination header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_header_values->identifiers == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source header values - missing identifiers.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_header_values->values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source header values - missing values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_header_values->amount > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source header values amount value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( index = 0; index < (int32_t) source_header_values->amount; index++ )
+	{
+		/* Skip the acquiry and system date
+		 */
+		if( ( index == LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_DATE )
+		 || ( index == LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ) )
+		{
+			continue;
+		}
+		/* Skip empty values
+		 */
+		if( source_header_values->values[ index ] == NULL )
+		{
+			LIBEWF_VERBOSE_PRINT( "%s: missing header value for index: %" PRIi32 ".\n",
+			 function, index );
+
+			continue;
+		}
+		string_length = libewf_string_length( source_header_values->values[ index ] );
+
+		/* Skip empty values
+		 */
+		if( string_length == 0 )
+		{
+			LIBEWF_VERBOSE_PRINT( "%s: empty header value for index: %" PRIi32 ".\n",
+			 function, index );
+
+			continue;
+		}
+		if( libewf_header_values_set_value(
+		     destination_header_values,
+		     source_header_values->identifiers[ index ],
+		     source_header_values->values[ index ],
+		     string_length ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set value for index: %" PRIi32 ".\n",
+			 function, index );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
 /* Parse a header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
@@ -1023,7 +1111,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string( LIBEWF_CHAR *hea
 
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header string\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid header string.\n",
 		 function );
 
 		return( NULL );

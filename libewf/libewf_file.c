@@ -962,6 +962,16 @@ int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t
 	         amount_of_sectors ) );
 }
 
+/* Copies the header values from the source to the destination handle
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle )
+{
+	return( libewf_internal_handle_copy_header_values(
+	         (LIBEWF_INTERNAL_HANDLE *) destination_handle,
+	         (LIBEWF_INTERNAL_HANDLE *) source_handle ) );
+}
+
 /* Set the notify values
  */
 void libewf_set_notify_values( FILE *stream, uint8_t verbose )

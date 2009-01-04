@@ -2614,3 +2614,48 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	return( 1 );
 }
 
+/* Copies the header values from the source to the destination handle
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_internal_handle_copy_header_values( LIBEWF_INTERNAL_HANDLE *destination_handle, LIBEWF_INTERNAL_HANDLE *source_handle )
+{
+	static char *function = "libewf_internal_handle_copy_header_values";
+
+	if( destination_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid destination handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_handle->header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source handle - missing header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( destination_handle->header_values == NULL )
+	{
+		destination_handle->header_values = libewf_header_values_alloc();
+
+		if( destination_handle->header_values == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values in destination handle.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( libewf_header_values_copy(
+	         destination_handle->header_values,
+	         source_handle->header_values ) );
+}
+

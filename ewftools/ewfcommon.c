@@ -3168,6 +3168,27 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 
 		return( -1 );
 	}
+	if( libewf_set_write_input_size( export_handle, read_size ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set write size in export handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_parse_header_values( handle, LIBEWF_DATE_FORMAT_ISO8601 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to parse header values in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_copy_header_values( export_handle, handle ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set copy header values to export handle.\n",
+		 function );
+
+		return( -1 );
+	}
 	read_all    = (uint8_t) ( ( read_size == (size64_t) media_size ) && ( read_offset == 0 ) );
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
@@ -3176,15 +3197,6 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
 		 function );
-
-		return( -1 );
-	}
-	if( libewf_set_write_input_size( export_handle, read_size ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set write size in export handle.\n",
-		 function );
-
-		libewf_common_free( data );
 
 		return( -1 );
 	}

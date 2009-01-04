@@ -128,6 +128,8 @@ TODO
 * ewfexport to export EWF format to merge delta file(s) and ewf file(s)
 * implement raw split support in ewfexport
 * change int8_t return values into int return values
+* update ewfexport man page
+* what about header values parsing with preservation of timestamps?
 
 Version: 20070819
 * worked on restructuring to improve internal structure
