@@ -49,7 +49,7 @@ extern "C" {
 
 int libewf_segment_file_check_file_signature( int file_descriptor );
 
-ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *segment_number );
+ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *segment_number, uint8_t *segment_file_type );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount, uint8_t flags );

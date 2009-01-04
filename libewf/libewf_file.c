@@ -256,15 +256,67 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 			return( NULL );
 		}
-		if( libewf_read_build_index( internal_handle ) != 1 )
+		/* TODO: Get the basename of the first segment file and store it in
+		 * the 0'th entry
+		 */
+
+		if( internal_handle->segment_table_build != 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create index.\n",
+			LIBEWF_WARNING_PRINT( "%s: segment table has already been build.\n",
 			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
 			return( NULL );
 		}
+		/* Initialize the internal handle for reading
+		 */
+		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		/* Read the segment table from the segment files
+		 */
+		result = libewf_segment_file_read_segment_table( internal_handle );
+
+		if( result == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: error while trying to read the segment table.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		else if( result != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read segment table.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		/* Determine the EWF file format
+		 */
+		if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
+			 function );
+		}
+		/* Calculate the media size
+		 */
+		internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
+						   * (size64_t) internal_handle->media->bytes_per_sector;
+
+		/* Flag that the segment table was build
+		 */
+		internal_handle->segment_table_build = 1;
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
@@ -302,15 +354,6 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 
 			return( NULL );
 		}
-		if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, 0, -1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
 	}
 	else
 	{
@@ -336,6 +379,7 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
+	int result                              = 0;
 
 	if( file_amount < 1 )
 	{
@@ -371,15 +415,67 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
-		if( libewf_read_build_index( internal_handle ) != 1 )
+		/* TODO: Get the basename of the first segment file and store it in
+		 * the 0'th entry
+		 */
+
+		if( internal_handle->segment_table_build != 0 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create index.\n",
+			LIBEWF_WARNING_PRINT( "%s: segment table has already been build.\n",
 			 function );
 
 			libewf_internal_handle_free( internal_handle );
 
 			return( NULL );
 		}
+		/* Initialize the internal handle for reading
+		 */
+		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		/* Read the segment table from the segment files
+		 */
+		result = libewf_segment_file_read_segment_table( internal_handle );
+
+		if( result == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: error while trying to read the segment table.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		else if( result != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read segment table.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		/* Determine the EWF file format
+		 */
+		if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
+			 function );
+		}
+		/* Calculate the media size
+		 */
+		internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
+						   * (size64_t) internal_handle->media->bytes_per_sector;
+
+		/* Flag that the segment table was build
+		 */
+		internal_handle->segment_table_build = 1;
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
@@ -411,15 +507,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
-		if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, 0, -1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
 			 function );
 
 			libewf_internal_handle_free( internal_handle );
@@ -547,9 +634,9 @@ off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk
 
 		return( -1 );
 	}
-	if( internal_handle->index_build == 0 )
+	if( internal_handle->segment_table_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );
@@ -618,9 +705,9 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 
 		return( -1 );
 	}
-	if( internal_handle->index_build == 0 )
+	if( internal_handle->segment_table_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );
@@ -973,9 +1060,9 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 
 		return( -1 );
 	}
-	if( internal_handle->index_build == 0 )
+	if( internal_handle->segment_table_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );

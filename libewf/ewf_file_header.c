@@ -38,10 +38,32 @@
 
 #include "ewf_file_header.h"
 
+const uint8_t dvf_file_signature[] = { 0x64, 0x66, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 const uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
-/* Validates the EWF file signature (EWF-E01, EWF-S01, EWF-L01)
+/* Validates the EWF delta file signature (EWF-D01)
+ * Returns 1 if the signature matches, 0 otherwise
+ */
+int dwf_file_header_check_signature( uint8_t *signature )
+{
+	static char *function = "dwf_file_header_check_signature";
+
+	if( signature == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid signature.\n",
+		 function );
+
+		return( 0 );
+	}
+	if( libewf_common_memcmp( dvf_file_signature, signature, sizeof( dvf_file_signature ) ) == 0 )
+	{
+		return( 1 );
+	}
+	return( 0 );
+}
+
+/* Validates the EWF segment file signature (EWF-E01, EWF-S01)
  * Returns 1 if the signature matches, 0 otherwise
  */
 int ewf_file_header_check_signature( uint8_t *signature )
@@ -59,12 +81,27 @@ int ewf_file_header_check_signature( uint8_t *signature )
 	{
 		return( 1 );
 	}
-/* for EWF-L01 support
+	return( 0 );
+}
+
+/* Validates the EWF logical evidence segment file signature (EWF-L01)
+ * Returns 1 if the signature matches, 0 otherwise
+ */
+int lwf_file_header_check_signature( uint8_t *signature )
+{
+	static char *function = "lwf_file_header_check_signature";
+
+	if( signature == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid signature.\n",
+		 function );
+
+		return( 0 );
+	}
 	if( libewf_common_memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 )
 	{
 		return( 1 );
 	}
-*/
 	return( 0 );
 }
 

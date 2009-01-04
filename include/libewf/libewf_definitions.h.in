@@ -126,6 +126,12 @@
  */
 #define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE	( 650 * 1024 * 1024 )
 
+/* Libewf segment file type definitions
+ */
+#define LIBEWF_SEGMENT_FILE_TYPE_DWF		(uint8_t) "d"
+#define LIBEWF_SEGMENT_FILE_TYPE_EWF		(uint8_t) "E"
+#define LIBEWF_SEGMENT_FILE_TYPE_LWF		(uint8_t) "L"
+
 /* The length of hash strings
  */
 #define LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5	33

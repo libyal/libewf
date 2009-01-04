@@ -90,6 +90,11 @@ struct libewf_offset_table
 	/* Dynamic array of the segment numbers
 	 */
 	uint16_t *segment_number;
+
+	/* Dynamic array of boolean that definines
+	 * if the chunk is stored in the delta file
+	 */
+	uint8_t *dirty;
 };
 
 LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );

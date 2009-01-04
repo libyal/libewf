@@ -37,9 +37,9 @@
 /* The libewf version
  */
 #if 0
-#define LIBEWF_VERSION				L"20070728"
+#define LIBEWF_VERSION				L"20070806"
 #else
-#define LIBEWF_VERSION				"20070728"
+#define LIBEWF_VERSION				"20070806"
 #endif
 
 /* The libewf file access
@@ -125,6 +125,12 @@
 /* Libewf default segment file size
  */
 #define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE	( 650 * 1024 * 1024 )
+
+/* Libewf segment file type definitions
+ */
+#define LIBEWF_SEGMENT_FILE_TYPE_DWF		(uint8_t) "d"
+#define LIBEWF_SEGMENT_FILE_TYPE_EWF		(uint8_t) "E"
+#define LIBEWF_SEGMENT_FILE_TYPE_LWF		(uint8_t) "L"
 
 /* The length of hash strings
  */

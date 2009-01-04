@@ -46,77 +46,6 @@
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
 
-/* Builds the index (section list and offset table) from the input files
- * Returns 1 if successful, or -1 on error
- */
-int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_read_build_index";
-	int result            = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->index_build != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: index has already been build.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Initialize the internal handle for reading
-	 */
-	if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Read the segment table from the segment files
-	 */
-	result = libewf_segment_file_read_segment_table( internal_handle );
-
-	if( result == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: error while trying to read the segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	else if( result != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Determine the EWF file format
-	 */
-	if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
-		 function );
-	}
-	/* Calculate the media size
-	 */
-	internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
-	                                   * (size64_t) internal_handle->media->bytes_per_sector;
-
-	/* Flag that the index was build
-	 */
-	internal_handle->index_build = 1;
-
-	LIBEWF_VERBOSE_PRINT( "%s: index successful build.\n",
-	 function );
-
-	return( 1 );
-}
-
 /* Reads a certain chunk of data from the segment file(s)
  * Will read until the requested size is filled or the entire chunk is read
  * This function swaps byte pairs if specified
@@ -187,9 +116,9 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 		return( -1 );
 	}
-	if( internal_handle->index_build == 0 )
+	if( internal_handle->segment_table_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );
@@ -588,9 +517,9 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 		return( -1 );
 	}
-	if( internal_handle->index_build == 0 )
+	if( internal_handle->segment_table_build == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: index was not build.\n",
+		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
 		 function );
 
 		return( -1 );

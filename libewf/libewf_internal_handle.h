@@ -192,9 +192,9 @@ struct libewf_internal_handle
 	 */
 	uint8_t ewf_format;
 
-	/* value to indicate if the index has been build
+	/* value to indicate if the segment table has been build
 	 */
-	uint8_t index_build;
+	uint8_t segment_table_build;
 
 	/* value to indicate the level of error tollerance
 	 */

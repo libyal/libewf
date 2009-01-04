@@ -59,9 +59,13 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 		return( NULL );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	segment_table->filename = (wchar_t **) libewf_common_alloc_cleared( ( amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ), 0 );
+	segment_table->filename = (wchar_t **) libewf_common_alloc_cleared(
+	                           ( amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ),
+	                           0 );
 #else
-	segment_table->filename = (char **) libewf_common_alloc_cleared( ( amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ), 0 );
+	segment_table->filename = (char **) libewf_common_alloc_cleared(
+	                           ( amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ),
+	                           0 );
 #endif
 
 	if( segment_table->filename == NULL )
@@ -73,7 +77,9 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->file_descriptor = (int *) libewf_common_alloc_cleared( ( amount * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ), -1 );
+	segment_table->file_descriptor = (int *) libewf_common_alloc_cleared(
+	                                  ( amount * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ),
+	                                  -1 );
 
 	if( segment_table->file_descriptor == NULL )
 	{
@@ -85,7 +91,9 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->file_offset = (off_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ), 0 );
+	segment_table->file_offset = (off_t *) libewf_common_alloc_cleared(
+	                              ( amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ),
+	                              0 );
 
 	if( segment_table->file_offset == NULL )
 	{
@@ -98,7 +106,9 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->amount_of_chunks = (uint32_t *) libewf_common_alloc_cleared( ( amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ), 0 );
+	segment_table->amount_of_chunks = (uint32_t *) libewf_common_alloc_cleared(
+	                                   ( amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ),
+	                                   0 );
 
 	if( segment_table->amount_of_chunks == NULL )
 	{
@@ -112,7 +122,26 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->section_list = (LIBEWF_SECTION_LIST **) libewf_common_alloc_cleared( ( amount * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ), 0 );
+	segment_table->segment_file_type = (uint8_t *) libewf_common_alloc_cleared(
+	                                    ( amount * LIBEWF_SEGMENT_TABLE_SEGMENT_FILE_TYPE_SIZE ),
+	                                    0 );
+
+	if( segment_table->segment_file_type == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate amount of chunks array.\n",
+		 function );
+
+		libewf_common_free( segment_table->filename );
+		libewf_common_free( segment_table->file_descriptor );
+		libewf_common_free( segment_table->file_offset );
+		libewf_common_free( segment_table->amount_of_chunks );
+		libewf_common_free( segment_table );
+
+		return( NULL );
+	}
+	segment_table->section_list = (LIBEWF_SECTION_LIST **) libewf_common_alloc_cleared(
+	                               ( amount * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ),
+	                               0 );
 
 	if( segment_table->section_list == NULL )
 	{
@@ -123,6 +152,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 		libewf_common_free( segment_table->file_descriptor );
 		libewf_common_free( segment_table->file_offset );
 		libewf_common_free( segment_table->amount_of_chunks );
+		libewf_common_free( segment_table->segment_file_type );
 		libewf_common_free( segment_table );
 
 		return( NULL );
@@ -151,6 +181,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 				libewf_common_free( segment_table->file_descriptor );
 				libewf_common_free( segment_table->file_offset );
 				libewf_common_free( segment_table->amount_of_chunks );
+				libewf_common_free( segment_table->segment_file_type );
 				libewf_common_free( segment_table->section_list );
 				libewf_common_free( segment_table );
 
@@ -175,20 +206,27 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
  */
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount )
 {
-	void *reallocation = NULL;
-	uint16_t iterator  = 0;
+	void *reallocation    = NULL;
+	static char *function = "libewf_segment_table_realloc";
+	uint16_t iterator     = 0;
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: invalid segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
 
 		return( NULL );
 	}
-	reallocation = libewf_common_realloc_new_cleared( segment_table->filename, ( segment_table->amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ), ( amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ), 0 );
+	reallocation = libewf_common_realloc_new_cleared(
+	                segment_table->filename,
+	                ( segment_table->amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ),
+	                ( amount * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ),
+	                0 );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to reallocate dynamic filename array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic filename array.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -197,38 +235,72 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 #else
 	segment_table->filename = (char **) reallocation;
 #endif
-	reallocation            = libewf_common_realloc_new_cleared( segment_table->file_descriptor, ( segment_table->amount * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ), ( amount * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ), -1 );
+	reallocation            = libewf_common_realloc_new_cleared(
+	                           segment_table->file_descriptor,
+	                           ( segment_table->amount * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ),
+	                           ( amount * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ),
+	                           -1 );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to reallocate dynamic file descriptor array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file descriptor array.\n",
+		 function );
 
 		return( NULL );
 	}
 	segment_table->file_descriptor = (int *) reallocation;
-	reallocation                   = libewf_common_realloc_new_cleared( segment_table->file_offset, ( segment_table->amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ), ( amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ), 0 );
+	reallocation                   = libewf_common_realloc_new_cleared(
+	                                  segment_table->file_offset,
+	                                  ( segment_table->amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ),
+	                                  ( amount * LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE ),
+	                                  0 );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to reallocate dynamic file offset array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file offset array.\n",
+		 function );
 
 		return( NULL );
 	}
 	segment_table->file_offset = (off_t *) reallocation;
-	reallocation               = libewf_common_realloc_new_cleared( segment_table->amount_of_chunks, ( segment_table->amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ), ( amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ), 0 );
+	reallocation               = libewf_common_realloc_new_cleared(
+	                              segment_table->amount_of_chunks,
+	                              ( segment_table->amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ),
+	                              ( amount * LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE ),
+	                              0 );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to reallocate dynamic amount of chunks array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic amount of chunks array.\n",
+		 function );
 
 		return( NULL );
 	}
 	segment_table->amount_of_chunks = (uint32_t *) reallocation;
-	reallocation                    = libewf_common_realloc_new_cleared( segment_table->section_list, ( segment_table->amount * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ), ( amount * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ), 0 );
+	reallocation                    = libewf_common_realloc_new_cleared(
+	                                   segment_table->amount_of_chunks,
+	                                   ( segment_table->amount * LIBEWF_SEGMENT_TABLE_SEGMENT_FILE_TYPE_SIZE ),
+	                                   ( amount * LIBEWF_SEGMENT_TABLE_SEGMENT_FILE_TYPE_SIZE ),
+	                                   0 );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to reallocate dynamic section list array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic segment file type array.\n",
+		 function );
+
+		return( NULL );
+	}
+	segment_table->segment_file_type = (uint8_t *) reallocation;
+	reallocation                     = libewf_common_realloc_new_cleared(
+	                                    segment_table->section_list,
+	                                    ( segment_table->amount * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ),
+	                                    ( amount * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ),
+	                                    0 );
+
+	if( reallocation == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic section list array.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -242,7 +314,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 
 			if( segment_table->section_list[ iterator ] == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: unable to allocate section list.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
+				 function );
 
 				return( NULL );
 			}
@@ -251,7 +324,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_segment_table_realloc: section list already created.\n" );
+			LIBEWF_WARNING_PRINT( "%s: section list already created.\n",
+			 function );
 		}
 	}
 	segment_table->amount = amount;
@@ -265,11 +339,13 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 {
 	LIBEWF_SECTION_LIST_ENTRY *section_list_entry         = NULL;
 	LIBEWF_SECTION_LIST_ENTRY *current_section_list_entry = NULL;
+	static char *function                                 = "libewf_segment_table_free";
 	uint16_t iterator                                     = 0;
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_free: invalid segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
 
 		return;
 	}
@@ -297,6 +373,7 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 	libewf_common_free( segment_table->file_descriptor );
 	libewf_common_free( segment_table->file_offset );
 	libewf_common_free( segment_table->amount_of_chunks );
+	libewf_common_free( segment_table->segment_file_type );
 	libewf_common_free( segment_table->section_list );
 	libewf_common_free( segment_table );
 }
@@ -308,15 +385,19 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
  */
 wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment )
 {
+	static char *function = "libewf_segment_table_get_wide_filename";
+
 	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_get_wide_filename: invalid segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( segment > segment_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_get_wide_filename: segment out of range.\n" );
+		LIBEWF_WARNING_PRINT( "%s: segment out of range.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -329,15 +410,19 @@ wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_t
  */
 char *libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment )
 {
+	static char *function = "libewf_segment_table_get_filename";
+
 	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_get_filename: invalid segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( segment > segment_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_get_filename: segment out of range.\n" );
+		LIBEWF_WARNING_PRINT( "%s: segment out of range.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -350,15 +435,19 @@ char *libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, ui
  */
 int libewf_segment_table_get_file_descriptor( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment )
 {
+	static char *function = "libewf_segment_table_get_file_descriptor";
+
 	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_get_file_descriptor: invalid segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( segment > segment_table->amount )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_get_file_descriptor: segment out of range.\n" );
+		LIBEWF_WARNING_PRINT( "%s: segment out of range.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -527,24 +616,3 @@ int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, u
 }
 #endif
 
-/* Sets a file descriptor for a specific segment
- * Returns 1 if succesful, or -1 on error
- */
-int8_t libewf_segment_table_set_file_descriptor( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, int file_descriptor )
-{
-	if( segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_set_file_descriptor: invalid segment table.\n" );
-
-		return( -1 );
-	}
-	if( segment > segment_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_set_file_descriptor: segment out of range.\n" );
-
-		return( -1 );
-	}
-	segment_table->file_descriptor[ segment ] = file_descriptor;
-
-	return( 1 );
-}

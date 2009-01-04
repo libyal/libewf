@@ -93,7 +93,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint16_t segment_amount, u
 	internal_handle->amount_of_header_sections = 0;
 	internal_handle->format                    = LIBEWF_FORMAT_UNKNOWN;
 	internal_handle->ewf_format                = EWF_FORMAT_UNKNOWN;
-	internal_handle->index_build               = 0;
+	internal_handle->segment_table_build       = 0;
 	internal_handle->error_tollerance          = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 
 	internal_handle->segment_table = libewf_segment_table_alloc( segment_amount );

@@ -81,17 +81,31 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 
 		return( -1 );
 	}
-	return( ewf_file_header_check_signature( signature ) );
+	/* The amount of EWF segment files will be the largest
+	 */
+	if( ewf_file_header_check_signature( signature ) == 1 )
+	{
+		return( 1 );
+	}
+	else if( lwf_file_header_check_signature( signature ) == 1 )
+	{
+		return( 1 );
+	}
+	else if( dwf_file_header_check_signature( signature ) == 1 )
+	{
+		return( 1 );
+	}
+	return( 0 );
 }
 
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror
  */
-ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *segment_number )
+ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *segment_number, uint8_t *delta_file )
 {
 	EWF_FILE_HEADER file_header;
 
-	static char *function = "libewf_segment_file_check_file_signature";
+	static char *function = "libewf_segment_file_read_file_header";
 	ssize_t read_count    = 0;
 
 	if( file_descriptor <= -1 )
@@ -108,6 +122,13 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 
 		return( -1 );
 	}
+	if( delta_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid delta file.\n",
+		 function );
+
+		return( -1 );
+	}
 	read_count = ewf_file_header_read( &file_header, file_descriptor );
 
 	if( read_count <= -1 )
@@ -117,7 +138,21 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 
 		return( -1 );
 	}
-	if( ewf_file_header_check_signature( file_header.signature ) == 0 )
+	/* The amount of EWF segment files will be the largest
+	 */
+	if( ewf_file_header_check_signature( file_header.signature ) == 1 )
+	{
+		*delta_file = LIBEWF_SEGMENT_FILE_TYPE_EWF;
+	}
+	else if( lwf_file_header_check_signature( file_header.signature ) == 1 )
+	{
+		*delta_file = LIBEWF_SEGMENT_FILE_TYPE_LWF;
+	}
+	else if( dwf_file_header_check_signature( file_header.signature ) == 1 )
+	{
+		*delta_file = LIBEWF_SEGMENT_FILE_TYPE_DWF;
+	}
+	else
 	{
 		LIBEWF_WARNING_PRINT( "%s: file signature does not match.\n",
 		 function );
@@ -141,11 +176,12 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
  */
 int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
 {
-	wchar_t *error_string   = NULL;
-	static char *function   = "libewf_segment_file_read_wide_open";
-	uint32_t iterator       = 0;
-	uint16_t segment_number = 0;
-	int file_descriptor     = 0;
+	wchar_t *error_string     = NULL;
+	static char *function     = "libewf_segment_file_read_wide_open";
+	uint32_t iterator         = 0;
+	uint16_t segment_number   = 0;
+	uint8_t segment_file_type = 0;
+	int file_descriptor       = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -213,7 +249,10 @@ int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle,
 			}
 			return( -1 );
 		}
-		if( libewf_segment_file_read_file_header( file_descriptor, &segment_number ) <= -1 )
+		if( libewf_segment_file_read_file_header(
+		     file_descriptor,
+		     &segment_number,
+		     &segment_file_type ) <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %ls.\n",
 			 function, filenames[ iterator ] );
@@ -264,6 +303,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	static char *function   = "libewf_segment_file_read_open";
 	uint32_t iterator       = 0;
 	uint16_t segment_number = 0;
+	uint8_t segment_file_type = 0;
 	int file_descriptor     = 0;
 
 	if( internal_handle == NULL )
@@ -332,7 +372,10 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 			}
 			return( -1 );
 		}
-		if( libewf_segment_file_read_file_header( file_descriptor, &segment_number ) <= -1 )
+		if( libewf_segment_file_read_file_header(
+		     file_descriptor,
+		     &segment_number,
+		     &segment_file_type ) <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %s.\n",
 			 function, filenames[ iterator ] );

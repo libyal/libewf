@@ -14,23 +14,11 @@
 Xsed='/bin/sed -e 1s/^X//'
 sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
 
-# Be Bourne compatible (taken from Autoconf:_AS_BOURNE_COMPATIBLE).
-if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then
-  emulate sh
-  NULLCMD=:
-  # Zsh 3.x and 4.x performs word splitting on ${1+"$@"}, which
-  # is contrary to our usage.  Disable this feature.
-  alias -g '${1+"$@"}'='"$@"'
-  setopt NO_GLOB_SUBST
-else
-  case `(set -o) 2>/dev/null` in *posix*) set -o posix;; esac
-fi
-
 # The HP-UX ksh and POSIX shell print the target directory to stdout
 # if CDPATH is set.
 (unset CDPATH) >/dev/null 2>&1 && unset CDPATH
 
-relink_command="(cd /home/lordyesta/Projects/libewf/ewftools; { test -z \"\${LIBRARY_PATH+set}\" || unset LIBRARY_PATH || { LIBRARY_PATH=; export LIBRARY_PATH; }; }; { test -z \"\${COMPILER_PATH+set}\" || unset COMPILER_PATH || { COMPILER_PATH=; export COMPILER_PATH; }; }; { test -z \"\${GCC_EXEC_PREFIX+set}\" || unset GCC_EXEC_PREFIX || { GCC_EXEC_PREFIX=; export GCC_EXEC_PREFIX; }; }; { test -z \"\${LD_RUN_PATH+set}\" || unset LD_RUN_PATH || { LD_RUN_PATH=; export LD_RUN_PATH; }; }; { test -z \"\${LD_LIBRARY_PATH+set}\" || unset LD_LIBRARY_PATH || { LD_LIBRARY_PATH=; export LD_LIBRARY_PATH; }; }; PATH=\"/usr/kerberos/bin:/usr/lib64/ccache:/usr/local/bin:/usr/bin:/bin:/home/lordyesta/bin\"; export PATH; gcc -Wextra -g -Wall -o \$progdir/\$file ewfcommon.o ewfgetopt.o ewfglob.o ewfsignal.o ewfalter.o  ../libewf/.libs/libewf.so -luuid -lcrypto -lz  -Wl,--rpath -Wl,/home/lordyesta/Projects/libewf/libewf/.libs ) "
+relink_command="(cd /home/lordyesta/Projects/libewf/ewftools; { test -z \"\${LIBRARY_PATH+set}\" || unset LIBRARY_PATH || { LIBRARY_PATH=; export LIBRARY_PATH; }; }; { test -z \"\${COMPILER_PATH+set}\" || unset COMPILER_PATH || { COMPILER_PATH=; export COMPILER_PATH; }; }; { test -z \"\${GCC_EXEC_PREFIX+set}\" || unset GCC_EXEC_PREFIX || { GCC_EXEC_PREFIX=; export GCC_EXEC_PREFIX; }; }; { test -z \"\${LD_RUN_PATH+set}\" || unset LD_RUN_PATH || { LD_RUN_PATH=; export LD_RUN_PATH; }; }; { test -z \"\${LD_LIBRARY_PATH+set}\" || unset LD_LIBRARY_PATH || { LD_LIBRARY_PATH=; export LD_LIBRARY_PATH; }; }; PATH=\"/usr/kerberos/bin:/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:/home/lordyesta/bin\"; export PATH; gcc -Wextra -g -Wall -o \$progdir/\$file ewfcommon.o ewfgetopt.o ewfglob.o ewfsignal.o ewfalter.o  ../libewf/.libs/libewf.so -luuid -lcrypto -lz -Wl,--rpath -Wl,/home/lordyesta/Projects/libewf/libewf/.libs -Wl,--rpath -Wl,/usr/local/lib)"
 
 # This environment variable determines our operation mode.
 if test "$libtool_install_magic" = "%%%MAGIC variable%%%"; then
@@ -116,7 +104,7 @@ else
 
       exec "$progdir/$program" ${1+"$@"}
 
-      $echo "$0: cannot exec $program $*"
+      $echo "$0: cannot exec $program ${1+"$@"}"
       exit 1
     fi
   else
