@@ -82,7 +82,7 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 /* Reads section data
  */
-void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size64_t size )
 {
 	static char *function      = "libewf_debug_read_section";
 	uint8_t *data              = NULL;
@@ -100,7 +100,7 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 	}
 	size *= sizeof( uint8_t );
 
-	if( size > (size_t) SSIZE_MAX )
+	if( size > (size64_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );

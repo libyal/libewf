@@ -129,7 +129,6 @@ TODO
 * change libewf_get and libewf_set functions for api consistency
   move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
-* fix libewf_debug_read_section to handle a size of size64_t
 
 * change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
@@ -149,6 +148,8 @@ Version: 20070915
   - added distclean make directive
 * Adjusted rpm based package 
 * fixed for rogue next sections in delta segment file section list during RW
+* fixed libewf_debug_read_section to handle a size of size64_t
+  - still limited to SSIZE_MAX
 
 Version: 20070912
 * fixed on error in delta file accouting for multiple rewrites
