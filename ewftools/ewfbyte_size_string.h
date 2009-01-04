@@ -26,8 +26,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <system_string.h>
-
-#include <libewf/types.h>
+#include <types.h>
 
 #if defined( __cplusplus )
 extern "C" {

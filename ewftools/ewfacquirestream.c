@@ -59,6 +59,7 @@
 #include "ewfglob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewfprocess_status.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -164,8 +165,6 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	system_character_t time_string[ 32 ];
-
 	system_character_t *filenames[ 1 ]         = { _SYSTEM_CHARACTER_T_STRING( "stream" ) };
 
 	character_t *calculated_md5_hash_string    = NULL;
@@ -187,12 +186,10 @@ int main( int argc, char * const argv[] )
 	system_character_t *option_notes           = NULL;
 
 	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfoutput_stream_process_status_fprint;
+	void *callback                             = &ewfprocess_status_update_unknown_total;
 
 	system_integer_t option                    = 0;
 	size_t string_length                       = 0;
-	time_t timestamp_start                     = 0;
-	time_t timestamp_end                       = 0;
 	int64_t write_count                        = 0;
 	uint64_t segment_file_size                 = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	uint64_t acquiry_offset                    = 0;
@@ -214,10 +211,12 @@ int main( int argc, char * const argv[] )
 	uint8_t verbose                            = 0;
 	int error_abort                            = 0;
 	int result                                 = 0;
+	int status                                 = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
 	 program );
+
 #if defined( HAVE_WINDOWS_API )
 	if( _setmode(
 	     _fileno(
@@ -721,11 +720,9 @@ int main( int argc, char * const argv[] )
 	}
 	if( error_abort != 0 )
 	{
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
 		return( EXIT_FAILURE );
 	}
 	if( calculate_md5 == 1 )
@@ -737,11 +734,9 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
 
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			return( EXIT_FAILURE );
 		}
 	}
@@ -767,31 +762,55 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
+		if( ewfprocess_status_initialize(
+		     &process_status,
+		     _CHARACTER_T_STRING( "Acquiry" ),
+		     _CHARACTER_T_STRING( "acquired" ),
+		     _CHARACTER_T_STRING( "Written" ),
+		     stdout ) != 1 )
+		{
+			fprintf( stderr, "Unable to initialize process status.\n" );
+
+			if( calculate_sha1 == 1 )
+			{
+				memory_free(
+				 calculated_sha1_hash_string );
+			}
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfprocess_status_start(
+		     process_status ) != 1 )
+		{
+			fprintf( stderr, "Unable to start process status.\n" );
+
+			ewfprocess_status_free(
+			 &process_status );
+
+			if( calculate_sha1 == 1 )
+			{
+				memory_free(
+				 calculated_sha1_hash_string );
+			}
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
+			return( EXIT_FAILURE );
+		}
 		/* Start acquiring data
 		 */
-		timestamp_start = time( NULL );
-
-		if( ewfcommon_ctime(
-		     &timestamp_start,
-		     time_string,
-		     32 ) == NULL )
-		{
-			fprintf( stdout, "Acquiry started.\n" );
-		}
-		else
-		{
-			fprintf( stdout, "Acquiry started at: %" PRIs_SYSTEM "\n",
-			 time_string );
-		}
-		if( callback != NULL )
-		{
-			ewfoutput_process_status_initialize(
-			 stdout,
-			 _CHARACTER_T_STRING( "acquired" ),
-			 timestamp_start );
-		}
-		fprintf( stdout, "This could take a while.\n\n" );
-
 		write_count = ewfcommon_write_from_file_descriptor(
 			       ewfcommon_libewf_handle,
 			       0,
@@ -811,65 +830,67 @@ int main( int argc, char * const argv[] )
 			       EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 			       swap_byte_pairs,
 			       callback );
-	}
-	if( ewfcommon_abort == 0 )
-	{
-		/* Done acquiring data
-		 */
-		timestamp_end = time( NULL );
 
 		if( write_count <= -1 )
 		{
-			if( ewfcommon_ctime(
-			     &timestamp_end,
-			     time_string,
-			     32 ) == NULL )
-			{
-				fprintf( stdout, "Acquiry failed.\n" );
-			}
-			else
-			{
-				fprintf( stdout, "Acquiry failed at: %" PRIs_SYSTEM "\n",
-				 time_string );
-			}
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 calculated_md5_hash_string );
-			}
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			return( EXIT_FAILURE );
-		}
-		if( ewfcommon_ctime(
-		     &timestamp_end,
-		     time_string,
-		     32 ) == NULL )
-		{
-			fprintf( stdout, "Acquiry completed.\n" );
+			status = EWFPROCESS_STATUS_FAILED;
 		}
 		else
 		{
-			fprintf( stdout, "Acquiry completed at: %" PRIs_SYSTEM "\n",
-			 time_string );
+			status = EWFPROCESS_STATUS_COMPLETED;
 		}
-		ewfoutput_process_summary_fprint(
-		 stdout,
-		 _CHARACTER_T_STRING( "Written" ),
-		 write_count,
-		 timestamp_start,
-		 timestamp_end );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		status = EWFPROCESS_STATUS_ABORTED;
+	}
+	if( ewfprocess_status_stop(
+	     process_status,
+	     (size64_t) write_count,
+	     status ) != 1 )
+	{
+		fprintf( stderr, "Unable to stop process status.\n" );
 
-		fprintf( stdout, "\n" );
+		ewfprocess_status_free(
+		 &process_status );
 
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
+		return( EXIT_FAILURE );
+	}
+	if( ewfprocess_status_free(
+	     &process_status ) != 1 )
+	{
+		fprintf( stderr, "Unable to free process status.\n" );
+
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
+		return( EXIT_FAILURE );
+	}
+	if( status == EWFPROCESS_STATUS_COMPLETED )
+	{
 		if( log_filename != NULL )
 		{
 			log_file_stream = ewfcommon_fopen(
@@ -900,20 +921,20 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
-		if( calculate_md5 == 1 )
+		if( log_file_stream != NULL )
 		{
-			memory_free(
-			 calculated_md5_hash_string );
+			file_stream_io_fclose(
+			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
 		{
 			memory_free(
 			 calculated_sha1_hash_string );
 		}
-		if( log_file_stream != NULL )
+		if( calculate_md5 == 1 )
 		{
-			file_stream_io_fclose(
-			 log_file_stream );
+			memory_free(
+			 calculated_md5_hash_string );
 		}
 		return( EXIT_FAILURE );
 	}
@@ -921,25 +942,22 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
-	if( ewfcommon_abort != 0 )
-	{
-		fprintf( stdout, "%" PRIs ": ABORTED\n",
-		 program );
-
-		if( calculate_md5 == 1 )
+        if( status != EWFPROCESS_STATUS_COMPLETED )
+        {
+		if( log_file_stream != NULL )
 		{
-			memory_free(
-			 calculated_md5_hash_string );
+			file_stream_io_fclose(
+			 log_file_stream );
 		}
 		if( calculate_sha1 == 1 )
 		{
 			memory_free(
 			 calculated_sha1_hash_string );
 		}
-		if( log_file_stream != NULL )
+		if( calculate_md5 == 1 )
 		{
-			file_stream_io_fclose(
-			 log_file_stream );
+			memory_free(
+			 calculated_md5_hash_string );
 		}
 		return( EXIT_FAILURE );
 	}

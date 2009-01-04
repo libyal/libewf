@@ -26,11 +26,11 @@
 #include <common.h>
 #include <character_string.h>
 #include <system_string.h>
+#include <types.h>
 
 #include <stdio.h>
 
 #include <libewf/handle.h>
-#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -71,26 +71,26 @@ void ewfoutput_acquiry_parameters_fprint(
 
 void ewfoutput_acquiry_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle,
+      libewf_handle_t *handle,
       uint32_t *amount_of_errors );
 
 void ewfoutput_crc_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle,
+      libewf_handle_t *handle,
       uint32_t *amount_of_errors );
 
 void ewfoutput_sessions_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle,
+      libewf_handle_t *handle,
       uint32_t *amount_of_sessions );
 
 void ewfoutput_header_values_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle );
+      libewf_handle_t *handle );
 
 void ewfoutput_hash_values_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle );
+      libewf_handle_t *handle );
 
 void ewfoutput_timestamp_fprint(
       FILE *stream,
@@ -104,26 +104,6 @@ void ewfoutput_bytes_per_second_fprint(
 void ewfoutput_bytes_fprint(
       FILE *stream,
       size64_t bytes );
-
-void ewfoutput_process_status_initialize(
-      FILE *stream,
-      character_t *string,
-      time_t timestamp_start );
-
-void ewfoutput_process_status_fprint(
-      size64_t bytes_read,
-      size64_t bytes_total );
-
-void ewfoutput_stream_process_status_fprint(
-      size64_t bytes_read,
-      size64_t bytes_total );
-
-void ewfoutput_process_summary_fprint(
-      FILE *stream,
-      character_t *string,
-      ssize64_t byte_count,
-      time_t timestamp_start,
-      time_t timestamp_end );
 
 #if defined( __cplusplus )
 }

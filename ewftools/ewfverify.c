@@ -52,6 +52,7 @@
 #include "ewfglob.h"
 #include "ewfmd5.h"
 #include "ewfoutput.h"
+#include "ewfprocess_status.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
 #include "ewfstring.h"
@@ -87,7 +88,6 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	system_character_t time_string[ 32 ];
 
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                            = NULL;
@@ -103,12 +103,10 @@ int main( int argc, char * const argv[] )
 	system_character_t *log_filename           = NULL;
 
 	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfoutput_process_status_fprint;
+	void *callback                             = &ewfprocess_status_update;
 
 	system_integer_t option                    = 0;
-	time_t timestamp_start                     = 0;
-	time_t timestamp_end                       = 0;
-	int64_t count                              = 0;
+	ssize64_t verify_count                     = 0;
 	uint32_t amount_of_crc_errors              = 0;
 	int8_t stored_md5_hash_result              = 0;
 	int8_t stored_sha1_hash_result             = 0;
@@ -121,6 +119,7 @@ int main( int argc, char * const argv[] )
 	int match_md5_hash                         = 0;
 	int match_sha1_hash                        = 0;
 	int result                                 = 0;
+	int status                                 = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -298,6 +297,9 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create stored MD5 hash string.\n" );
 
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			return( EXIT_FAILURE );
 		}
 		calculated_md5_hash_string = (character_t *) memory_allocate( 
@@ -309,6 +311,9 @@ int main( int argc, char * const argv[] )
 
 			memory_free(
 			 stored_md5_hash_string );
+
+			libewf_close(
+			 ewfcommon_libewf_handle );
 
 			return( EXIT_FAILURE );
 		}
@@ -329,6 +334,9 @@ int main( int argc, char * const argv[] )
 				memory_free(
 				 calculated_md5_hash_string );
 			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			return( EXIT_FAILURE );
 		}
 		calculated_sha1_hash_string = (character_t *) memory_allocate( 
@@ -338,6 +346,9 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
 
+			memory_free(
+			 stored_sha1_hash_string );
+
 			if( calculate_md5 == 1 )
 			{
 				memory_free(
@@ -345,82 +356,23 @@ int main( int argc, char * const argv[] )
 				memory_free(
 				 calculated_md5_hash_string );
 			}
-			memory_free(
-			 stored_sha1_hash_string );
+			libewf_close(
+			 ewfcommon_libewf_handle );
 
 			return( EXIT_FAILURE );
 		}
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		/* Start verifying data
-		 */
-		timestamp_start = time( NULL );
+		if( ewfprocess_status_initialize(
+		     &process_status,
+		     _CHARACTER_T_STRING( "Verify" ),
+		     _CHARACTER_T_STRING( "verified" ),
+		     _CHARACTER_T_STRING( "Read" ),
+		     stdout ) != 1 )
+		{
+			fprintf( stderr, "Unable to initialize process status.\n" );
 
-		if( ewfcommon_ctime(
-		     &timestamp_start,
-		     time_string,
-		     32 ) == NULL )
-		{
-			fprintf( stdout, "Verify started.\n" );
-		}
-		else
-		{
-			fprintf( stdout, "Verify started at: %" PRIs_SYSTEM "\n",
-			 time_string );
-		}
-		if( callback != NULL )
-		{
-			ewfoutput_process_status_initialize(
-			 stdout,
-			 _CHARACTER_T_STRING( "verified" ),
-			 timestamp_start );
-		}
-		fprintf( stdout, "This could take a while.\n\n" );
-
-		if( calculate_sha1 == 1 )
-		{
-			if( libewf_parse_hash_values(
-			     ewfcommon_libewf_handle ) != 1 )
-			{
-				fprintf( stderr, "Unable to get parse hash values.\n" );
-			}
-		}
-		count = ewfcommon_read_verify(
-			 ewfcommon_libewf_handle,
-			 calculate_md5,
-			 calculated_md5_hash_string,
-			 EWFSTRING_DIGEST_HASH_LENGTH_MD5,
-			 calculate_sha1,
-			 calculated_sha1_hash_string,
-			 EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
-			 swap_byte_pairs,
-			 wipe_chunk_on_error,
-			 callback );
-	}
-	if( ewfcommon_abort == 0 )
-	{
-		timestamp_end = time( NULL );
-
-		if( count <= -1 )
-		{
-			if( ewfcommon_ctime(
-			     &timestamp_end,
-			     time_string,
-			     32 ) == NULL )
-			{
-				fprintf( stdout, "Verify failed.\n" );
-			}
-			else
-			{
-				fprintf( stdout, "Verify failed at: %" PRIs_SYSTEM "\n",
-				 time_string );
-			}
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
 			if( calculate_md5 == 1 )
 			{
 				memory_free(
@@ -435,29 +387,128 @@ int main( int argc, char * const argv[] )
 				memory_free(
 				 calculated_sha1_hash_string );
 			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			return( EXIT_FAILURE );
 		}
-		if( ewfcommon_ctime(
-		     &timestamp_end,
-		     time_string,
-		     32 ) == NULL )
+		if( ewfprocess_status_start(
+		     process_status ) != 1 )
 		{
-			fprintf( stdout, "Verify completed.\n" );
+			fprintf( stderr, "Unable to start process status.\n" );
+
+			ewfprocess_status_free(
+			 &process_status );
+
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 stored_md5_hash_string );
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			if( calculate_sha1 == 1 )
+			{
+				memory_free(
+				 stored_sha1_hash_string );
+				memory_free(
+				 calculated_sha1_hash_string );
+			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
+			return( EXIT_FAILURE );
+		}
+		/* Start verifying data
+		 */
+		if( calculate_sha1 == 1 )
+		{
+			if( libewf_parse_hash_values(
+			     ewfcommon_libewf_handle ) != 1 )
+			{
+				fprintf( stderr, "Unable to get parse hash values.\n" );
+			}
+		}
+		verify_count = ewfcommon_read_verify(
+		                ewfcommon_libewf_handle,
+		                calculate_md5,
+		                calculated_md5_hash_string,
+		                EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+		                calculate_sha1,
+		                calculated_sha1_hash_string,
+		                EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+		                swap_byte_pairs,
+		                wipe_chunk_on_error,
+		                callback );
+
+		if( verify_count <= -1 )
+		{
+			status = EWFPROCESS_STATUS_FAILED;
 		}
 		else
 		{
-			fprintf( stdout, "Verify completed at: %" PRIs_SYSTEM "\n",
-			 time_string );
+			status = EWFPROCESS_STATUS_COMPLETED;
 		}
-		ewfoutput_process_summary_fprint(
-		 stdout,
-		 _CHARACTER_T_STRING( "Read" ),
-		 count,
-		 timestamp_start,
-		 timestamp_end );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		status = EWFPROCESS_STATUS_ABORTED;
+	}
+	if( ewfprocess_status_stop(
+	     process_status,
+	     (size64_t) verify_count,
+	     status ) != 1 )
+	{
+		fprintf( stderr, "Unable to stop process status.\n" );
 
-		fprintf( stdout, "\n" );
+		ewfprocess_status_free(
+		 &process_status );
 
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 stored_md5_hash_string );
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 stored_sha1_hash_string );
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
+		return( EXIT_FAILURE );
+	}
+	if( ewfprocess_status_free(
+	     &process_status ) != 1 )
+	{
+		fprintf( stderr, "Unable to free process status.\n" );
+
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 stored_md5_hash_string );
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 stored_sha1_hash_string );
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
+		return( EXIT_FAILURE );
+	}
+	if( status == EWFPROCESS_STATUS_COMPLETED )
+	{
 		if( calculate_md5 == 1 )
 		{
 			stored_md5_hash_result = libewf_get_md5_hash(
@@ -469,16 +520,6 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-
 				if( calculate_sha1 == 1 )
 				{
 					memory_free(
@@ -486,6 +527,14 @@ int main( int argc, char * const argv[] )
 					memory_free(
 					 calculated_sha1_hash_string );
 				}
+				memory_free(
+				 stored_md5_hash_string );
+				memory_free(
+				 calculated_md5_hash_string );
+
+				libewf_close(
+				 ewfcommon_libewf_handle );
+
 				return( EXIT_FAILURE );
 			}
 			if( ewfdigest_copy_to_string(
@@ -496,16 +545,6 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-
 				if( calculate_sha1 == 1 )
 				{
 					memory_free(
@@ -513,6 +552,14 @@ int main( int argc, char * const argv[] )
 					memory_free(
 					 calculated_sha1_hash_string );
 				}
+				memory_free(
+				 stored_md5_hash_string );
+				memory_free(
+				 calculated_md5_hash_string );
+
+				libewf_close(
+				 ewfcommon_libewf_handle );
+
 				return( EXIT_FAILURE );
 			}
 		}
@@ -528,11 +575,11 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to get stored SHA1 hash.\n" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
+				memory_free(
+				 stored_sha1_hash_string );
+				memory_free(
+				 calculated_sha1_hash_string );
+
 				if( calculate_md5 == 1 )
 				{
 					memory_free(
@@ -540,10 +587,8 @@ int main( int argc, char * const argv[] )
 					memory_free(
 					 calculated_md5_hash_string );
 				}
-				memory_free(
-				 stored_sha1_hash_string );
-				memory_free(
-				 calculated_sha1_hash_string );
+				libewf_close(
+				 ewfcommon_libewf_handle );
 
 				return( EXIT_FAILURE );
 			}
@@ -603,11 +648,8 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
-	if( ewfcommon_abort != 0 )
+	if( status != EWFPROCESS_STATUS_COMPLETED )
 	{
-		fprintf( stdout, "%" PRIs ": ABORTED\n",
-		 program );
-
 		if( calculate_md5 == 1 )
 		{
 			memory_free(

@@ -66,6 +66,7 @@
 #include "../libewf/ewf_digest_hash.h"
 
 #include "ewfcommon.h"
+#include "ewfprocess_status.h"
 #include "ewfstring.h"
 
 /* EWFCOMMON_BUFFER_SIZE definition is intended for testing purposes
@@ -78,8 +79,8 @@
 #define LIBEWF_OPERATING_SYSTEM "Unknown"
 #endif
 
-int ewfcommon_abort                    = 0;
-LIBEWF_HANDLE *ewfcommon_libewf_handle = NULL;
+int ewfcommon_abort                      = 0;
+libewf_handle_t *ewfcommon_libewf_handle = NULL;
 
 /* Signal handler for ewftools
  */
@@ -221,7 +222,7 @@ int8_t ewfcommon_determine_guid(
  * Returns 1 if successful, or -1 on error
  */
 int ewfcommon_initialize_write(
-     LIBEWF_HANDLE *handle,
+     libewf_handle_t *handle,
      character_t *case_number,
      character_t *description,
      character_t *evidence_number,
@@ -483,7 +484,7 @@ int ewfcommon_initialize_write(
  * Returns the amount of bytes read, 0 if at end of input, or -1 on error
  */
 ssize32_t ewfcommon_read_input(
-           LIBEWF_HANDLE *handle,
+           libewf_handle_t *handle,
            int file_descriptor,
            uint8_t *buffer,
            size_t buffer_size,
@@ -918,7 +919,7 @@ ssize32_t ewfcommon_read_input(
  * Returns the amount of bytes read, 0 if no more data can be read, or -1 on error
  */
 ssize_t ewfcommon_raw_read_ewf(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          uint8_t *raw_buffer,
          size_t raw_buffer_size,
          uint8_t **buffer,
@@ -1068,7 +1069,7 @@ ssize_t ewfcommon_raw_read_ewf(
  * Returns the amount of bytes written, 0 if no more data can be written, or -1 on error
  */
 ssize_t ewfcommon_raw_write_ewf(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          uint8_t *raw_buffer,
          size_t raw_buffer_size,
          uint8_t *buffer,
@@ -1168,7 +1169,7 @@ ssize_t ewfcommon_raw_write_ewf(
  * Returns the amount of bytes read if successful, or -1 on error
  */
 ssize64_t ewfcommon_read_verify(
-           LIBEWF_HANDLE *handle,
+           libewf_handle_t *handle,
            uint8_t calculate_md5,
            character_t *md5_hash_string,
            size_t md5_hash_string_length,
@@ -1177,7 +1178,7 @@ ssize64_t ewfcommon_read_verify(
            size_t sha1_hash_string_length,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
-           void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1460,6 +1461,7 @@ ssize64_t ewfcommon_read_verify(
 		if( callback != NULL )
 		{
 			callback(
+			 process_status,
 			 (size64_t) total_read_count,
 			 media_size );
 		}
@@ -1524,7 +1526,7 @@ ssize64_t ewfcommon_read_verify(
  * Returns the amount of bytes written, or -1 on error
  */
 ssize64_t ewfcommon_write_from_file_descriptor(
-           LIBEWF_HANDLE *handle,
+           libewf_handle_t *handle,
            int input_file_descriptor,
            size64_t write_size,
            off64_t write_offset,
@@ -1541,7 +1543,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            character_t *sha1_hash_string,
            size_t sha1_hash_string_length,
            uint8_t swap_byte_pairs,
-           void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1827,6 +1829,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		if( callback != NULL )
 		{
 			callback(
+		         process_status,
 		         (size64_t) total_write_count,
 		         write_size );
 		}
@@ -1957,13 +1960,13 @@ ssize64_t ewfcommon_write_from_file_descriptor(
  * Returns a -1 on error, the amount of bytes read on success
  */
 ssize64_t ewfcommon_export_raw(
-           LIBEWF_HANDLE *handle,
+           libewf_handle_t *handle,
            system_character_t *target_filename,
            size64_t export_size,
            off64_t read_offset,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
-           void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 	uint8_t *data               = NULL;
 	uint8_t *uncompressed_data  = NULL;
@@ -2252,7 +2255,10 @@ ssize64_t ewfcommon_export_raw(
 
 		if( callback != NULL )
 		{
-			callback( total_read_count, export_size );
+			callback(
+			 process_status,
+			 (size64_t) total_read_count,
+			 export_size );
 		}
 		if( ewfcommon_abort != 0 )
 		{
@@ -2272,8 +2278,8 @@ ssize64_t ewfcommon_export_raw(
  * Returns a -1 on error, the amount of bytes read on success
  */
 ssize64_t ewfcommon_export_ewf(
-           LIBEWF_HANDLE *handle,
-           LIBEWF_HANDLE *export_handle,
+           libewf_handle_t *handle,
+           libewf_handle_t *export_handle,
            int8_t compression_level,
            uint8_t compress_empty_block,
            uint8_t libewf_format,
@@ -2285,7 +2291,7 @@ ssize64_t ewfcommon_export_ewf(
            uint8_t calculate_sha1,
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
-           void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];
@@ -2736,7 +2742,8 @@ ssize64_t ewfcommon_export_ewf(
 		if( callback != NULL )
 		{
 			callback(
-			 total_read_count,
+			 process_status,
+			 (size64_t) total_read_count,
 			 export_size );
 		}
 		if( ewfcommon_abort != 0 )

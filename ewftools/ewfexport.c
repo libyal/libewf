@@ -52,6 +52,7 @@
 #include "ewfglob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
+#include "ewfprocess_status.h"
 #include "ewfsignal.h"
 
 /* Prints the executable usage information to the stream
@@ -155,14 +156,12 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	system_character_t time_string[ 32 ];
-
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                            = NULL;
 #endif
 	system_character_t *filenames[ 1 ]         = { NULL };
 
-	LIBEWF_HANDLE *export_handle               = NULL;
+	libewf_handle_t *export_handle             = NULL;
 	character_t *user_input                    = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfexport" );
 
@@ -170,18 +169,16 @@ int main( int argc, char * const argv[] )
 	system_character_t **ewf_filenames         = NULL;
 	system_character_t *target_filename        = NULL;
 
-	void *callback                             = &ewfoutput_process_status_fprint;
+	void *callback                             = &ewfprocess_status_update;
 	system_integer_t option                    = 0;
 	size64_t media_size                        = 0;
-	time_t timestamp_start                     = 0;
-	time_t timestamp_end                       = 0;
+	ssize64_t export_count                     = 0;
 	uint64_t maximum_segment_file_size         = 0;
 	uint64_t segment_file_size                 = 0;
 	uint64_t export_offset                     = 0;
 	uint64_t export_size                       = 0;
 	uint64_t sectors_per_chunk                 = 64;
 	uint32_t amount_of_crc_errors              = 0;
-	int64_t count                              = 0;
 	uint8_t libewf_format                      = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs                    = 0;
 	uint8_t wipe_chunk_on_error                = 0;
@@ -200,6 +197,7 @@ int main( int argc, char * const argv[] )
 	int amount_of_filenames                    = 0;
 	int output_raw                             = 1;
 	int result                                 = 1;
+	int status                                 = 0;
 
 	character_t *ewfexport_format_types[ 13 ] = \
 	 { _CHARACTER_T_STRING( "raw" ),
@@ -530,11 +528,9 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to determine media size.\n" );
 
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			memory_free(
 			 target_filename );
 
@@ -583,15 +579,14 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf( stderr, "Unsupported file format.\n" );
 
-					if( libewf_close(
-					     ewfcommon_libewf_handle ) != 0 )
-					{
-						fprintf( stderr, "Unable to close EWF file(s).\n" );
-					}
-					memory_free(
-					 target_filename );
 					memory_free(
 					 user_input );
+
+					libewf_close(
+					 ewfcommon_libewf_handle );
+
+					memory_free(
+					 target_filename );
 
 					exit( EXIT_FAILURE );
 				}
@@ -636,11 +631,9 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf( stderr, "Unsupported compression type.\n" );
 
-					if( libewf_close(
-					     ewfcommon_libewf_handle ) != 0 )
-					{
-						fprintf( stderr, "Unable to close EWF file(s).\n" );
-					}
+					libewf_close(
+					 ewfcommon_libewf_handle );
+
 					memory_free(
 					 target_filename );
 
@@ -670,11 +663,9 @@ int main( int argc, char * const argv[] )
 					{
 						fprintf( stderr, "Unsupported answer.\n" );
 
-						if( libewf_close(
-						     ewfcommon_libewf_handle ) != 0 )
-						{
-							fprintf( stderr, "Unable to close EWF file(s).\n" );
-						}
+						libewf_close(
+						 ewfcommon_libewf_handle );
+
 						memory_free(
 						 target_filename );
 
@@ -789,31 +780,41 @@ int main( int argc, char * const argv[] )
 		}
 		fprintf( stderr, "\n" );
 
+		if( ewfprocess_status_initialize(
+		     &process_status,
+		     _CHARACTER_T_STRING( "Export" ),
+		     _CHARACTER_T_STRING( "exported" ),
+		     _CHARACTER_T_STRING( "Written" ),
+		     stderr ) != 1 )
+		{
+			fprintf( stderr, "Unable to initialize process status.\n" );
+
+			libewf_close(
+			 ewfcommon_libewf_handle );
+			
+			memory_free(
+			 target_filename );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfprocess_status_start(
+		     process_status ) != 1 )
+		{
+			fprintf( stderr, "Unable to start process status.\n" );
+
+			ewfprocess_status_free(
+			 &process_status );
+
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
+			memory_free(
+			 target_filename );
+
+			return( EXIT_FAILURE );
+		}
 		/* Start exporting data
 		 */
-		timestamp_start = time( NULL );
-
-		if( ewfcommon_ctime(
-		     &timestamp_start,
-		     time_string,
-		     32 ) == NULL )
-		{
-			fprintf( stderr, "Export started.\n" );
-		}
-		else
-		{
-			fprintf( stderr, "Export started at: %" PRIs_SYSTEM "\n",
-			 time_string );
-		}
-		if( callback != NULL )
-		{
-			ewfoutput_process_status_initialize(
-			 stderr,
-			 _CHARACTER_T_STRING( "exported" ),
-			 timestamp_start );
-		}
-		fprintf( stderr, "This could take a while.\n\n" );
-
 		if( output_raw == 0 )
 		{
 			filenames[ 0 ] = target_filename;
@@ -831,95 +832,94 @@ int main( int argc, char * const argv[] )
 				ewfoutput_error_fprint(
 				 stderr, "Unable to open export EWF file(s)" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
+				ewfprocess_status_free(
+				 &process_status );
+
+				libewf_close(
+				 ewfcommon_libewf_handle );
+
 				return( EXIT_FAILURE );
 			}
-			count = ewfcommon_export_ewf(
-				 ewfcommon_libewf_handle,
-				 export_handle,
-				 compression_level,
-				 (uint8_t) compress_empty_block,
-				 libewf_format,
-				 segment_file_size,
-				 export_size,
-				 export_offset,
-				 (uint32_t) sectors_per_chunk,
-				 calculate_md5,
-				 calculate_sha1,
-				 swap_byte_pairs,
-				 wipe_chunk_on_error,
-				 callback );
+			export_count = ewfcommon_export_ewf(
+			                ewfcommon_libewf_handle,
+			                export_handle,
+			                compression_level,
+			                (uint8_t) compress_empty_block,
+			                libewf_format,
+			                segment_file_size,
+			                export_size,
+			                export_offset,
+			                (uint32_t) sectors_per_chunk,
+			                calculate_md5,
+			                calculate_sha1,
+			                swap_byte_pairs,
+			                wipe_chunk_on_error,
+			                callback );
 
 			if( libewf_close(
 			     export_handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close export EWF file handle.\n" );
 
+				ewfprocess_status_free(
+				 &process_status );
+
 				return( EXIT_FAILURE );
 			}
 		}
 		else
 		{
-			count = ewfcommon_export_raw(
-				 ewfcommon_libewf_handle,
-				 target_filename,
-				 export_size,
-				 export_offset,
-				 swap_byte_pairs,
-				 wipe_chunk_on_error,
-				 callback );
+			export_count = ewfcommon_export_raw(
+			                ewfcommon_libewf_handle,
+			                target_filename,
+			                export_size,
+			                export_offset,
+			                swap_byte_pairs,
+			                wipe_chunk_on_error,
+			                callback );
 
 			memory_free(
 			 target_filename );
 		}
-		timestamp_end = time( NULL );
-
-		if( count <= -1 )
+		if( export_count <= -1 )
 		{
-			if( ewfcommon_ctime(
-			     &timestamp_end,
-			     time_string,
-			     32 ) == NULL )
-			{
-				fprintf( stderr, "Export failed.\n" );
-			}
-			else
-			{
-				fprintf( stderr, "Export failed at: %" PRIs_SYSTEM "\n",
-				 time_string );
-			}
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		if( ewfcommon_ctime(
-		     &timestamp_end,
-		     time_string,
-		     32 ) == NULL )
-		{
-			fprintf( stderr, "Export completed.\n" );
+			status = EWFPROCESS_STATUS_FAILED;
 		}
 		else
 		{
-			fprintf( stderr, "Export completed at: %" PRIs_SYSTEM "\n",
-			 time_string );
+			status = EWFPROCESS_STATUS_COMPLETED;
 		}
-		ewfoutput_process_summary_fprint(
-		 stderr,
-		 _CHARACTER_T_STRING( "Written" ),
-		 count,
-		 timestamp_start,
-		 timestamp_end );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		status = EWFPROCESS_STATUS_ABORTED;
+	}
+	if( ewfprocess_status_stop(
+	     process_status,
+	     (size64_t) export_count,
+	     status ) != 1 )
+	{
+		fprintf( stderr, "Unable to stop process status.\n" );
 
-		fprintf( stderr, "\n" );
+		ewfprocess_status_free(
+		 &process_status );
 
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
+	}
+	if( ewfprocess_status_free(
+	     &process_status ) != 1 )
+	{
+		fprintf( stderr, "Unable to free process status.\n" );
+
+		libewf_close(
+		 ewfcommon_libewf_handle );
+
+		return( EXIT_FAILURE );
+	}
+	if( status == EWFPROCESS_STATUS_COMPLETED )
+	{
 		ewfoutput_crc_errors_fprint(
 		 stderr,
 		 ewfcommon_libewf_handle,
@@ -936,11 +936,8 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
-	if( ewfcommon_abort != 0 )
+	if( status != EWFPROCESS_STATUS_COMPLETED )
 	{
-		fprintf( stdout, "%" PRIs ": ABORTED\n",
-		 program );
-
 		return( EXIT_FAILURE );
 	}
 	return( EXIT_SUCCESS );

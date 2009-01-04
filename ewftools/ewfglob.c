@@ -114,7 +114,7 @@ int ewfglob_initialize(
  * Returns 1 if successful or -1 on error
  */
 int ewfglob_free(
-     ewfglob_t *glob )
+     ewfglob_t **glob )
 {
 	static char *function = "ewfglob_free";
 	int result_iterator   = 0;
@@ -126,21 +126,27 @@ int ewfglob_free(
 
 		return( -1 );
 	}
-	if( glob->result != NULL )
+	if( *glob != NULL )
 	{
-		for( result_iterator = 0; result_iterator < glob->amount_of_results; result_iterator++ )
+		if( ( *glob )->result != NULL )
 		{
-			if( glob->result[ iterator ] != NULL )
+			for( result_iterator = 0; result_iterator < ( *glob )->amount_of_results; result_iterator++ )
 			{
-				memory_free(
-				 glob->result[ iterator ] );
+				if( ( *glob )->result[ result_iterator ] != NULL )
+				{
+					memory_free(
+					 ( *glob )->result[ result_iterator ] );
+				}
 			}
+			memory_free(
+			 ( *glob )->result );
 		}
 		memory_free(
-		 glob->result );
+		 *glob );
+
+		*glob = NULL;
 	}
-	memory_free(
-	 glob );
+	return( 1 );
 }
 
 /* Resizes the glob
@@ -170,7 +176,7 @@ int ewfglob_resize(
 		return( -1 );
 	}
 	previous_size = sizeof( system_character_t * ) * glob->amount_of_results;
-	new_size      = sizeof( system_character_t * ) * new_amount;
+	new_size      = sizeof( system_character_t * ) * new_amount_of_results;
 
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (size_t) SSIZE_MAX ) )
@@ -228,8 +234,8 @@ int ewfglob_resolve(
 	intptr_t find_handle  = 0;
 #endif
 	static char *function = "ewfglob_resolve";
-	int32_t globs_found   = 0;
-	uint32_t iterator     = 0;
+	int globs_found       = 0;
+	int iterator          = 0;
 
 	if( glob == NULL )
 	{

@@ -145,12 +145,17 @@
 #define HAVE_MKTIME		1
 #endif
 
+#if !defined( HAVE_TIME )
+#define HAVE_TIME		1
+#endif
+
 #else
 #undef HAVE_CTIME_R
 #undef HAVE_WCTIME_R
 #undef HAVE_GMTIME_R
 #undef HAVE_LOCALTIME_R
 #undef HAVE_MKTIME
+#undef HAVE_TIME
 #endif
 
 /* Functions in common/directory_io.h

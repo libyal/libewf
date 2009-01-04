@@ -485,7 +485,7 @@ void ewfoutput_acquiry_parameters_fprint(
  */
 void ewfoutput_acquiry_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle,
+      libewf_handle_t *handle,
       uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_acquiry_errors_fprint";
@@ -554,7 +554,7 @@ void ewfoutput_acquiry_errors_fprint(
  */
 void ewfoutput_crc_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle,
+      libewf_handle_t *handle,
       uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_crc_errors_fprint";
@@ -622,7 +622,7 @@ void ewfoutput_crc_errors_fprint(
  */
 void ewfoutput_sessions_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle,
+      libewf_handle_t *handle,
       uint32_t *amount_of_sessions )
 {
 	static char *function      = "ewfoutput_sessions_fprint";
@@ -690,7 +690,7 @@ void ewfoutput_sessions_fprint(
  */
 void ewfoutput_header_values_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle )
+      libewf_handle_t *handle )
 {
 	character_t header_identifier[ 64 ];
 	character_t header_value[ 128 ];
@@ -924,7 +924,7 @@ void ewfoutput_header_values_fprint(
  */
 void ewfoutput_hash_values_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle )
+      libewf_handle_t *handle )
 {
 	character_t hash_identifier[ 32 ];
 	character_t hash_value[ 128 ];
@@ -1160,237 +1160,5 @@ void ewfoutput_bytes_fprint(
 		 " %" PRIi64 " bytes",
 		 bytes );
 	}
-}
-
-/* Static values for status information of the process
- */
-FILE* ewfoutput_process_status_stream              = NULL;
-character_t *ewfoutput_process_status_string       = NULL;
-time_t ewfoutput_process_status_timestamp_start    = 0;
-time_t ewfoutput_process_status_timestamp_last     = 0;
-int8_t ewfoutput_process_status_last_percentage    = -1;
-uint64_t ewfoutput_process_status_last_bytes_total = 0;
-
-/* Initializes the status information of the process
- */
-void ewfoutput_process_status_initialize(
-      FILE *stream,
-      character_t *string,
-      time_t timestamp_start )
-{
-	ewfoutput_process_status_stream          = stream;
-	ewfoutput_process_status_string          = string;
-	ewfoutput_process_status_timestamp_start = timestamp_start;
-	ewfoutput_process_status_timestamp_last  = timestamp_start;
-}
-
-/* Prints status information of the process
- */
-void ewfoutput_process_status_fprint(
-      size64_t bytes_read,
-      size64_t bytes_total )
-{
-	time_t seconds_current   = 0;
-	time_t seconds_total     = 0;
-	time_t seconds_remaining = 0;
-	time_t timestamp_current = 0;
-	int8_t new_percentage    = 0;
-
-	if( ewfoutput_process_status_stream == NULL )
-	{
-		return;
-	}
-	if( ewfoutput_process_status_string == NULL )
-	{
-		return;
-	}
-	if( ( bytes_total > 0 )
-	 && ( bytes_read > 0 ) )
-	{
-		new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
-	}
-	/* Estimate the remaining acquiry time
-	 */
-	timestamp_current = time( NULL );
-
-	if( ( new_percentage > ewfoutput_process_status_last_percentage )
-	 && ( timestamp_current > ewfoutput_process_status_timestamp_last ) )
-	{
-		ewfoutput_process_status_last_percentage = new_percentage;
-
-		fprintf(
-		 ewfoutput_process_status_stream,
-		 "Status: at %" PRIu8 "%%.\n",
-		 new_percentage );
-
-		fprintf(
-		 ewfoutput_process_status_stream,
-		 "        %" PRIs "",
-		 ewfoutput_process_status_string );
-
-		ewfoutput_bytes_fprint(
-		 ewfoutput_process_status_stream,
-		 bytes_read );
-
-		fprintf(
-		 ewfoutput_process_status_stream,
-		 " of total" );
-
-		ewfoutput_bytes_fprint(
-		 ewfoutput_process_status_stream,
-		 bytes_total );
-
-		fprintf(
-		 ewfoutput_process_status_stream,
-		 ".\n" );
-
-		if( ( timestamp_current > ewfoutput_process_status_timestamp_start )
-		 && ( new_percentage > 0 ) )
-		{
-			ewfoutput_process_status_timestamp_last = timestamp_current;
-
-			seconds_current   = timestamp_current - ewfoutput_process_status_timestamp_start;
-			seconds_total     = ( ( seconds_current * 100 ) / new_percentage );
-			seconds_remaining = seconds_total - seconds_current;
-
-			/* Negative time means nearly finished
-			 */
-			if( seconds_remaining < 0 )
-			{
-				seconds_remaining = 0;
-			}
-			fprintf(
-			 ewfoutput_process_status_stream,
-			 "        completion" );
-
-			ewfoutput_timestamp_fprint(
-			 ewfoutput_process_status_stream,
-			 seconds_remaining );
-
-			ewfoutput_bytes_per_second_fprint(
-			 ewfoutput_process_status_stream,
-			 bytes_total,
-			 seconds_total );
-
-			fprintf(
-			 ewfoutput_process_status_stream,
-			 ".\n" );
-		}
-		fprintf(
-		 ewfoutput_process_status_stream,
-		 "\n" );
-	}
-}
-
-/* Prints status information of the stream process
- */
-void ewfoutput_stream_process_status_fprint(
-      size64_t bytes_read,
-      size64_t bytes_total )
-{
-	time_t seconds_current   = 0;
-	time_t timestamp_current = 0;
-
-	if( ewfoutput_process_status_stream == NULL )
-	{
-		return;
-	}
-	if( ewfoutput_process_status_string == NULL )
-	{
-		return;
-	}
-	timestamp_current = time( NULL );
-
-	if( timestamp_current > ewfoutput_process_status_timestamp_last )
-	{
-		/* Update state
-		 * - if no status was printed before
-		 * - or input has grown > 10 Mb
-		 * - or the last update was 30 seconds ago
-		 */
-		if( ( ewfoutput_process_status_last_bytes_total == 0 )
-		 || ( bytes_read > ( ewfoutput_process_status_last_bytes_total + ( 10 * 1024 * 1024 ) ) )
-		 || ( ( timestamp_current - ewfoutput_process_status_timestamp_last ) > 30 ) )
-		{
-			ewfoutput_process_status_timestamp_last   = timestamp_current;
-			ewfoutput_process_status_last_bytes_total = bytes_read;
-
-			fprintf(
-			 ewfoutput_process_status_stream,
-			 "Status: %" PRIs "",
-			 ewfoutput_process_status_string );
-
-			ewfoutput_bytes_fprint(
-			 ewfoutput_process_status_stream,
-			 bytes_read );
-
-			fprintf(
-			 ewfoutput_process_status_stream,
-			 "\n" );
-
-			seconds_current = timestamp_current - ewfoutput_process_status_timestamp_start;
-
-			fprintf(
-			 ewfoutput_process_status_stream,
-			 "       " );
-
-			ewfoutput_timestamp_fprint(
-			 ewfoutput_process_status_stream,
-			 seconds_current );
-
-			ewfoutput_bytes_per_second_fprint(
-			 ewfoutput_process_status_stream,
-			 bytes_read,
-			 seconds_current );
-
-			fprintf(
-			 ewfoutput_process_status_stream,
-			 ".\n\n" );
-		}
-	}
-}
-
-/* Prints summary information of the process
- */
-void ewfoutput_process_summary_fprint(
-      FILE *stream,
-      character_t *string,
-      ssize64_t byte_count,
-      time_t timestamp_start,
-      time_t timestamp_end )
-{
-	time_t timestamp_acquiry = 0;
-
-	if( stream == NULL )
-	{
-		return;
-	}
-	if( string == NULL )
-	{
-		return;
-	}
-	timestamp_acquiry = timestamp_end - timestamp_start;
-
-	fprintf(
-	 stream,
-	 "%" PRIs ":",
-	 string );
-
-	ewfoutput_bytes_fprint(
-	 stream,
-	 byte_count );
-
-	ewfoutput_timestamp_fprint(
-	 stream,
-	 timestamp_acquiry );
-
-	ewfoutput_bytes_per_second_fprint(
-	 stream,
-	 byte_count,
-	 timestamp_acquiry );
-
-	fprintf(
-	 stream,
-	 ".\n" );
 }
 

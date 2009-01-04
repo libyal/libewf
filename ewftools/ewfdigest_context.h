@@ -24,6 +24,7 @@
 #define _EWFDIGEST_CONTEXT_H
 
 #include <common.h>
+#include <types.h>
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 #include <openssl/evp.h>
@@ -31,8 +32,6 @@
 #include <windows.h>
 #include <wincrypt.h>
 #endif
-
-#include <libewf/types.h>
 
 #include "ewfdigest_hash.h"
 

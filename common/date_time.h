@@ -32,6 +32,11 @@
 extern "C" {
 #endif
 
+#if defined( HAVE_TIME )
+#define date_time_time( timestamp ) \
+	time( timestamp )
+#endif
+
 #if defined( HAVE_WCTIME_R )
 #if defined( HAVE_WINDOWS_API )
 #define date_time_wctime( timestamp, string, size ) \

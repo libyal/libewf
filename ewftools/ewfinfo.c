@@ -50,6 +50,7 @@
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
+#include "ewfguid.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 
@@ -82,6 +83,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	character_t media_size_string[ 16 ];
+	character_t guid_string[ EWFGUID_STRING_LENGTH ];
 	uint8_t guid[ 16 ];
 
 	character_t *program                       = _CHARACTER_T_STRING( "ewfinfo" );
@@ -568,12 +570,14 @@ int main( int argc, char * const argv[] )
 			     guid,
 			     16 ) == 1 )
 			{
-				fprintf( stdout, "\tGUID:\t\t\t%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
-						 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
-						 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
-				 guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ], guid[ 4 ], guid[ 5 ], guid[ 6 ], guid[ 7 ],
-				 guid[ 8 ], guid[ 9 ], guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ]
-				);
+				if( ewfguid_to_string(
+				     (ewfguid_t *) guid,
+				     guid_string,
+				     EWFGUID_STRING_LENGTH ) == 1 )
+				{
+					fprintf( stdout, "\tGUID:\t\t\t%" PRIs "\n",
+					 guid_string );
+				}
 			}
 		}
 		ewfoutput_hash_values_fprint(
@@ -600,17 +604,17 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
-	if( ewfcommon_abort != 0 )
-	{
-		fprintf( stdout, "%" PRIs ": ABORTED\n",
-		 program );
-
-		return( EXIT_FAILURE );
-	}
 	if( libewf_close(
 	     ewfcommon_libewf_handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
+
+		return( EXIT_FAILURE );
+	}
+	if( ewfcommon_abort != 0 )
+	{
+		fprintf( stdout, "%" PRIs ": ABORTED\n",
+		 program );
 
 		return( EXIT_FAILURE );
 	}

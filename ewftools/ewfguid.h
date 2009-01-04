@@ -1,7 +1,7 @@
 /*
- * Crypographic hash for ewftools
+ * GUID functions
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -20,27 +20,31 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFDIGEST_HASH_H )
-#define _EWFDIGEST_HASH_H
+#if !defined( _EWFGUID_H )
+#define _EWFGUID_H
 
 #include <common.h>
 #include <character_string.h>
 #include <types.h>
 
+#if defined( HAVE_TIME_H )
+#include <time.h>
+#endif
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define EWFDIGEST_HASH_SIZE_MD5		(size_t) ( sizeof( ewfdigest_hash_t ) * 16 )
-#define EWFDIGEST_HASH_SIZE_SHA1	(size_t) ( sizeof( ewfdigest_hash_t ) * 20 )
+#define EWFGUID_STRING_LENGTH	37
 
-typedef uint8_t ewfdigest_hash_t;
+typedef uint8_t ewfguid_t;
 
-int ewfdigest_copy_to_string(
-     ewfdigest_hash_t *digest_hash,
-     size_t size_digest_hash,
+#define guid_t ewfguid_t;
+
+int ewfguid_to_string(
+     ewfguid_t *guid,
      character_t *string,
-     size_t size_string );
+     size_t length );
 
 #if defined( __cplusplus )
 }

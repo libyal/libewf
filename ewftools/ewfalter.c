@@ -306,11 +306,9 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to allocate buffer.\n" );
 
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
+			libewf_close(
+			 ewfcommon_libewf_handle );
+
 			return( EXIT_FAILURE );
 		}
 		if( memory_set(
@@ -320,13 +318,11 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to set buffer.\n" );
 
-			if( libewf_close(
-			     ewfcommon_libewf_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
 			memory_free(
 			 buffer );
+
+			libewf_close(
+			 ewfcommon_libewf_handle );
 
 			return( EXIT_FAILURE );
 		}
@@ -340,13 +336,11 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to set delta segment filename in handle.\n" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
 				memory_free(
 				 buffer );
+
+				libewf_close(
+				 ewfcommon_libewf_handle );
 
 				return( EXIT_FAILURE );
 			}
@@ -386,13 +380,11 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stdout, "Alteration failed.\n" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
 				memory_free(
 				 buffer );
+
+				libewf_close(
+				 ewfcommon_libewf_handle );
 
 				return( EXIT_FAILURE );
 			}
@@ -432,13 +424,11 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stdout, "Alteration failed.\n" );
 
-				if( libewf_close(
-				     ewfcommon_libewf_handle ) != 0 )
-				{
-					fprintf( stderr, "Unable to close EWF file(s).\n" );
-				}
 				memory_free(
 				 buffer );
+
+				libewf_close(
+				 ewfcommon_libewf_handle );
 
 				return( EXIT_FAILURE );
 			}

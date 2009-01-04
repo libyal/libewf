@@ -25,8 +25,7 @@
 
 #include <common.h>
 #include <system_string.h>
-
-#include <libewf/types.h>
+#include <types.h>
 
 #include "ewfcommon.h"
 

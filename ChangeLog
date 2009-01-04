@@ -113,9 +113,9 @@ Code clean up
 
 Next release(s):
 
-* store narrow strings internally as UTF-8, convert them when required to
-  reduce memory overhead or don't bother?
-* improve handling Unicode/USC input and output
+* fix ewfinfo
+
+* implement libuca
 
 * implement low memory usage option
   - trade off IO versus memory use
@@ -145,9 +145,6 @@ Next release(s):
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-* move guid to common?
-* use utf16 stream functions - implement libuca
-
 * rewrite ewfinput determine functions to pass value as argument
   and have return value be 1 or -1
 
@@ -171,6 +168,11 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080902
+* refactored process status
+* code clean up in ewftools
+* implemented ewfguid
 
 Version: 20080901
 * refactored ewfglob
@@ -1281,10 +1283,10 @@ Version: 20061208
 
 Version: 20061207
 * worked on calculating a GUID for write
-* added guid get and set functions to libewf
-* added guid check for data section
-* added guid write for encase5 and linen5 format
-* ewfacquire now adds random guid (uuid) for encase5 and time based guid for linen5 - only if libuuid is present
+* added GUID get and set functions to libewf
+* added GUID check for data section
+* added GUID write for encase5 and linen5 format
+* ewfacquire now adds random GUID (uuid) for encase5 and time based GUID for linen5 - only if libuuid is present
 * ewfacquire added test for block or character device before determining device size
 * ewfcommon created generic version function - added library version information
 * changed version() to ewfcommon_copyright_fprint()
