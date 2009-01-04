@@ -53,6 +53,10 @@ struct libewf_segment_file_handle
 	/* The segment file type
 	 */
 	uint8_t file_type;
+
+	/* Value to indicate that the segment file is open for writing
+	 */
+	uint8_t write_open;
 };
 
 int libewf_segment_file_handle_initialize(

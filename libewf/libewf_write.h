@@ -42,33 +42,30 @@ int libewf_write_test_empty_block(
      uint8_t *block_buffer,
      size_t size );
 
-int64_t libewf_write_calculate_chunks_per_segment_file(
-         size64_t segment_file_size,
-         size64_t maximum_segment_file_size,
-         off64_t segment_file_offset,
-         uint32_t maximum_section_amount_of_chunks,
-         uint32_t segment_amount_of_chunks,
-         uint32_t amount_of_chunks,
-         libewf_media_values_t *media_values,
-         uint8_t format,
-         uint8_t ewf_format,
-         uint8_t unrestrict_offset_amount );
+int libewf_write_calculate_chunks_per_segment(
+     uint32_t *chunks_per_segment,
+     size64_t remaining_segment_file_size,
+     uint32_t maximum_section_amount_of_chunks,
+     uint32_t segment_amount_of_chunks,
+     uint32_t amount_of_chunks,
+     libewf_media_values_t *media_values,
+     uint8_t format,
+     uint8_t ewf_format,
+     uint8_t unrestrict_offset_amount );
 
-uint32_t libewf_write_calculate_chunks_per_chunks_section(
-          size64_t segment_file_size,
-          size64_t maximum_segment_file_size,
-          uint32_t maximum_section_amount_of_chunks,
-          int64_t chunks_per_segment,
-          uint8_t chunks_section_number,
-          uint8_t unrestrict_offset_amount );
+int libewf_write_calculate_chunks_per_chunks_section(
+     uint32_t *chunks_per_chunks_section,
+     uint32_t maximum_section_amount_of_chunks,
+     uint32_t chunks_per_segment,
+     uint8_t chunks_section_number,
+     uint8_t unrestrict_offset_amount );
 
 int libewf_write_test_segment_file_full(
      ssize64_t remaining_segment_file_size,
      uint32_t segment_amount_of_chunks,
      libewf_media_values_t *media_values,
      ssize64_t input_write_count,
-     int64_t chunks_per_segment,
-     uint32_t section_amount_of_chunks,
+     uint32_t chunks_per_segment,
      uint32_t current_amount_of_chunks,
      uint8_t format,
      uint8_t ewf_format );

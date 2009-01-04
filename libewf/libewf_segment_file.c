@@ -1575,7 +1575,7 @@ ssize_t libewf_segment_file_write_close(
 
 		return( -1 );
 	}
-	segment_file_handle->file_io_pool_entry = -1;
+	segment_file_handle->write_open = 0;
 
 	return( total_write_count );
 }

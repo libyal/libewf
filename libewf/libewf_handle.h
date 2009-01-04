@@ -211,7 +211,7 @@ struct libewf_internal_handle_write
 
         /* The determined (estimated) amount of chunks per segment
          */
-        int64_t chunks_per_segment;
+        uint32_t chunks_per_segment;
 
         /* The determined (estimated) amount of chunks per chunks section
          */

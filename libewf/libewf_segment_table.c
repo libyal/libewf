@@ -927,6 +927,8 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
+	segment_table->segment_file_handle[ segment_number ]->write_open = 1;
+
 	return( 1 );
 }
 
