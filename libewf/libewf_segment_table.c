@@ -58,9 +58,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->segment_file = (LIBEWF_SEGMENT_FILE *) libewf_common_alloc_cleared(
-	                               ( amount * LIBEWF_SEGMENT_FILE_SIZE ),
-	                               0 );
+	segment_table->segment_file = (LIBEWF_SEGMENT_FILE *) libewf_common_alloc(
+	                               ( amount * LIBEWF_SEGMENT_FILE_SIZE ) );
 
 	if( segment_table->segment_file == NULL )
 	{
@@ -73,39 +72,34 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 	}
 	for( iterator = 0; iterator < amount; iterator++ )
 	{
-		segment_table->segment_file[ iterator ].file_descriptor = -1;
+		segment_table->segment_file[ iterator ].filename         = NULL;
+		segment_table->segment_file[ iterator ].file_descriptor  = -1;
+		segment_table->segment_file[ iterator ].file_offset      = 0;
+		segment_table->segment_file[ iterator ].amount_of_chunks = 0;
+
+		segment_table->segment_file[ iterator ].section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
 
 		if( segment_table->segment_file[ iterator ].section_list == NULL )
 		{
-			segment_table->segment_file[ iterator ].section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
+			 function );
 
-			if( segment_table->segment_file[ iterator ].section_list == NULL )
+			/* The current entry does not need to be freed, because it was never allocated
+			 * but the first entry 0 does, because the iterator is a unsigned integer
+			 * the iterator - 1 construction is used
+			 * There are no entries in the list
+			 */
+			for( ; iterator > 0; iterator-- )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
-				 function );
-
-				/* The current entry does not need to be freed, because it was never allocated
-				 * but the first entry 0 does, because the iterator is a unsigned integer
-				 * the iterator - 1 construction is used
-				 * There are no entries in the list
-				 */
-				for( ; iterator > 0; iterator-- )
-				{
-					libewf_common_free( segment_table->segment_file[ iterator - 1 ].section_list );
-				}
-				libewf_common_free( segment_table->segment_file );
-				libewf_common_free( segment_table );
-
-				return( NULL );
+				libewf_common_free( segment_table->segment_file[ iterator - 1 ].section_list );
 			}
-			segment_table->segment_file[ iterator ].section_list->first = NULL;
-			segment_table->segment_file[ iterator ].section_list->last  = NULL;
+			libewf_common_free( segment_table->segment_file );
+			libewf_common_free( segment_table );
+
+			return( NULL );
 		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: section list for segment file: %" PRIu16 "already created.\n",
-			 function, iterator );
-		}
+		segment_table->segment_file[ iterator ].section_list->first = NULL;
+		segment_table->segment_file[ iterator ].section_list->last  = NULL;
 	}
 	segment_table->amount = amount;
 
@@ -128,11 +122,16 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 		return( -1 );
 	}
-	reallocation = libewf_common_realloc_new_cleared(
+	if( segment_table->amount >= amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: new amount must be greater than previous amount.\n",
+		 function );
+
+		return( -1 );
+	}
+	reallocation = libewf_common_realloc(
 	                segment_table->segment_file,
-	                ( segment_table->amount * LIBEWF_SEGMENT_FILE_SIZE ),
-	                ( amount * LIBEWF_SEGMENT_FILE_SIZE ),
-	                0 );
+	                ( amount * LIBEWF_SEGMENT_FILE_SIZE ) );
 
 	if( reallocation == NULL )
 	{
@@ -145,27 +144,22 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 	for( iterator = segment_table->amount; iterator < amount; iterator++ )
 	{
-		segment_table->segment_file[ iterator ].file_descriptor = -1;
+		segment_table->segment_file[ iterator ].filename         = NULL;
+		segment_table->segment_file[ iterator ].file_descriptor  = -1;
+		segment_table->segment_file[ iterator ].file_offset      = 0;
+		segment_table->segment_file[ iterator ].amount_of_chunks = 0;
+
+		segment_table->segment_file[ iterator ].section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
 
 		if( segment_table->segment_file[ iterator ].section_list == NULL )
 		{
-			segment_table->segment_file[ iterator ].section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
+			 function );
 
-			if( segment_table->segment_file[ iterator ].section_list == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
-				 function );
-
-				return( -1 );
-			}
-			segment_table->segment_file[ iterator ].section_list->first = NULL;
-			segment_table->segment_file[ iterator ].section_list->last  = NULL;
+			return( -1 );
 		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: section list for segment file: %" PRIu16 "already created.\n",
-			 function, iterator );
-		}
+		segment_table->segment_file[ iterator ].section_list->first = NULL;
+		segment_table->segment_file[ iterator ].section_list->last  = NULL;
 	}
 	segment_table->amount = amount;
 
@@ -283,12 +277,12 @@ int libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	if( libewf_common_wide_memcpy(
 	     filename,
-	     segment_table->segment_file[ 0 ].filename,
+	     segment_table->segment_file[ segment ].filename,
 	     filename_length ) == NULL )
 #else
 	if( libewf_common_memcpy(
 	     filename,
-	     segment_table->segment_file[ 0 ].filename,
+	     segment_table->segment_file[ segment ].filename,
 	     filename_length ) == NULL )
 #endif
 	{

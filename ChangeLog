@@ -154,6 +154,10 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071113
+* worked on refactoring segment table to table of segment files
+* fixed error in libewf_raw_read_chunk regarding use of the right segment table
+
 Version: 20071112
 * change default segment file size to 1500 MB (^10)
   about 1400 MB in (^2), 3x segment files should fit on a DVD
