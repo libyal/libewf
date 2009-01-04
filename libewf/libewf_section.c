@@ -2584,13 +2584,6 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-	sectors_size = EWF_ERROR2_SECTOR_SIZE * amount_of_errors;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( error2->unknown, 200 ); );
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
-#endif
-
 	calculated_crc = ewf_crc_calculate( error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, error2->crc ) != 1 )
@@ -2612,6 +2605,13 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		return( -1 );
 	}
 	libewf_common_free( error2 );
+
+	sectors_size = EWF_ERROR2_SECTOR_SIZE * amount_of_errors;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( error2->unknown, 200 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
+#endif
 
 	if( stored_crc != calculated_crc )
 	{

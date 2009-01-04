@@ -466,6 +466,16 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 				}
 				else
 				{
+					LIBEWF_VERBOSE_PRINT( "%s: wiping remainder of chunk at offset %" PRIu32 ".\n",
+					 function, read_error_offset );
+
+					if( libewf_common_memset( &buffer[ read_error_offset ], 0, error_skip_bytes ) == NULL )
+					{
+						LIBEWF_WARNING_PRINT( "%s: unable to wipe data in chunk on error.\n",
+						 function );
+
+						return( -1 );
+					}
 					error2_sector            += read_error_offset;
 					error2_amount_of_sectors  = error_skip_bytes;
 				}

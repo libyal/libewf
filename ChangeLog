@@ -162,6 +162,8 @@ Version: 20071110
 * added libewf_convert_date_xheader_value
 * added ctime date format to ewfinfo which is now default
   refactored header values dat conversion functions
+* ewfacquire wipes remainder of chunk on acquiry error if wipe chunk is not set
+* fixed error in reading error2 section
 
 Version: 20071107
 * worked on delta file
