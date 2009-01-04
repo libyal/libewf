@@ -146,6 +146,11 @@ CLOSED
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
   no, this could be read from the error2 section
 
+Version: 20070915
+* Worked on deb based package
+  - added distclean make directive
+* Adjusted rpm based package 
+
 Version: 20070912
 * fixed on error in delta file accouting for multiple rewrites
 * removed libewf_write_chunk, libewf_internal_handle_read_is_initialized

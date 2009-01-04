@@ -4,6 +4,41 @@ SUBDIRS = \
 	manuals
 
 EXTRA_DIST = \
+	debian/changelog \
+	debian/changelog.in \
+	debian/compat \
+	debian/control \
+	debian/copyright \
+	debian/cron.d.ex \
+	debian/emacsen-install.ex \
+	debian/emacsen-startup.ex \
+	debian/emacsen-remove.ex \
+	debian/init.d.ex \
+	debian/libewf.install \
+	debian/libewf.dirs \
+	debian/libewf.docs \
+	debian/libewf.postinst.debhelper \
+	debian/libewf.postrm.debhelper \
+	debian/libewf-default.ex \
+	debian/libewf-dev.dirs \
+	debian/libewf-dev.docs \
+	debian/libewf-dev.install \
+	debian/libewf-tools.dirs \
+	debian/libewf-tools.docs \
+	debian/libewf-tools.install \
+	debian/libewf.doc-base.EX \
+	debian/manpage.1.ex \
+	debian/manpage.sgml.ex \
+	debian/manpage.xml.ex \
+	debian/menu.ex \
+	debian/rules \
+	debian/postinst.ex \
+	debian/postrm.ex \
+	debian/preinst.ex \
+	debian/prerm.ex \
+	debian/shlibs.local.ex \
+	debian/shlibs.local.ex.in \
+	debian/watch.ex \
 	include/libewf.h.in \
 	include/libewf/libewf_definitions.h.in \
 	include/libewf/libewf_types.h.in \
@@ -28,10 +63,11 @@ EXTRA_DIST = \
 	msvscpp/libewf_dll \
 	msvscpp/libewf_dll/libewf_dll.vcproj \
 	msvscpp/libewf.sln \
-	TESTS \
-	libewf.spec.in \
+	libewf.pc \
+	libewf.pc.in \
 	libewf.spec \
-	libewf.pc.in
+	libewf.spec.in \
+	TESTS
 
 pkgconfigdir = $(libdir)/pkgconfig
 
@@ -54,4 +90,20 @@ lib: library
 
 library:
 	cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS)
+
+distclean: clean
+	/bin/rm -f Makefile
+	/bin/rm -f config.status config.cache config.log
+	/bin/rm -f libewf.pc
+	/bin/rm -f libewf.spec
+	/bin/rm -f debian/changelog
+	/bin/rm -f debian/shlibs.local.ex
+	/bin/rm -f include/libewf.h
+	/bin/rm -f include/libewf/libewf_definitions.h
+	/bin/rm -f include/libewf/libewf_types.h
+	/bin/rm -f libewf/libewf_config.h
+	@for dir in ${subdirs}; do \
+		(cd $$dir && $(MAKE) distclean) \
+		|| case "$(MFLAGS)" in *k*) fail=yes;; *) exit 1;; esac; \
+	done && test -z "$$fail"
 

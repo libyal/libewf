@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070912], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20070915], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20070912])
+AM_INIT_AUTOMAKE([libewf], [20070915])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -218,7 +218,7 @@ LIBEWF_DETERMINE_OPERATING_SYSTEM
 
 CFLAGS="$CFLAGS -Wall";
 
-AC_CONFIG_FILES([Makefile libewf/Makefile ewftools/Makefile manuals/Makefile libewf.pc libewf.spec include/libewf.h include/libewf/libewf_definitions.h include/libewf/libewf_types.h])
+AC_CONFIG_FILES([Makefile libewf/Makefile ewftools/Makefile manuals/Makefile debian/changelog debian/shlibs.local.ex libewf.pc libewf.spec include/libewf.h include/libewf/libewf_definitions.h include/libewf/libewf_types.h])
 AC_CONFIG_HEADERS([libewf/libewf_config.h])
 
 AC_OUTPUT

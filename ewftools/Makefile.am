@@ -80,3 +80,6 @@ ewfverify_SOURCES = \
 
 ewfverify_LDADD  = ../libewf/libewf.la
 
+distclean: clean
+	/bin/rm -f Makefile
+

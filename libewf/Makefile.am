@@ -46,3 +46,6 @@ libewf_la_SOURCES = \
 
 libewf_la_LDFLAGS = -no-undefined -version-info 1:2:0
 
+distclean: clean
+	/bin/rm -f Makefile
+

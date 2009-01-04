@@ -6,3 +6,6 @@ man_MANS = \
 	ewfverify.1 \
 	libewf.3
 
+distclean: clean
+	/bin/rm -f Makefile
+
