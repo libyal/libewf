@@ -156,6 +156,7 @@ Version: 20070916
   - moved the user input functions from ewfcommon to ewfinput
   - moved the user output functions from ewfcommon to ewfoutput
   - updated MSVCPP project files
+  - seperated read and crc/uncompression functions
 
 Version: 20070915
 * Worked on deb based package

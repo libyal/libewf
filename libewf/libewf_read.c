@@ -46,6 +46,84 @@
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
 
+/* Processes the chunk data, applies decompression if necessary and validates the CRC
+ * Returns the amount of bytes of the processed chunk data, or -1 on error
+ */
+ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK *chunk_data, size_t chunk_data_size, EWF_CHUNK *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed )
+{
+	static char *function  = "libewf_read_process_chunk_data";
+	EWF_CRC calculated_crc = 0;
+	size_t buffer_size     = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_data_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk data size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( is_compressed == 0 )
+	{
+		buffer_size = chunk_data_size;
+
+		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) chunk_data, buffer_size, 1 ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( uncompressed_chunk_data == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid uncompressed chunk data.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( chunk_data == uncompressed_chunk_data )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid uncompressed chunk data is the same as chunk data.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( *uncompressed_chunk_data_size > (size_t) SSIZE_MAX )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid uncompressed chunk data size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		buffer_size = *uncompressed_chunk_data_size;
+
+		if( ewf_chunk_uncompress( uncompressed_chunk_data, uncompressed_chunk_data_size, chunk_data, chunk_data_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to uncompressed chunk data.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( (ssize_t) buffer_size );
+}
+
 /* Reads a certain chunk of data from the segment file(s)
  * Will read until the requested size is filled or the entire chunk is read
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
@@ -54,7 +132,9 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 {
 	EWF_CHUNK *chunk_data     = NULL;
 	EWF_CHUNK *chunk_read     = NULL;
-	EWF_CRC calculated_crc    = 0;
+#if defined( HAVE_VERBOSE_OUTPUT )
+        char *chunk_type          = NULL;
+#endif
 	static char *function     = "libewf_read_chunk";
 	ssize_t chunk_read_count  = 0;
 	ssize_t crc_read_count    = 0;
@@ -62,7 +142,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	size_t bytes_available    = 0;
 	uint16_t segment_number   = 0;
 	int chunk_cache_data_used = 0;
-	int result                = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -161,18 +240,42 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	{
 		return( 0 );
 	}
-	/* Check if raw access is required
-	 */
-	if( raw_access != 0 )
-	{
-		*is_compressed = internal_handle->offset_table->compressed[ chunk ];
-	}
 	/* Check if the chunk is cached
 	 */
-	else if( ( internal_handle->chunk_cache->chunk != chunk )
+	if( ( internal_handle->chunk_cache->chunk != chunk )
 	 || ( internal_handle->chunk_cache->cached == 0 ) )
 	{
 		segment_number = internal_handle->offset_table->segment_number[ chunk ];
+
+		/* Determine the size of the chunk including the CRC
+		 */
+		chunk_data_size = internal_handle->offset_table->size[ chunk ];
+
+		chunk_cache_data_used = (int) ( buffer == internal_handle->chunk_cache->data );
+
+		/* Make sure the chunk cache is large enough
+		 */
+		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
+		{
+			LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
+			 function, chunk_data_size );
+
+			if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
+				 function );
+
+				return( -1 );
+			}
+			/* Adjust chunk data buffer if necessary
+			 */
+			if( ( chunk_cache_data_used == 1 )
+			 && ( buffer != internal_handle->chunk_cache->data ) )
+			{
+				buffer = internal_handle->chunk_cache->data;
+			}
+		}
+		chunk_data = internal_handle->chunk_cache->data;
 
 #if defined( HAVE_BUFFER_PASSTHROUGH )
 		/* Determine if the chunk data should be put directly in the buffer
@@ -183,40 +286,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		{
 			chunk_data = (EWF_CHUNK *) buffer;
 		}
-		else
 #endif
-		{
-			chunk_cache_data_used = (int) ( buffer == internal_handle->chunk_cache->data );
-
-			/* Determine the size of the chunk including the CRC
-			 */
-			chunk_data_size = internal_handle->offset_table->size[ chunk ];
-
-			/* Make sure the chunk cache is large enough
-			 */
-			if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
-			{
-				LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
-				 function, chunk_data_size );
-
-				if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
-					 function );
-
-					return( -1 );
-				}
-				/* Adjust chunk data buffer if necessary
-				 */
-				if( ( chunk_cache_data_used == 1 )
-				 && ( buffer != internal_handle->chunk_cache->data ) )
-				{
-					buffer = internal_handle->chunk_cache->data;
-				}
-			}
-			chunk_data = internal_handle->chunk_cache->data;
-		}
-
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */
@@ -264,9 +334,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		 */
 		if( internal_handle->offset_table->compressed[ chunk ] == 0 )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is UNCOMPRESSED.\n",
-			 function, ( chunk + 1 ), internal_handle->offset_table->amount );
-
 			/* If buffer passthrough is used the CRC needs to be read seperately
 			 */
 			if( ( chunk_read != internal_handle->chunk_cache->compressed )
@@ -310,85 +377,15 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				}
 				chunk_data_size -= (uint32_t) EWF_CRC_SIZE;
 			}
-			/* Calculate the CRC
-			 */
-			if( ewf_crc_calculate( &calculated_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-				 function );
-
-				return( -1 );
-			}
-			LIBEWF_VERBOSE_PRINT( "%s: CRC for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-			 function, ( chunk + 1 ), *chunk_crc, calculated_crc );
-
-			if( *chunk_crc != calculated_crc )
-			{
-				LIBEWF_WARNING_PRINT( "%s: CRC does not match for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-				 function, ( chunk + 1 ), *chunk_crc, calculated_crc );
-
-#if defined( WIPE_ON_ERROR )
-				/* The chunk data is wiped
-				 */
-				if( libewf_common_memset( chunk_read, 0, internal_handle->media->chunk_size ) == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
-					 function );
-
-					return( -1 );
-				}
-#endif
-				if( libewf_internal_handle_add_crc_error_chunk( internal_handle, chunk ) != 1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
-					 function );
-
-					return( -1 );
-				}
-				if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
+			chunk_type = "UNCOMPRESSED";
 		}
 		/* Determine if the chunk is compressed
 		 */
 		else if( internal_handle->offset_table->compressed[ chunk ] == 1 )
 		{
 			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
-			result          = ewf_chunk_uncompress( chunk_data, &chunk_data_size, chunk_read, chunk_read_count );
 
-			LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is COMPRESSED.\n",
-			 function, ( chunk + 1 ), internal_handle->offset_table->amount );
-
-			if( result != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to uncompress chunk.\n",
-				 function );
-
-#if defined( WIPE_ON_ERROR )
-				/* The chunk data is wiped
-				 */
-				if( libewf_common_memset( chunk_data, 0, internal_handle->media->chunk_size ) == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
-					 function );
-
-					return( -1 );
-				}
-#endif
-				if( libewf_internal_handle_add_crc_error_chunk( internal_handle, chunk ) != 1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
-					 function );
-
-					return( -1 );
-				}
-				if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-				{
-					return( -1 );
-				}
-			}
+			chunk_type = "COMPRESSED";
 		}
 		else
 		{
@@ -396,6 +393,40 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 			 function );
 
 			return( -1 );
+		}
+		LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s.\n",
+		 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
+
+		if( libewf_read_process_chunk_data(
+		     internal_handle,
+		     chunk_read,
+		     chunk_read_count,
+		     chunk_data,
+		     &chunk_data_size,
+		     internal_handle->offset_table->compressed[ chunk ] ) == -1 )
+		{
+#if defined( WIPE_ON_ERROR )
+			/* The chunk data is wiped
+			 */
+			if( libewf_common_memset( chunk_read, 0, internal_handle->media->chunk_size ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
+				 function );
+
+				return( -1 );
+			}
+#endif
+			if( libewf_internal_handle_add_crc_error_chunk( internal_handle, chunk ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set CRC error chunk.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+			{
+				return( -1 );
+			}
 		}
 		/* Flag that the chunk was cached
 		 */

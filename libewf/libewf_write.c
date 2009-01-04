@@ -597,12 +597,12 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 	return( 0 );
 }
 
-/* Prepares the chunk data, applies compression if necessary and calculates the CRC
+/* Processes the chunk data, applies compression if necessary and calculates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
-ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK *chunk_data, size_t chunk_data_size, EWF_CHUNK *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc )
+ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK *chunk_data, size_t chunk_data_size, EWF_CHUNK *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc )
 {
-	static char *function     = "libewf_write_prepare_chunk_data";
+	static char *function     = "libewf_write_process_chunk_data";
 	size_t data_write_size    = 0;
 	int8_t compression_level  = 0;
 	int chunk_cache_data_used = 0;
@@ -1188,7 +1188,7 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 			/* Compress the chunk if necessary and determine its CRC
 			 */
-			chunk_data_size = libewf_write_prepare_chunk_data(
+			chunk_data_size = libewf_write_process_chunk_data(
 					   internal_handle, 
 					   chunk_data,
 					   write_size,
@@ -1207,7 +1207,7 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 			}
 			/* Make sure to update the chunk_data pointer if 
 			 * internal_handle->chunk_cache->data has been reallocated by
-			 * libewf_write_prepare_chunk_data()
+			 * libewf_write_process_chunk_data()
 			 */
 			if( ( chunk_cache_data_used == 1 )
 			 && ( chunk_data != internal_handle->chunk_cache->data ) )
@@ -1972,7 +1972,7 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
 
 		return( -1 );
 	}
-	chunk_data_size = libewf_write_prepare_chunk_data(
+	chunk_data_size = libewf_write_process_chunk_data(
 	                   internal_handle,
 	                   (EWF_CHUNK *) buffer,
 	                   buffer_size,
