@@ -22,7 +22,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <memory.h>
 #include <system_string.h>
 #include <types.h>
@@ -46,10 +45,11 @@
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "ewfglob.h"
+#include "glob.h"
 #include "ewfguid.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
@@ -95,7 +95,7 @@ int main( int argc, char * const argv[] )
 	system_character_t **ewf_filenames         = NULL;
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                            = NULL;
+	glob_t *glob                            = NULL;
 #endif
 	char *file_format_string                   = NULL;
 	system_integer_t option                    = 0;
@@ -254,14 +254,14 @@ int main( int argc, char * const argv[] )
 	amount_of_filenames = argc - optind;
 
 #if !defined( HAVE_GLOB_H )
-	if( ewfglob_initialize(
+	if( glob_initialize(
 	     &glob ) != 1 )
 	{
 		fprintf( stderr, "Unable to initialize glob.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	amount_of_filenames = ewfglob_resolve(
+	amount_of_filenames = glob_resolve(
 	                       glob,
 	                       &argv[ optind ],
 	                       ( argc - optind ) );
@@ -271,7 +271,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free(
+		glob_free(
 		 &glob );
 
 		return( EXIT_FAILURE );
@@ -295,7 +295,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
 
 #if !defined( HAVE_GLOB_H )
-			ewfglob_free(
+			glob_free(
 			 &glob );
 #endif
 
@@ -308,7 +308,7 @@ int main( int argc, char * const argv[] )
 	                           amount_of_filenames,
 	                           LIBEWF_OPEN_READ );
 #if !defined( HAVE_GLOB_H )
-	ewfglob_free(
+	glob_free(
 	 &glob );
 #endif
 	if( ewf_filenames != NULL )
@@ -505,11 +505,11 @@ int main( int argc, char * const argv[] )
 		     ewfcommon_libewf_handle,
 		     &media_size ) == 1 )
 		{
-			result = ewfbyte_size_string_create(
+			result = byte_size_string_create(
 				  media_size_string,
 				  16,
 				  media_size,
-				  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+				  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
 			if( result == 1 )
 			{

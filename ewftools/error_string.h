@@ -23,8 +23,8 @@
 #if !defined( _ERROR_STRING_H )
 #define _ERROR_STRING_H
 
-#include "common.h"
-#include "types.h"
+#include <common.h>
+#include <types.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -61,20 +61,13 @@ extern "C" {
 #endif
 
 #if defined( error_string_strerror_r ) || defined( HAVE_STRERROR )
-char *libewf_error_string_strerror(
+char *error_string_strerror(
        int error_number );
-
-#define error_string_strerror( error_number ) \
-	libewf_error_string_strerror( error_number )
 #endif
 
 #if defined( error_string_wcserror_r )
-wchar_t *libewf_error_string_wcserror(
+wchar_t *error_string_wcserror(
           int error_number );
-
-#define error_string_wcserror( error_number ) \
-	libewf_error_string_wcserror( error_number )
-
 #endif
 
 #if defined( __cplusplus )

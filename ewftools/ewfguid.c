@@ -21,10 +21,10 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <notify.h>
 #include <types.h>
 
+#include "character_string.h"
 #include "ewfguid.h"
 
 /* Converts the GUID into a string

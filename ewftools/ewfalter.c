@@ -44,10 +44,10 @@
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
+#include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "ewfglob.h"
+#include "glob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
@@ -89,7 +89,7 @@ int main( int argc, char * const argv[] )
 	character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                            = NULL;
+	glob_t *glob                            = NULL;
 #endif
 
 	character_t *program                       = _CHARACTER_T_STRING( "ewfalter" );
@@ -148,7 +148,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_system_character(
+				result = byte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &process_buffer_size );
@@ -208,14 +208,14 @@ int main( int argc, char * const argv[] )
 	amount_of_filenames = argc - optind;
 
 #if !defined( HAVE_GLOB_H )
-	if( ewfglob_initialize(
+	if( glob_initialize(
 	     &glob ) != 1 )
 	{
 		fprintf( stderr, "Unable to initialize glob.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	amount_of_filenames = ewfglob_resolve(
+	amount_of_filenames = glob_resolve(
 	                       glob,
 	                       &argv[ optind ],
 	                       ( argc - optind ) );
@@ -225,7 +225,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free(
+		glob_free(
 		 &glob );
 
 		return( EXIT_FAILURE );
@@ -249,7 +249,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
 
 #if !defined( HAVE_GLOB_H )
-			ewfglob_free(
+			glob_free(
 			 &glob );
 #endif
 
@@ -262,7 +262,7 @@ int main( int argc, char * const argv[] )
 	                           amount_of_filenames,
 	                           LIBEWF_OPEN_READ_WRITE );
 #if !defined( HAVE_GLOB_H )
-	ewfglob_free(
+	glob_free(
 	 &glob );
 #endif
 	if( ewf_filenames != NULL )

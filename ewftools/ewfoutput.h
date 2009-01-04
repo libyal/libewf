@@ -24,7 +24,6 @@
 #define _EWFOUTPUT_H
 
 #include <common.h>
-#include <character_string.h>
 #include <date_time.h>
 #include <system_string.h>
 #include <types.h>
@@ -32,6 +31,8 @@
 #include <stdio.h>
 
 #include <libewf/handle.h>
+
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {

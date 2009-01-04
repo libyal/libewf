@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -44,7 +43,8 @@
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewfstring.h"
 
@@ -1449,33 +1449,33 @@ int ewfinput_get_byte_size_variable(
 
 		return( -1 );
 	}
-	if( ewfbyte_size_string_create(
+	if( byte_size_string_create(
 	     minimum_size_string,
 	     16,
 	     minimum,
-	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
+	     BYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create minimum byte size string.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ewfbyte_size_string_create(
+	if( byte_size_string_create(
 	     default_size_string,
 	     16,
 	     default_value,
-	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
+	     BYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create default byte size string.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ewfbyte_size_string_create(
+	if( byte_size_string_create(
 	     maximum_size_string,
 	     16,
 	     maximum,
-	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
+	     BYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create maximum byte size string.\n",
 		 function );
@@ -1541,7 +1541,7 @@ int ewfinput_get_byte_size_variable(
 
 				return( 0 );
 			}
-			if( ewfbyte_size_string_convert(
+			if( byte_size_string_convert(
 			     input_buffer,
 			     (size_t) input_length,
 			     byte_size_variable ) != 1 )

@@ -1,5 +1,5 @@
 /*
- * Globbing functions for the ewftools
+ * Globbing functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,14 +20,13 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFGLOB_H )
-#define _EWFGLOB_H
+#if !defined( _GLOB_H )
+#define _GLOB_H
 
 #include <common.h>
-#include <system_string.h>
 #include <types.h>
 
-#include "ewfcommon.h"
+#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -35,9 +34,29 @@ extern "C" {
 
 #if !defined( HAVE_GLOB_H )
 
-typedef struct ewfglob ewfglob_t;
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 
-struct ewfglob
+#define glob_finddata_t	_wfinddata_t
+#define glob_makepath	_wmakepath_s
+#define glob_findfirst	_wfindfirst
+#define glob_findnext	_wfindnext
+#define glob_splitpath	_wsplitpath_s
+
+#else
+
+#define glob_finddata_t	_finddata_t
+#define glob_makepath	_makepath_s
+#define glob_findfirst	_findfirst
+#define glob_findnext	_findnext
+#define glob_splitpath	_splitpath_s
+
+#endif
+
+#define glob_findclose	_findclose
+
+typedef struct glob glob_t;
+
+struct glob
 {
 	/* The amount of globs resolved
 	 */
@@ -48,18 +67,18 @@ struct ewfglob
 	system_character_t **result;
 };
 
-int ewfglob_initialize(
-     ewfglob_t **glob );
+int glob_initialize(
+     glob_t **glob );
 
-int ewfglob_free(
-     ewfglob_t **glob );
+int glob_free(
+     glob_t **glob );
 
-int ewfglob_resize(
-     ewfglob_t *glob,
+int glob_resize(
+     glob_t *glob,
      int new_amount_of_results );
 
-int ewfglob_resolve(
-     ewfglob_t *glob,
+int glob_resolve(
+     glob_t *glob,
      system_character_t * const patterns[],
      int amount_of_patterns );
 

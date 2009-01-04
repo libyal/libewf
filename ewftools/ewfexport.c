@@ -22,7 +22,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <memory.h>
 #include <system_string.h>
 #include <types.h>
@@ -54,15 +53,16 @@
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfdigest_context.h"
 #include "ewfgetopt.h"
-#include "ewfglob.h"
+#include "glob.h"
 #include "ewfinput.h"
 #include "ewfmd5.h"
 #include "ewfoutput.h"
-#include "ewfprocess_status.h"
+#include "process_status.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
 #include "ewfstring.h"
@@ -85,35 +85,35 @@ void usage_fprint(
 	{
 		return;
 	}
-	result = ewfbyte_size_string_create(
+	result = byte_size_string_create(
 	          default_segment_file_size_string,
 	          16,
 	          EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
 	if( result == 1 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 			  minimum_segment_file_size_string,
 			  16,
 			  EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	if( result == 1 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 			  maximum_32bit_segment_file_size_string,
 			  16,
 			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	if( result == 1 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 			  maximum_64bit_segment_file_size_string,
 			  16,
 			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	fprintf( stream, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ]\n"
 	                 "                 [ -c compression_type ] [ -d digest_type ] [ -f format ]\n"
@@ -184,7 +184,7 @@ int main( int argc, char * const argv[] )
 	character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                            = NULL;
+	glob_t *glob                            = NULL;
 #endif
 	system_character_t *filenames[ 1 ]         = { NULL };
 
@@ -202,7 +202,7 @@ int main( int argc, char * const argv[] )
 	system_character_t *target_filename        = NULL;
 
 	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfprocess_status_update;
+	void *callback                             = &process_status_update;
 
 	system_integer_t option                    = 0;
 	size64_t media_size                        = 0;
@@ -395,7 +395,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_system_character(
+				result = byte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &process_buffer_size );
@@ -423,7 +423,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_system_character(
+				result = byte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &segment_file_size );
@@ -492,14 +492,14 @@ int main( int argc, char * const argv[] )
 	amount_of_filenames = argc - optind;
 
 #if !defined( HAVE_GLOB_H )
-	if( ewfglob_initialize(
+	if( glob_initialize(
 	     &glob ) != 1 )
 	{
 		fprintf( stderr, "Unable to initialize glob.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	amount_of_filenames = ewfglob_resolve(
+	amount_of_filenames = glob_resolve(
 	                       glob,
 	                       &argv[ optind ],
 	                       ( argc - optind ) );
@@ -509,7 +509,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free(
+		glob_free(
 		 &glob );
 
 		return( EXIT_FAILURE );
@@ -533,7 +533,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
 
 #if !defined( HAVE_GLOB_H )
-			ewfglob_free(
+			glob_free(
 			 &glob );
 #endif
 
@@ -546,7 +546,7 @@ int main( int argc, char * const argv[] )
 	                           amount_of_filenames,
 	                           LIBEWF_OPEN_READ );
 #if !defined( HAVE_GLOB_H )
-	ewfglob_free(
+	glob_free(
 	 &glob );
 #endif
 	if( ewf_filenames != NULL )
@@ -905,7 +905,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "\n" );
 
-		if( ewfprocess_status_initialize(
+		if( process_status_initialize(
 		     &process_status,
 		     _CHARACTER_T_STRING( "Export" ),
 		     _CHARACTER_T_STRING( "exported" ),
@@ -932,12 +932,12 @@ int main( int argc, char * const argv[] )
 			
 			return( EXIT_FAILURE );
 		}
-		if( ewfprocess_status_start(
+		if( process_status_start(
 		     process_status ) != 1 )
 		{
 			fprintf( stderr, "Unable to start process status.\n" );
 
-			ewfprocess_status_free(
+			process_status_free(
 			 &process_status );
 
 			memory_free(
@@ -977,7 +977,7 @@ int main( int argc, char * const argv[] )
 				ewfoutput_error_fprint(
 				 stderr, "Unable to open export EWF file(s)" );
 
-				ewfprocess_status_free(
+				process_status_free(
 				 &process_status );
 
 				if( calculate_sha1 == 1 )
@@ -1034,7 +1034,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to close export EWF file handle.\n" );
 
-				ewfprocess_status_free(
+				process_status_free(
 				 &process_status );
 
 				if( calculate_sha1 == 1 )
@@ -1076,25 +1076,25 @@ int main( int argc, char * const argv[] )
 		}
 		if( export_count <= -1 )
 		{
-			status = EWFPROCESS_STATUS_FAILED;
+			status = PROCESS_STATUS_FAILED;
 		}
 		else
 		{
-			status = EWFPROCESS_STATUS_COMPLETED;
+			status = PROCESS_STATUS_COMPLETED;
 		}
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		status = EWFPROCESS_STATUS_ABORTED;
+		status = PROCESS_STATUS_ABORTED;
 	}
-	if( ewfprocess_status_stop(
+	if( process_status_stop(
 	     process_status,
 	     (size64_t) export_count,
 	     status ) != 1 )
 	{
 		fprintf( stderr, "Unable to stop process status.\n" );
 
-		ewfprocess_status_free(
+		process_status_free(
 		 &process_status );
 
 		if( calculate_sha1 == 1 )
@@ -1112,7 +1112,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( ewfprocess_status_free(
+	if( process_status_free(
 	     &process_status ) != 1 )
 	{
 		fprintf( stderr, "Unable to free process status.\n" );
@@ -1132,7 +1132,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( status == EWFPROCESS_STATUS_COMPLETED )
+	if( status == PROCESS_STATUS_COMPLETED )
 	{
 		if( log_filename != NULL )
 		{
@@ -1185,7 +1185,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
-	if( status != EWFPROCESS_STATUS_COMPLETED )
+	if( status != PROCESS_STATUS_COMPLETED )
 	{
 		if( log_file_stream != NULL )
 		{

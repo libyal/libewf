@@ -22,7 +22,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <file_stream_io.h>
 #include <memory.h>
 #include <system_string.h>
@@ -61,13 +60,14 @@
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "ewfglob.h"
+#include "glob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "ewfprocess_status.h"
+#include "process_status.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
 
@@ -87,35 +87,35 @@ void usage_fprint(
 	{
 		return;
 	}
-	result = ewfbyte_size_string_create(
+	result = byte_size_string_create(
 	          default_segment_file_size_string,
 	          16,
 	          EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
 	if( result == 1 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 			  minimum_segment_file_size_string,
 			  16,
 			  EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	if( result == 1 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 			  maximum_32bit_segment_file_size_string,
 			  16,
 			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	if( result == 1 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 			  maximum_64bit_segment_file_size_string,
 			  16,
 			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	fprintf( stream, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ]\n"
 	                 "                        [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
@@ -204,7 +204,7 @@ int main( int argc, char * const argv[] )
 	system_character_t *option_notes           = NULL;
 
 	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfprocess_status_update_unknown_total;
+	void *callback                             = &process_status_update_unknown_total;
 
 	system_integer_t option                    = 0;
 	size_t string_length                       = 0;
@@ -381,7 +381,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_system_character(
+				result = byte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &process_buffer_size );
@@ -408,7 +408,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_system_character(
+				result = byte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &segment_file_size );
@@ -768,7 +768,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		if( ewfprocess_status_initialize(
+		if( process_status_initialize(
 		     &process_status,
 		     _CHARACTER_T_STRING( "Acquiry" ),
 		     _CHARACTER_T_STRING( "acquired" ),
@@ -792,12 +792,12 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		if( ewfprocess_status_start(
+		if( process_status_start(
 		     process_status ) != 1 )
 		{
 			fprintf( stderr, "Unable to start process status.\n" );
 
-			ewfprocess_status_free(
+			process_status_free(
 			 &process_status );
 
 			if( calculate_sha1 == 1 )
@@ -840,25 +840,25 @@ int main( int argc, char * const argv[] )
 
 		if( write_count <= -1 )
 		{
-			status = EWFPROCESS_STATUS_FAILED;
+			status = PROCESS_STATUS_FAILED;
 		}
 		else
 		{
-			status = EWFPROCESS_STATUS_COMPLETED;
+			status = PROCESS_STATUS_COMPLETED;
 		}
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		status = EWFPROCESS_STATUS_ABORTED;
+		status = PROCESS_STATUS_ABORTED;
 	}
-	if( ewfprocess_status_stop(
+	if( process_status_stop(
 	     process_status,
 	     (size64_t) write_count,
 	     status ) != 1 )
 	{
 		fprintf( stderr, "Unable to stop process status.\n" );
 
-		ewfprocess_status_free(
+		process_status_free(
 		 &process_status );
 
 		if( calculate_sha1 == 1 )
@@ -876,7 +876,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( ewfprocess_status_free(
+	if( process_status_free(
 	     &process_status ) != 1 )
 	{
 		fprintf( stderr, "Unable to free process status.\n" );
@@ -896,7 +896,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( status == EWFPROCESS_STATUS_COMPLETED )
+	if( status == PROCESS_STATUS_COMPLETED )
 	{
 		if( log_filename != NULL )
 		{
@@ -949,7 +949,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to detach signal handler.\n" );
 	}
-        if( status != EWFPROCESS_STATUS_COMPLETED )
+        if( status != PROCESS_STATUS_COMPLETED )
         {
 		if( log_file_stream != NULL )
 		{

@@ -199,6 +199,7 @@ Version: 20080910
 * implemted new version of notify dump data
 * fixed check of libewf_string_snprintf should also check for > size
 * removed explicit set end of string after snprintf
+* worked on clean up of common
 
 Version: 20080909
 * replaced libuca with libuna

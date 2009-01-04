@@ -21,9 +21,7 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <date_time.h>
-#include <error_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
@@ -83,7 +81,9 @@
 #include "../libewf/libewf_hash_values.h"
 #include "../libewf/libewf_header_values.h"
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
+#include "error_string.h"
 #include "ewfdigest_context.h"
 #include "ewfmd5.h"
 #include "ewfsha1.h"
@@ -307,11 +307,11 @@ void ewfoutput_bytes_per_second_fprint(
 
 		if( bytes_per_second > 1024 )
 		{
-			result = ewfbyte_size_string_create(
+			result = byte_size_string_create(
 			          bytes_per_second_string,
 			          10,
 			          bytes_per_second,
-			          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 		}
 		fprintf(
 		 stream,
@@ -351,11 +351,11 @@ void ewfoutput_bytes_fprint(
 	}
 	if( bytes > 1024 )
 	{
-		result = ewfbyte_size_string_create(
+		result = byte_size_string_create(
 		          bytes_string,
 		          10,
 		          bytes,
-		          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	if( result == 1 )
 	{
@@ -569,11 +569,11 @@ void ewfoutput_acquiry_parameters_fprint(
 	fprintf( stream, "Acquiry start offet:\t\t%" PRIi64 "\n",
 	 acquiry_offset );
 
-	result = ewfbyte_size_string_create(
+	result = byte_size_string_create(
 	          acquiry_size_string,
 	          16,
 	          acquiry_size,
-	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
 	fprintf( stream, "Amount of bytes to acquire:\t" );
 
@@ -594,11 +594,11 @@ void ewfoutput_acquiry_parameters_fprint(
 	}
 	fprintf( stream, "\n" );
 
-	result = ewfbyte_size_string_create(
+	result = byte_size_string_create(
 	          segment_file_size_string,
 	          16,
 	          segment_file_size,
-	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
 
 	fprintf( stream, "Evidence segment file size:\t" );
 

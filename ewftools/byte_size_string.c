@@ -1,5 +1,5 @@
 /*
- * Byte size string functions for the ewftools
+ * Byte size string functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -21,17 +21,17 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <notify.h>
 #include <system_string.h>
 #include <types.h>
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
 
 /* Determines the factor string of a certain factor value
  * Returns the string if successful or NULL on error
  */
-const character_t *ewfbyte_size_string_get_factor_string(
+const character_t *byte_size_string_get_factor_string(
                     int8_t factor )
 {
 	switch( factor )
@@ -63,7 +63,7 @@ const character_t *ewfbyte_size_string_get_factor_string(
 /* Determines the factor from a factor string
  * Returns the factor if successful or -1 on error
  */
-int8_t ewfbyte_size_string_get_factor(
+int8_t byte_size_string_get_factor(
         character_t factor )
 {
 	switch( factor )
@@ -101,7 +101,7 @@ int8_t ewfbyte_size_string_get_factor(
 /* Creates a human readable byte size string
  * Returns 1 if successful or -1 on error
  */
-int ewfbyte_size_string_create(
+int byte_size_string_create(
      character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
@@ -109,7 +109,7 @@ int ewfbyte_size_string_create(
 {
 	const character_t *factor_string = NULL;
 	const character_t *units_string  = NULL;
-	static char *function            = "ewfbyte_size_string_create";
+	static char *function            = "byte_size_string_create";
 	ssize_t print_count              = 0;
 	uint64_t factored_size           = 0;
 	uint64_t last_factored_size      = 0;
@@ -133,11 +133,11 @@ int ewfbyte_size_string_create(
 		return( -1 );
 	}
 	if( ( size < 1024 )
-	 || ( units == EWFBYTE_SIZE_STRING_UNIT_MEGABYTE ) )
+	 || ( units == BYTE_SIZE_STRING_UNIT_MEGABYTE ) )
 	{
 		units_string = _CHARACTER_T_STRING( "B" );
 	}
-	else if( units == EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE )
+	else if( units == BYTE_SIZE_STRING_UNIT_MEBIBYTE )
 	{
 		units_string = _CHARACTER_T_STRING( "iB" );
 	}
@@ -165,7 +165,7 @@ int ewfbyte_size_string_create(
 			return( -1 );
 		}
 	}
-	factor_string = ewfbyte_size_string_get_factor_string(
+	factor_string = byte_size_string_get_factor_string(
 	                 factor );
 
 	if( factor_string == NULL )
@@ -218,12 +218,12 @@ int ewfbyte_size_string_create(
 /* Converts a human readable byte size string into a value
  * Returns 1 if successful or -1 on error
  */
-int ewfbyte_size_string_convert(
+int byte_size_string_convert(
      character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
-	static char *function            = "ewfbyte_size_string_convert";
+	static char *function            = "byte_size_string_convert";
 	size_t byte_size_string_iterator = 0;
 	uint64_t byte_size               = 0;
 	int8_t factor                    = 0;
@@ -292,7 +292,7 @@ int ewfbyte_size_string_convert(
 	{
 		byte_size_string_iterator++;
 	}
-	factor = ewfbyte_size_string_get_factor(
+	factor = byte_size_string_get_factor(
 	          byte_size_string[ byte_size_string_iterator ] );
 
 	if( factor < 0 )
@@ -307,13 +307,13 @@ int ewfbyte_size_string_convert(
 	if( ( byte_size_string[ byte_size_string_iterator ] == 'i' )
 	 && ( byte_size_string[ byte_size_string_iterator + 1 ] == 'B' ) )
 	{
-		units = EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE;
+		units = BYTE_SIZE_STRING_UNIT_MEBIBYTE;
 
 		byte_size_string_iterator += 2;
 	}
 	else if( byte_size_string[ byte_size_string_iterator ] == 'B' )
 	{
-		units = EWFBYTE_SIZE_STRING_UNIT_MEGABYTE;
+		units = BYTE_SIZE_STRING_UNIT_MEGABYTE;
 
 		byte_size_string_iterator++;
 	}
@@ -359,7 +359,7 @@ int ewfbyte_size_string_convert(
 /* Determines the factor from a factor string
  * Returns the factor if successful or -1 on error
  */
-int8_t ewfbyte_size_string_get_factor_system_character(
+int8_t byte_size_string_get_factor_system_character(
         system_character_t factor )
 {
 	switch( factor )
@@ -397,12 +397,12 @@ int8_t ewfbyte_size_string_get_factor_system_character(
 /* Converts a human readable byte size string into a value
  * Returns 1 if successful or -1 on error
  */
-int ewfbyte_size_string_convert_system_character(
+int byte_size_string_convert_system_character(
      system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size )
 {
-	static char *function            = "ewfbyte_size_string_convert_system_character";
+	static char *function            = "byte_size_string_convert_system_character";
 	size_t byte_size_string_iterator = 0;
 	uint64_t byte_size               = 0;
 	int8_t factor                    = 0;
@@ -471,7 +471,7 @@ int ewfbyte_size_string_convert_system_character(
 	{
 		byte_size_string_iterator++;
 	}
-	factor = ewfbyte_size_string_get_factor_system_character(
+	factor = byte_size_string_get_factor_system_character(
 	          byte_size_string[ byte_size_string_iterator ] );
 
 	if( factor < 0 )
@@ -486,13 +486,13 @@ int ewfbyte_size_string_convert_system_character(
 	if( ( byte_size_string[ byte_size_string_iterator ] == 'i' )
 	 && ( byte_size_string[ byte_size_string_iterator + 1 ] == 'B' ) )
 	{
-		units = EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE;
+		units = BYTE_SIZE_STRING_UNIT_MEBIBYTE;
 
 		byte_size_string_iterator += 2;
 	}
 	else if( byte_size_string[ byte_size_string_iterator ] == 'B' )
 	{
-		units = EWFBYTE_SIZE_STRING_UNIT_MEGABYTE;
+		units = BYTE_SIZE_STRING_UNIT_MEGABYTE;
 
 		byte_size_string_iterator++;
 	}

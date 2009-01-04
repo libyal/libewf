@@ -24,9 +24,10 @@
 #define _EWFINPUT_H
 
 #include <common.h>
-#include <character_string.h>
 #include <system_string.h>
 #include <types.h>
+
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {

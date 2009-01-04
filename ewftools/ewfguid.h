@@ -24,8 +24,9 @@
 #define _EWFGUID_H
 
 #include <common.h>
-#include <character_string.h>
 #include <types.h>
+
+#include "character_string.h"
 
 #if defined( HAVE_TIME_H )
 #include <time.h>

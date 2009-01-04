@@ -23,8 +23,10 @@
 #if !defined( _STRING_CONVERSION_H )
 #define _STRING_CONVERSION_H
 
-#include "common.h"
-#include "types.h"
+#include <common.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -32,21 +34,15 @@ extern "C" {
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-int libewf_string_copy_wchar_to_char(
+int string_copy_wchar_to_char(
      char *destination,
      const wchar_t *source,
      size_t size );
 
-#define string_copy_wchar_to_char( destination, source, size ) \
-	libewf_string_copy_wchar_to_char( destination, source, size )
-
-int libewf_string_copy_char_to_wchar(
+int string_copy_char_to_wchar(
      wchar_t *destination,
      const char *source,
      size_t size );
-
-#define string_copy_char_to_wchar( destination, source, size ) \
-	libewf_string_copy_char_to_wchar( destination, source, size )
 
 #endif
 

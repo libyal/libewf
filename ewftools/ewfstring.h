@@ -24,8 +24,9 @@
 #define _EWFSTRING_H
 
 #include <common.h>
-#include <character_string.h>
 #include <system_string.h>
+
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {

@@ -20,9 +20,10 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "common.h"
-#include "notify.h"
-#include "types.h"
+#include <common.h>
+#include <notify.h>
+#include <types.h>
+
 #include "string_conversion.h"
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -31,12 +32,12 @@
  * Terminates the destination string with an end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_string_copy_wchar_to_char(
+int string_copy_wchar_to_char(
      char *destination,
      const wchar_t *source,
      size_t size )
 {
-	static char *function = "libewf_string_copy_wchar_to_char";
+	static char *function = "string_copy_wchar_to_char";
 	size_t iterator       = 0;
 	int character         = 0;
 
@@ -86,12 +87,12 @@ int libewf_string_copy_wchar_to_char(
  * Terminates the destination string with an end of string character
  * Returns 1 if successful or -1 on error
  */
-int libewf_string_copy_char_to_wchar(
+int string_copy_char_to_wchar(
      wchar_t *destination,
      const char *source,
      size_t size )
 {
-	static char *function = "libewf_string_copy_char_to_wchar";
+	static char *function = "string_copy_char_to_wchar";
 	size_t iterator       = 0;
 
 	if( source == NULL )

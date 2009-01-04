@@ -1,5 +1,5 @@
 /*
- * Process status functions for the ewftools
+ * Process status functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -21,29 +21,29 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <date_time.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
-#include "ewfprocess_status.h"
-#include "ewfoutput.h"
+#include "byte_size_string.h"
+#include "character_string.h"
+#include "process_status.h"
+#include "system_string.h"
 
-ewfprocess_status_t *process_status = NULL;
+process_status_t *process_status = NULL;
 
 /* Initializes the process status information
  * Returns 1 if successful or -1 on error
  */
-int ewfprocess_status_initialize(
-     ewfprocess_status_t **process_status,
+int process_status_initialize(
+     process_status_t **process_status,
      const character_t *status_process_string,
      const character_t *status_update_string,
      const character_t *status_summary_string,
      FILE *output_stream )
 {
-	static char *function = "ewfprocess_status_initialize";
+	static char *function = "process_status_initialize";
 
 	if( process_status == NULL )
 	{
@@ -54,8 +54,8 @@ int ewfprocess_status_initialize(
 	}
 	if( *process_status == NULL )
 	{
-		*process_status = (ewfprocess_status_t *) memory_allocate(
-		                                           sizeof( ewfprocess_status_t ) );
+		*process_status = (process_status_t *) memory_allocate(
+		                                           sizeof( process_status_t ) );
 
 		if( *process_status == NULL )
 		{
@@ -67,7 +67,7 @@ int ewfprocess_status_initialize(
 		if( memory_set(
 		     *process_status,
 		     0,
-		     sizeof( ewfprocess_status_t ) ) == NULL )
+		     sizeof( process_status_t ) ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear process status.\n",
 			 function );
@@ -85,10 +85,10 @@ int ewfprocess_status_initialize(
 /* Frees the process status information
  * Returns 1 if successful or -1 on error
  */
-int ewfprocess_status_free(
-     ewfprocess_status_t **process_status )
+int process_status_free(
+     process_status_t **process_status )
 {
-	static char *function = "ewfprocess_status_free";
+	static char *function = "process_status_free";
 
 	if( process_status == NULL )
 	{
@@ -107,15 +107,161 @@ int ewfprocess_status_free(
 	return( 1 );
 }
 
+/* Prints a time stamp (with a leading space) to a stream
+ */
+void process_status_timestamp_fprint(
+      FILE *stream,
+      time_t timestamp )
+{
+	struct tm *time_elements = NULL;
+
+	if( stream == NULL )
+	{
+		return;
+	}
+	time_elements = date_time_gmtime(
+	                 &timestamp );
+
+	if( time_elements != NULL )
+	{
+		fprintf( stream, " in" );
+
+		if( time_elements->tm_isdst != 0 )
+		{
+			time_elements->tm_hour -= 1;
+			time_elements->tm_isdst = 0;	
+		}
+		if( time_elements->tm_yday > 0 )
+		{
+			fprintf(
+			 stream,
+			 " %i day(s), %i hour(s), %i minute(s) and",
+			 time_elements->tm_yday,
+			 time_elements->tm_hour,
+			 time_elements->tm_min );
+		}
+		else if( time_elements->tm_hour > 0 )
+		{
+			fprintf(
+			 stream,
+			 " %i hour(s), %i minute(s) and",
+			 time_elements->tm_hour,
+			 time_elements->tm_min );
+		}
+		else if( time_elements->tm_min > 0 )
+		{
+			fprintf(
+			 stream,
+			 " %i minute(s) and",
+			 time_elements->tm_min );
+		}
+		fprintf(
+		 stream,
+		 " %i second(s)",
+		 time_elements->tm_sec );
+
+		memory_free(
+		 time_elements );
+	}
+}
+
+/* Prints the amount of bytes per second (with a leading space) to a stream
+ */
+void process_status_bytes_per_second_fprint(
+      FILE *stream,
+      size64_t bytes,
+      time_t seconds )
+{
+	character_t bytes_per_second_string[ 16 ];
+
+	size64_t bytes_per_second = 0;
+	int result                = 0;
+
+	if( stream == NULL )
+	{
+		return;
+	}
+	if( seconds > 0 )
+	{
+		bytes_per_second = bytes / seconds;
+
+		if( bytes_per_second > 1024 )
+		{
+			result = byte_size_string_create(
+			          bytes_per_second_string,
+			          10,
+			          bytes_per_second,
+			          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+		}
+		fprintf(
+		 stream,
+		 " with" );
+
+		if( result == 1 )
+		{
+			fprintf(
+			 stream,
+			 " %" PRIs "/s (%" PRIu64 " bytes/second)",
+			 bytes_per_second_string, bytes_per_second );
+		}
+		else
+		{
+			fprintf(
+			 stream,
+			 " %" PRIu64 " bytes/second",
+			 bytes_per_second );
+		}
+	}
+}
+
+/* Prints the amount of bytes (with a leading space) to a stream
+ * Creates a human readable version of the amount of bytes if possible
+ */
+void process_status_bytes_fprint(
+      FILE *stream,
+      size64_t bytes )
+{
+	character_t bytes_string[ 16 ];
+
+	int result = 0;
+
+	if( stream == NULL )
+	{
+		return;
+	}
+	if( bytes > 1024 )
+	{
+		result = byte_size_string_create(
+		          bytes_string,
+		          10,
+		          bytes,
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	}
+	if( result == 1 )
+	{
+		fprintf(
+		 stream,
+		 " %" PRIs " (%" PRIi64 " bytes)",
+		 bytes_string, bytes );
+	}
+	else
+	{
+		fprintf(
+		 stream,
+		 " %" PRIi64 " bytes",
+		 bytes );
+	}
+}
+
 /* Starts the process status information
  * Returns 1 if successful or -1 on error
  */
-int ewfprocess_status_start(
-     ewfprocess_status_t *process_status )
+int process_status_start(
+     process_status_t *process_status )
 {
 	system_character_t time_string[ 32 ];
 
-	static char *function = "ewfprocess_status_start";
+	static char *function = "process_status_start";
 
 	if( process_status == NULL )
 	{
@@ -131,7 +277,7 @@ int ewfprocess_status_start(
 	if( ( process_status->output_stream != NULL )
 	 && ( process_status->status_process_string != NULL ) )
 	{
-		if( ewfprocess_status_ctime(
+		if( process_status_ctime(
 		     &( process_status->start_timestamp ),
 		     time_string,
 		     32 ) == NULL )
@@ -152,12 +298,12 @@ int ewfprocess_status_start(
 /* Updates the process status information
  * Returns 1 if successful or -1 on error
  */
-int ewfprocess_status_update(
-     ewfprocess_status_t *process_status,
+int process_status_update(
+     process_status_t *process_status,
      size64_t bytes_read,
      size64_t bytes_total )
 {
-	static char *function    = "ewfprocess_status_update";
+	static char *function    = "process_status_update";
 	time_t seconds_current   = 0;
 	time_t seconds_total     = 0;
 	time_t seconds_remaining = 0;
@@ -198,7 +344,7 @@ int ewfprocess_status_update(
 			 "        %" PRIs "",
 			 process_status->status_update_string );
 
-			ewfoutput_bytes_fprint(
+			process_status_bytes_fprint(
 			 process_status->output_stream,
 			 bytes_read );
 
@@ -206,7 +352,7 @@ int ewfprocess_status_update(
 			 process_status->output_stream,
 			 " of total" );
 
-			ewfoutput_bytes_fprint(
+			process_status_bytes_fprint(
 			 process_status->output_stream,
 			 bytes_total );
 
@@ -233,11 +379,11 @@ int ewfprocess_status_update(
 				 process_status->output_stream,
 				 "        completion" );
 
-				ewfoutput_timestamp_fprint(
+				process_status_timestamp_fprint(
 				 process_status->output_stream,
 				 seconds_remaining );
 
-				ewfoutput_bytes_per_second_fprint(
+				process_status_bytes_per_second_fprint(
 				 process_status->output_stream,
 				 bytes_total,
 				 seconds_total );
@@ -257,12 +403,12 @@ int ewfprocess_status_update(
 /* Updates the process status information when the total amount of bytes is unknown
  * Returns 1 if successful or -1 on error
  */
-int ewfprocess_status_update_unknown_total(
-     ewfprocess_status_t *process_status,
+int process_status_update_unknown_total(
+     process_status_t *process_status,
      size64_t bytes_read,
      size64_t bytes_total )
 {
-	static char *function    = "ewfprocess_status_update_unknown_total";
+	static char *function    = "process_status_update_unknown_total";
 	time_t seconds_current   = 0;
 	time_t timestamp_current = 0;
 
@@ -297,7 +443,7 @@ int ewfprocess_status_update_unknown_total(
 				 "Status: %" PRIs "",
 				 process_status->status_update_string );
 
-				ewfoutput_bytes_fprint(
+				process_status_bytes_fprint(
 				 process_status->output_stream,
 				 bytes_read );
 
@@ -311,11 +457,11 @@ int ewfprocess_status_update_unknown_total(
 				 process_status->output_stream,
 				 "       " );
 
-				ewfoutput_timestamp_fprint(
+				process_status_timestamp_fprint(
 				 process_status->output_stream,
 				 seconds_current );
 
-				ewfoutput_bytes_per_second_fprint(
+				process_status_bytes_per_second_fprint(
 				 process_status->output_stream,
 				 bytes_read,
 				 seconds_current );
@@ -332,14 +478,14 @@ int ewfprocess_status_update_unknown_total(
 /* Stops the process status information
  * Returns 1 if successful or -1 on error
  */
-int ewfprocess_status_stop(
-     ewfprocess_status_t *process_status,
+int process_status_stop(
+     process_status_t *process_status,
      size64_t bytes_total,
      int status )
 {
 	system_character_t time_string[ 32 ];
 
-	static char *function            = "ewfprocess_status_start";
+	static char *function            = "process_status_start";
 	const character_t *status_string = NULL;
 	time_t seconds_total             = 0;
 
@@ -350,9 +496,9 @@ int ewfprocess_status_stop(
 
 		return( -1 );
 	}
-	if( ( status != EWFPROCESS_STATUS_ABORTED )
-	 && ( status != EWFPROCESS_STATUS_COMPLETED )
-	 && ( status != EWFPROCESS_STATUS_FAILED ) )
+	if( ( status != PROCESS_STATUS_ABORTED )
+	 && ( status != PROCESS_STATUS_COMPLETED )
+	 && ( status != PROCESS_STATUS_FAILED ) )
 	{
 		notify_warning_printf( "%s: unsupported status.\n",
 		 function );
@@ -365,15 +511,15 @@ int ewfprocess_status_stop(
 	if( ( process_status->output_stream != NULL )
 	 && ( process_status->status_process_string != NULL ) )
 	{
-		if( status == EWFPROCESS_STATUS_ABORTED )
+		if( status == PROCESS_STATUS_ABORTED )
 		{
 			status_string = _CHARACTER_T_STRING( "aborted" );
 		}
-		else if( status == EWFPROCESS_STATUS_COMPLETED )
+		else if( status == PROCESS_STATUS_COMPLETED )
 		{
 			status_string = _CHARACTER_T_STRING( "completed" );
 		}
-		else if( status == EWFPROCESS_STATUS_FAILED )
+		else if( status == PROCESS_STATUS_FAILED )
 		{
 			status_string = _CHARACTER_T_STRING( "failed" );
 		}
@@ -383,7 +529,7 @@ int ewfprocess_status_stop(
 		 process_status->status_process_string,
 		 status_string );
 
-		if( ewfprocess_status_ctime(
+		if( process_status_ctime(
 		     &( process_status->last_timestamp ),
 		     time_string,
 		     32 ) != NULL )
@@ -399,7 +545,7 @@ int ewfprocess_status_stop(
 			 process_status->output_stream,
 			 ".\n" );
 		}
-		if( ( status == EWFPROCESS_STATUS_COMPLETED )
+		if( ( status == PROCESS_STATUS_COMPLETED )
 	 	 && ( process_status->status_summary_string != NULL ) )
 		{
 			seconds_total = process_status->last_timestamp - process_status->start_timestamp;
@@ -409,15 +555,15 @@ int ewfprocess_status_stop(
 			"%" PRIs ":",
 			process_status->status_summary_string );
 
-			ewfoutput_bytes_fprint(
+			process_status_bytes_fprint(
 			process_status->output_stream,
 			bytes_total );
 
-			ewfoutput_timestamp_fprint(
+			process_status_timestamp_fprint(
 			process_status->output_stream,
 			seconds_total );
 
-			ewfoutput_bytes_per_second_fprint(
+			process_status_bytes_per_second_fprint(
 			process_status->output_stream,
 			bytes_total,
 			seconds_total );

@@ -23,12 +23,13 @@
 #if !defined( _CHARACTER_STRING_H )
 #define _CHARACTER_STRING_H
 
-#include "common.h"
-#include "date_time.h"
-#include "narrow_string.h"
+#include <common.h>
+#include <date_time.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
+
 #include "string_conversion.h"
-#include "types.h"
-#include "wide_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -36,9 +37,7 @@ extern "C" {
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-typedef wchar_t libcommon_character_t;
-
-#define character_t libcommon_character_t
+typedef wchar_t character_t;
 
 #define PRIc	"lc"
 #define PRIs	"ls"
@@ -81,9 +80,7 @@ typedef wchar_t libcommon_character_t;
 
 #else
 
-typedef char libcommon_character_t;
-
-#define character_t libcommon_character_t
+typedef char character_t;
 
 #define PRIc	"c"
 #define PRIs	"s"
@@ -120,33 +117,22 @@ typedef char libcommon_character_t;
 
 #endif
 
-character_t *libcommon_string_duplicate(
+character_t *string_duplicate(
               character_t *string,
               size_t size );
 
-#define string_duplicate( string, size ) \
-	libcommon_string_duplicate( string, size )
-
 #if defined( string_to_signed_long_long )
-
-int libcommon_string_to_int64(
+int string_to_int64(
      const character_t *string,
      size_t size,
      int64_t *value );
-
-#define string_to_int64( string, size, value ) \
-	 libcommon_string_to_int64( string, size, value )
 #endif
 
 #if defined( string_to_unsigned_long_long )
-
-int libcommon_string_to_uint64(
+int string_to_uint64(
      const character_t *string,
      size_t size,
      uint64_t *value );
-
-#define string_to_uint64( string, size, value ) \
-	 libcommon_string_to_uint64( string, size, value )
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -174,13 +160,10 @@ int libcommon_string_to_uint64(
 	date_time_wctime( timestamp, string, size )
 
 #elif defined( date_time_ctime )
-character_t *libcommon_string_ctime(
+character_t *string_ctime(
               const time_t *timestamp,
               character_t *string,
               size_t size );
-
-#define string_ctime( timestamp, string, size ) \
-	libcommon_string_ctime( timestamp, string, size )
 #endif
 
 #elif defined( date_time_ctime )

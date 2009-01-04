@@ -22,7 +22,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <file_stream_io.h>
 #include <memory.h>
 #include <system_string.h>
@@ -46,14 +45,15 @@
 
 #include <libewf.h>
 
-#include "ewfbyte_size_string.h"
+#include "character_string.h"
+#include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfdigest_context.h"
 #include "ewfgetopt.h"
-#include "ewfglob.h"
+#include "glob.h"
 #include "ewfmd5.h"
 #include "ewfoutput.h"
-#include "ewfprocess_status.h"
+#include "process_status.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
 #include "ewfstring.h"
@@ -101,7 +101,7 @@ int main( int argc, char * const argv[] )
 #endif
 
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                            = NULL;
+	glob_t *glob                            = NULL;
 #endif
 	character_t *calculated_md5_hash_string    = NULL;
 	character_t *calculated_sha1_hash_string   = NULL;
@@ -114,7 +114,7 @@ int main( int argc, char * const argv[] )
 	system_character_t *log_filename           = NULL;
 
 	FILE *log_file_stream                      = NULL;
-	void *callback                             = &ewfprocess_status_update;
+	void *callback                             = &process_status_update;
 
 	system_integer_t option                    = 0;
 	ssize64_t verify_count                     = 0;
@@ -184,7 +184,7 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_system_character(
+				result = byte_size_string_convert_system_character(
 				          optarg,
 				          string_length,
 				          &process_buffer_size );
@@ -245,14 +245,14 @@ int main( int argc, char * const argv[] )
 	amount_of_filenames = argc - optind;
 
 #if !defined( HAVE_GLOB_H )
-	if( ewfglob_initialize(
+	if( glob_initialize(
 	     &glob ) != 1 )
 	{
 		fprintf( stderr, "Unable to initialize glob.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	amount_of_filenames = ewfglob_resolve(
+	amount_of_filenames = glob_resolve(
 	                       glob,
 	                       &argv[ optind ],
 	                       amount_of_filenames );
@@ -262,7 +262,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free(
+		glob_free(
 		 &glob );
 
 		return( EXIT_FAILURE );
@@ -286,7 +286,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
 
 #if !defined( HAVE_GLOB_H )
-			ewfglob_free(
+			glob_free(
 			 &glob );
 #endif
 
@@ -299,7 +299,7 @@ int main( int argc, char * const argv[] )
 	                           amount_of_filenames,
 	                           LIBEWF_OPEN_READ );
 #if !defined( HAVE_GLOB_H )
-	ewfglob_free(
+	glob_free(
 	 &glob );
 #endif
 	if( ewf_filenames != NULL )
@@ -396,7 +396,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		if( ewfprocess_status_initialize(
+		if( process_status_initialize(
 		     &process_status,
 		     _CHARACTER_T_STRING( "Verify" ),
 		     _CHARACTER_T_STRING( "verified" ),
@@ -424,12 +424,12 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
-		if( ewfprocess_status_start(
+		if( process_status_start(
 		     process_status ) != 1 )
 		{
 			fprintf( stderr, "Unable to start process status.\n" );
 
-			ewfprocess_status_free(
+			process_status_free(
 			 &process_status );
 
 			if( calculate_md5 == 1 )
@@ -485,25 +485,25 @@ int main( int argc, char * const argv[] )
 
 		if( verify_count <= -1 )
 		{
-			status = EWFPROCESS_STATUS_FAILED;
+			status = PROCESS_STATUS_FAILED;
 		}
 		else
 		{
-			status = EWFPROCESS_STATUS_COMPLETED;
+			status = PROCESS_STATUS_COMPLETED;
 		}
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		status = EWFPROCESS_STATUS_ABORTED;
+		status = PROCESS_STATUS_ABORTED;
 	}
-	if( ewfprocess_status_stop(
+	if( process_status_stop(
 	     process_status,
 	     (size64_t) verify_count,
 	     status ) != 1 )
 	{
 		fprintf( stderr, "Unable to stop process status.\n" );
 
-		ewfprocess_status_free(
+		process_status_free(
 		 &process_status );
 
 		if( calculate_md5 == 1 )
@@ -525,7 +525,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( ewfprocess_status_free(
+	if( process_status_free(
 	     &process_status ) != 1 )
 	{
 		fprintf( stderr, "Unable to free process status.\n" );
@@ -549,7 +549,7 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( status == EWFPROCESS_STATUS_COMPLETED )
+	if( status == PROCESS_STATUS_COMPLETED )
 	{
 		if( calculate_md5 == 1 )
 		{
@@ -801,7 +801,7 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( status != EWFPROCESS_STATUS_COMPLETED )
+	if( status != PROCESS_STATUS_COMPLETED )
 	{
 		if( log_file_stream != NULL )
 		{

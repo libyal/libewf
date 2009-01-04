@@ -21,7 +21,6 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <file_io.h>
 #include <memory.h>
 #include <narrow_string.h>
@@ -64,8 +63,9 @@
 
 #include <libewf.h>
 
+#include "character_string.h"
 #include "ewfcommon.h"
-#include "ewfprocess_status.h"
+#include "process_status.h"
 #include "ewfstring.h"
 
 /* EWFCOMMON_BUFFER_SIZE definition is intended for testing purposes
@@ -1198,7 +1198,7 @@ ssize64_t ewfcommon_read_verify(
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
            size_t data_buffer_size,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1573,7 +1573,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            uint8_t wipe_chunk_on_error,
            uint8_t seek_on_error,
            size_t data_buffer_size,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -2016,7 +2016,7 @@ ssize64_t ewfcommon_export_raw(
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
            size_t data_buffer_size,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -2475,7 +2475,7 @@ ssize64_t ewfcommon_export_ewf(
            character_t *acquiry_operating_system,
            character_t *acquiry_software,
            character_t *acquiry_software_version,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) )
 {
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	uint8_t guid[ 16 ];

@@ -24,8 +24,9 @@
 #define _EWFDIGEST_HASH_H
 
 #include <common.h>
-#include <character_string.h>
 #include <types.h>
+
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {

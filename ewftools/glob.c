@@ -1,5 +1,5 @@
 /*
- * Globbing functions for the ewftools
+ * Globbing functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -23,7 +23,6 @@
 #include <common.h>
 #include <memory.h>
 #include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <errno.h>
@@ -32,43 +31,22 @@
 #include <stdlib.h>
 #endif
 
-#if !defined( HAVE_GLOB_H ) && defined( HAVE_IO_H )
+#if defined( HAVE_IO_H )
 #include <io.h>
 #endif
 
-#include <libewf.h>
-
-#include "ewfglob.h"
+#include "glob.h"
+#include "system_string.h"
 
 #if !defined( HAVE_GLOB_H )
-
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-
-#define ewfglob_finddata_t	_wfinddata_t
-#define ewfglob_makepath	_wmakepath_s
-#define ewfglob_findfirst	_wfindfirst
-#define ewfglob_findnext	_wfindnext
-#define ewfglob_splitpath	_wsplitpath_s
-
-#else
-
-#define ewfglob_finddata_t	_finddata_t
-#define ewfglob_makepath	_makepath_s
-#define ewfglob_findfirst	_findfirst
-#define ewfglob_findnext	_findnext
-#define ewfglob_splitpath	_splitpath_s
-
-#endif
-
-#define ewfglob_findclose	_findclose
 
 /* Initializes a new glob
  * Returns 1 if successful or -1 on error
  */
-int ewfglob_initialize(
-     ewfglob_t **glob )
+int glob_initialize(
+     glob_t **glob )
 {
-	static char *function = "ewfglob_initialize";
+	static char *function = "glob_initialize";
 
 	if( glob == NULL )
 	{
@@ -79,8 +57,8 @@ int ewfglob_initialize(
 	}
 	if( *glob == NULL )
 	{
-		*glob = (ewfglob_t *) memory_allocate(
-		                       sizeof( ewfglob_t ) );
+		*glob = (glob_t *) memory_allocate(
+		                       sizeof( glob_t ) );
 
 		if( *glob == NULL )
 		{
@@ -92,7 +70,7 @@ int ewfglob_initialize(
 		if( memory_set(
 		     *glob,
 		     0,
-		     sizeof( ewfglob_t ) ) == NULL )
+		     sizeof( glob_t ) ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear glob.\n",
 			 function );
@@ -113,10 +91,10 @@ int ewfglob_initialize(
 /* Frees memory of a glob
  * Returns 1 if successful or -1 on error
  */
-int ewfglob_free(
-     ewfglob_t **glob )
+int glob_free(
+     glob_t **glob )
 {
-	static char *function = "ewfglob_free";
+	static char *function = "glob_free";
 	int result_iterator   = 0;
 
 	if( glob == NULL )
@@ -152,12 +130,12 @@ int ewfglob_free(
 /* Resizes the glob
  * Returns 1 if successful or -1 on error
  */
-int ewfglob_resize(
-     ewfglob_t *glob,
+int glob_resize(
+     glob_t *glob,
      int new_amount_of_results )
 {
 	void *reallocation    = NULL;
-	static char *function = "ewfglob_resize";
+	static char *function = "glob_resize";
 	size_t previous_size  = 0;
 	size_t new_size       = 0;
 
@@ -209,7 +187,7 @@ int ewfglob_resize(
 
 		return( -1 );
 	}
-	glob->amount_of_results  = new_amount_of_results;
+	glob->amount_of_results = new_amount_of_results;
 
 	return( 1 );
 }
@@ -217,13 +195,13 @@ int ewfglob_resize(
 /* Resolves filenames with wildcards (globs)
  * Returns the amount of results if successful or -1 on error
  */
-int ewfglob_resolve(
-     ewfglob_t *glob,
+int glob_resolve(
+     glob_t *glob,
      system_character_t * const patterns[],
      int amount_of_patterns )
 {
 #if defined( HAVE_WINDOWS_API )
-	struct ewfglob_finddata_t find_data;
+	struct glob_finddata_t find_data;
 
 	system_character_t find_path[ _MAX_PATH ];
 	system_character_t find_drive[ _MAX_DRIVE ];
@@ -233,7 +211,7 @@ int ewfglob_resolve(
 
 	intptr_t find_handle  = 0;
 #endif
-	static char *function = "ewfglob_resolve";
+	static char *function = "glob_resolve";
 	int globs_found       = 0;
 	int iterator          = 0;
 
@@ -254,7 +232,7 @@ int ewfglob_resolve(
 			return( -1 );
 		}
 #if defined( HAVE_WINDOWS_API )
-		if( ewfglob_splitpath(
+		if( glob_splitpath(
 		     patterns[ iterator ],
 		     find_drive,
 		     _MAX_DRIVE,
@@ -270,7 +248,7 @@ int ewfglob_resolve(
 
 			return( -1 );
 		}
-		find_handle = ewfglob_findfirst(
+		find_handle = glob_findfirst(
 		               patterns[ iterator ],
 		               &find_data );
 
@@ -278,7 +256,7 @@ int ewfglob_resolve(
 		{
 			do
 			{
-				if( ewfglob_resize(
+				if( glob_resize(
 				     glob,
 				     ( glob->amount_of_results + 1 ) ) != 1 )
 				{
@@ -287,7 +265,7 @@ int ewfglob_resolve(
 
 					return( -1 );
 				}
-				if( ewfglob_makepath(
+				if( glob_makepath(
 				     find_path,
 				     _MAX_PATH,
 				     find_drive,
@@ -315,7 +293,7 @@ int ewfglob_resolve(
 					return( -1 );
 				}
 			}
-			while( ewfglob_findnext(
+			while( glob_findnext(
 			        find_handle,
 			        &find_data ) == 0 );
 
@@ -326,7 +304,7 @@ int ewfglob_resolve(
 
 				return( -1 );
 			}
-			if( ewfglob_findclose(
+			if( glob_findclose(
 			     find_handle ) != 0 )
 			{
 				notify_warning_printf( "%s: error closing find handle.\n",

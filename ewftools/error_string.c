@@ -21,7 +21,6 @@
  */
 
 #include "common.h"
-#include "error_string.h"
 #include "memory.h"
 #include "notify.h"
 
@@ -35,15 +34,17 @@
 #include <string.h>
 #endif
 
+#include "error_string.h"
+
 #if defined( error_string_strerror_r ) || defined( HAVE_STRERROR )
 
 /* Function to wrap strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
-char *libewf_error_string_strerror(
+char *error_string_strerror(
        int error_number )
 {
-	static char *function     = "libewf_error_string_strerror";
+	static char *function     = "error_string_strerror";
 #if !defined( error_string_strerror_r ) && defined( HAVE_STRERROR )
 	char *static_error_string = NULL;
 #endif
@@ -115,10 +116,10 @@ char *libewf_error_string_strerror(
 /* Function to wrap wide character equivalent of strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
-wchar_t *libewf_error_string_wcserror(
+wchar_t *error_string_wcserror(
           int error_number )
 {
-	static char *function      = "libewf_error_string_wcserror";
+	static char *function      = "error_string_wcserror";
 	wchar_t *error_string      = NULL;
 	uint16_t error_string_size = 256;
 

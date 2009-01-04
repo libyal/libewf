@@ -24,8 +24,6 @@
 #define _EWFCOMMON_H
 
 #include <common.h>
-#include <character_string.h>
-#include <error_string.h>
 #include <date_time.h>
 #include <file_stream_io.h>
 #include <system_string.h>
@@ -36,11 +34,13 @@
 #include <libewf/definitions.h>
 #include <libewf/handle.h>
 
+#include "character_string.h"
+#include "error_string.h"
 #include "ewfdigest_context.h"
 #include "ewfmd5.h"
-#include "ewfprocess_status.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
+#include "process_status.h"
 
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
 #define EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE		( 1024 * 1024 )
@@ -151,7 +151,7 @@ ssize64_t ewfcommon_read_verify(
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
            size_t data_buffer_size,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 ssize64_t ewfcommon_write_from_file_descriptor(
            libewf_handle_t *handle,
@@ -172,7 +172,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
            uint8_t wipe_chunk_on_error,
            uint8_t seek_on_error,
            size_t data_buffer_size,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 ssize64_t ewfcommon_export_raw(
            libewf_handle_t *handle,
@@ -188,7 +188,7 @@ ssize64_t ewfcommon_export_raw(
            uint8_t swap_byte_pairs,
            uint8_t wipe_chunk_on_error,
            size_t data_buffer_size,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 ssize64_t ewfcommon_export_ewf(
            libewf_handle_t *handle,
@@ -212,7 +212,7 @@ ssize64_t ewfcommon_export_ewf(
            character_t *acquiry_operating_system,
            character_t *acquiry_software,
            character_t *acquiry_software_version,
-           void (*callback)( ewfprocess_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 #if defined( __cplusplus )
 }

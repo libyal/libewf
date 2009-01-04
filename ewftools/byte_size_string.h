@@ -1,5 +1,5 @@
 /*
- * Byte size string functions for the ewftools
+ * Byte size string functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,42 +20,43 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFBYTE_SIZE_STRING_H )
-#define _EWFBYTE_SIZE_STRING_H
+#if !defined( _BYTE_SIZE_STRING_H )
+#define _BYTE_SIZE_STRING_H
 
 #include <common.h>
-#include <character_string.h>
 #include <system_string.h>
 #include <types.h>
+
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define EWFBYTE_SIZE_STRING_UNIT_MEGABYTE		1000
-#define EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE		1024
+#define BYTE_SIZE_STRING_UNIT_MEGABYTE		1000
+#define BYTE_SIZE_STRING_UNIT_MEBIBYTE		1024
 
-const character_t *ewfbyte_size_string_get_factor_string(
+const character_t *byte_size_string_get_factor_string(
                     int8_t factor );
 
-int8_t ewfbyte_size_string_get_factor(
+int8_t byte_size_string_get_factor(
         character_t factor );
 
-int ewfbyte_size_string_create(
+int byte_size_string_create(
      character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
      int units );
 
-int ewfbyte_size_string_convert(
+int byte_size_string_convert(
      character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );
 
-int8_t ewfbyte_size_string_get_factor_system_character(
+int8_t byte_size_string_get_factor_system_character(
         system_character_t factor );
 
-int ewfbyte_size_string_convert_system_character(
+int byte_size_string_convert_system_character(
      system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t *size );

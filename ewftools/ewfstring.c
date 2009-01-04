@@ -21,9 +21,10 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <notify.h>
 #include <system_string.h>
+
+#include "character_string.h"
 
 /* Copies the source string (of system_character_t) into the destination string for a certain length
  * Terminates the destination string with \0 at ( length - 1 )
