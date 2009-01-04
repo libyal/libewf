@@ -1,4 +1,7 @@
 Roadmap:
+* low level and high level api
+  - to allow raw access to sections etc. (for recovery)
+* xsignature section to sign xhash and/or hash
 * create iso2ewf tool?
 * resume write i.e. system failure (check to which part EWF files ok)
 * lvf support
@@ -155,6 +158,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080426
+* Minor changes
 
 Version: 20080416
 * Minor changes

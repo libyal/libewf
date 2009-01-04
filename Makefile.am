@@ -128,14 +128,14 @@ library:
 distclean: clean
 	/bin/rm -f Makefile
 	/bin/rm -f config.status config.cache config.log
+	/bin/rm -f common/config.h
+	/bin/rm -f include/libewf.h
+	/bin/rm -f include/libewf/definitions.h
+	/bin/rm -f include/libewf/types.h
 	/bin/rm -f libewf.pc
 	/bin/rm -f libewf.spec
 	/bin/rm -f debian/changelog
 	/bin/rm -f debian/shlibs.local.ex
-	/bin/rm -f include/libewf.h
-	/bin/rm -f include/libewf/definitions.h
-	/bin/rm -f include/libewf/types.h
-	/bin/rm -f common/config.h
 	/bin/rm -f macosx/Introduction.rtf
 	@for dir in ${subdirs}; do \
 		(cd $$dir && $(MAKE) distclean) \
