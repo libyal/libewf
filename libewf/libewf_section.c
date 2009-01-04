@@ -880,9 +880,9 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -915,7 +915,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	volume->unknown1[ 0 ] = 1;
 
-	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_chunks, volume->amount_of_chunks ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_chunks, volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
@@ -924,7 +924,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
 		 function );
@@ -933,7 +933,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->bytes_per_sector, volume->bytes_per_sector ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->bytes_per_sector, volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
 		 function );
@@ -942,7 +942,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_sectors, volume->amount_of_sectors ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_sectors, volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 		 function );
@@ -971,8 +971,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n",
-	 function, internal_handle->media->amount_of_chunks, internal_handle->media->sectors_per_chunk,
-	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
+	 function, internal_handle->media_values->amount_of_chunks, internal_handle->media_values->sectors_per_chunk,
+	 internal_handle->media_values->bytes_per_sector, internal_handle->media_values->amount_of_sectors );
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file,
@@ -1246,9 +1246,9 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -1286,11 +1286,11 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	else
 	{
-		volume->media_type = internal_handle->media->media_type;
+		volume->media_type = internal_handle->media_values->media_type;
 	}
-	volume->media_flags = internal_handle->media->media_flags;
+	volume->media_flags = internal_handle->media_values->media_flags;
 
-	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_chunks, volume->amount_of_chunks ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_chunks, volume->amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
@@ -1299,7 +1299,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->sectors_per_chunk, volume->sectors_per_chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
 		 function );
@@ -1308,7 +1308,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->bytes_per_sector, volume->bytes_per_sector ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->bytes_per_sector, volume->bytes_per_sector ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
 		 function );
@@ -1317,7 +1317,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_sectors, volume->amount_of_sectors ) != 1 )
+	if( libewf_endian_revert_32bit( internal_handle->media_values->amount_of_sectors, volume->amount_of_sectors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 		 function );
@@ -1334,7 +1334,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	{
 		volume->compression_level = (uint8_t) internal_handle->compression_level;
 
-		if( libewf_common_memcpy( volume->guid, internal_handle->guid, 16 ) == NULL )
+		if( libewf_common_memcpy( volume->guid, internal_handle->media_values->guid, 16 ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
 			 function );
@@ -1343,7 +1343,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			return( -1 );
 		}
-		if( libewf_endian_revert_32bit( internal_handle->media->error_granularity, volume->error_granularity ) != 1 )
+		if( libewf_endian_revert_32bit( internal_handle->media_values->error_granularity, volume->error_granularity ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
 			 function );
@@ -1365,8 +1365,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: amount_of_chunks: %" PRIu32 ", sectors_per_chunk: %" PRIu32 ", bytes_per_sector: %" PRIu32 ", amount_of_sectors: %" PRIu32 ".\n",
-	 function, internal_handle->media->amount_of_chunks, internal_handle->media->sectors_per_chunk,
-	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
+	 function, internal_handle->media_values->amount_of_chunks, internal_handle->media_values->sectors_per_chunk,
+	 internal_handle->media_values->bytes_per_sector, internal_handle->media_values->amount_of_sectors );
 
 	section_write_count = libewf_section_start_write(
 	                       segment_file,
@@ -1838,9 +1838,9 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -1862,7 +1862,7 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	if( internal_handle->offset_table == NULL )
 	{
 		internal_handle->offset_table = libewf_offset_table_alloc(
-		                                 internal_handle->media->amount_of_chunks );
+		                                 internal_handle->media_values->amount_of_chunks );
 
 		if( internal_handle->offset_table == NULL )
 		{
@@ -2164,9 +2164,9 @@ ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -2187,7 +2187,7 @@ ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 	}
 	if( internal_handle->secondary_offset_table == NULL )
 	{
-		internal_handle->secondary_offset_table = libewf_offset_table_alloc( internal_handle->media->amount_of_chunks );
+		internal_handle->secondary_offset_table = libewf_offset_table_alloc( internal_handle->media_values->amount_of_chunks );
 
 		if( internal_handle->secondary_offset_table == NULL )
 		{
@@ -2481,9 +2481,9 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -2570,7 +2570,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 #endif
 	/* TODO add more checks
 	 */
-	if( internal_handle->media->media_type != data->media_type )
+	if( internal_handle->media_values->media_type != data->media_type )
 	{
 		LIBEWF_WARNING_PRINT( "%s: media type does not match in data section.\n",
 		 function );
@@ -2591,7 +2591,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media->amount_of_chunks != amount_of_chunks )
+	if( internal_handle->media_values->amount_of_chunks != amount_of_chunks )
 	{
 		LIBEWF_WARNING_PRINT( "%s: amount of chunks does not match in data section.\n",
 		 function );
@@ -2612,7 +2612,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media->sectors_per_chunk != sectors_per_chunk )
+	if( internal_handle->media_values->sectors_per_chunk != sectors_per_chunk )
 	{
 		LIBEWF_WARNING_PRINT( "%s: sectors per chunk does not match in data section.\n",
 		 function );
@@ -2633,7 +2633,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media->bytes_per_sector != bytes_per_sector )
+	if( internal_handle->media_values->bytes_per_sector != bytes_per_sector )
 	{
 		LIBEWF_WARNING_PRINT( "%s: bytes per sector does not match in data section.\n",
 		 function );
@@ -2654,7 +2654,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media->amount_of_sectors != amount_of_sectors )
+	if( internal_handle->media_values->amount_of_sectors != amount_of_sectors )
 	{
 		LIBEWF_WARNING_PRINT( "%s: amount of sectors does not match in data section.\n",
 		 function );
@@ -2675,7 +2675,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media->error_granularity != error_granularity )
+	if( internal_handle->media_values->error_granularity != error_granularity )
 	{
 		LIBEWF_WARNING_PRINT( "%s: error granularity does not match in data section.\n",
 		 function );
@@ -2687,7 +2687,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 			return( -1 );
 		}
 	}
-	if( internal_handle->media->media_flags != data->media_flags )
+	if( internal_handle->media_values->media_flags != data->media_flags )
 	{
 		LIBEWF_WARNING_PRINT( "%s: media flags do not match in data section.\n",
 		 function );
@@ -2699,7 +2699,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 			return( -1 );
 		}
 	}
-	if( libewf_common_memcmp( internal_handle->guid, data->guid, 16 ) != 0 )
+	if( libewf_common_memcmp( internal_handle->media_values->guid, data->guid, 16 ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: GUID does not match in data section.\n",
 		 function );
@@ -4227,16 +4227,16 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_volume_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->media->amount_of_chunks ),
-		              &( internal_handle->media->sectors_per_chunk ),
-		              &( internal_handle->media->bytes_per_sector ),
-		              &( internal_handle->media->amount_of_sectors ),
-		              &( internal_handle->media->chunk_size ),
-		              &( internal_handle->media->error_granularity ),
-		              &( internal_handle->media->media_type ),
-		              &( internal_handle->media->media_flags ),
+		              &( internal_handle->media_values->amount_of_chunks ),
+		              &( internal_handle->media_values->sectors_per_chunk ),
+		              &( internal_handle->media_values->bytes_per_sector ),
+		              &( internal_handle->media_values->amount_of_sectors ),
+		              &( internal_handle->media_values->chunk_size ),
+		              &( internal_handle->media_values->error_granularity ),
+		              &( internal_handle->media_values->media_type ),
+		              &( internal_handle->media_values->media_flags ),
 		              &( internal_handle->compression_level ),
-		              internal_handle->guid,
+		              internal_handle->media_values->guid,
 		              &( internal_handle->format ),
 		              &( internal_handle->ewf_format ),
 		              internal_handle->error_tollerance );

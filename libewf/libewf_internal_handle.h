@@ -38,6 +38,7 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_error_sector.h"
+#include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
 #include "libewf_values_table.h"
@@ -55,9 +56,6 @@ extern "C" {
 #define LIBEWF_INTERNAL_HANDLE libewf_internal_handle_t
 #define LIBEWF_INTERNAL_HANDLE_SIZE sizeof( LIBEWF_INTERNAL_HANDLE )
 
-#define LIBEWF_INTERNAL_HANDLE_MEDIA libewf_internal_handle_media_t
-#define LIBEWF_INTERNAL_HANDLE_MEDIA_SIZE sizeof( LIBEWF_INTERNAL_HANDLE_MEDIA )
-
 #define LIBEWF_INTERNAL_HANDLE_READ libewf_internal_handle_read_t
 #define LIBEWF_INTERNAL_HANDLE_READ_SIZE sizeof( LIBEWF_INTERNAL_HANDLE_READ )
 
@@ -65,23 +63,22 @@ extern "C" {
 #define LIBEWF_INTERNAL_HANDLE_WRITE_SIZE sizeof( LIBEWF_INTERNAL_HANDLE_WRITE )
 
 typedef struct libewf_internal_handle libewf_internal_handle_t;
-typedef struct libewf_internal_handle_media libewf_internal_handle_media_t;
 typedef struct libewf_internal_handle_read libewf_internal_handle_read_t;
 typedef struct libewf_internal_handle_write libewf_internal_handle_write_t;
 
 struct libewf_internal_handle
 {
-	/* A specific subhandle for media specific values
-	 */
-	libewf_internal_handle_media_t *media;
-
 	/* A specific subhandle for read specific values
 	 */
-	libewf_internal_handle_read_t *read;
+	LIBEWF_INTERNAL_HANDLE_READ *read;
 
 	/* A specific subhandle for write specific values
 	 */
-	libewf_internal_handle_write_t *write;
+	LIBEWF_INTERNAL_HANDLE_WRITE *write;
+
+	/* The media values
+	 */
+	LIBEWF_MEDIA_VALUES *media_values;
 
 	/* The list of segment files
 	 */
@@ -187,51 +184,6 @@ struct libewf_internal_handle
 	/* value to indicate the level of error tollerance
 	 */
 	uint8_t error_tollerance;
-
-	/* The GUID of the acquiry system
-	 */
-	uint8_t guid[ 16 ];
-};
-
-/* Additional subhandle for media specific parameters
- */
-struct libewf_internal_handle_media
-{
-	/* The media size
-	 */
-	size64_t media_size;
-
-	/* The size of an individual chunk
-	 */
-	size32_t chunk_size;
-
-	/* The amount of sectors per chunk
-	 */
-	uint32_t sectors_per_chunk;
-
-	/* The amount of bytes per sector
-	 */
-	uint32_t bytes_per_sector;
-
-        /* The amount of chunks
-         */
-        uint32_t amount_of_chunks;
-
-        /* The amount of sectors
-         */
-        uint32_t amount_of_sectors;
-
-        /* The amount of sectors to use as error granularity
-         */
-        uint32_t error_granularity;
-
-	/* The media type
-	 */
-	uint8_t media_type;
-
-	/* The media flags
-	 */
-	uint8_t media_flags;
 };
 
 /* Additional subhandle for read specific parameters
@@ -348,10 +300,6 @@ struct libewf_internal_handle_write
 
 LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags );
 void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
-LIBEWF_INTERNAL_HANDLE_MEDIA *libewf_internal_handle_media_alloc( void );
-#define libewf_internal_handle_media_free( handle_media ) \
-	free( handle_media )
 
 LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void );
 void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read );

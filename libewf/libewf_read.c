@@ -397,16 +397,16 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->read == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -486,7 +486,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 		 */
 		if( ( buffer != internal_handle->chunk_cache->data )
 		 && ( chunk_offset == 0 )
-		 && ( size >= (size_t) internal_handle->media->chunk_size ) )
+		 && ( size >= (size_t) internal_handle->media_values->chunk_size ) )
 		{
 			chunk_data = buffer;
 
@@ -531,7 +531,8 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 
 		if( is_compressed != 0 )
 		{
-			chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
+			chunk_data_size = internal_handle->media_values->chunk_size
+			                + EWF_CRC_SIZE;
 		}
 		if( libewf_read_process_chunk_data(
 		     internal_handle,
@@ -547,7 +548,10 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 			 */
 			if( internal_handle->read->wipe_on_error != 0 )
 			{
-				if( libewf_common_memset( chunk_read, 0, internal_handle->media->chunk_size ) == NULL )
+				if( libewf_common_memset(
+				     chunk_read,
+				     0,
+				     internal_handle->media_values->chunk_size ) == NULL )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to wipe chunk data.\n",
 					 function );
@@ -557,12 +561,12 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 			}
 			/* Add CRC error
 			 */
-			sector            = (off64_t) chunk * (off64_t) internal_handle->media->sectors_per_chunk;
-			amount_of_sectors = internal_handle->media->sectors_per_chunk;
+			sector            = (off64_t) chunk * (off64_t) internal_handle->media_values->sectors_per_chunk;
+			amount_of_sectors = internal_handle->media_values->sectors_per_chunk;
 
-			if( ( sector + amount_of_sectors ) > internal_handle->media->amount_of_sectors )
+			if( ( sector + amount_of_sectors ) > internal_handle->media_values->amount_of_sectors )
 			{
-				amount_of_sectors = (uint32_t) ( (off64_t) internal_handle->media->amount_of_sectors - sector );
+				amount_of_sectors = (uint32_t) ( (off64_t) internal_handle->media_values->amount_of_sectors - sector );
 			}
 			if( libewf_add_crc_error( (LIBEWF_HANDLE *) internal_handle, sector, amount_of_sectors ) != 1 )
 			{
@@ -575,7 +579,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 			{
 				return( -1 );
 			}
-			chunk_data_size = amount_of_sectors * internal_handle->media->bytes_per_sector;
+			chunk_data_size = amount_of_sectors * internal_handle->media_values->bytes_per_sector;
 		}
 		/* Flag that the chunk was cached
 		 */
@@ -771,9 +775,9 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
@@ -813,7 +817,7 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents some reallocations of the chunk cache
 	 */
-	chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
+	chunk_data_size = internal_handle->media_values->chunk_size + EWF_CRC_SIZE;
 
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
@@ -853,12 +857,12 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 		internal_handle->current_chunk_offset += (uint32_t) chunk_read_count;
 
-		if( internal_handle->current_chunk_offset == internal_handle->media->chunk_size )
+		if( internal_handle->current_chunk_offset == internal_handle->media_values->chunk_size )
 		{
 			internal_handle->current_chunk_offset = 0;
 			internal_handle->current_chunk       += 1;
 		}
-		else if( internal_handle->current_chunk_offset > internal_handle->media->chunk_size )
+		else if( internal_handle->current_chunk_offset > internal_handle->media_values->chunk_size )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
 			 function );

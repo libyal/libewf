@@ -35,6 +35,7 @@ libewf_la_SOURCES = \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_includes.h \
 	libewf_internal_handle.c libewf_internal_handle.h \
+	libewf_media_values.c libewf_media_values.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_offset_table.c libewf_offset_table.h \
 	libewf_read.c libewf_read.h \

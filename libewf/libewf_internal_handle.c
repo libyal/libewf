@@ -65,9 +65,9 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
-	internal_handle->media                     = NULL;
 	internal_handle->read                      = NULL;
 	internal_handle->write                     = NULL;
+	internal_handle->media_values              = NULL;
 	internal_handle->segment_table             = NULL;
 	internal_handle->delta_segment_table       = NULL;
 	internal_handle->offset_table              = NULL;
@@ -134,11 +134,11 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
-	internal_handle->media = libewf_internal_handle_media_alloc();
+	internal_handle->media_values = libewf_media_values_alloc();
 
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create media sub handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create media values.\n",
 		 function );
 
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
@@ -154,10 +154,10 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		if( internal_handle->read == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create read sub handle.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create subhandle read.\n",
 			 function );
 
-			libewf_internal_handle_media_free( internal_handle->media );
+			libewf_common_free( internal_handle->media_values );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
 			libewf_segment_table_free( internal_handle->segment_table );
 			libewf_segment_table_free( internal_handle->delta_segment_table );
@@ -172,14 +172,14 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		if( internal_handle->write == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create write sub handle.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create subhandle write.\n",
 			 function );
 
 			if( internal_handle->read != NULL )
 			{
 				libewf_internal_handle_read_free( internal_handle->read );
 			}
-			libewf_internal_handle_media_free( internal_handle->media );
+			libewf_common_free( internal_handle->media_values );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
 			libewf_segment_table_free( internal_handle->segment_table );
 			libewf_segment_table_free( internal_handle->delta_segment_table );
@@ -204,9 +204,9 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 		return;
 	}
-	if( internal_handle->media != NULL )
+	if( internal_handle->media_values != NULL )
 	{
-		libewf_internal_handle_media_free( internal_handle->media );
+		libewf_common_free( internal_handle->media_values );
 	}
 	if( internal_handle->read != NULL )
 	{
@@ -251,36 +251,6 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
 	}
 	libewf_common_free( internal_handle );
-}
-
-/* Allocates memory for a new handle media struct
- * Returns a pointer to the new instance, NULL on error
- */
-LIBEWF_INTERNAL_HANDLE_MEDIA *libewf_internal_handle_media_alloc( void )
-{
-	LIBEWF_INTERNAL_HANDLE_MEDIA *handle_media = NULL;
-	static char *function                      = "libewf_internal_handle_media_alloc";
-
-	handle_media = (LIBEWF_INTERNAL_HANDLE_MEDIA *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_MEDIA_SIZE );
-
-	if( handle_media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate handle media.\n",
-		 function );
-
-		return( NULL );
-	}
-	handle_media->media_size        = 0;
-	handle_media->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
-	handle_media->sectors_per_chunk = 64;
-	handle_media->bytes_per_sector  = 512;
-	handle_media->amount_of_chunks  = 0;
-	handle_media->amount_of_sectors = 0;
-	handle_media->error_granularity = 0;
-	handle_media->media_type        = 0;
-	handle_media->media_flags       = 0x01;
-
-	return( handle_media );
 }
 
 /* Allocates memory for a new handle read struct
@@ -981,7 +951,7 @@ int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_han
 	}
 	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle read.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
 		 function );
 
 		return( -1 );
@@ -1014,16 +984,16 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		return( -1 );
 	}
-	if( internal_handle->media == NULL )
+	if( internal_handle->media_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
 		 function );
 
 		return( -1 );
@@ -1037,26 +1007,26 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	}
 	/* Determine the chunk size
 	 */
-	internal_handle->media->chunk_size = internal_handle->media->sectors_per_chunk
-	                                   * internal_handle->media->bytes_per_sector;
+	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
+	                                          * internal_handle->media_values->bytes_per_sector;
 
-	if( internal_handle->media->chunk_size == 0 )
+	if( internal_handle->media_values->chunk_size == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: the media chunk size cannot be zero - using default media values.\n",
 		 function );
 
-		internal_handle->media->sectors_per_chunk = 64;
-		internal_handle->media->bytes_per_sector  = 512;
-		internal_handle->media->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
+		internal_handle->media_values->sectors_per_chunk = 64;
+		internal_handle->media_values->bytes_per_sector  = 512;
+		internal_handle->media_values->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
 	}
-	if( internal_handle->media->chunk_size > (uint32_t) INT32_MAX )
+	if( internal_handle->media_values->chunk_size > (uint32_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid media chunk size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
+	if( internal_handle->media_values->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
 		 function );
@@ -1075,12 +1045,13 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	}
 	/* Check if the input file size does not exceed the maximum input file size
 	 */
-	maximum_input_file_size = (uint64_t) internal_handle->media->chunk_size * (uint64_t) UINT32_MAX;
+	maximum_input_file_size = (uint64_t) internal_handle->media_values->chunk_size
+	                        * (uint64_t) UINT32_MAX;
 
 	if( internal_handle->write->input_write_size > maximum_input_file_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: input write size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
-		 function, maximum_input_file_size, internal_handle->media->chunk_size );
+		 function, maximum_input_file_size, internal_handle->media_values->chunk_size );
 
 		return( -1 );
 	}
@@ -1214,9 +1185,10 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 		}
 		/* Determine the amount of chunks to write
 		 */
-		amount_of_chunks = (int64_t) internal_handle->write->input_write_size / (int64_t) internal_handle->media->chunk_size;
+		amount_of_chunks = (int64_t) internal_handle->write->input_write_size
+		                 / (int64_t) internal_handle->media_values->chunk_size;
 
-		if( ( internal_handle->write->input_write_size % internal_handle->media->chunk_size ) != 0 )
+		if( ( internal_handle->write->input_write_size % internal_handle->media_values->chunk_size ) != 0 )
 		{
 			amount_of_chunks += 1;
 		}
@@ -1227,11 +1199,12 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 			return( -1 );
 		}
-		internal_handle->media->amount_of_chunks = (uint32_t) amount_of_chunks;
+		internal_handle->media_values->amount_of_chunks = (uint32_t) amount_of_chunks;
 
 		/* Determine the amount of sectors to write
 		 */
-		amount_of_sectors = (int64_t) internal_handle->write->input_write_size / (int64_t) internal_handle->media->bytes_per_sector;
+		amount_of_sectors = (int64_t) internal_handle->write->input_write_size
+		                  / (int64_t) internal_handle->media_values->bytes_per_sector;
 
 		if( amount_of_chunks > (int64_t) UINT32_MAX )
 		{
@@ -1240,7 +1213,7 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 			return( -1 );
 		}
-		internal_handle->media->amount_of_sectors = (uint32_t) amount_of_sectors;
+		internal_handle->media_values->amount_of_sectors = (uint32_t) amount_of_sectors;
 	}
 	/* Allocate the offset table if necessary
 	 */
@@ -1264,11 +1237,11 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	}
 	/* Make sure the chuck cache is large enough
 	 */
-	if( ( internal_handle->media->chunk_size + EWF_CRC_SIZE ) > internal_handle->chunk_cache->allocated_size )
+	if( ( internal_handle->media_values->chunk_size + EWF_CRC_SIZE ) > internal_handle->chunk_cache->allocated_size )
 	{
 		if( libewf_chunk_cache_realloc(
 		     internal_handle->chunk_cache,
-		     ( internal_handle->media->chunk_size + EWF_CRC_SIZE ) ) != 1 )
+		     ( internal_handle->media_values->chunk_size + EWF_CRC_SIZE ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );
