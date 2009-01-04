@@ -107,6 +107,8 @@ int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );
 
 #define ewf_section_is_type_ltree( section ) \
 	ewf_section_is_type( section, (EWF_CHAR *) "ltree" )
+#define ewf_section_is_type_session( section ) \
+	ewf_section_is_type( section, (EWF_CHAR *) "session" )
 
 #define ewf_section_is_type_xheader( section ) \
 	ewf_section_is_type( section, (EWF_CHAR *) "xheader" )

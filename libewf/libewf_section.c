@@ -55,6 +55,7 @@
 #include "ewf_header2.h"
 #include "ewf_ltree.h"
 #include "ewf_section.h"
+#include "ewf_session.h"
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
 #include "ewf_table.h"
@@ -570,10 +571,10 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	internal_handle->media->chunk_size = (uint32_t) bytes_per_chunk;
 
-	LIBEWF_VERBOSE_PRINT( "%s: This volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n",
+	LIBEWF_VERBOSE_PRINT( "%s: this volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n",
 	 function, internal_handle->media->amount_of_chunks, bytes_per_chunk, stored_crc, calculated_crc );
 
-	LIBEWF_VERBOSE_PRINT( "%s: This volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	LIBEWF_VERBOSE_PRINT( "%s: this volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
 	 function, internal_handle->media->amount_of_sectors, internal_handle->media->bytes_per_sector );
 
 	if( libewf_common_memcmp( (void *) volume_smart->signature, (void *) "SMART", 5 ) == 0 )
@@ -868,7 +869,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 	LIBEWF_VERBOSE_PRINT( "%s: this volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n",
 	 function, internal_handle->media->amount_of_chunks, bytes_per_chunk, stored_crc, calculated_crc );
-	LIBEWF_VERBOSE_PRINT( "%s: This volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
+	LIBEWF_VERBOSE_PRINT( "%s: this volume has %" PRIu32 " sectors of %" PRIi32 " bytes each.\n",
 	 function, internal_handle->media->amount_of_sectors, internal_handle->media->bytes_per_sector );
 
 	if( libewf_common_memcpy( internal_handle->guid, volume->guid, 16 ) == NULL )
@@ -1659,7 +1660,7 @@ ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 /* Reads a sectors section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_sectors_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+ssize64_t libewf_section_sectors_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size64_t size )
 {
 	static char *function = "libewf_section_sectors_read";
 
@@ -1691,7 +1692,7 @@ ssize_t libewf_section_sectors_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	return( (ssize_t) size );
+	return( (ssize64_t) size );
 }
 
 /* Reads a ltree section from file
@@ -1753,6 +1754,91 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, tree_data, size ); );
 
 	libewf_common_free( tree_data );
+
+	return( (ssize_t) size );
+}
+
+/* Reads a session section from file
+ * Returns the amount of bytes read, or -1 on error
+ */
+ssize_t libewf_section_session_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
+{
+	EWF_SESSION *session  = NULL;
+	static char *function = "libewf_section_session_read";
+	EWF_CRC calculated_crc         = 0;
+	EWF_CRC stored_crc             = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size != EWF_SESSION_SIZE )
+	{
+		LIBEWF_WARNING_PRINT( "%s: mismatch in section session size.\n",
+		 function );
+
+		return( -1 );
+	}
+	session = (EWF_SESSION *) libewf_common_alloc( EWF_SESSION_SIZE );
+
+	if( session == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate session.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ewf_session_read( session, file_descriptor ) <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read session.\n",
+		 function );
+
+		libewf_common_free( session );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( session->unknown, 68 ); );
+#endif
+
+	if( ewf_crc_calculate(
+	     &calculated_crc,
+	     (uint8_t *) session,
+	     ( EWF_SESSION_SIZE - EWF_CRC_SIZE ),
+	     1 ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
+
+		libewf_common_free( session );
+
+		return( -1 );
+	}
+	if( libewf_endian_convert_32bit( &stored_crc, session->crc ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
+
+		libewf_common_free( session );
+
+		return( -1 );
+	}
+	if( stored_crc != calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
+
+		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		{
+			libewf_common_free( session );
+
+			return( -1 );
+		}
+	}
+	libewf_common_free( session );
 
 	return( (ssize_t) size );
 }
@@ -3275,6 +3361,15 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	else if( ewf_section_is_type_ltree( section ) == 1 )
 	{
 		count = libewf_section_ltree_read(
+		         internal_handle,
+		         file_descriptor,
+		         (size_t) size );
+	}
+	/* Read the session section
+	 */
+	else if( ewf_section_is_type_session( section ) == 1 )
+	{
+		count = libewf_section_session_read(
 		         internal_handle,
 		         file_descriptor,
 		         (size_t) size );

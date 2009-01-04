@@ -1,6 +1,8 @@
 Roadmap:
-* add write support for > 2Gb segment file for EnCase 6.7
+* add read/write support for > 2Gb segment file for EnCase 6.7
   make sure offsets in table remain within 2Gb limit
+* add read/write support for session section
+* create iso2ewf tool
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -43,7 +45,9 @@ To do/think about:
 * ewfacquire: non interactive mode - read settings from file?
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
-  (make a generic media access solution also useable for revit)
+  make a generic media access solution also useable for revit?
+* ewfacquire: add entire disk (physical) and partition only (logical) to volume type
+  description
 * ewfexport: non interactive mode?
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfdebug: create a tool to analyse a single segment file
@@ -131,11 +135,17 @@ TODO
   move functions from internal handle to file
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
+* write >2Gb segment files
+  chunk offset must remain below 2Gb in relation to base offset
 
 * remove libewf_set_media_values
 
+Version: 20070829
+* worked on read support for > 2Gb segment file for EnCase 6.7
+* worked on session section support
+
 Version: 20070828
-* added read support for > 2Gb segment file for EnCase 6.7
+* worked on read support for > 2Gb segment file for EnCase 6.7
 * changed off_t to off64_t for Windows >2Gb segment file support
 * worked on write support for > 2Gb segment file for EnCase 6.7
 * corrected use of stdout and stderr in ewfacquire

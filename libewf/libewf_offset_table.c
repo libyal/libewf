@@ -516,7 +516,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 		{
 			chunk_type = "compressed";
 		}
-		LIBEWF_VERBOSE_PRINT( "%s: %s chunk %" PRIu32 " read with base: %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 ".\n",
 		 function, chunk_type, offset_table->last, base_offset, current_offset, chunk_size );
 #endif
 
@@ -568,7 +568,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	{
 		chunk_type = "compressed";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: %s last chunk %" PRIu32 " read with base: %" PRIu64 " and offset %" PRIu32 ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 ".\n",
 	 function, chunk_type, ( offset_table->last + 1 ), base_offset, current_offset );
 #endif
 
