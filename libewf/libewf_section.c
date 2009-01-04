@@ -3404,7 +3404,9 @@ ssize_t libewf_section_hash_read( libewf_segment_file_handle_t *segment_file_han
 /* Writes a hash section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_handle, EWF_DIGEST_HASH *md5_hash )
+ssize_t libewf_section_hash_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         EWF_DIGEST_HASH *md5_hash )
 {
 	ewf_hash_t hash;
 
@@ -3425,23 +3427,34 @@ ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_ha
 	}
 	section_offset = segment_file_handle->file_offset;
 
-	if( libewf_common_memset( &hash, 0, sizeof( ewf_hash_t ) ) == NULL )
+	if( libewf_common_memset(
+	     &hash,
+	     0,
+	     sizeof( ewf_hash_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy( hash.md5_hash, md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	if( libewf_common_memcpy(
+	     hash.md5_hash,
+	     md5_hash,
+	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &hash, ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &hash,
+	                  ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_revert_32bit( calculated_crc, hash.crc ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     calculated_crc,
+	     hash.crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 		 function );

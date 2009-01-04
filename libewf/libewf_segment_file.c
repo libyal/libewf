@@ -1220,7 +1220,19 @@ ssize_t libewf_segment_file_write_delta_chunk( libewf_segment_file_handle_t *seg
 /* Closes the segment file, necessary sections at the end of the segment file will be written
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_close( libewf_segment_file_handle_t *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, libewf_hash_sections_t *hash_sections, libewf_values_table_t *hash_values, libewf_media_values_t *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, ewf_data_t **cached_data_section )
+ssize_t libewf_segment_file_write_close(
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint16_t segment_number,
+         uint32_t segment_amount_of_chunks,
+         int last_segment_file,
+         libewf_hash_sections_t *hash_sections,
+         libewf_values_table_t *hash_values,
+         libewf_media_values_t *media_values,
+         libewf_sector_table_t *acquiry_errors,
+         int8_t compression_level,
+         uint8_t format,
+         uint8_t ewf_format,
+         ewf_data_t **cached_data_section )
 {
 	static char *function     = "libewf_segment_file_write_close";
 	ssize_t total_write_count = 0;

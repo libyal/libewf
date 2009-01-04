@@ -94,7 +94,8 @@ uint8_t libewf_get_flags_write( void )
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
  */
-int libewf_check_file_signature( const libewf_filename_t *filename )
+int libewf_check_file_signature(
+     const libewf_filename_t *filename )
 {
 	static char *function = "libewf_check_file_signature";
 	int file_descriptor   = 0;
@@ -139,7 +140,10 @@ int libewf_check_file_signature( const libewf_filename_t *filename )
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
  * Returns a pointer to the new instance of handle, NULL on error
  */
-LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file_amount, uint8_t flags )
+LIBEWF_HANDLE *libewf_open(
+                libewf_filename_t * const filenames[],
+                uint16_t file_amount,
+                uint8_t flags )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_open";
@@ -254,7 +258,8 @@ LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 0 if successful, or -1 on error
  */
-int libewf_close( LIBEWF_HANDLE *handle )
+int libewf_close(
+     LIBEWF_HANDLE *handle )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_close";
@@ -301,7 +306,9 @@ int libewf_close( LIBEWF_HANDLE *handle )
  * It will set the related file offset to the specific chunk offset
  * Returns the offset if seek is successful, or -1 on error
  */
-off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
+off64_t libewf_seek_offset(
+     LIBEWF_HANDLE *handle,
+     off64_t offset )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_seek_offset";
@@ -379,7 +386,9 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 /* Retrieves the amount of sectors per chunk from the media information
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk )
+int libewf_get_sectors_per_chunk(
+     LIBEWF_HANDLE *handle,
+     uint32_t *sectors_per_chunk )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_sectors_per_chunk";
@@ -422,7 +431,9 @@ int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_c
 /* Retrieves the amount of bytes per sector from the media information
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector )
+int libewf_get_bytes_per_sector(
+     LIBEWF_HANDLE *handle,
+     uint32_t *bytes_per_sector )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_bytes_per_sector";
@@ -465,7 +476,9 @@ int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sect
 /* Retrieves the amount of sectors from the media information
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors )
+int libewf_get_amount_of_sectors(
+     LIBEWF_HANDLE *handle,
+     uint32_t *amount_of_sectors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_sectors";
@@ -553,7 +566,9 @@ int libewf_get_chunk_size(
 /* Retrieves the error granularity from the media information
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity )
+int libewf_get_error_granularity(
+     LIBEWF_HANDLE *handle,
+     uint32_t *error_granularity )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_error_granularity";
@@ -596,7 +611,10 @@ int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granula
 /* Retrieves the compression values
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_compression_values( LIBEWF_HANDLE *handle, int8_t *compression_level, uint8_t *compress_empty_block )
+int libewf_get_compression_values(
+     LIBEWF_HANDLE *handle,
+     int8_t *compression_level,
+     uint8_t *compress_empty_block )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_compression_values";
@@ -633,7 +651,9 @@ int libewf_get_compression_values( LIBEWF_HANDLE *handle, int8_t *compression_le
 /* Retrieves the size of the contained media data
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size )
+int libewf_get_media_size(
+     LIBEWF_HANDLE *handle,
+     size64_t *media_size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_size";
@@ -681,7 +701,9 @@ int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size )
 /* Retrieves the media type value
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type )
+int libewf_get_media_type(
+     LIBEWF_HANDLE *handle,
+     int8_t *media_type )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_type";
@@ -724,7 +746,9 @@ int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type )
 /* Retrieves the media flags
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags )
+int libewf_get_media_flags(
+     LIBEWF_HANDLE *handle,
+     int8_t *media_flags )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_flags";
@@ -767,7 +791,9 @@ int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags )
 /* Retrieves the volume type value
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type )
+int libewf_get_volume_type(
+     LIBEWF_HANDLE *handle,
+     int8_t *volume_type )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
@@ -809,7 +835,9 @@ int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type )
 /* Retrieves the format type value
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format )
+int libewf_get_format(
+     LIBEWF_HANDLE *handle,
+     int8_t *format )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
@@ -852,7 +880,10 @@ int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format )
 /* Retrieves the GUID
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
+int libewf_get_guid(
+     LIBEWF_HANDLE *handle,
+     uint8_t *guid,
+     size_t size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_guid";
@@ -903,7 +934,10 @@ int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 /* Retrieves the MD5 hash
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
+int libewf_get_md5_hash(
+     LIBEWF_HANDLE *handle,
+     uint8_t *md5_hash,
+     size_t size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_md5_hash";
@@ -958,7 +992,10 @@ int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 /* Retrieves the delta segment filename
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, libewf_filename_t *filename, size_t length )
+int libewf_get_delta_segment_filename(
+     LIBEWF_HANDLE *handle,
+     libewf_filename_t *filename,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_delta_segment_filename";
@@ -988,7 +1025,9 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, libewf_filename_t 
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful, 0 if no header values are present, or -1 on error
  */
-int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors )
+int libewf_get_amount_of_acquiry_errors(
+     LIBEWF_HANDLE *handle,
+     uint32_t *amount_of_errors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_acquiry_errors";
@@ -1024,7 +1063,11 @@ int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount
 /* Retrieves the information of an acquiry error
  * Returns 1 if successful, 0 if no acquiry error could be found, or -1 on error
  */
-int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
+int libewf_get_acquiry_error(
+     LIBEWF_HANDLE *handle,
+     uint32_t index,
+     off64_t *sector,
+     uint32_t *amount_of_sectors )
 {
 	static char *function = "libewf_get_acquiry_error";
 
@@ -1052,7 +1095,9 @@ int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *se
 /* Retrieves the amount of CRC errors
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_amount_of_crc_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors )
+int libewf_get_amount_of_crc_errors(
+     LIBEWF_HANDLE *handle,
+     uint32_t *amount_of_errors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_crc_errors";
@@ -1095,7 +1140,11 @@ int libewf_get_amount_of_crc_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_
 /* Retrieves the information of a CRC error
  * Returns 1 if successful, 0 if no CRC error could be found, or -1 on error
  */
-int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
+int libewf_get_crc_error(
+     LIBEWF_HANDLE *handle,
+     uint32_t index,
+     off64_t *sector,
+     uint32_t *amount_of_sectors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_crc_error";
@@ -1126,7 +1175,9 @@ int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector
 /* Retrieves the amount of chunks written
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks )
+int libewf_get_write_amount_of_chunks(
+     LIBEWF_HANDLE *handle,
+     uint32_t *amount_of_chunks )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_write_amount_of_chunks";
@@ -1162,7 +1213,9 @@ int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_o
 /* Retrieves the amount of header values
  * Returns 1 if successful, 0 if no header values are present, or -1 on error
  */
-int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_of_values )
+int libewf_get_amount_of_header_values(
+     LIBEWF_HANDLE *handle,
+     uint32_t *amount_of_values )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_header_values";
@@ -1195,7 +1248,11 @@ int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_
 /* Retrieves the header value identifier specified by its index
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, libewf_char_t *value, size_t length )
+int libewf_get_header_value_identifier(
+     LIBEWF_HANDLE *handle,
+     uint32_t index,
+     libewf_char_t *value,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value_identifier";
@@ -1223,7 +1280,11 @@ int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, l
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_header_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
+int libewf_get_header_value(
+     LIBEWF_HANDLE *handle,
+     libewf_char_t *identifier,
+     libewf_char_t *value,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value";
@@ -1261,7 +1322,9 @@ int libewf_get_header_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, l
 /* Retrieves the amount of hash values
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of_values )
+int libewf_get_amount_of_hash_values(
+     LIBEWF_HANDLE *handle,
+     uint32_t *amount_of_values )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_hash_values";
@@ -1294,7 +1357,11 @@ int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of
 /* Retrieves the hash value identifier specified by its index
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, libewf_char_t *value, size_t length )
+int libewf_get_hash_value_identifier(
+     LIBEWF_HANDLE *handle,
+     uint32_t index,
+     libewf_char_t *value,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value_identifier";
@@ -1650,7 +1717,9 @@ int libewf_set_segment_file_size(
 /* Sets the media type
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_media_type( LIBEWF_HANDLE *handle, uint8_t media_type )
+int libewf_set_media_type(
+     LIBEWF_HANDLE *handle,
+     uint8_t media_type )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_media_type";
@@ -1693,7 +1762,9 @@ int libewf_set_media_type( LIBEWF_HANDLE *handle, uint8_t media_type )
 /* Sets the volume type
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_volume_type( LIBEWF_HANDLE *handle, uint8_t volume_type )
+int libewf_set_volume_type(
+     LIBEWF_HANDLE *handle,
+     uint8_t volume_type )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_volume_type";
@@ -1816,7 +1887,10 @@ int libewf_set_format(
 /* Sets the GUID
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
+int libewf_set_guid(
+     LIBEWF_HANDLE *handle,
+     uint8_t *guid,
+     size_t size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_guid";
@@ -1875,7 +1949,10 @@ int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 /* Sets the MD5 hash
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
+int libewf_set_md5_hash(
+     LIBEWF_HANDLE *handle,
+     uint8_t *md5_hash,
+     size_t size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_md5_hash";
@@ -1935,7 +2012,10 @@ int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 /* Sets the delta segment file
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, libewf_filename_t *filename, size_t length )
+int libewf_set_delta_segment_filename(
+     LIBEWF_HANDLE *handle,
+     libewf_filename_t *filename,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_delta_segment_filename";
@@ -1994,7 +2074,9 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, libewf_filename_t 
  * The chunk is not wiped if read raw is used
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_error )
+int libewf_set_read_wipe_chunk_on_error(
+     LIBEWF_HANDLE *handle,
+     uint8_t wipe_on_error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_read_wipe_chunk_on_error";
@@ -2023,7 +2105,11 @@ int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_
 /* Sets the header value specified by the identifier
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_header_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
+int libewf_set_header_value(
+     LIBEWF_HANDLE *handle,
+     libewf_char_t *identifier,
+     libewf_char_t *value,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_header_value";
@@ -2069,7 +2155,11 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, l
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_hash_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, libewf_char_t *value, size_t length )
+int libewf_set_hash_value(
+     LIBEWF_HANDLE *handle,
+     libewf_char_t *identifier,
+     libewf_char_t *value,
+     size_t length )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_hash_value";
@@ -2116,7 +2206,9 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, lib
  * Will parse the first available header in order mentioned above
  * Returns 1 if successful, or -1 on error
  */
-int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
+int libewf_parse_header_values(
+     LIBEWF_HANDLE *handle,
+     uint8_t date_format )
 {
 	libewf_values_table_t *header_values      = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2194,7 +2286,8 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 /* Parses the hash values from the xhash section
  * Returns 1 if successful, or -1 on error
  */
-int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
+int libewf_parse_hash_values(
+     LIBEWF_HANDLE *handle )
 {
 	libewf_values_table_t *hash_values        = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -2244,7 +2337,10 @@ int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 /* Add an acquiry error
  * Returns 1 if successful, or -1 on error
  */
-int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
+int libewf_add_acquiry_error(
+     LIBEWF_HANDLE *handle,
+     off64_t sector,
+     uint32_t amount_of_sectors )
 {
 	static char *function = "libewf_add_acquiry_error";
 
@@ -2264,7 +2360,10 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 /* Add a CRC error
  * Returns 1 if successful, or -1 on error
  */
-int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
+int libewf_add_crc_error(
+     LIBEWF_HANDLE *handle,
+     off64_t sector,
+     uint32_t amount_of_sectors )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_add_crc_error";
@@ -2294,7 +2393,9 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 /* Copies the header values from the source to the destination handle
  * Returns 1 if successful, or -1 on error
  */
-int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle )
+int libewf_copy_header_values(
+     LIBEWF_HANDLE *destination_handle,
+     LIBEWF_HANDLE *source_handle )
 {
 	libewf_internal_handle_t *internal_destination_handle = NULL;
 	libewf_internal_handle_t *internal_source_handle      = NULL;
@@ -2350,7 +2451,9 @@ int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE 
 
 /* Set the notify values
  */
-void libewf_set_notify_values( FILE *stream, uint8_t verbose )
+void libewf_set_notify_values(
+      FILE *stream,
+      uint8_t verbose )
 {
 	libewf_notify_set_values( stream, verbose );
 }

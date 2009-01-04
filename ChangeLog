@@ -161,6 +161,9 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080119
+* worked on basic multi threaded safety
+
 Version: 20080115
 * worked on refactoring write initialize
 * added initialize function for format specific write values

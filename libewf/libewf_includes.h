@@ -42,8 +42,6 @@
 #include "libewf_config_windows.h"
 #endif
 
-#include "memwatch.h"
-
 #include <libewf/libewf_types.h>
 
 #if defined( HAVE_LIMITS_H )
