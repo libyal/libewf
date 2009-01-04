@@ -38,10 +38,10 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_error_sector.h"
-#include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
+#include "libewf_values_table.h"
 
 #include "ewf_char.h"
 #include "ewf_data.h"
@@ -143,7 +143,7 @@ struct libewf_internal_handle
 
 	/* The hash values
 	 */
-	LIBEWF_HASH_VALUES *hash_values;
+	LIBEWF_VALUES_TABLE *hash_values;
 
 	/* The MD5 hash of the data
 	 */

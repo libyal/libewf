@@ -244,7 +244,7 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	}
 	if( internal_handle->hash_values != NULL )
 	{
-		libewf_hash_values_free( internal_handle->hash_values );
+		libewf_values_table_free( internal_handle->hash_values );
 	}
 	if( internal_handle->chunk_cache != NULL )
 	{
