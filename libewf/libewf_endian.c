@@ -215,3 +215,35 @@ int8_t libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes )
 	return( 1 );
 }
 
+/* Swaps the byte order of byte pairs within a buffer of a certain size
+ * Returns 1 if successful, -1 on error
+ */
+int8_t libewf_endian_swap_byte_pairs( uint8_t *buffer, size_t size )
+{
+	static char *function = "libewf_endian_swap_byte_pairs";
+	uint8_t byte          = 0;
+	size_t iterator       = 0;
+
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < size; iterator += 2 )
+	{
+		byte                   = buffer[ iterator ];
+		buffer[ iterator ]     = buffer[ iterator + 1 ];
+		buffer[ iterator + 1 ] = byte;
+	}
+	return( 1 );
+}
+

@@ -1,5 +1,5 @@
 /*
- * crypographic digest wrapper code for ewftools
+ * libewf crypographic digest wrapper code
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -32,24 +32,22 @@
  */
 
 
-#include "../libewf/libewf_includes.h"
-
-#include "ewfdigest_context.h"
-
-#include "../libewf/libewf_common.h"
-#include "../libewf/libewf_notify.h"
+#include "libewf_includes.h"
+#include "libewf_common.h"
+#include "libewf_digest_context.h"
+#include "libewf_notify.h"
 
 /* Initializes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_initialize( EWFDIGEST_CONTEXT* digest_context, uint8_t type )
+int8_t libewf_digest_context_initialize( LIBEWF_DIGEST_CONTEXT* digest_context, uint8_t type )
 {
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 	const EVP_MD *digest_type = NULL;
 #elif defined( HAVE_WINCPRYPT_H )
 	DWORD digest_type   = 0;
 #endif
-	static char *function = "ewfdigest_context_initialize";
+	static char *function = "libewf_digest_context_initialize";
 
 	if( digest_context == NULL )
 	{
@@ -58,8 +56,8 @@ int ewfdigest_context_initialize( EWFDIGEST_CONTEXT* digest_context, uint8_t typ
 
 		return( -1 );
 	}
-	if( ( type != EWFDIGEST_CONTEXT_TYPE_MD5 )
-	 && ( type != EWFDIGEST_CONTEXT_TYPE_SHA1 ) )
+	if( ( type != LIBEWF_DIGEST_CONTEXT_TYPE_MD5 )
+	 && ( type != LIBEWF_DIGEST_CONTEXT_TYPE_SHA1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unsupported digest context type.\n",
 		 function );
@@ -69,11 +67,11 @@ int ewfdigest_context_initialize( EWFDIGEST_CONTEXT* digest_context, uint8_t typ
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 	EVP_MD_CTX_init( digest_context );
 
-	if( type == EWFDIGEST_CONTEXT_TYPE_MD5 )
+	if( type == LIBEWF_DIGEST_CONTEXT_TYPE_MD5 )
 	{
 		digest_type = EVP_md5();
 	}
-	else if( type == EWFDIGEST_CONTEXT_TYPE_SHA1 )
+	else if( type == LIBEWF_DIGEST_CONTEXT_TYPE_SHA1 )
 	{
 		digest_type = EVP_sha1();
 	}
@@ -117,11 +115,11 @@ int ewfdigest_context_initialize( EWFDIGEST_CONTEXT* digest_context, uint8_t typ
 
 		return( 0 );
 	}
-	if( type == EWFDIGEST_CONTEXT_TYPE_MD5 )
+	if( type == LIBEWF_DIGEST_CONTEXT_TYPE_MD5 )
 	{
 		digest_type = CALG_MD5;
 	}
-	else if( type == EWFDIGEST_CONTEXT_TYPE_SHA1 )
+	else if( type == LIBEWF_DIGEST_CONTEXT_TYPE_SHA1 )
 	{
 		digest_type = CALG_SHA1;
 	}
@@ -146,9 +144,9 @@ int ewfdigest_context_initialize( EWFDIGEST_CONTEXT* digest_context, uint8_t typ
 /* Updates the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_update( EWFDIGEST_CONTEXT* digest_context, uint8_t *buffer, size_t size )
+int8_t libewf_digest_context_update( LIBEWF_DIGEST_CONTEXT* digest_context, uint8_t *buffer, size_t size )
 {
-	static char *function = "ewfdigest_context_update";
+	static char *function = "libewf_digest_context_update";
 
 	if( digest_context == NULL )
 	{
@@ -201,9 +199,9 @@ int ewfdigest_context_update( EWFDIGEST_CONTEXT* digest_context, uint8_t *buffer
 /* Finalizes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_finalize( EWFDIGEST_CONTEXT* digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size )
+int8_t libewf_digest_context_finalize( LIBEWF_DIGEST_CONTEXT* digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size )
 {
-	static char *function = "ewfdigest_context_finalize";
+	static char *function = "libewf_digest_context_finalize";
 
 	if( digest_context == NULL )
 	{

@@ -102,9 +102,9 @@ LIBEWF_HASH_VALUES *libewf_hash_values_alloc( void )
 }
 
 /* Reallocates memory for the hash values
- * Returns 1 if successful, or -1 on error
+ * Returns a pointer to the instance, NULL on error
  */
-int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previous_amount, uint32_t new_amount )
+LIBEWF_HASH_VALUES *libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previous_amount, uint32_t new_amount )
 {
 	LIBEWF_CHAR **reallocation = NULL;
 	static char *function      = "libewf_hash_values_realloc";
@@ -116,7 +116,7 @@ int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previo
 		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	if( ( previous_amount > (uint32_t) INT32_MAX )
 	 || ( new_amount > (uint32_t) INT32_MAX ) )
@@ -124,14 +124,14 @@ int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previo
 		LIBEWF_WARNING_PRINT( "%s: invalid amount value exceeds maximum.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	if( previous_amount >= new_amount )
 	{
 		LIBEWF_WARNING_PRINT( "%s: new amount smaller than previous amount.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (ssize_t) SSIZE_MAX ) )
@@ -139,7 +139,7 @@ int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previo
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	reallocation = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( hash_values->identifiers, previous_size, new_size, 0 );
 
@@ -148,7 +148,7 @@ int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previo
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate identifiers.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	hash_values->identifiers = reallocation;
 	reallocation             = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( hash_values->values, previous_size, new_size, 0 );
@@ -158,12 +158,12 @@ int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previo
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate values.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
 	}
 	hash_values->values = reallocation;
 	hash_values->amount = new_amount;
 
-	return( 1 );
+	return( hash_values );
 }
 
 /* Frees memory of a hash values struct including elements
@@ -358,7 +358,7 @@ int8_t libewf_hash_values_set_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHA
 
 			return( -1 );
 		}
-		if( libewf_hash_values_realloc( hash_values, hash_values->amount, ( index + 1 ) ) != 1 )
+		if( libewf_hash_values_realloc( hash_values, hash_values->amount, ( index + 1 ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate hash values.\n",
 			 function );

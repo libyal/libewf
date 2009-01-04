@@ -715,6 +715,74 @@ int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF
 	return( 1 );
 }
 
+/* Converts the EWF digest hash to a printable string
+ * Returns 1 if successful, 0 if hash was not set, or -1 on error
+ */
+int libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_string, EWF_DIGEST_HASH *digest_hash, size_t size_digest_hash )
+{
+	static char *function       = "libewf_string_copy_from_digest_hash";
+	size_t string_iterator      = 0;
+	size_t digest_hash_iterator = 0;
+	uint8_t digest_digit        = 0;
+
+	if( string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( size_string > (size_t) SSIZE_MAX ) || ( size_digest_hash > (size_t) SSIZE_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* The string requires space for 2 characters per digest hash digit and a end of string
+	 */
+	if( size_string < ( ( 2 * size_digest_hash ) + 1 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( digest_hash == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: invalid digest hash.\n",
+		 function );
+
+		return( 0 );
+	}
+	for( digest_hash_iterator = 0; digest_hash_iterator < size_digest_hash; digest_hash_iterator++ )
+	{
+		digest_digit = digest_hash[ digest_hash_iterator ] / 16;
+
+		if( digest_digit <= 9 )
+		{
+			string[ string_iterator++ ] = (LIBEWF_CHAR) ( (uint8_t) '0' + digest_digit );
+		}
+		else
+		{
+			string[ string_iterator++ ] = (LIBEWF_CHAR) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
+		}
+		digest_digit = digest_hash[ digest_hash_iterator ] % 16;
+
+		if( digest_digit <= 9 )
+		{
+			string[ string_iterator++ ] = (LIBEWF_CHAR) ( (uint8_t) '0' + digest_digit );
+		}
+		else
+		{
+			string[ string_iterator++ ] = (LIBEWF_CHAR) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
+		}
+	}
+	string[ string_iterator ] = (LIBEWF_CHAR) '\0';
+
+	return( 1 );
+}
+
 /* Converts an EWF header2 to a string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */

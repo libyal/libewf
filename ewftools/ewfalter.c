@@ -205,6 +205,16 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( libewf_set_swap_byte_pairs( handle, swap_byte_pairs ) != 1 )
+	{
+		fprintf( stderr, "Unable to set swap byte pairs in handle.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		return( EXIT_FAILURE );
+	}
 	if( libewf_get_media_size( handle, &media_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to determine media size.\n" );

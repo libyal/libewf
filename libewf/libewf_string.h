@@ -213,6 +213,8 @@ int libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size_as
 int libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string );
 int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string );
 
+int libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_string, EWF_DIGEST_HASH *digest_hash, size_t size_digest_hash );
+
 #define libewf_string_copy_from_header( string, size_string, header, size_header ) \
 	libewf_string_copy_from_ewf_char( string, size_string, header, size_header )
 #define libewf_string_copy_to_header( string, size_string, header, size_header ) \

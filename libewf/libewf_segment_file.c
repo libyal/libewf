@@ -1556,6 +1556,192 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 	return( total_write_count );
 }
 
+/* Write the necessary sections at the end of the segment file
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_segment_file_write_end( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, LIBEWF_SECTION_LIST *section_list, off64_t start_offset, int last_segment_file )
+{
+	LIBEWF_CHAR *md5_hash_string = NULL;
+	static char *function        = "libewf_segment_file_write_end";
+	ssize_t total_write_count    = 0;
+	ssize_t write_count          = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( last_segment_file != 0 )
+	{
+		if( internal_handle->calculated_md5_hash != NULL )
+		{
+			/* Write the hash section
+			 */
+			write_count = libewf_section_hash_write(
+			               internal_handle,
+			               file_descriptor,
+			               start_offset,
+			               internal_handle->calculated_md5_hash );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write hash section.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( libewf_section_list_append(
+			     section_list,
+			     (EWF_CHAR *) "hash",
+			     start_offset,
+			     ( start_offset + write_count ) ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to append hash section to section list.\n",
+				 function );
+
+				return( -1 );
+			}
+			start_offset      += write_count;
+			total_write_count += write_count;
+
+			if( libewf_internal_handle_set_stored_md5_hash(
+			     internal_handle,
+			     internal_handle->calculated_md5_hash ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set stored MD5 hash in handle.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( internal_handle->format == LIBEWF_FORMAT_EWFX )
+			{
+				md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
+
+				if( md5_hash_string == NULL )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash string.\n",
+					 function );
+
+					return( -1 );
+				}
+				if( libewf_string_copy_from_digest_hash(
+				     md5_hash_string,
+				     LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5,
+				     internal_handle->stored_md5_hash,
+				     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
+					 function );
+
+					libewf_common_free( md5_hash_string );
+
+					return( -1 );
+				}
+				if( libewf_internal_handle_set_hash_value(
+				     internal_handle,
+				     _S_LIBEWF_CHAR( "MD5" ),
+				     md5_hash_string,
+				     LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string in hash values.\n",
+					 function );
+
+					libewf_common_free( md5_hash_string );
+
+					return( -1 );
+				}
+				libewf_common_free( md5_hash_string );
+			}
+		}
+		/* Write the xhash section
+		 */
+		if( internal_handle->format == LIBEWF_FORMAT_EWFX )
+		{
+			if( internal_handle->xhash != NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: xhash already set - cleaning previous defintion.\n",
+				 function );
+
+				libewf_common_free( internal_handle->xhash );
+			}
+			internal_handle->xhash = libewf_hash_values_generate_xhash_string_ewfx(
+			                          internal_handle->hash_values,
+			                          &internal_handle->xhash_size );
+
+			if( internal_handle->xhash == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to generate xhash.\n",
+				 function );
+
+				return( -1 );
+			}
+			write_count = libewf_section_xhash_write(
+			               internal_handle,
+			               file_descriptor,
+			               start_offset,
+			               internal_handle->xhash,
+			               internal_handle->xhash_size,
+			               EWF_COMPRESSION_DEFAULT );
+
+			if( write_count == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write xhash section.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( libewf_section_list_append(
+			     section_list,
+			     (EWF_CHAR *) "xhash",
+			     start_offset,
+			     ( start_offset + write_count ) ) == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to append xhash section to section list.\n",
+				 function );
+
+				return( -1 );
+			}
+			start_offset      += write_count;
+			total_write_count += write_count;
+		}
+	}
+	/* Write the last section
+	 */
+	write_count = libewf_segment_file_write_last_section(
+	               internal_handle,
+	               file_descriptor,
+	               section_list,
+	               start_offset,
+	               last_segment_file );
+
+	if( write_count == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write last section.\n",
+		 function );
+
+		return( -1 );
+	}
+	total_write_count += write_count;
+
+	return( total_write_count );
+}
+
 /* Write the necessary sections before the actual data chunks to file
  * Returns the amount of bytes written, or -1 on error
  */
@@ -2190,6 +2376,7 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_tab
 ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file )
 {
 	static char *function     = "libewf_segment_file_write_close";
+	size_t md5_hash_size      = 0;
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
 
@@ -2236,12 +2423,35 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		return( -1 );
 	}
 
-	if( last_segment_file != 0 )
+	if( last_segment_file == 1 )
 	{
+		md5_hash_size = EWF_DIGEST_HASH_SIZE_MD5;
+
+		if( internal_handle->calculated_md5_hash == NULL )
+		{
+			internal_handle->calculated_md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( md5_hash_size );
+
+			if( internal_handle->calculated_md5_hash == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
+				 function );
+
+				return( -1 );
+			}
+		}
+		/* Complete the MD5 hash calculation
+		 */
+		if( ( libewf_md5_finalize( &internal_handle->md5_context, internal_handle->calculated_md5_hash, &md5_hash_size ) != 1 )
+		 || ( md5_hash_size != EWF_DIGEST_HASH_SIZE_MD5 ) )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to finalize MD5 context.\n",
+			 function );
+
+			return( -1 );
+		}
 		/* Write the data section for a single segment file only for EWF-E01
 		 */
-		if( ( internal_handle->ewf_format == EWF_FORMAT_E01 )
-		 && ( segment_number == 1 ) )
+		if( ( internal_handle->ewf_format == EWF_FORMAT_E01 ) && ( segment_number == 1 ) )
 		{
 			write_count = libewf_section_data_write(
 			               internal_handle,
@@ -2308,97 +2518,15 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
 			total_write_count                                             += write_count;
 		}
-		/* Write the hash section if required
-		 */
-		if( internal_handle->md5_hash_set != 0 )
-		{
-			write_count = libewf_section_hash_write(
-			               internal_handle,
-			               internal_handle->segment_table->file_descriptor[ segment_number ],
-			               internal_handle->segment_table->file_offset[ segment_number ],
-			               internal_handle->md5_hash );
-
-			if( write_count == -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write hash section.\n",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_section_list_append(
-			     internal_handle->segment_table->section_list[ segment_number ],
-			     (EWF_CHAR *) "hash",
-			     internal_handle->segment_table->file_offset[ segment_number ],
-			     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to append hash section to section list.\n",
-				 function );
-
-				return( -1 );
-			}
-			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-			total_write_count                                             += write_count;
-		}
-
-		/* Write the xhash section
-		 */
-		if( internal_handle->format == LIBEWF_FORMAT_EWFX )
-		{
-			if( internal_handle->xhash != NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: xhash already set - cleaning previous defintion.\n",
-				 function );
-
-				libewf_common_free( internal_handle->xhash );
-			}
-			internal_handle->xhash = libewf_hash_values_generate_xhash_string_ewfx(
-			                          internal_handle->hash_values,
-			                          &internal_handle->xhash_size );
-
-			if( internal_handle->xhash == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to generate xhash.\n",
-				 function );
-
-				return( -1 );
-			}
-			write_count = libewf_section_xhash_write(
-			               internal_handle,
-			               internal_handle->segment_table->file_descriptor[ segment_number ],
-			               internal_handle->segment_table->file_offset[ segment_number ],
-			               internal_handle->xhash,
-			               internal_handle->xhash_size,
-			               EWF_COMPRESSION_DEFAULT );
-
-			if( write_count == -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to write xhash section.\n",
-				 function );
-
-				return( -1 );
-			}
-			if( libewf_section_list_append(
-			     internal_handle->segment_table->section_list[ segment_number ],
-			     (EWF_CHAR *) "xhash",
-			     internal_handle->segment_table->file_offset[ segment_number ],
-			     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to append xhash section to section list.\n",
-				 function );
-
-				return( -1 );
-			}
-			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-			total_write_count                                             += write_count;
-		}
 	}
-	/* Write the done or next section
+	/* Write the end of the segment file
+	 * like the next, done and/or hash section
 	 */
-	write_count = libewf_segment_file_write_last_section(
+	write_count = libewf_segment_file_write_end(
 	               internal_handle,
-		       internal_handle->segment_table->file_descriptor[ segment_number ],
-		       internal_handle->segment_table->section_list[ segment_number ],
-		       internal_handle->segment_table->file_offset[ segment_number ],
+	               internal_handle->segment_table->file_descriptor[ segment_number ],
+	               internal_handle->segment_table->section_list[ segment_number ],
+	               internal_handle->segment_table->file_offset[ segment_number ],
 	               last_segment_file );
 
 	if( write_count == -1 )

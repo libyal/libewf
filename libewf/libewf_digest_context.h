@@ -1,5 +1,5 @@
 /*
- * crypographic digest wrapper code for ewftools
+ * libewf crypographic digest wrapper code
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,10 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _EWFDIGEST_CONTEXT_H )
-#define _EWFDIGEST_CONTEXT_H
+#if !defined( _LIBEWF_DIGEST_H )
+#define _LIBEWF_DIGEST_H
 
-#include "../libewf/libewf_includes.h"
+#include "libewf_includes.h"
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 #include <openssl/evp.h>
@@ -51,20 +51,20 @@
 extern "C" {
 #endif
 
-#define EWFDIGEST_CONTEXT_TYPE_MD5		(uint8_t) 'm'
-#define EWFDIGEST_CONTEXT_TYPE_SHA1		(uint8_t) 's'
+#define LIBEWF_DIGEST_CONTEXT_TYPE_MD5		(uint8_t) 'm'
+#define LIBEWF_DIGEST_CONTEXT_TYPE_SHA1		(uint8_t) 's'
 
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 
-#define EWFDIGEST_CONTEXT EVP_MD_CTX
+#define LIBEWF_DIGEST_CONTEXT EVP_MD_CTX
 
 #else
 
-#define EWFDIGEST_CONTEXT ewfdigest_context_t
+#define LIBEWF_DIGEST_CONTEXT libewf_digest_context_t
 
-typedef struct ewfdigest_context ewfdigest_context_t;
+typedef struct libewf_digest_context libewf_digest_context_t;
 
-struct ewfdigest_context
+struct libewf_digest_context
 {
 #if defined( HAVE_WINCPRYPT_H )
 	HCRYPTPROV crypt_provider;
@@ -76,9 +76,9 @@ struct ewfdigest_context
 
 #endif
 
-int ewfdigest_context_initialize( EWFDIGEST_CONTEXT *digest_context, uint8_t type );
-int ewfdigest_context_update( EWFDIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size );
-int ewfdigest_context_finalize( EWFDIGEST_CONTEXT *digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size );
+int8_t libewf_digest_context_initialize( LIBEWF_DIGEST_CONTEXT *digest_context, uint8_t type );
+int8_t libewf_digest_context_update( LIBEWF_DIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size );
+int8_t libewf_digest_context_finalize( LIBEWF_DIGEST_CONTEXT *digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size );
 
 #if defined( __cplusplus )
 }
