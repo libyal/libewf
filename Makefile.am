@@ -1,4 +1,5 @@
 SUBDIRS = \
+	common \
 	libewf \
 	ewftools \
 	manuals

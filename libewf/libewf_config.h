@@ -325,11 +325,11 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "20080305"
 
+/* The size of `off_t', as computed by sizeof. */
+#define SIZEOF_OFF_T 8
+
 /* The size of `size_t', as computed by sizeof. */
 #define SIZEOF_SIZE_T 4
-
-/* The size of `ssize_t', as computed by sizeof. */
-#define SIZEOF_SSIZE_T 4
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
