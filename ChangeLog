@@ -108,7 +108,11 @@ Code clean up
 
 Next release(s):
 * implement low memory usage option
+  - trade off IO versus memory use
+  - for write only offset table is not needed etc.
+
 * implement session section write
+
 * ewfverify: verify against all available hashes that can be verified
 
 * Try to correct the table
@@ -135,17 +139,12 @@ Next stable:
 
 * merge alloc and realloc blocks
 
-* change uppercase type definitions to lowercase _t type definitions
 * change ewf_char/string into byte_char/string
 * create common functions i.e. for libewf_char/string
 
 * test abort
 
 * refactor write initialize into seperate functions
-* rename/move libewf_internal_handle_determine_format and 
-  libewf_internal_handle_get_write_maximum_amount_of_segments
-* create internal value to limit memory use
-  - for write only offset table is not needed etc.
 * what about open read write and set functions?
 
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
@@ -181,6 +180,7 @@ Version: 20080223
 * worked on logging of digest hashes to log file
 * refactored ewfacquire, ewfacquirestream, ewfexport, ewfverify
 * updated manuals
+* moved libewf_internal_handle_determine_format to header_sections
 
 Version: 20080221
 * fixed logical error in libewf_write_test_chunks_section_full

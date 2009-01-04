@@ -44,7 +44,8 @@
 /* Allocates memory for a new header sections struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_header_sections_t *libewf_header_sections_alloc( void )
+libewf_header_sections_t *libewf_header_sections_alloc(
+                           void )
 {
 	libewf_header_sections_t *header_sections = NULL;
 	static char *function                     = "libewf_header_sections_alloc";
@@ -76,7 +77,8 @@ libewf_header_sections_t *libewf_header_sections_alloc( void )
 
 /* Frees memory of a header sections struct including elements
  */
-void libewf_header_sections_free( libewf_header_sections_t *header_sections )
+void libewf_header_sections_free(
+      libewf_header_sections_t *header_sections )
 {
         static char *function = "libewf_header_sections_free";
 
@@ -105,7 +107,11 @@ void libewf_header_sections_free( libewf_header_sections_t *header_sections )
 /* Create the header sections from the header values
  * Returns 1 on success, -1 on error
  */
-int libewf_header_sections_create( libewf_header_sections_t *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format )
+int libewf_header_sections_create(
+     libewf_header_sections_t *header_sections,
+     libewf_values_table_t *header_values,
+     int8_t compression_level,
+     uint8_t format )
 {
 	static char *function = "libewf_header_sections_create";
 	time_t timestamp      = time( NULL );
@@ -346,6 +352,190 @@ int libewf_header_sections_create( libewf_header_sections_t *header_sections, li
 
 			return( -1 );
 		}
+	}
+	return( 1 );
+}
+
+/* Determines the EWF file format based on known characteristics
+ * Returns 1 if the format was determined, -1 on errror
+ */
+int libewf_header_sections_determine_format(
+     libewf_header_sections_t *header_sections,
+     uint8_t ewf_format,
+     uint8_t *format )
+{
+	static char *function = "libewf_header_sections_determine_format";
+
+	if( header_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( format == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid format.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ewf_format == EWF_FORMAT_S01 )
+	{
+		/* The format identifier for the EWF-S01 format was already set
+		 * while reading the volume section
+		 */
+	}
+	else if( ewf_format == EWF_FORMAT_E01 )
+	{
+		if( header_sections->xheader != NULL )
+		{
+			*format = LIBEWF_FORMAT_EWFX;
+		}
+		/* The header2 in raw format starts with 0xff 0xfe <number>
+		 */
+		else if( header_sections->header2 != NULL )
+		{
+			if( header_sections->header2[ 2 ] == (ewf_char_t) '3' )
+			{
+				/* The EnCase5 header2 contains av on the 6th position (36 ... 38 ...)
+				 * the header2 is an UTF16 string
+				 */
+				if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'a' )
+				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'v' ) )
+				{
+					*format = LIBEWF_FORMAT_ENCASE5;
+				}
+				else if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'm' )
+				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'd' ) )
+				{
+					*format = LIBEWF_FORMAT_ENCASE6;
+				}
+				else
+				{
+					LIBEWF_WARNING_PRINT( "%s: unsupported header2 format: %c%c.\n",
+					 function, (char) header_sections->header2[ 36 ],
+					 (char) header_sections->header2[ 38 ] );
+
+					return( -1 );
+				}
+			}
+			else if( header_sections->header2[ 2 ] == (ewf_char_t) '1' )
+			{
+				*format = LIBEWF_FORMAT_ENCASE4;
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: unsupported header2 version: %c.\n",
+				 function, (char) header_sections->header2[ 2 ] );
+
+				return( -1 );
+			}
+		}
+		else if( header_sections->header != NULL )
+		{
+			if( header_sections->header[ 0 ] == (ewf_char_t) '3' )
+			{
+				/* The linen5 header2 contains av on the 6th position (17 18)
+				 * the header2 is an UTF16 string
+				 */
+				if( ( header_sections->header[ 17 ] == (ewf_char_t) 'a' )
+				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'v' ) )
+				{
+					*format = LIBEWF_FORMAT_LINEN5;
+				}
+				else if( ( header_sections->header[ 17 ] == (ewf_char_t) 'm' )
+				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'd' ) )
+				{
+					*format = LIBEWF_FORMAT_LINEN6;
+				}
+				else
+				{
+					LIBEWF_WARNING_PRINT( "%s: unsupported header format: %c%c.\n",
+					 function, (char) header_sections->header[ 17 ],
+					 (char) header_sections->header[ 18 ] );
+
+					return( -1 );
+				}
+			}
+			else if( header_sections->header[ 0 ] == (ewf_char_t) '1' )
+			{
+				/* EnCase uses \r\n
+				 */
+				if( header_sections->header[ 1 ] == (ewf_char_t) '\r' )
+				{
+					if( header_sections->header[ 25 ] == (ewf_char_t) 'r' )
+					{
+						*format = LIBEWF_FORMAT_ENCASE1;
+
+						if( header_sections->amount_of_header_sections != 1 )
+						{
+							LIBEWF_VERBOSE_PRINT( "%s: multiple header sections found.\n",
+							 function );
+						}
+					}
+					else if( header_sections->header[ 31 ] == (ewf_char_t) 'r' )
+					{
+						*format = LIBEWF_FORMAT_ENCASE2;
+					}
+					else
+					{
+						LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
+				/* FTK Imager uses \n
+				 */
+				else if( header_sections->header[ 1 ] == (ewf_char_t) '\n' )
+				{
+					if( header_sections->header[ 29 ] == (ewf_char_t) 'r' )
+					{
+						*format = LIBEWF_FORMAT_FTK;
+					}
+					else
+					{
+						LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
+				else
+				{
+					LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+					 function );
+
+					return( -1 );
+				}
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: unsupported header version.\n",
+				 function );
+
+				return( -1 );
+			}
+		}
+		else
+		{
+			LIBEWF_WARNING_PRINT( "%s: missing header information.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( ewf_format == EWF_FORMAT_L01 )
+	{
+		*format = LIBEWF_FORMAT_LVF;
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported EWF file format.\n",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }

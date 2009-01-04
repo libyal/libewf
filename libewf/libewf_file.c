@@ -430,7 +430,7 @@ LIBEWF_HANDLE *libewf_open(
 		}
 		/* Determine the EWF format
 		 */
-		if( libewf_internal_handle_determine_format(
+		if( libewf_header_sections_determine_format(
 		     internal_handle->header_sections,
 		     internal_handle->ewf_format,
 		     &( internal_handle->format ) ) != 1 )

@@ -79,11 +79,22 @@ struct libewf_header_sections
 	uint8_t amount_of_header_sections;
 };
 
-libewf_header_sections_t *libewf_header_sections_alloc( void );
+libewf_header_sections_t *libewf_header_sections_alloc(
+                            void );
 
-void libewf_header_sections_free( libewf_header_sections_t *header_sections );
+void libewf_header_sections_free(
+      libewf_header_sections_t *header_sections );
 
-int libewf_header_sections_create( libewf_header_sections_t *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format );
+int libewf_header_sections_create(
+     libewf_header_sections_t *header_sections,
+     libewf_values_table_t *header_values,
+     int8_t compression_level,
+     uint8_t format );
+
+int libewf_header_sections_determine_format(
+     libewf_header_sections_t *header_sections,
+     uint8_t ewf_format,
+     uint8_t *format );
 
 #if defined( __cplusplus )
 }
