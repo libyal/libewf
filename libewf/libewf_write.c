@@ -45,7 +45,6 @@
 
 #include "libewf_chunk_cache.h"
 #include "libewf_compression.h"
-#include "libewf_endian.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_offset_table.h"
@@ -595,6 +594,7 @@ ssize_t libewf_write_process_chunk_data(
          ewf_crc_t *chunk_crc,
          int8_t *write_crc )
 {
+	uint8_t *chunk_data_crc        = NULL;
 	static char *function          = "libewf_write_process_chunk_data";
 	size_t data_write_size         = 0;
 	int8_t chunk_compression_level = 0;
@@ -798,15 +798,12 @@ ssize_t libewf_write_process_chunk_data(
 		 */
 		if( chunk_data == chunk_cache->data )
 		{
-			if( libewf_endian_revert_32bit(
-			     *chunk_crc,
-			     (uint8_t *) &( chunk_data[ chunk_data_size ] ) ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to revert CRC value.\n",
-				 function );
+			chunk_data_crc = &( chunk_data[ chunk_data_size ] );
 
-				return( -1 );
-			}
+			endian_little_revert_32bit(
+			 chunk_data_crc,
+			 *chunk_crc );
+
 			data_write_size += sizeof( ewf_crc_t );
 		}
 		else

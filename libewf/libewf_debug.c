@@ -152,7 +152,7 @@ void libewf_debug_header_print(
 		return;
 	}
 	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * size );
+	                                 sizeof( character_t ) * ( size + 1 ) );
 
 	if( header_string == NULL )
 	{
@@ -174,6 +174,8 @@ void libewf_debug_header_print(
 
 		return;
 	}
+	header_string[ size ] = (character_t) '\0';
+
 	notify_printf( "%" PRIs "",
 	 header_string );
 

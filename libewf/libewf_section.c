@@ -40,7 +40,6 @@
 
 #include "libewf_compression.h"
 #include "libewf_debug.h"
-#include "libewf_endian.h"
 #include "libewf_header_values.h"
 #include "libewf_section.h"
 
@@ -202,38 +201,28 @@ ssize_t libewf_section_start_write(
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_64bit(
-	     section_size,
-	     section.size ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert size value.\n",
-		 function );
+	endian_little_revert_64bit(
+	 section.size,
+	 section_size );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_64bit(
-	     section_offset,
-	     section.next ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert next offset value.\n",
-		 function );
+	endian_little_revert_64bit(
+	 section.next,
+	 section_offset );
 
-		return( -1 );
-	}
 	calculated_crc = ewf_crc_calculate(
 	                  &section,
 	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     section.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 section.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	notify_verbose_printf( "%s: writing section start of type: %s with size: %" PRIu64 ", with CRC: %" PRIu32 ".\n",
+	 function, (char *) section_type, section_size, calculated_crc );
+#endif
+
 	write_count = libewf_segment_file_handle_write(
 	               segment_file_handle,
 	               &section,
@@ -993,54 +982,22 @@ ssize_t libewf_section_volume_s01_write(
 	}
 	volume->unknown1[ 0 ] = 1;
 
-	if( libewf_endian_revert_32bit(
-	     media_values->amount_of_chunks,
-	     volume->amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of chunks value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 volume->amount_of_chunks,
+	 media_values->amount_of_chunks );
 
-		memory_free(
-		 volume );
+	endian_little_revert_32bit(
+	 volume->sectors_per_chunk,
+	 media_values->sectors_per_chunk );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     media_values->sectors_per_chunk,
-	     volume->sectors_per_chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert sectors per chunk value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 volume->bytes_per_sector,
+	 media_values->bytes_per_sector );
 
-		memory_free(
-		 volume );
+	endian_little_revert_32bit(
+	 volume->amount_of_sectors,
+	 media_values->amount_of_sectors );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     media_values->bytes_per_sector,
-	     volume->bytes_per_sector ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert bytes per sector value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     media_values->amount_of_sectors,
-	     volume->amount_of_sectors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of sectors value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 	if( format == LIBEWF_FORMAT_SMART )
 	{
 		volume->signature[ 0 ] = (uint8_t) 'S';
@@ -1054,18 +1011,10 @@ ssize_t libewf_section_volume_s01_write(
 	                  ( sizeof( ewf_volume_smart_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     volume->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 volume->crc,
+	 calculated_crc );
 
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
@@ -1349,54 +1298,22 @@ ssize_t libewf_section_volume_e01_write(
 	}
 	volume->media_flags = media_values->media_flags;
 
-	if( libewf_endian_revert_32bit(
-	     media_values->amount_of_chunks,
-	     volume->amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of chunks value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 volume->amount_of_chunks,
+	 media_values->amount_of_chunks );
 
-		memory_free(
-		 volume );
+	endian_little_revert_32bit(
+	 volume->sectors_per_chunk,
+	 media_values->sectors_per_chunk );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     media_values->sectors_per_chunk,
-	     volume->sectors_per_chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert sectors per chunk value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 volume->bytes_per_sector,
+	 media_values->bytes_per_sector );
 
-		memory_free(
-		 volume );
+	endian_little_revert_32bit(
+	 volume->amount_of_sectors,
+	 media_values->amount_of_sectors );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     media_values->bytes_per_sector,
-	     volume->bytes_per_sector ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert bytes per sector value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     media_values->amount_of_sectors,
-	     volume->amount_of_sectors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of sectors value.\n",
-		 function );
-
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 	if( ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 )
 	 || ( format == LIBEWF_FORMAT_LINEN5 )
@@ -1418,36 +1335,19 @@ ssize_t libewf_section_volume_e01_write(
 
 			return( -1 );
 		}
-		if( libewf_endian_revert_32bit(
-		     media_values->error_granularity,
-		     volume->error_granularity ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert error granularity value.\n",
-			 function );
-
-			memory_free(
-			 volume );
-
-			return( -1 );
-		}
+		endian_little_revert_32bit(
+		 volume->error_granularity,
+		 media_values->error_granularity );
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  volume,
 	                  ( sizeof( ewf_volume_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     volume->crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 volume->crc,
+	 calculated_crc );
 
-		memory_free(
-		 volume );
-
-		return( -1 );
-	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: volume has %" PRIu32 " chunks of %" PRIi32 " bytes (%" PRIi32 " sectors) each.\n",
 	 function, media_values->amount_of_chunks, media_values->chunk_size, media_values->sectors_per_chunk );
@@ -1971,38 +1871,23 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit(
-	     amount_of_offsets,
-	     table.amount_of_chunks ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of chunks value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 table.amount_of_chunks,
+	 amount_of_offsets );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_64bit(
-	     base_offset,
-	     table.base_offset ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert base offset value.\n",
-		 function );
+	endian_little_revert_64bit(
+	 table.base_offset,
+	 base_offset );
 
-		return( -1 );
-	}
 	calculated_crc = ewf_crc_calculate(
 	                  &table,
 	                  ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     table.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 table.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	if( write_crc != 0 )
 	{
 		calculated_crc = ewf_crc_calculate(
@@ -2053,15 +1938,10 @@ ssize_t libewf_section_table_write(
 
 	if( write_crc != 0 )
 	{
-		if( libewf_endian_revert_32bit(
-		     calculated_crc,
-		     calculated_crc_buffer ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert CRC value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 calculated_crc_buffer,
+		 calculated_crc );
 
-			return( -1 );
-		}
 		write_count = libewf_segment_file_handle_write(
 		               segment_file_handle,
 	        	       calculated_crc_buffer,
@@ -2627,29 +2507,19 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit(
-	     sessions->amount,
-	     ewf_session.amount_of_sessions ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of sessions value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 ewf_session.amount_of_sessions,
+	 sessions->amount );
 
-		return( -1 );
-	}
 	calculated_crc = ewf_crc_calculate(
 	                  &ewf_session,
 	                  ( sizeof( ewf_session_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     ewf_session.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 ewf_session.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	ewf_sessions = (ewf_session_entry_t *) memory_allocate(
 	                                        ewf_sessions_size );
 
@@ -2662,18 +2532,9 @@ ssize_t libewf_section_session_write(
 	}
 	for( iterator = 0; iterator < sessions->amount; iterator++ )
 	{
-		if( libewf_endian_revert_32bit(
-		     (uint32_t) sessions->sector[ iterator ].first_sector,
-		     ewf_sessions[ iterator ].first_sector ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert first sector value.\n",
-			 function );
-
-			memory_free(
-			 ewf_sessions );
-
-			return( -1 );
-		}
+		endian_little_revert_32bit(
+		 ewf_sessions[ iterator ].first_sector,
+		 (uint32_t) sessions->sector[ iterator ].first_sector );
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  ewf_sessions,
@@ -2730,15 +2591,10 @@ ssize_t libewf_section_session_write(
 	}
 	section_write_count += write_count;
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     calculated_crc_buffer ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 calculated_crc_buffer,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	write_count = libewf_segment_file_handle_write(
  	               segment_file_handle,
  	               calculated_crc_buffer,
@@ -3104,57 +2960,32 @@ ssize_t libewf_section_data_write(
 		}
 		( *cached_data_section )->media_flags = media_values->media_flags;
 
-		if( libewf_endian_revert_32bit(
-		     media_values->amount_of_chunks,
-		     ( *cached_data_section )->amount_of_chunks ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert amount of chunks value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 ( *cached_data_section )->amount_of_chunks,
+		 media_values->amount_of_chunks );
 
-			return( -1 );
-		}
-		if( libewf_endian_revert_32bit(
-		     media_values->sectors_per_chunk,
-		     ( *cached_data_section )->sectors_per_chunk ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert sectors per chunk value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 ( *cached_data_section )->sectors_per_chunk,
+		 media_values->sectors_per_chunk );
 
-			return( -1 );
-		}
-		if( libewf_endian_revert_32bit(
-		     media_values->bytes_per_sector,
-		     ( *cached_data_section )->bytes_per_sector ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert bytes per sector value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 ( *cached_data_section )->bytes_per_sector,
+		 media_values->bytes_per_sector );
 
-			return( -1 );
-		}
-		if( libewf_endian_revert_32bit(
-		     media_values->amount_of_sectors,
-		     ( *cached_data_section )->amount_of_sectors ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert amount of sectors value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 ( *cached_data_section )->amount_of_sectors,
+		 media_values->amount_of_sectors );
 
-			return( -1 );
-		}
 		if( ( format == LIBEWF_FORMAT_ENCASE5 )
 		 || ( format == LIBEWF_FORMAT_ENCASE6 )
 		 || ( format == LIBEWF_FORMAT_LINEN5 )
 		 || ( format == LIBEWF_FORMAT_LINEN6 )
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
-			if( libewf_endian_revert_32bit(
-			     media_values->error_granularity,
-			     ( *cached_data_section )->error_granularity ) != 1 )
-			{
-				notify_warning_printf( "%s: unable to revert error granularity value.\n",
-				 function );
+			endian_little_revert_32bit(
+			 ( *cached_data_section )->error_granularity,
+			 media_values->error_granularity );
 
-				return( -1 );
-			}
 			( *cached_data_section )->compression_level = (uint8_t) compression_level;
 
 			if( memory_copy(
@@ -3173,15 +3004,9 @@ ssize_t libewf_section_data_write(
 		                  ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ),
 		                  1 );
 
-		if( libewf_endian_revert_32bit(
-		     calculated_crc,
-		     ( *cached_data_section )->crc ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert CRC value.\n",
-			 function );
-
-			return( -1 );
-		}
+		endian_little_revert_32bit(
+		 ( *cached_data_section )->crc,
+		 calculated_crc );
 	}
 	section_write_count = libewf_section_start_write(
 	                       segment_file_handle,
@@ -3504,29 +3329,19 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit(
-	     acquiry_errors->amount,
-	     error2.amount_of_errors ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert amount of errors value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 error2.amount_of_errors,
+	 acquiry_errors->amount );
 
-		return( -1 );
-	}
 	calculated_crc = ewf_crc_calculate(
 	                  &error2,
 	                  ( sizeof( ewf_error2_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     error2.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 error2.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	error2_sectors = (ewf_error2_sector_t *) memory_allocate(
 	                                          sectors_size );
 
@@ -3539,30 +3354,13 @@ ssize_t libewf_section_error2_write(
 	}
 	for( iterator = 0; iterator < acquiry_errors->amount; iterator++ )
 	{
-		if( libewf_endian_revert_32bit(
-		     (uint32_t) acquiry_errors->sector[ iterator ].first_sector,
-		     error2_sectors[ iterator ].first_sector ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert first sector value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 error2_sectors[ iterator ].first_sector,
+		 (uint32_t) acquiry_errors->sector[ iterator ].first_sector );
 
-			memory_free(
-			 error2_sectors );
-
-			return( -1 );
-		}
-		if( libewf_endian_revert_32bit(
-		     acquiry_errors->sector[ iterator ].amount_of_sectors,
-		     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert amount of sectors value.\n",
-			 function );
-
-			memory_free(
-			 error2_sectors );
-
-			return( -1 );
-		}
+		endian_little_revert_32bit(
+		 error2_sectors[ iterator ].amount_of_sectors,
+		 acquiry_errors->sector[ iterator ].amount_of_sectors );
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  error2_sectors,
@@ -3619,15 +3417,10 @@ ssize_t libewf_section_error2_write(
 	}
 	section_write_count += write_count;
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     calculated_crc_buffer ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 calculated_crc_buffer,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	write_count = libewf_segment_file_handle_write(
  	               segment_file_handle,
  	               calculated_crc_buffer,
@@ -3790,15 +3583,10 @@ ssize_t libewf_section_hash_write(
 	                  ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit(
-	     calculated_crc,
-	     hash.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 hash.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	section_write_count = libewf_section_start_write(
 	                       segment_file_handle,
 	                       section_type,
@@ -3917,29 +3705,23 @@ ssize_t libewf_section_last_write(
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_64bit( section_size, section.size ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert size value.\n",
-		 function );
+	endian_little_revert_64bit(
+	 section.size,
+	 section_size );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_64bit( section_offset, section.next ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert next offset value.\n",
-		 function );
+	endian_little_revert_64bit(
+	 section.next,
+	 section_offset );
 
-		return( -1 );
-	}
-	calculated_crc = ewf_crc_calculate( &section, ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate(
+	                  &section,
+	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
 
-	if( libewf_endian_revert_32bit( calculated_crc, section.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(	
+	 section.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	section_write_count = libewf_segment_file_handle_write(
 	                       segment_file_handle,
 	                       &section,
@@ -4424,22 +4206,14 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	/* The chunk value is stored + 1 count in the file
 	 */
-	if( libewf_endian_revert_32bit(
-	     ( chunk + 1 ),
-	     delta_chunk_header.chunk ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert chunk value.\n" );
+	endian_little_revert_32bit(
+	 delta_chunk_header.chunk,
+	 ( chunk + 1 ) );
 
-		return( -1 );
-	}
-	if( libewf_endian_revert_32bit(
-	     (uint32_t) chunk_data_size,
-	     delta_chunk_header.chunk_size ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert chunk size value.\n" );
+	endian_little_revert_32bit(
+	 delta_chunk_header.chunk_size,
+	 (uint32_t) chunk_data_size );
 
-		return( -1 );
-	}
 	delta_chunk_header.padding[ 0 ] = (uint8_t) 'D';
 	delta_chunk_header.padding[ 1 ] = (uint8_t) 'E';
 	delta_chunk_header.padding[ 2 ] = (uint8_t) 'L';
@@ -4451,13 +4225,10 @@ ssize_t libewf_section_delta_chunk_write(
 	                  ( sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_crc_t ) ),
 	                  1 );
 
-	if( libewf_endian_revert_32bit( calculated_crc, delta_chunk_header.crc ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert CRC value.\n",
-		 function );
+	endian_little_revert_32bit(
+	 delta_chunk_header.crc,
+	 calculated_crc );
 
-		return( -1 );
-	}
 	section_size = sizeof( ewfx_delta_chunk_header_t ) + chunk_data_size;
 
 	section_write_count = libewf_section_start_write(
@@ -4503,13 +4274,10 @@ ssize_t libewf_section_delta_chunk_write(
 
 	if( write_crc != 0 )
 	{
-		if( libewf_endian_revert_32bit( *chunk_crc, calculated_crc_buffer ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert CRC value.\n",
-			 function );
+		endian_little_revert_32bit(
+		  calculated_crc_buffer,
+		 *chunk_crc );
 
-			return( -1 );
-		}
 		write_count = libewf_segment_file_handle_write(
 			       segment_file_handle,
 			       calculated_crc_buffer,

@@ -24,7 +24,6 @@ libewf_la_SOURCES = \
 	libewf_chunk_offset.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_debug.c libewf_debug.h \
-	libewf_endian.c libewf_endian.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \
 	libewf_hash_sections.c libewf_hash_sections.h \

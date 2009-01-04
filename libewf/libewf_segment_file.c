@@ -40,7 +40,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_endian.h"
 #include "libewf_hash_values.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"
@@ -675,15 +674,10 @@ ssize_t libewf_segment_file_write_start(
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_16bit(
-	     segment_number,
-	     file_header.fields_segment ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to revert segment number.\n",
-		 function );
+	endian_little_revert_16bit(
+	 file_header.fields_segment,
+	 segment_number );
 
-		return( -1 );
-	}
 	file_header.fields_start    = 1;
 	file_header.fields_end[ 0 ] = 0;
 	file_header.fields_end[ 1 ] = 0;
@@ -1014,15 +1008,10 @@ ssize_t libewf_segment_file_write_chunks_data(
 	 */
 	if( write_crc != 0 )
 	{
-		if( libewf_endian_revert_32bit(
-		     *chunk_crc,
-		     calculated_crc_buffer ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert CRC value.\n",
-			 function );
+		endian_little_revert_32bit(
+		 calculated_crc_buffer,
+		 *chunk_crc );
 
-			return( -1 );
-		}
 		write_count = libewf_segment_file_handle_write(
 		               segment_file_handle,
 		               calculated_crc_buffer,

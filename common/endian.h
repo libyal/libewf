@@ -82,6 +82,46 @@ extern "C" {
 	      | ( (uint64_t) ( bytes[ 1 ] ) << 8 ) \
 	      | (uint64_t) ( bytes[ 0 ] )
 
+#define endian_big_revert_16bit( bytes, value ) \
+	bytes[ 0 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \
+	bytes[ 1 ] = (uint8_t) ( value & 0x0ff )
+
+#define endian_big_revert_32bit( bytes, value ) \
+	bytes[ 0 ] = (uint8_t) ( ( value >> 24 ) & 0x0ff ); \
+	bytes[ 1 ] = (uint8_t) ( ( value >> 16 ) & 0x0ff ); \
+	bytes[ 2 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \
+	bytes[ 3 ] = (uint8_t) ( value & 0x0ff )
+
+#define endian_big_revert_64bit( bytes, value ) \
+	bytes[ 0 ] = (uint8_t) ( ( value >> 56 ) & 0x0ff ); \
+	bytes[ 1 ] = (uint8_t) ( ( value >> 48 ) & 0x0ff ); \
+	bytes[ 2 ] = (uint8_t) ( ( value >> 40 ) & 0x0ff ); \
+	bytes[ 3 ] = (uint8_t) ( ( value >> 32 ) & 0x0ff ); \
+	bytes[ 4 ] = (uint8_t) ( ( value >> 24 ) & 0x0ff ); \
+	bytes[ 5 ] = (uint8_t) ( ( value >> 16 ) & 0x0ff ); \
+	bytes[ 6 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \
+	bytes[ 7 ] = (uint8_t) ( value & 0x0ff )
+
+#define endian_little_revert_16bit( bytes, value ) \
+	bytes[ 1 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \
+	bytes[ 0 ] = (uint8_t) ( value & 0x0ff )
+
+#define endian_little_revert_32bit( bytes, value ) \
+	bytes[ 3 ] = (uint8_t) ( ( value >> 24 ) & 0x0ff ); \
+	bytes[ 2 ] = (uint8_t) ( ( value >> 16 ) & 0x0ff ); \
+	bytes[ 1 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \
+	bytes[ 0 ] = (uint8_t) ( value & 0x0ff )
+
+#define endian_little_revert_64bit( bytes, value ) \
+	bytes[ 7 ] = (uint8_t) ( ( value >> 56 ) & 0x0ff ); \
+	bytes[ 6 ] = (uint8_t) ( ( value >> 48 ) & 0x0ff ); \
+	bytes[ 5 ] = (uint8_t) ( ( value >> 40 ) & 0x0ff ); \
+	bytes[ 4 ] = (uint8_t) ( ( value >> 32 ) & 0x0ff ); \
+	bytes[ 3 ] = (uint8_t) ( ( value >> 24 ) & 0x0ff ); \
+	bytes[ 2 ] = (uint8_t) ( ( value >> 16 ) & 0x0ff ); \
+	bytes[ 1 ] = (uint8_t) ( ( value >> 8 ) & 0x0ff ); \
+	bytes[ 0 ] = (uint8_t) ( value & 0x0ff )
+
 #if defined( __cplusplus )
 }
 #endif

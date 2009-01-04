@@ -39,7 +39,6 @@
 
 #include <libewf/definitions.h>
 
-#include "libewf_endian.h"
 #include "libewf_offset_table.h"
 
 #include "ewf_definitions.h"
@@ -455,15 +454,9 @@ int libewf_offset_table_fill_offsets(
 		{
 			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
-		if( libewf_endian_revert_32bit(
-		     offset32_value,
-		     (uint8_t *) offsets[ iterator ].offset ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to revert start offset.\n",
-			 function );
-
-			return( -1 );
-		}
+		endian_little_revert_32bit(
+		 offsets[ iterator ].offset,
+		 offset32_value );
 	}
 	return( 1 );
 }
