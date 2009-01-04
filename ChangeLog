@@ -122,9 +122,7 @@ TODO
 * remove internal_handle passing from most functions
   only pass the necessary values
 * segment table should only be updated by functions in segment file/table
-
 * rewrite ewfglob marcros to function macros (including arguments)
-
 * what about header values parsing with preservation of timestamps?
 
 * change int8_t return values into int return values
@@ -153,6 +151,7 @@ Version: 20070912
 * removed libewf_write_chunk, libewf_internal_handle_read_is_initialized
   and libewf_internal_handle_write_is_initialized
 * fixed write finalize after R or RW open
+* clean up of small to do's
 
 Version: 20070910
 * worked to allow to set the delta file path
