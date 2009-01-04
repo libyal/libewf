@@ -99,6 +99,12 @@ Next release:
 * use off_t for size values instead of uint64_t
 * check printf %jd and %zu for Cygwin
 
+* refactor function names into static char *
+
+Version: 20070710
+* worked on function name refactoring
+* removed type from configure.ac
+
 Version: 20070708
 * worked on space in directory issue
 * added DLL support to configure.ac

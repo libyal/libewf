@@ -16,7 +16,7 @@ AC_DEFUN([LIBEWF_FUNC_CTIME_R],
 	[AC_CHECK_FUNC([ctime_r],
 		[AC_DEFINE( [HAVE_CTIME_R], [1], [Define to 1 if you have the ctime_r function.] )
 		AC_LANG_PUSH(C)
-		AC_MSG_CHECKING([if ctime_r is defined according to the POSIX definion])
+		AC_MSG_CHECKING([if ctime_r is defined according to the POSIX definition])
 		AC_LINK_IFELSE(
 			AC_LANG_PROGRAM( [[#include <time.h>]], [[ctime_r(NULL,NULL,0)]] ),
 			[AC_MSG_RESULT([ctime_r with additional size argument detected])

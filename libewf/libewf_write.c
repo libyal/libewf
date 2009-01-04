@@ -67,6 +67,7 @@
  */
 uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number )
 {
+	static libewf_char_t *function      = _S_LIBEWF_CHAR( "libewf_write_calculate_chunks_per_segment" );
 	int32_t available_segment_file_size = 0;
 	int32_t maximum_chunks_per_segment  = 0;
 	int32_t chunks_per_segment          = 0;
@@ -75,31 +76,36 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_segment: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid handle.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_segment: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_segment: invalid handle - missing subhandle write.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid handle - missing subhandle write.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->write->segment_file_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_segment: invalid segment file size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid segment file size only values below 2^32 are supported.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->segment_table->file_offset[ segment_number ] > (off_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_segment: invalid segment file offset only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid segment file offset only values below 2^32 are supported.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -111,7 +117,8 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
 	}
 	/* Calculate the available segment file size
 	 */
-	available_segment_file_size = (int32_t) internal_handle->write->segment_file_size - (int32_t) internal_handle->segment_table->file_offset[ segment_number ];
+	available_segment_file_size = (int32_t) internal_handle->write->segment_file_size
+	                            - (int32_t) internal_handle->segment_table->file_offset[ segment_number ];
 
 	/* Leave space for the done or next section
 	 */
@@ -123,17 +130,20 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
 	{
 		/* The EWF-S01 format uses compression this will add 16 bytes on average
 		 */
-		maximum_chunks_per_segment = available_segment_file_size / ( internal_handle->media->chunk_size + 16 );
+		maximum_chunks_per_segment = available_segment_file_size
+		                           / ( internal_handle->media->chunk_size + 16 );
 	}
 	else
 	{
-		maximum_chunks_per_segment = available_segment_file_size / ( internal_handle->media->chunk_size + EWF_CRC_SIZE );
+		maximum_chunks_per_segment = available_segment_file_size
+		                           / ( internal_handle->media->chunk_size + EWF_CRC_SIZE );
 	}
 	/* Determine the amount of required chunk sections
 	 */
 	if( internal_handle->write->unrestrict_offset_amount == 0 )
 	{
-		required_chunk_sections = maximum_chunks_per_segment % EWF_MAXIMUM_OFFSETS_IN_TABLE;
+		required_chunk_sections = maximum_chunks_per_segment
+		                        % EWF_MAXIMUM_OFFSETS_IN_TABLE;
 	}
 	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	{
@@ -171,11 +181,13 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
 	{
 		/* The EWF-S01 format uses compression this will add 16 bytes on average
 		 */
-		chunks_per_segment = available_segment_file_size / ( internal_handle->media->chunk_size + 16 );
+		chunks_per_segment = available_segment_file_size
+		                   / ( internal_handle->media->chunk_size + 16 );
 	}
 	else
 	{
-		chunks_per_segment = available_segment_file_size / ( internal_handle->media->chunk_size + EWF_CRC_SIZE );
+		chunks_per_segment = available_segment_file_size
+		                   / ( internal_handle->media->chunk_size + EWF_CRC_SIZE );
 	}
 	/* If the input size is known
 	 */
@@ -183,7 +195,8 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
 	{
 		/* Calculate the amount of chunks that will remain
 		 */
-		remaining_amount_of_chunks = (int32_t) internal_handle->media->amount_of_chunks - (int32_t) internal_handle->write->amount_of_chunks;
+		remaining_amount_of_chunks = (int32_t) internal_handle->media->amount_of_chunks
+		                           - (int32_t) internal_handle->write->amount_of_chunks;
 
 		/* Check if the less chunks remain than the amount of chunks calculated
 		 */
@@ -206,41 +219,48 @@ uint32_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *inte
  */
 uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
+	static libewf_char_t *function     = _S_LIBEWF_CHAR( "libewf_write_calculate_chunks_per_chunks_section" );
 	int32_t remaining_amount_of_chunks = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_chunks_section: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid handle.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_chunks_section: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->write == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_chunks_section: invalid handle - missing subhandle write.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid handle - missing subhandle write.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->write->chunks_per_segment > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_chunks_section: invalid chunks per segment only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid chunks per segment only values below 2^32 are supported.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->write->segment_file_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_chunks_section: invalid segment file size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": invalid segment file size only values below 2^32 are supported.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( internal_handle->write->chunks_section_number == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_write_calculate_chunks_per_chunks_section: unsupported section number: %" PRIu8 ".\n", internal_handle->write->chunks_section_number );
+		LIBEWF_WARNING_PRINT( "%" PRIs_EWF ": unsupported section number: %" PRIu8 ".\n",
+		 function, internal_handle->write->chunks_section_number );
 
 		return( 0 );
 	}
