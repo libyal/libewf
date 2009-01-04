@@ -1,5 +1,5 @@
 /*
- * libewf file handling
+ * libewf support functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,50 +31,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_FILE_H )
-#define _LIBEWF_FILE_H
-
 #include <common.h>
 #include <character_string.h>
-#include <system_string.h>
+#include <notify.h>
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf/extern.h
+#include <libewf/definitions.h>
+
+#include "libewf_internal_handle.h"
+#include "libewf_support.h"
+
+/* Returns the library version
  */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
-#endif
-
-#include <libewf/extern.h>
-#include <libewf/handle.h>
-
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-LIBEWF_EXTERN int libewf_check_file_signature(
-                   const system_character_t *filename );
-
-LIBEWF_EXTERN int libewf_glob(
-                   const system_character_t *filename,
-                   size_t length,
-                   uint8_t format,
-                   system_character_t **filenames[] );
-
-LIBEWF_EXTERN libewf_handle_t *libewf_open(
-                              system_character_t * const filenames[],
-                              uint16_t amount_of_files,
-                              uint8_t flags );
-
-LIBEWF_EXTERN int libewf_close(
-                   libewf_handle_t *handle );
-
-LIBEWF_EXTERN off64_t libewf_seek_offset(
-                       libewf_handle_t *handle, off64_t offset );
-
-#if defined( __cplusplus )
+const character_t *libewf_get_version(
+                    void )
+{
+	return( (const character_t *) LIBEWF_VERSION_STRING );
 }
-#endif
 
-#endif
+/* Signals the libewf handle to abort its current activity
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_signal_abort(
+     libewf_handle_t *handle )
+{
+	static char *function = "libewf_signal_abort";
+
+	if( handle == NULL )
+	{
+		notify_warning_printf( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	( (libewf_internal_handle_t *) handle )->abort = 1;
+
+	return( 1 );
+}
+
+/* Set the notify values
+ */
+void libewf_set_notify_values(
+      FILE *stream,
+      uint8_t verbose )
+{
+	libewf_notify_set_values(
+	 stream,
+	 verbose );
+}
 

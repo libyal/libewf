@@ -1,5 +1,5 @@
 /*
- * libewf file handling
+ * libewf support functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,12 +31,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_FILE_H )
-#define _LIBEWF_FILE_H
+#if !defined( _LIBEWF_SUPPORT_H )
+#define _LIBEWF_SUPPORT_H
 
 #include <common.h>
 #include <character_string.h>
-#include <system_string.h>
+
+#include <stdio.h>
 
 /* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
  * before including libewf/extern.h
@@ -47,30 +48,21 @@
 
 #include <libewf/extern.h>
 #include <libewf/handle.h>
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-LIBEWF_EXTERN int libewf_check_file_signature(
-                   const system_character_t *filename );
+LIBEWF_EXTERN const character_t *libewf_get_version(
+                     void );
 
-LIBEWF_EXTERN int libewf_glob(
-                   const system_character_t *filename,
-                   size_t length,
-                   uint8_t format,
-                   system_character_t **filenames[] );
-
-LIBEWF_EXTERN libewf_handle_t *libewf_open(
-                              system_character_t * const filenames[],
-                              uint16_t amount_of_files,
-                              uint8_t flags );
-
-LIBEWF_EXTERN int libewf_close(
+LIBEWF_EXTERN int libewf_signal_abort(
                    libewf_handle_t *handle );
 
-LIBEWF_EXTERN off64_t libewf_seek_offset(
-                       libewf_handle_t *handle, off64_t offset );
+LIBEWF_EXTERN void libewf_set_notify_values(
+                    FILE *stream,
+                    uint8_t verbose );
 
 #if defined( __cplusplus )
 }

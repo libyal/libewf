@@ -30,6 +30,7 @@ libewf_la_SOURCES = \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_sections.c libewf_header_sections.h \
 	libewf_header_values.c libewf_header_values.h \
+	libewf_interface.c libewf_interface.h \
 	libewf_internal_handle.c libewf_internal_handle.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_offset_table.c libewf_offset_table.h \
@@ -41,6 +42,7 @@ libewf_la_SOURCES = \
 	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \
+	libewf_support.c libewf_support.h \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 

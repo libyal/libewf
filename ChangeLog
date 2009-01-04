@@ -155,6 +155,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080323
+* Moved functions in libewf_file to libewf_interface and libewf_support
+
 Version: 20080322
 * implemented endian conversion macros
 * fixed minor issue in libewf_debug_header_print

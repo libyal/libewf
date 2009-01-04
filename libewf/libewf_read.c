@@ -42,6 +42,7 @@
 #include "libewf_compression.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
+#include "libewf_interface.h"
 #include "libewf_read.h"
 #include "libewf_segment_file_handle.h"
 
