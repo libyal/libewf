@@ -182,10 +182,10 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 	return( segment_table );
 }
 
-/* Reallocates memory for the segment table 
- * Returns a pointer to the instance, NULL on error
+/* Reallocates memory for the segment table values
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount )
+int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_segment_table_realloc";
@@ -196,7 +196,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	reallocation = libewf_common_realloc_new_cleared(
 	                segment_table->filename,
@@ -209,7 +209,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic filename array.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	segment_table->filename = (wchar_t **) reallocation;
@@ -227,7 +227,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file descriptor array.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	segment_table->file_descriptor = (int *) reallocation;
 	reallocation                   = libewf_common_realloc_new_cleared(
@@ -241,7 +241,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic file offset array.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	segment_table->file_offset = (off_t *) reallocation;
 	reallocation               = libewf_common_realloc_new_cleared(
@@ -255,7 +255,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic amount of chunks array.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	segment_table->amount_of_chunks = (uint32_t *) reallocation;
 	reallocation                    = libewf_common_realloc_new_cleared(
@@ -269,7 +269,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic section list array.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	segment_table->section_list = (LIBEWF_SECTION_LIST **) reallocation;
 
@@ -284,7 +284,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 				LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
 				 function );
 
-				return( NULL );
+				return( -1 );
 			}
 			segment_table->section_list[ iterator ]->first = NULL;
 			segment_table->section_list[ iterator ]->last  = NULL;
@@ -297,7 +297,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segmen
 	}
 	segment_table->amount = amount;
 
-	return( segment_table );
+	return( 1 );
 }
 
 /* Frees memory of a file list struct including elements

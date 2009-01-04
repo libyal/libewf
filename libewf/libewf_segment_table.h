@@ -91,7 +91,7 @@ struct libewf_segment_table
 };
 
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
+int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
 void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )

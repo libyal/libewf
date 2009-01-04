@@ -1539,12 +1539,20 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	 */
 	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
 	{
-		/* Write the chunk to a delta segment file
+		/* Write the chunk to the last delta segment file
 		 */
-		segment_number = internal_handle->delta_segment_table->amount;
+		segment_number = ( internal_handle->delta_segment_table->amount - 1 );
 
-		if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
-		    + chunk_data_size + EWF_CRC_SIZE ) > internal_handle->write->segment_file_size )
+		/* Check if a new delta segment file should be created
+		 */
+		if( internal_handle->delta_segment_table->file_descriptor[ segment_number ] != -1 )
+		{
+			segment_number++;
+		}
+		/* Check if chunk fits in exisiting delta segment file
+		 */
+		else if( ( internal_handle->delta_segment_table->file_offset[ segment_number ]
+		            + chunk_data_size + EWF_CRC_SIZE ) > internal_handle->write->segment_file_size )
 		{
 		}
 
