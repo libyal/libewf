@@ -43,6 +43,9 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+typedef wchar_t libewf_filename_t;
+
 #define LIBEWF_FILENAME		wchar_t
 #define LIBEWF_FILENAME_SIZE	sizeof( wchar_t )
 #define PRIs_EWF_filename	"ls"
@@ -57,6 +60,9 @@ extern "C" {
 	libewf_common_wide_open( filename, flags )
 
 #else
+
+typedef char libewf_filename_t;
+
 #define LIBEWF_FILENAME		char
 #define LIBEWF_FILENAME_SIZE	sizeof( char )
 #define PRIs_EWF_filename	"s"
@@ -73,14 +79,35 @@ extern "C" {
 #endif
 
 #ifdef REFACTOR
-int libewf_filename_get( LIBEWF_FILENAME *internal_filename, LIBEWF_FILENAME *external_filename, size_t length_external_filename );
+int libewf_filename_get(
+     libewf_filename_t *internal_filename,
+     libewf_filename_t *external_filename,
+     size_t length_external_filename );
 
-int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILENAME *external_filename, size_t length_external_filename );
+int libewf_filename_set(
+     libewf_filename_t **internal_filename,
+     const libewf_filename_t *external_filename,
+     size_t length_external_filename );
 #endif
 
-int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format );
+int libewf_filename_set_extension(
+     libewf_filename_t *extension,
+     uint16_t segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format );
 
-int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename, LIBEWF_FILENAME *basename, size_t length_basename, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format );
+int libewf_filename_create(
+     libewf_filename_t **filename,
+     size_t *length_filename,
+     libewf_filename_t *basename,
+     size_t length_basename,
+     uint16_t segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format );
 
 
 #if defined( __cplusplus )

@@ -979,6 +979,7 @@ libewf_char_t *libewf_string_ctime( const time_t *timestamp )
 
                 return( NULL );
         }
+	libewf_common_free( narrow_ctime_string );
 #endif
 	return( ctime_string );
 }

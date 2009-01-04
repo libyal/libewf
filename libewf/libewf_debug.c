@@ -49,9 +49,9 @@
  */
 void libewf_debug_dump_data( uint8_t *data, size_t size )
 {
-	static char *function  = "libewf_debug_dump_data";
-	EWF_CRC stored_crc     = 0;
-	EWF_CRC calculated_crc = 0;
+	static char *function    = "libewf_debug_dump_data";
+	ewf_crc_t stored_crc     = 0;
+	ewf_crc_t calculated_crc = 0;
 
 	if( size > (size_t) SSIZE_MAX )
 	{
@@ -60,11 +60,11 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 		return;
 	}
-	calculated_crc = ewf_crc_calculate( data, ( size - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( data, ( size - sizeof( ewf_crc_t ) ), 1 );
 
 	libewf_dump_data( data, size );
 
-	if( libewf_common_memcpy( &stored_crc, &data[ size - EWF_CRC_SIZE ], EWF_CRC_SIZE ) == NULL )
+	if( libewf_common_memcpy( &stored_crc, &data[ size - sizeof( ewf_crc_t ) ], sizeof( ewf_crc_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set CRC.\n",
 		 function );
@@ -80,11 +80,11 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
  */
 void libewf_debug_section_fprint( FILE *stream, ewf_section_t *section )
 {
-	static char *function  = "libewf_debug_section_fprint";
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
-	uint64_t next          = 0;
-	uint64_t size          = 0;
+	static char *function    = "libewf_debug_section_fprint";
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
+	uint64_t next            = 0;
+	uint64_t size            = 0;
 
 	if( stream == NULL )
 	{

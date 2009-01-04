@@ -45,12 +45,13 @@
 /* Allocates memory for a new offset table struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
+libewf_offset_table_t *libewf_offset_table_alloc( uint32_t amount )
 {
-	LIBEWF_OFFSET_TABLE *offset_table = NULL;
-	static char *function             = "libewf_offset_table_alloc";
+	libewf_offset_table_t *offset_table = NULL;
+	static char *function               = "libewf_offset_table_alloc";
 
-	offset_table = (LIBEWF_OFFSET_TABLE *) libewf_common_alloc( LIBEWF_OFFSET_TABLE_SIZE );
+	offset_table = (libewf_offset_table_t *) libewf_common_alloc(
+	                                          sizeof( libewf_offset_table_t ) );
 
 	if( offset_table == NULL )
 	{
@@ -97,7 +98,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 /* Reallocates memory for the dynamic file descriptor, offset and size array
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount )
+int libewf_offset_table_realloc( libewf_offset_table_t *offset_table, uint32_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_offset_table_realloc";
@@ -146,7 +147,7 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 
 /* Frees memory of a offset table struct including elements
  */
-void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
+void libewf_offset_table_free( libewf_offset_table_t *offset_table )
 {
 	static char *function = "libewf_offset_table_free";
 
@@ -169,7 +170,7 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 /* Fills the offset table
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t error_tollerance )
+int libewf_offset_table_fill( libewf_offset_table_t *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, libewf_segment_file_handle_t *segment_file_handle, uint8_t error_tollerance )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *chunk_type        = NULL;
@@ -375,12 +376,12 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 /* Calculate the last offset
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance )
+int libewf_offset_table_calculate_last_offset( libewf_offset_table_t *offset_table, libewf_section_list_t *section_list, uint8_t error_tollerance )
 {
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
-	static char *function                         = "libewf_offset_table_calculate_last_offset";
-	off64_t last_offset                           = 0;
-	off64_t chunk_size                            = 0;
+	libewf_section_list_entry_t *section_list_entry = NULL;
+	static char *function                           = "libewf_offset_table_calculate_last_offset";
+	off64_t last_offset                             = 0;
+	off64_t chunk_size                              = 0;
 
 	if( offset_table == NULL )
 	{
@@ -462,7 +463,7 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 /* Compare the offsets in tablel and table2 sections
  * Returns 1 if tables match, 0 if table differ, or -1 on error
  */
-int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 )
+int libewf_offset_table_compare( libewf_offset_table_t *offset_table1, libewf_offset_table_t *offset_table2 )
 {
 	static char *function = "libewf_offset_table_compare";
 	uint64_t iterator     = 0;
@@ -522,7 +523,7 @@ int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFS
 /* Seeks a certain chunk offset within the offset table
  * Returns the chunk segment file offset if the seek is successful, or -1 on error
  */
-off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk )
+off64_t libewf_offset_table_seek_chunk_offset( libewf_offset_table_t *offset_table, uint32_t chunk )
 {
 	static char *function = "libewf_segment_table_seek_chunk_offset";
 

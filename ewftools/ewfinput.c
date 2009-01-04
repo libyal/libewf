@@ -530,8 +530,31 @@ libewf_char_t *ewfinput_get_variable( FILE *stream, libewf_char_t *request_strin
 			{
 				return( NULL );
 			}
+#if defined( MEMWATCH )
 			/* One additional character required for end of string
 			 */
+			user_input = libewf_common_alloc( sizeof( libewf_char_t ) * ( input_length + 1 ) );
+
+			if( user_input == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				 function );
+
+				return( NULL );
+			}
+			if( libewf_string_copy( user_input, user_input_buffer_ptr, input_length ) == NULL  )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
+				 function );
+
+				libewf_common_free( user_input );
+
+				return( NULL );
+			}
+			/* Make sure the string is \0 terminated
+			 */
+			user_input[ input_length ] = (libewf_char_t) '\0';
+#else
 			user_input = libewf_string_duplicate( user_input_buffer_ptr, input_length );
 
 			if( user_input == NULL )
@@ -541,6 +564,7 @@ libewf_char_t *ewfinput_get_variable( FILE *stream, libewf_char_t *request_strin
 
 				return( NULL );
 			}
+#endif
 			break;
 		}
 		else
@@ -569,23 +593,39 @@ CHAR_T *ewfinput_get_variable_char_t( FILE *stream, libewf_char_t *request_strin
 	}
 	if( sizeof( CHAR_T ) < sizeof( libewf_char_t ) )
 	{
-		user_input_length = libewf_string_length( user_input );
-		user_input_char_t = libewf_common_alloc( ( user_input_length + 1 ) * sizeof( CHAR_T ) );
+		user_input_length = libewf_string_length(
+		                     user_input );
+
+		user_input_char_t = libewf_common_alloc(
+		                     ( user_input_length + 1 ) * sizeof( CHAR_T ) );
 
 		if( user_input_char_t == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create conversion string.\n",
 			 function );
 
+			libewf_common_free(
+			 user_input );
+
 			return( NULL );
 		}
-		if( ewfstring_copy_libewf_char_to_char_t( user_input, user_input_char_t, ( user_input_length + 1 ) ) != 1 )
+		if( ewfstring_copy_libewf_char_to_char_t(
+		     user_input,
+		     user_input_char_t,
+		     ( user_input_length + 1 ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set conversion string.\n",
 			 function );
 
+			libewf_common_free(
+			 user_input );
+			libewf_common_free(
+			 user_input_char_t );
+
 			return( NULL );
 		}
+		libewf_common_free( user_input );
+
 		return( user_input_char_t );
 	}
 	LIBEWF_WARNING_PRINT( "%s: character conversion unsupported.\n",
@@ -752,8 +792,31 @@ libewf_char_t *ewfinput_get_fixed_value( FILE *stream, libewf_char_t *request_st
 		{
 			value_length = libewf_string_length( values[ iterator ] );
 
+#if defined( MEMWATCH )
 			/* One additional character required for end of string
 			 */
+			user_input = libewf_common_alloc( sizeof( libewf_char_t ) * ( value_length + 1 ) );
+
+			if( user_input == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				 function );
+
+				return( NULL );
+			}
+			if( libewf_string_copy( user_input, values[ iterator ], value_length ) == NULL  )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
+				 function );
+
+				libewf_common_free( user_input );
+
+				return( NULL );
+			}
+			/* Make sure the string is \0 terminated
+			 */
+			user_input[ input_length ] = (libewf_char_t) '\0';
+#else
 			user_input = libewf_string_duplicate( values[ iterator ], value_length );
 
 			if( user_input == NULL )
@@ -763,6 +826,7 @@ libewf_char_t *ewfinput_get_fixed_value( FILE *stream, libewf_char_t *request_st
 
 				return( NULL );
 			}
+#endif
 			break;
 		}
 		else

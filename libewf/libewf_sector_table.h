@@ -52,7 +52,7 @@ struct libewf_sector_table
 
 	/* A dynamic array containting references to error sectors
 	 */
-	LIBEWF_ERROR_SECTOR *error_sector;
+	libewf_error_sector_t *error_sector;
 };
 
 libewf_sector_table_t *libewf_sector_table_alloc( uint32_t amount );

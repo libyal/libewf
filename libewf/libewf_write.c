@@ -68,7 +68,7 @@
 /* Calculates an estimate of the amount of chunks that fit within a segment file
  * Returns the amount of chunks that could fit in the segment file, or -1 on error
  */
-int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t segment_file_size, size64_t maximum_segment_file_size, uint32_t maximum_section_amount_of_chunks, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t ewf_format, uint8_t unrestrict_offset_amount )
+int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *internal_handle, libewf_segment_file_handle_t *segment_file_handle, size64_t segment_file_size, size64_t maximum_segment_file_size, uint32_t maximum_section_amount_of_chunks, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t ewf_format, uint8_t unrestrict_offset_amount )
 {
 	static char *function                = "libewf_write_calculate_chunks_per_segment_file";
 	size64_t available_segment_file_size = 0;
@@ -159,7 +159,7 @@ int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *
 	else
 	{
 		maximum_chunks_per_segment = available_segment_file_size
-		                           / ( media_values->chunk_size + EWF_CRC_SIZE );
+		                           / ( media_values->chunk_size + sizeof( ewf_crc_t ) );
 	}
 	/* Determine the amount of required chunk sections
 	 */
@@ -182,7 +182,7 @@ int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *
 	{
 		/* Leave space for the chunk section starts and the offset table CRC
 		 */
-		available_segment_file_size -= ( required_chunk_sections * ( EWF_SECTION_SIZE + EWF_CRC_SIZE ) );
+		available_segment_file_size -= ( required_chunk_sections * ( EWF_SECTION_SIZE + sizeof( ewf_crc_t ) ) );
 
 		/* Leave space for the table offsets
 		 */
@@ -192,7 +192,7 @@ int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *
 	{
 		/* Leave space for the chunk, table and table2 section starts and the offset table CRC
 		 */
-		available_segment_file_size -= ( required_chunk_sections * ( ( 3 * EWF_SECTION_SIZE ) + EWF_CRC_SIZE ) );
+		available_segment_file_size -= ( required_chunk_sections * ( ( 3 * EWF_SECTION_SIZE ) + sizeof( ewf_crc_t ) ) );
 
 		/* Leave space for the table and table2 offsets
 		 */
@@ -210,7 +210,7 @@ int64_t libewf_write_calculate_chunks_per_segment_file( LIBEWF_INTERNAL_HANDLE *
 	else
 	{
 		chunks_per_segment = available_segment_file_size
-		                   / ( media_values->chunk_size + EWF_CRC_SIZE );
+		                   / ( media_values->chunk_size + sizeof( ewf_crc_t ) );
 	}
 	/* If the input size is known
 	 */
@@ -413,11 +413,11 @@ int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle
 		                   * ( EWF_SECTION_SIZE
 		                     + ( internal_handle->write->section_amount_of_chunks
 		                       * EWF_TABLE_OFFSET_SIZE )
-		                     + EWF_CRC_SIZE );
+		                     + sizeof( ewf_crc_t ) );
 
 		/* Leave space for an additional chunk
 		 */
-		segment_file_size += chunk_size + EWF_CRC_SIZE;
+		segment_file_size += chunk_size + sizeof( ewf_crc_t );
 
 		/* Determine if a chunk would fit in the segment file
 		 */
@@ -543,12 +543,12 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 		                   * ( EWF_SECTION_SIZE
 		                     + ( internal_handle->write->section_amount_of_chunks
 		                       * EWF_TABLE_OFFSET_SIZE )
-		                     + EWF_CRC_SIZE );
+		                     + sizeof( ewf_crc_t ) );
 
 		/* Leave space for an additional chunk
 		 */
 		segment_file_size += internal_handle->media_values->chunk_size
-		                   + EWF_CRC_SIZE;
+		                   + sizeof( ewf_crc_t );
 
 		/* Determine if a chunk would fit in the segment file
 		 */
@@ -588,7 +588,7 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 /* Processes the chunk data, applies compression if necessary and calculates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
-ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc )
+ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, ewf_crc_t *chunk_crc, int8_t *write_crc )
 {
 	static char *function     = "libewf_write_process_chunk_data";
 	size_t data_write_size    = 0;
@@ -780,8 +780,8 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 		 */
 		if( libewf_common_memcpy(
 		     chunk_crc,
-		     &( chunk_data[ *compressed_chunk_data_size - EWF_CRC_SIZE ] ),
-		     EWF_CRC_SIZE ) == NULL )
+		     &( chunk_data[ *compressed_chunk_data_size - sizeof( ewf_crc_t ) ] ),
+		     sizeof( ewf_crc_t ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set CRC.\n",
 			 function );
@@ -806,7 +806,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 				return( -1 );
 			}
-			data_write_size += EWF_CRC_SIZE;
+			data_write_size += sizeof( ewf_crc_t );
 		}
 		else
 		{
@@ -820,7 +820,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
  * The necessary settings of the write values must have been made
  * Returns the amount of bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
+ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t write_crc )
 {
 	static char *function     = "libewf_raw_write_chunk_new";
 	ssize_t total_write_count = 0;
@@ -1206,14 +1206,14 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
  * The necessary settings of the write values must have been made
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
+ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t write_crc )
 {
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
-	static char *function                           = "libewf_raw_write_chunk_existing";
-	ssize_t total_write_count                       = 0;
-	ssize_t write_count                             = 0;
-	uint16_t segment_number                         = 0;
-	int result                                      = 0;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_raw_write_chunk_existing";
+	ssize_t total_write_count                         = 0;
+	ssize_t write_count                               = 0;
+	uint16_t segment_number                           = 0;
+	int result                                        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1356,7 +1356,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
-			if( ( segment_file_handle->file_offset + (off64_t) chunk_size + (off64_t) EWF_CRC_SIZE + (off64_t) EWF_SECTION_SIZE )
+			if( ( segment_file_handle->file_offset + (off64_t) chunk_size + (off64_t) sizeof( ewf_crc_t ) + (off64_t) EWF_SECTION_SIZE )
 			    > (off64_t) internal_handle->write->segment_file_size )
 			{
 				result = 0;
@@ -1524,7 +1524,7 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
 {
 	ewf_char_t *chunk_data            = NULL;
 	static char *function             = "libewf_write_chunk_data_new";
-	EWF_CRC chunk_crc                 = 0;
+	ewf_crc_t chunk_crc               = 0;
 	ssize_t chunk_data_size           = 0;
 	ssize_t write_count               = 0;
 	size_t write_size                 = 0;
@@ -1737,7 +1737,7 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 {
 	ewf_char_t *chunk_data = NULL;
 	static char *function  = "libewf_write_chunk_data_existing";
-	EWF_CRC chunk_crc      = 0;
+	ewf_crc_t chunk_crc    = 0;
 	ssize_t read_count     = 0;
 	ssize_t write_count    = 0;
 	size_t write_size      = 0;
@@ -1961,7 +1961,7 @@ ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, si
 	                   (ewf_char_t *) compressed_buffer,
 	                   compressed_buffer_size,
 	                   is_compressed,
-	                   (EWF_CRC *) chunk_crc,
+	                   (ewf_crc_t *) chunk_crc,
 	                   write_crc );
 
 	if( chunk_data_size <= -1 )
@@ -2062,7 +2062,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 		               size,
 		               data_size,
 		               is_compressed,
-		               (EWF_CRC) chunk_crc,
+		               (ewf_crc_t) chunk_crc,
 		               write_crc );
 	}
 	else
@@ -2074,7 +2074,7 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 		               size,
 		               data_size,
 		               is_compressed,
-		               (EWF_CRC) chunk_crc,
+		               (ewf_crc_t) chunk_crc,
 		               write_crc );
 	}
 	if( write_count <= -1 )
@@ -2160,7 +2160,7 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents multiple reallocations of the chunk cache
 	 */
-	chunk_data_size = internal_handle->media_values->chunk_size + EWF_CRC_SIZE;
+	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( ewf_crc_t );
 
 	if( buffer == internal_handle->chunk_cache->compressed )
 	{
@@ -2278,14 +2278,14 @@ ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, o
  */
 ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle         = NULL;
-	LIBEWF_SECTION_LIST_ENTRY *list_entry_iterator  = NULL;
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
-	static char *function                           = "libewf_write_finalize";
-	ssize_t write_count_finalize                    = 0;
-	ssize_t write_count                             = 0;
-	uint16_t segment_table_iterator                 = 0;
-	uint16_t segment_number                         = 0;
+	LIBEWF_INTERNAL_HANDLE *internal_handle           = NULL;
+	libewf_section_list_entry_t *list_entry_iterator  = NULL;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_write_finalize";
+	ssize_t write_count_finalize                      = 0;
+	ssize_t write_count                               = 0;
+	uint16_t segment_table_iterator                   = 0;
+	uint16_t segment_number                           = 0;
 
 	if( handle == NULL )
 	{

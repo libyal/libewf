@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_ERROR_SECTOR libewf_error_sector_t
-#define LIBEWF_ERROR_SECTOR_SIZE sizeof( LIBEWF_ERROR_SECTOR )
-
 typedef struct libewf_error_sector libewf_error_sector_t;
 
 struct libewf_error_sector

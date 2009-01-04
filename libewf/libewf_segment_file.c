@@ -106,7 +106,7 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror
  */
-ssize_t libewf_segment_file_read_file_header( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t *segment_number, uint8_t *segment_file_type )
+ssize_t libewf_segment_file_read_file_header( libewf_segment_file_handle_t *segment_file_handle, uint16_t *segment_number, uint8_t *segment_file_type )
 {
 	EWF_FILE_HEADER file_header;
 
@@ -192,7 +192,7 @@ ssize_t libewf_segment_file_read_file_header( LIBEWF_SEGMENT_FILE_HANDLE *segmen
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance  )
+int libewf_segment_file_read_sections( libewf_segment_file_handle_t *segment_file_handle, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, libewf_offset_table_t *offset_table, libewf_offset_table_t *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance  )
 {
 	EWF_SECTION section;
 
@@ -264,7 +264,7 @@ int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_
 /* Write the headers to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_headers( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format )
+ssize_t libewf_segment_file_write_headers( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format )
 {
 	static char *function     = "libewf_segment_file_write_headers";
 	ssize_t write_count       = 0;
@@ -518,7 +518,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_SEGMENT_FILE_HANDLE *segment_f
 /* Write the last section at the end of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int last_segment_file, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_last_section( libewf_segment_file_handle_t *segment_file_handle, int last_segment_file, uint8_t format, uint8_t ewf_format )
 {
 	ewf_char_t *last_section_type = NULL;
 	static char *function         = "libewf_segment_file_write_last_section";
@@ -561,7 +561,7 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE_HANDLE *segm
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_start( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
+ssize_t libewf_segment_file_write_start( libewf_segment_file_handle_t *segment_file_handle, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format, ewf_data_t **cached_data_section )
 {
 	EWF_FILE_HEADER file_header;
 
@@ -752,7 +752,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 /* Write the necessary sections before the actual data chunks to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_OFFSET_TABLE *offset_table, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_chunks_section_start( libewf_segment_file_handle_t *segment_file_handle, libewf_offset_table_t *offset_table, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount, uint8_t format, uint8_t ewf_format )
 {
 	static char *function = "libewf_segment_file_write_chunks_section_start";
 	ssize_t write_count   = 0;
@@ -816,7 +816,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_SEGMENT_FILE_HAND
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
 		section_size = segment_chunk_amount 
-		             * ( chunk_size + EWF_CRC_SIZE );
+		             * ( chunk_size + sizeof( ewf_crc_t ) );
 
 		/* Write sectors section start
 		 */
@@ -840,7 +840,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_SEGMENT_FILE_HAND
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_data( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, ewf_char_t *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc )
+ssize_t libewf_segment_file_write_chunks_data( libewf_segment_file_handle_t *segment_file_handle, libewf_offset_table_t *offset_table, uint32_t chunk, ewf_char_t *chunk_data, size_t size, int8_t is_compressed, ewf_crc_t *chunk_crc, int8_t write_crc )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 
@@ -896,7 +896,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_SEGMENT_FILE_HANDLE *segme
 	}
 	if( write_crc != 0 )
 	{
-		chunk_size += EWF_CRC_SIZE;
+		chunk_size += sizeof( ewf_crc_t );
 	}
 	/* Make sure the chunk is available in the offset table
 	 */
@@ -964,9 +964,9 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_SEGMENT_FILE_HANDLE *segme
 		write_count = libewf_segment_file_handle_write(
 		               segment_file_handle,
 		               calculated_crc_buffer,
-		               EWF_CRC_SIZE );
+		               sizeof( ewf_crc_t ) );
 
-		if( write_count != (ssize_t) EWF_CRC_SIZE )
+		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write CRC.\n",
 			 function );
@@ -982,7 +982,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_SEGMENT_FILE_HANDLE *segme
  * Also write the necessary sections after the actual data chunks to file (like table and table2 sections for EWF-E01 format)
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_OFFSET_TABLE *offset_table, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_chunks_correction( libewf_segment_file_handle_t *segment_file_handle, libewf_offset_table_t *offset_table, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks, uint8_t format, uint8_t ewf_format )
 {
 	ewf_char_t *table_section_string = NULL;
 	static char *function            = "libewf_segment_file_write_chunks_correction";
@@ -1156,7 +1156,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_SEGMENT_FILE_HANDLE 
 /* Write a delta chunk of data to a segment file and update the offset table
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc )
+ssize_t libewf_segment_file_write_delta_chunk( libewf_segment_file_handle_t *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, ewf_crc_t *chunk_crc, uint8_t write_crc )
 {
 	static char *function = "libewf_segment_file_write_delta_chunk";
 	ssize_t write_count   = 0;
@@ -1209,7 +1209,7 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE_HANDLE *segme
 /* Closes the segment file, necessary sections at the end of the segment file will be written
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
+ssize_t libewf_segment_file_write_close( libewf_segment_file_handle_t *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, ewf_data_t **cached_data_section )
 {
 	static char *function     = "libewf_segment_file_write_close";
 	ssize_t total_write_count = 0;

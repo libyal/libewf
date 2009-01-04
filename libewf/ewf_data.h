@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_DATA ewf_data_t
-#define EWF_DATA_SIZE sizeof( EWF_DATA )
-
 typedef struct ewf_data ewf_data_t;
 
 struct ewf_data

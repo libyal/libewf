@@ -85,19 +85,19 @@ struct libewf_internal_handle
 
 	/* The list of segment files
 	 */
-	LIBEWF_SEGMENT_TABLE *segment_table;
+	libewf_segment_table_t *segment_table;
 
 	/* The list of delta segment files
 	 */
-	LIBEWF_SEGMENT_TABLE *delta_segment_table;
+	libewf_segment_table_t *delta_segment_table;
 
 	/* The list of offsets within the segment files within the table sections
 	 */
-	LIBEWF_OFFSET_TABLE *offset_table;
+	libewf_offset_table_t *offset_table;
 
 	/* The list of offsets within the segment files within the table2 sections
 	 */
-	LIBEWF_OFFSET_TABLE *secondary_offset_table;
+	libewf_offset_table_t *secondary_offset_table;
 
 	/* A simple cache is implemented here to avoid having to read and decompress the
 	 * same chunk while reading the data.
@@ -177,7 +177,7 @@ struct libewf_internal_handle_write
 {
 	/* A cached version of the data section
 	 */
-	EWF_DATA *data_section;
+	ewf_data_t *data_section;
 
 	/* The amount of bytes of the input written
 	 */

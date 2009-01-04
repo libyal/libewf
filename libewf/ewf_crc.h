@@ -47,17 +47,10 @@ extern "C" {
 /* The unsigned crc type defintion
  * consists of 4 bytes (32 bits)
  */
-#define EWF_CRC ewf_crc_t
-#define EWF_CRC_SIZE sizeof( EWF_CRC )
-
 typedef uint32_t ewf_crc_t;
 
-/*
-int ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key );
-*/
-
 #define ewf_crc_calculate( buffer, size, previous_key ) \
-	(EWF_CRC) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
+	(ewf_crc_t) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
 
 #if defined( __cplusplus )
 }

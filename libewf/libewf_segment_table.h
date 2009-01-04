@@ -49,9 +49,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_SEGMENT_TABLE		libewf_segment_table_t
-#define LIBEWF_SEGMENT_TABLE_SIZE	sizeof( LIBEWF_SEGMENT_TABLE )
-
 typedef struct libewf_segment_table libewf_segment_table_t;
 
 struct libewf_segment_table
@@ -62,22 +59,66 @@ struct libewf_segment_table
 
 	/* A dynamic array containting references to segment file handles
 	 */
-	LIBEWF_SEGMENT_FILE_HANDLE **segment_file_handle;
+	libewf_segment_file_handle_t **segment_file_handle;
 };
 
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );
-int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
-void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
+libewf_segment_table_t *libewf_segment_table_alloc(
+                         uint16_t amount );
 
-int libewf_segment_table_build( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance );
+int libewf_segment_table_realloc(
+     libewf_segment_table_t *segment_table,
+     uint16_t amount );
 
-int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_SEGMENT_TABLE *delta_segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance );
+void libewf_segment_table_free(
+      libewf_segment_table_t *segment_table );
 
-int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount );
+int libewf_segment_table_build(
+     libewf_segment_table_t *segment_table,
+     LIBEWF_HEADER_SECTIONS *header_sections,
+     LIBEWF_HASH_SECTIONS *hash_sections,
+     LIBEWF_MEDIA_VALUES *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_offset_table_t *secondary_offset_table,
+     libewf_sector_table_t *acquiry_errors,
+     int8_t *compression_level,
+     uint8_t *format,
+     uint8_t *ewf_format,
+     size64_t *segment_file_size,
+     uint8_t error_tollerance );
 
-int libewf_segment_table_close_all( LIBEWF_SEGMENT_TABLE *segment_table );
+int libewf_segment_table_read_open(
+     libewf_segment_table_t *segment_table,
+     libewf_segment_table_t *delta_segment_table,
+     libewf_filename_t * const filenames[],
+     uint16_t file_amount,
+     uint8_t flags,
+     LIBEWF_HEADER_SECTIONS *header_sections,
+     LIBEWF_HASH_SECTIONS *hash_sections,
+     LIBEWF_MEDIA_VALUES *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_offset_table_t *secondary_offset_table,
+     libewf_sector_table_t *acquiry_errors,
+     int8_t *compression_level,
+     uint8_t *format,
+     uint8_t *ewf_format,
+     size64_t *segment_file_size,
+     uint8_t error_tollerance );
 
-int libewf_segment_table_create_segment_file( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format );
+int libewf_segment_table_write_open(
+     libewf_segment_table_t *segment_table,
+     libewf_filename_t * const filenames[],
+     uint16_t file_amount );
+
+int libewf_segment_table_close_all(
+     libewf_segment_table_t *segment_table );
+
+int libewf_segment_table_create_segment_file(
+     libewf_segment_table_t *segment_table,
+     uint16_t segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format );
 
 #if defined( __cplusplus )
 }

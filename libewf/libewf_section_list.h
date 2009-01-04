@@ -40,12 +40,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_SECTION_LIST_ENTRY libewf_section_list_entry_t
-#define LIBEWF_SECTION_LIST_ENTRY_SIZE sizeof( LIBEWF_SECTION_LIST_ENTRY )
-
-#define LIBEWF_SECTION_LIST libewf_section_list_t
-#define LIBEWF_SECTION_LIST_SIZE sizeof( LIBEWF_SECTION_LIST )
-
 typedef struct libewf_section_list_entry libewf_section_list_entry_t;
 typedef struct libewf_section_list libewf_section_list_t;
 
@@ -70,26 +64,26 @@ struct libewf_section_list_entry
 
 	/* The next section list entry
 	 */
-	LIBEWF_SECTION_LIST_ENTRY *next;
+	libewf_section_list_entry_t *next;
 
 	/* The previous section list entry
 	 */
-	LIBEWF_SECTION_LIST_ENTRY *previous;
+	libewf_section_list_entry_t *previous;
 };
 
 struct libewf_section_list
 {
 	/* The first entry in the list
 	 */
-	LIBEWF_SECTION_LIST_ENTRY *first;
+	libewf_section_list_entry_t *first;
 
 	/* The last entry in the list
 	 */
-	LIBEWF_SECTION_LIST_ENTRY *last;
+	libewf_section_list_entry_t *last;
 };
 
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset );
-int libewf_section_list_remove_last( LIBEWF_SECTION_LIST *section_list );
+libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset );
+int libewf_section_list_remove_last( libewf_section_list_t *section_list );
 
 #if defined( __cplusplus )
 }

@@ -46,9 +46,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_OFFSET_TABLE libewf_offset_table_t
-#define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
-
 typedef struct libewf_offset_table libewf_offset_table_t;
 
 struct libewf_offset_table
@@ -67,15 +64,15 @@ struct libewf_offset_table
 	LIBEWF_CHUNK_OFFSET *chunk_offset;
 };
 
-LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
-int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
-void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
+libewf_offset_table_t *libewf_offset_table_alloc( uint32_t amount );
+int libewf_offset_table_realloc( libewf_offset_table_t *offset_table, uint32_t amount );
+void libewf_offset_table_free( libewf_offset_table_t *offset_table );
 
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t error_tollerance );
-int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance );
-int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
+int libewf_offset_table_fill( libewf_offset_table_t *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, libewf_segment_file_handle_t *segment_file_handle, uint8_t error_tollerance );
+int libewf_offset_table_calculate_last_offset( libewf_offset_table_t *offset_table, libewf_section_list_t *section_list, uint8_t error_tollerance );
+int libewf_offset_table_compare( libewf_offset_table_t *offset_table1, libewf_offset_table_t *offset_table2 );
 
-off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk );
+off64_t libewf_offset_table_seek_chunk_offset( libewf_offset_table_t *offset_table, uint32_t chunk );
 
 #if defined( __cplusplus )
 }

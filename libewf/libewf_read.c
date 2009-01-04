@@ -51,10 +51,10 @@
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
-ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t read_crc )
+ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t read_crc )
 {
-	static char *function  = "libewf_read_process_chunk_data";
-	EWF_CRC calculated_crc = 0;
+	static char *function    = "libewf_read_process_chunk_data";
+	ewf_crc_t calculated_crc = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -81,7 +81,7 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	{
 		if( read_crc == 0 )
 		{
-			chunk_data_size -= EWF_CRC_SIZE;
+			chunk_data_size -= sizeof( ewf_crc_t );
 
 			if( libewf_endian_convert_32bit( &chunk_crc, &chunk_data[ chunk_data_size ] ) != 1 )
 			{
@@ -146,19 +146,19 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
  * 4 last bytes of the buffer, used for uncompressed chunks only
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
-ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *read_crc )
+ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, int8_t *is_compressed, ewf_crc_t *chunk_crc, int8_t *read_crc )
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
-        char *chunk_type                                = NULL;
+        char *chunk_type                                  = NULL;
 #endif
-	static char *function                           = "libewf_raw_read_chunk";
-	ssize_t chunk_read_count                        = 0;
-	ssize_t crc_read_count                          = 0;
-	size_t chunk_data_size                          = 0;
-	uint16_t segment_number                         = 0;
+	static char *function                             = "libewf_raw_read_chunk";
+	ssize_t chunk_read_count                          = 0;
+	ssize_t crc_read_count                            = 0;
+	size_t chunk_data_size                            = 0;
+	uint16_t segment_number                           = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -263,7 +263,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	{
 		if( chunk_size < chunk_data_size )
 		{
-			chunk_data_size -= EWF_CRC_SIZE;
+			chunk_data_size -= sizeof( ewf_crc_t );
 			*read_crc        = 1;
 		}
 		*is_compressed = 0;
@@ -331,9 +331,9 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 		crc_read_count = libewf_segment_file_handle_read(
 				  segment_file_handle,
 				  stored_crc_buffer,
-				  EWF_CRC_SIZE );
+				  sizeof( ewf_crc_t ) );
 
-		if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
+		if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
 			 function, chunk, segment_number, segment_file_handle->filename );
@@ -373,7 +373,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 	ewf_char_t *chunk_data     = NULL;
 	ewf_char_t *chunk_read     = NULL;
 	static char *function      = "libewf_read_chunk_data";
-	EWF_CRC chunk_crc          = 0;
+	ewf_crc_t chunk_crc        = 0;
 	off64_t sector             = 0;
 	ssize_t chunk_read_count   = 0;
 	size_t chunk_data_size     = 0;
@@ -489,7 +489,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 			 */
 			if( internal_handle->offset_table->chunk_offset[ chunk ].compressed == 0 )
 			{
-				chunk_data_size -= EWF_CRC_SIZE;
+				chunk_data_size -= sizeof( ewf_crc_t );
 			}
 		}
 		/* Determine if the chunk data should be directly read into chunk data buffer
@@ -525,7 +525,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 		if( is_compressed != 0 )
 		{
 			chunk_data_size = internal_handle->media_values->chunk_size
-			                + EWF_CRC_SIZE;
+			                + sizeof( ewf_crc_t );
 		}
 		if( libewf_read_process_chunk_data(
 		     internal_handle,
@@ -681,7 +681,7 @@ ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, siz
 	                   (ewf_char_t *) uncompressed_buffer,
 	                   uncompressed_buffer_size,
 	                   is_compressed,
-	                   (EWF_CRC) chunk_crc,
+	                   (ewf_crc_t) chunk_crc,
 	                   read_crc );
 
 	if( chunk_data_size <= -1 )
@@ -735,7 +735,7 @@ ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size
 	              buffer,
 	              size,
 	              is_compressed,
-	              (EWF_CRC *) chunk_crc,
+	              (ewf_crc_t *) chunk_crc,
 	              read_crc );
 
 	if( read_count <= -1 )
@@ -810,7 +810,7 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
 	 * this prevents some reallocations of the chunk cache
 	 */
-	chunk_data_size = internal_handle->media_values->chunk_size + EWF_CRC_SIZE;
+	chunk_data_size = internal_handle->media_values->chunk_size + sizeof( ewf_crc_t );
 
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{

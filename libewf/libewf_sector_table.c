@@ -59,8 +59,8 @@ libewf_sector_table_t *libewf_sector_table_alloc( uint32_t amount )
 
 	if( amount > 0 )
 	{
-		sector_table->error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc(
-		                              ( amount * LIBEWF_ERROR_SECTOR_SIZE ) );
+		sector_table->error_sector = (libewf_error_sector_t *) libewf_common_alloc(
+		                              ( amount * sizeof( libewf_error_sector_t ) ) );
 
 		if( sector_table->error_sector == NULL )
 		{
@@ -74,7 +74,7 @@ libewf_sector_table_t *libewf_sector_table_alloc( uint32_t amount )
 		if( libewf_common_memset(
 		     sector_table->error_sector,
 		     0, 
-		     ( amount * LIBEWF_ERROR_SECTOR_SIZE ) ) == NULL )
+		     ( amount * sizeof( libewf_error_sector_t ) ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic error sector array.\n",
 			 function );
@@ -114,7 +114,7 @@ int libewf_sector_table_realloc( libewf_sector_table_t *sector_table, uint32_t a
 	}
 	reallocation = libewf_common_realloc(
 	                sector_table->error_sector,
-	                ( amount * LIBEWF_ERROR_SECTOR_SIZE ) );
+	                ( amount * sizeof( libewf_error_sector_t ) ) );
 
 	if( reallocation == NULL )
 	{
@@ -123,12 +123,12 @@ int libewf_sector_table_realloc( libewf_sector_table_t *sector_table, uint32_t a
 
 		return( -1 );
 	}
-	sector_table->error_sector = (LIBEWF_ERROR_SECTOR *) reallocation;
+	sector_table->error_sector = (libewf_error_sector_t *) reallocation;
 
 	if( libewf_common_memset(
 	     &( sector_table->error_sector[ sector_table->amount ] ),
 	     0, 
-	     ( ( amount - sector_table->amount ) * LIBEWF_ERROR_SECTOR_SIZE ) ) == NULL )
+	     ( ( amount - sector_table->amount ) * sizeof( libewf_error_sector_t ) ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic error sector array.\n",
 		 function );
@@ -217,11 +217,11 @@ int libewf_sector_table_get_error_sector( libewf_sector_table_t *sector_table, u
  */
 int libewf_sector_table_add_error_sector( libewf_sector_table_t *sector_table, off64_t sector, uint32_t amount_of_sectors )
 {
-	LIBEWF_ERROR_SECTOR *error_sector = NULL;
-	static char *function             = "libewf_sector_table_add_error_sector";
-	off64_t last_sector               = 0;
-	off64_t last_range_sector         = 0;
-	uint32_t iterator                 = 0;
+	libewf_error_sector_t *error_sector = NULL;
+	static char *function               = "libewf_sector_table_add_error_sector";
+	off64_t last_sector                 = 0;
+	off64_t last_range_sector           = 0;
+	uint32_t iterator                   = 0;
 
 	if( sector_table == NULL )
 	{
@@ -263,9 +263,9 @@ int libewf_sector_table_add_error_sector( libewf_sector_table_t *sector_table, o
 	}
 	/* Create a new error sector
 	 */
-	error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
+	error_sector = (libewf_error_sector_t *) libewf_common_realloc(
 	                sector_table->error_sector,
-	                ( LIBEWF_ERROR_SECTOR_SIZE * ( sector_table->amount + 1 ) ) );
+	                ( sizeof( libewf_error_sector_t ) * ( sector_table->amount + 1 ) ) );
 
 	if( error_sector == NULL )
 	{

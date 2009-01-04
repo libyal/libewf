@@ -44,10 +44,10 @@
 /* Allocates memory for a segment table struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
+libewf_segment_table_t *libewf_segment_table_alloc( uint16_t amount )
 {
-	LIBEWF_SEGMENT_TABLE *segment_table = NULL;
-	static char *function               = "libewf_segment_table_alloc";
+	libewf_segment_table_t *segment_table = NULL;
+	static char *function                 = "libewf_segment_table_alloc";
 
 	if( amount == 0 )
 	{
@@ -56,7 +56,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table = (LIBEWF_SEGMENT_TABLE *) libewf_common_alloc( LIBEWF_SEGMENT_TABLE_SIZE );
+	segment_table = (libewf_segment_table_t *) libewf_common_alloc(
+	                                            sizeof( libewf_segment_table_t ) );
 
 	if( segment_table == NULL )
 	{
@@ -65,8 +66,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	}
-	segment_table->segment_file_handle = (LIBEWF_SEGMENT_FILE_HANDLE **) libewf_common_alloc(
-	                                      ( amount * sizeof( LIBEWF_SEGMENT_FILE_HANDLE* ) ) );
+	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) libewf_common_alloc(
+	                                      ( amount * sizeof( libewf_segment_file_handle_t * ) ) );
 
 	if( segment_table->segment_file_handle == NULL )
 	{
@@ -80,7 +81,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 	if( libewf_common_memset(
 	     segment_table->segment_file_handle,
 	     0, 
-	     ( amount * sizeof( LIBEWF_SEGMENT_FILE_HANDLE* ) ) ) == NULL )
+	     ( amount * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic segment file array.\n",
 		 function );
@@ -98,7 +99,9 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 /* Reallocates memory for the segment table values
  * Returns 1 if successful, or -1 on error
  */
-int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount )
+int libewf_segment_table_realloc(
+     libewf_segment_table_t *segment_table,
+     uint16_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_segment_table_realloc";
@@ -119,7 +122,7 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 	}
 	reallocation = libewf_common_realloc(
 	                segment_table->segment_file_handle,
-	                ( amount * sizeof( LIBEWF_SEGMENT_FILE_HANDLE* ) ) );
+	                ( amount * sizeof( libewf_segment_file_handle_t * ) ) );
 
 	if( reallocation == NULL )
 	{
@@ -128,12 +131,12 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 		return( -1 );
 	}
-	segment_table->segment_file_handle = (LIBEWF_SEGMENT_FILE_HANDLE **) reallocation;
+	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) reallocation;
 
 	if( libewf_common_memset(
 	     &( segment_table->segment_file_handle[ segment_table->amount ] ),
 	     0, 
-	     ( ( amount - segment_table->amount ) * sizeof( LIBEWF_SEGMENT_FILE_HANDLE* ) ) ) == NULL )
+	     ( ( amount - segment_table->amount ) * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear segment file array.\n",
 		 function );
@@ -147,7 +150,8 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 /* Frees memory of a segment table struct including elements
  */
-void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
+void libewf_segment_table_free(
+      libewf_segment_table_t *segment_table )
 {
 	static char *function = "libewf_segment_table_free";
 	uint16_t iterator     = 0;
@@ -163,17 +167,32 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 	{
 		if( segment_table->segment_file_handle[ iterator ] != NULL )
 		{
-			libewf_segment_file_handle_free( segment_table->segment_file_handle[ iterator ] );
+			libewf_segment_file_handle_free(
+			 segment_table->segment_file_handle[ iterator ] );
 		}
 	}
-	libewf_common_free( segment_table->segment_file_handle );
-	libewf_common_free( segment_table );
+	libewf_common_free(
+	 segment_table->segment_file_handle );
+	libewf_common_free(
+	 segment_table );
 }
 
 /* Builds the segment table from all segment files
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_table_build( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance )
+int libewf_segment_table_build(
+     libewf_segment_table_t *segment_table,
+     LIBEWF_HEADER_SECTIONS *header_sections,
+     LIBEWF_HASH_SECTIONS *hash_sections,
+     LIBEWF_MEDIA_VALUES *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_offset_table_t *secondary_offset_table,
+     libewf_sector_table_t *acquiry_errors,
+     int8_t *compression_level,
+     uint8_t *format,
+     uint8_t *ewf_format,
+     size64_t *segment_file_size,
+     uint8_t error_tollerance )
 {
 	static char *function   = "libewf_segment_table_build";
 	uint16_t segment_number = 0;
@@ -247,16 +266,31 @@ int libewf_segment_table_build( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_HEAD
  * Opens EWF segment files for reading and EWF delta segment files for reading and writing
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_SEGMENT_TABLE *delta_segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance )
+int libewf_segment_table_read_open(
+     libewf_segment_table_t *segment_table,
+     libewf_segment_table_t *delta_segment_table,
+     LIBEWF_FILENAME * const filenames[],
+     uint16_t file_amount, uint8_t flags,
+     LIBEWF_HEADER_SECTIONS *header_sections,
+     LIBEWF_HASH_SECTIONS *hash_sections,
+     LIBEWF_MEDIA_VALUES *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_offset_table_t *secondary_offset_table,
+     libewf_sector_table_t *acquiry_errors,
+     int8_t *compression_level,
+     uint8_t *format,
+     uint8_t *ewf_format,
+     size64_t *segment_file_size,
+     uint8_t error_tollerance )
 {
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
-	static char *function                           = "libewf_segment_table_read_open";
-	size_t filename_length                          = 0;
-	uint32_t iterator                               = 0;
-	uint16_t segment_number                         = 0;
-	uint8_t segment_file_type                       = 0;
-	int file_descriptor                             = 0;
-	int result                                      = 0;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_segment_table_read_open";
+	size_t filename_length                            = 0;
+	uint32_t iterator                                 = 0;
+	uint16_t segment_number                           = 0;
+	uint8_t segment_file_type                         = 0;
+	int file_descriptor                               = 0;
+	int result                                        = 0;
 
 	if( segment_table == NULL )
 	{
@@ -314,17 +348,15 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 	}
 	/* Set segment table basename
 	 */
-	segment_file_handle = libewf_segment_file_handle_alloc();
+	segment_table->segment_file_handle[ 0 ] = libewf_segment_file_handle_alloc();
 
-	if( segment_file_handle == NULL )
+	if( segment_table->segment_file_handle[ 0 ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_table->segment_file_handle[ 0 ] = segment_file_handle;
-
 	if( libewf_segment_file_handle_set_filename(
 	     segment_table->segment_file_handle[ 0 ],
 	     filenames[ iterator ],
@@ -337,17 +369,15 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 	}
 	/* Set delta segment table basename
 	 */
-	segment_file_handle = libewf_segment_file_handle_alloc();
+	delta_segment_table->segment_file_handle[ 0 ] = libewf_segment_file_handle_alloc();
 
-	if( segment_file_handle == NULL )
+	if( delta_segment_table->segment_file_handle[ 0 ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	delta_segment_table->segment_file_handle[ 0 ] = segment_file_handle;
-
 	if( libewf_segment_file_handle_set_filename(
 	     delta_segment_table->segment_file_handle[ 0 ],
 	     filenames[ iterator ],
@@ -372,6 +402,9 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 			LIBEWF_WARNING_PRINT( "%s: unable to create segment file handle.\n",
 			 function );
 
+			libewf_segment_file_handle_free(
+			 segment_file_handle );
+
 			return( -1 );
 		}
 		if( libewf_segment_file_handle_set_filename(
@@ -382,6 +415,9 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment file handle.\n",
 			 function );
 
+			libewf_segment_file_handle_free(
+			 segment_file_handle );
+
 			return( -1 );
 		}
 		if( libewf_segment_file_handle_open(
@@ -390,6 +426,9 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
 			 function, filenames[ iterator ] );
+
+			libewf_segment_file_handle_free(
+			 segment_file_handle );
 
 			return( -1 );
 		}
@@ -401,6 +440,9 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %" PRIs_EWF_filename ".\n",
 			 function, filenames[ iterator ] );
 
+			libewf_segment_file_handle_free(
+			 segment_file_handle );
+
 			return( -1 );
 		}
 		if( segment_number == 0 )
@@ -408,12 +450,18 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
 			LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
 			 function );
 
+			libewf_segment_file_handle_free(
+			 segment_file_handle );
+
 			return( -1 );
 		}
 		if( segment_number > file_amount )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range or missing segment files.\n",
 			 function );
+
+			libewf_segment_file_handle_free(
+			 segment_file_handle );
 
 			return( -1 );
 		}
@@ -555,11 +603,13 @@ int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_
  * Opens EWF segment file(s) for writing
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount )
+int libewf_segment_table_write_open(
+     libewf_segment_table_t *segment_table,
+     LIBEWF_FILENAME * const filenames[],
+     uint16_t file_amount )
 {
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
-	static char *function                           = "libewf_segment_table_write_open";
-	size_t filename_length                          = 0;
+	static char *function  = "libewf_segment_table_write_open";
+	size_t filename_length = 0;
 
 	if( segment_table == NULL )
 	{
@@ -593,17 +643,15 @@ int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF
 	}
 	/* Set segment table basename
 	 */
-	segment_file_handle = libewf_segment_file_handle_alloc();
+	segment_table->segment_file_handle[ 0 ] = libewf_segment_file_handle_alloc();
 
-	if( segment_file_handle == NULL )
+	if( segment_table->segment_file_handle[ 0 ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_table->segment_file_handle[ 0 ] = segment_file_handle;
-
 	if( libewf_segment_file_handle_set_filename(
 	     segment_table->segment_file_handle[ 0 ],
 	     filenames[ 0 ],
@@ -620,7 +668,8 @@ int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF
 /* Closes all the EWF segment file(s) in the segment table
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_table_close_all( LIBEWF_SEGMENT_TABLE *segment_table )
+int libewf_segment_table_close_all(
+     libewf_segment_table_t *segment_table )
 {
 	static char *function = "libewf_segment_table_close_all";
 	uint16_t iterator     = 0;
@@ -667,10 +716,16 @@ int libewf_segment_table_close_all( LIBEWF_SEGMENT_TABLE *segment_table )
  * The necessary sections at the start of the segment file are written
  * Returns 1 if successful, or -1 on error
  */
-int libewf_segment_table_create_segment_file( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format )
+int libewf_segment_table_create_segment_file(
+     libewf_segment_table_t *segment_table,
+     uint16_t segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format )
 {
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
-	static char *function                           = "libewf_segment_table_create_segment_file";
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_segment_table_create_segment_file";
 
 	if( segment_table == NULL )
 	{

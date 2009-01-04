@@ -57,12 +57,12 @@
 /* Reads a section start from a segment file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_SECTION *section, uint8_t error_tollerance )
+ssize_t libewf_section_start_read( libewf_segment_file_handle_t *segment_file_handle, EWF_SECTION *section, uint8_t error_tollerance )
 {
-	static char *function  = "libewf_section_start_read";
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
-	ssize_t read_count     = 0;
+	static char *function    = "libewf_section_start_read";
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
+	ssize_t read_count       = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -90,7 +90,7 @@ ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( section, ( EWF_SECTION_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, section->crc ) != 1 )
 	{
@@ -120,15 +120,15 @@ ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Writes a section start to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, size64_t section_data_size )
+ssize_t libewf_section_start_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, size64_t section_data_size )
 {
 	EWF_SECTION section;
 
-	static char *function   = "libewf_section_start_write";
-	EWF_CRC calculated_crc  = 0;
-	ssize_t write_count     = 0;
-	uint64_t section_size   = 0;
-	uint64_t section_offset = 0;
+	static char *function    = "libewf_section_start_write";
+	ewf_crc_t calculated_crc = 0;
+	ssize_t write_count      = 0;
+	uint64_t section_size    = 0;
+	uint64_t section_offset  = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -199,7 +199,7 @@ ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &section, ( EWF_SECTION_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, section.crc ) != 1 )
 	{
@@ -226,7 +226,7 @@ ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Reads a compressed string section from a segment file and uncompresses it
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t compressed_string_size, ewf_char_t **uncompressed_string, size_t *uncompressed_string_size )
+ssize_t libewf_section_compressed_string_read( libewf_segment_file_handle_t *segment_file_handle, size_t compressed_string_size, ewf_char_t **uncompressed_string, size_t *uncompressed_string_size )
 {
 	ewf_char_t *compressed_string = NULL;
 	ewf_char_t *reallocation      = NULL;
@@ -361,7 +361,7 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE_HANDLE *segme
 /* Writes a compressed string section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, ewf_char_t *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
+ssize_t libewf_section_write_compressed_string( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, ewf_char_t *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
 {
 	ewf_char_t *compressed_string = NULL;
 	ewf_char_t *reallocation      = NULL;
@@ -495,7 +495,7 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE_HANDLE *segm
 /* Reads a header section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_header_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_header, size_t *cached_header_size )
+ssize_t libewf_section_header_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, ewf_char_t **cached_header, size_t *cached_header_size )
 {
 	ewf_char_t *header    = NULL;
 	static char *function = "libewf_section_header_read";
@@ -570,7 +570,7 @@ ssize_t libewf_section_header_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Writes a header section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *header, size_t header_size, int8_t compression_level )
+ssize_t libewf_section_header_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *header, size_t header_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_header_write";
 	ssize_t section_write_count = 0;
@@ -608,7 +608,7 @@ ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Reads a header2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_header2, size_t *cached_header2_size )
+ssize_t libewf_section_header2_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, ewf_char_t **cached_header2, size_t *cached_header2_size )
 {
 	ewf_char_t *header2   = NULL;
 	static char *function = "libewf_section_header2_read";
@@ -683,7 +683,7 @@ ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Writes a header2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *header2, size_t header2_size, int8_t compression_level )
+ssize_t libewf_section_header2_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *header2, size_t header2_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_header2_write";
 	ssize_t section_write_count = 0;
@@ -721,12 +721,12 @@ ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 /* Reads an EWF-S01 (SMART) volume section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, uint8_t *format, uint8_t error_tollerance )
+ssize_t libewf_section_volume_s01_read( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, uint8_t *format, uint8_t error_tollerance )
 {
 	EWF_VOLUME_SMART *volume = NULL;
 	static char *function    = "libewf_section_volume_s01_read";
-	EWF_CRC calculated_crc   = 0;
-	EWF_CRC stored_crc       = 0;
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
 	ssize_t read_count       = 0;
 
 	if( segment_file_handle == NULL )
@@ -773,7 +773,7 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SMART_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
 	{
@@ -862,12 +862,12 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file
 /* Writes an EWF-S01 (SMART) volume section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t no_section_append )
+ssize_t libewf_section_volume_s01_write( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, uint8_t format, uint8_t no_section_append )
 {
 	ewf_char_t *section_type    = (ewf_char_t *) "volume";
 	EWF_VOLUME_SMART *volume    = NULL;
 	static char *function       = "libewf_section_volume_s01_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	size_t section_type_length  = 6;
 	ssize_t section_write_count = 0;
@@ -960,7 +960,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 		volume->signature[ 3 ] = (uint8_t) 'R';
 		volume->signature[ 4 ] = (uint8_t) 'T';
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SMART_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, volume->crc ) != 1 )
 	{
@@ -1029,13 +1029,13 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 /* Reads an EWF-E01 (EnCase) volume section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t error_tollerance )
+ssize_t libewf_section_volume_e01_read( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t error_tollerance )
 {
-	EWF_VOLUME *volume     = NULL;
-	static char *function  = "libewf_section_volume_e01_read";
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
-	ssize_t read_count     = 0;
+	EWF_VOLUME *volume       = NULL;
+	static char *function    = "libewf_section_volume_e01_read";
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
+	ssize_t read_count       = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1081,7 +1081,7 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
 	{
@@ -1197,12 +1197,12 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file
 /* Writes an EWF-E01 (EnCase) volume section to file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t no_section_append )
+ssize_t libewf_section_volume_e01_write( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t no_section_append )
 {
 	ewf_char_t *section_type    = (ewf_char_t *) "volume";
 	EWF_VOLUME *volume          = NULL;
 	static char *function       = "libewf_section_volume_e01_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	size_t section_type_length  = 6;
 	ssize_t section_write_count = 0;
@@ -1328,7 +1328,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 			return( -1 );
 		}
 	}
-	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, volume->crc ) != 1 )
 	{
@@ -1397,7 +1397,7 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 /* Reads a volume section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_volume_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, uint8_t error_tollerance )
 {
 	static char *function    = "libewf_section_volume_read";
 	ssize_t read_count       = 0;
@@ -1511,15 +1511,15 @@ ssize_t libewf_section_volume_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Reads a table section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE *offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_table_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, uint32_t media_amount_of_chunks, libewf_offset_table_t *offset_table, uint8_t format, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_TABLE table;
 	uint8_t stored_crc_buffer[ 4 ];
 
 	EWF_TABLE_OFFSET *offsets  = NULL;
 	static char *function      = "libewf_section_table_read";
-	EWF_CRC calculated_crc     = 0;
-	EWF_CRC stored_crc         = 0;
+	ewf_crc_t calculated_crc   = 0;
+	ewf_crc_t stored_crc       = 0;
 	size_t offsets_size        = 0;
 	ssize_t section_read_count = 0;
 	ssize_t read_count         = 0;
@@ -1576,7 +1576,7 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 	}
 	/* The table size contains the size of the CRC (4 bytes)
 	 */
-	calculated_crc = ewf_crc_calculate( &table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &table, ( EWF_TABLE_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, table.crc ) != 1 )
 	{
@@ -1678,9 +1678,9 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 			read_count = libewf_segment_file_handle_read(
 			              segment_file_handle,
 			              stored_crc_buffer,
-			              EWF_CRC_SIZE );
+			              sizeof( ewf_crc_t ) );
 
-			if( read_count != (ssize_t) EWF_CRC_SIZE )
+			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 				 function );
@@ -1776,14 +1776,14 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Writes a table or table2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, ewf_char_t *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append )
+ssize_t libewf_section_table_write( libewf_segment_file_handle_t *segment_file_handle, off64_t base_offset, libewf_offset_table_t *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, ewf_char_t *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append )
 {
 	EWF_TABLE table;
 	uint8_t calculated_crc_buffer[ 4 ];
 
 	EWF_TABLE_OFFSET *offsets   = NULL;
 	static char *function       = "libewf_section_table_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	off64_t offset64_value      = 0;
 	ssize_t section_write_count = 0;
@@ -1830,7 +1830,7 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 	if( ewf_format != EWF_FORMAT_S01 )
 	{
 		write_crc     = 1;
-		section_size += EWF_CRC_SIZE;
+		section_size += sizeof( ewf_crc_t );
 	}
 	if( libewf_common_memset( &table, 0, EWF_TABLE_SIZE ) == NULL )
 	{
@@ -1853,7 +1853,7 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &table, ( EWF_TABLE_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, table.crc ) != 1 )
 	{
@@ -2002,9 +2002,9 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 		write_count = libewf_segment_file_handle_write(
 		               segment_file_handle,
 	        	       calculated_crc_buffer,
-	        	       EWF_CRC_SIZE );
+	        	       sizeof( ewf_crc_t ) );
 
-		if( write_count != (ssize_t) EWF_CRC_SIZE )
+		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write table offsets CRC to file.\n",
 			 function );
@@ -2034,7 +2034,7 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Reads a sectors section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize64_t libewf_section_sectors_read( libewf_segment_file_handle_t *segment_file_handle, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	static char *function = "libewf_section_sectors_read";
 
@@ -2082,7 +2082,7 @@ ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_
  * Does not write the actual data in the sectors section
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_sectors_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t sectors_data_size, uint8_t no_section_append )
+ssize_t libewf_section_sectors_write( libewf_segment_file_handle_t *segment_file_handle, size64_t sectors_data_size, uint8_t no_section_append )
 {
 	ewf_char_t *section_type    = (ewf_char_t *) "sectors";
 	static char *function       = "libewf_section_sectors_write";
@@ -2133,7 +2133,7 @@ ssize_t libewf_section_sectors_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 /* Reads a ltree section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, uint8_t *ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_ltree_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, uint8_t *ewf_format, uint8_t error_tollerance )
 {
 	EWF_LTREE *ltree           = NULL;
 	ewf_char_t *ltree_data     = NULL;
@@ -2244,15 +2244,15 @@ ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Reads a session section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_session_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	ewf_session_t session;
 	uint8_t stored_crc_buffer[ 4 ];
 
 	ewf_session_entry_t *sessions = NULL;
 	static char *function         = "libewf_section_session_read";
-	EWF_CRC calculated_crc        = 0;
-	EWF_CRC stored_crc            = 0;
+	ewf_crc_t calculated_crc      = 0;
+	ewf_crc_t stored_crc          = 0;
 	ssize_t section_read_count    = 0;
 	ssize_t read_count            = 0;
 	size_t sessions_size          = 0;
@@ -2370,9 +2370,9 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 		read_count = libewf_segment_file_handle_read(
 		              segment_file_handle,
 		              stored_crc_buffer,
-		              EWF_CRC_SIZE );
+		              sizeof( ewf_crc_t ) );
 
-		if( read_count != (ssize_t) EWF_CRC_SIZE )
+		if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 			 function );
@@ -2416,12 +2416,12 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Reads a data section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_data_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, uint8_t ewf_format, uint8_t error_tollerance )
 {
-	EWF_DATA *data             = NULL;
+	ewf_data_t *data           = NULL;
 	static char *function      = "libewf_section_data_read";
-	EWF_CRC calculated_crc     = 0;
-	EWF_CRC stored_crc         = 0;
+	ewf_crc_t calculated_crc   = 0;
+	ewf_crc_t stored_crc       = 0;
 	ssize_t read_count         = 0;
 	uint32_t amount_of_chunks  = 0;
 	uint32_t sectors_per_chunk = 0;
@@ -2453,14 +2453,14 @@ ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
 			return( -1 );
 		}
 	}
-	if( section_size != EWF_DATA_SIZE )
+	if( section_size != sizeof( ewf_data_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: mismatch in section data size.\n",
 		 function );
 
 		return( -1 );
 	}
-	data = (EWF_DATA *) libewf_common_alloc( EWF_DATA_SIZE );
+	data = (ewf_data_t *) libewf_common_alloc( sizeof( ewf_data_t ) );
 
 	if( data == NULL )
 	{
@@ -2472,9 +2472,9 @@ ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
 	read_count = libewf_segment_file_handle_read(
 	              segment_file_handle,
 	              data,
-	              EWF_DATA_SIZE );
+	              sizeof( ewf_data_t ) );
 	
-	if( read_count != (ssize_t) EWF_DATA_SIZE )
+	if( read_count != (ssize_t) sizeof( ewf_data_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read data.\n",
 		 function );
@@ -2483,7 +2483,7 @@ ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( data, ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, data->crc ) != 1 )
 	{
@@ -2667,11 +2667,11 @@ ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
 /* Writes a data section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append )
+ssize_t libewf_section_data_write( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, ewf_data_t **cached_data_section, uint8_t no_section_append )
 {
 	ewf_char_t *section_type    = (ewf_char_t *) "data";
 	static char *function       = "libewf_section_data_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	size_t section_type_length  = 4;
 	ssize_t section_write_count = 0;
@@ -2704,7 +2704,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 	 */
 	if( *cached_data_section == NULL )
 	{
-		*cached_data_section = (EWF_DATA *) libewf_common_alloc( EWF_DATA_SIZE );
+		*cached_data_section = (ewf_data_t *) libewf_common_alloc( sizeof( ewf_data_t ) );
 
 		if( *cached_data_section == NULL )
 		{
@@ -2713,7 +2713,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 
 			return( -1 );
 		}
-		if( libewf_common_memset( *cached_data_section, 0, EWF_DATA_SIZE ) == NULL )
+		if( libewf_common_memset( *cached_data_section, 0, sizeof( ewf_data_t ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to clear data.\n",
 			 function );
@@ -2794,7 +2794,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 				return( -1 );
 			}
 		}
-		calculated_crc = ewf_crc_calculate( *cached_data_section, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
+		calculated_crc = ewf_crc_calculate( *cached_data_section, ( sizeof( ewf_data_t ) - sizeof( ewf_crc_t ) ), 1 );
 
 		if( libewf_endian_revert_32bit(
 		     calculated_crc,
@@ -2810,7 +2810,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 	                       segment_file_handle,
 	                       section_type,
 	                       section_type_length,
-	                       (size64_t) EWF_DATA_SIZE );
+	                       (size64_t) sizeof( ewf_data_t ) );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -2822,9 +2822,9 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 	write_count = libewf_segment_file_handle_write(
 	               segment_file_handle,
 	               *cached_data_section,
-	               EWF_DATA_SIZE );
+	               sizeof( ewf_data_t ) );
 
-	if( write_count != (ssize_t) EWF_DATA_SIZE )
+	if( write_count != (ssize_t) sizeof( ewf_data_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
 		 function );
@@ -2854,15 +2854,15 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Reads a error2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, libewf_sector_table_t *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_handle, libewf_sector_table_t *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_ERROR2 error2;
 	uint8_t stored_crc_buffer[ 4 ];
 
 	EWF_ERROR2_SECTOR *error2_sectors = NULL;
 	static char *function             = "libewf_section_error2_read";
-	EWF_CRC calculated_crc            = 0;
-	EWF_CRC stored_crc                = 0;
+	ewf_crc_t calculated_crc          = 0;
+	ewf_crc_t stored_crc              = 0;
 	ssize_t section_read_count        = 0;
 	ssize_t read_count                = 0;
 	size_t sectors_size               = 0;
@@ -2906,7 +2906,7 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &error2, ( EWF_ERROR2_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, error2.crc ) != 1 )
 	{
@@ -2980,9 +2980,9 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 		read_count = libewf_segment_file_handle_read(
 		              segment_file_handle,
 		              stored_crc_buffer,
-		              EWF_CRC_SIZE );
+		              sizeof( ewf_crc_t ) );
 
-		if( read_count != (ssize_t) EWF_CRC_SIZE )
+		if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 			 function );
@@ -3026,7 +3026,8 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 
 			acquiry_errors->amount = 0;
 		}
-		acquiry_errors->error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE * amount_of_errors );
+		acquiry_errors->error_sector = (libewf_error_sector_t *) libewf_common_alloc(
+		                                                          sizeof( libewf_error_sector_t ) * amount_of_errors );
 
 		if( acquiry_errors->error_sector == NULL )
 		{
@@ -3072,7 +3073,7 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Writes a error2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, libewf_sector_table_t *acquiry_errors )
+ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_handle, libewf_sector_table_t *acquiry_errors )
 {
 	EWF_ERROR2 error2;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -3080,7 +3081,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 	EWF_ERROR2_SECTOR *error2_sectors = NULL;
 	ewf_char_t *section_type          = (ewf_char_t *) "error2";
 	static char *function             = "libewf_section_error2_write";
-	EWF_CRC calculated_crc            = 0;
+	ewf_crc_t calculated_crc          = 0;
 	off64_t section_offset            = 0;
 	ssize_t section_write_count       = 0;
 	ssize_t write_count               = 0;
@@ -3105,7 +3106,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 	}
 	section_offset = segment_file_handle->file_offset;
 	sectors_size   = EWF_ERROR2_SECTOR_SIZE * acquiry_errors->amount;
-	section_size   = EWF_ERROR2_SIZE + sectors_size + EWF_CRC_SIZE;
+	section_size   = EWF_ERROR2_SIZE + sectors_size + sizeof( ewf_crc_t );
 
 	if( libewf_common_memset( &error2, 0, EWF_ERROR2_SIZE ) == NULL )
 	{
@@ -3121,7 +3122,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &error2, ( EWF_ERROR2_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, error2.crc ) != 1 )
 	{
@@ -3223,9 +3224,9 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 	write_count = libewf_segment_file_handle_write(
  	               segment_file_handle,
  	               calculated_crc_buffer,
- 	               EWF_CRC_SIZE );
+ 	               sizeof( ewf_crc_t ) );
 
-	if( write_count != (ssize_t) EWF_CRC_SIZE )
+	if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write error2 sectors CRC to file.\n",
 		 function );
@@ -3252,14 +3253,14 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Reads a hash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_DIGEST_HASH *md5_hash, uint8_t error_tollerance )
+ssize_t libewf_section_hash_read( libewf_segment_file_handle_t *segment_file_handle, EWF_DIGEST_HASH *md5_hash, uint8_t error_tollerance )
 {
 	EWF_HASH hash;
 
-	static char *function  = "libewf_section_hash_read";
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
-	ssize_t read_count     = 0;
+	static char *function    = "libewf_section_hash_read";
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
+	ssize_t read_count       = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3287,7 +3288,7 @@ ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, hash.crc ) != 1 )
 	{
@@ -3326,13 +3327,13 @@ ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handl
 /* Writes a hash section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_DIGEST_HASH *md5_hash )
+ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_handle, EWF_DIGEST_HASH *md5_hash )
 {
 	EWF_HASH hash;
 
 	ewf_char_t *section_type    = (ewf_char_t *) "hash";
 	static char *function       = "libewf_section_hash_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	size_t section_type_length  = 4;
 	ssize_t section_write_count = 0;
@@ -3361,7 +3362,7 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, hash.crc ) != 1 )
 	{
@@ -3416,12 +3417,12 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
  * This is used for the next and done sections, these sections point back towards themselves
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_section_last_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *section_type, size_t section_type_length, uint8_t format, uint8_t ewf_format )
 {
 	EWF_SECTION section;
 
 	static char *function       = "libewf_section_last_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
 	size_t section_size         = 0;
@@ -3494,7 +3495,7 @@ ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &section, ( EWF_SECTION_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, section.crc ) != 1 )
 	{
@@ -3533,7 +3534,7 @@ ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Reads a xheader section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xheader_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_xheader, size_t *cached_xheader_size )
+ssize_t libewf_section_xheader_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, ewf_char_t **cached_xheader, size_t *cached_xheader_size )
 {
 	ewf_char_t *xheader   = NULL;
 	static char *function = "libewf_section_xheader_read";
@@ -3608,7 +3609,7 @@ ssize_t libewf_section_xheader_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Writes a xheader section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *xheader, size_t xheader_size, int8_t compression_level )
+ssize_t libewf_section_xheader_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *xheader, size_t xheader_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_xheader_write";
 	ssize_t section_write_count = 0;
@@ -3646,7 +3647,7 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 /* Reads a xhash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, ewf_char_t **cached_xhash, size_t *cached_xhash_size )
+ssize_t libewf_section_xhash_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, ewf_char_t **cached_xhash, size_t *cached_xhash_size )
 {
 	ewf_char_t *xhash     = NULL;
 	static char *function = "libewf_section_xhash_read";
@@ -3721,7 +3722,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Writes a xhash section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, ewf_char_t *xhash, size_t xhash_size, int8_t compression_level )
+ssize_t libewf_section_xhash_write( libewf_segment_file_handle_t *segment_file_handle, ewf_char_t *xhash, size_t xhash_size, int8_t compression_level )
 {
 	static char *function       = "libewf_section_xhash_write";
 	ssize_t section_write_count = 0;
@@ -3759,15 +3760,15 @@ ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, uint8_t error_tollerance )
+ssize_t libewf_section_delta_chunk_read( libewf_segment_file_handle_t *segment_file_handle, size_t section_size, libewf_offset_table_t *offset_table, libewf_offset_table_t *secondary_offset_table, uint8_t error_tollerance )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 
-	static char *function  = "libewf_section_delta_chunk_read";
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
-	uint32_t chunk         = 0;
-	uint32_t chunk_size    = 0;
+	static char *function    = "libewf_section_delta_chunk_read";
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
+	uint32_t chunk           = 0;
+	uint32_t chunk_size      = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3800,7 +3801,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &delta_chunk_header, ( EWFX_DELTA_CHUNK_HEADER_SIZE - EWF_CRC_SIZE ), 1 );
+	calculated_crc = ewf_crc_calculate( &delta_chunk_header, ( EWFX_DELTA_CHUNK_HEADER_SIZE - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, delta_chunk_header.crc ) != 1 )
 	{
@@ -3892,14 +3893,14 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc, uint8_t no_section_append )
+ssize_t libewf_section_delta_chunk_write( libewf_segment_file_handle_t *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, ewf_crc_t *chunk_crc, uint8_t write_crc, uint8_t no_section_append )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 	uint8_t calculated_crc_buffer[ 4 ];
 
 	ewf_char_t *section_type    = (ewf_char_t *) "delta_chunk";
 	static char *function       = "libewf_section_delta_chunk_write";
-	EWF_CRC calculated_crc      = 0;
+	ewf_crc_t calculated_crc    = 0;
 	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
 	ssize_t write_count         = 0;
@@ -3934,7 +3935,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fi
 
 	if( write_crc != 0 )
 	{
-		chunk_data_size += EWF_CRC_SIZE;
+		chunk_data_size += sizeof( ewf_crc_t );
 	}
 	/* The chunk value is stored + 1 count in the file
 	 */
@@ -3962,7 +3963,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fi
 
 	calculated_crc = ewf_crc_calculate(
 	                  &delta_chunk_header,
-	                  ( EWFX_DELTA_CHUNK_HEADER_SIZE - EWF_CRC_SIZE ),
+	                  ( EWFX_DELTA_CHUNK_HEADER_SIZE - sizeof( ewf_crc_t ) ),
 	                  1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, delta_chunk_header.crc ) != 1 )
@@ -4027,9 +4028,9 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fi
 		write_count = libewf_segment_file_handle_write(
 			       segment_file_handle,
 			       calculated_crc_buffer,
-			       EWF_CRC_SIZE );
+			       sizeof( ewf_crc_t ) );
 
-		if( write_count != (size_t) EWF_CRC_SIZE )
+		if( write_count != (size_t) sizeof( ewf_crc_t ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write CRC to file.\n",
 			 function );
@@ -4061,7 +4062,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fi
 /* Reads a section from file for debugging purposes
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t section_size )
+ssize_t libewf_section_debug_read( libewf_segment_file_handle_t *segment_file_handle, size64_t section_size )
 {
 	uint8_t *data              = NULL;
 	uint8_t *uncompressed_data = NULL;
@@ -4173,7 +4174,7 @@ ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
  */
-int libewf_section_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
+int libewf_section_read( libewf_segment_file_handle_t *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, libewf_offset_table_t *offset_table, libewf_offset_table_t *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;

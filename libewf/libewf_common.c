@@ -320,7 +320,8 @@ char *libewf_common_ctime( const time_t *timestamp )
 
 		return( NULL );
 	}
-	time_string = (char *) libewf_common_alloc( time_string_size * sizeof( char ) );
+	time_string = (char *) libewf_common_alloc(
+	                        time_string_size * sizeof( char ) );
 
 	if( time_string == NULL )
 	{
@@ -331,9 +332,15 @@ char *libewf_common_ctime( const time_t *timestamp )
 	}
 #if defined( libewf_common_ctime_r )
 #if defined( HAVE_WINDOWS_API )
-	if( libewf_common_ctime_r( timestamp, time_string, time_string_size ) != 0 )
+	if( libewf_common_ctime_r(
+             timestamp,
+             time_string,
+             time_string_size ) != 0 )
 #else
-	if( libewf_common_ctime_r( timestamp, time_string, time_string_size ) == NULL )
+	if( libewf_common_ctime_r(
+	     timestamp,
+	     time_string,
+	     time_string_size ) == NULL )
 #endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
@@ -356,7 +363,10 @@ char *libewf_common_ctime( const time_t *timestamp )
 
 		return( NULL );
 	}
-	if( libewf_common_string_copy( time_string, static_time_string, time_string_size ) == NULL )
+	if( libewf_common_string_copy(
+             time_string,
+             static_time_string,
+             time_string_size ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
 		 function );

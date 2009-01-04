@@ -140,7 +140,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
-	internal_handle->chunk_cache = libewf_chunk_cache_alloc( EWF_MINIMUM_CHUNK_SIZE + EWF_CRC_SIZE );
+	internal_handle->chunk_cache = libewf_chunk_cache_alloc( EWF_MINIMUM_CHUNK_SIZE + sizeof( ewf_crc_t ) );
 
 	if( internal_handle->chunk_cache == NULL )
 	{
@@ -1105,11 +1105,11 @@ int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_ha
 	}
 	/* Make sure the chuck cache is large enough
 	 */
-	if( ( internal_handle->media_values->chunk_size + EWF_CRC_SIZE ) > internal_handle->chunk_cache->allocated_size )
+	if( ( internal_handle->media_values->chunk_size + sizeof( ewf_crc_t ) ) > internal_handle->chunk_cache->allocated_size )
 	{
 		if( libewf_chunk_cache_realloc(
 		     internal_handle->chunk_cache,
-		     ( internal_handle->media_values->chunk_size + EWF_CRC_SIZE ) ) != 1 )
+		     ( internal_handle->media_values->chunk_size + sizeof( ewf_crc_t ) ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );

@@ -41,10 +41,11 @@
 /* Allocates memory for a segment file handle struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_segment_file_handle_t *libewf_segment_file_handle_alloc( void )
+libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
+                               void )
 {
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
-	static char *function                           = "libewf_segment_file_handle_alloc";
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_segment_file_handle_alloc";
 
 	segment_file_handle = (libewf_segment_file_handle_t *) libewf_common_alloc(
 	                                                        sizeof( libewf_segment_file_handle_t ) );
@@ -81,11 +82,12 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc( void )
 
 /* Frees memory of a segment file handle struct including elements
  */
-void libewf_segment_file_handle_free( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle )
+void libewf_segment_file_handle_free(
+      libewf_segment_file_handle_t *segment_file_handle )
 {
-        LIBEWF_SECTION_LIST_ENTRY *section_list_entry         = NULL;
-        LIBEWF_SECTION_LIST_ENTRY *current_section_list_entry = NULL;
-	static char *function                                 = "libewf_segment_file_handle_free";
+        libewf_section_list_entry_t *section_list_entry         = NULL;
+        libewf_section_list_entry_t *current_section_list_entry = NULL;
+	static char *function                                   = "libewf_segment_file_handle_free";
 
 	if( segment_file_handle == NULL )
 	{
@@ -118,7 +120,10 @@ void libewf_segment_file_handle_free( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_h
 /* Retrieves a filename of a certain segment file handle
  * Returns 1 if succesful, or -1 on error
  */
-int libewf_segment_file_handle_get_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_FILENAME *filename, size_t length_filename )
+int libewf_segment_file_handle_get_filename(
+     libewf_segment_file_handle_t *segment_file_handle,
+     libewf_filename_t *filename,
+     size_t length_filename )
 {
 	static char *function  = "libewf_segment_file_handle_get_filename";
 	size_t filename_length = 0;
@@ -174,7 +179,10 @@ int libewf_segment_file_handle_get_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment
  * Creates a duplicate of the string
  * Returns 1 if succesful, or -1 on error
  */
-int libewf_segment_file_handle_set_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, const LIBEWF_FILENAME *filename, size_t length_filename )
+int libewf_segment_file_handle_set_filename(
+     libewf_segment_file_handle_t *segment_file_handle,
+     const libewf_filename_t *filename,
+     size_t length_filename )
 {
 	static char *function = "libewf_segment_file_handle_set_filename";
 
@@ -252,7 +260,9 @@ int libewf_segment_file_handle_set_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment
  * Sets the filename and the file descriptor in the segment file handle struct
  * Returns 1 if successful, or -1 on error
  */
-int libewf_segment_file_handle_open( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t flags )
+int libewf_segment_file_handle_open(
+     libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t flags )
 {
 	static char *function = "libewf_segment_file_handle_open";
 
@@ -287,7 +297,9 @@ int libewf_segment_file_handle_open( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 /* Re-opens a segment file handle
  * Returns 1 if successful, or -1 on error
  */
-int libewf_segment_file_handle_reopen( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t flags )
+int libewf_segment_file_handle_reopen(
+     libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t flags )
 {
 	static char *function = "libewf_segment_file_handle_reopen";
 
@@ -340,7 +352,10 @@ int libewf_segment_file_handle_reopen( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_
  * Updates the file offset
  * Returns the amount of bytes read if successful, or -1 on errror
  */
-ssize_t libewf_segment_file_handle_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, void *buffer, size_t size )
+ssize_t libewf_segment_file_handle_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         void *buffer,
+         size_t size )
 {
 	static char *function = "libewf_segment_file_handle_read";
 	ssize_t read_count    = 0;
@@ -401,7 +416,10 @@ ssize_t libewf_segment_file_handle_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_fil
  * Updates the file offset
  * Returns the amount of bytes written if successful, or -1 on errror
  */
-ssize_t libewf_segment_file_handle_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, void *buffer, size_t size )
+ssize_t libewf_segment_file_handle_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         void *buffer,
+         size_t size )
 {
 	static char *function = "libewf_segment_file_handle_write";
 	ssize_t write_count   = 0;
@@ -461,7 +479,9 @@ ssize_t libewf_segment_file_handle_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fi
 /* Seeks a certain offset within the a segment file handle
  * Returns 1 if the seek is successful, or -1 on error
  */
-off64_t libewf_segment_file_handle_seek_offset( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, off64_t offset )
+off64_t libewf_segment_file_handle_seek_offset(
+         libewf_segment_file_handle_t *segment_file_handle,
+         off64_t offset )
 {
 	static char *function = "libewf_segment_file_handle_seek_offset";
 
@@ -516,7 +536,8 @@ off64_t libewf_segment_file_handle_seek_offset( LIBEWF_SEGMENT_FILE_HANDLE *segm
 /* Closes a segment file handle
  * Returns 0 if successful, or -1 on error
  */
-int libewf_segment_file_handle_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle )
+int libewf_segment_file_handle_close(
+     libewf_segment_file_handle_t *segment_file_handle )
 {
 	static char *function = "libewf_segment_file_handle_close";
 

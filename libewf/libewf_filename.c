@@ -44,7 +44,10 @@
 /* Retrieves an internally used filename
  * Returns 1 if succesful, or -1 on error
  */
-int libewf_filename_get( LIBEWF_FILENAME *internal_filename, LIBEWF_FILENAME *external_filename, size_t length_external_filename )
+int libewf_filename_get(
+     libewf_filename_t *internal_filename,
+     libewf_filename_t *external_filename,
+     size_t length_external_filename )
 {
 	static char *function           = "libewf_filename_get";
 	size_t length_internal_filename = 0;
@@ -63,7 +66,8 @@ int libewf_filename_get( LIBEWF_FILENAME *internal_filename, LIBEWF_FILENAME *ex
 
 		return( -1 );
 	}
-	length_internal_filename = libewf_filename_length( internal_filename );
+	length_internal_filename = libewf_filename_length(
+	                            internal_filename );
 
 	/* Add one additional character for the end of line
 	 */
@@ -92,7 +96,10 @@ int libewf_filename_get( LIBEWF_FILENAME *internal_filename, LIBEWF_FILENAME *ex
 /* Sets an internal filename, creates a duplicate of the string
  * Returns 1 if succesful, or -1 on error
  */
-int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILENAME *external_filename, size_t length_external_filename )
+int libewf_filename_set(
+     libewf_filename_t **internal_filename,
+     const libewf_filename_t *external_filename,
+     size_t length_external_filename )
 {
 	static char *function = "libewf_filename_set";
 
@@ -133,7 +140,8 @@ int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILEN
 	}
 	/* One additional byte for the end of string character is needed
 	 */
-	*internal_filename = (LIBEWF_FILENAME *) libewf_common_alloc( LIBEWF_FILENAME_SIZE * ( length_external_filename + 1 ) );
+	*internal_filename = (libewf_filename_t *) libewf_common_alloc(
+	                                            sizeof( libewf_filename_t ) * ( length_external_filename + 1 ) );
 
 	if( *internal_filename == NULL )
 	{
@@ -142,7 +150,10 @@ int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILEN
 
 		return( -1 );
 	}
-	if( libewf_filename_copy( *internal_filename, external_filename, length_external_filename ) == NULL )
+	if( libewf_filename_copy(
+	     *internal_filename,
+	     external_filename,
+	     length_external_filename ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set internal filename.\n",
 		 function );
@@ -165,11 +176,17 @@ int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILEN
  * For EWF-E01, EWF-S01 segment file extension naming scheme
  * Returns 1 on success, -1 on error
  */
-int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format )
+int libewf_filename_set_extension(
+     libewf_filename_t *extension,
+     uint16_t segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format )
 {
-	static char *function                           = "libewf_filename_set_extension";
-	LIBEWF_FILENAME extension_first_character       = (LIBEWF_FILENAME) '\0';
-	LIBEWF_FILENAME extension_additional_characters = (LIBEWF_FILENAME) '\0';
+	static char *function                             = "libewf_filename_set_extension";
+	libewf_filename_t extension_first_character       = (libewf_filename_t) '\0';
+	libewf_filename_t extension_additional_characters = (libewf_filename_t) '\0';
 
 	if( extension == NULL )
 	{
@@ -204,29 +221,29 @@ int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_
 		if( ( format == LIBEWF_FORMAT_EWF )
 		 || ( format == LIBEWF_FORMAT_EWFX ) )
 		{
-			extension_first_character       = (LIBEWF_FILENAME) 'e';
-			extension_additional_characters = (LIBEWF_FILENAME) 'a';
+			extension_first_character       = (libewf_filename_t) 'e';
+			extension_additional_characters = (libewf_filename_t) 'a';
 		}
 		else if( ewf_format == EWF_FORMAT_S01 )
 		{
-			extension_first_character       = (LIBEWF_FILENAME) 's';
-			extension_additional_characters = (LIBEWF_FILENAME) 'a';
+			extension_first_character       = (libewf_filename_t) 's';
+			extension_additional_characters = (libewf_filename_t) 'a';
 		}
 		else
 		{
-			extension_first_character       = (LIBEWF_FILENAME) 'E';
-			extension_additional_characters = (LIBEWF_FILENAME) 'A';
+			extension_first_character       = (libewf_filename_t) 'E';
+			extension_additional_characters = (libewf_filename_t) 'A';
 		}
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
 	{
-		extension_first_character       = (LIBEWF_FILENAME) 'L';
-		extension_additional_characters = (LIBEWF_FILENAME) 'A';
+		extension_first_character       = (libewf_filename_t) 'L';
+		extension_additional_characters = (libewf_filename_t) 'A';
 	}
 	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
-		extension_first_character       = (LIBEWF_FILENAME) 'd';
-		extension_additional_characters = (LIBEWF_FILENAME) 'a';
+		extension_first_character       = (libewf_filename_t) 'd';
+		extension_additional_characters = (libewf_filename_t) 'a';
 	}
 	else
 	{
@@ -239,15 +256,15 @@ int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_
 
 	if( segment_number <= 99 )
 	{
-		extension[ 2 ] = (LIBEWF_FILENAME) '0' + (LIBEWF_FILENAME) ( segment_number % 10 );
-		extension[ 1 ] = (LIBEWF_FILENAME) '0' + (LIBEWF_FILENAME) ( segment_number / 10 );
+		extension[ 2 ] = (libewf_filename_t) '0' + (libewf_filename_t) ( segment_number % 10 );
+		extension[ 1 ] = (libewf_filename_t) '0' + (libewf_filename_t) ( segment_number / 10 );
 	}
 	else if( segment_number >= 100 )
 	{
 		segment_number -= 100;
-		extension[ 2 ]  = extension_additional_characters + (LIBEWF_FILENAME) ( segment_number % 26 );
+		extension[ 2 ]  = extension_additional_characters + (libewf_filename_t) ( segment_number % 26 );
 		segment_number /= 26;
-		extension[ 1 ]  = extension_additional_characters + (LIBEWF_FILENAME) ( segment_number % 26 );
+		extension[ 1 ]  = extension_additional_characters + (libewf_filename_t) ( segment_number % 26 );
 		segment_number /= 26;
 
 		if( segment_number >= 26 )
@@ -257,20 +274,20 @@ int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_
 
 			return( -1 );
 		}
-		extension[ 0 ] = extension_first_character + (LIBEWF_FILENAME) segment_number;
+		extension[ 0 ] = extension_first_character + (libewf_filename_t) segment_number;
 	}
 	/* Safety check
 	 */
-	if( ( extension[ 0 ] > (LIBEWF_FILENAME) 'z' )
-	 || ( ( extension[ 0 ] > (LIBEWF_FILENAME) 'Z' )
-	  && ( extension[ 0 ] < (LIBEWF_FILENAME) 'a' ) ) )
+	if( ( extension[ 0 ] > (libewf_filename_t) 'z' )
+	 || ( ( extension[ 0 ] > (libewf_filename_t) 'Z' )
+	  && ( extension[ 0 ] < (libewf_filename_t) 'a' ) ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to support for more segment files.\n",
 		 function );
 
 		return( -1 );
 	}
-	extension[ 3 ] = (LIBEWF_FILENAME) '\0';
+	extension[ 3 ] = (libewf_filename_t) '\0';
 
 	return( 1 );
 }
@@ -278,9 +295,18 @@ int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_
 /* Creates a filename for a certain segment file
  * Returns 1 if successful, or -1 on error
  */
-int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename, LIBEWF_FILENAME *basename, size_t length_basename, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format )
+int libewf_filename_create(
+     libewf_filename_t **filename,
+     size_t *length_filename,
+     libewf_filename_t *basename,
+     size_t length_basename,
+     uint16_t segment_number,
+     int16_t maximum_amount_of_segments,
+     uint8_t segment_file_type,
+     uint8_t format,
+     uint8_t ewf_format )
 {
-	LIBEWF_FILENAME *new_filename = NULL;
+	libewf_filename_t *new_filename = NULL;
 	static char *function         = "libewf_filename_create";
 
 	if( filename == NULL )
@@ -320,7 +346,8 @@ int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename,
 	}
 	/* The actual filename also contains a '.', 3 character extension and a end of string byte
 	 */
-	new_filename = libewf_common_alloc( LIBEWF_FILENAME_SIZE * ( length_basename + 5 ) );
+	new_filename = libewf_common_alloc(
+	                sizeof( libewf_filename_t ) * ( length_basename + 5 ) );
 
 	if( new_filename == NULL )
 	{
@@ -331,7 +358,10 @@ int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename,
 	}
 	/* Add one additional character for the end of line
 	 */
-	if( libewf_filename_copy( new_filename, basename, ( length_basename + 1 ) ) == NULL )
+	if( libewf_filename_copy(
+	     new_filename,
+	     basename,
+	     ( length_basename + 1 ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to copy basename.\n",
 		 function );
@@ -340,7 +370,7 @@ int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename,
 
 		return( -1 );
 	}
-	new_filename[ length_basename ] = (LIBEWF_FILENAME) '.';
+	new_filename[ length_basename ] = (libewf_filename_t) '.';
 
 	if( libewf_filename_set_extension(
 	     &( new_filename[ length_basename + 1 ] ),

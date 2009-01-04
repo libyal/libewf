@@ -43,16 +43,13 @@
 extern "C" {
 #endif
 
-#define LIBEWF_SEGMENT_FILE_HANDLE		libewf_segment_file_handle_t
-#define LIBEWF_SEGMENT_FILE_HANDLE_SIZE		sizeof( LIBEWF_SEGMENT_FILE_HANDLE )
-
 typedef struct libewf_segment_file_handle libewf_segment_file_handle_t;
 
 struct libewf_segment_file_handle
 {
 	/* The filename
 	 */
-	LIBEWF_FILENAME *filename;
+	libewf_filename_t *filename;
 
 	/* The filename length
 	 */
@@ -72,21 +69,49 @@ struct libewf_segment_file_handle
 
         /* The list of all the sections
          */
-        LIBEWF_SECTION_LIST *section_list;
+        libewf_section_list_t *section_list;
 };
 
-LIBEWF_SEGMENT_FILE_HANDLE *libewf_segment_file_handle_alloc( void );
-void libewf_segment_file_handle_free( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle );
+libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
+                               void );
 
-int libewf_segment_file_handle_get_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_FILENAME *filename, size_t length_filename );
-int libewf_segment_file_handle_set_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, const LIBEWF_FILENAME *filename, size_t length_filename );
+void libewf_segment_file_handle_free(
+      libewf_segment_file_handle_t *segment_file_handle );
 
-int libewf_segment_file_handle_open( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t flags );
-int libewf_segment_file_handle_reopen( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t flags );
-ssize_t libewf_segment_file_handle_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, void *buffer, size_t size );
-ssize_t libewf_segment_file_handle_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, void *buffer, size_t size );
-off64_t libewf_segment_file_handle_seek_offset( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, off64_t offset );
-int libewf_segment_file_handle_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle );
+int libewf_segment_file_handle_get_filename(
+     libewf_segment_file_handle_t *segment_file_handle,
+     libewf_filename_t *filename,
+     size_t length_filename );
+
+int libewf_segment_file_handle_set_filename(
+     libewf_segment_file_handle_t *segment_file_handle,
+     const libewf_filename_t *filename,
+     size_t length_filename );
+
+int libewf_segment_file_handle_open(
+     libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t flags );
+
+int libewf_segment_file_handle_reopen(
+     libewf_segment_file_handle_t *segment_file_handle,
+     uint8_t flags );
+
+ssize_t libewf_segment_file_handle_read(
+         libewf_segment_file_handle_t *segment_file_handle,
+         void *buffer,
+         size_t size );
+
+ssize_t libewf_segment_file_handle_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         void *buffer,
+         size_t size );
+
+off64_t libewf_segment_file_handle_seek_offset(
+         libewf_segment_file_handle_t *segment_file_handle,
+         off64_t offset );
+
+int libewf_segment_file_handle_close(
+     libewf_segment_file_handle_t *segment_file_handle );
 
 #if defined( __cplusplus )
 }

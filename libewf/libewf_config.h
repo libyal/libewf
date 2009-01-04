@@ -5,7 +5,7 @@
 #define HAVE_ATOLL 1
 
 /* Define to 1 if you have the `btowc' function. */
-/* #undef HAVE_BTOWC */
+#define HAVE_BTOWC 1
 
 /* Defines if compressBound funtion is present in zlib. */
 #define HAVE_COMPRESS_BOUND 1
@@ -46,7 +46,7 @@
 #define HAVE_FGETS 1
 
 /* Define to 1 if you have the `fgetws' function. */
-/* #undef HAVE_FGETWS */
+#define HAVE_FGETWS 1
 
 /* Define to 1 if you have the `getopt' function. */
 #define HAVE_GETOPT 1
@@ -85,10 +85,10 @@
 #define HAVE_LOCALTIME_R 1
 
 /* Define to 1 if you have the `mbsinit' function. */
-/* #undef HAVE_MBSINIT */
+#define HAVE_MBSINIT 1
 
 /* Define to 1 if you have the `mbsrtowcs' function. */
-/* #undef HAVE_MBSRTOWCS */
+#define HAVE_MBSRTOWCS 1
 
 /* Define to 1 if you have the `memchr' function. */
 #define HAVE_MEMCHR 1
@@ -125,7 +125,7 @@
 
 /* Defines if libewf's read and write raw functionality should be used in the
    ewf tools */
-/* #undef HAVE_RAW_ACCESS */
+#define HAVE_RAW_ACCESS 1
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
@@ -191,7 +191,7 @@
 #define HAVE_STRTOULL 1
 
 /* Define to 1 if you have the `swprintf' function. */
-/* #undef HAVE_SWPRINTF */
+#define HAVE_SWPRINTF 1
 
 /* Define to 1 if you have the <sys/disklabel.h> header file. */
 /* #undef HAVE_SYS_DISKLABEL_H */
@@ -236,64 +236,64 @@
 /* #undef HAVE_VARARGS_H */
 
 /* Defines if verbose output should be used */
-/* #undef HAVE_VERBOSE_OUTPUT */
+#define HAVE_VERBOSE_OUTPUT 1
 
 /* Define to 1 if you have the `vprintf' function. */
 #define HAVE_VPRINTF 1
 
 /* Define to 1 if you have the <wchar.h> header file. */
-/* #undef HAVE_WCHAR_H */
+#define HAVE_WCHAR_H 1
 
 /* Define to 1 if you have the `wcschr' function. */
-/* #undef HAVE_WCSCHR */
+#define HAVE_WCSCHR 1
 
 /* Define to 1 if you have the `wcscmp' function. */
-/* #undef HAVE_WCSCMP */
+#define HAVE_WCSCMP 1
 
 /* Define to 1 if you have the `wcscpy' function. */
-/* #undef HAVE_WCSCPY */
+#define HAVE_WCSCPY 1
 
 /* Define to 1 if you have the `wcsdup' function. */
-/* #undef HAVE_WCSDUP */
+#define HAVE_WCSDUP 1
 
 /* Define to 1 if you have the `wcslen' function. */
-/* #undef HAVE_WCSLEN */
+#define HAVE_WCSLEN 1
 
 /* Define to 1 if you have the `wcsncmp' function. */
-/* #undef HAVE_WCSNCMP */
+#define HAVE_WCSNCMP 1
 
 /* Define to 1 if you have the `wcsncpy' function. */
-/* #undef HAVE_WCSNCPY */
+#define HAVE_WCSNCPY 1
 
 /* Define to 1 if you have the `wcsrchr' function. */
-/* #undef HAVE_WCSRCHR */
+#define HAVE_WCSRCHR 1
 
 /* Define to 1 if you have the `wcsrtombs' function. */
-/* #undef HAVE_WCSRTOMBS */
+#define HAVE_WCSRTOMBS 1
 
 /* Define to 1 if you have the `wcstoll' function. */
-/* #undef HAVE_WCSTOLL */
+#define HAVE_WCSTOLL 1
 
 /* Define to 1 if you have the `wcstoull' function. */
-/* #undef HAVE_WCSTOULL */
+#define HAVE_WCSTOULL 1
 
 /* Define to 1 if you have the `wctob' function. */
-/* #undef HAVE_WCTOB */
+#define HAVE_WCTOB 1
 
 /* Defines if wide character type should be used */
-/* #undef HAVE_WIDE_CHARACTER_TYPE */
+#define HAVE_WIDE_CHARACTER_TYPE 1
 
 /* Define to 1 if you have the `wmain' function. */
 /* #undef HAVE_WMAIN */
 
 /* Define to 1 if you have the `wmemchr' function. */
-/* #undef HAVE_WMEMCHR */
+#define HAVE_WMEMCHR 1
 
 /* Define to 1 if you have the `wmemcmp' function. */
-/* #undef HAVE_WMEMCMP */
+#define HAVE_WMEMCMP 1
 
 /* Define to 1 if you have the `wmemcpy' function. */
-/* #undef HAVE_WMEMCPY */
+#define HAVE_WMEMCPY 1
 
 /* Define to 1 if you have the `wmemrchr' function. */
 /* #undef HAVE_WMEMRCHR */
@@ -314,13 +314,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20080103"
+#define PACKAGE_STRING "libewf 20080106"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20080103"
+#define PACKAGE_VERSION "20080106"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -332,7 +332,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20080103"
+#define VERSION "20080106"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64

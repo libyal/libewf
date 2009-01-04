@@ -39,10 +39,10 @@
 /* Append an entry to the section list
  * Returns a pointer to the instance, NULL on error
  */
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset )
+libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset )
 {
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
-	static char *function                         = "libewf_section_list_append";
+	libewf_section_list_entry_t *section_list_entry = NULL;
+	static char *function                           = "libewf_section_list_append";
 
 	if( section_list == NULL )
 	{
@@ -72,7 +72,8 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 
 		return( NULL );
 	}
-	section_list_entry = (LIBEWF_SECTION_LIST_ENTRY *) libewf_common_alloc( LIBEWF_SECTION_LIST_ENTRY_SIZE );
+	section_list_entry = (libewf_section_list_entry_t *) libewf_common_alloc(
+	                                                      sizeof( libewf_section_list_entry_t ) );
 
 	if( section_list_entry == NULL )
 	{
@@ -84,7 +85,7 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 	if( libewf_common_memset(
 	     section_list_entry,
 	     0,
-	     LIBEWF_SECTION_LIST_ENTRY_SIZE ) == NULL )
+	     sizeof( libewf_section_list_entry_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear section list entry.\n",
 		 function );
@@ -127,10 +128,10 @@ LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_li
 /* Removes the last entry from the section list
  * Returns 1 if successful, or -1 on error
  */
-int libewf_section_list_remove_last( LIBEWF_SECTION_LIST *section_list )
+int libewf_section_list_remove_last( libewf_section_list_t *section_list )
 {
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
-	static char *function                         = "libewf_section_list_remove_last";
+	libewf_section_list_entry_t *section_list_entry = NULL;
+	static char *function                           = "libewf_section_list_remove_last";
 
 	if( section_list == NULL )
 	{

@@ -53,7 +53,7 @@ struct libewf_chunk_offset
 {
 	/* A reference to the segment file handle
 	 */
-	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle;
+	libewf_segment_file_handle_t *segment_file_handle;
 
 	/* The file offset of the chunk in the segment file
 	 */

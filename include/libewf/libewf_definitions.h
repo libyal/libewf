@@ -36,10 +36,10 @@
 
 /* The libewf version
  */
-#if 0
-#define LIBEWF_VERSION				L"20080103"
+#if 1
+#define LIBEWF_VERSION				L"20080106"
 #else
-#define LIBEWF_VERSION				"20080103"
+#define LIBEWF_VERSION				"20080106"
 #endif
 
 /* The libewf file access
@@ -114,7 +114,7 @@
 
 /* Libewf compression types
  */
-#if 0
+#if 1
 #define LIBEWF_COMPRESSION_TYPE_NONE		L"n"
 #define LIBEWF_COMPRESSION_TYPE_FAST		L"f"
 #define LIBEWF_COMPRESSION_TYPE_BEST		L"b"
