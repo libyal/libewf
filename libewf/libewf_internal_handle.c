@@ -90,6 +90,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->current_chunk             = 0;
 	internal_handle->current_chunk_offset      = 0;
 	internal_handle->swap_byte_pairs           = 0;
+	internal_handle->calculate_md5             = 1;
 	internal_handle->compression_level         = EWF_COMPRESSION_UNKNOWN;
 	internal_handle->amount_of_header_sections = 0;
 	internal_handle->format                    = LIBEWF_FORMAT_UNKNOWN;
@@ -1555,7 +1556,7 @@ int libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_hand
 	return( libewf_hash_values_set_value( internal_handle->hash_values, identifier, value, length ) );
 }
 
-/* Sets the swap byte pairs, used by both read and write
+/* Sets the value to swap byte pairs internally, used by both read and write
  * Returns 1 if successful, -1 on error
  */
 int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs )
@@ -1574,10 +1575,29 @@ int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal
 	return( 1 );
 }
 
+/* Sets the value to calculate the MD5 internally, used by both read and write
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_internal_handle_set_calculate_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t calculate_md5 )
+{
+	static char *function = "libewf_internal_handle_set_calculate_md5";
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->calculate_md5 = calculate_md5;
+
+	return( 1 );
+}
+
 /* Add a acquiry read error sector to the list
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors )
+int libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors )
 {
 	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
 	static char *function                      = "libewf_internal_handle_add_acquiry_error_sector";
@@ -1643,7 +1663,7 @@ int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *
 /* Add a CRC error sector to the list
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk ) 
+int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk ) 
 {
 	LIBEWF_ERROR_SECTOR *crc_error_sectors = NULL;
 	static char *function                  = "libewf_internal_handle_add_crc_error_chunk";

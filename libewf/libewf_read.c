@@ -367,9 +367,10 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			return( -1 );
 		}
-		/* Check if the chunk was processed in the MD5 hash calculation
+		/* Check if the MD5 of the chunk needs to be calculated
 		 */
-		if( internal_handle->offset_table->hashed[ chunk ] != 1 )
+		if( ( internal_handle->calculate_md5 != 0 )
+		 && ( internal_handle->offset_table->hashed[ chunk ] != 1 ) )
 		{
 			if( libewf_md5_update( &internal_handle->md5_context, chunk_data, chunk_data_size ) != 1 )
 			{
@@ -415,7 +416,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		}
 		/* Swap bytes after MD5 calculation
 		 */
-		if( ( internal_handle->swap_byte_pairs == 1 )
+		if( ( internal_handle->swap_byte_pairs != 0 )
 		 && ( libewf_endian_swap_byte_pairs( chunk_data, chunk_data_size ) != 1 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",

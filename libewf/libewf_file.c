@@ -640,7 +640,7 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 	         length ) );
 }
 
-/* Sets the swap byte pairs, used by both read and write
+/* Sets the value to swap byte pairs internally, used by both read and write
  * Returns 1 if successful, -1 on error
  */
 int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs )
@@ -648,6 +648,16 @@ int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs )
 	return( libewf_internal_handle_set_swap_byte_pairs(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
 	         swap_byte_pairs ) );
+}
+
+/* Sets the value to calculate the MD5 internally, used by both read and write
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_set_calculate_md5( LIBEWF_HANDLE *handle, uint8_t calculate_md5 )
+{
+	return( libewf_internal_handle_set_calculate_md5(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         calculate_md5 ) );
 }
 
 /* Calculates the MD5 hash and creates a printable string of the calculated md5 hash
@@ -842,7 +852,7 @@ int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *strin
  * Will parse the first available header in order mentioned above
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
+int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 {
 	LIBEWF_HEADER_VALUES *header_values     = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
@@ -911,7 +921,7 @@ int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 /* Parses the hash values from the xhash section
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
+int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_HASH_VALUES *hash_values         = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
@@ -954,7 +964,7 @@ int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 /* Add an acquiry error
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
+int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
 {
 	return( libewf_internal_handle_add_acquiry_error_sector(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,

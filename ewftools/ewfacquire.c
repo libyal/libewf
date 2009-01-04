@@ -279,6 +279,7 @@ int main( int argc, char * const argv[] )
 	uint8_t read_error_retry                 = 2;
 	uint8_t swap_byte_pairs                  = 0;
 	uint8_t seek_on_error                    = 1;
+	uint8_t calculate_md5                    = 1;
 	uint8_t calculate_sha1                   = 0;
 	uint8_t verbose                          = 0;
 	int file_descriptor                      = 0;
@@ -802,6 +803,22 @@ int main( int argc, char * const argv[] )
 	if( libewf_set_swap_byte_pairs( handle, swap_byte_pairs ) != 1 )
 	{
 		fprintf( stderr, "Unable to set swap byte pairs in handle.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		if( libewf_common_close( file_descriptor ) != 0 )
+		{
+			fprintf( stderr, "Unable to close input.\n" );
+		}
+		libewf_common_free( filename );
+
+		return( EXIT_FAILURE );
+	}
+	if( libewf_set_calculate_md5( handle, calculate_md5 ) != 1 )
+	{
+		fprintf( stderr, "Unable to set calculate MD5 in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{

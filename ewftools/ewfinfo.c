@@ -247,6 +247,16 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( libewf_set_calculate_md5( handle, 0 ) != 1 )
+	{
+		fprintf( stderr, "Unable to set calculate MD5 in handle.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		return( EXIT_FAILURE );
+	}
 	if( libewf_parse_header_values( handle, date_format ) != 1 )
 	{
 		fprintf( stderr, "Unable to parse header values.\n" );

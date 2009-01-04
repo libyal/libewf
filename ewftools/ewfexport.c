@@ -128,6 +128,7 @@ int main( int argc, char * const argv[] )
 	int64_t segment_file_size    = 0;
 	uint8_t libewf_format        = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs      = 0;
+	uint8_t calculate_md5        = 1;
 	uint8_t verbose              = 0;
 	int8_t compression_level     = LIBEWF_COMPRESSION_NONE;
 	int8_t compress_empty_block  = 0;
@@ -333,6 +334,18 @@ int main( int argc, char * const argv[] )
 	if( libewf_set_swap_byte_pairs( handle, swap_byte_pairs ) != 1 )
 	{
 		fprintf( stderr, "Unable to set swap byte pairs in handle.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		libewf_common_free( target_filename );
+
+		return( EXIT_FAILURE );
+	}
+	if( libewf_set_calculate_md5( handle, calculate_md5 ) != 1 )
+	{
+		fprintf( stderr, "Unable to set calculate MD5 in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{

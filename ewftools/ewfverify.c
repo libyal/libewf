@@ -212,6 +212,16 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( libewf_set_calculate_md5( handle, 1 ) != 1 )
+	{
+		fprintf( stderr, "Unable to set calculate MD5 in handle.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		return( EXIT_FAILURE );
+	}
 	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( stored_md5_hash_string == NULL )
