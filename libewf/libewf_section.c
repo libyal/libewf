@@ -59,16 +59,15 @@
 /* Reads a section start from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_start_read( int file_descriptor, EWF_SECTION *section, uint8_t error_tollerance )
+ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTION *section, uint8_t error_tollerance )
 {
 	static char *function  = "libewf_section_start_read";
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
-	ssize_t read_count     = 0;
 
-	if( file_descriptor == -1 )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
@@ -80,9 +79,10 @@ ssize_t libewf_section_start_read( int file_descriptor, EWF_SECTION *section, ui
 
 		return( -1 );
 	}
-	read_count = libewf_common_read( file_descriptor, section, EWF_SECTION_SIZE );
-
-	if( read_count != (ssize_t) EWF_SECTION_SIZE )
+	if( libewf_segment_file_read(
+	     segment_file,
+	     section,
+	     EWF_SECTION_SIZE ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read section start.\n",
 		 function );
@@ -3352,38 +3352,42 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size, uint16_t segment_number, off64_t start_offset )
+ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint16_t segment_number, uint8_t error_tollerance )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 
 	static char *function  = "libewf_section_delta_chunk_read";
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
-	ssize_t read_count     = (ssize_t) size;
 	uint32_t chunk         = 0;
 
-	if( internal_handle == NULL )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table == NULL )
+	if( section_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	read_count = libewf_common_read(
-	              file_descriptor,
-	              &delta_chunk_header,
-	              EWFX_DELTA_CHUNK_HEADER_SIZE );
-
-	if( read_count <= -1 )
+	if( offset_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read delta chunk header from file.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_segment_file_read(
+	     segment_file,
+	     &delta_chunk_header,
+	     EWFX_DELTA_CHUNK_HEADER_SIZE ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read delta chunk header.\n",
 		 function );
 
 		return( -1 );
@@ -3409,14 +3413,17 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
 		 function, stored_crc, calculated_crc );
 
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
 			return( -1 );
 		}
 	}
 	/* Skip the chunk data within the section
 	 */
-	if( libewf_common_lseek( file_descriptor, ( size - EWFX_DELTA_CHUNK_HEADER_SIZE ), SEEK_CUR ) == -1 )
+	if( libewf_segment_file_seek_offset(
+	     segment_file,
+	     ( section_size - EWFX_DELTA_CHUNK_HEADER_SIZE ),
+	     SEEK_CUR ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 		 function );
@@ -3425,14 +3432,15 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	/* Update the chunk data in the offset table
 	 */
-	internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
-	internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = file_descriptor;
-	internal_handle->offset_table->chunk_offset[ chunk ].file_offset     = (off64_t) ( start_offset + EWFX_DELTA_CHUNK_HEADER_SIZE );
-	internal_handle->offset_table->chunk_offset[ chunk ].size            = size - EWFX_DELTA_CHUNK_HEADER_SIZE;
-	internal_handle->offset_table->chunk_offset[ chunk ].compressed      = 0;
-	internal_handle->offset_table->chunk_offset[ chunk ].dirty           = 1;
+	offset_table->chunk_offset[ chunk ].segment_file    = segment_file;
+	offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
+	offset_table->chunk_offset[ chunk ].file_descriptor = segment_file->file_descriptor;
+	offset_table->chunk_offset[ chunk ].file_offset     = section_offset + EWFX_DELTA_CHUNK_HEADER_SIZE;
+	offset_table->chunk_offset[ chunk ].size            = section_size - EWFX_DELTA_CHUNK_HEADER_SIZE;
+	offset_table->chunk_offset[ chunk ].compressed      = 0;
+	offset_table->chunk_offset[ chunk ].dirty           = 1;
 
-	return( (ssize_t) size );
+	return( (ssize_t) section_size );
 }
 
 /* Writes a delta chunk section to file
@@ -3611,7 +3619,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		return( -1 );
 	}
 	if( libewf_section_start_read(
-	     segment_file->file_descriptor,
+	     segment_file,
 	     section,
 	     internal_handle->error_tollerance ) <= -1 )
 	{
@@ -3777,11 +3785,12 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "delta_chunk", 12 ) == 0 )
 	{
 		count = libewf_section_delta_chunk_read(
-		         internal_handle,
- 		         segment_file->file_descriptor,
+ 		         segment_file,
+ 		         *section_start_offset,
  		         (size_t) size,
+ 		         internal_handle->offset_table,
  		         segment_number,
- 		         *section_start_offset );
+ 		         internal_handle->error_tollerance );
 	}
 	/* Read the ltree section
 	 * The \0 byte is included in the compare

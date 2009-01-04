@@ -137,6 +137,8 @@ Next release:
 * refactor chunk offset segment_number and file_descriptor to
   reference of segment_file struct
   - dirty still needed?
+* store length segment filename in segment file
+* refactor segment table to a table of segment file **
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

@@ -49,6 +49,7 @@ extern "C" {
 
 int libewf_segment_file_check_file_signature( int file_descriptor );
 
+LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, int flags );
 ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffer, size_t size );
 off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset, int whence );
 

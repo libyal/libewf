@@ -103,6 +103,77 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	return( 0 );
 }
 
+/* Creates and opens a segment file
+ * Sets the filename and the file descriptor in the segment file struct
+ * Returns a pointer to the segment file if successful, or NULL on error
+ */
+LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, int flags )
+{
+	LIBEWF_SEGMENT_FILE *segment_file = NULL;
+	static char *function             = "libewf_segment_file_open";
+
+	if( filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
+
+		return( NULL );
+	}
+	segment_file = (LIBEWF_SEGMENT_FILE *) libewf_common_alloc( LIBEWF_SEGMENT_FILE_SIZE );
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create segment file.\n",
+		 function );
+
+		return( NULL );
+	}
+	segment_file->section_list = (LIBEWF_SECTION_LIST *) libewf_common_alloc( LIBEWF_SECTION_LIST_SIZE );
+
+	if( segment_file->section_list == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create section list.\n",
+		 function );
+
+		libewf_common_free( segment_file );
+
+		return( NULL );
+	}
+	segment_file->file_descriptor     = -1;
+	segment_file->filename            = NULL;
+	segment_file->file_offset         = 0;
+	segment_file->section_list->first = NULL;
+	segment_file->section_list->last  = NULL;
+
+	if( libewf_segment_file_set_filename(
+	     segment_file,
+	     filename,
+	     length_filename ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment file.\n",
+		 function );
+
+		libewf_common_free( segment_file->section_list );
+		libewf_common_free( segment_file );
+
+		return( NULL );
+	}
+	segment_file->file_descriptor = libewf_filename_open( filename, flags );
+
+	if( segment_file->file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to open segment file: %" PRIs_EWF_filename ".\n",
+		 function, filename );
+
+		libewf_common_free( segment_file->filename );
+		libewf_common_free( segment_file->section_list );
+		libewf_common_free( segment_file );
+
+		return( NULL );
+	}
+	return( segment_file );
+}
+
 /* Reads a buffer from a segment file
  * Updates the segment file offset
  * Returns the amount of bytes read if successful, or -1 on errror
