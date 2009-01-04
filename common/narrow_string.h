@@ -117,6 +117,13 @@ extern "C" {
 	fgets( string, size, stream )
 #endif
 
+/* String input conversion (sscanf)
+ */
+#if defined( HAVE_SSCANF )
+#define narrow_string_sscanf( string, format, ... ) \
+	sscanf( string, format, __VA_ARGS__ )
+#endif
+
 /* String to singed long long (int64)
  */
 #if defined( HAVE_ATOI64 )
