@@ -1049,12 +1049,13 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		/* Write the section start of the chunks section
 		 */
 		write_count = libewf_segment_file_write_chunks_section_start(
-		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
 		               internal_handle->offset_table,
 		               internal_handle->media_values->chunk_size,
 		               internal_handle->write->amount_of_chunks,
-		               internal_handle->write->chunks_per_chunks_section );
+		               internal_handle->write->chunks_per_chunks_section,
+		               internal_handle->format,
+		               internal_handle->ewf_format );
 
 		if( write_count == -1 )
 		{
@@ -1072,8 +1073,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	 function, chunk_size, segment_number );
 
 	write_count = libewf_segment_file_write_chunks_data(
-		       internal_handle,
 		       internal_handle->segment_table->segment_file[ segment_number ],
+		       internal_handle->offset_table,
 		       chunk,
 		       chunk_buffer,
 		       chunk_size,
@@ -1117,12 +1118,14 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		/* Correct the offset, size in the chunks section
 		 */
 		write_count = libewf_segment_file_write_chunks_correction(
-		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
+		               internal_handle->offset_table,
 		               internal_handle->write->chunks_section_offset,
 		               (size64_t) internal_handle->write->chunks_section_write_count,
 		               internal_handle->write->amount_of_chunks,
-		               internal_handle->write->section_amount_of_chunks );
+		               internal_handle->write->section_amount_of_chunks,
+		               internal_handle->format,
+		               internal_handle->ewf_format );
 
 		if( write_count == -1 )
 		{
@@ -1166,7 +1169,12 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 			               internal_handle->segment_table->segment_file[ segment_number ],
 			               segment_number,
 			               internal_handle->write->segment_amount_of_chunks,
-			               0 );
+			               0,
+			               internal_handle->media_values,
+			               internal_handle->hash_sections,
+			               internal_handle->compression_level,
+			               internal_handle->format,
+			               internal_handle->ewf_format );
 
 			if( write_count == -1 )
 			{
@@ -2396,12 +2404,14 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 			 function );
 
 			write_count = libewf_segment_file_write_chunks_correction(
-				       internal_handle,
 				       segment_file,
+				       internal_handle->offset_table,
 				       internal_handle->write->chunks_section_offset,
 				       (size64_t) internal_handle->write->chunks_section_write_count,
 				       internal_handle->write->amount_of_chunks,
-				       internal_handle->write->section_amount_of_chunks );
+				       internal_handle->write->section_amount_of_chunks,
+				       internal_handle->format,
+				       internal_handle->ewf_format );
 
 			if( write_count == -1 )
 			{
@@ -2424,7 +2434,12 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		               segment_file,
 		               segment_number,
 		               internal_handle->write->segment_amount_of_chunks,
-		               1 );
+		               1,
+		               internal_handle->media_values,
+		               internal_handle->hash_sections,
+		               internal_handle->compression_level,
+		               internal_handle->format,
+		               internal_handle->ewf_format );
 
 		if( write_count == -1 )
 		{
@@ -2444,7 +2459,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		 */
 		internal_handle->media_values->amount_of_chunks  = internal_handle->write->amount_of_chunks;
 		internal_handle->media_values->amount_of_sectors = (uint32_t) ( internal_handle->write->input_write_count
-							  / internal_handle->media_values->bytes_per_sector );
+		                                                 / internal_handle->media_values->bytes_per_sector );
 
 		/* Correct the segment files
 		 */

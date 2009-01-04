@@ -1,5 +1,5 @@
 /*
- * libewf segment table
+ * libewf hash sections
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,74 +31,49 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_SEGMENT_TABLE_H )
-#define _LIBEWF_SEGMENT_TABLE_H
+#if !defined( _LIBEWF_HASH_SECTIONS_H )
+#define _LIBEWF_HASH_SECTIONS_H
 
 #include "libewf_includes.h"
-#include "libewf_char.h"
 
-#include "libewf_filename.h"
-#include "libewf_section_list.h"
+#include "libewf_values_table.h"
+
+#include "ewf_char.h"
+#include "ewf_digest_hash.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_SEGMENT_FILE		libewf_segment_file_t
-#define LIBEWF_SEGMENT_FILE_SIZE	sizeof( LIBEWF_SEGMENT_FILE )
+#define LIBEWF_HASH_SECTIONS	 	libewf_hash_sections_t
+#define LIBEWF_HASH_SECTIONS_SIZE	sizeof( LIBEWF_HASH_SECTIONS )
 
-typedef struct libewf_segment_file libewf_segment_file_t;
+typedef struct libewf_hash_sections libewf_hash_sections_t;
 
-struct libewf_segment_file
+/* Additional subhandle for media specific parameters
+ */
+struct libewf_hash_sections
 {
-	/* The filename
+	/* The stored xhash
 	 */
-	LIBEWF_FILENAME *filename;
+	EWF_CHAR *xhash;
 
-	/* The filename length
+	/* The size of the stored xhash
 	 */
-	size_t length_filename;
+	size_t xhash_size;
 
-	/* The file descriptor
+	/* The MD5 hash of the data
 	 */
-	int file_descriptor;
+	EWF_DIGEST_HASH md5_hash[ EWF_DIGEST_HASH_SIZE_MD5 ];
 
-	/* The file offset
+	/* Value to indicate if the MD5 hash was set
 	 */
-	off64_t file_offset;
-
-	/* The amount of chunks
-	 */
-	uint32_t amount_of_chunks;
-
-        /* The list of all the sections
-         */
-        LIBEWF_SECTION_LIST *section_list;
+	uint8_t md5_hash_set;
 };
 
-#define LIBEWF_SEGMENT_TABLE		libewf_segment_table_t
-#define LIBEWF_SEGMENT_TABLE_SIZE	sizeof( LIBEWF_SEGMENT_TABLE )
+LIBEWF_HASH_SECTIONS *libewf_hash_sections_alloc( void );
 
-typedef struct libewf_segment_table libewf_segment_table_t;
-
-struct libewf_segment_table
-{
-	/* The amount of segments in the table
-	 */
-	uint16_t amount;
-
-	/* A dynamic array containting references to segment files
-	 */
-	LIBEWF_SEGMENT_FILE **segment_file;
-};
-
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );
-int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
-void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
-
-int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount );
-
-int libewf_segment_table_close_all( LIBEWF_SEGMENT_TABLE *segment_table );
+void libewf_hash_sections_free( LIBEWF_HASH_SECTIONS *hash_sections );
 
 #if defined( __cplusplus )
 }

@@ -63,7 +63,7 @@ LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void )
 	     0,
 	     LIBEWF_HEADER_SECTIONS_SIZE ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear media values.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to clear header sections.\n",
 		 function );
 
 		libewf_common_free( header_sections );

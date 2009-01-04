@@ -1,5 +1,5 @@
 /*
- * libewf segment table
+ * libewf hash sections
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,78 +31,58 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_SEGMENT_TABLE_H )
-#define _LIBEWF_SEGMENT_TABLE_H
-
 #include "libewf_includes.h"
-#include "libewf_char.h"
 
-#include "libewf_filename.h"
-#include "libewf_section_list.h"
+#include "libewf_common.h"
+#include "libewf_hash_sections.h"
+#include "libewf_notify.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
-
-#define LIBEWF_SEGMENT_FILE		libewf_segment_file_t
-#define LIBEWF_SEGMENT_FILE_SIZE	sizeof( LIBEWF_SEGMENT_FILE )
-
-typedef struct libewf_segment_file libewf_segment_file_t;
-
-struct libewf_segment_file
+/* Allocates memory for a new hash sections struct
+ * Returns a pointer to the new instance, NULL on error
+ */
+LIBEWF_HASH_SECTIONS *libewf_hash_sections_alloc( void )
 {
-	/* The filename
-	 */
-	LIBEWF_FILENAME *filename;
+	LIBEWF_HASH_SECTIONS *hash_sections = NULL;
+	static char *function                   = "libewf_hash_sections_alloc";
 
-	/* The filename length
-	 */
-	size_t length_filename;
+	hash_sections = (LIBEWF_HASH_SECTIONS *) libewf_common_alloc( LIBEWF_HASH_SECTIONS_SIZE );
 
-	/* The file descriptor
-	 */
-	int file_descriptor;
+	if( hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate hash sections.\n",
+		 function );
 
-	/* The file offset
-	 */
-	off64_t file_offset;
+		return( NULL );
+	}
+	if( libewf_common_memset(
+	     hash_sections,
+	     0,
+	     LIBEWF_HASH_SECTIONS_SIZE ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear hash sections.\n",
+		 function );
 
-	/* The amount of chunks
-	 */
-	uint32_t amount_of_chunks;
+		libewf_common_free( hash_sections );
 
-        /* The list of all the sections
-         */
-        LIBEWF_SECTION_LIST *section_list;
-};
-
-#define LIBEWF_SEGMENT_TABLE		libewf_segment_table_t
-#define LIBEWF_SEGMENT_TABLE_SIZE	sizeof( LIBEWF_SEGMENT_TABLE )
-
-typedef struct libewf_segment_table libewf_segment_table_t;
-
-struct libewf_segment_table
-{
-	/* The amount of segments in the table
-	 */
-	uint16_t amount;
-
-	/* A dynamic array containting references to segment files
-	 */
-	LIBEWF_SEGMENT_FILE **segment_file;
-};
-
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );
-int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
-void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
-
-int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount );
-
-int libewf_segment_table_close_all( LIBEWF_SEGMENT_TABLE *segment_table );
-
-#if defined( __cplusplus )
+		return( NULL );
+	}
+	return( hash_sections );
 }
-#endif
 
-#endif
+/* Frees memory of a hash sections struct including elements
+ */
+void libewf_hash_sections_free( LIBEWF_HASH_SECTIONS *hash_sections )
+{
+        static char *function = "libewf_hash_sections_free";
+
+	if( hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash sections.\n",
+		 function );
+
+		return;
+	}
+	libewf_common_free( hash_sections->xhash );
+	libewf_common_free( hash_sections );
+}
 

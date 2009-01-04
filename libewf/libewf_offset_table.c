@@ -39,6 +39,7 @@
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 #include "libewf_offset_table.h"
+#include "libewf_segment_file.h"
 
 #include "ewf_definitions.h"
 
@@ -505,5 +506,45 @@ int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFS
 		}
 	}
 	return( 1 );
+}
+
+/* Seeks a certain chunk offset within the offset table
+ * Returns the chunk segment file offset if the seek is successful, or -1 on error
+ */
+off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk )
+{
+	static char *function = "libewf_segment_table_seek_chunk_offset";
+
+	if( offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->chunk_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table - missing chunk offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk >= offset_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: chunk: %" PRIu32 " not in offset table.\n",
+		 function, chunk );
+
+		return( -1 );
+	}
+	if( libewf_segment_file_seek_offset(
+	     offset_table->chunk_offset[ chunk ].segment_file,
+	     offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
+		 function, offset_table->chunk_offset[ chunk ].file_offset );
+
+		return( -1 );
+	}
+	return( offset_table->chunk_offset[ chunk ].file_offset );
 }
 

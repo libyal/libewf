@@ -189,8 +189,10 @@ LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_a
 
 			return( NULL );
 		}
-		if( libewf_segment_file_read_open(
+		if( libewf_segment_table_read_open(
 		     internal_handle, 
+		     internal_handle->segment_table, 
+		     internal_handle->delta_segment_table, 
 		     filenames, 
 		     file_amount,
 		     flags ) != 1 )
@@ -218,8 +220,8 @@ LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_a
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
-		if( libewf_segment_file_write_open(
-		     internal_handle, 
+		if( libewf_segment_table_write_open(
+		     internal_handle->segment_table, 
 		     filenames, 
 		     file_amount ) != 1 )
 		{
@@ -262,9 +264,18 @@ int libewf_close( LIBEWF_HANDLE *handle )
 
 		libewf_write_finalize( handle );
 	}
-	if( libewf_segment_file_close_all( internal_handle ) != 1 )
+	if( libewf_segment_table_close_all(
+	     internal_handle->segment_table ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to close all segment files.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to close all segment files in segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_segment_table_close_all(
+	     internal_handle->delta_segment_table ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to close all segment files in delta segment table.\n",
 		 function );
 
 		return( -1 );
@@ -326,13 +337,17 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 
 		return( -1 );
 	}
-	if( libewf_segment_file_seek_chunk_offset( internal_handle, (uint32_t) chunk ) == -1 )
+	if( libewf_offset_table_seek_chunk_offset(
+	     internal_handle->offset_table,
+	     (uint32_t) chunk ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
 		 function );
 
 		return( -1 );
 	}
+	internal_handle->current_chunk = chunk;
+
 	/* Determine the offset within the decompressed chunk that is requested
 	 */
 	chunk_offset = offset % internal_handle->media_values->chunk_size;
@@ -899,7 +914,14 @@ int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->md5_hash_set == 0 )
+	if( internal_handle->hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing hash sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->hash_sections->md5_hash_set == 0 )
 	{
 		return( 0 );
 	}
@@ -917,7 +939,10 @@ int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy( md5_hash, internal_handle->md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	if( libewf_common_memcpy(
+	     md5_hash,
+	     internal_handle->hash_sections->md5_hash,
+	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
 		 function );
@@ -1547,6 +1572,13 @@ int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
+	if( internal_handle->hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing hash sections.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( md5_hash == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid MD5 hash.\n",
@@ -1561,21 +1593,24 @@ int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 
 		return( -1 );
 	}
-	if( internal_handle->md5_hash_set )
+	if( internal_handle->hash_sections->md5_hash_set )
 	{
 		LIBEWF_WARNING_PRINT( "%s: MD5 hash cannot be changed.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy( internal_handle->md5_hash, md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	if( libewf_common_memcpy(
+	     internal_handle->hash_sections->md5_hash,
+	     md5_hash,
+	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->md5_hash_set = 1;
+	internal_handle->hash_sections->md5_hash_set = 1;
 
 	return( 1 );
 }
@@ -2084,11 +2119,18 @@ int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->xhash != NULL )
+	if( internal_handle->hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing hash sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->hash_sections->xhash != NULL )
 	{
 		hash_values = libewf_hash_values_parse_xhash(
-		               internal_handle->xhash,
-		               internal_handle->xhash_size );
+		               internal_handle->hash_sections->xhash,
+		               internal_handle->hash_sections->xhash_size );
 	}
 	if( hash_values == NULL )
 	{

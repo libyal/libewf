@@ -103,6 +103,8 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance );
 int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
 
+off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk );
+
 #if defined( __cplusplus )
 }
 #endif

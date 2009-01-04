@@ -182,3 +182,115 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 	libewf_common_free( segment_table );
 }
 
+/* Initializes the segment table
+ * Opens EWF segment file(s) for writing
+ * Returns 1 if successful, 0 if not, or -1 on error
+ */
+int libewf_segment_table_write_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount )
+{
+	LIBEWF_SEGMENT_FILE *segment_file = NULL;
+	static char *function             = "libewf_segment_table_write_open";
+	size_t filename_length            = 0;
+
+	if( segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filenames == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_amount < 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
+		 function );
+
+		return( -1 );
+	}
+	filename_length = libewf_filename_length( filenames[ 0 ] );
+
+	if( filename_length == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Set segment table basename
+	 */
+	segment_file = libewf_segment_file_alloc();
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	segment_table->segment_file[ 0 ] = segment_file;
+
+	if( libewf_segment_file_set_filename(
+	     segment_table->segment_file[ 0 ],
+	     filenames[ 0 ],
+	     filename_length ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Closes all the EWF segment file(s) in the segment table
+ * Returns 1 if successful, 0 if not, or -1 on error
+ */
+int libewf_segment_table_close_all( LIBEWF_SEGMENT_TABLE *segment_table )
+{
+	static char *function = "libewf_segment_table_close_all";
+	uint16_t iterator     = 0;
+	int result            = 1;
+
+	if( segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing segment files.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 1; iterator < segment_table->amount; iterator++ )
+	{
+		if( segment_table->segment_file[ iterator ]->file_descriptor > 0 )
+		{
+			if( libewf_common_close( segment_table->segment_file[ iterator ]->file_descriptor ) != 0 )
+			{
+				if( segment_table->segment_file[ iterator ]->filename == NULL )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 ".\n",
+					 function, iterator );
+				}
+				else
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
+					 function, iterator, segment_table->segment_file[ iterator ]->filename );
+				}
+				result = 0;
+			}
+		}
+	}
+	return( result );
+}
+

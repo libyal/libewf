@@ -38,6 +38,7 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_error_sector.h"
+#include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
@@ -106,13 +107,9 @@ struct libewf_internal_handle
 	 */
 	LIBEWF_HEADER_SECTIONS *header_sections;
 
-	/* The stored xhash
+	/* The stored hash sections
 	 */
-	EWF_CHAR *xhash;
-
-	/* The size of the stored xhash
-	 */
-	size_t xhash_size;
+	LIBEWF_HASH_SECTIONS *hash_sections;
 
 	/* The header values
 	 */
@@ -121,10 +118,6 @@ struct libewf_internal_handle
 	/* The hash values
 	 */
 	LIBEWF_VALUES_TABLE *hash_values;
-
-	/* The MD5 hash of the data
-	 */
-	EWF_DIGEST_HASH md5_hash[ EWF_DIGEST_HASH_SIZE_MD5 ];
 
 	/* The sectors with acquiry read errors
 	 */
@@ -145,10 +138,6 @@ struct libewf_internal_handle
 	/* value to indicate the compression level used
 	 */
 	int8_t compression_level;
-
-	/* value to indicate if the MD5 hash was set
-	 */
-	int8_t md5_hash_set;
 
 	/* value to indicate which file format is used
 	 */

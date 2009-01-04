@@ -38,6 +38,7 @@
 
 #include <libewf/libewf_handle.h>
 
+#include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_internal_handle.h"
 #include "libewf_section_list.h"
@@ -71,25 +72,20 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE *segment_fil
 
 ssize_t libewf_segment_file_write_start( LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section );
 
-ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount );
+ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount, uint8_t format, uint8_t ewf_format );
 
-ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc );
+ssize_t libewf_segment_file_write_chunks_data( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc );
 
-ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks );
+ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks, uint8_t format, uint8_t ewf_format );
 
 ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc );
 
-ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file );
+ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_HASH_SECTIONS *hash_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format );
 
 int libewf_segment_file_get_filename( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_FILENAME *filename, size_t length_filename );
 int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const LIBEWF_FILENAME *filename, size_t length_filename );
 
-int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags );
-int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount );
-
-off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );
-
-int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int libewf_segment_table_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_SEGMENT_TABLE *delta_segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags );
 
 #if defined( __cplusplus )
 }

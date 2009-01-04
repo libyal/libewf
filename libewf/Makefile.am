@@ -31,6 +31,7 @@ libewf_la_SOURCES = \
 	libewf_filename.c libewf_filename.h \
 	libewf_file_io_handle.c libewf_file_io_handle.h \
 	libewf_file_io_pool.c libewf_file_io_pool.h \
+	libewf_hash_sections.c libewf_hash_sections.h \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_sections.c libewf_header_sections.h \
 	libewf_header_values.c libewf_header_values.h \

@@ -74,6 +74,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->secondary_offset_table   = NULL;
 	internal_handle->chunk_cache              = NULL;
 	internal_handle->header_sections          = NULL;
+	internal_handle->hash_sections            = NULL;
 	internal_handle->header_values            = NULL;
 	internal_handle->hash_values              = NULL;
 	internal_handle->acquiry_error_sectors    = NULL;
@@ -81,7 +82,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->current_chunk            = 0;
 	internal_handle->current_chunk_offset     = 0;
 	internal_handle->compression_level        = EWF_COMPRESSION_UNKNOWN;
-	internal_handle->md5_hash_set             = 0;
 	internal_handle->format                   = LIBEWF_FORMAT_UNKNOWN;
 	internal_handle->ewf_format               = EWF_FORMAT_UNKNOWN;
 	internal_handle->error_tollerance         = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
@@ -155,6 +155,22 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
+	internal_handle->hash_sections = libewf_hash_sections_alloc();
+
+	if( internal_handle->hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create hash sections.\n",
+		 function );
+
+		libewf_header_sections_free( internal_handle->header_sections );
+		libewf_media_values_free( internal_handle->media_values );
+		libewf_chunk_cache_free( internal_handle->chunk_cache );
+		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_common_free( internal_handle );
+
+		return( NULL );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		internal_handle->read = libewf_internal_handle_read_alloc();
@@ -164,6 +180,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			LIBEWF_WARNING_PRINT( "%s: unable to create subhandle read.\n",
 			 function );
 
+			libewf_hash_sections_free( internal_handle->hash_sections );
 			libewf_header_sections_free( internal_handle->header_sections );
 			libewf_media_values_free( internal_handle->media_values );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
@@ -187,6 +204,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			{
 				libewf_internal_handle_read_free( internal_handle->read );
 			}
+			libewf_hash_sections_free( internal_handle->hash_sections );
 			libewf_header_sections_free( internal_handle->header_sections );
 			libewf_media_values_free( internal_handle->media_values );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
@@ -247,8 +265,10 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	{
 		libewf_header_sections_free( internal_handle->header_sections );
 	}
-	libewf_common_free( internal_handle->xhash );
-
+	if( internal_handle->hash_sections != NULL )
+	{
+		libewf_hash_sections_free( internal_handle->hash_sections );
+	}
 	if( internal_handle->header_values != NULL )
 	{
 		libewf_values_table_free( internal_handle->header_values );

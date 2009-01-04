@@ -463,7 +463,7 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE *segment_fil
 
 	libewf_common_free( compressed_string );
 
-	if( write_count == -1 )
+	if( write_count != (ssize_t) compressed_string_size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write string to file.\n",
 		 function );
@@ -590,7 +590,6 @@ ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR
 	                       header_size,
 	                       compression_level );
 
-	/* refactor */
 	if( section_write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write header to file.\n",
@@ -704,7 +703,6 @@ ssize_t libewf_section_header2_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHA
 	                       header2_size,
 	                       compression_level );
 
-	/* refactor */
 	if( section_write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write header2 to file.\n",
@@ -2014,7 +2012,7 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t b
 		     section_type,
 		     section_type_length,
 		     section_offset,
-		     ( section_offset + section_write_count ) ) == NULL )
+		     ( section_offset + section_size ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
 			 function, (char *) section_type );
@@ -2070,6 +2068,58 @@ ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, size64
 		return( -1 );
 	}
 	return( (ssize64_t) section_size );
+}
+
+/* Writes a sectors section to file
+ * Does not write the actual data in the sectors section
+ * Returns the amount of bytes written, or -1 on error
+ */
+ssize_t libewf_section_sectors_write( LIBEWF_SEGMENT_FILE *segment_file, size64_t sectors_data_size, uint8_t no_section_append )
+{
+	EWF_CHAR *section_type      = (EWF_CHAR *) "sectors";
+	static char *function       = "libewf_section_sectors_write";
+	off64_t section_offset      = 0;
+	size_t section_type_length  = 7;
+	ssize_t section_write_count = 0;
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_offset = segment_file->file_offset;
+
+	section_write_count = libewf_section_start_write(
+	                       segment_file,
+	                       section_type,
+	                       section_type_length,
+	                       sectors_data_size );
+
+	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to write section: %s to file.\n",
+		 function, (char *) section_type );
+
+		return( -1 );
+	}
+	if( no_section_append == 0 )
+	{
+		if( libewf_section_list_append(
+		     segment_file->section_list,
+		     section_type,
+		     section_type_length,
+		     section_offset,
+		     ( section_offset + sectors_data_size ) ) == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to append: %s section to section list.\n",
+			 function, (char *) section_type );
+
+			return( -1 );
+		}
+	}
+	return( section_write_count );
 }
 
 /* Reads a ltree section from file
@@ -3576,7 +3626,6 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHA
 	                       xheader_size,
 	                       compression_level );
 
-	/* refactor */
 	if( section_write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write xheader to file.\n",
@@ -3690,7 +3739,6 @@ ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR 
 	                       xhash_size,
 	                       compression_level );
 
-	/* refactor */
 	if( section_write_count == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write xhash to file.\n",
@@ -4118,7 +4166,7 @@ ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t s
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
  */
-int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTION *section, off64_t *section_start_offset )
+int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;
@@ -4134,16 +4182,23 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 
 		return( -1 );
 	}
-	if( internal_handle->header_sections == NULL )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing header sections.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( segment_file == NULL )
+	if( header_sections == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid header sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash sections.\n",
 		 function );
 
 		return( -1 );
@@ -4172,7 +4227,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	if( libewf_section_start_read(
 	     segment_file,
 	     section,
-	     internal_handle->error_tollerance ) <= -1 )
+	     error_tollerance ) <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read section start.\n",
 		 function );
@@ -4268,10 +4323,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_header2_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header_sections->header2 ),
-		              &( internal_handle->header_sections->header2_size ) );
+		              &( header_sections->header2 ),
+		              &( header_sections->header2_size ) );
 
-		internal_handle->header_sections->amount_of_header_sections++;
+		header_sections->amount_of_header_sections++;
 	}
 	/* Read the header section
 	 * The \0 byte is included in the compare
@@ -4281,10 +4336,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_header_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header_sections->header ),
-		              &( internal_handle->header_sections->header_size ) );
+		              &( header_sections->header ),
+		              &( header_sections->header_size ) );
 
-		internal_handle->header_sections->amount_of_header_sections++;
+		header_sections->amount_of_header_sections++;
 	}
 	/* Read the xheader section
 	 * The \0 byte is included in the compare
@@ -4294,10 +4349,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_xheader_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header_sections->xheader ),
-		              &( internal_handle->header_sections->xheader_size ) );
+		              &( header_sections->xheader ),
+		              &( header_sections->xheader_size ) );
 
-		internal_handle->header_sections->amount_of_header_sections++;
+		header_sections->amount_of_header_sections++;
 	}
 	/* Read the volume or disk section
 	 * The \0 byte is included in the compare
@@ -4312,14 +4367,14 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              &( internal_handle->compression_level ),
 		              &( internal_handle->format ),
 		              &( internal_handle->ewf_format ),
-		              internal_handle->error_tollerance );
+		              error_tollerance );
 
 		/* Check if the EWF file format is that of EnCase1
 		 * this allows the table read function to reduce verbose
 		 * output of unexpected additional data in table section
 		 */
 		if( ( internal_handle->ewf_format == EWF_FORMAT_E01 )
-		 && ( internal_handle->header_sections->amount_of_header_sections == 1 ) )
+		 && ( header_sections->amount_of_header_sections == 1 ) )
 		{
 			internal_handle->format = LIBEWF_FORMAT_ENCASE1;
 		}
@@ -4336,7 +4391,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              &( internal_handle->secondary_offset_table ),
 		              internal_handle->format,
 		              internal_handle->ewf_format,
-		              internal_handle->error_tollerance );
+		              error_tollerance );
 	}
 	/* Read the table section
 	 * The \0 byte is included in the compare
@@ -4350,7 +4405,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              &( internal_handle->offset_table ),
 		              internal_handle->format,
 		              internal_handle->ewf_format,
-		              internal_handle->error_tollerance );
+		              error_tollerance );
 	}
 	/* Read the sectors section
 	 * The \0 byte is included in the compare
@@ -4361,7 +4416,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              segment_file,
  		              (size64_t) size,
  		              internal_handle->ewf_format,
- 		              internal_handle->error_tollerance );
+ 		              error_tollerance );
 	}
 	/* Read the delta_chunk section
 	 * The \0 byte is included in the compare
@@ -4373,7 +4428,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
  		              (size_t) size,
  		              internal_handle->offset_table,
  		              internal_handle->secondary_offset_table,
- 		              internal_handle->error_tollerance );
+ 		              error_tollerance );
 	}
 	/* Read the ltree section
 	 * The \0 byte is included in the compare
@@ -4384,7 +4439,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              segment_file,
  		              (size_t) size,
 		              &( internal_handle->ewf_format ),
- 		              internal_handle->error_tollerance );
+ 		              error_tollerance );
 	}
 	/* Read the session section
 	 * The \0 byte is included in the compare
@@ -4395,7 +4450,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              segment_file,
 		              (size_t) size,
 		              internal_handle->ewf_format,
- 		              internal_handle->error_tollerance );
+ 		              error_tollerance );
 	}
 	/* Read the data section
 	 * The \0 byte is included in the compare
@@ -4407,7 +4462,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              (size_t) size,
 		              internal_handle->media_values,
 		              internal_handle->ewf_format,
- 		              internal_handle->error_tollerance );
+ 		              error_tollerance );
 	}
 	/* Read the hash section
 	 * The \0 byte is included in the compare
@@ -4416,10 +4471,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_hash_read(
 		              segment_file,
-		              internal_handle->md5_hash,
- 		              internal_handle->error_tollerance );
+		              hash_sections->md5_hash,
+ 		              error_tollerance );
 
-		internal_handle->md5_hash_set = 1;
+		hash_sections->md5_hash_set = 1;
 
 	}
 	/* Read the xhash section
@@ -4430,8 +4485,8 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_xhash_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->xhash ),
-		              &( internal_handle->xhash_size ) );
+		              &( hash_sections->xhash ),
+		              &( hash_sections->xhash_size ) );
 	}
 	/* Read the error2 section
 	 * The \0 byte is included in the compare
@@ -4443,7 +4498,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		              &( internal_handle->acquiry_error_sectors ),
 		              &( internal_handle->amount_of_acquiry_errors ),
 		              internal_handle->ewf_format,
- 		              internal_handle->error_tollerance );
+ 		              error_tollerance );
 	}
 	else
 	{

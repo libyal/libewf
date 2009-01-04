@@ -36,6 +36,8 @@
 
 #include "libewf_includes.h"
 #include "libewf_error_sector.h"
+#include "libewf_hash_sections.h"
+#include "libewf_header_sections.h"
 #include "libewf_internal_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
@@ -74,6 +76,7 @@ ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, size_t sec
 ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t base_offset, LIBEWF_OFFSET_TABLE *offset_table, uint32_t offset_table_index, uint32_t amount_of_offsets, EWF_CHAR *section_type, size_t section_type_length, size_t additional_size, uint8_t format, uint8_t ewf_format, uint8_t no_section_append );
 
 ssize64_t libewf_section_sectors_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size, uint8_t ewf_format, uint8_t error_tollerance );
+ssize_t libewf_section_sectors_write( LIBEWF_SEGMENT_FILE *segment_file, size64_t sectors_data_size, uint8_t no_section_append );
 
 ssize_t libewf_section_ltree_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t *ewf_format, uint8_t error_tollerance );
 
@@ -103,7 +106,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE *segment_file, size64_t section_size );
 #endif
 
-int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTION *section, off64_t *section_start_offset );
+int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
 
 #if defined( __cplusplus )
 }
