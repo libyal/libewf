@@ -122,6 +122,9 @@ DELTA FILE
 
 Version: 20070811
 * removed external char
+* removed error string from libewf_check_file_signature,
+  libewf_segment_file_read_open, libewf_segment_file_write_open
+* merged common code in wide and narrow functions
 * worked on restructuring to improve internal structure
 * worked on improved rewrite using delta segment files
 

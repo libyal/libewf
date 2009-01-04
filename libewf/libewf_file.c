@@ -78,11 +78,6 @@ int libewf_check_file_signature( const wchar_t *filename )
 int libewf_check_file_signature( const char *filename )
 #endif
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *error_string = NULL;
-#else
-	char *error_string    = NULL;
-#endif
 	static char *function = "libewf_check_file_signature";
 	int file_descriptor   = 0;
 	int result            = 0;
@@ -103,33 +98,12 @@ int libewf_check_file_signature( const char *filename )
 	if( file_descriptor < 0 )
 	{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		error_string = libewf_common_wide_strerror( errno );
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+		 function, filename );
 #else
-		error_string = libewf_common_strerror( errno );
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+		 function, filename );
 #endif
-
-		if( error_string == NULL )
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-			 function, filename );
-#else
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-			 function, filename );
-#endif
-		}
-		else
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
-			 function, filename, error_string );
-#else
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-			 function, filename, error_string );
-#endif
-
-			libewf_common_free( error_string );
-		}
 		return( -1 );
 	}
 	result = libewf_segment_file_check_file_signature( file_descriptor );
@@ -137,33 +111,13 @@ int libewf_check_file_signature( const char *filename )
 	if( libewf_common_close( file_descriptor ) != 0 )
 	{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		error_string = libewf_common_wide_strerror( errno );
+		LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls.\n",
+		 function, filename );
 #else
-		error_string = libewf_common_strerror( errno );
+		LIBEWF_WARNING_PRINT( "%s: unable to close file: %s.\n",
+		 function, filename );
 #endif
 
-		if( error_string == NULL )
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls.\n",
-			 function, filename );
-#else
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s.\n",
-			 function, filename );
-#endif
-		}
-		else
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls with error: %ls.\n",
-			 function, filename, error_string );
-#else
-			LIBEWF_WARNING_PRINT( "%s: unable to close file: %s with error: %s.\n",
-			 function, filename, error_string );
-#endif
-
-			libewf_common_free( error_string );
-		}
 		return( -1 );
 	}
 	if( result <= -1 )

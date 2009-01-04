@@ -2174,13 +2174,6 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
  */
 ssize_t libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int16_t maximum_amount_of_segments )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *filename     = NULL;
-	wchar_t *error_string = NULL;
-#else
-	char *filename        = NULL;
-	char *error_string    = NULL;
-#endif
 	static char *function = "libewf_segment_file_write_open";
 	ssize_t write_count   = 0;
 	int file_descriptor   = -1;
@@ -2240,9 +2233,7 @@ ssize_t libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 		return( -1 );
 	}
-	filename = internal_handle->segment_table->filename[ segment_number ];
-
-	if( filename == NULL )
+	if( internal_handle->segment_table->filename[ segment_number ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid filename for segment file: %" PRIu32 ".\n",
 		 function, segment_number );
@@ -2250,48 +2241,27 @@ ssize_t libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle,
 		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	file_descriptor = libewf_common_wide_open( filename, LIBEWF_OPEN_WRITE );
-
-	if( file_descriptor == -1 )
-	{
-		error_string = libewf_common_wide_strerror( errno );
-
-		if( error_string == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-			 function, filename );
-		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
-			 function, filename, error_string );
-
-			libewf_common_free( error_string );
-		}
-		return( -1 );
-	}
+	file_descriptor = libewf_common_wide_open(
+	                   internal_handle->segment_table->filename[ segment_number ],
+	                   LIBEWF_OPEN_WRITE );
 #else
-	file_descriptor = libewf_common_open( filename, LIBEWF_OPEN_WRITE );
+	file_descriptor = libewf_common_open(
+	                   internal_handle->segment_table->filename[ segment_number ],
+	                   LIBEWF_OPEN_WRITE );
+#endif
 
 	if( file_descriptor == -1 )
 	{
-		error_string = libewf_common_strerror( errno );
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+		 function, internal_handle->segment_table->filename[ segment_number ] );
+#else
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+		 function, internal_handle->segment_table->filename[ segment_number ] );
+#endif
 
-		if( error_string == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-			 function, filename );
-		}
-		else
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-			 function, filename, error_string );
-
-			libewf_common_free( error_string );
-		}
 		return( -1 );
 	}
-#endif
 	internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
 
 	/* Write the start of the segment file
@@ -2507,10 +2477,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 #endif
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *error_string     = NULL;
 	static char *function     = "libewf_segment_file_read_wide_open";
 #else
-	char *error_string        = NULL;
 	static char *function     = "libewf_segment_file_read_open";
 #endif
 	uint32_t iterator         = 0;
@@ -2588,6 +2556,10 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 		return( -1 );
 	}
+	/* TODO: Get the basename of the first segment file and store it in
+	 * the 0'th entry
+	 */
+
 	/* TODO check for maximum amount of open file descriptors
 	 */
 	for( iterator = 0; iterator < file_amount; iterator++ )
@@ -2600,30 +2572,13 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 		if( file_descriptor == -1 )
 		{
-			error_string = libewf_common_strerror( errno );
-
-			if( error_string == NULL )
-			{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-				 function, filenames[ iterator ] );
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+			 function, filenames[ iterator ] );
 #else
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-				 function, filenames[ iterator ] );
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+			 function, filenames[ iterator ] );
 #endif
-			}
-			else
-			{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %ls.\n",
-				 function, filenames[ iterator ], error_string );
-#else
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-				 function, filenames[ iterator ], error_string );
-#endif
-
-				libewf_common_free( error_string );
-			}
 			return( -1 );
 		}
 		if( libewf_segment_file_read_file_header(
