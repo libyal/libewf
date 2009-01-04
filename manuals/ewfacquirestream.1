@@ -1,4 +1,4 @@
-.Dd March 2, 2008
+.Dd February 24, 2008
 .Dt ewfacquirestream
 .Os libewf
 .Sh NAME
@@ -77,8 +77,8 @@ the notes (default is notes)
 swap byte pairs of the media data (from AB to BA)
 (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
-the segment file size in bytes (default is 1.4 GiB)
-(minimum is 1.4 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats)
+the segment file size in kibibytes (KiB) (default is 1536000)
+(minimum is 1440, maximum is 9007199254740991 for encase6 format and 2097151 for other formats)
 .It Fl t Ar target
 the target file (without extension) to write to (default is stream)
 .It Fl v
@@ -117,7 +117,7 @@ Compress empty blocks:          no
 EWF file format:                EnCase 5
 Acquiry start offet:            0
 Amount of bytes to acquire:     0 (until end of input)
-Evidence segment file size:     1.4 GiB (1572864000 bytes)
+Evidence segment file size:     1536000 kibibytes (KiB)
 Block size:                     64 sectors
 Error granularity:              64 sectors
 Retries on read error:          2

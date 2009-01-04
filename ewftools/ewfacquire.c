@@ -706,12 +706,14 @@ int main( int argc, char * const argv[] )
 		{
 			maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 		}
-		segment_file_size = ewfinput_get_byte_size_variable(
+		segment_file_size = ewfinput_get_size_variable(
 		                     stdout,
-		                     _S_LIBEWF_CHAR( "Evidence segment file size in bytes" ),
-		                     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE ),
-		                     ( maximum_segment_file_size ),
-		                     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE ) );
+		                     _S_LIBEWF_CHAR( "Evidence segment file size in kibibytes (KiB)" ),
+		                     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
+		                     ( maximum_segment_file_size / 1024 ),
+		                     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
+
+		segment_file_size *= 1024;
 
 		/* Make sure the segment file size is smaller than or equal to the maximum
 		 */

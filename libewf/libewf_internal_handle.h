@@ -37,6 +37,7 @@
 #include "libewf_includes.h"
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
+#include "libewf_error_sector.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_media_values.h"
@@ -109,10 +110,6 @@ struct libewf_internal_handle
 	/* The hash values
 	 */
 	libewf_values_table_t *hash_values;
-
-	/* The stored sessions information
-	 */
-	libewf_sector_table_t *sessions;
 
 	/* The sectors with acquiry read errors
 	 */

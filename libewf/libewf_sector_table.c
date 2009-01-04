@@ -38,10 +38,9 @@
 #include "libewf_sector_table.h"
 
 /* Allocates memory for a sector table struct
- * Returns a pointer to the new instance or NULL on error
+ * Returns a pointer to the new instance, NULL on error
  */
-libewf_sector_table_t *libewf_sector_table_alloc(
-                        uint32_t amount )
+libewf_sector_table_t *libewf_sector_table_alloc( uint32_t amount )
 {
 	libewf_sector_table_t *sector_table = NULL;
 	static char *function               = "libewf_sector_table_alloc";
@@ -56,16 +55,16 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 		return( NULL );
 	}
-	sector_table->sector = NULL;
+	sector_table->error_sector = NULL;
 
 	if( amount > 0 )
 	{
-		sector_table->sector = (libewf_sector_table_entry_t *) libewf_common_alloc(
-		                                                        sizeof( libewf_sector_table_entry_t ) * amount );
+		sector_table->error_sector = (libewf_error_sector_t *) libewf_common_alloc(
+		                              ( amount * sizeof( libewf_error_sector_t ) ) );
 
-		if( sector_table->sector == NULL )
+		if( sector_table->error_sector == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic sector array.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic error sector array.\n",
 			 function );
 
 			libewf_common_free( sector_table );
@@ -73,17 +72,15 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 			return( NULL );
 		}
 		if( libewf_common_memset(
-		     sector_table->sector,
+		     sector_table->error_sector,
 		     0, 
-		     ( sizeof( libewf_sector_table_entry_t ) * amount ) ) == NULL )
+		     ( amount * sizeof( libewf_error_sector_t ) ) ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic sector array.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic error sector array.\n",
 			 function );
 
-			libewf_common_free(
-			 sector_table->sector );
-			libewf_common_free(
-			 sector_table );
+			libewf_common_free( sector_table->error_sector );
+			libewf_common_free( sector_table );
 
 			return( NULL );
 		} 
@@ -94,11 +91,9 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 }
 
 /* Reallocates memory for the sector table values
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, or -1 on error
  */
-int libewf_sector_table_realloc(
-     libewf_sector_table_t *sector_table,
-     uint32_t amount )
+int libewf_sector_table_realloc( libewf_sector_table_t *sector_table, uint32_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_sector_table_realloc";
@@ -118,24 +113,24 @@ int libewf_sector_table_realloc(
 		return( -1 );
 	}
 	reallocation = libewf_common_realloc(
-	                sector_table->sector,
-	                ( sizeof( libewf_sector_table_entry_t ) * amount ) );
+	                sector_table->error_sector,
+	                ( amount * sizeof( libewf_error_sector_t ) ) );
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic sector array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate dynamic error sector array.\n",
 		 function );
 
 		return( -1 );
 	}
-	sector_table->sector = (libewf_sector_table_entry_t *) reallocation;
+	sector_table->error_sector = (libewf_error_sector_t *) reallocation;
 
 	if( libewf_common_memset(
-	     &( sector_table->sector[ sector_table->amount ] ),
+	     &( sector_table->error_sector[ sector_table->amount ] ),
 	     0, 
-	     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
+	     ( ( amount - sector_table->amount ) * sizeof( libewf_error_sector_t ) ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic sector array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic error sector array.\n",
 		 function );
 
 		return( 1 );
@@ -147,8 +142,7 @@ int libewf_sector_table_realloc(
 
 /* Frees memory of a sector table struct including elements
  */
-void libewf_sector_table_free(
-      libewf_sector_table_t *sector_table )
+void libewf_sector_table_free( libewf_sector_table_t *sector_table )
 {
 	static char *function = "libewf_sector_table_free";
 
@@ -159,25 +153,19 @@ void libewf_sector_table_free(
 
 		return;
 	}
-	if( sector_table->sector != NULL )
+	if( sector_table->error_sector != NULL )
 	{
-		libewf_common_free(
-		 sector_table->sector );
+		libewf_common_free( sector_table->error_sector );
 	}
-	libewf_common_free(
-	 sector_table );
+	libewf_common_free( sector_table );
 }
 
-/* Retrieves the information of a sector
- * Returns 1 if successful, 0 if no sector could be found or -1 on error
+/* Retrieves the information of an error sector
+ * Returns 1 if successful, 0 if no error sector could be found, or -1 on error
  */
-int libewf_sector_table_get_sector(
-     libewf_sector_table_t *sector_table,
-     uint32_t index,
-     off64_t *first_sector,
-     uint32_t *amount_of_sectors )
+int libewf_sector_table_get_error_sector( libewf_sector_table_t *sector_table, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
 {
-	static char *function = "libewf_sector_table_get_sector";
+	static char *function = "libewf_sector_table_get_error_sector";
 
 	if( sector_table == NULL )
 	{
@@ -190,16 +178,16 @@ int libewf_sector_table_get_sector(
 	{
 		return( 0 );
 	}
-	if( sector_table->sector == NULL )
+	if( sector_table->error_sector == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector table - missing sectors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid sector table - missing error sectors.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( first_sector == NULL )
+	if( sector == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid first sector.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
 		 function );
 
 		return( -1 );
@@ -218,26 +206,22 @@ int libewf_sector_table_get_sector(
 
 		return( -1 );
 	}
-	*first_sector      = sector_table->sector[ index ].first_sector;
-	*amount_of_sectors = sector_table->sector[ index ].amount_of_sectors;
+	*sector            = sector_table->error_sector[ index ].sector;
+	*amount_of_sectors = sector_table->error_sector[ index ].amount_of_sectors;
 
 	return( 1 );
 }
 
-/* Add a sector
+/* Add an error sector
  * Returns 1 if successful, or -1 on error
  */
-int libewf_sector_table_add_sector(
-     libewf_sector_table_t *sector_table,
-     off64_t first_sector,
-     uint32_t amount_of_sectors,
-     int merge_continious_entries )
+int libewf_sector_table_add_error_sector( libewf_sector_table_t *sector_table, off64_t sector, uint32_t amount_of_sectors )
 {
-	libewf_sector_table_entry_t *reallocation = NULL;
-	static char *function                     = "libewf_sector_table_add_sector";
-	off64_t last_sector                       = 0;
-	off64_t last_range_sector                 = 0;
-	uint32_t iterator                         = 0;
+	libewf_error_sector_t *error_sector = NULL;
+	static char *function               = "libewf_sector_table_add_error_sector";
+	off64_t last_sector                 = 0;
+	off64_t last_range_sector           = 0;
+	uint32_t iterator                   = 0;
 
 	if( sector_table == NULL )
 	{
@@ -246,55 +230,54 @@ int libewf_sector_table_add_sector(
 
 		return( -1 );
 	}
-	if( first_sector < 0 )
+	if( sector < 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid first sector value is below zero.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid sector value is below zero.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ( merge_continious_entries != 0 )
-	 && ( sector_table->sector != NULL ) )
+	if( sector_table->error_sector != NULL )
 	{
-		/* Check if the sector is already in the table
+		/* Check if the error sector is already in the table
 		 */
 		for( iterator = 0; iterator < sector_table->amount; iterator++ )
 		{
-			last_range_sector = sector_table->sector[ iterator ].first_sector
-			                  + sector_table->sector[ iterator ].amount_of_sectors;
+			last_range_sector = sector_table->error_sector[ iterator ].sector
+			                  + sector_table->error_sector[ iterator ].amount_of_sectors;
 
-			if( ( first_sector >= sector_table->sector[ iterator ].first_sector )
-			 && ( first_sector <= last_range_sector ) )
+			if( ( sector >= sector_table->error_sector[ iterator ].sector )
+			 && ( sector <= last_range_sector ) )
 			{
-				/* Merge current sector with existing
+				/* Merge current error sector with existing
 				 */
-				last_sector = first_sector + amount_of_sectors;
+				last_sector = sector + amount_of_sectors;
 
 				if( last_sector > last_range_sector )
 				{
-					sector_table->sector[ iterator ].amount_of_sectors += (uint32_t) ( last_sector - last_range_sector );
+					sector_table->error_sector[ iterator ].amount_of_sectors += (uint32_t) ( last_sector - last_range_sector );
 				}
 				return( 1 );
 			}
 		}
 	}
-	/* Create a new sector
+	/* Create a new error sector
 	 */
-	reallocation = (libewf_sector_table_entry_t *) libewf_common_realloc(
-	                                                sector_table->sector,
-	                                                ( sizeof( libewf_sector_table_entry_t ) * ( sector_table->amount + 1 ) ) );
+	error_sector = (libewf_error_sector_t *) libewf_common_realloc(
+	                sector_table->error_sector,
+	                ( sizeof( libewf_error_sector_t ) * ( sector_table->amount + 1 ) ) );
 
-	if( reallocation == NULL )
+	if( error_sector == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create sectors.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create error sectors.\n",
 		 function );
 
 		return( -1 );
 	}
-	sector_table->sector = reallocation;
+	sector_table->error_sector = error_sector;
 
-	sector_table->sector[ sector_table->amount ].first_sector      = first_sector;
-	sector_table->sector[ sector_table->amount ].amount_of_sectors = amount_of_sectors;
+	sector_table->error_sector[ sector_table->amount ].sector            = sector;
+	sector_table->error_sector[ sector_table->amount ].amount_of_sectors = amount_of_sectors;
 
 	sector_table->amount += 1;
 

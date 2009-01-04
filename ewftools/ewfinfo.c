@@ -115,7 +115,6 @@ int main( int argc, char * const argv[] )
 	uint32_t amount_of_sectors        = 0;
 	uint32_t error_granularity        = 0;
 	uint32_t amount_of_acquiry_errors = 0;
-	uint32_t amount_of_sessions       = 0;
 	int8_t compression_level          = 0;
 	int8_t media_type                 = 0;
 	int8_t media_flags                = 0;
@@ -547,11 +546,6 @@ int main( int argc, char * const argv[] )
 		 handle );
 
 		fprintf( stdout, "\n" );
-
-		ewfoutput_sessions_fprint(
-		 stdout,
-		 handle,
-		 &amount_of_sessions );
 	}
 	if( ( info_option == 'a' )
 	 || ( info_option == 'e' ) )

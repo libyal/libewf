@@ -33,7 +33,7 @@
  */
 
 #if !defined( _EWFSTRING_H )
-#define _EWFSTRING_H
+#define _EWFCSTRINGH
 
 #include "../libewf/libewf_includes.h"
 
@@ -129,16 +129,6 @@ extern "C" {
 #error Missing wide character string to long (wcstoll)
 #endif
 
-#if defined( HAVE_WINDOWS_API )
-#define CHAR_T_SNPRINTF( target, size, format, ... ) \
-	swprintf_s( target, size, format, __VA_ARGS__ )
-#elif defined( HAVE_SWPRINTF )
-#define CHAR_T_SNPRINTF( target, size, format, ... ) \
-	swprintf( target, size, format, __VA_ARGS__ )
-#else
-#error Missing wide character string print to stream (swprintf)
-#endif
-
 #if defined( HAVE_FGETWS )
 #define CHAR_T_GET_FROM_STREAM( string, size, stream ) \
 	fgetws( string, size, stream )
@@ -226,19 +216,6 @@ extern "C" {
 #error Missing string to long long function (strtoll and atoll)
 #endif
 
-#if defined( HAVE_WINDOWS_API )
-#define CHAR_T_SNPRINTF( target, size, format, ... ) \
-        sprintf_s( target, size, format, __VA_ARGS__ )
-#elif defined(HAVE_SNPRINTF)
-#define CHAR_T_SNPRINTF( target, size, format, ... ) \
-        snprintf( target, size, format, __VA_ARGS__ )
-#elif defined(HAVE_SPRINTF)
-#define CHAR_T_SNPRINTF( target, size, format, ... ) \
-        sprintf( target, format, __VA_ARGS__ )
-#else
-#error Missing string print to stream (snprintf and sprintf)
-#endif
-
 #if defined( HAVE_FGETS )
 #define CHAR_T_GET_FROM_STREAM( string, size, stream ) \
 	fgets( string, size, stream )
@@ -256,15 +233,15 @@ wchar_t *ewfstring_wide_strerror(
           int error_number );
 #endif
 
-int ewfstring_copy_libewf_char_from_char_t(
-     libewf_char_t *destination,
-     const CHAR_T *source,
-     size_t length );
+int8_t ewfstring_copy_libewf_char_from_char_t(
+        libewf_char_t *destination,
+        const CHAR_T *source,
+        size_t length );
 
-int ewfstring_copy_libewf_char_to_char_t(
-     const libewf_char_t *source,
-     CHAR_T *destination,
-     size_t length );
+int8_t ewfstring_copy_libewf_char_to_char_t(
+        const libewf_char_t *source,
+        CHAR_T *destination,
+        size_t length );
 
 #if defined( __cplusplus )
 }

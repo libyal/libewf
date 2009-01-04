@@ -65,7 +65,6 @@
 #include "../libewf/libewf_notify.h"
 #include "../libewf/libewf_string.h"
 
-#include "ewfbyte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfglob.h"
@@ -79,46 +78,9 @@
 void usage_fprint(
       FILE *stream )
 {
-	libewf_char_t default_segment_file_size_string[ 16 ];
-	libewf_char_t minimum_segment_file_size_string[ 16 ];
-	libewf_char_t maximum_32bit_segment_file_size_string[ 16 ];
-	libewf_char_t maximum_64bit_segment_file_size_string[ 16 ];
-
-	int result = 0;
-
 	if( stream == NULL )
 	{
 		return;
-	}
-	result = ewfbyte_size_string_create(
-	          default_segment_file_size_string,
-	          16,
-	          EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE,
-	          EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-
-	if( result == 1 )
-	{
-		result = ewfbyte_size_string_create(
-			  minimum_segment_file_size_string,
-			  16,
-			  EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-	}
-	if( result == 1 )
-	{
-		result = ewfbyte_size_string_create(
-			  maximum_32bit_segment_file_size_string,
-			  16,
-			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
-	}
-	if( result == 1 )
-	{
-		result = ewfbyte_size_string_create(
-			  maximum_64bit_segment_file_size_string,
-			  16,
-			  EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
-			  EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE );
 	}
 	fprintf( stream, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ] [ -C case_number ] [ -d digest_type ] [ -D description ]\n" );
 	fprintf( stream, "                        [ -e examiner_name ] [ -E evidence_number ] [ -f format ] [ -l filename ] [ -m media_type ] [ -M volume_type ]\n" );
@@ -143,25 +105,12 @@ void usage_fprint(
 	fprintf( stream, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stream, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stream, "\t    (use this for big to little endian conversion and vice versa)\n" );
-
-	if( result == 1 )
-	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIs_EWF ")\n",
-		 default_segment_file_size_string );
-		fprintf( stream, "\t    (minimum is %" PRIs_EWF ", maximum is %" PRIs_EWF " for encase6 format and %" PRIs_EWF " for other formats)\n",
-		 minimum_segment_file_size_string,
-		 maximum_64bit_segment_file_size_string,
-		 maximum_32bit_segment_file_size_string );
-	}
-	else
-	{
-		fprintf( stream, "\t-S: specify the segment file size in bytes (default is %" PRIu32 ")\n",
-		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
-		fprintf( stream, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
-		 (uint32_t) EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
-		 (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT,
-		 (uint32_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT );
-	}
+	fprintf( stream, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
+	 (uint32_t) ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
+	fprintf( stream, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
+	 (uint32_t) ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
+	 (uint64_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT / 1024 ),
+	 (uint32_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT / 1024 ) );
 	fprintf( stream, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
 	fprintf( stream, "\t-v: verbose output to stderr\n" );
 	fprintf( stream, "\t-V: print version\n" );
@@ -197,6 +146,7 @@ int main( int argc, char * const argv[] )
 	CHAR_T *option_evidence_number             = NULL;
 	CHAR_T *option_notes                       = NULL;
 	CHAR_T *time_string                        = NULL;
+	CHAR_T *end_of_string                      = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string                       = NULL;
 #endif
@@ -228,7 +178,6 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1                     = 0;
 	uint8_t verbose                            = 0;
 	int error_abort                            = 0;
-	int result                                 = 0;
 
 	ewfsignal_initialize();
 
@@ -406,13 +355,16 @@ int main( int argc, char * const argv[] )
 				string_length = CHAR_T_LENGTH(
 				                 optarg );
 
-				result = ewfbyte_size_string_convert_char_t(
-				          optarg,
-				          string_length,
-				          &segment_file_size );
+				end_of_string = &optarg[ string_length - 1 ];
 
-				if( ( result != 1 )
-				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				segment_file_size  = (uint64_t) CHAR_T_TOLONG(
+				                                 optarg,
+				                                 &end_of_string,
+				                                 0 );
+
+				segment_file_size *= 1024;
+
+				if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
 				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )

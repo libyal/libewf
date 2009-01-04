@@ -60,14 +60,6 @@ struct ewf_session
 	 * starts with offset 76
 	 */
 	uint8_t crc[ 4 ];
-
-	/* The session entry array
-	 * consists of 32 bytes per sector
-	 * as long as necessary
-	 */
-
-	/* The last session entry is followed by a 4 byte CRC
-	 */
 };
 
 typedef struct ewf_session_entry ewf_session_entry_t;

@@ -36,57 +36,32 @@
 
 #include "libewf_includes.h"
 
+#include "libewf_error_sector.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
-
-typedef struct libewf_sector_table_entry libewf_sector_table_entry_t;
-
-struct libewf_sector_table_entry
-{
-	/* The first sector
-	 */
-	off64_t first_sector;
-
-	/* The amount of sectors
-	 */
-	uint32_t amount_of_sectors;
-};
 
 typedef struct libewf_sector_table libewf_sector_table_t;
 
 struct libewf_sector_table
 {
-	/* The amount of sectors in the table
+	/* The amount of error sectors in the table
 	 */
 	uint32_t amount;
 
-	/* A dynamic array containting references to the sectors
+	/* A dynamic array containting references to error sectors
 	 */
-	libewf_sector_table_entry_t *sector;
+	libewf_error_sector_t *error_sector;
 };
 
-libewf_sector_table_t *libewf_sector_table_alloc(
-                        uint32_t amount );
+libewf_sector_table_t *libewf_sector_table_alloc( uint32_t amount );
+int libewf_sector_table_realloc( libewf_sector_table_t *sector_table, uint32_t amount );
+void libewf_sector_table_free( libewf_sector_table_t *sector_table );
 
-int libewf_sector_table_realloc(
-     libewf_sector_table_t *sector_table,
-     uint32_t amount );
+int libewf_sector_table_get_error_sector( libewf_sector_table_t *sector_table, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors );
 
-void libewf_sector_table_free(
-      libewf_sector_table_t *sector_table );
-
-int libewf_sector_table_get_sector(
-     libewf_sector_table_t *sector_table,
-     uint32_t index,
-     off64_t *first_sector,
-     uint32_t *amount_of_sectors );
-
-int libewf_sector_table_add_sector(
-     libewf_sector_table_t *sector_table,
-     off64_t first_sector,
-     uint32_t amount_of_sectors,
-     int merge_continious_entries );
+int libewf_sector_table_add_error_sector( libewf_sector_table_t *sector_table, off64_t sector, uint32_t amount_of_sectors );
 
 #if defined( __cplusplus )
 }

@@ -55,7 +55,6 @@
 #include "../libewf/libewf_notify.h"
 #include "../libewf/libewf_string.h"
 
-#include "ewfbyte_size_string.h"
 #include "ewfinput.h"
 
 /* Input selection defintions
@@ -106,8 +105,7 @@ libewf_char_t *ewfinput_yes_no[ 2 ] = \
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint8_t ewfinput_determine_libewf_format(
-         const libewf_char_t *argument )
+uint8_t ewfinput_determine_libewf_format( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_libewf_format";
 
@@ -118,89 +116,53 @@ uint8_t ewfinput_determine_libewf_format(
 
 		return( 0 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "smart" ),
-	          3 ) == 0 )
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "smart" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_SMART );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "ftk" ),
-	          3 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "ftk" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_FTK );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "encase1" ),
-	          7 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "encase1" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE1 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "encase2" ),
-	          7 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "encase2" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE2 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "encase3" ),
-	          7 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "encase3" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE3 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "encase4" ),
-	          7 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "encase4" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE4 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "encase5" ),
-	          7 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "encase5" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE5 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "encase6" ),
-	          7 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "encase6" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE6 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "linen5" ),
-	          6 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "linen5" ), 6 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_LINEN5 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "linen6" ),
-	          6 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "linen6" ), 6 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_LINEN6 );
 	}
 	/* This check must before the check for "ewf"
 	 */
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "ewfx" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "ewfx" ), 4 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_EWFX );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "ewf" ),
-	          3 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "ewf" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_EWF );
 	}
@@ -210,8 +172,7 @@ uint8_t ewfinput_determine_libewf_format(
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint8_t ewfinput_determine_libewf_format_char_t(
-         const CHAR_T *argument )
+uint8_t ewfinput_determine_libewf_format_char_t( const CHAR_T *argument )
 {
 	static char *function = "ewfinput_determine_libewf_format_char_t";
 
@@ -222,89 +183,53 @@ uint8_t ewfinput_determine_libewf_format_char_t(
 
 		return( 0 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "smart" ),
-	          3 ) == 0 )
+	if( CHAR_T_COMPARE( argument, _S_CHAR_T( "smart" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_SMART );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "ftk" ),
-	          3 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ftk" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_FTK );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "encase1" ),
-	          7 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase1" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE1 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "encase2" ),
-	          7 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase2" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE2 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "encase3" ),
-	          7 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase3" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE3 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "encase4" ),
-	          7 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase4" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE4 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "encase5" ),
-	          7 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase5" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE5 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "encase6" ),
-	          7 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "encase6" ), 7 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_ENCASE6 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "linen5" ),
-	          6 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "linen5" ), 6 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_LINEN5 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "linen6" ),
-	          6 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "linen6" ), 6 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_LINEN6 );
 	}
 	/* This check must before the check for "ewf"
 	 */
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "ewfx" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_EWFX );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "ewf" ),
-	          3 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "ewf" ), 3 ) == 0 )
 	{
 		return( LIBEWF_FORMAT_EWF );
 	}
@@ -314,8 +239,7 @@ uint8_t ewfinput_determine_libewf_format_char_t(
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint32_t ewfinput_determine_sectors_per_chunk(
-          const libewf_char_t *argument )
+uint32_t ewfinput_determine_sectors_per_chunk( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk";
 
@@ -326,73 +250,43 @@ uint32_t ewfinput_determine_sectors_per_chunk(
 
 		return( 0 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "32768" ),
-	          5 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "32768" ), 5 ) == 0 )
 	{
 		return( 32768 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "16384" ),
-	          5 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "16384" ), 5 ) == 0 )
 	{
 		return( 16384 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "8192" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "8192" ), 4 ) == 0 )
 	{
 		return( 8192 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "4096" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "4096" ), 4 ) == 0 )
 	{
 		return( 4096 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "2048" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "2048" ), 4 ) == 0 )
 	{
 		return( 2048 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "1024" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "1024" ), 4 ) == 0 )
 	{
 		return( 1024 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "512" ),
-	          3 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "512" ), 3 ) == 0 )
 	{
 		return( 512 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "256" ),
-	          3 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "256" ), 3 ) == 0 )
 	{
 		return( 256 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "128" ),
-	          3 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "128" ), 3 ) == 0 )
 	{
 		return( 128 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "64" ),
-	          2 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "64" ), 2 ) == 0 )
 	{
 		return( 64 );
 	}
@@ -402,8 +296,7 @@ uint32_t ewfinput_determine_sectors_per_chunk(
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint32_t ewfinput_determine_sectors_per_chunk_char_t(
-          const CHAR_T *argument )
+uint32_t ewfinput_determine_sectors_per_chunk_char_t( const CHAR_T *argument )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk_char_t";
 
@@ -414,73 +307,43 @@ uint32_t ewfinput_determine_sectors_per_chunk_char_t(
 
 		return( 0 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "32768" ),
-	          5 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "32768" ), 5 ) == 0 )
 	{
 		return( 32768 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "16384" ),
-	          5 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "16384" ), 5 ) == 0 )
 	{
 		return( 16384 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "8192" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "8192" ), 4 ) == 0 )
 	{
 		return( 8192 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "4096" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "4096" ), 4 ) == 0 )
 	{
 		return( 4096 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "2048" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "2048" ), 4 ) == 0 )
 	{
 		return( 2048 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "1024" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "1024" ), 4 ) == 0 )
 	{
 		return( 1024 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "512" ),
-	          3 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "512" ), 3 ) == 0 )
 	{
 		return( 512 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "256" ),
-	          3 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "256" ), 3 ) == 0 )
 	{
 		return( 256 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "128" ),
-	          3 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "128" ), 3 ) == 0 )
 	{
 		return( 128 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "64" ),
-	          2 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "64" ), 2 ) == 0 )
 	{
 		return( 64 );
 	}
@@ -490,8 +353,7 @@ uint32_t ewfinput_determine_sectors_per_chunk_char_t(
 /* Determines the compression level value from an argument string
  * Returns the compression level value, or -1 on error
  */
-int8_t ewfinput_determine_compression_level(
-        const libewf_char_t *argument )
+int8_t ewfinput_determine_compression_level( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_compression_level";
 
@@ -502,24 +364,15 @@ int8_t ewfinput_determine_compression_level(
 
 		return( -1 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "none" ),
-	          4 ) == 0 )
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "none" ), 4 ) == 0 )
 	{
 		return( LIBEWF_COMPRESSION_NONE );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "fast" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "fast" ), 4 ) == 0 )
 	{
 		return( LIBEWF_COMPRESSION_FAST );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "best" ),
-	          4 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "best" ), 4 ) == 0 )
 	{
 		return( LIBEWF_COMPRESSION_BEST );
 	}
@@ -529,8 +382,7 @@ int8_t ewfinput_determine_compression_level(
 /* Determines the compression level value from an argument string
  * Returns the compression level value, or -1 on error
  */
-int8_t ewfinput_determine_compression_level_char_t(
-        const CHAR_T *argument )
+int8_t ewfinput_determine_compression_level_char_t( const CHAR_T *argument )
 {
 	static char *function = "ewfinput_determine_compression_level_char_t";
 
@@ -541,24 +393,15 @@ int8_t ewfinput_determine_compression_level_char_t(
 
 		return( -1 );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "none" ),
-	          4 ) == 0 )
+	if( CHAR_T_COMPARE( argument, _S_CHAR_T( "none" ), 4 ) == 0 )
 	{
 		return( LIBEWF_COMPRESSION_NONE );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "fast" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "fast" ), 4 ) == 0 )
 	{
 		return( LIBEWF_COMPRESSION_FAST );
 	}
-	else if( CHAR_T_COMPARE(
-	          argument,
-	          _S_CHAR_T( "best" ),
-	          4 ) == 0 )
+	else if( CHAR_T_COMPARE( argument, _S_CHAR_T( "best" ), 4 ) == 0 )
 	{
 		return( LIBEWF_COMPRESSION_BEST );
 	}
@@ -568,8 +411,7 @@ int8_t ewfinput_determine_compression_level_char_t(
 /* Determines the media type value from an argument string
  * Returns the media type value, or -1 on error
  */
-int8_t ewfinput_determine_media_type(
-        const libewf_char_t *argument )
+int8_t ewfinput_determine_media_type( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_media_type";
 
@@ -580,17 +422,11 @@ int8_t ewfinput_determine_media_type(
 
 		return( -1 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "fixed" ),
-	          5 ) == 0 )
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "fixed" ), 5 ) == 0 )
 	{
 		return( LIBEWF_MEDIA_TYPE_FIXED );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "removable" ),
-	          9 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "removable" ), 9 ) == 0 )
 	{
 		return( LIBEWF_MEDIA_TYPE_REMOVABLE );
 	}
@@ -600,8 +436,7 @@ int8_t ewfinput_determine_media_type(
 /* Determines the volume type value from an argument string
  * Returns the volume type value, or -1 on error
  */
-int8_t ewfinput_determine_volume_type(
-        const libewf_char_t *argument )
+int8_t ewfinput_determine_volume_type( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_volume_type";
 
@@ -612,17 +447,11 @@ int8_t ewfinput_determine_volume_type(
 
 		return( -1 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "logical" ),
-	          7 ) == 0 )
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "logical" ), 7 ) == 0 )
 	{
 		return( LIBEWF_VOLUME_TYPE_LOGICAL );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "physical" ),
-	          8 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "physical" ), 8 ) == 0 )
 	{
 		return( LIBEWF_VOLUME_TYPE_PHYSICAL );
 	}
@@ -632,8 +461,7 @@ int8_t ewfinput_determine_volume_type(
 /* Determines the yes or no value from an argument string
  * Returns 1 if yes, 0 if no, or -1 on error
  */
-int8_t ewfinput_determine_yes_no(
-        const libewf_char_t *argument )
+int8_t ewfinput_determine_yes_no( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_yes_no";
 
@@ -644,17 +472,11 @@ int8_t ewfinput_determine_yes_no(
 
 		return( -1 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "yes" ),
-	          3 ) == 0 )
+	if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "yes" ), 3 ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( libewf_string_compare(
-	          argument,
-	          _S_LIBEWF_CHAR( "no" ),
-	          2 ) == 0 )
+	else if( libewf_string_compare( argument, _S_LIBEWF_CHAR( "no" ), 2 ) == 0 )
 	{
 		return( 0 );
 	}
@@ -664,9 +486,7 @@ int8_t ewfinput_determine_yes_no(
 /* Get variable input from the user
  * with a maximum of 1023 characters
  */
-libewf_char_t *ewfinput_get_variable(
-                FILE *stream,
-                libewf_char_t *request_string )
+libewf_char_t *ewfinput_get_variable( FILE *stream, libewf_char_t *request_string )
 {
 	libewf_char_t user_input_buffer[ 1024 ];
 
@@ -694,17 +514,11 @@ libewf_char_t *ewfinput_get_variable(
 	{
 		fprintf( stream, "%" PRIs_EWF ": ", request_string );
 
-		user_input_buffer_ptr = libewf_string_get_from_stream(
-		                         user_input_buffer_ptr,
-		                         1023,
-		                         stdin );
+		user_input_buffer_ptr = libewf_string_get_from_stream( user_input_buffer_ptr, 1023, stdin );
 
 		if( user_input_buffer_ptr != NULL )
 		{
-			end_of_input = libewf_string_search(
-			                user_input_buffer_ptr,
-			                (libewf_char_t) '\n',
-			                1023 );
+			end_of_input = libewf_string_search( user_input_buffer_ptr, (libewf_char_t) '\n', 1023 );
 
 			if( end_of_input == NULL )
 			{
@@ -719,8 +533,7 @@ libewf_char_t *ewfinput_get_variable(
 #if defined( MEMWATCH )
 			/* One additional character required for end of string
 			 */
-			user_input = libewf_common_alloc(
-			              sizeof( libewf_char_t ) * ( input_length + 1 ) );
+			user_input = libewf_common_alloc( sizeof( libewf_char_t ) * ( input_length + 1 ) );
 
 			if( user_input == NULL )
 			{
@@ -729,16 +542,12 @@ libewf_char_t *ewfinput_get_variable(
 
 				return( NULL );
 			}
-			if( libewf_string_copy(
-			     user_input,
-			     user_input_buffer_ptr,
-			     input_length ) == NULL  )
+			if( libewf_string_copy( user_input, user_input_buffer_ptr, input_length ) == NULL  )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
 				 function );
 
-				libewf_common_free(
-				 user_input );
+				libewf_common_free( user_input );
 
 				return( NULL );
 			}
@@ -746,9 +555,7 @@ libewf_char_t *ewfinput_get_variable(
 			 */
 			user_input[ input_length ] = (libewf_char_t) '\0';
 #else
-			user_input = libewf_string_duplicate(
-			              user_input_buffer_ptr,
-			              input_length );
+			user_input = libewf_string_duplicate( user_input_buffer_ptr, input_length );
 
 			if( user_input == NULL )
 			{
@@ -771,18 +578,14 @@ libewf_char_t *ewfinput_get_variable(
 /* Get variable input from the user
  * with a maximum of 1023 characters
  */
-CHAR_T *ewfinput_get_variable_char_t(
-         FILE *stream,
-         libewf_char_t *request_string )
+CHAR_T *ewfinput_get_variable_char_t( FILE *stream, libewf_char_t *request_string )
 {
 	libewf_char_t *user_input = NULL;
 	CHAR_T *user_input_char_t = NULL;
 	static char *function     = "ewfinput_get_variable_char_t";
 	size_t user_input_length  = 0;
 
-	user_input = ewfinput_get_variable(
-	              stream,
-	              request_string );
+	user_input = ewfinput_get_variable( stream, request_string );
 
 	if( sizeof( CHAR_T ) == sizeof( libewf_char_t ) )
 	{
@@ -794,7 +597,7 @@ CHAR_T *ewfinput_get_variable_char_t(
 		                     user_input );
 
 		user_input_char_t = libewf_common_alloc(
-		                     sizeof( CHAR_T ) * ( user_input_length + 1 ) );
+		                     ( user_input_length + 1 ) * sizeof( CHAR_T ) );
 
 		if( user_input_char_t == NULL )
 		{
@@ -821,8 +624,7 @@ CHAR_T *ewfinput_get_variable_char_t(
 
 			return( NULL );
 		}
-		libewf_common_free(
-		 user_input );
+		libewf_common_free( user_input );
 
 		return( user_input_char_t );
 	}
@@ -832,15 +634,10 @@ CHAR_T *ewfinput_get_variable_char_t(
 	return( NULL );
 }
 
-/* Get variable containing a size definition input from the user
+/* Get variable containing a size definnition input from the user
  * with a maximum of 1023 characters
  */
-uint64_t ewfinput_get_size_variable(
-          FILE *stream,
-          libewf_char_t *request_string,
-          uint64_t minimum,
-          uint64_t maximum,
-          uint64_t default_value )
+uint64_t ewfinput_get_size_variable( FILE *stream, libewf_char_t *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value )
 {
 	libewf_char_t user_input_buffer[ 1024 ];
 
@@ -865,144 +662,23 @@ uint64_t ewfinput_get_size_variable(
 	}
 	while( 1 )
 	{
-		fprintf( stream, "%" PRIs_EWF " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
-		 request_string, minimum, maximum, default_value );
+		fprintf( stream, "%" PRIs_EWF " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ", request_string, minimum, maximum, default_value );
 
-		user_input_buffer_ptr = libewf_string_get_from_stream(
-		                         user_input_buffer_ptr,
-		                         1023,
-		                         stdin );
+		user_input_buffer_ptr = libewf_string_get_from_stream( user_input_buffer_ptr, 1023, stdin );
 
 		if( user_input_buffer_ptr != NULL )
 		{
 			/* Remove the trailing newline character
 			 */
-			input_length = libewf_string_length(
-			                user_input_buffer_ptr ) - 1;
+			input_length = libewf_string_length( user_input_buffer_ptr ) - 1;
 
 			if( input_length <= 0 )
 			{
 				return( default_value );
 			}
-			size_value = libewf_string_to_uint64(
-			              user_input_buffer_ptr,
-			              input_length );
+			size_value = libewf_string_to_uint64( user_input_buffer_ptr, input_length );
 
-			if( ( size_value >= minimum )
-			 && ( size_value <= maximum ) )
-			{
-				break;
-			}
-			else
-			{
-				fprintf( stream, "Value not within specified range, please try again or terminate using Ctrl^C.\n" );
-			}
-		}
-		else
-		{
-			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
-		}
-	}
-	return( size_value );
-}
-
-/* Get variable containing a byte size definition input from the user
- * with a maximum of 1023 characters
- */
-uint64_t ewfinput_get_byte_size_variable(
-          FILE *stream,
-          libewf_char_t *request_string,
-          uint64_t minimum,
-          uint64_t maximum,
-          uint64_t default_value )
-{
-	libewf_char_t minimum_size_string[ 16 ];
-	libewf_char_t maximum_size_string[ 16 ];
-	libewf_char_t default_size_string[ 16 ];
-	libewf_char_t user_input_buffer[ 1024 ];
-
-	libewf_char_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
-	static char *function                = "ewfinput_get_byte_size_variable";
-	size_t input_length                  = 0;
-	uint64_t size_value                  = 0;
-
-	if( stream == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( request_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( ewfbyte_size_string_create(
-	     minimum_size_string,
-	     16,
-	     minimum,
-	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create minimum byte size string.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( ewfbyte_size_string_create(
-	     default_size_string,
-	     16,
-	     default_value,
-	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create default byte size string.\n",
-		 function );
-
-		return( 0 );
-	}
-	if( ewfbyte_size_string_create(
-	     maximum_size_string,
-	     16,
-	     maximum,
-	     EWFBYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create maximum byte size string.\n",
-		 function );
-
-		return( 0 );
-	}
-	while( 1 )
-	{
-		fprintf( stream, "%" PRIs_EWF " (%" PRIs_EWF " >= value >= %" PRIs_EWF ") [%" PRIs_EWF "]: ",
-		 request_string, minimum_size_string, maximum_size_string, default_size_string );
-
-		user_input_buffer_ptr = libewf_string_get_from_stream(
-		                         user_input_buffer_ptr,
-		                         1023,
-		                         stdin );
-
-		if( user_input_buffer_ptr != NULL )
-		{
-			/* Remove the trailing newline character
-			 */
-			input_length = libewf_string_length(
-			                user_input_buffer_ptr ) - 1;
-
-			if( input_length <= 0 )
-			{
-				return( default_value );
-			}
-			if( ewfbyte_size_string_convert(
-			     user_input_buffer_ptr,
-			     input_length,
-			     &size_value ) != 1 )
-			{
-				fprintf( stream, "Invalid value, please try again or terminate using Ctrl^C.\n" );
-			}
-			else if( ( size_value >= minimum )
-			 && ( size_value <= maximum ) )
+			if( ( size_value >= minimum ) && ( size_value <= maximum ) )
 			{
 				break;
 			}
@@ -1022,12 +698,7 @@ uint64_t ewfinput_get_byte_size_variable(
 /* Get fixed value input from the user
  * The first value is considered the default value
  */
-libewf_char_t *ewfinput_get_fixed_value(
-                FILE *stream,
-                libewf_char_t *request_string,
-                libewf_char_t **values,
-                uint8_t amount,
-                uint8_t default_value )
+libewf_char_t *ewfinput_get_fixed_value( FILE *stream, libewf_char_t *request_string, libewf_char_t **values, uint8_t amount, uint8_t default_value )
 {
 	libewf_char_t user_input_buffer[ 1024 ];
 
@@ -1074,10 +745,7 @@ libewf_char_t *ewfinput_get_fixed_value(
 		}
 		fprintf( stream, ") [%" PRIs_EWF "]: ", values[ default_value ] );
 
-		user_input_buffer_ptr = libewf_string_get_from_stream(
-		                         user_input_buffer_ptr,
-		                         1023,
-		                         stdin );
+		user_input_buffer_ptr = libewf_string_get_from_stream( user_input_buffer_ptr, 1023, stdin );
 
 		if( user_input_buffer_ptr != NULL )
 		{
@@ -1085,31 +753,23 @@ libewf_char_t *ewfinput_get_fixed_value(
 
 			/* Remove the trailing newline character
 			 */
-			input_length = libewf_string_length(
-			                user_input_buffer_ptr ) - 1;
+			input_length = libewf_string_length( user_input_buffer_ptr ) - 1;
 
 			/* Check if the default value was selected
 			 */
 			if( input_length == 0 )
 			{
-				iterator = default_value;
-
-				input_length = libewf_string_length(
-				                values[ iterator ] );
-
+				iterator     = default_value;
+				input_length = libewf_string_length( values[ iterator ] );
 				value_match  = 1;
 			}
 			else
 			{
 				while( iterator < amount )
 				{
-					value_length = libewf_string_length(
-					                values[ iterator ] );
+					value_length = libewf_string_length( values[ iterator ] );
 
-					if( libewf_string_compare(
-					     user_input_buffer_ptr,
-					     values[ iterator ],
-					     value_length ) == 0 )
+					if( libewf_string_compare( user_input_buffer_ptr, values[ iterator ], value_length ) == 0 )
 					{
 						/* Make sure no trailing characters were given
 						 */
@@ -1130,14 +790,12 @@ libewf_char_t *ewfinput_get_fixed_value(
 		}
 		if( value_match == 1 )
 		{
-			value_length = libewf_string_length(
-			                values[ iterator ] );
+			value_length = libewf_string_length( values[ iterator ] );
 
 #if defined( MEMWATCH )
 			/* One additional character required for end of string
 			 */
-			user_input = libewf_common_alloc(
-			              sizeof( libewf_char_t ) * ( value_length + 1 ) );
+			user_input = libewf_common_alloc( sizeof( libewf_char_t ) * ( value_length + 1 ) );
 
 			if( user_input == NULL )
 			{
@@ -1146,16 +804,12 @@ libewf_char_t *ewfinput_get_fixed_value(
 
 				return( NULL );
 			}
-			if( libewf_string_copy(
-			     user_input,
-			     values[ iterator ],
-			     value_length ) == NULL  )
+			if( libewf_string_copy( user_input, values[ iterator ], value_length ) == NULL  )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
 				 function );
 
-				libewf_common_free(
-				 user_input );
+				libewf_common_free( user_input );
 
 				return( NULL );
 			}
@@ -1163,9 +817,7 @@ libewf_char_t *ewfinput_get_fixed_value(
 			 */
 			user_input[ input_length ] = (libewf_char_t) '\0';
 #else
-			user_input = libewf_string_duplicate(
-			              values[ iterator ],
-			              value_length );
+			user_input = libewf_string_duplicate( values[ iterator ], value_length );
 
 			if( user_input == NULL )
 			{

@@ -80,8 +80,7 @@
 /* Function to wrap strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
-char *ewfstring_strerror(
-       int error_number )
+char *ewfstring_strerror( int error_number )
 {
 	static char *function     = "ewfstring_strerror";
 #if !defined( ewfstring_strerror_r ) && defined( HAVE_STRERROR )
@@ -91,8 +90,7 @@ char *ewfstring_strerror(
 	char *error_string        = NULL;
 	size_t error_string_size  = 256;
 
-	error_string = (char *) libewf_common_alloc(
-	                         sizeof( char ) * error_string_size );
+	error_string = (char *) libewf_common_alloc( error_string_size * sizeof( char ) );
 
 	if( error_string == NULL )
 	{
@@ -111,24 +109,20 @@ char *ewfstring_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
 		 function );
 
-		libewf_common_free(
-		 error_string );
+		libewf_common_free( error_string );
 
 		return( NULL );
 	}
 	return( error_string );
-
 #elif defined( HAVE_STRERROR )
-	static_error_string = strerror(
-	                       error_number );
+	static_error_string = strerror( error_number );
 
 	if( static_error_string == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create static error string.\n",
 		 function );
 
-		libewf_common_free(
-		 error_string );
+		libewf_common_free( error_string );
 
 		return( NULL );
 	}
@@ -140,14 +134,12 @@ char *ewfstring_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
 		 function );
 
-		libewf_common_free(
-		 error_string );
+		libewf_common_free( error_string );
 
 		return( NULL );
 	}
 	return( error_string );
 #else
-
 	return( NULL );
 #endif
 }
@@ -167,16 +159,14 @@ char *ewfstring_strerror(
 /* Function to wrap wide character equivalent of strerror()
  * Returns a new instance to a string containing the error string, NULL on error
  */
-wchar_t *ewfstring_wide_strerror(
-          int error_number )
+wchar_t *ewfstring_wide_strerror( int error_number )
 {
 	static char *function      = "ewfstring_wide_strerror";
 #if defined( libewf_wide_common_strerror_r )
 	wchar_t *error_string      = NULL;
 	uint16_t error_string_size = 256;
 
-	error_string = (wchar_t *) libewf_common_alloc(
-	                         sizeof( wchar_t ) * error_string_size );
+	error_string = (wchar_t *) libewf_common_alloc( error_string_size * sizeof( wchar_t ) );
 
 	if( error_string == NULL )
 	{
@@ -193,14 +183,12 @@ wchar_t *ewfstring_wide_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
 		 function );
 
-		libewf_common_free(
-		 error_string );
+		libewf_common_free( error_string );
 
 		return( NULL );
 	}
 	return( error_string );
 #else
-
 	return( NULL );
 #endif
 }
@@ -210,10 +198,7 @@ wchar_t *ewfstring_wide_strerror(
  * Terminates the destination string with \0 at ( length - 1 )
  * Returns 1 if successful, -1 on error
  */
-int ewfstring_copy_libewf_char_from_char_t(
-     libewf_char_t *destination,
-     const CHAR_T *source,
-     size_t length )
+int8_t ewfstring_copy_libewf_char_from_char_t( libewf_char_t *destination, const CHAR_T *source, size_t length )
 {
 	static char *function = "ewfstring_copy_libewf_char_from_char_t";
 	ssize_t conversion    = (ssize_t) ( sizeof( libewf_char_t ) - sizeof( CHAR_T ) );
@@ -242,13 +227,11 @@ int ewfstring_copy_libewf_char_from_char_t(
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
-			destination[ iterator ] = (libewf_char_t) btowc(
-			                                           (int) source[ iterator ] );
+			destination[ iterator ] = (libewf_char_t) btowc( (int) source[ iterator ] );
 		}
 		else if( conversion < 0 )
 		{
-			destination[ iterator ] = (libewf_char_t) wctob(
-			                                           (wint_t) source[ iterator ] );
+			destination[ iterator ] = (libewf_char_t) wctob( (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
 			 */
@@ -275,10 +258,7 @@ int ewfstring_copy_libewf_char_from_char_t(
  * Terminates the destination string with \0 at ( length - 1 )
  * Returns 1 if successful, -1 on error
  */
-int ewfstring_copy_libewf_char_to_char_t(
-     const libewf_char_t *source,
-     CHAR_T *destination,
-     size_t length )
+int8_t ewfstring_copy_libewf_char_to_char_t( const libewf_char_t *source, CHAR_T *destination, size_t length )
 {
 	static char *function = "ewfstring_copy_libewf_char_to_char_t";
 	ssize_t conversion    = (ssize_t) ( sizeof( libewf_char_t ) - sizeof( CHAR_T ) );
@@ -307,8 +287,7 @@ int ewfstring_copy_libewf_char_to_char_t(
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
-			destination[ iterator ] = (CHAR_T) wctob(
-			                                    (wint_t) source[ iterator ] );
+			destination[ iterator ] = (CHAR_T) wctob( (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
 			 */
@@ -319,8 +298,7 @@ int ewfstring_copy_libewf_char_to_char_t(
 		}
 		else if( conversion < 0 )
 		{
-			destination[ iterator ] = (CHAR_T) btowc(
-			                                    (int) source[ iterator ] );
+			destination[ iterator ] = (CHAR_T) btowc( (int) source[ iterator ] );
 		}
 #endif
 		else

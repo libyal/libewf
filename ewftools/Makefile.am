@@ -3,7 +3,6 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
 
 ewfacquire_SOURCES = \
-	ewfbyte_size_string.c ewfbyte_size_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
 	ewfdigest_hash.c ewfdigest_hash.h \
@@ -20,7 +19,6 @@ ewfacquire_SOURCES = \
 ewfacquire_LDADD  = ../libewf/libewf.la
 
 ewfacquirestream_SOURCES = \
-	ewfbyte_size_string.c ewfbyte_size_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
 	ewfdigest_hash.c ewfdigest_hash.h \
@@ -37,7 +35,6 @@ ewfacquirestream_SOURCES = \
 ewfacquirestream_LDADD  = ../libewf/libewf.la
 
 ewfalter_SOURCES = \
-	ewfbyte_size_string.c ewfbyte_size_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
 	ewfdigest_hash.c ewfdigest_hash.h \
@@ -54,7 +51,6 @@ ewfalter_SOURCES = \
 ewfalter_LDADD  = ../libewf/libewf.la
 
 ewfexport_SOURCES = \
-	ewfbyte_size_string.c ewfbyte_size_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
 	ewfdigest_hash.c ewfdigest_hash.h \
@@ -71,7 +67,6 @@ ewfexport_SOURCES = \
 ewfexport_LDADD  = ../libewf/libewf.la
 
 ewfinfo_SOURCES = \
-	ewfbyte_size_string.c ewfbyte_size_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
 	ewfdigest_hash.c ewfdigest_hash.h \
@@ -87,7 +82,6 @@ ewfinfo_SOURCES = \
 ewfinfo_LDADD  = ../libewf/libewf.la
 
 ewfverify_SOURCES = \
-	ewfbyte_size_string.c ewfbyte_size_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfdigest_context.c ewfdigest_context.h \
 	ewfdigest_hash.c ewfdigest_hash.h \

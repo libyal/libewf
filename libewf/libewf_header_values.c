@@ -164,18 +164,22 @@ int libewf_convert_timestamp(
 	}
 	if( date_format == LIBEWF_DATE_FORMAT_CTIME )
 	{
-		if( libewf_string_ctime(
-		     &timestamp,
-		     date_string,
-		     date_string_length ) != 1 )
+		*date_string = libewf_string_ctime(
+		                &timestamp );
+
+		/* The libewf_string_ctime function returns a string of length 32
+		 */
+		*date_string_length = 32;
+
+		if( date_string == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
 			 function );
 
 			return( -1 );
 		}
 		newline = libewf_string_search(
-		           *date_string,
+		           date_string,
 		           (libewf_char_t) '\n',
 		           *date_string_length );
 
@@ -269,10 +273,6 @@ int libewf_convert_timestamp(
 		}
 		libewf_common_free(
 		 time_elements );
-
-		/* Make sure the string is terminated
-		 */
-		( *date_string )[ *date_string_length - 1 ] = (libewf_char_t) '\0';
 	}
 	return( 1 );
 }
@@ -860,8 +860,7 @@ int libewf_header_values_parse_header_string(
 		{
 			continue;
 		}
-		string_length = libewf_string_length(
-		                 values[ iterator ] );
+		string_length = libewf_string_length( values[ iterator ] );
 
 		/* Remove trailing white space
 		 */
@@ -1022,8 +1021,6 @@ int libewf_header_values_parse_header_string(
 				}
 				libewf_common_free(
 				 date_string );
-
-				date_string = NULL;
 			}
 		}
 		else if( libewf_string_compare(
@@ -4290,12 +4287,20 @@ int libewf_generate_date_xheader_value(
 
 		return( -1 );
 	}
-	if( libewf_string_ctime(
-	     &timestamp,
-	     date_string,
-	     date_string_length ) != 1 )
+	*date_string = libewf_string_ctime(
+	                &timestamp );
+
+	/* The libewf_string_ctime function returns a string of length 32
+	 */
+	*date_string_length = 32;
+
+	/* refactor to have libewf_string_ctime create the date string and
+	 * set the date string length
+	 */
+
+	if( *date_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
 		 function );
 
 		return( -1 );
