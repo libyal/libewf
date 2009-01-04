@@ -10,6 +10,7 @@ ewfacquire_SOURCES = \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
+	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfacquire.c
 
@@ -23,6 +24,7 @@ ewfacquirestream_SOURCES = \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
+	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfacquirestream.c
 
@@ -36,6 +38,7 @@ ewfalter_SOURCES = \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
+	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfalter.c
 
@@ -49,6 +52,7 @@ ewfexport_SOURCES = \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
+	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfexport.c
 
@@ -62,6 +66,7 @@ ewfinfo_SOURCES = \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
+	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfinfo.c
 
@@ -75,6 +80,7 @@ ewfverify_SOURCES = \
 	ewfglob.c ewfglob.h \
 	ewfmd5.h \
 	ewfsignal.c ewfsignal.h \
+	ewfstring.c ewfstring.h \
 	ewfsha1.h \
 	ewfverify.c
 

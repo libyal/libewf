@@ -44,6 +44,7 @@
 #include "ewfdigest_context.h"
 #include "ewfmd5.h"
 #include "ewfsha1.h"
+#include "ewfstring.h"
 
 #include "../libewf/libewf_char.h"
 #include "../libewf/libewf_internal_handle.h"
@@ -52,178 +53,6 @@
 
 #if defined( __cplusplus )
 extern "C" {
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Have wide character support for the functions:
- * main (wmain)
- * open (wopen)
- */
-#define CHAR_T			wchar_t
-#define INT_T			wint_t
-
-#define PRIc			"lc"
-#define PRIs			"ls"
-
-/* Intermediate version of the macro
- * required for correct evaluation
- * predefined string
- */
-#define _S_CHAR_T_I( string )	L ## string
-#define _S_CHAR_T( string )	_S_CHAR_T_I( string )
-
-#if defined( HAVE_WCSLEN )
-#define CHAR_T_LENGTH( string ) \
-	wcslen( string )
-#else
-#error Missing wide character string length function (wcslen)
-#endif
-
-#if defined( HAVE_WMEMCMP )
-#define CHAR_T_COMPARE( string1, string2, length ) \
-	wmemcmp( (void *) string1, (void *) string2, length )
-#elif defined( HAVE_WCSNCMP )
-#define CHAR_T_COMPARE( string1, string2, length ) \
-	wcsncmp( string1, string2, length )
-#elif defined( HAVE_WCSCMP )
-#define CHAR_T_COMPARE( string1, string2, length ) \
-	wcscmp( string1, string2 )
-#else
-#error Missing wide character string compare function (wmemcmp, wcsncmp and wcscmp)
-#endif
-
-#if defined( HAVE_WMEMCPY )
-#define CHAR_T_COPY( destination, source, length ) \
-	(CHAR_T *) wmemcpy( (void *) destination, (void *) source, length )
-#elif defined( HAVE_WCSNCPY )
-#define CHAR_T_COPY( destination, source, length ) \
-	wcsncpy( destination, source, length )
-#elif defined( HAVE_WCSCPY )
-#define CHAR_T_COPY( destination, source, length ) \
-	wcscpy( destination, source )
-#else
-#error Missing wide character string copy function (wmemcpy, wcsncpy and wcscpy)
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-#define CHAR_T_DUPLICATE( string ) \
-	_wcsdup( string )
-#elif defined( HAVE_WCSDUP )
-#define CHAR_T_DUPLICATE( string ) \
-	wcsdup( string )
-#else
-#error Missing wide character string duplicate function (_wcssup and wcsdup)
-#endif
-
-#if defined( HAVE_WMEMCHR )
-#define CHAR_T_SEARCH( string, character, length ) \
-	(CHAR_T *) wmemchr( (void *) string, character, length )
-#elif defined( HAVE_WCSCHR )
-#define CHAR_T_SEARCH( string, character, length ) \
-	wcschr( string, character )
-#else
-#error Missing wide character string search function (wmemchr and wcschr)
-#endif
-
-#if defined( HAVE_WCSTOL )
-#define CHAR_T_TOLONG( string, end_of_string, base ) \
-	(int64_t) wcstol( string, end_of_string, base )
-#else
-#error Missing wide character string to long (wcstol)
-#endif
-
-#if defined( HAVE_FGETWS )
-#define CHAR_T_GET_FROM_STREAM( string, size, stream ) \
-	fgetws( string, size, stream )
-#else
-#error Missing wide character string get from stream function (fgetws)
-#endif
-
-#else
-
-/* Have character support for the functions:
- * main
- * open
- */
-#define CHAR_T			char
-#define INT_T			int
-
-#define PRIc			"c"
-#define PRIs			"s"
-
-#define _S_CHAR_T( string )	string
-
-#if defined( HAVE_STRLEN )
-#define CHAR_T_LENGTH( string ) \
-	strlen( string )
-#else
-#error Missing string length function (strlen)
-#endif
-
-#if defined( HAVE_MEMCMP )
-#define CHAR_T_COMPARE( string1, string2, length ) \
-	memcmp( (void *) string1, (void *) string2, length )
-#elif defined( HAVE_STRNCMP )
-#define CHAR_T_COMPARE( string1, string2, length ) \
-	strncmp( string1, string2, length )
-#elif defined( HAVE_STRCMP )
-#define CHAR_T_COMPARE( string1, string2, length ) \
-	strcmp( string1, string2 )
-#else
-#error Missing string compare function (memcmp, strncmp and strcmp)
-#endif
-
-#if defined( HAVE_MEMCPY )
-#define CHAR_T_COPY( destination, source, length ) \
-	(CHAR_T *) memcpy( (void *) destination, (void *) source, length )
-#elif defined( HAVE_STRNCPY )
-#define CHAR_T_COPY( destination, source, length ) \
-	strncpy( destination, source, length )
-#elif defined( HAVE_STRCPY )
-#define CHAR_T_COPY( destination, source, length ) \
-	strcpy( destination, source )
-#else
-#error Missing string copy function (memcpy, strncpy and strcpy)
-#endif
-
-#if defined( HAVE_WINDOWS_API )
-#define CHAR_T_DUPLICATE( string ) \
-	_strdup( string )
-#elif defined( HAVE_STRDUP )
-#define CHAR_T_DUPLICATE( string ) \
-	strdup( string )
-#else
-#error Missing string duplicate function (_strsup and strdup)
-#endif
-
-#if defined( HAVE_MEMCHR )
-#define CHAR_T_SEARCH( string, character, length ) \
-	(CHAR_T *) memchr( (void *) string, character, length )
-#elif defined( HAVE_STRCHR )
-#define CHAR_T_SEARCH( string, character, length ) \
-	strchr( string, character )
-#else
-#error Missing string search function (memchr and strchr)
-#endif
-
-#if defined( HAVE_STRTOL )
-#define CHAR_T_TOLONG( string, end_of_string, base ) \
-	(int64_t) strtol( string, end_of_string, base )
-#elif defined( HAVE_ATOL )
-#define CHAR_T_TOLONG( string, end_of_string, base ) \
-	(int64_t) atol( string )
-#else
-#error Missing string to long function (strtol and atol)
-#endif
-
-#if defined( HAVE_FGETS )
-#define CHAR_T_GET_FROM_STREAM( string, size, stream ) \
-	fgets( string, size, stream )
-#else
-#error Missing string get from stream function (fgets)
-#endif
-
 #endif
 
 extern LIBEWF_CHAR *ewfcommon_compression_levels[ 3 ];
@@ -250,12 +79,6 @@ extern LIBEWF_CHAR *ewfcommon_yes_no[ 2 ];
 
 int ewfcommon_swap_byte_pairs( uint8_t *buffer, size_t size );
 
-char *ewfcommon_strerror( int error_number );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *ewfcommon_wide_strerror( int error_number );
-#endif
-
 LIBEWF_CHAR *ewfcommon_determine_operating_system( void );
 int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format );
 LIBEWF_CHAR *ewfcommon_determine_units_string( int factor );
@@ -267,9 +90,6 @@ int8_t ewfcommon_determine_compression_level( const CHAR_T *argument );
 int8_t ewfcommon_determine_media_type( const CHAR_T *argument );
 int8_t ewfcommon_determine_volume_type( const CHAR_T *argument );
 int8_t ewfcommon_determine_yes_no( const CHAR_T *argument );
-
-int8_t ewfcommon_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const CHAR_T *source, size_t length );
-int8_t ewfcommon_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *destination, size_t length );
 
 LIBEWF_CHAR *ewfcommon_get_user_input_variable( FILE *stream, LIBEWF_CHAR *request_string );
 CHAR_T *ewfcommon_get_user_input_variable_char_t( FILE *stream, LIBEWF_CHAR *request_string );

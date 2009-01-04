@@ -64,6 +64,7 @@
 #include "ewfmd5.h"
 #include "ewfsignal.h"
 #include "ewfsha1.h"
+#include "ewfstring.h"
 
 /* Prints the executable usage information
  */
@@ -212,7 +213,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
 		{
-			error_string = ewfcommon_strerror( errno );
+			error_string = ewfstring_strerror( errno );
 		}
 		if( error_string != NULL )
 		{

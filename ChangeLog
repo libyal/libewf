@@ -9,6 +9,13 @@ Roadmap:
 * internationalisation (gettext)
 * enhance thread safety
 
+Further analysis of the EWF format:
+* password hash
+* 16 bytes in hash section (EWF-E01)
+* values in EnCase5 header2 (+/-)
+* values in ltree strings (EWF-L01 LVF)
+* values in session section
+
 To do/think about:
 * all: add LVF support - ltree section
 * all: check for race conditions especially on change of data elements
@@ -16,6 +23,7 @@ To do/think about:
   - can the values in data be used to correct a corrupted volume ?
 * all: allow for multiple language support - what about gettext?
 * all: implement signal handling - cancelation option in library?
+  - mainly for read/writes of large buffers
 * file: add function/flag to open segments files progressively using only the basename (like write)
 * libewf_string: enhance UTF16 conversion code
 * read: correct for errors in the table or table2 section for EWF-E01
@@ -25,12 +33,9 @@ To do/think about:
   - correct size
 * read: reduce multiple successive crc error entries to a single
 * write: reduce multiple successive acquiry error (error2) entries to a single
-* write: add additional data to file for different EWF formats
 * look at integrating support for carvefs (libmodewf.c) - EWF specifics only
   - put it in contrib for now ?
   - what about xml based media data output like in libmodewf.c ?
-* add basic string functions to API for accessing strings outside the library - does this work with application and library memory space?
-  - if so remove libewf_string include from ewfacquire
 * reduce open file descriptors allows reading a lot of segment files
   - make sure to detect when a file is closed and when a new segment file needs to be created
 * make compilation resilient for missing crypto library
@@ -42,12 +47,12 @@ To do/think about:
 * ewfacquire: add native Windows support for accessing devices
 * ewfacquire: read from pipe
 * ewfacquire: non interactive mode - read settings from file?
+  no, but perhaps commandline parameters?
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
   make a generic media access solution also useable for revit?
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type
   description
-* ewfexport: non interactive mode?
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfdebug: create a tool to analyse a single segment file
 * ewfrecover: create a tool recover ewf files
@@ -61,12 +66,6 @@ To do/think about:
 
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   - header2 and ltree only affected sections
-
-Further analysis of the EWF format:
-* password hash
-* 16 bytes in hash section (EWF-E01)
-* values in EnCase5 header2 (+/-)
-* values in ltree strings (EWF-L01 LVF)
 
 Possible performance improvements:
 * create a offset table per segment file - create it on demand - section list per segment table is done
@@ -99,12 +98,7 @@ Next release:
 * add libewf_convert_date_xheader_value function ?
   - add raw date format to allow to print raw date string
 * change string duplicate function to macro?
-* check if successive headers match first header
-* write api functions to rid ewfcommon of internal_handle
-  - acquiry errors
-  - CRC read errors
-  - the header values amount
-  - the hash values amount
+* check if successive headers match first header ?
 * have ewftools only use API ? (what about chunk cache passthrough necessary for testing)
 * change section start to static definition in libewf_section_last_write and libewf_section_start_write
 * do not create human readable byte string if size <= 1024
@@ -135,6 +129,14 @@ TODO
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
 
+* ewfexport: non interactive mode?
+
+* write api functions to rid ewfcommon of internal_handle
+  - acquiry errors
+  - CRC read errors
+  - the header values amount
+  - the hash values amount
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -142,6 +144,14 @@ CLOSED
   solved by delta files
 * move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle?
   no, this could be read from the error2 section
+* add basic string functions to API for accessing strings outside the library
+  - does this work with application and library memory space?
+  - if so remove libewf_string include from ewfacquire
+  not needed
+
+Version: 20070916
+* Worked on implementing raw read in ewftools
+  - moved the string functions from ewfcommon to ewfstring
 
 Version: 20070915
 * Worked on deb based package

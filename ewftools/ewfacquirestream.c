@@ -67,6 +67,7 @@
 #include "ewfgetopt.h"
 #include "ewfglob.h"
 #include "ewfsignal.h"
+#include "ewfstring.h"
 
 /* Prints the executable usage information
  */
@@ -351,7 +352,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( ewfcommon_copy_libewf_char_from_char_t( case_number, option_case_number, string_length ) != 1 )
+			if( ewfstring_copy_libewf_char_from_char_t( case_number, option_case_number, string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set case number string.\n" );
 
@@ -374,7 +375,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( ewfcommon_copy_libewf_char_from_char_t( description, option_description, string_length ) != 1 )
+			if( ewfstring_copy_libewf_char_from_char_t( description, option_description, string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set description string.\n" );
 
@@ -397,7 +398,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( ewfcommon_copy_libewf_char_from_char_t( examiner_name, option_examiner_name, string_length ) != 1 )
+			if( ewfstring_copy_libewf_char_from_char_t( examiner_name, option_examiner_name, string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set examiner name string.\n" );
 
@@ -420,7 +421,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( ewfcommon_copy_libewf_char_from_char_t( evidence_number, option_evidence_number, string_length ) != 1 )
+			if( ewfstring_copy_libewf_char_from_char_t( evidence_number, option_evidence_number, string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set evidence number string.\n" );
 
@@ -443,7 +444,7 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			if( ewfcommon_copy_libewf_char_from_char_t( notes, option_notes, string_length ) != 1 )
+			if( ewfstring_copy_libewf_char_from_char_t( notes, option_notes, string_length ) != 1 )
 			{
 				fprintf( stderr, "Unable to set notes string.\n" );
 
@@ -484,7 +485,7 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
 		{
-			error_string = ewfcommon_strerror( errno );
+			error_string = ewfstring_strerror( errno );
 		}
 		if( error_string != NULL )
 		{
