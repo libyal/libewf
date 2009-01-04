@@ -380,11 +380,11 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
  * Will read until the requested size is filled or the entire chunk is read
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
-ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, EWF_CHAR *buffer, size_t size )
+ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, EWF_CHAR *buffer, size_t size )
 {
 	EWF_CHAR *chunk_data       = NULL;
 	EWF_CHAR *chunk_read       = NULL;
-	static char *function      = "libewf_read_chunk";
+	static char *function      = "libewf_read_chunk_data";
 	EWF_CRC chunk_crc          = 0;
 	off64_t sector             = 0;
 	ssize_t chunk_read_count   = 0;
@@ -647,115 +647,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chu
 	return( (ssize_t) bytes_available );
 }
 
-/* Reads certain chunk data from the segment file(s)
- * Will read until the requested size is filled or the entire chunk is read
- * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
- */
-ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, void *buffer, size_t size )
-{
-	static char *function    = "libewf_read_chunk_data";
-	ssize_t chunk_read_count = 0;
-	ssize_t total_read_count = 0;
-	size_t chunk_data_size   = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( buffer == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( buffer == internal_handle->chunk_cache->data )
-	 || ( buffer == internal_handle->chunk_cache->compressed ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	LIBEWF_VERBOSE_PRINT( "%s: reading size: %zu.\n",
-	 function, size );
-
-	/* Reallocate the chunk cache if the chunk size is not the default chunk size
-	 * this prevents multiple reallocations of the chunk cache
-	 */
-	chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
-
-	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
-		 function, chunk_data_size );
-
-		if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	while( size > 0 )
-	{
-		chunk_read_count = libewf_read_chunk(
-		                    internal_handle,
-		                    internal_handle->current_chunk,
-		                    internal_handle->current_chunk_offset,
-		                    (EWF_CHAR *) &( (uint8_t *) buffer )[ total_read_count ],
-		                    size );
-
-		if( chunk_read_count <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",
-			 function );
-
-			return( -1 );
-		}
-		else if( chunk_read_count == 0 )
-		{
-			break;
-		}
-		size             -= chunk_read_count;
-		total_read_count += chunk_read_count;
-
-		internal_handle->current_chunk_offset += (uint32_t) chunk_read_count;
-
-		if( internal_handle->current_chunk_offset == internal_handle->media->chunk_size )
-		{
-			internal_handle->current_chunk_offset = 0;
-			internal_handle->current_chunk       += 1;
-		}
-		else if( internal_handle->current_chunk_offset > internal_handle->media->chunk_size )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( total_read_count );
-}
-
 /* Prepares a buffer with chunk data after reading it according to the handle settings
  * intended for raw read
  * The buffer size cannot be larger than the chunk size
@@ -878,20 +769,117 @@ ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size
  */
 ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 {
-	static char *function = "libewf_read_buffer";
-	ssize_t read_count    = 0;
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_read_buffer";
+	ssize_t chunk_read_count                = 0;
+	ssize_t total_read_count                = 0;
+	size_t chunk_data_size                  = 0;
 
-	read_count = libewf_read_chunk_data(
-	              (LIBEWF_INTERNAL_HANDLE *) handle,
-	              buffer,
-	              size );
-
-	if( read_count <= -1 )
+	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read chunk data.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
 		 function );
+
+		return( -1 );
 	}
-	return( read_count );
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_cache == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer - same as chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	LIBEWF_VERBOSE_PRINT( "%s: reading size: %zu.\n",
+	 function, size );
+
+	/* Reallocate the chunk cache if the chunk size is not the default chunk size
+	 * this prevents some reallocations of the chunk cache
+	 */
+	chunk_data_size = internal_handle->media->chunk_size + EWF_CRC_SIZE;
+
+	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
+		 function, chunk_data_size );
+
+		if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	while( size > 0 )
+	{
+		chunk_read_count = libewf_read_chunk_data(
+		                    internal_handle,
+		                    internal_handle->current_chunk,
+		                    internal_handle->current_chunk_offset,
+		                    (EWF_CHAR *) &( (uint8_t *) buffer )[ total_read_count ],
+		                    size );
+
+		if( chunk_read_count <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",
+			 function );
+
+			return( -1 );
+		}
+		else if( chunk_read_count == 0 )
+		{
+			break;
+		}
+		size             -= chunk_read_count;
+		total_read_count += chunk_read_count;
+
+		internal_handle->current_chunk_offset += (uint32_t) chunk_read_count;
+
+		if( internal_handle->current_chunk_offset == internal_handle->media->chunk_size )
+		{
+			internal_handle->current_chunk_offset = 0;
+			internal_handle->current_chunk       += 1;
+		}
+		else if( internal_handle->current_chunk_offset > internal_handle->media->chunk_size )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( total_read_count );
 }
 
 /* Reads media data from an offset into a buffer

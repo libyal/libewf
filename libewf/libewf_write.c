@@ -1871,7 +1871,7 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 	{
 		/* Read the chunk data into the chunk cache
 		 */
-		read_count = libewf_read_chunk(
+		read_count = libewf_read_chunk_data(
 		              internal_handle,
 		              chunk,
 		              0,
