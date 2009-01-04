@@ -155,6 +155,7 @@ WORKING
 * make buffer passthrough default behavior
 * work on TODO in write
 * check unused parameters gcc -Wextra
+* fix raw write
 
 Version: 20071030
 * fixed input handling of format in ewfexport wide string support

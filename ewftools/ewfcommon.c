@@ -288,7 +288,7 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 			              &buffer[ buffer_offset + read_error_offset ],
 			              bytes_to_read );
 
-			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi64 " with size: %zi.\n",
+			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi32 " with size: %zi.\n",
 			 function, ( chunk_amount + 1 ), read_count );
 
 			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
