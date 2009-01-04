@@ -35,7 +35,6 @@
 #define _LIBEWF_SECTION_H
 
 #include "libewf_includes.h"
-#include "libewf_error_sector.h"
 #include "libewf_hash_sections.h"
 #include "libewf_header_sections.h"
 #include "libewf_media_values.h"

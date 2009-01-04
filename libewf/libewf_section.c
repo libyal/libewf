@@ -3177,19 +3177,19 @@ ssize_t libewf_section_error2_read(
 #if defined( HAVE_DEBUG_OUTPUT )
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
 #endif
-		if( acquiry_errors->error_sector != NULL )
+		if( acquiry_errors->sector != NULL )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: acquiry error sectors already set in handle - removing previous one.\n",
 			 function );
 
-			libewf_common_free( acquiry_errors->error_sector );
+			libewf_common_free( acquiry_errors->sector );
 
 			acquiry_errors->amount = 0;
 		}
-		acquiry_errors->error_sector = (libewf_error_sector_t *) libewf_common_alloc(
-		                                                          sizeof( libewf_error_sector_t ) * amount_of_errors );
+		acquiry_errors->sector = (libewf_sector_table_entry_t *) libewf_common_alloc(
+		                                                          sizeof( libewf_sector_table_entry_t ) * amount_of_errors );
 
-		if( acquiry_errors->error_sector == NULL )
+		if( acquiry_errors->sector == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create acquiry error sectors.\n",
 			 function );
@@ -3211,10 +3211,10 @@ ssize_t libewf_section_error2_read(
 
 				return( -1 );
 			}
-			acquiry_errors->error_sector[ iterator ].sector = (uint64_t) sector;
+			acquiry_errors->sector[ iterator ].sector = (uint64_t) sector;
 
 			if( libewf_endian_convert_32bit(
-			     &( acquiry_errors->error_sector[ iterator ].amount_of_sectors ),
+			     &( acquiry_errors->sector[ iterator ].amount_of_sectors ),
 			     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
@@ -3305,7 +3305,7 @@ ssize_t libewf_section_error2_write(
 	for( iterator = 0; iterator < acquiry_errors->amount; iterator++ )
 	{
 		if( libewf_endian_revert_32bit(
-		     (uint32_t) acquiry_errors->error_sector[ iterator ].sector,
+		     (uint32_t) acquiry_errors->sector[ iterator ].sector,
 		     error2_sectors[ iterator ].sector ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert sector value.\n",
@@ -3316,7 +3316,7 @@ ssize_t libewf_section_error2_write(
 			return( -1 );
 		}
 		if( libewf_endian_revert_32bit(
-		     acquiry_errors->error_sector[ iterator ].amount_of_sectors,
+		     acquiry_errors->sector[ iterator ].amount_of_sectors,
 		     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",

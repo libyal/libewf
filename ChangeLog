@@ -134,6 +134,8 @@ Next release(s):
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
 
+* retrieve md5 hash in md5 hash value function?
+
 Next stable:
 * full platform test
 
@@ -162,6 +164,7 @@ CLOSED
 
 Version: 20080302
 * Code clean up
+* worked on session support currently protected by define LIBEWF_SESSION_SUPPORT
 
 Version: 20080301
 * Code clean up

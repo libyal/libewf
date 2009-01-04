@@ -85,7 +85,7 @@ typedef __int64			off64_t;
 #error Missing integer type definitions (inttypes.h, stdint.h)
 #endif
 
-#if  || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if 0 || defined( HAVE_WIDE_CHARACTER_TYPE )
 
 #define LIBEWF_WIDE_CHARACTER_TYPE	1
 
