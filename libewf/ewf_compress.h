@@ -40,8 +40,8 @@
 extern "C" {
 #endif
 
-int8_t ewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t *uncompressed_data, size_t uncompressed_size, int8_t compression_level );
-int8_t ewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, uint8_t *compressed_data, size_t compressed_size );
+int ewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t *uncompressed_data, size_t uncompressed_size, int8_t compression_level );
+int ewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, uint8_t *compressed_data, size_t compressed_size );
 
 #ifdef __cplusplus
 }

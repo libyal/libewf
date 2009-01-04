@@ -50,14 +50,12 @@
 
 #include "ewf_chunk.h"
 #include "ewf_crc.h"
-#include "ewf_section.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle );
-EWF_SECTION *libewf_read_sections_from_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number );
 
 ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size );
 

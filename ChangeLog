@@ -103,6 +103,7 @@ Next release:
 * refactor some int64 to size64_t and off_t into off64_t
 * add maximum check to set functions in internal handle
 * rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
+* move acquiry_error_sectors and acquiry_amount_of_errors to write sub handle
 
 TODO
 * move write offset/buffer functionality into write raw common function and call write raw from functions?
@@ -110,10 +111,14 @@ TODO
 * remove raw access value in handle and RAW flag
 * ewfacquire check if last segment file is closed before telling acquiry was completed
 
+Version: 20070722
+* worked on allowing to write raw buffers as chunks
+
 Version: 20070721
 * worked on allowing to write raw buffers as chunks
 * removed is_dll function no need
 * adjusted seek offset function
+* added libewf_segment_file to give library improved structure
 
 Version: 20070718
 * worked on allowing to write raw buffers as chunks

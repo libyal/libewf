@@ -46,18 +46,21 @@ EWF_CHAR *ewf_string_uncompress( EWF_CHAR *compressed_string, size_t *size )
 {
 	EWF_CHAR *uncompressed_string = NULL;
 	EWF_CHAR *reallocation        = NULL;
+	static char *function         = "ewf_string_uncompress";
 	size_t compressed_size        = 0;
-	int8_t result                 = 0;
+	int result                    = 0;
 
 	if( compressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_uncompress: invalid compressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid compressed string.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( size == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_uncompress: invalid size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -73,11 +76,16 @@ EWF_CHAR *ewf_string_uncompress( EWF_CHAR *compressed_string, size_t *size )
 
 	if( uncompressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_uncompress: unable to allocate uncompressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate uncompressed string.\n",
+		 function );
 
 		return( NULL );
 	}
-	result = ewf_uncompress( (uint8_t *) uncompressed_string, size, (uint8_t *) compressed_string, compressed_size );
+	result = ewf_uncompress(
+	          (uint8_t *) uncompressed_string,
+	          size,
+	          (uint8_t *) compressed_string,
+	          compressed_size );
 
 	while( ( result == -1 ) && ( *size > 0 ) )
 	{
@@ -87,7 +95,8 @@ EWF_CHAR *ewf_string_uncompress( EWF_CHAR *compressed_string, size_t *size )
 
 		if( reallocation == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewf_string_uncompress: unable to reallocate uncompressed string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate uncompressed string.\n",
+			 function );
 
 			libewf_common_free( uncompressed_string );
 
@@ -95,11 +104,16 @@ EWF_CHAR *ewf_string_uncompress( EWF_CHAR *compressed_string, size_t *size )
 		}
 		uncompressed_string = reallocation;
 
-		result = ewf_uncompress( (uint8_t *) uncompressed_string, size, (uint8_t *) compressed_string, compressed_size );
+		result = ewf_uncompress(
+		          (uint8_t *) uncompressed_string,
+		          size,
+		          (uint8_t *) compressed_string,
+		          compressed_size );
 	}
 	if( result == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_uncompress: unable to uncompress string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to uncompress string.\n",
+		 function );
 
 		libewf_common_free( uncompressed_string );
 
@@ -117,20 +131,23 @@ EWF_CHAR *ewf_string_uncompress( EWF_CHAR *compressed_string, size_t *size )
  */
 EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8_t compression_level )
 {
-	EWF_CHAR *compressed_string  = NULL;
-	EWF_CHAR *reallocation       = NULL;
-	size_t uncompressed_size     = 0;
-	int8_t result                = 0;
+	EWF_CHAR *compressed_string = NULL;
+	EWF_CHAR *reallocation      = NULL;
+	static char *function       = "ewf_string_compress";
+	size_t uncompressed_size    = 0;
+	int result                  = 0;
 
 	if( uncompressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_compress: invalid uncompressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid uncompressed string.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( size == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_compress: invalid size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -139,11 +156,17 @@ EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8
 
 	if( compressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_compress: unable to allocate compressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate compressed string.\n",
+		 function );
 
 		return( NULL );
 	}
-	result = ewf_compress( (uint8_t *) compressed_string, size, (uint8_t *) uncompressed_string, uncompressed_size, compression_level );
+	result = ewf_compress(
+	          (uint8_t *) compressed_string,
+	          size,
+	          (uint8_t *) uncompressed_string,
+	          uncompressed_size,
+	          compression_level );
 
 	if( ( result == -1 ) && ( *size > 0 ) )
 	{
@@ -151,7 +174,8 @@ EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8
 
 		if( reallocation == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewf_string_compress: unable to reallocate compressed string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate compressed string.\n",
+			 function );
 
 			libewf_common_free( compressed_string );
 
@@ -159,11 +183,17 @@ EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8
 		}
 		compressed_string = reallocation;
 
-		result = ewf_compress( (uint8_t *) compressed_string, size, (uint8_t *) uncompressed_string, uncompressed_size, compression_level );
+		result = ewf_compress(
+		          (uint8_t *) compressed_string,
+		          size,
+		          (uint8_t *) uncompressed_string,
+		          uncompressed_size,
+		          compression_level );
 	}
 	if( result == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_compress: unable to compress string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to compress string.\n",
+		 function );
 
 		libewf_common_free( compressed_string );
 
@@ -177,11 +207,13 @@ EWF_CHAR *ewf_string_compress( EWF_CHAR *uncompressed_string, size_t *size, int8
  */
 ssize_t ewf_string_read_to_buffer( EWF_CHAR *string, int file_descriptor, size_t size )
 {
-	ssize_t count = 0;
+	static char *function = "ewf_string_read_to_buffer";
+	ssize_t count         = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read_to_buffer: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -189,7 +221,8 @@ ssize_t ewf_string_read_to_buffer( EWF_CHAR *string, int file_descriptor, size_t
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read_to_buffer: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -197,7 +230,8 @@ ssize_t ewf_string_read_to_buffer( EWF_CHAR *string, int file_descriptor, size_t
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read_to_buffer: unable to read string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -209,11 +243,13 @@ ssize_t ewf_string_read_to_buffer( EWF_CHAR *string, int file_descriptor, size_t
  */
 ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, size_t size )
 {
-	ssize_t count = 0;
+	static char *function = "ewf_string_write_from_buffer";
+	ssize_t count         = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_write_from_buffer: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -221,7 +257,8 @@ ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, siz
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_write_from_buffer: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -229,7 +266,8 @@ ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, siz
 
 	if( count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_write_from_buffer: unable to write string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -241,11 +279,13 @@ ssize_t ewf_string_write_from_buffer( EWF_CHAR *string, int file_descriptor, siz
  */
 EWF_CHAR *ewf_string_read( int file_descriptor, size_t size )
 {
-	EWF_CHAR *string = NULL;
+	EWF_CHAR *string      = NULL;
+	static char *function = "ewf_string_read";
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -253,13 +293,15 @@ EWF_CHAR *ewf_string_read( int file_descriptor, size_t size )
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read: unable to allocate string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate string.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( ewf_string_read_to_buffer( string, file_descriptor, size ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read: unable to read string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read string.\n",
+		 function );
 
 		libewf_common_free( string );
 
@@ -275,10 +317,12 @@ EWF_CHAR *ewf_string_read_compressed( int file_descriptor, size_t *size )
 {
 	EWF_CHAR *uncompressed_string = NULL;
 	EWF_CHAR *compressed_string   = NULL;
+	static char *function         = "ewf_string_read_compressed";
 
 	if( size == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read_compressed: invalid size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -286,7 +330,8 @@ EWF_CHAR *ewf_string_read_compressed( int file_descriptor, size_t *size )
 
 	if( compressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read_compressed: unable to read compressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read compressed string.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -296,7 +341,8 @@ EWF_CHAR *ewf_string_read_compressed( int file_descriptor, size_t *size )
 
 	if( uncompressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_read_compressed: unable to uncompress string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to uncompress string.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -309,17 +355,20 @@ EWF_CHAR *ewf_string_read_compressed( int file_descriptor, size_t *size )
 ssize_t ewf_string_write_compressed( EWF_CHAR *uncompressed_string, int file_descriptor, size_t *size, int8_t compression_level )
 {
 	EWF_CHAR *compressed_string = NULL;
+	static char *function       = "ewf_string_write_compressed";
 	ssize_t count               = 0;
 
 	if( uncompressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_write_compressed: invalid uncompressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid uncompressed string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewf_string_write_compressed: invalid size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -327,7 +376,8 @@ ssize_t ewf_string_write_compressed( EWF_CHAR *uncompressed_string, int file_des
 
         if( compressed_string == NULL )
         {
-		LIBEWF_WARNING_PRINT( "ewf_string_write_compressed: unable to compress string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to compress string.\n",
+		 function );
 
 		return( -1 );
 	}

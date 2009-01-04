@@ -40,6 +40,7 @@ libewf_la_SOURCES = \
 	libewf_read.c libewf_read.h \
 	libewf_section.c libewf_section.h \
 	libewf_section_list.c libewf_section_list.h \
+	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \
 	libewf_write.c libewf_write.h

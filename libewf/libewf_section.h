@@ -51,7 +51,7 @@
 extern "C" {
 #endif
 
-EWF_SECTION *libewf_section_start_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor );
+ssize_t libewf_section_start_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section );
 ssize_t libewf_section_start_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_CHAR *section_type, size_t section_data_size, off_t start_offset );
 
 ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_CHAR *section_type, EWF_CHAR *uncompressed_string, size_t size, int8_t compression_level );
@@ -99,7 +99,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 #define libewf_section_xhash_write( handle, file_descriptor, start_offset, xhash, size, compression_level ) \
 	libewf_section_compressed_string_write( handle, file_descriptor, start_offset, (EWF_CHAR *) "xhash", xhash, size, compression_level )
 
-EWF_SECTION *libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off_t *section_start_offset );
+int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off_t *section_start_offset );
 
 #ifdef __cplusplus
 }

@@ -40,7 +40,7 @@
 #include "libewf_notify.h"
 #include "libewf_file.h"
 #include "libewf_read.h"
-#include "libewf_section.h"
+#include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 
 #include "ewf_crc.h"
@@ -51,130 +51,95 @@
  */
 int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
-	EWF_SECTION *last_section = NULL;
-	uint16_t segment_number   = 0;
+	static char *function   = "libewf_read_build_index";
+	uint16_t segment_number = 0;
+	int last_segment_file   = 0;
+	int result              = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_read_build_index: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->index_build != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_read_build_index: index has already been build.\n" );
+		LIBEWF_WARNING_PRINT( "%s: index has already been build.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_read_build_index: unable to initialize read values in handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	for( segment_number = 1; segment_number < internal_handle->segment_table->amount; segment_number++ )
 	{
-		if( last_section != NULL )
+		LIBEWF_VERBOSE_PRINT( "%s: building index for segment number: %" PRIu32 ".\n",
+		 function, segment_number );
+
+		result = libewf_segment_file_read_sections(
+		          internal_handle,
+		          segment_number,
+		          internal_handle->segment_table->file_descriptor[ segment_number ],
+		          internal_handle->segment_table->section_list[ segment_number ],
+		          &last_segment_file );
+
+		if( result == -1 )
 		{
-			libewf_common_free( last_section );
+			LIBEWF_WARNING_PRINT( "%s: unable to read sections.\n",
+			 function );
+
+			return( -1 );
 		}
-		LIBEWF_VERBOSE_PRINT( "libewf_read_build_index: building index for segment number: %" PRIu32 ".\n", segment_number );
+		else if( result == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to missing next or done section.\n",
+			 function );
 
-		last_section = libewf_read_sections_from_segment( internal_handle, segment_number );
+			return( -1 );
+		}
 	}
-	/* Check to see if the done section has been found
+	/* Check to see if the done section has been found in the last segment file
 	 */
-	if( last_section == NULL )
+	if( last_segment_file != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_read_build_index: invalid last section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to find the last segment file.\n",
+		 function );
 
 		return( -1 );
 	}
-	else if( ewf_section_is_type_done( last_section ) == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_read_build_index: unable to find the last segment file (done section).\n" );
-
-		libewf_common_free( last_section );
-
-		return( -1 );
-	}
-	libewf_common_free( last_section );
-
 	/* Determine the EWF file format
 	 */
 	if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_read_build_index: unable to determine file format.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
+		 function );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_read_build_index: index successful build.\n" );
-
 	/* Calculate the media size
 	 */
-	internal_handle->media->media_size = (uint64_t) internal_handle->media->amount_of_sectors * (uint64_t) internal_handle->media->bytes_per_sector;
+	internal_handle->media->media_size = (size64_t) internal_handle->media->amount_of_sectors
+	                                   * (size64_t) internal_handle->media->bytes_per_sector;
 
 	/* Flag that the index was build
 	 */
 	internal_handle->index_build = 1;
 
+	LIBEWF_VERBOSE_PRINT( "%s: index successful build.\n",
+	 function );
+
 	return( 1 );
-}
-
-/* Reads and processes sections of a segment file
- * Returns the last section read, or NULL on error
- */
-EWF_SECTION *libewf_read_sections_from_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number )
-{
-	EWF_SECTION *section = NULL;
-	int file_descriptor  = 0;
-
-	/* The first offset is directly after the file header (13 byte)
-	 */
-	off_t previous_offset = (off_t) EWF_FILE_HEADER_SIZE;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_sections_read_segment: invalid handle.\n" );
-
-		return( NULL );
-	}
-	if( libewf_segment_table_values_is_set( internal_handle->segment_table, segment_number ) == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_sections_read_segment: missing a segment file for segment %" PRIu32 ".\n", segment_number );
-
-		return( NULL );
-	}
-	file_descriptor = libewf_segment_table_get_file_descriptor( internal_handle->segment_table, segment_number );
-
-	if( file_descriptor <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "libewf_sections_read_segment: invalid file descriptor.\n" );
-
-		return( NULL );
-	}
-	do
-	{
-		if( section != NULL )
-		{
-			libewf_common_free( section );
-		}
-		section = libewf_section_read( internal_handle, file_descriptor, internal_handle->segment_table->section_list[ segment_number ], segment_number, &previous_offset );
-
-		if( section == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "libewf_sections_read_segment: unable to read section.\n" );
-
-			return( NULL );
-		}
-		/* The done and next sections point back at themselves
-		 */
-		if( ( ewf_section_is_type_next( section ) == 1 ) || ( ewf_section_is_type_done( section ) == 1 ) )
-		{
-			break;
-		}
-	}
-	while( section != NULL );
-
-	return( section );
 }
 
 /* Reads a certain chunk of data from the segment file(s)

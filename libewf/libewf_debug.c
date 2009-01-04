@@ -83,7 +83,7 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 	uint8_t *uncompressed_data = NULL;
 	ssize_t read_count         = 0;
 	size_t uncompressed_size   = 0;
-	int8_t result              = 0;
+	int result                 = 0;
 
 	if( internal_handle == NULL )
 	{

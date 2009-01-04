@@ -62,7 +62,7 @@ typedef struct libewf_segment_table libewf_segment_table_t;
 struct libewf_segment_table
 {
 	/* The amount of segments in the table
-	 * consists of 2 bytes (16 bits) containing
+	 * consists of 2 bytes (16 bits)
 	 */
 	uint16_t amount;
 
