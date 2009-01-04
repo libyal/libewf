@@ -522,7 +522,7 @@ off64_t libewf_segment_file_handle_seek_offset(
 	}
 	if( segment_file_handle->file_offset != offset )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd_EWF " in segment file: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd " in segment file: %" PRIs_EWF_filename " with file descriptor: %d.\n",
 		 function, offset, segment_file_handle->filename, segment_file_handle->file_descriptor );
 
 		if( libewf_common_lseek(
@@ -530,7 +530,7 @@ off64_t libewf_segment_file_handle_seek_offset(
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd_EWF " in segment file: %" PRIs_EWF_filename ".\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd " in segment file: %" PRIs_EWF_filename ".\n",
 			 function, offset, segment_file_handle->filename );
 
 			return( -1 );

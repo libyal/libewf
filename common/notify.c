@@ -81,7 +81,7 @@ void notify_set_values(
 /* Print a formatted string on the notify stream
  */
 void VARARGS(
-      libewf_printf,
+      notify_printf,
       char *,
       format )
 {

@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/common -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common
 
 lib_LTLIBRARIES = libewf.la
 

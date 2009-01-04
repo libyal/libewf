@@ -979,7 +979,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd_EWF " with size: %" PRIzu_EWF ", with CRC: %" PRIu32 ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function, chunk_type, ( chunk + 1 ), segment_file_handle->file_offset, chunk_size, *chunk_crc );
 #endif
 
@@ -1093,7 +1093,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	if( ( ewf_format == EWF_FORMAT_S01 )
 	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd_EWF ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: correcting table section size: %" PRIu64 " offset: %" PRIjd ".\n",
 		 function, chunks_section_size, chunks_section_offset );
 
 		/* Rewrite table section start
@@ -1121,7 +1121,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	}
 	else if( ewf_format == EWF_FORMAT_E01 )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: correcting sectors section size: %" PRIzu_EWF " offset: %" PRIjd_EWF ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: correcting sectors section size: %" PRIzu " offset: %" PRIjd ".\n",
 		 function, chunks_section_size, chunks_section_offset );
 
 		/* Rewrite sectors section start

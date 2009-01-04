@@ -380,7 +380,7 @@ ssize_t libewf_raw_read_chunk(
 	{
 		chunk_type = "COMPRESSED";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
 	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type,
 	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
@@ -482,7 +482,7 @@ ssize_t libewf_read_chunk_data(
 
 		if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu_EWF ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu ".\n",
 			 function, chunk_data_size );
 
 			if( libewf_chunk_cache_realloc(
@@ -854,7 +854,7 @@ ssize_t libewf_read_buffer(
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: reading size: %" PRIzu_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: reading size: %" PRIzu ".\n",
 	 function, size );
 
 	/* Reallocate the chunk cache if the chunk size is not the default chunk size
@@ -864,7 +864,7 @@ ssize_t libewf_read_buffer(
 
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu_EWF ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function, chunk_data_size );
 
 		if( libewf_chunk_cache_realloc(

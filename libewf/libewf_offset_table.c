@@ -477,7 +477,7 @@ int libewf_offset_table_calculate_last_offset(
 			}
 			offset_table->chunk_offset[ offset_table->last ].size = (size_t) chunk_size;
 
-			LIBEWF_VERBOSE_PRINT( "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu_EWF ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu ".\n",
 			 function, ( offset_table->last + 1 ), last_offset, (size_t) chunk_size );
 
 			break;
@@ -582,7 +582,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 	     offset_table->chunk_offset[ chunk ].segment_file_handle,
 	     offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %" PRIjd_EWF ".\n",
+		LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %" PRIjd ".\n",
 		 function, offset_table->chunk_offset[ chunk ].file_offset );
 
 		return( -1 );

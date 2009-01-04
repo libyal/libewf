@@ -469,7 +469,7 @@ void libewf_string_split_values_free(
  * Returns 1 if successful, on -1 on error
  */
 int libewf_string_copy_from_utf16(
-     libewf_char_t* string,
+     libewf_char_t *string,
      size_t size_string,
      ewf_char_t *utf16_string,
      size_t size_utf16 )

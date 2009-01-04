@@ -247,7 +247,7 @@ off64_t libewf_file_io_handle_seek_offset(
 	}
 	if( file_io_handle->file_offset != offset )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd_EWF " in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: seeking offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename " with file descriptor: %d.\n",
 		 function, offset, file_io_handle->filename, file_io_handle->file_descriptor );
 
 		if( libewf_common_lseek(
@@ -255,7 +255,7 @@ off64_t libewf_file_io_handle_seek_offset(
 		     offset,
 		     SEEK_SET ) == -1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd_EWF " in file io handle: %" PRIs_EWF_filename ".\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to find offset: %" PRIjd " in file io handle: %" PRIs_EWF_filename ".\n",
 			 function, offset, file_io_handle->filename );
 
 			return( -1 );

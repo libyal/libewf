@@ -1001,7 +1001,7 @@ ssize_t libewf_raw_write_chunk_new(
 	{
 		return( 0 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing chunk of size: %" PRIzu_EWF " with data of size: %" PRIzd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing chunk of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, chunk_size, chunk_data_size );
 
 	segment_number = internal_handle->segment_table->amount - 1;
@@ -1211,7 +1211,7 @@ ssize_t libewf_raw_write_chunk_new(
 	}
 	/* Write the chunk data
 	 */
-	LIBEWF_VERBOSE_PRINT( "%s: writing %" PRIzd_EWF " bytes to segment file: %" PRIu16 ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing %" PRIzd " bytes to segment file: %" PRIu16 ".\n",
 	 function, chunk_size, segment_number );
 
 	write_count = libewf_segment_file_write_chunks_data(
@@ -1454,7 +1454,7 @@ ssize_t libewf_raw_write_chunk_existing(
 	}
 	segment_file_type = segment_file_handle->file_type;
 
-	LIBEWF_VERBOSE_PRINT( "%s: writing delta chunk of size: %" PRIzu_EWF " with data of size: %" PRIzd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing delta chunk of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, chunk_size, chunk_data_size );
 
 	/* Check if the chunk already exists in a delta segment file
@@ -1516,7 +1516,7 @@ ssize_t libewf_raw_write_chunk_existing(
 				     segment_file_handle,
 				     segment_file_handle->section_list->last->start_offset ) == -1 )
 				{
-					LIBEWF_WARNING_PRINT( "%s: cannot find offset: %" PRIjd_EWF ".\n",
+					LIBEWF_WARNING_PRINT( "%s: cannot find offset: %" PRIjd ".\n",
 					 function, segment_file_handle->section_list->last->start_offset );
 
 					return( -1 );
@@ -1622,7 +1622,7 @@ ssize_t libewf_raw_write_chunk_existing(
 			return( -1 );
 		}
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %" PRIjd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %" PRIjd ".\n",
 	 function, segment_file_handle->file_offset );
 
 	/* Write the chunk in the delta segment file
@@ -1741,7 +1741,7 @@ ssize_t libewf_write_chunk_data_new(
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %" PRIzu_EWF " with data of size: %" PRIzd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
 
 	/* Determine the size of data to read
@@ -1785,7 +1785,7 @@ ssize_t libewf_write_chunk_data_new(
 		{
 			read_size = remaining_chunk_size;
 		}
-		LIBEWF_VERBOSE_PRINT( "%s: reading %" PRIzu_EWF " bytes from buffer.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: reading %" PRIzu " bytes from buffer.\n",
 		 function, read_size );
 
 		if( memory_copy(
@@ -1974,7 +1974,7 @@ ssize_t libewf_write_chunk_data_existing(
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %" PRIzu_EWF " with data of size: %" PRIzd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %" PRIzu " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
 
 	/* Check if the data size exceeds the chunk size
@@ -2215,7 +2215,7 @@ ssize_t libewf_raw_write_buffer(
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: writing chunk: %d of total: %d.\n",
 	 function, ( internal_handle->current_chunk + 1 ), internal_handle->offset_table->amount );
-	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %" PRIzd_EWF " with data of size: %" PRIzd_EWF ".\n",
+	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
 
 	/* Check if chunk has already been created within a segment file
@@ -2351,7 +2351,7 @@ ssize_t libewf_write_buffer(
 	}
 	if( chunk_data_size > internal_handle->chunk_cache->allocated_size )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu_EWF ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %" PRIzu ".\n",
 		 function, chunk_data_size );
 
 		if( libewf_chunk_cache_realloc(

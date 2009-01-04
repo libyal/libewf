@@ -1,5 +1,5 @@
 /*
- * libewf character type string functions
+ * Character string functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,19 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_STRING_H )
-#define _LIBEWF_STRING_H
+#if !defined( _CHARACTER_STRING_H )
+#define _CHARACTER_STRING_H
 
-#include <common.h>
-
-#include <stdio.h>
+#include "common.h"
 
 #include <libewf/types.h>
-
-#include "libewf_char.h"
-
-#include "ewf_char.h"
-#include "ewf_digest_hash.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -51,71 +44,86 @@ extern "C" {
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
+typedef wchar_t character_t;
+
+#define PRIc	"lc"
+#define PRIs	"ls"
+
+/* Intermediate version of the macro required
+ * for correct evaluation predefined string
+ */
+#define _CHARACTER_T_STRING_INTERMEDIATE( string ) \
+	L ## string
+
+#define _CHARACTER_T_STRING( string ) \
+	_CHARACTER_T_STRING_INTERMEDIATE( string )
+
 #if defined( HAVE_WCSLEN )
-#define libewf_string_length( string ) \
+
+#define string_length( string ) \
 	wcslen( string )
 #else
 #error Missing wide character string length function (wcslen)
 #endif
 
 #if defined( HAVE_WMEMCMP )
-#define libewf_string_compare( string1, string2, size ) \
+#define string_compare( string1, string2, size ) \
 	wmemcmp( (void *) string1, (void *) string2, size )
 #elif defined( HAVE_WCSNCMP )
-#define libewf_string_compare( string1, string2, size ) \
+#define string_compare( string1, string2, size ) \
 	wcsncmp( string1, string2, size )
 #elif defined( HAVE_WCSCMP )
-#define libewf_string_compare( string1, string2, size ) \
+#define string_compare( string1, string2, size ) \
 	wcscmp( string1, string2 )
 #else
 #error Missing wide character string compare function (wmemcmp, wcsncmp and wcscmp)
 #endif
 
 #if defined( HAVE_WMEMCPY )
-#define libewf_string_copy( destination, source, size ) \
-	(libewf_char_t *) wmemcpy( (void *) destination, (void *) source, size )
+#define string_copy( destination, source, size ) \
+	(character_t *) wmemcpy( (void *) destination, (void *) source, size )
 #elif defined( HAVE_WCSNCPY )
-#define libewf_string_copy( destination, source, size ) \
+#define string_copy( destination, source, size ) \
 	wcsncpy( destination, source, size )
 #elif defined( HAVE_WCSCPY )
-#define libewf_string_copy( destination, source, size ) \
+#define string_copy( destination, source, size ) \
 	wcscpy( destination, source )
 #else
 #error Missing wide character string copy function (wmemcpy, wcsncpy and wcscpy)
 #endif
 
 #if defined( HAVE_WMEMCHR )
-#define libewf_string_search( string, character, size ) \
-	(libewf_char_t *) wmemchr( (void *) string, (wchar_t) character, size )
+#define string_search( string, character, size ) \
+	(character_t *) wmemchr( (void *) string, (wchar_t) character, size )
 #elif defined( HAVE_WCSCHR )
-#define libewf_string_search( string, character, size ) \
+#define string_search( string, character, size ) \
 	wcschr( string, (wchar_t) character )
 #else
 #error Missing wide character string search function (wmemchr and wcschr)
 #endif
 
 #if defined( HAVE_WMEMRCHR )
-#define libewf_string_search_reverse( string, character, size ) \
-	(libewf_char_t *) wmemrchr( (void *) string, (wchar_t) character, size )
+#define string_search_reverse( string, character, size ) \
+	(character_t *) wmemrchr( (void *) string, (wchar_t) character, size )
 #elif defined( HAVE_WCSRCHR )
-#define libewf_string_search_reverse( string, character, size ) \
+#define string_search_reverse( string, character, size ) \
 	wcsrchr( string, (wchar_t) character )
 #else
 #error Missing wide character reverse string search function (wmemrchr and wcsrchr)
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define libewf_string_snprintf( target, size, format, ... ) \
+#define string_snprintf( target, size, format, ... ) \
 	swprintf_s( target, size, format, __VA_ARGS__ )
 #elif defined( HAVE_SWPRINTF )
-#define libewf_string_snprintf( target, size, format, ... ) \
+#define string_snprintf( target, size, format, ... ) \
 	swprintf( target, size, format, __VA_ARGS__ )
 #else
 #error Missing swprintf
 #endif
 
 #if defined( HAVE_FGETWS )
-#define libewf_string_get_from_stream( string, size, stream ) \
+#define string_get_from_stream( string, size, stream ) \
 	fgetws( string, size, stream )
 #else
 #error Missing wide character string get from stream function (fgetws)
@@ -123,74 +131,82 @@ extern "C" {
 
 #else
 
+typedef char character_t;
+
+#define PRIc	"c"
+#define PRIs	"s"
+
+#define _CHARACTER_T_STRING( string ) \
+	string
+
 #if defined( HAVE_STRLEN )
-#define libewf_string_length( string ) \
+#define string_length( string ) \
 	strlen( string )
 #else
 #error Missing string length function (strlen)
 #endif
 
 #if defined( HAVE_MEMCMP )
-#define libewf_string_compare( string1, string2, size ) \
+#define string_compare( string1, string2, size ) \
 	memcmp( (void *) string1, (void *) string2, size )
 #elif defined( HAVE_STRNCMP )
-#define libewf_string_compare( string1, string2, size ) \
+#define string_compare( string1, string2, size ) \
 	strncmp( string1, string2, size )
 #elif defined( HAVE_STRCMP )
-#define libewf_string_compare( string1, string2, size ) \
+#define string_compare( string1, string2, size ) \
 	strcmp( string1, string2 )
 #else
 #error Missing string compare function (memcmp, strncmp and strcmp)
 #endif
 
 #if defined( HAVE_MEMCPY )
-#define libewf_string_copy( destination, source, size ) \
-	(libewf_char_t *) memcpy( (void *) destination, (void *) source, size )
+#define string_copy( destination, source, size ) \
+	(character_t *) memcpy( (void *) destination, (void *) source, size )
 #elif defined( HAVE_STRNCPY )
-#define libewf_string_copy( destination, source, size ) \
+#define string_copy( destination, source, size ) \
 	strncpy( destination, source, size )
 #elif defined( HAVE_STRCPY )
-#define libewf_string_copy( destination, source, size ) \
+#define string_copy( destination, source, size ) \
 	strcpy( destination, source )
 #else
 #error Missing string copy function (memcpy, strncpy and strcpy)
 #endif
 
 #if defined( HAVE_MEMCHR )
-#define libewf_string_search( string, character, size ) \
-	(libewf_char_t *) memchr( (void *) string, (int) character, size )
+#define string_search( string, character, size ) \
+	(character_t *) memchr( (void *) string, (int) character, size )
 #elif defined( HAVE_STRCHR )
-#define libewf_string_search( string, character, size ) \
+#define string_search( string, character, size ) \
 	strchr( string, (int) character )
 #else
 #error Missing string search function (memchr and strchr)
 #endif
 
 #if defined( HAVE_MEMRCHR ) && HAVE_DECL_MEMRCHR_ == 1
-#define libewf_string_search_reverse( string, character, size ) \
-	(libewf_char_t *) memrchr( (void *) string, (int) character, size )
+#define string_search_reverse( string, character, size ) \
+	(character_t *) memrchr( (void *) string, (int) character, size )
 #elif defined( HAVE_STRRCHR )
-#define libewf_string_search_reverse( string, character, size ) \
+#define string_search_reverse( string, character, size ) \
 	strrchr( string, (int) character )
 #else
 #error Missing reverse string search function (memrchr and strrchr)
 #endif
 
 #if defined( HAVE_WINDOWS_API )
-#define libewf_string_snprintf( target, size, format, ... ) \
+#define string_snprintf( target, size, format, ... ) \
 	sprintf_s( target, size, format, __VA_ARGS__ )
 #elif defined(HAVE_SNPRINTF)
-#define libewf_string_snprintf( target, size, format, ... ) \
+#define string_snprintf( target, size, format, ... ) \
 	snprintf( target, size, format, __VA_ARGS__ )
 #elif defined(HAVE_SPRINTF)
-#define libewf_string_snprintf( target, size, format, ... ) \
+#define string_snprintf( target, size, format, ... ) \
 	sprintf( target, format, __VA_ARGS__ )
 #else
 #error Missing snprintf and sprintf
 #endif
 
 #if defined( HAVE_FGETS )
-#define libewf_string_get_from_stream( string, size, stream ) \
+#define string_get_from_stream( string, size, stream ) \
 	fgets( string, size, stream )
 #else
 #error Missing string get from stream function (fgets)
@@ -198,78 +214,34 @@ extern "C" {
 
 #endif
 
-typedef char libewf_string_t;
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) || !defined( HAVE_STRNDUP )
+character_t *string_duplicate(
+              character_t *string,
+              size_t size );
 
-#define LIBEWF_STRING_LITTLE_ENDIAN	(uint8_t) 'l'
-#define LIBEWF_STRING_BIG_ENDIAN	(uint8_t) 'b'
+#else
+#define string_duplicate( string, size ) \
+	strndup( string, size )
 
-libewf_char_t *libewf_string_duplicate(
-                libewf_char_t *string, size_t size );
+#endif
 
-int64_t libewf_string_to_int64(
-         const libewf_char_t *string,
+int64_t string_to_int64(
+         const character_t *string,
          size_t size );
 
-uint64_t libewf_string_to_uint64(
-          const libewf_char_t *string,
+uint64_t string_to_uint64(
+          const character_t *string,
           size_t size );
 
-libewf_char_t **libewf_string_split(
-                 libewf_char_t *string,
-                 size_t size,
-                 libewf_char_t delimiter,
-                 uint32_t *amount );
+character_t **string_split(
+               character_t *string,
+               size_t size,
+               character_t delimiter,
+               uint32_t *amount );
 
-void libewf_string_split_values_free(
-      libewf_char_t **split_values,
+void string_split_values_free(
+      character_t **split_values,
       uint32_t amount );
-
-int libewf_string_copy_from_utf16(
-     libewf_char_t *string,
-     size_t size_string,
-     ewf_char_t *utf16_string,
-     size_t size_utf16 );
-
-int libewf_string_copy_to_utf16(
-     libewf_char_t *string,
-     size_t size,
-     ewf_char_t *utf16_string,
-     size_t size_utf16,
-     uint8_t byte_order );
-
-int libewf_string_copy_from_ewf_char(
-     libewf_char_t *string,
-     size_t size_string,
-     ewf_char_t *ewf_char_string,
-     size_t size_ewf_char_string );
-
-int libewf_string_copy_to_ewf_char(
-     libewf_char_t *string,
-     size_t size_string,
-     ewf_char_t *ewf_char_string,
-     size_t size_ewf_char_string );
-
-#define libewf_string_copy_from_header( string, size_string, header, size_header ) \
-	libewf_string_copy_from_ewf_char( string, size_string, header, size_header )
-#define libewf_string_copy_to_header( string, size_string, header, size_header ) \
-	libewf_string_copy_to_ewf_char( string, size_string, header, size_header )
-
-int libewf_string_copy_from_header2(
-     libewf_char_t *string,
-     size_t size_string,
-     ewf_char_t *header2,
-     size_t size_header2 );
-
-int libewf_string_copy_to_header2(
-     libewf_char_t *string,
-     size_t size_string,
-     ewf_char_t *header2,
-     size_t size_header2 );
-
-int libewf_string_ctime(
-     const time_t *timestamp,
-     libewf_char_t **ctime_string,
-     size_t *ctime_string_length );
 
 #if defined( __cplusplus )
 }

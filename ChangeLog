@@ -148,6 +148,7 @@ Next stable:
 * fix MSVCPP project
 
 * rename include/libewf/libewf_x to include/libewf/x
+* refactor character_string_split to return int
 
 * change HAVE_WIDE_CHARACTER_TYPE into HAVE_WCHAR_T
 

@@ -602,7 +602,7 @@ ssize32_t ewfcommon_read_input(
 			              &( buffer[ buffer_offset + read_error_offset ] ),
 			              bytes_to_read );
 
-			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi32 " with size: %" PRIzd_EWF ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
 			 function, ( chunk_amount + 1 ), read_count );
 
 			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
@@ -663,7 +663,7 @@ ssize32_t ewfcommon_read_input(
 
 					if( current_read_offset != current_calculated_offset )
 					{
-						LIBEWF_VERBOSE_PRINT( "%s: correcting offset drift current: %" PRIjd_EWF ", calculated: %" PRIjd_EWF ".\n",
+						LIBEWF_VERBOSE_PRINT( "%s: correcting offset drift current: %" PRIjd ", calculated: %" PRIjd ".\n",
 						 function, current_read_offset, current_calculated_offset );
 
 						if( current_read_offset < current_calculated_offset )
@@ -719,7 +719,7 @@ ssize32_t ewfcommon_read_input(
 				{
 					return( 0 );
 				}
-				LIBEWF_VERBOSE_PRINT( "%s: read error at offset %" PRIjd_EWF " after reading %" PRIzd_EWF " bytes.\n",
+				LIBEWF_VERBOSE_PRINT( "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
 				 function, current_calculated_offset, read_count );
 
 				/* There was a read error at a certain offset
@@ -857,7 +857,7 @@ ssize32_t ewfcommon_read_input(
 					read_error_offset     += error_skip_bytes;
 					read_amount_of_errors  = 0;
 
-					LIBEWF_VERBOSE_PRINT( "%s: remaining to read from chunk %" PRIzd_EWF " bytes.\n",
+					LIBEWF_VERBOSE_PRINT( "%s: remaining to read from chunk %" PRIzd " bytes.\n",
 					 function, bytes_to_read );
 				}
 				else

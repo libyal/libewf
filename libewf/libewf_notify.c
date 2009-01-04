@@ -151,7 +151,7 @@ void libewf_dump_data(
 	{
 		if( iterator % 16 == 0 )
 		{
-			fprintf( libewf_notify_stream, "%.8" PRIzx_EWF ": ", iterator );
+			fprintf( libewf_notify_stream, "%.8" PRIzx ": ", iterator );
 		}
 		fprintf( libewf_notify_stream, "%.2" PRIx8 "", data[ iterator++ ] );
 
@@ -176,7 +176,7 @@ void libewf_dump_data(
 	{
 		if( iterator % 32 == 0 )
 		{
-			fprintf( libewf_notify_stream, "%.8" PRIzx_EWF ": ", iterator );
+			fprintf( libewf_notify_stream, "%.8" PRIzx ": ", iterator );
 		}
 		fprintf( libewf_notify_stream, "%c ", (char) data[ iterator++ ] );
 
