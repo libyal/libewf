@@ -1784,6 +1784,13 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
+	if( internal_handle->acquiry_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing acquiry errors.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -1831,7 +1838,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		}
 		/* Write the error2 section if required 
 		 */
-		if( ( internal_handle->amount_of_acquiry_errors > 0 )
+		if( ( internal_handle->acquiry_errors->amount > 0 )
 		 && ( ( format == LIBEWF_FORMAT_ENCASE3 )
 		  || ( format == LIBEWF_FORMAT_ENCASE4 )
 		  || ( format == LIBEWF_FORMAT_ENCASE5 )
@@ -1842,8 +1849,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		{
 			write_count = libewf_section_error2_write(
 			               segment_file,
-			               internal_handle->acquiry_error_sectors,
-			               internal_handle->amount_of_acquiry_errors );
+			               internal_handle->acquiry_errors );
 
 			if( write_count == -1 )
 			{

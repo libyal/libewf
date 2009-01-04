@@ -43,6 +43,7 @@
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
+#include "libewf_sector_table.h"
 #include "libewf_values_table.h"
 
 #include "ewf_char.h"
@@ -121,11 +122,7 @@ struct libewf_internal_handle
 
 	/* The sectors with acquiry read errors
 	 */
-	LIBEWF_ERROR_SECTOR *acquiry_error_sectors;
-
-	/* The amount of the acquiry read error sectors
-	 */
-	uint32_t amount_of_acquiry_errors;
+	LIBEWF_SECTOR_TABLE *acquiry_errors;
 
 	/* The current chunk
 	 */
@@ -158,11 +155,7 @@ struct libewf_internal_handle_read
 {
 	/* The sectors with CRC errors
 	 */
-	LIBEWF_ERROR_SECTOR *crc_error_sectors;
-
-	/* The amount of the CRC error sectors
-	 */
-	uint32_t crc_amount_of_errors;
+	LIBEWF_SECTOR_TABLE *crc_errors;
 
 	/* Value to indicate the write values were initialized
 	 */

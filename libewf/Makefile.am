@@ -22,6 +22,7 @@ libewf_la_SOURCES = \
 	libewf.c \
 	libewf_char.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
+	libewf_chunk_offset.h \
 	libewf_common.c libewf_common.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_debug.c libewf_debug.h \
@@ -43,6 +44,7 @@ libewf_la_SOURCES = \
 	libewf_read.c libewf_read.h \
 	libewf_section.c libewf_section.h \
 	libewf_section_list.c libewf_section_list.h \
+	libewf_sector_table.c libewf_sector_table.h \
 	libewf_segment_file.c libewf_segment_file.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \

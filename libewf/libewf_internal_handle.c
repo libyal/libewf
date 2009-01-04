@@ -77,8 +77,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->hash_sections            = NULL;
 	internal_handle->header_values            = NULL;
 	internal_handle->hash_values              = NULL;
-	internal_handle->acquiry_error_sectors    = NULL;
-	internal_handle->amount_of_acquiry_errors = 0;
+	internal_handle->acquiry_errors           = NULL;
 	internal_handle->current_chunk            = 0;
 	internal_handle->current_chunk_offset     = 0;
 	internal_handle->compression_level        = EWF_COMPRESSION_UNKNOWN;
@@ -171,6 +170,23 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 		return( NULL );
 	}
+	internal_handle->acquiry_errors = libewf_sector_table_alloc( 0 );
+
+	if( internal_handle->acquiry_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry errors.\n",
+		 function );
+
+		libewf_hash_sections_free( internal_handle->hash_sections );
+		libewf_header_sections_free( internal_handle->header_sections );
+		libewf_media_values_free( internal_handle->media_values );
+		libewf_chunk_cache_free( internal_handle->chunk_cache );
+		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_segment_table_free( internal_handle->delta_segment_table );
+		libewf_common_free( internal_handle );
+
+		return( NULL );
+	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
 		internal_handle->read = libewf_internal_handle_read_alloc();
@@ -180,6 +196,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			LIBEWF_WARNING_PRINT( "%s: unable to create subhandle read.\n",
 			 function );
 
+			libewf_sector_table_free( internal_handle->acquiry_errors );
 			libewf_hash_sections_free( internal_handle->hash_sections );
 			libewf_header_sections_free( internal_handle->header_sections );
 			libewf_media_values_free( internal_handle->media_values );
@@ -204,6 +221,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			{
 				libewf_internal_handle_read_free( internal_handle->read );
 			}
+			libewf_sector_table_free( internal_handle->acquiry_errors );
 			libewf_hash_sections_free( internal_handle->hash_sections );
 			libewf_header_sections_free( internal_handle->header_sections );
 			libewf_media_values_free( internal_handle->media_values );
@@ -259,8 +277,10 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	{
 		libewf_offset_table_free( internal_handle->secondary_offset_table );
 	}
-	libewf_common_free( internal_handle->acquiry_error_sectors );
-
+	if( internal_handle->acquiry_errors == NULL )
+	{
+		libewf_sector_table_free( internal_handle->acquiry_errors );
+	}
 	if( internal_handle->header_sections != NULL )
 	{
 		libewf_header_sections_free( internal_handle->header_sections );
@@ -301,10 +321,19 @@ LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void )
 
 		return( NULL );
 	}
-	handle_read->crc_error_sectors    = NULL;
-	handle_read->crc_amount_of_errors = 0;
-	handle_read->values_initialized   = 0;
-	handle_read->wipe_on_error        = 1;
+	handle_read->crc_errors = libewf_sector_table_alloc( 0 );
+
+	if( handle_read->crc_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate crc errors.\n",
+		 function );
+
+		libewf_common_free( handle_read );
+
+		return( NULL );
+	}
+	handle_read->values_initialized = 0;
+	handle_read->wipe_on_error      = 1;
 
 	return( handle_read );
 }
@@ -322,7 +351,7 @@ void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read 
 
 		return;
 	}
-	libewf_common_free( handle_read->crc_error_sectors );
+	libewf_sector_table_free( handle_read->crc_errors );
 	libewf_common_free( handle_read );
 }
 

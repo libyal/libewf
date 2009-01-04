@@ -999,6 +999,13 @@ int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
+	if( internal_handle->acquiry_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing acquiry errors.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( amount_of_errors == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
@@ -1006,11 +1013,7 @@ int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount
 
 		return( -1 );
 	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		return( 0 );
-	}
-	*amount_of_errors = internal_handle->amount_of_acquiry_errors;
+	*amount_of_errors = internal_handle->acquiry_errors->amount;
 
 	return( 1 );
 }
@@ -1020,25 +1023,11 @@ int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount
  */
 int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_acquiry_error";
+	static char *function = "libewf_get_acquiry_error";
 
 	if( handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->amount_of_acquiry_errors == 0 )
-	{
-		return( 0 );
-	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing acquiry error sectors.\n",
 		 function );
 
 		return( -1 );
@@ -1050,24 +1039,11 @@ int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *se
 
 		return( -1 );
 	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( index >= internal_handle->amount_of_acquiry_errors )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-	*sector            = internal_handle->acquiry_error_sectors[ index ].sector;
-	*amount_of_sectors = internal_handle->acquiry_error_sectors[ index ].amount_of_sectors;
-
-	return( 1 );
+	return( libewf_sector_table_get_error_sector(
+	         ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_errors,
+	         index,
+	         sector,
+	         amount_of_sectors ) );
 }
 
 /* Retrieves the amount of CRC errors
@@ -1094,6 +1070,13 @@ int libewf_get_amount_of_crc_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_
 
 		return( -1 );
 	}
+	if( internal_handle->read->crc_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid subhandle read - missing crc errors.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( amount_of_errors == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
@@ -1101,11 +1084,7 @@ int libewf_get_amount_of_crc_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_
 
 		return( -1 );
 	}
-	if( internal_handle->read->crc_error_sectors == NULL )
-	{
-		return( 0 );
-	}
-	*amount_of_errors = internal_handle->read->crc_amount_of_errors;
+	*amount_of_errors = internal_handle->read->crc_errors->amount;
 
 	return( 1 );
 }
@@ -1134,42 +1113,11 @@ int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector
 
 		return( -1 );
 	}
-	if( internal_handle->read->crc_amount_of_errors == 0 )
-	{
-		return( 0 );
-	}
-	if( internal_handle->read->crc_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid subhandle read - missing CRC error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( index >= internal_handle->read->crc_amount_of_errors )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-	*sector            = internal_handle->read->crc_error_sectors[ index ].sector;
-	*amount_of_sectors = internal_handle->read->crc_error_sectors[ index ].amount_of_sectors;
-
-	return( 1 );
+	return( libewf_sector_table_get_error_sector(
+	         internal_handle->read->crc_errors,
+	         index,
+	         sector,
+	         amount_of_sectors ) );
 }
 
 /* Retrieves the amount of chunks written
@@ -2156,12 +2104,7 @@ int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
  */
 int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle    = NULL;
-	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
-	static char *function                      = "libewf_add_acquiry_error";
-	off64_t last_sector                        = 0;
-	off64_t last_range_sector                  = 0;
-	uint32_t iterator                          = 0;
+	static char *function = "libewf_add_acquiry_error";
 
 	if( handle == NULL )
 	{
@@ -2170,66 +2113,10 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 
 		return( -1 );
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sector <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
-	}
-	else
-	{
-		/* Check if acquiry read error sector is already in list
-		 */
-		for( iterator = 0; iterator < internal_handle->amount_of_acquiry_errors; iterator++ )
-		{
-			last_range_sector = internal_handle->acquiry_error_sectors[ iterator ].sector
-			                  + internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors;
-
-			if( ( sector >= internal_handle->acquiry_error_sectors[ iterator ].sector )
-			 && ( sector <= last_range_sector ) )
-			{
-				last_sector = sector + amount_of_sectors;
-
-				if( last_sector > last_range_sector )
-				{
-					internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors += last_sector - last_range_sector;
-				}
-				return( 1 );
-			}
-		}
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
-		                         internal_handle->acquiry_error_sectors,
-		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->amount_of_acquiry_errors + 1 ) ) );
-	}
-	if( acquiry_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry read error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->acquiry_error_sectors = acquiry_error_sectors;
-
-	internal_handle->acquiry_error_sectors[ internal_handle->amount_of_acquiry_errors ].sector            = sector;
-	internal_handle->acquiry_error_sectors[ internal_handle->amount_of_acquiry_errors ].amount_of_sectors = amount_of_sectors;
-
-	internal_handle->amount_of_acquiry_errors++;
-
-	return( 1 );
+	return( libewf_sector_table_add_error_sector(
+	         ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_errors,
+	         sector,
+	         amount_of_sectors ) );
 }
 
 /* Add a CRC error
@@ -2238,11 +2125,7 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	LIBEWF_ERROR_SECTOR *crc_error_sectors  = NULL;
 	static char *function                   = "libewf_add_crc_error";
-	off64_t last_sector                     = 0;
-	off64_t last_range_sector               = 0;
-	uint32_t iterator                       = 0;
 
 	if( handle == NULL )
 	{
@@ -2253,13 +2136,6 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->read == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
@@ -2267,50 +2143,10 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 
 		return( -1 );
 	}
-	if( internal_handle->read->crc_error_sectors == NULL )
-	{
-		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
-	}
-	else
-	{
-		/* Check if CRC error is already in list
-		 */
-		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
-		{
-			last_range_sector = internal_handle->read->crc_error_sectors[ iterator ].sector
-			                  + internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors;
-
-			if( ( sector >= internal_handle->read->crc_error_sectors[ iterator ].sector )
-			 && ( sector <= last_range_sector ) )
-			{
-				last_sector = sector + amount_of_sectors;
-
-				if( last_sector > last_range_sector )
-				{
-					internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors += last_sector - last_range_sector;
-				}
-				return( 1 );
-			}
-		}
-		crc_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
-		                     internal_handle->read->crc_error_sectors,
-		                     ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->read->crc_amount_of_errors + 1 ) ) );
-	}
-	if( crc_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create CRC error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->read->crc_error_sectors = crc_error_sectors;
-
-	internal_handle->read->crc_error_sectors[ internal_handle->read->crc_amount_of_errors ].sector            = sector;
-	internal_handle->read->crc_error_sectors[ internal_handle->read->crc_amount_of_errors ].amount_of_sectors = amount_of_sectors;
-
-	internal_handle->read->crc_amount_of_errors++;
-
-	return( 1 );
+	return( libewf_sector_table_add_error_sector(
+	         internal_handle->read->crc_errors,
+	         sector,
+	         amount_of_sectors ) );
 }
 
 /* Copies the header values from the source to the destination handle

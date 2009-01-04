@@ -1,5 +1,5 @@
 /*
- * libewf offset table
+ * libewf chunk offset
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,13 +31,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_OFFSET_TABLE_H )
-#define _LIBEWF_OFFSET_TABLE_H
+#if !defined( _LIBEWF_CHUNK_OFFSET_H )
+#define _LIBEWF_CHUNK_OFFSET_H
 
 #include "libewf_includes.h"
 
-#include "libewf_chunk_offset.h"
-#include "libewf_section_list.h"
 #include "libewf_segment_table.h"
 
 #include "ewf_table.h"
@@ -46,36 +44,34 @@
 extern "C" {
 #endif
 
-#define LIBEWF_OFFSET_TABLE libewf_offset_table_t
-#define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
+#define LIBEWF_CHUNK_OFFSET libewf_chunk_offset_t
+#define LIBEWF_CHUNK_OFFSET_SIZE sizeof( LIBEWF_CHUNK_OFFSET )
 
-typedef struct libewf_offset_table libewf_offset_table_t;
+typedef struct libewf_chunk_offset libewf_chunk_offset_t;
 
-struct libewf_offset_table
+struct libewf_chunk_offset
 {
-	/* Stores the amount of chunks in the table
-	 * There is an offset per chunk in the table
+	/* A reference to the segment file
 	 */
-	uint32_t amount;
+	LIBEWF_SEGMENT_FILE *segment_file;
 
-	/* The last chunk that was defined
+	/* The file offset of the chunk in the segment file
 	 */
-	uint32_t last;
+	off64_t file_offset;
 
-	/* Dynamic array of chunk offsets
+	/* The size of the chunk
 	 */
-	LIBEWF_CHUNK_OFFSET *chunk_offset;
+	size_t size;
+
+	/* Value to indicate if the chunk is compressed
+	 */
+	uint8_t compressed;
+
+	/* Value to indicate if the chunk is stored in
+	 * a delta segment file
+	 */
+	uint8_t dirty;
 };
-
-LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
-int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
-void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
-
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE *segment_file, uint8_t error_tollerance );
-int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance );
-int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
-
-off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk );
 
 #if defined( __cplusplus )
 }

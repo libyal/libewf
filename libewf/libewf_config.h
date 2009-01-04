@@ -23,7 +23,7 @@
 /* #undef HAVE_CYGWIN_FS_H */
 
 /* Defines if debug output should be used */
-#define HAVE_DEBUG_OUTPUT 1
+/* #undef HAVE_DEBUG_OUTPUT */
 
 /* Define to 1 if you have the declaration of `memrchr ', and to 0 if you
    don't. */
@@ -125,7 +125,7 @@
 
 /* Defines if libewf's read and write raw functionality should be used in the
    ewf tools */
-#define HAVE_RAW_ACCESS 1
+/* #undef HAVE_RAW_ACCESS */
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1

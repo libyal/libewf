@@ -1,5 +1,5 @@
 /*
- * libewf offset table
+ * Error sector table definition for CRC and acquiry read errrors
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,51 +31,40 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_OFFSET_TABLE_H )
-#define _LIBEWF_OFFSET_TABLE_H
+#if !defined( _LIBEWF_SECTOR_TABLE_H )
+#define _LIBEWF_SECTOR_TABLE_H
 
 #include "libewf_includes.h"
 
-#include "libewf_chunk_offset.h"
-#include "libewf_section_list.h"
-#include "libewf_segment_table.h"
-
-#include "ewf_table.h"
+#include "libewf_error_sector.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_OFFSET_TABLE libewf_offset_table_t
-#define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
+#define LIBEWF_SECTOR_TABLE		libewf_sector_table_t
+#define LIBEWF_SECTOR_TABLE_SIZE	sizeof( LIBEWF_SECTOR_TABLE )
 
-typedef struct libewf_offset_table libewf_offset_table_t;
+typedef struct libewf_sector_table libewf_sector_table_t;
 
-struct libewf_offset_table
+struct libewf_sector_table
 {
-	/* Stores the amount of chunks in the table
-	 * There is an offset per chunk in the table
+	/* The amount of error sectors in the table
 	 */
-	uint32_t amount;
+	size_t amount;
 
-	/* The last chunk that was defined
+	/* A dynamic array containting references to error sectors
 	 */
-	uint32_t last;
-
-	/* Dynamic array of chunk offsets
-	 */
-	LIBEWF_CHUNK_OFFSET *chunk_offset;
+	LIBEWF_ERROR_SECTOR *error_sector;
 };
 
-LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
-int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
-void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
+LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( size_t amount );
+int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, size_t amount );
+void libewf_sector_table_free( LIBEWF_SECTOR_TABLE *sector_table );
 
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE *segment_file, uint8_t error_tollerance );
-int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance );
-int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
+int libewf_sector_table_get_error_sector( LIBEWF_SECTOR_TABLE *sector_table, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors );
 
-off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk );
+int libewf_sector_table_add_error_sector( LIBEWF_SECTOR_TABLE *sector_table, off64_t sector, uint32_t amount_of_sectors );
 
 #if defined( __cplusplus )
 }

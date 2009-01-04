@@ -2842,7 +2842,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_MED
 /* Reads a error2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ERROR_SECTOR **acquiry_error_sectors, uint32_t *amount_of_acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_SECTOR_TABLE *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_ERROR2 error2;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -2865,16 +2865,9 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 
 		return( -1 );
 	}
-	if( acquiry_error_sectors == NULL )
+	if( acquiry_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid acquiry error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_acquiry_errors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of acquiry errors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid acquiry errors.\n",
 		 function );
 
 		return( -1 );
@@ -3012,16 +3005,18 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 #if defined( HAVE_DEBUG_OUTPUT )
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
 #endif
-		if( *acquiry_error_sectors != NULL )
+		if( acquiry_errors->error_sector != NULL )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: acquiry error sectors already set in handle - removing previous one.\n",
 			 function );
 
-			libewf_common_free( *acquiry_error_sectors );
-		}
-		*acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE * amount_of_errors );
+			libewf_common_free( acquiry_errors->error_sector );
 
-		if( *acquiry_error_sectors == NULL )
+			acquiry_errors->amount = 0;
+		}
+		acquiry_errors->error_sector = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE * amount_of_errors );
+
+		if( acquiry_errors->error_sector == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create acquiry error sectors.\n",
 			 function );
@@ -3030,7 +3025,7 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 
 			return( -1 );
 		}
-		*amount_of_acquiry_errors = amount_of_errors;
+		acquiry_errors->amount = amount_of_errors;
 
 		for( iterator = 0; iterator < amount_of_errors; iterator++ )
 		{
@@ -3043,10 +3038,10 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 
 				return( -1 );
 			}
-			( *acquiry_error_sectors )[ iterator ].sector = (uint64_t) sector;
+			acquiry_errors->error_sector[ iterator ].sector = (uint64_t) sector;
 
 			if( libewf_endian_convert_32bit(
-			     &( ( *acquiry_error_sectors )[ iterator ].amount_of_sectors ),
+			     &( acquiry_errors->error_sector[ iterator ].amount_of_sectors ),
 			     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
@@ -3065,7 +3060,7 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ER
 /* Writes a error2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_ERROR_SECTOR *sectors, uint32_t amount_of_errors )
+ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_SECTOR_TABLE *acquiry_errors )
 {
 	EWF_ERROR2 error2;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -3089,15 +3084,15 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 
 		return( -1 );
 	}
-	if( sectors == NULL )
+	if( acquiry_errors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid acquiry read error sectors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid acquiry errors.\n",
 		 function );
 
 		return( -1 );
 	}
 	section_offset = segment_file->file_offset;
-	sectors_size   = EWF_ERROR2_SECTOR_SIZE * amount_of_errors;
+	sectors_size   = EWF_ERROR2_SECTOR_SIZE * acquiry_errors->amount;
 	section_size   = EWF_ERROR2_SIZE + sectors_size + EWF_CRC_SIZE;
 
 	if( libewf_common_memset( &error2, 0, EWF_ERROR2_SIZE ) == NULL )
@@ -3107,7 +3102,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( amount_of_errors, error2.amount_of_errors ) != 1 )
+	if( libewf_endian_revert_32bit( acquiry_errors->amount, error2.amount_of_errors ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of errors value.\n",
 		 function );
@@ -3132,10 +3127,10 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 
 		return( -1 );
 	}
-	for( iterator = 0; iterator < amount_of_errors; iterator++ )
+	for( iterator = 0; iterator < acquiry_errors->amount; iterator++ )
 	{
 		if( libewf_endian_revert_32bit(
-		     (uint32_t) sectors[ iterator ].sector,
+		     (uint32_t) acquiry_errors->error_sector[ iterator ].sector,
 		     error2_sectors[ iterator ].sector ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert sector value.\n",
@@ -3146,7 +3141,7 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 			return( -1 );
 		}
 		if( libewf_endian_revert_32bit(
-		     sectors[ iterator ].amount_of_sectors,
+		     acquiry_errors->error_sector[ iterator ].amount_of_sectors,
 		     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
@@ -4495,8 +4490,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	{
 		read_count = libewf_section_error2_read(
 		              segment_file,
-		              &( internal_handle->acquiry_error_sectors ),
-		              &( internal_handle->amount_of_acquiry_errors ),
+		              internal_handle->acquiry_errors,
 		              internal_handle->ewf_format,
  		              error_tollerance );
 	}

@@ -49,6 +49,13 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 	LIBEWF_SEGMENT_TABLE *segment_table = NULL;
 	static char *function               = "libewf_segment_table_alloc";
 
+	if( amount == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount value cannot be zero.\n",
+		 function );
+
+		return( NULL );
+	}
 	segment_table = (LIBEWF_SEGMENT_TABLE *) libewf_common_alloc( LIBEWF_SEGMENT_TABLE_SIZE );
 
 	if( segment_table == NULL )
@@ -63,7 +70,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 	if( segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate segment file array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic segment file array.\n",
 		 function );
 
 		libewf_common_free( segment_table );
@@ -75,7 +82,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 	     0, 
 	     ( amount * sizeof( LIBEWF_SEGMENT_FILE* ) ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear segment file array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic segment file array.\n",
 		 function );
 
 		libewf_common_free( segment_table->segment_file );
@@ -138,7 +145,7 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 	return( 1 );
 }
 
-/* Frees memory of a file list struct including elements
+/* Frees memory of a segment table struct including elements
  */
 void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 {

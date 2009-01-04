@@ -138,6 +138,8 @@ Next release:
 * libewf_parse_header_values refactor to check if header values are already
   set and pass header values reference as parameter
 
+* set crc errors in raw access verify
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
