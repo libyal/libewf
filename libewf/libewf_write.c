@@ -558,6 +558,16 @@ int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		return( 1 );
 	}
+	/* TODO */
+	/* Make sure the chunks section remains smaller than 2Gb
+	 */
+	if( internal_handle->write->chunks_section_write_count > (ssize32_t) INT32_MAX )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: no space left for additional chunk.\n",
+		 function );
+
+		return( 1 );
+	}
 	LIBEWF_VERBOSE_PRINT( "%s: space left for additional chunk.\n",
 	 function );
 

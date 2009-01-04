@@ -1417,11 +1417,12 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	EWF_TABLE *table                  = NULL;
 	EWF_TABLE_OFFSET *offsets         = NULL;
 	static char *function             = "libewf_section_table_write";
+	off64_t offset64_value            = 0;
 	ssize_t section_write_count       = 0;
 	ssize_t table_write_count         = 0;
 	ssize_t table_offsets_write_count = 0;
 	size_t size                       = 0;
-	uint32_t offset_value             = 0;
+	uint32_t offset32_value           = 0;
 	uint32_t iterator                 = 0;
 	uint8_t write_crc                 = 0;
 
@@ -1502,9 +1503,13 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	for( iterator = 0; iterator < amount_of_offsets; iterator++ )
 	{
-		if( offset_table->offset[ offset_table_index + iterator ] > (off64_t) INT64_MAX )
+		offset64_value = offset_table->offset[ offset_table_index + iterator ]
+		               - base_offset;
+
+		if( ( offset64_value < 0 )
+		 || ( offset64_value > (off64_t) INT32_MAX ) )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value.\n",
 			 function );
 
 			libewf_common_free( table );
@@ -1512,14 +1517,13 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 			return( -1 );
 		}
-
-		offset_value = (uint32_t) offset_table->offset[ offset_table_index + iterator ];
+		offset32_value = (uint32_t) offset64_value;
 
 		if( offset_table->compressed[ offset_table_index + iterator ] != 0 )
 		{
-			offset_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
 		}
-		if( libewf_endian_revert_32bit( offset_value, (uint8_t *) offsets[ iterator ].offset ) != 1 )
+		if( libewf_endian_revert_32bit( offset32_value, (uint8_t *) offsets[ iterator ].offset ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert start offset.\n",
 			 function );
@@ -3064,7 +3068,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;
-	ssize_t count              = 0;
+	ssize64_t count            = 0;
 	uint64_t size              = 0;
 	uint64_t next_offset       = 0;
 
@@ -3317,6 +3321,13 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 		 function, (char *) section->type );
 
 #if defined( HAVE_DEBUG_OUTPUT )
+		if( size > SSIZE_MAX )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
+			 function );
+
+			return( -1 );
+		}
 		LIBEWF_VERBOSE_EXEC( libewf_debug_read_section( internal_handle, file_descriptor, (size_t) size ); );
 #else
 		/* Skip the data within the section
@@ -3329,7 +3340,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 			return( -1 );
 		}
 #endif
-		count = (ssize_t) size;
+		count = (ssize64_t) size;
 	}
 	if( count <= -1 )
 	{
@@ -3340,7 +3351,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 	*section_start_offset += (off64_t) count;
 
-	if( count != (ssize_t) size )
+	if( count != (ssize64_t) size )
 	{
 		LIBEWF_WARNING_PRINT( "%s: section: %s was not entirely read.\n",
 		 function, (char *) section->type );

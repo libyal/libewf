@@ -96,17 +96,17 @@ typedef size_t u64;
  */
 void usage( void )
 {
-	fprintf( stderr, "Usage: ewfacquire [ -d digest_type ] [ -hqsvV ] source\n\n" );
+	fprintf( stdout, "Usage: ewfacquire [ -d digest_type ] [ -hqsvV ] source\n\n" );
 
-	fprintf( stderr, "\tsource: the source file or device\n\n" );
+	fprintf( stdout, "\tsource: the source file or device\n\n" );
 
-	fprintf( stderr, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stderr, "\t-h:     shows this help\n" );
-	fprintf( stderr, "\t-q:     quiet shows no status information\n" );
-	fprintf( stderr, "\t-s:     swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stderr, "\t        (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-v:     verbose output to stderr\n" );
-	fprintf( stderr, "\t-V:     print version\n" );
+	fprintf( stdout, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stdout, "\t-h:     shows this help\n" );
+	fprintf( stdout, "\t-q:     quiet shows no status information\n" );
+	fprintf( stdout, "\t-s:     swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stdout, "\t        (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stdout, "\t-v:     verbose output to stderr\n" );
+	fprintf( stdout, "\t-V:     print version\n" );
 }
 
 /* Prints an overview of the user provided input
@@ -287,7 +287,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, program );
+	ewfcommon_version_fprint( stdout, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hqsvV" ) ) ) != (INT_T) -1 )
 	{
@@ -333,7 +333,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stderr );
+				ewfcommon_copyright_fprint( stdout );
 
 				return( EXIT_SUCCESS );
 		}
@@ -1083,19 +1083,19 @@ int main( int argc, char * const argv[] )
 
 	if( time_string != NULL )
 	{
-		fprintf( stderr, "Acquiry started at: %" PRIs "\n", time_string );
+		fprintf( stdout, "Acquiry started at: %" PRIs "\n", time_string );
 
 		libewf_common_free( time_string );
 	}
 	else
 	{
-		fprintf( stderr, "Acquiry started.\n" );
+		fprintf( stdout, "Acquiry started.\n" );
 	}
 	if( callback != NULL )
 	{
-		ewfcommon_process_status_initialize( stderr, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
+		ewfcommon_process_status_initialize( stdout, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
 	}
-	fprintf( stderr, "This could take a while.\n\n" );
+	fprintf( stdout, "This could take a while.\n\n" );
 
 	write_count = ewfcommon_write_from_file_descriptor(
 	               handle,
@@ -1188,13 +1188,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( time_string != NULL )
 		{
-			fprintf( stderr, "Acquiry failed at: %" PRIs "\n", time_string );
+			fprintf( stdout, "Acquiry failed at: %" PRIs "\n", time_string );
 
 			libewf_common_free( time_string );
 		}
 		else
 		{
-			fprintf( stderr, "Acquiry failed.\n" );
+			fprintf( stdout, "Acquiry failed.\n" );
 		}
 		if( libewf_close( handle ) != 0 )
 		{
@@ -1210,19 +1210,19 @@ int main( int argc, char * const argv[] )
 	}
 	if( time_string != NULL )
 	{
-		fprintf( stderr, "Acquiry completed at: %" PRIs "\n", time_string );
+		fprintf( stdout, "Acquiry completed at: %" PRIs "\n", time_string );
 
 		libewf_common_free( time_string );
 	}
 	else
 	{
-		fprintf( stderr, "Acquiry completed.\n" );
+		fprintf( stdout, "Acquiry completed.\n" );
 	}
-	ewfcommon_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
+	ewfcommon_process_summary_fprint( stdout, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
 
-	fprintf( stderr, "\n" );
+	fprintf( stdout, "\n" );
 
-	ewfcommon_acquiry_errors_fprint( stderr, handle );
+	ewfcommon_acquiry_errors_fprint( stdout, handle );
 
 	if( libewf_close( handle ) != 0 )
 	{
@@ -1250,11 +1250,11 @@ int main( int argc, char * const argv[] )
 	}
 	else if( result_md5_hash == 0 )
 	{
-		fprintf( stderr, "MD5 hash calculated over data:\tN/A\n" );
+		fprintf( stdout, "MD5 hash calculated over data:\tN/A\n" );
 	}
 	else
 	{
-		fprintf( stderr, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
 	}
 	libewf_common_free( calculated_md5_hash_string );
 
@@ -1270,11 +1270,11 @@ int main( int argc, char * const argv[] )
 		}
 		else if( result_sha1_hash == 0 )
 		{
-			fprintf( stderr, "SHA1 hash calculated over data:\tN/A\n" );
+			fprintf( stdout, "SHA1 hash calculated over data:\tN/A\n" );
 		}
 		else
 		{
-			fprintf( stderr, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
+			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
 		}
 		libewf_common_free( calculated_sha1_hash_string );
 	}

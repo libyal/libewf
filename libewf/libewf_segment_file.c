@@ -1822,9 +1822,9 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
+		               0,
 		               internal_handle->offset_table,
 		               total_chunk_amount,
 		               segment_chunk_amount,
@@ -2124,9 +2124,9 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               chunks_section_offset,
+		               0,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
@@ -2206,9 +2206,9 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
+		               0,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
@@ -2240,9 +2240,9 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               0,
 		               internal_handle->segment_table->file_descriptor[ segment_number ],
 		               internal_handle->segment_table->file_offset[ segment_number ],
+		               0,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
 		               section_amount_of_chunks,
