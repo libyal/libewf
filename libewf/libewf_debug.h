@@ -28,31 +28,42 @@
 
 #include <stdio.h>
 
+#include "libewf_error.h"
+#include "libewf_string.h"
+
 #include "ewf_section.h"
-#include "ewf_ltree.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-void libewf_debug_dump_data(
-      uint8_t *data,
-      size_t size );
+int libewf_debug_dump_data(
+     libewf_character_t *header,
+     uint8_t *data,
+     size_t data_size,
+     libewf_error_t **error );
 
-void libewf_debug_section_print(
-      ewf_section_t *section );
+int libewf_debug_section_print(
+     ewf_section_t *section,
+     libewf_error_t **error );
 
-void libewf_debug_header_print(
-      uint8_t *header,
-      size_t header_size );
+int libewf_debug_byte_stream_print(
+     libewf_character_t *header,
+     uint8_t *byte_stream,
+     size_t byte_stream_size,
+     libewf_error_t **error );
 
-void libewf_debug_header2_print(
-      uint8_t *header2,
-      size_t header2_size );
+int libewf_debug_utf8_stream_print(
+     libewf_character_t *header,
+     uint8_t *utf8_stream,
+     size_t utf8_stream_size,
+     libewf_error_t **error );
 
-void libewf_debug_xheader_print(
-      uint8_t *xheader,
-      size_t xheader_size );
+int libewf_debug_utf16_stream_print(
+     libewf_character_t *header,
+     uint8_t *utf16_stream,
+     size_t utf16_stream_size,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

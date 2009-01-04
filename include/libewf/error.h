@@ -250,17 +250,21 @@ enum LIBEWF_RUNTIME_ERROR
 	 */
 	LIBEWF_RUNTIME_ERROR_REMOVE_FAILED           = 10,
 
+	/* The value could not be printed
+	 */
+	LIBEWF_RUNTIME_ERROR_PRINT_FAILED            = 11,
+
 	/* The value was out of range
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE      = 11,
+	LIBEWF_RUNTIME_ERROR_VALUE_OUT_OF_RANGE      = 12,
 
 	/* The value exceeds the maximum for its specific type
 	 */
-	LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM   = 12,
+	LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM   = 13,
 
 	/* The value is unsupported
 	 */
-	LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE       = 13
+	LIBEWF_RUNTIME_ERROR_UNSUPPORTED_VALUE       = 14
 };
 
 /* The output error codes

@@ -128,10 +128,19 @@ ssize_t libewf_section_start_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_section_print(
+	       section,
+	       error ) != 1 ) )
 	{
-		libewf_debug_section_print(
-		 section );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print section.\n",
+		 function );
+
+		return( -1 );
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -779,15 +788,24 @@ ssize_t libewf_section_header_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: Header:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_byte_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "Header" ),
+	       header,
+	       header_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_header_print(
-		 header,
-		 header_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print header.\n",
+		 function );
+
+		memory_free(
+		 header );
+
+		return( -1 );
 	}
 #endif
 
@@ -846,15 +864,21 @@ ssize_t libewf_section_header_write(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: Header:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_byte_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "Header" ),
+	       header,
+	       header_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_header_print(
-		 header,
-		 header_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print header.\n",
+		 function );
+
+		return( -1 );
 	}
 #endif
 
@@ -974,15 +998,24 @@ ssize_t libewf_section_header2_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: Header2:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf16_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "Header2" ),
+	       header2,
+	       header2_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_header2_print(
-		 header2,
-		 header2_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print header2.\n",
+		 function );
+
+		memory_free(
+		 header2 );
+
+		return( -1 );
 	}
 #endif
 	if( *cached_header2 == NULL )
@@ -1040,15 +1073,21 @@ ssize_t libewf_section_header2_write(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: Header2:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf16_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "Header2" ),
+	       header2,
+	       header2_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_header2_print(
-		 header2,
-		 header2_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print header2.\n",
+		 function );
+
+		return( -1 );
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -3257,11 +3296,24 @@ ssize_t libewf_section_ltree_read(
 	section_read_count += read_count;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf16_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "ltree data" ),
+	       ltree_data,
+	       ltree_data_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_header2_print(
-		 ltree_data,
-		 ltree_data_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print ltree data.\n",
+		 function );
+
+		memory_free(
+		 ltree_data );
+
+		return( -1 );
 	}
 #endif
 	memory_free(
@@ -5318,15 +5370,24 @@ ssize_t libewf_section_xheader_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: XHeader:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf8_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "XHeader" ),
+	       xheader,
+	       xheader_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_xheader_print(
-		 xheader,
-		 xheader_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print xheader.\n",
+		 function );
+
+		memory_free(
+		 xheader );
+
+		return( -1 );
 	}
 #endif
 	if( *cached_xheader == NULL )
@@ -5384,15 +5445,21 @@ ssize_t libewf_section_xheader_write(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: XHeader:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf8_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "XHeader" ),
+	       xheader,
+	       xheader_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_xheader_print(
-		 xheader,
-		 xheader_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print xheader.\n",
+		 function );
+
+		return( -1 );
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -5511,15 +5578,24 @@ ssize_t libewf_section_xhash_read(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: XHash:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf8_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "XHash" ),
+	       xhash,
+	       xhash_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_xheader_print(
-		 xhash,
-		 xhash_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print xhash.\n",
+		 function );
+
+		memory_free(
+		 xhash );
+
+		return( -1 );
 	}
 #endif
 	if( *cached_xhash == NULL )
@@ -5577,15 +5653,21 @@ ssize_t libewf_section_xhash_write(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
-	notify_verbose_printf(
-	 "%s: XHash:\n",
-	 function );
-
-	if( libewf_notify_verbose != 0 )
+	if( ( libewf_notify_verbose != 0 )
+	 && ( libewf_debug_utf8_stream_print(
+	       _LIBEWF_CHARACTER_T_STRING( "XHash" ),
+	       xhash,
+	       xhash_size,
+	       error ) != 1 ) )
 	{
-		libewf_debug_xheader_print(
-		 xhash,
-		 xhash_size );
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print xhash.\n",
+		 function );
+
+		return( -1 );
 	}
 #endif
 	section_write_count = libewf_section_write_compressed_string(
@@ -6015,7 +6097,7 @@ ssize_t libewf_section_debug_read(
 {
 	uint8_t *data              = NULL;
 	uint8_t *uncompressed_data = NULL;
-	static char *function      = "libewf_debug_read_section";
+	static char *function      = "libewf_section_debug_read";
 	ssize_t read_count         = 0;
 	size_t uncompressed_size   = 0;
 	int result                 = 0;
@@ -6111,49 +6193,41 @@ ssize_t libewf_section_debug_read(
 	          uncompressed_data,
 	          &uncompressed_size,
 	          data,
-	          (size_t) section_size );
+	          (size_t) section_size,
+	          error );
 
 	if( result == 0 )
 	{
-		notify_printf(
-		 "%s: data is UNCOMPRESSED.\n",
-		 function );
-
-		libewf_debug_dump_data(
-		 data,
-		 (size_t) section_size );
+		result = libewf_debug_dump_data(
+		          _LIBEWF_CHARACTER_T_STRING( "COMPRESSED data" ),
+		          data,
+		          (size_t) section_size,
+	                  error );
 	}
 	else if( result == 1 )
 	{
-		notify_printf(
-		 "%s: data is zlib COMPRESSED.\n",
-		 function );
-
-		libewf_debug_dump_data(
-		 uncompressed_data,
-		 uncompressed_size );
-	}
-	else
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_COMPRESSION,
-		 LIBEWF_COMPRESSION_ERROR_UNCOMPRESS_FAILED,
-		 "%s: unable to uncompress data.\n",
-		 function );
-
-		memory_free(
-		 data );
-		memory_free(
-		 uncompressed_data );
-
-		return( -1 );
+		result = libewf_debug_dump_data(
+		          _LIBEWF_CHARACTER_T_STRING( "UNCOMPRESSED data" ),
+		          uncompressed_data,
+		          uncompressed_size,
+	                  error );
 	}
 	memory_free(
 	 data );
 	memory_free(
 	 uncompressed_data );
 
+	if( result == -1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_PRINT_FAILED,
+		 "%s: unable to debug print data.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( read_count );
 }
 

@@ -27,73 +27,113 @@
 #include <types.h>
 
 #include "libewf_debug.h"
-#include "libewf_libuna.h"
+#include "libewf_error.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
 
 /* Prints a dump of data
+ * Returns 1 if successful or -1 on error
  */
-void libewf_debug_dump_data(
-      uint8_t *data,
-      size_t size )
+int libewf_debug_dump_data(
+     libewf_character_t *header,
+     uint8_t *data,
+     size_t data_size,
+     libewf_error_t **error )
 {
+	uint8_t *crc_data        = NULL;
 	static char *function    = "libewf_debug_dump_data";
 	ewf_crc_t stored_crc     = 0;
 	ewf_crc_t calculated_crc = 0;
 
-	if( size > (size_t) SSIZE_MAX )
+	if( header == NULL )
 	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header.\n",
 		 function );
 
-		return;
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  data,
-	                  ( size - sizeof( ewf_crc_t ) ),
+	                  ( data_size - sizeof( ewf_crc_t ) ),
 	                  1 );
+
+	crc_data = &data[ data_size - sizeof( ewf_crc_t ) ];
+
+	endian_little_convert_32bit(
+	 stored_crc,
+	 crc_data );
+
+	notify_printf(
+	 "%" PRIs_LIBEWF ":\n",
+	 header );
 
 	notify_dump_data(
 	 data,
-	 size );
+	 data_size );
 
-	if( memory_copy(
-	     &stored_crc,
-	     &data[ size - sizeof( ewf_crc_t ) ],
-	     sizeof( ewf_crc_t ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to set CRC.\n",
-		 function );
-	}
-	else
-	{
-		notify_printf( "%s: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
-		 function, stored_crc, calculated_crc );
-	}
+	notify_printf(
+	 "%s: possible CRC (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+	 function,	
+	 stored_crc,	
+	 calculated_crc );
+
+	return( 1 );
 }
 
 /* Prints the section data to notify stream
+ * Returns 1 if successful or -1 on error
  */
-void libewf_debug_section_print(
-      ewf_section_t *section )
+int libewf_debug_section_print(
+     ewf_section_t *section,
+     libewf_error_t **error )
 {
 	static char *function    = "libewf_debug_section_print";
 	ewf_crc_t calculated_crc = 0;
 	ewf_crc_t stored_crc     = 0;
-	uint64_t next            = 0;
-	uint64_t size            = 0;
+	uint64_t section_next    = 0;
+	uint64_t section_size    = 0;
 
 	if( section == NULL )
 	{
-		notify_warning_printf( "%s: invalid section.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  section,
-	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
+	                  sizeof( ewf_section_t ) - sizeof( ewf_crc_t ),
 	                  1 );
 
 	endian_little_convert_32bit(
@@ -101,224 +141,315 @@ void libewf_debug_section_print(
 	 section->crc );
 
 	endian_little_convert_64bit(
-	 next,
+	 section_next,
 	 section->next );
 
 	endian_little_convert_64bit(
-	 size,
+	 section_size,
 	 section->size );
 
-	notify_printf( "Section:\n" );
-	notify_printf( "type: %s\n",
-	 (char *) section->type );
-	notify_printf( "next: %" PRIu64 "\n",
-	 next );
-	notify_printf( "size: %" PRIu64 "\n",
-	 size );
-	notify_printf( "crc: %" PRIu32 " ( %" PRIu32 " )\n",
-	 stored_crc, calculated_crc );
-	notify_printf( "\n" );
+	notify_printf(
+	 "Section:\n"
+	 "type:\t%s\n"
+	 "next:\t%" PRIu64 "\n"
+	 "size:\t%" PRIu64 "\n"
+	 "crc:\t%" PRIu32 " ( %" PRIu32 " )\n"
+	 "\n",
+	 (char *) section->type,
+	 section_next,
+	 section_size,
+	 stored_crc,
+	 calculated_crc );
+
+	return( 1 );
 }
 
-/* Prints the header data to the notify stream
+/* Prints the byte stream data to the notify stream
+ * Returns 1 if successful or -1 on error
  */
-void libewf_debug_header_print(
-      uint8_t *header,
-      size_t header_size )
+int libewf_debug_byte_stream_print(
+     libewf_character_t *header,
+     uint8_t *byte_stream,
+     size_t byte_stream_size,
+     libewf_error_t **error )
 {
-	libewf_character_t *header_string = NULL;
-	libuna_error_t *error             = NULL;
-	static char *function             = "libewf_debug_header_print";
-	size_t header_string_size         = 0;
+	libewf_character_t *string = NULL;
+	static char *function      = "libewf_debug_byte_stream_print";
+	size_t string_size         = 0;
 
 	if( header == NULL )
 	{
-		notify_warning_printf( "%s: invalid header.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header.\n",
 		 function );
 
-		return;
+		return( -1 );
+	}
+	if( byte_stream == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte stream.\n",
+		 function );
+
+		return( -1 );
 	}
 	if( libewf_string_size_from_byte_stream(
-	     header,
-	     header_size,
+	     byte_stream,
+	     byte_stream_size,
 	     LIBUNA_CODEPAGE_ASCII,
-	     &header_string_size,
-	     &error ) != 1 )
+	     &string_size,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to determine header string size.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine string size.\n",
 		 function );
 
-		libuna_error_free(
-		 &error );
-
-		return;
+		return( -1 );
 	}
-	header_string = (libewf_character_t *) memory_allocate(
-	                                        sizeof( libewf_character_t ) * header_string_size );
+	string = (libewf_character_t *) memory_allocate(
+	                                 sizeof( libewf_character_t ) * string_size );
 
-	if( header_string == NULL )
+	if( string == NULL )
 	{
-		notify_warning_printf( "%s: unable to create header string.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create string.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
 	if( libewf_string_copy_from_byte_stream(
-	     header_string,
-	     header_string_size,
-	     header,
-	     header_size,
+	     string,
+	     string_size,
+	     byte_stream,
+	     byte_stream_size,
 	     LIBUNA_CODEPAGE_ASCII,
-	     &error ) != 1 )
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set header string.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set string.\n",
 		 function );
 
-		libuna_error_free(
-		 &error );
 		memory_free(
-		 header_string );
+		 string );
 
-		return;
+		return( -1 );
 	}
-	notify_printf( "%" PRIs_LIBEWF "",
-	 header_string );
+	notify_printf(
+	 "%" PRIs_LIBEWF ":\n",
+	 "%" PRIs_LIBEWF "",
+	 header,
+	 string );
 
 	memory_free(
-	 header_string );
+	 string );
+
+	return( 1 );
 }
 
-/* Prints the header2 data to the notify stream
+/* Prints the UTF-8 stream data to the notify stream
+ * Returns 1 if successful or -1 on error
  */
-void libewf_debug_header2_print(
-      uint8_t *header2,
-      size_t header2_size )
+int libewf_debug_utf8_stream_print(
+     libewf_character_t *header,
+     uint8_t *utf8_stream,
+     size_t utf8_stream_size,
+     libewf_error_t **error )
 {
-	libewf_character_t *header_string = NULL;
-	libuna_error_t *error             = NULL;
-	static char *function             = "libewf_debug_header2_print";
-	size_t header_string_size         = 0;
+	libewf_character_t *string = NULL;
+	static char *function      = "libewf_debug_utf8_stream_print";
+	size_t string_size         = 0;
 
-	if( header2 == NULL )
+	if( header == NULL )
 	{
-		notify_warning_printf( "%s: invalid header2.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	if( libewf_string_size_from_utf16_stream(
-	     header2,
-	     header2_size,
-	     LIBUNA_ENDIAN_LITTLE,
-	     &header_string_size,
-	     &error ) != 1 )
+	if( utf8_stream == NULL )
 	{
-		notify_warning_printf( "%s: unable to determine header string size.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 stream.\n",
 		 function );
 
-		libuna_error_free(
-		 &error );
-
-		return;
-	}
-	header_string = (libewf_character_t *) memory_allocate(
-	                                        sizeof( libewf_character_t ) * header_string_size );
-
-	if( header_string == NULL )
-	{
-		notify_warning_printf( "%s: unable to create header string.\n",
-		 function );
-
-		return;
-	}
-	if( libewf_string_copy_from_utf16_stream(
-	     header_string,
-	     header_string_size,
-	     header2,
-	     header2_size,
-	     LIBUNA_ENDIAN_LITTLE,
-	     &error ) != 1 )
-	{
-		notify_warning_printf( "%s: unable to set header string.\n",
-		 function );
-
-		libuna_error_free(
-		 &error );
-		memory_free(
-		 header_string );
-
-		return;
-	}
-	notify_printf( "%" PRIs_LIBEWF "",
-	 header_string );
-
-	memory_free(
-	 header_string );
-}
-
-/* Prints the xheader data to the notify stream
- */
-void libewf_debug_xheader_print(
-      uint8_t *xheader,
-      size_t xheader_size )
-{
-	libewf_character_t *header_string = NULL;
-	libuna_error_t *error             = NULL;
-	static char *function             = "libewf_debug_xheader_print";
-	size_t header_string_size         = 0;
-
-	if( xheader == NULL )
-	{
-		notify_warning_printf( "%s: invalid xheader.\n",
-		 function );
-
-		return;
+		return( -1 );
 	}
 	if( libewf_string_size_from_utf8_stream(
-	     xheader,
-	     xheader_size,
-	     &header_string_size,
-	     &error ) != 1 )
+	     utf8_stream,
+	     utf8_stream_size,
+	     &string_size,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to determine header string size.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine string size.\n",
 		 function );
 
-		libuna_error_free(
-		 &error );
-
-		return;
+		return( -1 );
 	}
-	header_string = (libewf_character_t *) memory_allocate(
-	                                        sizeof( libewf_character_t ) * header_string_size );
+	string = (libewf_character_t *) memory_allocate(
+	                                 sizeof( libewf_character_t ) * string_size );
 
-	if( header_string == NULL )
+	if( string == NULL )
 	{
-		notify_warning_printf( "%s: unable to create header string.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create string.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
 	if( libewf_string_copy_from_utf8_stream(
-	     header_string,
-	     header_string_size,
-	     xheader,
-	     xheader_size,
-	     &error ) != 1 )
+	     string,
+	     string_size,
+	     utf8_stream,
+	     utf8_stream_size,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to set header string.\n",
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set string.\n",
 		 function );
 
-		libuna_error_free(
-		 &error );
 		memory_free(
-		 header_string );
+		 string );
 
-		return;
+		return( -1 );
 	}
-	notify_printf( "%" PRIs_LIBEWF "",
-	 header_string );
+	notify_printf(
+	 "%" PRIs_LIBEWF ":",
+	 "%" PRIs_LIBEWF "",
+	 header,
+	 string );
 
 	memory_free(
-	 header_string );
+	 string );
+
+	return( 1 );
+}
+
+/* Prints the UTF-16 data to the notify stream
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_debug_utf16_stream_print(
+     libewf_character_t *header,
+     uint8_t *utf16_stream,
+     size_t utf16_stream_size,
+     libewf_error_t **error )
+{
+	libewf_character_t *string = NULL;
+	static char *function      = "libewf_debug_utf16_stream_print";
+	size_t string_size         = 0;
+
+	if( header == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_stream == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-16 stream.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_size_from_utf16_stream(
+	     utf16_stream,
+	     utf16_stream_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     &string_size,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine string size.\n",
+		 function );
+
+		return( -1 );
+	}
+	string = (libewf_character_t *) memory_allocate(
+	                                 sizeof( libewf_character_t ) * string_size );
+
+	if( string == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_MEMORY,
+		 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_copy_from_utf16_stream(
+	     string,
+	     string_size,
+	     utf16_stream,
+	     utf16_stream_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     error ) != 1 )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_CONVERSION,
+		 LIBEWF_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set string.\n",
+		 function );
+
+		memory_free(
+		 string );
+
+		return( -1 );
+	}
+	notify_printf(
+	 "%" PRIs_LIBEWF ":",
+	 "%" PRIs_LIBEWF "",
+	 header,
+	 string );
+
+	memory_free(
+	 string );
+
+	return( 1 );
 }
 
