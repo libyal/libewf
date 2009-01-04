@@ -24,6 +24,9 @@
 #define _NOTIFY_H
 
 #include <common.h>
+#include <types.h>
+
+#include <liberror.h>
 
 #include <stdio.h>
 
@@ -46,6 +49,9 @@ void notify_printf(
 
 #define notify_warning_printf \
 	if( notify_verbose != 0 ) notify_printf
+
+void notify_error_backtrace(
+      liberror_error_t *error );
 
 #if defined( __cplusplus )
 }

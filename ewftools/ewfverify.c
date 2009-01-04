@@ -58,6 +58,7 @@
 #include "file_stream_io.h"
 #include "glob.h"
 #include "md5.h"
+#include "notify.h"
 #include "process_status.h"
 #include "sha1.h"
 #include "system_string.h"
@@ -102,9 +103,9 @@ int main( int argc, char * const argv[] )
 {
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+#endif
 
 	liberror_error_t *error                    = NULL;
-#endif
 
 #if !defined( HAVE_GLOB_H )
 	glob_t *glob                               = NULL;
@@ -242,6 +243,9 @@ int main( int argc, char * const argv[] )
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
+	notify_set_values(
+	 stderr,
+	 verbose );
 
 	if( ewfsignal_attach(
 	     ewfcommon_signal_handler ) != 1 )
@@ -322,7 +326,8 @@ int main( int argc, char * const argv[] )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
 		ewfoutput_error_fprint(
-		 stderr, "Unable to open EWF image file(s)" );
+		 stderr,
+		 "Unable to open EWF image file(s)" );
 
 		return( EXIT_FAILURE );
 	}
@@ -570,6 +575,8 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
 
+				notify_error_backtrace(
+				 error );
 				liberror_error_free(
 				 &error );
 
@@ -623,11 +630,16 @@ int main( int argc, char * const argv[] )
 			                           3,
 			                           stored_md5_hash_string,
 			                           EWFSTRING_DIGEST_HASH_LENGTH_MD5,
-			                           NULL );
+			                           &error );
 
 			if( stored_md5_hash_result == -1 )
 			{
 				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
 				if( calculate_sha1 == 1 )
 				{
@@ -656,11 +668,16 @@ int main( int argc, char * const argv[] )
 						   4,
 						   stored_sha1_hash_string,
 						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
-						   NULL );
+						   &error );
 
 			if( stored_sha1_hash_result == -1 )
 			{
 				fprintf( stderr, "Unable to get stored SHA1 hash.\n" );
+
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
 				memory_free(
 				 stored_sha1_hash_string );

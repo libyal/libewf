@@ -23,6 +23,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -99,4 +101,17 @@ void VARARGS(
 #undef VARARGS
 #undef VASTART
 #undef VAEND
+
+/* Prints a backtrace of the error using notify_printf
+ */
+void notify_error_backtrace(
+      liberror_error_t *error )
+{
+	if( notify_stream != NULL )
+	{
+		liberror_error_backtrace_fprint(
+		 error,
+		 notify_stream );
+	}
+}
 

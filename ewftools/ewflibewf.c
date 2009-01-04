@@ -40,7 +40,7 @@
 #include "ewflibewf.h"
 
 /* Retrieves the header value from the libewf handle
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int ewflibewf_get_header_value(
      libewf_handle_t *handle,
@@ -55,6 +55,7 @@ int ewflibewf_get_header_value(
 	char *utf8_header_value       = NULL;
 	static char *function         = "ewflibewf_get_header_value";
 	size_t utf8_header_value_size = 0;
+	int result                    = 0;
 
 	if( handle == NULL )
 	{
@@ -97,11 +98,13 @@ int ewflibewf_get_header_value(
 	utf8_header_value_size = header_value_size;
 #endif
 
-	if( libewf_get_header_value(
-	     handle,
-	     utf8_header_value_identifier,
-	     utf8_header_value,
-	     utf8_header_value_size ) == 1 )
+	result = libewf_get_header_value(
+	          handle,
+	          utf8_header_value_identifier,
+	          utf8_header_value,
+	          utf8_header_value_size );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -111,6 +114,10 @@ int ewflibewf_get_header_value(
 		 function );
 
 		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	utf8_header_value_size = 1 + narrow_string_length(
@@ -282,7 +289,7 @@ int ewflibewf_set_header_value(
 }
 
 /* Retrieves the hash value from the libewf handle
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int ewflibewf_get_hash_value(
      libewf_handle_t *handle,
@@ -297,6 +304,7 @@ int ewflibewf_get_hash_value(
 	char *utf8_hash_value       = NULL;
 	static char *function       = "ewflibewf_get_hash_value";
 	size_t utf8_hash_value_size = 0;
+	int result                  = 0;
 
 	if( handle == NULL )
 	{
@@ -339,11 +347,13 @@ int ewflibewf_get_hash_value(
 	utf8_hash_value_size = hash_value_size;
 #endif
 
-	if( libewf_get_hash_value(
-	     handle,
-	     utf8_hash_value_identifier,
-	     utf8_hash_value,
-	     utf8_hash_value_size ) == 1 )
+	result = libewf_get_hash_value(
+	          handle,
+	          utf8_hash_value_identifier,
+	          utf8_hash_value,
+	          utf8_hash_value_size );
+
+	if( result == -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -353,6 +363,10 @@ int ewflibewf_get_hash_value(
 		 function );
 
 		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	utf8_hash_value_size = 1 + narrow_string_length(
