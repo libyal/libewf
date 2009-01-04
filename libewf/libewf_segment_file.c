@@ -2100,6 +2100,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	uint16_t segment_number   = 0;
 	uint8_t segment_file_type = 0;
 	int file_descriptor       = 0;
+	int result                = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -2358,6 +2359,35 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 		 function );
 
 		return( -1 );
+	}
+	/* Only compare the primary and secondary offset table
+	 * if the secondary table was created
+	 */
+	if( internal_handle->secondary_offset_table != NULL )
+	{
+		result = libewf_offset_table_compare(
+			  internal_handle->offset_table,
+			  internal_handle->secondary_offset_table );
+
+		if( result == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to compare primary and secondary offset table.\n",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: primary and secondary offset table differ.\n",
+			 function );
+
+			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+			{
+				return( -1 );
+			}
+			/* TODO Try to correct the table
+			 */
+		}
 	}
 	return( 1 );
 }

@@ -1751,25 +1751,11 @@ int libewf_offset_table_read( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_T
 /* Reads a table section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size )
+ssize_t libewf_section_table_read( LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size, uint32_t media_amount_of_chunks, LIBEWF_OFFSET_TABLE **offset_table, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	static char *function     = "libewf_section_table_read";
 	uint32_t amount_of_chunks = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -1784,12 +1770,18 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table == NULL )
+	if( offset_table == NULL )
 	{
-		internal_handle->offset_table = libewf_offset_table_alloc(
-		                                 internal_handle->media_values->amount_of_chunks );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
 
-		if( internal_handle->offset_table == NULL )
+		return( -1 );
+	}
+	if( *offset_table == NULL )
+	{
+		*offset_table = libewf_offset_table_alloc( media_amount_of_chunks );
+
+		if( *offset_table == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create offset table.\n",
 			 function );
@@ -1799,12 +1791,12 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	}
 	if( libewf_offset_table_read(
 	     segment_file,
-	     internal_handle->offset_table,
+	     *offset_table,
 	     &amount_of_chunks,
 	     section_offset,
 	     section_size,
-	     internal_handle->ewf_format,
-	     internal_handle->error_tollerance ) != 1 )
+	     ewf_format,
+	     error_tollerance ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read offset table.\n",
 		 function );
@@ -2071,95 +2063,6 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t b
 		}
 	}
 	return( section_write_count );
-}
-
-/* Reads a table2 section from file
- * Returns the amount of bytes read, or -1 on error
- */
-ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t section_offset, size_t section_size )
-{
-	static char *function     = "libewf_section_table2_read";
-	uint32_t amount_of_chunks = 0;
-	int result                = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( section_size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->secondary_offset_table == NULL )
-	{
-		internal_handle->secondary_offset_table = libewf_offset_table_alloc( internal_handle->media_values->amount_of_chunks );
-
-		if( internal_handle->secondary_offset_table == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create secondairy offset table.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	if( libewf_offset_table_read(
-	     segment_file,
-	     internal_handle->secondary_offset_table,
-	     &amount_of_chunks,
-	     section_offset,
-	     section_size,
-	     internal_handle->ewf_format,
-	     internal_handle->error_tollerance ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	result = libewf_offset_table_compare(
-	          internal_handle->offset_table,
-	          internal_handle->secondary_offset_table );
-
-	if( result == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to compare table1 and table2.\n",
-		 function );
-
-		return( -1 );
-	}
-	else if( result == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: table1 and table2 differ.\n",
-		 function );
-
-		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-		{
-			return( -1 );
-		}
-		/* TODO Try to correct the table
-		 */
-	}
-	return( (ssize_t) section_size );
 }
 
 /* Reads a sectors section from file
@@ -4163,11 +4066,14 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	 */
 	else if( ewf_string_compare( section->type, "table2", 7 ) == 0 )
 	{
-		read_count = libewf_section_table2_read(
-		              internal_handle,
+		read_count = libewf_section_table_read(
 		              segment_file,
 		              *section_start_offset,
-		              (size_t) size );
+		              (size_t) size,
+		              internal_handle->media_values->amount_of_chunks,
+		              &( internal_handle->secondary_offset_table ),
+		              internal_handle->ewf_format,
+		              internal_handle->error_tollerance );
 	}
 	/* Read the table section
 	 * The \0 byte is included in the compare
@@ -4175,10 +4081,13 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "table", 6 ) == 0 )
 	{
 		read_count = libewf_section_table_read(
-		              internal_handle,
 		              segment_file,
 		              *section_start_offset,
-		              (size_t) size );
+		              (size_t) size,
+		              internal_handle->media_values->amount_of_chunks,
+		              &( internal_handle->offset_table ),
+		              internal_handle->ewf_format,
+		              internal_handle->error_tollerance );
 	}
 	/* Read the sectors section
 	 * The \0 byte is included in the compare

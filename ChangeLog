@@ -146,6 +146,9 @@ Next release:
 * section make sure read count is returned instead of section_size
 * section remove passing of internal handle
 
+* Try to correct the table
+  - add error flag
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -159,6 +162,11 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071123
+* worked on refactoring code
+* moved libewf_offset_table_compare after the full index build
+  in libewf_segment_file_read_open
 
 Version: 20071121
 * worked on refactoring code
