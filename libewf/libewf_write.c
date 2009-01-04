@@ -184,34 +184,35 @@ int64_t libewf_write_calculate_chunks_per_segment_file(
 
 	/* Calculate the maximum amount of chunks within this segment file
 	 */
+	maximum_chunks_per_segment = available_segment_file_size;
+
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* The EWF-S01 format uses compression this will add 16 bytes on average
 		 */
-		maximum_chunks_per_segment = available_segment_file_size
-		                           / ( media_values->chunk_size + 16 );
+		maximum_chunks_per_segment /= media_values->chunk_size + 16;
 	}
 	else
 	{
-		maximum_chunks_per_segment = available_segment_file_size
-		                           / ( media_values->chunk_size + sizeof( ewf_crc_t ) );
+		maximum_chunks_per_segment /= media_values->chunk_size + sizeof( ewf_crc_t );
 	}
 	/* Determine the amount of required chunk sections
 	 */
 	if( unrestrict_offset_amount == 0 )
 	{
-		required_chunk_sections = maximum_chunks_per_segment
-		                        % maximum_section_amount_of_chunks;
+		required_chunk_sections = maximum_chunks_per_segment;
+
+		required_chunk_sections %= maximum_section_amount_of_chunks;
 	}
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* Leave space for the chunk section starts
 		 */
-		available_segment_file_size -= ( required_chunk_sections * sizeof( ewf_section_t ) );
+		available_segment_file_size -= required_chunk_sections * sizeof( ewf_section_t );
 
 		/* Leave space for the table offsets
 		 */
-		available_segment_file_size -= ( maximum_chunks_per_segment * sizeof( ewf_table_offset_t ) );
+		available_segment_file_size -= maximum_chunks_per_segment * sizeof( ewf_table_offset_t );
 	}
 	else if( format == LIBEWF_FORMAT_ENCASE1 )
 	{
@@ -235,17 +236,17 @@ int64_t libewf_write_calculate_chunks_per_segment_file(
 	}
 	/* Calculate the amount of chunks within this segment file
 	 */
+	chunks_per_segment = available_segment_file_size;
+
 	if( ewf_format == EWF_FORMAT_S01 )
 	{
 		/* The EWF-S01 format uses compression this will add 16 bytes on average
 		 */
-		chunks_per_segment = available_segment_file_size
-		                   / ( media_values->chunk_size + 16 );
+		chunks_per_segment /= media_values->chunk_size + 16;
 	}
 	else
 	{
-		chunks_per_segment = available_segment_file_size
-		                   / ( media_values->chunk_size + sizeof( ewf_crc_t ) );
+		chunks_per_segment /= media_values->chunk_size + sizeof( ewf_crc_t );
 	}
 	/* Determine if the input size is known
 	 */
@@ -497,7 +498,7 @@ int libewf_write_test_segment_file_full(
 		if( remaining_segment_file_size > segment_file_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf( "%s: no space left for additional chunk.\n",
+			notify_verbose_printf( "%s: no space left for additional chunk - file size exceeded.\n",
 			 function );
 #endif
 
@@ -621,6 +622,40 @@ int libewf_write_test_chunks_section_full(
 
 		return( 1 );
 	}
+	/* If the maximum offsets in table restriction should apply
+	 */
+	if( ( unrestrict_offset_amount == 0 )
+	 && ( section_amount_of_chunks >= maximum_section_amount_of_chunks ) )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf( "%s: no space left for additional chunk - maximum reached.\n",
+		 function );
+#endif
+
+		return( 1 );
+	}
+	/* Fail safe no more than 2^31 values are allowed
+	 */
+	if( section_amount_of_chunks > (uint32_t) INT32_MAX )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf( "%s: no space left for additional chunk - preventing chunk overflow.\n",
+		 function );
+#endif
+
+		return( 1 );
+	}
+	/* Prevent offset overflow
+	 */
+	if( ( segment_file_offset - internal_handle->write->chunks_section_offset ) > (off64_t) INT32_MAX )
+	{
+#if defined( HAVE_VERBOSE_OUTPUT )
+		notify_verbose_printf( "%s: no space left for additional chunk - preventing offset overflow.\n",
+		 function );
+#endif
+
+		return( 1 );
+	}
 	/* The EWF-S01 and EnCase1 format do not allow for a growth of the offset table
 	 */
 	if( ( ewf_format == EWF_FORMAT_S01 )
@@ -635,15 +670,6 @@ int libewf_write_test_chunks_section_full(
 
 			return( 1 );
 		}
-	}
-	else if( ( segment_file_offset - internal_handle->write->chunks_section_offset ) > INT32_MAX )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: no space left for additional chunk - preventing offset overflow.\n",
-		 function );
-#endif
-
-		return( 1 );
 	}
 	else
 	{
@@ -673,35 +699,12 @@ int libewf_write_test_chunks_section_full(
 		if( remaining_segment_file_size > segment_file_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf( "%s: no space left for additional chunk.\n",
+			notify_verbose_printf( "%s: no space left for additional chunk - file size exceeded.\n",
 			 function );
 #endif
 
 			return( 1 );
 		}
-	}
-	/* If the maximum offsets in table restriction should apply
-	 */
-	if( ( unrestrict_offset_amount == 0 )
-	 && ( section_amount_of_chunks >= maximum_section_amount_of_chunks ) )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: no space left for additional chunk.\n",
-		 function );
-#endif
-
-		return( 1 );
-	}
-	/* Fail safe no more than 2^31 values are allowed
-	 */
-	if( section_amount_of_chunks > (uint32_t) INT32_MAX )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: no space left for additional chunk.\n",
-		 function );
-#endif
-
-		return( 1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: space left for additional chunk.\n",
@@ -1205,7 +1208,7 @@ ssize_t libewf_raw_write_chunk_new(
 		 function, internal_handle->write->chunks_per_segment );
 #endif
 	}
-	/* Check if another chunk section should be created
+	/* Check if a chunk section should be created
 	 */
 	if( internal_handle->write->create_chunks_section == 1 )
 	{

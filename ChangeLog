@@ -139,6 +139,9 @@ Next release(s):
 Next stable:
 * Check EnCase 6.8 offset table overflow behavior
 
+Profiling gcov
+DFLAGS=-fprofile-arcs -ftest-coverage
+
 CLOSED
 * what about read+write and compression?
   solved by delta files

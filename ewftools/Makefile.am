@@ -17,7 +17,7 @@ ewfacquire_SOURCES = \
 	ewfsha1.h \
 	ewfacquire.c
 
-ewfacquire_LDADD  = ../libewf/libewf.la
+ewfacquire_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
 ewfacquirestream_SOURCES = \
 	ewfbyte_size_string.c ewfbyte_size_string.h \
@@ -34,7 +34,7 @@ ewfacquirestream_SOURCES = \
 	ewfsha1.h \
 	ewfacquirestream.c
 
-ewfacquirestream_LDADD  = ../libewf/libewf.la
+ewfacquirestream_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
 ewfalter_SOURCES = \
 	ewfbyte_size_string.c ewfbyte_size_string.h \
@@ -51,7 +51,7 @@ ewfalter_SOURCES = \
 	ewfsha1.h \
 	ewfalter.c
 
-ewfalter_LDADD  = ../libewf/libewf.la
+ewfalter_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
 ewfexport_SOURCES = \
 	ewfbyte_size_string.c ewfbyte_size_string.h \
@@ -68,7 +68,7 @@ ewfexport_SOURCES = \
 	ewfsha1.h \
 	ewfexport.c
 
-ewfexport_LDADD  = ../libewf/libewf.la
+ewfexport_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
 ewfinfo_SOURCES = \
 	ewfbyte_size_string.c ewfbyte_size_string.h \
@@ -84,7 +84,7 @@ ewfinfo_SOURCES = \
 	ewfsha1.h \
 	ewfinfo.c
 
-ewfinfo_LDADD  = ../libewf/libewf.la
+ewfinfo_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
 ewfverify_SOURCES = \
 	ewfbyte_size_string.c ewfbyte_size_string.h \
@@ -100,7 +100,7 @@ ewfverify_SOURCES = \
 	ewfsha1.h \
 	ewfverify.c
 
-ewfverify_LDADD  = ../libewf/libewf.la
+ewfverify_LDADD  = ../common/libcommon.la ../libewf/libewf.la
 
 distclean: clean
 	/bin/rm -f Makefile
