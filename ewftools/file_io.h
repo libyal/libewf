@@ -69,37 +69,25 @@ extern "C" {
 #endif
 
 #if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
-int libcommon_file_io_exists(
+int file_io_exists(
      const char *filename );
-
-#define file_io_exists( filename ) \
-	libcommon_file_io_exists( filename )
 #endif
 
 #if defined( HAVE_WOPEN ) && defined( HAVE_CLOSE )
-int libcommon_file_io_wexists(
+int file_io_wexists(
      const wchar_t *filename );
-
-#define file_io_wexists( filename, flags ) \
-	libcommon_file_io_wexists( filename )
 #endif
 
 #if defined( HAVE_OPEN )
-int libcommon_file_io_open(
+int file_io_open(
      const char *filename,
      int flags );
-
-#define file_io_open( filename, flags ) \
-	libcommon_file_io_open( filename, flags )
 #endif
 
 #if defined( HAVE_WOPEN )
-int libcommon_file_io_wopen(
+int file_io_wopen(
      const wchar_t *filename,
      int flags );
-
-#define file_io_wopen( filename, flags ) \
-	libcommon_file_io_wopen( filename, flags )
 
 #endif
 
@@ -144,6 +132,26 @@ int libcommon_file_io_wopen(
 #else
 #define file_io_close( file_descriptor ) \
 	close( file_descriptor )
+#endif
+#endif
+
+#if defined( HAVE_UMASK )
+#if defined( WINAPI )
+#error Unsuported function umask for WINAPI
+
+#else
+#define file_io_umask( mask ) \
+	umask( mask )
+#endif
+#endif
+
+#if defined( HAVE_UNLINK )
+#if defined( WINAPI )
+#error Unsuported function unlink for WINAPI
+
+#else
+#define file_io_unlink( filename ) \
+	unlink( filename )
 #endif
 #endif
 

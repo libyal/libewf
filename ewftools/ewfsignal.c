@@ -26,66 +26,14 @@
 #include "ewfsignal.h"
 #include "notify.h"
 
-#if defined( HAVE_SIGNAL_H )
-
-#if defined( HAVE_SYS_TYPES_H )
-#include <sys/types.h>
-#endif
-
-#include <signal.h>
-
-/* Attaches a signal handler for SIGINT
- * Returns 1 if successful or -1 on error
- */
-int ewfsignal_attach(
-     void (*signal_handler)( ewfsignal_t ) )
-{
-	static char *function = "ewfsignal_attach";
-
-	if( signal_handler == NULL )
-	{
-		notify_warning_printf( "%s: invalid signal handler.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( signal(
-	     SIGINT,
-	     signal_handler ) == SIG_ERR )
-	{
-		notify_warning_printf( "%s: unable to attach signal handler.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Detaches a signal handler for SIGINT
- * Returns 1 if successful or -1 on error
- */
-int ewfsignal_detach(
-     void )
-{
-	static char *function = "ewfsignal_detach";
-
-	if( signal(
-	     SIGINT,
-	     SIG_DFL ) == SIG_ERR )
-	{
-		notify_warning_printf( "%s: unable to detach signal handler.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-#elif defined(WINAPI)
-
-#include <windows.h>
+#if defined( WINAPI )
 #include <winnt.h>
 #include <crtdbg.h>
+#elif defined( HAVE_SIGNAL_H )
+#include <signal.h>
+#endif
+
+#if defined( WINAPI )
 
 void (*ewfsignal_signal_handler)( ewfsignal_t ) = NULL;
 
@@ -221,6 +169,55 @@ int ewfsignal_detach(
 	}
 	ewfsignal_signal_handler = NULL;
 
+	return( 1 );
+}
+
+#elif defined( HAVE_SIGNAL_H )
+
+/* Attaches a signal handler for SIGINT
+ * Returns 1 if successful or -1 on error
+ */
+int ewfsignal_attach(
+     void (*signal_handler)( ewfsignal_t ) )
+{
+	static char *function = "ewfsignal_attach";
+
+	if( signal_handler == NULL )
+	{
+		notify_warning_printf( "%s: invalid signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( signal(
+	     SIGINT,
+	     signal_handler ) == SIG_ERR )
+	{
+		notify_warning_printf( "%s: unable to attach signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Detaches a signal handler for SIGINT
+ * Returns 1 if successful or -1 on error
+ */
+int ewfsignal_detach(
+     void )
+{
+	static char *function = "ewfsignal_detach";
+
+	if( signal(
+	     SIGINT,
+	     SIG_DFL ) == SIG_ERR )
+	{
+		notify_warning_printf( "%s: unable to detach signal handler.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

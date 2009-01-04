@@ -107,7 +107,7 @@ extern "C" {
 #endif
 #endif
 
-/* String retrieve form stream (fgets)
+/* String retrieve from stream (fgets)
  */
 #if defined( HAVE_FGETWS )
 #define wide_string_get_from_stream( string, size, stream ) \

@@ -83,8 +83,8 @@ void libewf_error_free(
 /* Prints a descriptive string of the error to the stream
  */
 void libewf_error_fprint(
-     libewf_error_t *error,
-     FILE *stream )
+      libewf_error_t *error,
+      FILE *stream )
 {
 	liberror_error_fprint(
 	 (liberror_error_t *) error,
@@ -94,8 +94,8 @@ void libewf_error_fprint(
 /* Prints a backtrace of the error to the stream
  */
 void libewf_error_backtrace_fprint(
-     libewf_error_t *error,
-     FILE *stream )
+      libewf_error_t *error,
+      FILE *stream )
 {
 	liberror_error_backtrace_fprint(
 	 (liberror_error_t *) error,

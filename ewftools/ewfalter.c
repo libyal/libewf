@@ -47,10 +47,11 @@
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "glob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
+#include "glob.h"
+#include "notify.h"
 
 #define EWFALTER_INPUT_BUFFER_SIZE	64
 
@@ -197,6 +198,9 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
+	 stderr,
+	 verbose );
+	notify_set_values(
 	 stderr,
 	 verbose );
 

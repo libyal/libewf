@@ -24,6 +24,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "libewf_definitions.h"
 #include "libewf_file_io.h"
 #include "libewf_file_io_pool.h"

@@ -68,6 +68,7 @@
 #include "ewfstring.h"
 #include "file_stream_io.h"
 #include "glob.h"
+#include "notify.h"
 #include "process_status.h"
 #include "system_string.h"
 
@@ -454,6 +455,9 @@ int main( int argc, char * const argv[] )
 		}
 	}
 	libewf_set_notify_values(
+	 stderr,
+	 verbose );
+	notify_set_values(
 	 stderr,
 	 verbose );
 

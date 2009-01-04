@@ -1,5 +1,5 @@
 /*
- * Signal handling functions for the ewftools
+ * Signal handling functions
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -24,25 +24,20 @@
 #define _EWFSIGNAL_H
 
 #include <common.h>
+#include <types.h>
 
 #if defined( WINAPI )
-#include <windows.h>
+#include <winnt.h>
+#include <crtdbg.h>
+#elif defined( HAVE_SIGNAL_H )
+#include <signal.h>
 #endif
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_SIGNAL_H )
-typedef int ewfsignal_t;
-
-int ewfsignal_attach(
-     void (*signal_handler)( ewfsignal_t ) );
-
-int ewfsignal_detach(
-     void );
-
-#elif defined( WINAPI )
+#if defined( WINAPI )
 typedef unsigned long ewfsignal_t;
 
 BOOL WINAPI ewfsignal_handler(
@@ -57,11 +52,18 @@ int ewfsignal_attach(
 int ewfsignal_detach(
      void );
 
+#elif defined( HAVE_SIGNAL_H )
+typedef int ewfsignal_t;
+
+int ewfsignal_attach(
+     void (*signal_handler)( ewfsignal_t ) );
+
+int ewfsignal_detach(
+     void );
+
 #else
-
-#error missing signal function
+#error missing signal functions
 #endif
-
 
 #if defined( __cplusplus )
 }

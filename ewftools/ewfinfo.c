@@ -52,6 +52,7 @@
 #include "ewfsignal.h"
 #include "glob.h"
 #include "guid.h"
+#include "notify.h"
 #include "system_string.h"
 
 /* Prints the executable usage information
@@ -95,7 +96,7 @@ int main( int argc, char * const argv[] )
 	system_character_t **ewf_filenames         = NULL;
 
 #if !defined( HAVE_GLOB_H )
-	glob_t *glob                            = NULL;
+	glob_t *glob                               = NULL;
 #endif
 	char *file_format_string                   = NULL;
 	system_integer_t option                    = 0;
@@ -243,6 +244,9 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
+	 stderr,
+	 verbose );
+	notify_set_values(
 	 stderr,
 	 verbose );
 

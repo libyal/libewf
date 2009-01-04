@@ -110,7 +110,7 @@ extern "C" {
 	sprintf( target, format, __VA_ARGS__ )
 #endif
 
-/* String retrieve form stream (fgets)
+/* String retrieve from stream (fgets)
  */
 #if defined( HAVE_FGETS )
 #define narrow_string_get_from_stream( string, size, stream ) \

@@ -125,6 +125,7 @@ Other:
 check error tollerance
 check TODO
 
+* move fgets to file stream IO
 
 * use internal format of date/time string convert them in interface
 * what about header values parsing with preservation of timestamps?
@@ -195,6 +196,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20081015
+* Minor adjustments
 
 Version: 20081013
 * Fixed APIv2 of libewf_check_file_signature

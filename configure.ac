@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20081013],
+ [20081015],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20081013])
+ [20081015])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -132,12 +132,16 @@ AC_CHECK_HEADERS([sys/stat.h])
 AC_CHECK_HEADERS([fcntl.h])
 AC_CHECK_HEADERS([unistd.h])
 
-dnl Other headers
-AC_CHECK_HEADERS([errno.h])
+dnl Headers included in and ewftools/glob.h
 AC_CHECK_HEADERS([glob.h])
-AC_CHECK_HEADERS([locale.h])
+
+dnl Headers included in and ewftools/ewfsignal.h
 AC_CHECK_HEADERS([signal.h])
 AC_CHECK_HEADERS([sys/signal.h])
+
+dnl Other headers
+AC_CHECK_HEADERS([errno.h])
+AC_CHECK_HEADERS([locale.h])
 AC_CHECK_HEADERS([sys/utsname.h])
 
 AC_CHECK_HEADERS([openssl/opensslv.h])
@@ -252,13 +256,6 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 dnl Narrow character string functions used in common/narrow_string.h
-AC_CHECK_FUNCS(
- [fgets],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: fgets],
-  [1]) ])
-
 AC_CHECK_FUNCS(
  [snprintf],
  [],
@@ -416,6 +413,13 @@ AC_CHECK_FUNCS(
  [],
  [AC_MSG_FAILURE(
   [Missing function: feof],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [fgets],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: fgets],
   [1]) ])
 
 AC_CHECK_FUNCS(

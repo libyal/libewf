@@ -760,6 +760,9 @@ int main( int argc, char * const argv[] )
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
+	notify_set_values(
+	 stderr,
+	 verbose );
 
 	/* Check if to read from stdin
 	 */

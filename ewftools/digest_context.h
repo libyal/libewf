@@ -31,7 +31,6 @@
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 #include <openssl/evp.h>
 #elif defined( HAVE_WINCPRYPT_H )
-#include <windows.h>
 #include <wincrypt.h>
 #endif
 
