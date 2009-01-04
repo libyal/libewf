@@ -210,6 +210,13 @@ char *libewf_common_ctime( const time_t *timestamp );
 wchar_t *libewf_common_wide_ctime( const time_t *timestamp );
 #endif
 
+#if defined( HAVE_MKTIME )
+#define libewf_common_mktime( time_elements ) \
+	mktime( time_elements )
+#else
+#error Missing function mktime
+#endif
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t length );
 int libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t length );

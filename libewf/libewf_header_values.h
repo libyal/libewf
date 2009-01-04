@@ -84,6 +84,8 @@ int libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR *
 #define libewf_date_string_set_seconds( date_string, date_elements ) \
 	libewf_date_string_set_2digit_value( date_string, date_elements, 5 )
 
+LIBEWF_CHAR *libewf_convert_date_timestamp( time_t timestamp, uint8_t date_format );
+
 LIBEWF_CHAR *libewf_convert_date_header_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format );
 LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp );
 LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, size_t header_value_length, uint8_t date_format );

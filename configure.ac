@@ -166,7 +166,7 @@ AC_CHECK_TYPE([off64_t],[AC_SUBST([HAVE_OFF64_T],[1])],[AC_SUBST([HAVE_OFF64_T],
 AC_CHECK_TYPES([ssize_t, u64])
 
 dnl Check for functions
-AC_CHECK_FUNCS( atol ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )
+AC_CHECK_FUNCS( atol ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset mktime snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )
 
 AC_FUNC_MEMCMP
 AC_FUNC_STRERROR_R
