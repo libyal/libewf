@@ -117,7 +117,7 @@ int libewf_header_values_parse_header(
 int libewf_header_values_parse_header2(
      libewf_values_table_t **header_values,
      ewf_char_t *header2,
-     size_t size,
+     size_t header2_size,
      uint8_t date_format );
 
 int libewf_header_values_convert_header_string_to_header(
@@ -128,9 +128,9 @@ int libewf_header_values_convert_header_string_to_header(
 
 int libewf_header_values_convert_header_string_to_header2(
      character_t *header_string,
-     size_t header_string_length,
+     size_t header_string_size,
      ewf_char_t **header2,
-     size_t *header2_length );
+     size_t *header2_size );
 
 int libewf_header_values_generate_header_string_type1(
      libewf_values_table_t *header_values,

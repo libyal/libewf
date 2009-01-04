@@ -258,7 +258,7 @@ character_t *libewf_string_ctime(
 	libuca_utf32_string_copy_from_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
 
 #define utf16_stream_size_from_string( string, size_string ) \
-	libuca_utf16_stream_size_from_utf32( string, size_string, 0 )
+	libuca_utf16_stream_size_from_utf32( (libuca_utf32_character_t *) string, size_string, 0 )
 
 #define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
 	libuca_utf16_stream_copy_from_utf32( stream, size_stream, byte_order, (libuca_utf32_character_t *) string, string_size, 0 )
@@ -271,7 +271,7 @@ character_t *libewf_string_ctime(
 	libuca_utf16_string_copy_from_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
 
 #define utf16_stream_size_from_string( string, size_string ) \
-	libuca_utf16_stream_size_from_utf16( string, size_string, 0 )
+	libuca_utf16_stream_size_from_utf16( (libuca_utf16_character_t *) string, size_string, 0 )
 
 #define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
 	libuca_utf16_stream_copy_from_utf16( stream, size_stream, byte_order, (libuca_utf16_character_t *) string, string_size, 0 )
@@ -288,7 +288,7 @@ character_t *libewf_string_ctime(
 	libuca_utf8_string_copy_from_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
 
 #define utf16_stream_size_from_string( string, size_string ) \
-	libuca_utf16_stream_size_from_utf8( string, size_string, 0 )
+	libuca_utf16_stream_size_from_utf8( (libuca_utf8_character_t *) string, size_string, 0 )
 
 #define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
 	libuca_utf16_stream_copy_from_utf8( stream, size_stream, byte_order, (libuca_utf8_character_t *) string, string_size, 0 )

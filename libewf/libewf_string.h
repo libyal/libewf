@@ -29,19 +29,13 @@
 
 #include <stdio.h>
 
-#include "ewf_char.h"
-#include "ewf_digest_hash.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_STRING_LITTLE_ENDIAN	(uint8_t) 'l'
-#define LIBEWF_STRING_BIG_ENDIAN	(uint8_t) 'b'
-
 int libewf_string_split(
      character_t *string,
-     size_t size,
+     size_t string_size,
      character_t delimiter,
      character_t ***split_values,
      size_t *amount_of_split_values );
@@ -49,19 +43,6 @@ int libewf_string_split(
 int libewf_string_split_values_free(
       character_t **split_values,
       size_t amount_of_split_values );
-
-int libewf_string_copy_from_utf16(
-     character_t *string,
-     size_t size_string,
-     ewf_char_t *utf16_string,
-     size_t size_utf16 );
-
-int libewf_string_copy_to_utf16(
-     character_t *string,
-     size_t size,
-     ewf_char_t *utf16_string,
-     size_t size_utf16,
-     uint8_t byte_order );
 
 #if defined( __cplusplus )
 }

@@ -23,6 +23,7 @@
 #include <common.h>
 #include <character_string.h>
 #include <date_time.h>
+#include <endian.h>
 #include <memory.h>
 #include <notify.h>
 
@@ -1385,12 +1386,12 @@ int libewf_header_values_parse_header(
 int libewf_header_values_parse_header2(
      libewf_values_table_t **header_values,
      ewf_char_t *header2,
-     size_t size,
+     size_t header2_size,
      uint8_t date_format )
 {
 	character_t *header_string = NULL;
 	static char *function      = "libewf_header_values_parse_header2";
-	size_t header_size         = 0;
+	ssize_t header_string_size = 0;
 	int result                 = 0;
 
 	if( header2 == NULL )
@@ -1400,9 +1401,20 @@ int libewf_header_values_parse_header2(
 
 		return( -1 );
 	}
-	header_size   = ( size - 2 ) / 2;
+	header_string_size = string_size_from_utf16_stream(
+	                      header2,
+	                      header2_size,
+	                      LIBUCA_ENDIAN_LITTLE );
+
+	if( header_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header string size.\n",
+		 function );
+
+		return( -1 );
+	}
 	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * ( header_size + 1 ) );
+	                                 sizeof( character_t ) * (size_t) header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -1411,13 +1423,14 @@ int libewf_header_values_parse_header2(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_utf16(
+	if( string_copy_from_utf16_stream(
 	     header_string,
-	     header_size,
+	     (size_t) header_string_size,
 	     header2,
-	     size ) != 1 )
+	     header2_size,
+	     LIBUCA_ENDIAN_LITTLE ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy header2 to header string.\n",
+		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
 		memory_free(
@@ -1428,7 +1441,7 @@ int libewf_header_values_parse_header2(
 	result = libewf_header_values_parse_header_string(
 	          header_values,
 	          header_string,
-	          header_size,
+	          (size_t) header_string_size,
 	          date_format );
 
 	memory_free(
@@ -1516,16 +1529,17 @@ int libewf_header_values_convert_header_string_to_header(
 }
 
 /* Converts a header string into a header2
- * Sets the header and header length
+ * Sets the header and header size
  * Returns 1 if successful or -1 on error
  */
 int libewf_header_values_convert_header_string_to_header2(
      character_t *header_string,
-     size_t header_string_length,
+     size_t header_string_size,
      ewf_char_t **header2,
-     size_t *header2_length )
+     size_t *header2_size )
 {
-	static char *function = "libewf_header_values_convert_header_string_to_header2";
+	static char *function     = "libewf_header_values_convert_header_string_to_header2";
+	ssize_t utf16_stream_size = 0;
 
 	if( header_string == NULL )
 	{
@@ -1548,35 +1562,40 @@ int libewf_header_values_convert_header_string_to_header2(
 
 		return( -1 );
 	}
-	if( header2_length == NULL )
+	if( header2_size == NULL )
 	{
-		notify_warning_printf( "%s: invalid header2 length.\n",
+		notify_warning_printf( "%s: invalid header2 size.\n",
 		 function );
 
 		return( -1 );
 	}
-	/* Add a character for the UTF16 endian type
-	 */
-	*header2_length = ( header_string_length + 1 ) * 2;
+	utf16_stream_size = utf16_stream_size_from_string(
+	                     header_string,
+	                     header_string_size );
 
+	if( utf16_stream_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header2 size.\n",
+		 function );
+
+		return( -1 );
+	}
 	*header2 = (ewf_char_t *) memory_allocate(
-	                           sizeof( ewf_char_t ) * *header2_length );
+	                           sizeof( ewf_char_t ) * (size_t) utf16_stream_size );
 
 	if( *header2 == NULL )
 	{
 		notify_warning_printf( "%s: unable to create header2.\n",
 		 function );
 
-		*header2_length = 0;
-
 		return( -1 );
 	}
-	if( libewf_string_copy_to_utf16(
-	     header_string,
-	     header_string_length,
+	if( utf16_stream_copy_from_string(
 	     *header2,
-	     *header2_length,
-	     LIBEWF_STRING_LITTLE_ENDIAN ) != 1 )
+	     (size_t) utf16_stream_size,
+	     LIBUCA_ENDIAN_LITTLE,
+	     header_string,
+	     header_string_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header2.\n",
 		 function );
@@ -1584,11 +1603,12 @@ int libewf_header_values_convert_header_string_to_header2(
 		memory_free(
 		 header2 );
 
-		*header2        = NULL;
-		*header2_length = 0;
+		*header2 = NULL;
 
 		return( -1 );
 	}
+	*header2_size = (size_t) utf16_stream_size;
+
 	return( 1 );
 }
 

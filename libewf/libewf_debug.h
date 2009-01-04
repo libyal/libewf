@@ -46,11 +46,11 @@ void libewf_debug_section_print(
 
 void libewf_debug_header_print(
       ewf_char_t *header,
-      size_t size );
+      size_t header_size );
 
 void libewf_debug_header2_print(
       ewf_char_t *header2,
-      size_t size );
+      size_t header2_size );
 
 #if defined( __cplusplus )
 }

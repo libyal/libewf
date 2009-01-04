@@ -116,6 +116,10 @@ Next release(s):
 * fix ewfinfo
 
 * implement libuca
+  - replace utf16 functions
+  - replace string_copy_from_char
+
+* check if libewf_string_split is resistant to empty strings
 
 * rename length into size, make sure string size contains end of string
   character
@@ -181,6 +185,7 @@ Version: 20080902
 * implemented ewfguid
 * refactored character string split to return int
 * changed project website
+* worked on integrating libuca
 
 Version: 20080901
 * refactored ewfglob

@@ -748,13 +748,13 @@ character_t *ewfinput_get_variable(
 
 				return( NULL );
 			}
-			/* Make sure the string is \0 terminated
+			/* Make sure the string is terminated with an end of string character
 			 */
-			user_input[ input_length ] = (character_t) '\0';
+			user_input[ input_length ] = 0;
 #else
 			user_input = string_duplicate(
 			              user_input_buffer_ptr,
-			              input_length );
+			              input_length + 1 );
 
 			if( user_input == NULL )
 			{
@@ -1168,13 +1168,13 @@ character_t *ewfinput_get_fixed_value(
 
 				return( NULL );
 			}
-			/* Make sure the string is \0 terminated
+			/* Make sure the string is terminated with an end of string character
 			 */
-			user_input[ input_length ] = (character_t) '\0';
+			user_input[ input_length ] = 0;
 #else
 			user_input = string_duplicate(
 			              values[ iterator ],
-			              value_length );
+			              value_length + 1 );
 
 			if( user_input == NULL )
 			{

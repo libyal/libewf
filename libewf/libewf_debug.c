@@ -128,7 +128,7 @@ void libewf_debug_section_print(
  */
 void libewf_debug_header_print(
       ewf_char_t *header,
-      size_t size )
+      size_t header_size )
 {
 	character_t *header_string = NULL;
 	static char *function      = "libewf_debug_header_print";
@@ -141,7 +141,7 @@ void libewf_debug_header_print(
 		return;
 	}
 	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * ( size + 1 ) );
+	                                 sizeof( character_t ) * ( header_size + 1 ) );
 
 	if( header_string == NULL )
 	{
@@ -153,7 +153,7 @@ void libewf_debug_header_print(
 	if( string_copy_from_char(
 	     header_string,
 	     (char *) header,
-	     size ) != 1 )
+	     header_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to copy header to header string.\n",
 		 function );
@@ -163,7 +163,7 @@ void libewf_debug_header_print(
 
 		return;
 	}
-	header_string[ size ] = (character_t) '\0';
+	header_string[ header_size ] = (character_t) '\0';
 
 	notify_printf( "%" PRIs "",
 	 header_string );
@@ -176,11 +176,11 @@ void libewf_debug_header_print(
  */
 void libewf_debug_header2_print(
       ewf_char_t *header2,
-      size_t size )
+      size_t header2_size )
 {
 	character_t *header_string = NULL;
 	static char *function      = "libewf_debug_header2_print";
-	size_t header_size         = 0;
+	ssize_t header_string_size = 0;
 
 	if( header2 == NULL )
 	{
@@ -189,9 +189,20 @@ void libewf_debug_header2_print(
 
 		return;
 	}
-	header_size   = ( size - 1 ) / 2;
+	header_string_size = string_size_from_utf16_stream(
+	                      header2,
+	                      header2_size,
+	                      LIBUCA_ENDIAN_LITTLE );
+
+	if( header_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header string size.\n",
+		 function );
+
+		return;
+	}
 	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * ( header_size + 1 ) );
+	                                 sizeof( character_t ) * (size_t) header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -200,13 +211,14 @@ void libewf_debug_header2_print(
 
 		return;
 	}
-	if( libewf_string_copy_from_utf16(
+	if( string_copy_from_utf16_stream(
 	     header_string,
-	     header_size,
+	     (size_t) header_string_size,
 	     header2,
-	     size ) != 1 )
+	     header2_size,
+	     LIBUCA_ENDIAN_LITTLE ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy header2 to header string.\n",
+		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
 		memory_free(
@@ -214,8 +226,6 @@ void libewf_debug_header2_print(
 
 		return;
 	}
-	header_string[ header_size ] = (character_t) '\0';
-
 	notify_printf( "%" PRIs "",
 	 header_string );
 

@@ -1,4 +1,8 @@
+if HAVE_LOCAL_LIBUCA
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/libuca
+else
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common
+endif
 
 lib_LTLIBRARIES = libewf.la
 
@@ -51,7 +55,11 @@ IGNORE = \
 	libewf_file_io_handle.c libewf_file_io_handle.h \
 	libewf_file_io_pool.c libewf_file_io_pool.h
 
+if HAVE_LOCAL_LIBUCA
+libewf_la_LIBADD  = ../common/libcommon.la ../libuca/libuca.la
+else
 libewf_la_LIBADD  = ../common/libcommon.la
+endif
 libewf_la_LDFLAGS = -no-undefined -version-info 1:4:0
 
 distclean: clean
