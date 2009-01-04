@@ -66,7 +66,7 @@ struct libewf_hash_values
 };
 
 LIBEWF_HASH_VALUES *libewf_hash_values_alloc( void );
-LIBEWF_HASH_VALUES *libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previous_amount, uint32_t new_amount );
+int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previous_amount, uint32_t new_amount );
 void libewf_hash_values_free( LIBEWF_HASH_VALUES *hash_values );
 
 int32_t libewf_hash_values_get_index( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier );

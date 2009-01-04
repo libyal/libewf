@@ -1,13 +1,6 @@
 Roadmap:
-* add read/write support for > 2Gb segment file for EnCase 6.7
-* raw read/write
-* move md5 calculation out library into ewftools
-* make compilation resilient for missing crypto library
-* move byte swap out library into ewftools
-
 * add read/write support for session section
 * create iso2ewf tool
-
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
   - error resistency
@@ -94,9 +87,14 @@ Known issues:
 * The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
 
 Next release:
+* add read/write support for > 2Gb segment file for EnCase 6.7
+* raw read/write
+* move md5 calculation out library into ewftools
+* make compilation resilient for missing crypto library
+* move byte swap out library into ewftools
+
 * full platform test
 * profile read and write functions
-* add a check to libewf_close to enforce libewf_write_finalize ?
 * what about read+write and compression?
 * add libewf_convert_date_xheader_value function ?
   - add raw date format to allow to print raw date string
@@ -120,10 +118,9 @@ TODO
 * ewfacquire check if last segment file is closed before telling acquiry was completed
 * check if segment table entry 0 is used in read mode make sure to use consistent
   usage of the segment table for read/write
-* remove write_finalized
 * make buffer passthrough default behavior
+
 * move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
-* have compound reallocation functions return an integer as result
 * remove internal_handle passing from most functions
   only pass the necessary values
 * segment table should only be updated by functions in segment file/table
@@ -146,7 +143,6 @@ TODO
 * check chunk size for >2Gb table offsets
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
-* fix >2Gb segment file write support for chunk offset value overflow
 
 * move libewf_string_copy_from_digest_hash to ewfdigest_hash
 
@@ -160,6 +156,10 @@ Version: 20070908
   - added macros libewf_set_hash_value_md5 and libewf_set_hash_value_sha1 to API
   - removed libewf_get_md5_hash from API
   - removed several libewf_internal_handle_get_ and libewf_internal_handle_set_ functions
+* worked on write support for > 2Gb segment file for EnCase 6.7
+* added check to libewf_close to enforce libewf_write_finalize
+* worked on having compound reallocation functions return an integer as result
+  - removed libewf_internal_handle_chunk_cache_realloc
 
 Version: 20070905
 * worked on remove of MD5 calculation from library

@@ -1508,8 +1508,9 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		offset64_value = offset_table->offset[ offset_table_index + iterator ]
 		               - base_offset;
 
-		if( ( offset64_value < 0 )
-		 || ( offset64_value > (off64_t) INT32_MAX ) )
+		if( ( overflow == 0 )
+		 && ( ( offset64_value < 0 )
+		  || ( offset64_value > (off64_t) INT32_MAX ) ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value.\n",
 			 function );
@@ -1523,7 +1524,20 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		if( offset_table->compressed[ offset_table_index + iterator ] != 0 )
 		{
-			offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+			if( overflow == 0 )
+			{
+				offset32_value |= EWF_OFFSET_COMPRESSED_WRITE_MASK;
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to write compressed chunks after chunk overflow.\n",
+				 function );
+
+				libewf_common_free( table );
+				libewf_common_free( offsets );
+
+				return( -1 );
+			}
 		}
 		if( libewf_endian_revert_32bit( offset32_value, (uint8_t *) offsets[ iterator ].offset ) != 1 )
 		{
@@ -1541,10 +1555,24 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		if( ( overflow == 0 )
 		 && ( ( offset64_value + offset_table->size[ offset_table_index + iterator ] ) > (off64_t) INT32_MAX ) )
 		{
-			overflow = 1;
+			if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+			 || ( internal_handle->format == LIBEWF_FORMAT_LINEN6 ) )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
+				 function, offset64_value );
 
-			LIBEWF_VERBOSE_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
-			 function, offset64_value );
+				overflow = 1;
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
+				 function, offset64_value );
+
+				libewf_common_free( table );
+				libewf_common_free( offsets );
+
+				return( -1 );
+			}
 		}
 	}
 	section_write_count = libewf_section_start_write(

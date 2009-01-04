@@ -303,16 +303,15 @@ int libewf_close( LIBEWF_HANDLE *handle )
 		return( -1 );
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-/*
+
 	if( ( internal_handle->write != NULL )
 	 && ( internal_handle->write->write_finalized == 0 ) )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: write has not been finalized.\n",
+		LIBEWF_VERBOSE_PRINT( "%s: finalizing write.\n",
 		 function );
 
 		libewf_write_finalize( handle );
 	}
-*/
 	if( libewf_segment_file_close_all( internal_handle ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to close all segment files.\n",

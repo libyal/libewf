@@ -164,7 +164,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 			LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
 			 function, chunk_data_size );
 
-			if( libewf_internal_handle_chunk_cache_realloc( internal_handle, chunk_data_size ) == NULL )
+			if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 				 function );
@@ -515,7 +515,7 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
 		 function, chunk_data_size );
 
-		if( libewf_internal_handle_chunk_cache_realloc( internal_handle, chunk_data_size ) == NULL )
+		if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );

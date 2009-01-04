@@ -384,42 +384,6 @@ void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_wri
 	libewf_common_free( handle_write );
 }
 
-/* Reallocates the handle chunk cache
- * Returns a pointer to the instance, NULL on error
- */
-LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTERNAL_HANDLE *internal_handle, size_t size )
-{
-	LIBEWF_CHUNK_CACHE *chunk_cache = NULL;
-	static char *function           = "libewf_internal_handle_chunk_cache_realloc";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
-		 function );
-
-		return( NULL );
-	}
-	chunk_cache = libewf_chunk_cache_realloc( internal_handle->chunk_cache, size );
-
-	if( chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
-		 function );
-
-		return( NULL );
-	}
-	internal_handle->chunk_cache = chunk_cache;
-
-	return( internal_handle );
-}
-
 /* Check if the header value is set
  * Returns 0 if not set, 1 if set, or -1 on error
  */
@@ -1836,7 +1800,9 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	 */
 	if( ( internal_handle->media->chunk_size + EWF_CRC_SIZE ) > internal_handle->chunk_cache->allocated_size )
 	{
-		if( libewf_internal_handle_chunk_cache_realloc( internal_handle, ( internal_handle->media->chunk_size + EWF_CRC_SIZE ) ) == NULL )
+		if( libewf_chunk_cache_realloc(
+		     internal_handle->chunk_cache,
+		     ( internal_handle->media->chunk_size + EWF_CRC_SIZE ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );

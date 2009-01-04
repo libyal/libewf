@@ -115,9 +115,9 @@ LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 }
 
 /* Reallocates memory for the header values
- * Returns a pointer to the instance, NULL on error
+ * Returns 1 if successful, or -1 on error
  */
-LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount )
+int libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount )
 {
 	LIBEWF_CHAR **reallocation = NULL;
 	static char *function      = "libewf_header_values_realloc";
@@ -129,7 +129,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( ( previous_amount > (uint32_t) INT32_MAX )
 	 || ( new_amount > (uint32_t) INT32_MAX ) )
@@ -137,14 +137,14 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 		LIBEWF_WARNING_PRINT( "%s: invalid amount value exceeds maximum.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( previous_amount >= new_amount )
 	{
 		LIBEWF_WARNING_PRINT( "%s: new amount smaller than previous amount.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (size_t) SSIZE_MAX ) )
@@ -152,7 +152,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	reallocation = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( header_values->identifiers, previous_size, new_size, 0 );
 
@@ -161,7 +161,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate identifiers.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	header_values->identifiers = reallocation;
 	reallocation               = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( header_values->values, previous_size, new_size, 0 );
@@ -171,12 +171,12 @@ LIBEWF_HEADER_VALUES *libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header
 		LIBEWF_WARNING_PRINT( "%s: unable to reallocate values.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	header_values->values = reallocation;
 	header_values->amount = new_amount;
 
-	return( header_values );
+	return( 1 );
 }
 
 /* Frees memory of a header values struct including elements
@@ -949,7 +949,7 @@ int libewf_header_values_set_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_
 		if( libewf_header_values_realloc(
 		     header_values,
 		     header_values->amount,
-		     ( index + 1 ) ) == NULL )
+		     ( index + 1 ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate header values.\n",
 			 function );
