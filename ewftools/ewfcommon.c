@@ -152,7 +152,7 @@ character_t *ewfcommon_determine_operating_system(
 {
 	character_t *string    = NULL;
 	char *operating_system = NULL;
-	uint32_t length        = 0;
+	size_t length          = 0;
 
 #if defined( HAVE_SYS_UTSNAME_H )
 	struct utsname utsname_buffer;
@@ -171,14 +171,14 @@ character_t *ewfcommon_determine_operating_system(
 #else
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
-	length = (uint32_t) strlen(
-	                     operating_system ) + 1;
+	length = 1 + strlen(
+	              operating_system );
 
 	string = (character_t *) memory_allocate(
 	                          sizeof( character_t ) * length );
 
 	if( ( string != NULL )
-	 && ( ewfstring_copy_system_string_to_character_string(
+	 && ( string_copy_from_char(
 	       string,
 	       operating_system,
 	       length ) != 1 ) )

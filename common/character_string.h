@@ -342,6 +342,22 @@ int libewf_string_copy_char_to_wchar(
 
 #endif
 
+#if defined( HAVE_WIDE_CHARACTER_T )
+#define string_copy_from_char( destination, source, length ) \
+	string_copy_char_to_wchar( destination, source, length )
+
+#define string_copy_to_char( destination, source, length ) \
+	string_copy_wchar_to_char( destination, source, length )
+
+#else
+#define string_copy_from_char( destination, source, length ) \
+	string_copy( destination, source, length )
+
+#define string_copy_to_char( destination, source, length ) \
+	string_copy( destination, source, length )
+
+#endif
+
 #if defined( __cplusplus )
 }
 #endif
