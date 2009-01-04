@@ -60,6 +60,12 @@
 /* Define to 1 if you have the <glob.h> header file. */
 #define HAVE_GLOB_H 1
 
+/* Define to 1 if you have the `gmtime' function. */
+#define HAVE_GMTIME 1
+
+/* Define to 1 if you have the `gmtime_r' function. */
+#define HAVE_GMTIME_R 1
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
@@ -77,12 +83,6 @@
 
 /* Define to 1 if you have the <linux/fs.h> header file. */
 #define HAVE_LINUX_FS_H 1
-
-/* Define to 1 if you have the `localtime' function. */
-#define HAVE_LOCALTIME 1
-
-/* Define to 1 if you have the `localtime_r' function. */
-#define HAVE_LOCALTIME_R 1
 
 /* Define to 1 if you have the `mbsinit' function. */
 /* #undef HAVE_MBSINIT */
@@ -311,13 +311,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20070806"
+#define PACKAGE_STRING "libewf 20070809"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20070806"
+#define PACKAGE_VERSION "20070809"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -329,7 +329,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20070806"
+#define VERSION "20070809"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64

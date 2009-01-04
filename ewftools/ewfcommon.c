@@ -1230,7 +1230,7 @@ void ewfcommon_timestamp_fprint( FILE *stream, time_t timestamp )
 	{
 		return;
 	}
-	time_elements = libewf_common_localtime( &timestamp );
+	time_elements = libewf_common_gmtime( &timestamp );
 
 	if( time_elements != NULL )
 	{
@@ -1377,7 +1377,8 @@ void ewfcommon_process_status_fprint( uint64_t bytes_read, uint64_t bytes_total 
 
 		fprintf( ewfcommon_process_status_stream, ".\n" );
 
-		if( ( timestamp_current > ewfcommon_process_status_timestamp_start ) && ( new_percentage > 0 ) )
+		if( ( timestamp_current > ewfcommon_process_status_timestamp_start )
+		 && ( new_percentage > 0 ) )
 		{
 			ewfcommon_process_status_timestamp_last = timestamp_current;
 

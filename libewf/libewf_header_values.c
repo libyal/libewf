@@ -601,7 +601,7 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp )
 	LIBEWF_CHAR *date_string = NULL;
 	struct tm *time_elements = NULL;
 
-	time_elements = libewf_common_localtime( &timestamp );
+	time_elements = libewf_common_gmtime( &timestamp );
 
 	if( time_elements == NULL )
 	{
@@ -663,7 +663,7 @@ LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, uint8
 		return( NULL );
 	}
 	timestamp     = libewf_string_to_int64( header_value, libewf_string_length( header_value ) );
-	time_elements = libewf_common_localtime( &timestamp );
+	time_elements = libewf_common_gmtime( &timestamp );
 
 	if( time_elements == NULL )
 	{

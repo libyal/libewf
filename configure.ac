@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070806], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20070809], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20070806])
+AM_INIT_AUTOMAKE([libewf], [20070809])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -167,7 +167,7 @@ AC_CHECK_TYPE([off64_t],[AC_SUBST([HAVE_OFF64_T],[1])],[AC_SUBST([HAVE_OFF64_T],
 AC_CHECK_TYPES([ssize_t, u64])
 
 dnl Check for functions
-AC_CHECK_FUNCS( atol ctime fgets getopt memchr memcmp memcpy memrchr memset localtime localtime_r snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )
+AC_CHECK_FUNCS( atol ctime fgets getopt gmtime gmtime_r memchr memcmp memcpy memrchr memset snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )
 
 AC_FUNC_MEMCMP
 AC_FUNC_STRERROR_R

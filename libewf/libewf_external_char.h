@@ -1,5 +1,6 @@
 /*
- * libewf section list
+ * libewf character type to wrap both char and wchar_t
+ * for external functions
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,65 +32,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _LIBEWF_EXTERNAL_CHAR_H
+#define _LIBEWF_EXTERNAL_CHAR_H
+
 #include "libewf_includes.h"
-#include "libewf_common.h"
-#include "libewf_notify.h"
-#include "libewf_section_list.h"
 
-/* Append an entry to the section list
- * Returns a pointer to the instance, NULL on error
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define LIBEWF_EXTERNAL_CHAR libewf_char_t
+#define LIBEWF_EXTERNAL_CHAR_SIZE sizeof( LIBEWF_EXTERNAL_CHAR )
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+#define LIBEWF_EXTERNAL_CHAR_WIDE
+
+typedef wchar_t libewf_external_char_t;
+
+#define PRIc_EWF_external			"lc"
+#define PRIs_EWF_external			"ls"
+
+/* Intermediate version of the macro
+ * required for correct evaluation
+ * predefined string
  */
-LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off_t start_offset, off_t end_offset )
-{
-	LIBEWF_SECTION_LIST_ENTRY *section_list_entry = NULL;
-	static char *function                         = "libewf_section_list_append";
+#define _S_LIBEWF_EXTERNAL_CHAR_I( string )	L ## string
+#define _S_LIBEWF_EXTERNAL_CHAR( string )	_S_LIBEWF_EXTERNAL_CHAR_I( string )
 
-	if( section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
-		 function );
+#else
 
-		return( NULL );
-	}
-	if( type == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid type.\n",
-		 function );
+typedef char libewf_external_char_t;
 
-		return( NULL );
-	}
-	section_list_entry = (LIBEWF_SECTION_LIST_ENTRY *) libewf_common_alloc( LIBEWF_SECTION_LIST_ENTRY_SIZE );
+#define PRIc_EWF_external			"c"
+#define PRIs_EWF_external			"s"
 
-	if( section_list_entry == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create section list entry.\n",
-		 function );
+#define _S_LIBEWF_EXTERNAL_CHAR( string )	string
 
-		return( NULL );
-	}
-	if( libewf_common_memcpy( section_list_entry->type, type, 16 ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set section list entry type.\n",
-		 function );
+#endif
 
-		libewf_common_free( section_list_entry );
-
-		return( NULL );
-	}
-	section_list_entry->start_offset = start_offset;
-	section_list_entry->end_offset   = end_offset;
-	section_list_entry->next         = NULL;
-
-	if( section_list->first == NULL )
-	{
-		section_list->first = section_list_entry;
-	}
-	if( section_list->last != NULL )
-	{
-		section_list->last->next = section_list_entry;
-	}
-	section_list->last = section_list_entry;
-
-	return( section_list );
+#ifdef __cplusplus
 }
+#endif
+
+#endif
 

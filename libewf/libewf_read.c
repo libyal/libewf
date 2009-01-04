@@ -37,6 +37,7 @@
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
+#include "libewf_external_char.h"
 #include "libewf_notify.h"
 #include "libewf_file.h"
 #include "libewf_read.h"
@@ -53,26 +54,22 @@
  */
 ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size )
 {
-	EWF_CHUNK *chunk_data       = NULL;
-	EWF_CHUNK *chunk_read       = NULL;
-	EWF_CRC calculated_crc      = 0;
-	EWF_CRC stored_crc          = 0;
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *filename           = NULL;
-#else
-	char *filename              = NULL;
-#endif
-	static char *function       = "libewf_read_chunk";
-	ssize_t chunk_read_count    = 0;
-	ssize_t crc_read_count      = 0;
-	size_t chunk_data_size      = 0;
-	size_t bytes_available      = 0;
-	size_t md5_hash_size        = 0;
-	uint16_t segment_number     = 0;
-	uint8_t percentage          = 0;
-	int chunk_cache_used        = 0;
-	int file_descriptor         = 0;
-	int result                  = 0;
+	EWF_CHUNK *chunk_data          = NULL;
+	EWF_CHUNK *chunk_read          = NULL;
+	EWF_CRC calculated_crc         = 0;
+	EWF_CRC stored_crc             = 0;
+	LIBEWF_EXTERNAL_CHAR *filename = NULL;
+	static char *function          = "libewf_read_chunk";
+	ssize_t chunk_read_count       = 0;
+	ssize_t crc_read_count         = 0;
+	size_t chunk_data_size         = 0;
+	size_t bytes_available         = 0;
+	size_t md5_hash_size           = 0;
+	uint16_t segment_number        = 0;
+	uint8_t percentage             = 0;
+	int chunk_cache_used           = 0;
+	int file_descriptor            = 0;
+	int result                     = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -145,7 +142,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	}
 	/* Check if the chunk is cached
 	 */
-	if( ( internal_handle->chunk_cache->chunk != chunk ) || ( internal_handle->chunk_cache->cached == 0 ) )
+	if( ( internal_handle->chunk_cache->chunk != chunk )
+	 || ( internal_handle->chunk_cache->cached == 0 ) )
 	{
 		file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
 		segment_number  = internal_handle->offset_table->segment_number[ chunk ];
@@ -213,7 +211,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		}
 		/* Make sure the file offset is in the right place
 		 */
-		if( libewf_seek_chunk( internal_handle, chunk ) <= -1 )
+		if( libewf_segment_file_seek_chunk_offset( internal_handle, chunk ) <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to seek chunk.\n",
 			 function );
@@ -246,13 +244,14 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 
 			/* If buffer passthrough is used the CRC needs to be read seperately
 			 */
-			if( ( chunk_read != internal_handle->chunk_cache->compressed ) && ( chunk_read != internal_handle->chunk_cache->data ) )
+			if( ( chunk_read != internal_handle->chunk_cache->compressed )
+			 && ( chunk_read != internal_handle->chunk_cache->data ) )
 			{
 				crc_read_count = ewf_crc_read( &stored_crc, file_descriptor );
 
 				if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( LIBEWF_EXTERNAL_CHAR_WIDE )
 					filename = libewf_segment_table_get_wide_filename( internal_handle->segment_table, segment_number );
 #else
 					filename = libewf_segment_table_get_filename( internal_handle->segment_table, segment_number );
@@ -265,13 +264,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 					}
 					else
 					{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-						LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%ls).\n",
+						LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_external ").\n",
 						 function, chunk, segment_number, filename );
-#else
-						LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%s).\n",
-						 function, chunk, segment_number, filename );
-#endif
 					}
 					return( -1 );
 				}
@@ -467,7 +461,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	}
 	if( bytes_available > (size_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid available amount of bytes only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid available amount of bytes value exceeds maximum.\n",
 		 function );
 
 		return( -1 );

@@ -422,27 +422,29 @@ uint8_t libewf_common_test_empty_block( uint8_t *block_buffer, size_t size )
 }
 
 #if defined( HAVE_WINDOWS_API )
-#define libewf_common_localtime_r( timestamp, time_elements ) \
-	localtime_s( time_elements, timestamp )
+#define libewf_common_gmtime_r( timestamp, time_elements ) \
+	gmtime_s( time_elements, timestamp )
 
-#elif defined( HAVE_LOCALTIME_R )
-#define libewf_common_localtime_r( timestamp, time_elements ) \
-	localtime_r( timestamp, time_elements )
+#elif defined( HAVE_GMTIME_R )
+#define libewf_common_gmtime_r( timestamp, time_elements ) \
+	gmtime_r( timestamp, time_elements )
 
 #endif
 
 /* Returns a structured representation of a time using the local time zone, or NULL on error
  */
-struct tm *libewf_common_localtime( const time_t *timestamp )
+struct tm *libewf_common_gmtime( const time_t *timestamp )
 {
-#if !defined( libewf_common_localtime_r ) && defined( HAVE_LOCALTIME )
+#if !defined( libewf_common_gmtime_r ) && defined( HAVE_GMTIME )
 	struct tm *static_time_elements = NULL;
 #endif
 	struct tm *time_elements        = NULL;
+	static char *function           = "libewf_common_gmtime";
 
 	if( timestamp == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_localtime: invalid time stamp.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid time stamp.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -450,45 +452,49 @@ struct tm *libewf_common_localtime( const time_t *timestamp )
 
 	if( time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_localtime: unable to create time elements.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
+		 function );
 
 		return( NULL );
 	}
-#if defined( libewf_common_localtime_r )
+#if defined( libewf_common_gmtime_r )
 #if defined( HAVE_WINDOWS_API )
-	if( libewf_common_localtime_r( timestamp, time_elements ) != 0 )
+	if( libewf_common_gmtime_r( timestamp, time_elements ) != 0 )
 #else
-	if( libewf_common_localtime_r( timestamp, time_elements ) == NULL )
+	if( libewf_common_gmtime_r( timestamp, time_elements ) == NULL )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_localtime: unable to set time elements.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		 function );
 
 		libewf_common_free( time_elements );
 
 		return( NULL );
 	}
 	return( time_elements );
-#elif defined( HAVE_LOCALTIME )
-	static_time_elements = localtime( timestamp );
+#elif defined( HAVE_GMTIME )
+	static_time_elements = gmtime( timestamp );
 
 	if( static_time_elements == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_localtime: unable to create static time elements.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create static time elements.\n",
+		 function );
 
 		libewf_common_free( time_elements );
 
 		return( NULL );
 	}
-	if( libewf_common_string_copy( time_elements, static_time_elements, sizeof( struct tm ) ) == NULL )
+	if( libewf_common_memcpy( time_elements, static_time_elements, sizeof( struct tm ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_common_localtime: unable to set time elements.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
+		 function );
 
 		libewf_common_free( time_elements );
 
 		return( NULL );
 	}
 #else
-#error Missing equivalent of function localtime
+#error Missing equivalent of function gmtime
 #endif
 }
 

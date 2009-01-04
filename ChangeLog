@@ -116,6 +116,21 @@ TODO
 * check if segment table entry 0 is used in read mode make sure to use consistent
   usage of the segment table for read/write
 
+DELTA FILE
+* consists of sections "delta_chunk" with chunk number
+  chunk data and CRC
+
+Version: 20070809
+* change _localtime functions into _gmtime
+
+Version: 20070807
+* worked on restructuring to improve internal structure
+* worked on improved rewrite using delta segment files
+
+Version: 20070806
+* worked on restructuring to improve internal structure
+* worked on improved rewrite using delta segment files
+
 Version: 20070728
 * worked on restructuring to improve internal structure
 

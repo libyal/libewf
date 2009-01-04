@@ -89,6 +89,10 @@ struct libewf_internal_handle
 	 */
 	LIBEWF_SEGMENT_TABLE *segment_table;
 
+	/* The list of delta segment files
+	 */
+	LIBEWF_SEGMENT_TABLE *delta_segment_table;
+
 	/* The list of offsets within the segment files within the table sections
 	 */
 	LIBEWF_OFFSET_TABLE *offset_table;

@@ -1181,73 +1181,21 @@ ssize_t libewf_write_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_
 
 		return( -1 );
 	}
-	if( raw_access != 0 )
+	/* If the chunk exists write the chunk in a delta segment file
+	 */
+	if( existing_chunk == 1 )
+	{
+
+		/* TODO
+		 * check if the chunk already exists in a delta segment file
+		 * overwrite the chunk in the delta segment file
+		 * or write the chunk to a delta segment file
+		 */
+	}
+	else if( raw_access != 0 )
 	{
 		chunk_data = (EWF_CHUNK *) buffer;
 		write_size = read_size;
-	}
-	/* If the chunk exists retrieve the chunk data if necessary
-	 */
-	else if( ( existing_chunk == 1 )
-	 && ( read_size < internal_handle->media->chunk_size ) )
-	{
-		/* TODO how to handle chunk cache passthrough? especially compressed
-		 */
-		if( chunk_cache_used == 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot handle chunk cache passthrough here yet.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( internal_handle->offset_table->compressed[ chunk ] == 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot over write compressed chunks safely yet.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( internal_handle->chunk_cache->offset != 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot handle remaining data in chunk cache here yet.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_read_chunk(
-		     internal_handle,
-		     raw_access,
-		     chunk,
-		     0,
-		     internal_handle->chunk_cache->data,
-		     internal_handle->chunk_cache->allocated_size ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read data from chunk.\n",
-			 function );
-
-			return( -1 );
-		}
-		/* Make sure to put the file offset back to the beginning of the chunk
-		 */
-		if( libewf_seek_chunk( internal_handle, chunk ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to seek chunk.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_common_memcpy(
-		     &internal_handle->chunk_cache->data[ chunk_offset ],
-		     buffer,
-		     read_size ) == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to write data.\n",
-			 function );
-
-			return( -1 );
-		}
-		chunk_data = internal_handle->chunk_cache->data;
-		write_size = internal_handle->chunk_cache->amount;
 	}
 	/* Check if chunk cache passthrough is being used
 	 */

@@ -55,7 +55,6 @@ extern "C" {
 #define LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE	sizeof( int )
 #define LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE		sizeof( off_t )
 #define LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE	sizeof( uint32_t )
-#define LIBEWF_SEGMENT_TABLE_SEGMENT_FILE_TYPE_SIZE	sizeof( uint8_t )
 #define LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE		sizeof( LIBEWF_SECTION_LIST )
 
 typedef struct libewf_segment_table libewf_segment_table_t;
@@ -87,10 +86,6 @@ struct libewf_segment_table
 	 */
 	uint32_t *amount_of_chunks;
 
-	/* A dynamic array containting the segment file type
-	 */
-	uint8_t *segment_file_type;
-
         /* A list of all the sections within a certain segment file
          */
         LIBEWF_SECTION_LIST **section_list;
@@ -105,8 +100,6 @@ wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_t
 #else
 char *libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment );
 #endif
-
-int libewf_segment_table_get_file_descriptor( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 int8_t libewf_segment_table_set_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, const wchar_t *filename, size_t length_filename );

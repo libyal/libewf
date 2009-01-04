@@ -169,272 +169,6 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	return( read_count );
 }
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Opens EWF segment file(s) for reading
- * Returns 1 if successful, 0 if not, or -1 on error
- */
-int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
-{
-	wchar_t *error_string     = NULL;
-	static char *function     = "libewf_segment_file_read_wide_open";
-	uint32_t iterator         = 0;
-	uint16_t segment_number   = 0;
-	uint8_t segment_file_type = 0;
-	int file_descriptor       = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( file_amount < 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* TODO check for maximum amount of open file descriptors
-	 */
-	for( iterator = 0; iterator < file_amount; iterator++ )
-	{
-		file_descriptor = libewf_common_wide_open( filenames[ iterator ], flags );
-
-		if( file_descriptor == -1 )
-		{
-			error_string = libewf_common_wide_strerror( errno );
-
-			if( error_string == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-				 function, filenames[ iterator ] );
-			}
-			else
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %s.\n",
-				 function, filenames[ iterator ], error_string );
-
-				libewf_common_free( error_string );
-			}
-			return( -1 );
-		}
-		if( libewf_segment_file_read_file_header(
-		     file_descriptor,
-		     &segment_number,
-		     &segment_file_type ) <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %ls.\n",
-			 function, filenames[ iterator ] );
-
-			return( -1 );
-		}
-		if( segment_number == 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( segment_number > internal_handle->segment_table->amount )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_segment_table_set_wide_filename(
-		     internal_handle->segment_table,
-		     0,
-		     filenames[ iterator ],
-		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
-		internal_handle->segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
-
-		LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
-		 function, filenames[ iterator ], file_descriptor, segment_number );
-	}
-	return( 1 );
-}
-#else
-
-/* Opens EWF segment file(s) for reading
- * Returns 1 if successful, 0 if not, or -1 on error
- */
-int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount, uint8_t flags )
-{
-	char *error_string      = NULL;
-	static char *function   = "libewf_segment_file_read_open";
-	uint32_t iterator       = 0;
-	uint16_t segment_number = 0;
-	uint8_t segment_file_type = 0;
-	int file_descriptor     = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( file_amount < 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* TODO check for maximum amount of open file descriptors
-	 */
-	for( iterator = 0; iterator < file_amount; iterator++ )
-	{
-		file_descriptor = libewf_common_open( filenames[ iterator ], flags );
-
-		if( file_descriptor == -1 )
-		{
-			error_string = libewf_common_strerror( errno );
-
-			if( error_string == NULL )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-				 function, filenames[ iterator ] );
-			}
-			else
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-				 function, filenames[ iterator ], error_string );
-
-				libewf_common_free( error_string );
-			}
-			return( -1 );
-		}
-		if( libewf_segment_file_read_file_header(
-		     file_descriptor,
-		     &segment_number,
-		     &segment_file_type ) <= -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %s.\n",
-			 function, filenames[ iterator ] );
-
-			return( -1 );
-		}
-		if( segment_number == 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( segment_number > internal_handle->segment_table->amount )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_segment_table_set_filename(
-		     internal_handle->segment_table,
-		     0,
-		     filenames[ iterator ],
-		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
-		internal_handle->segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
-
-		LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-		 function, filenames[ iterator ], file_descriptor, segment_number );
-	}
-	return( 1 );
-}
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-
-/* Opens EWF segment file(s) for writing
- * Returns 1 if successful, 0 if not, or -1 on error
-int libewf_segment_file_write_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount )
-{
-}
- */
-#else
-
-/* Opens EWF segment file(s) for writing
- * Returns 1 if successful, 0 if not, or -1 on error
-int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount )
-{
-}
- */
-#endif
-
 /* Reads the segment table from all segment files
  * Returns 1 if successful, 0 if not, or -1 on error
  */
@@ -2761,5 +2495,534 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 	internal_handle->segment_table->amount_of_chunks[ segment_number ] = segment_amount_of_chunks;
 
 	return( total_write_count );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+/* Opens EWF segment file(s) for reading
+ * Returns 1 if successful, 0 if not, or -1 on error
+ */
+int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
+{
+	wchar_t *error_string     = NULL;
+	static char *function     = "libewf_segment_file_read_wide_open";
+	uint32_t iterator         = 0;
+	uint16_t segment_number   = 0;
+	uint8_t segment_file_type = 0;
+	int file_descriptor       = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_amount < 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO check for maximum amount of open file descriptors
+	 */
+	for( iterator = 0; iterator < file_amount; iterator++ )
+	{
+		file_descriptor = libewf_common_wide_open( filenames[ iterator ], flags );
+
+		if( file_descriptor == -1 )
+		{
+			error_string = libewf_common_wide_strerror( errno );
+
+			if( error_string == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+				 function, filenames[ iterator ] );
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %s.\n",
+				 function, filenames[ iterator ], error_string );
+
+				libewf_common_free( error_string );
+			}
+			return( -1 );
+		}
+		if( libewf_segment_file_read_file_header(
+		     file_descriptor,
+		     &segment_number,
+		     &segment_file_type ) <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %ls.\n",
+			 function, filenames[ iterator ] );
+
+			return( -1 );
+		}
+		if( segment_number == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( segment_number > internal_handle->segment_table->amount )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+		 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
+		{
+			if( libewf_segment_table_set_wide_filename(
+			     internal_handle->segment_table,
+			     0,
+			     filenames[ iterator ],
+			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
+			internal_handle->segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
+
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
+		}
+		else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+		{
+			if( libewf_segment_table_set_wide_filename(
+			     internal_handle->delta_segment_table,
+			     0,
+			     filenames[ iterator ],
+			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set filename in delta segment table.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->delta_segment_table->file_descriptor[ segment_number ] = file_descriptor;
+			internal_handle->delta_segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
+
+			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
+		}
+		else
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment file type.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+#else
+
+/* Opens EWF segment file(s) for reading
+ * Returns 1 if successful, 0 if not, or -1 on error
+ */
+int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount, uint8_t flags )
+{
+	char *error_string      = NULL;
+	static char *function   = "libewf_segment_file_read_open";
+	uint32_t iterator       = 0;
+	uint16_t segment_number = 0;
+	uint8_t segment_file_type = 0;
+	int file_descriptor     = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->file_offset == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file offsets.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_amount < 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO check for maximum amount of open file descriptors
+	 */
+	for( iterator = 0; iterator < file_amount; iterator++ )
+	{
+		file_descriptor = libewf_common_open( filenames[ iterator ], flags );
+
+		if( file_descriptor == -1 )
+		{
+			error_string = libewf_common_strerror( errno );
+
+			if( error_string == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+				 function, filenames[ iterator ] );
+			}
+			else
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
+				 function, filenames[ iterator ], error_string );
+
+				libewf_common_free( error_string );
+			}
+			return( -1 );
+		}
+		if( libewf_segment_file_read_file_header(
+		     file_descriptor,
+		     &segment_number,
+		     &segment_file_type ) <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %s.\n",
+			 function, filenames[ iterator ] );
+
+			return( -1 );
+		}
+		if( segment_number == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( segment_number > internal_handle->segment_table->amount )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+		 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
+		{
+			if( libewf_segment_table_set_filename(
+			     internal_handle->segment_table,
+			     0,
+			     filenames[ iterator ],
+			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
+			internal_handle->segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
+
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
+		}
+		else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+		{
+			if( libewf_segment_table_set_filename(
+			     internal_handle->delta_segment_table,
+			     0,
+			     filenames[ iterator ],
+			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to set filename in delta segment table.\n",
+				 function );
+
+				return( -1 );
+			}
+			internal_handle->delta_segment_table->file_descriptor[ segment_number ] = file_descriptor;
+			internal_handle->delta_segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
+
+			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			 function, filenames[ iterator ], file_descriptor, segment_number );
+		}
+		else
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid segment file type.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+
+/* Opens EWF segment file(s) for writing
+ * Returns 1 if successful, 0 if not, or -1 on error
+int libewf_segment_file_write_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount )
+{
+}
+ */
+#else
+
+/* Opens EWF segment file(s) for writing
+ * Returns 1 if successful, 0 if not, or -1 on error
+int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount )
+{
+}
+ */
+#endif
+
+/* Seeks a certain chunk offset within the EWF segment file(s)
+ * Returns the segment file offset if seek is successful, or -1 on error
+ */
+off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk )
+{
+	static char *function   = "libewf_segment_file_seek_chunk_offset";
+	off_t offset            = 0;
+	uint16_t segment_number = 0;
+	int file_descriptor     = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->chunk_cache == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table_build == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk >= internal_handle->offset_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: chunk: %" PRIu32 " not in offset table.\n",
+		 function, chunk );
+
+		return( -1 );
+	}
+	file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
+	offset          = internal_handle->offset_table->offset[ chunk ];
+	segment_number  = internal_handle->offset_table->segment_number[ chunk ];
+
+	LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
+	 function, file_descriptor, segment_number, offset );
+
+	if( offset > (off_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_offset[ segment_number ] != offset )
+	{
+		if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
+			 function, offset );
+
+			return( -1 );
+		}
+		internal_handle->segment_table->file_offset[ segment_number ] = offset;
+	}
+	internal_handle->current_chunk = chunk;
+
+	return( offset );
+}
+
+/* Closes all the EWF segment file(s)
+ * Returns 1 if successful, 0 if not, or -1 on error
+ */
+int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
+{
+	static char *function = "libewf_segment_file_close_all";
+	uint16_t iterator     = 0;
+	int result            = 1;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table->file_descriptor == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < internal_handle->segment_table->amount; iterator++ )
+	{
+		if( internal_handle->segment_table->file_descriptor[ iterator ] > 0 )
+		{
+			if( libewf_common_close( internal_handle->segment_table->file_descriptor[ iterator ] ) != 0 )
+			{
+				if( internal_handle->segment_table->filename[ iterator ] == NULL )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 ".\n",
+					 function, iterator );
+				}
+				else
+				{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%ls).\n",
+					 function, iterator, internal_handle->segment_table->filename[ iterator ] );
+#else
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%s).\n",
+					 function, iterator, internal_handle->segment_table->filename[ iterator ] );
+#endif
+				}
+				result = 0;
+			}
+		}
+	}
+	return( result );
 }
 

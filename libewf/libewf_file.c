@@ -260,15 +260,6 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 		 * the 0'th entry
 		 */
 
-		if( internal_handle->segment_table_build != 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: segment table has already been build.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
 		/* Initialize the internal handle for reading
 		 */
 		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
@@ -419,15 +410,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 		 * the 0'th entry
 		 */
 
-		if( internal_handle->segment_table_build != 0 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: segment table has already been build.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
 		/* Initialize the internal handle for reading
 		 */
 		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
@@ -534,14 +516,7 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 int8_t libewf_close( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *filename                       = NULL;
-#else
-	char *filename                          = NULL;
-#endif
 	static char *function                   = "libewf_close";
-	uint16_t iterator                       = 0;
-	int8_t result                           = 0;
 
 	if( handle == NULL )
 	{
@@ -552,7 +527,8 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 /*
-	if( ( internal_handle->write != NULL ) && ( internal_handle->write->write_finalized == 0 ) )
+	if( ( internal_handle->write != NULL )
+	 && ( internal_handle->write->write_finalized == 0 ) )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: write has not been finalized.\n",
 		 function );
@@ -560,122 +536,16 @@ int8_t libewf_close( LIBEWF_HANDLE *handle )
 		libewf_write_finalize( handle );
 	}
 */
-	for( iterator = 0; iterator < internal_handle->segment_table->amount; iterator++ )
+	if( libewf_segment_file_close_all( internal_handle ) != 1 )
 	{
-		if( internal_handle->segment_table->file_descriptor[ iterator ] > 0 )
-		{
-			if( libewf_common_close( internal_handle->segment_table->file_descriptor[ iterator ] ) != 0 )
-			{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				filename = libewf_segment_table_wide_get_filename( internal_handle->segment_table, iterator );
-#else
-				filename = libewf_segment_table_get_filename( internal_handle->segment_table, iterator );
-#endif
+		LIBEWF_WARNING_PRINT( "%s: unable to close all segment files.\n",
+		 function );
 
-				if( filename == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu32 ".\n",
-					 function, iterator );
-				}
-				else
-				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu32 " (%ls).\n",
-					 function, iterator, filename );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu32 " (%s).\n",
-					 function, iterator, filename );
-#endif
-				}
-				result = -1;
-			}
-		}
+		return( -1 );
 	}
 	libewf_internal_handle_free( internal_handle );
 
-	return( result );
-}
-
-/* Seeks a certain chunk offset within the EWF file(s)
- * Returns the segment file offset if seek is successful, or -1 on error
- */
-off_t libewf_seek_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk )
-{
-	static char *function   = "libewf_seek_chunk";
-	off_t offset            = 0;
-	uint16_t segment_number = 0;
-	int file_descriptor     = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table_build == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment table was not build.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk >= internal_handle->offset_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: chunk: %" PRIu32 " not in offset table.\n",
-		 function, chunk );
-
-		return( -1 );
-	}
-	file_descriptor = internal_handle->offset_table->file_descriptor[ chunk ];
-	offset          = internal_handle->offset_table->offset[ chunk ];
-	segment_number  = internal_handle->offset_table->segment_number[ chunk ];
-
-	LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
-	 function, file_descriptor, segment_number, offset );
-
-	if( offset > (off_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset only values below 2^32 are supported.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset[ segment_number ] != offset )
-	{
-		if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
-			 function, offset );
-
-			return( -1 );
-		}
-		internal_handle->segment_table->file_offset[ segment_number ] = offset;
-	}
-	internal_handle->current_chunk = chunk;
-
-	return( offset );
+	return( 1 );
 }
 
 /* Seeks a certain offset of the media data within the EWF file(s)
@@ -737,7 +607,7 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 
 		return( -1 );
 	}
-	if( libewf_seek_chunk( internal_handle, (uint32_t) chunk ) == -1 )
+	if( libewf_segment_file_seek_chunk_offset( internal_handle, (uint32_t) chunk ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
 		 function );
@@ -1231,14 +1101,16 @@ int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 		                 internal_handle->xheader_size,
 		                 date_format );
 	}
-	if( ( header_values == NULL ) && internal_handle->header2 != NULL )
+	if( ( header_values == NULL )
+	 && internal_handle->header2 != NULL )
 	{
 		header_values = libewf_header_values_parse_header2(
 		                 internal_handle->header2,
 		                 internal_handle->header2_size,
 		                 date_format );
 	}
-	if( ( header_values == NULL ) && ( internal_handle->header != NULL ) )
+	if( ( header_values == NULL )
+	 && ( internal_handle->header != NULL ) )
 	{
 		header_values = libewf_header_values_parse_header(
 		                 internal_handle->header,

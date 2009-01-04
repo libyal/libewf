@@ -59,6 +59,12 @@
 /* Define to 1 if you have the <glob.h> header file. */
 #undef HAVE_GLOB_H
 
+/* Define to 1 if you have the `gmtime' function. */
+#undef HAVE_GMTIME
+
+/* Define to 1 if you have the `gmtime_r' function. */
+#undef HAVE_GMTIME_R
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -76,12 +82,6 @@
 
 /* Define to 1 if you have the <linux/fs.h> header file. */
 #undef HAVE_LINUX_FS_H
-
-/* Define to 1 if you have the `localtime' function. */
-#undef HAVE_LOCALTIME
-
-/* Define to 1 if you have the `localtime_r' function. */
-#undef HAVE_LOCALTIME_R
 
 /* Define to 1 if you have the `mbsinit' function. */
 #undef HAVE_MBSINIT
