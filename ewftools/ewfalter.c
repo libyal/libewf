@@ -403,7 +403,6 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-#ifdef X
 	if( ewfcommon_abort == 0 )
 	{
 		/* Second alteration run
@@ -450,7 +449,6 @@ int main( int argc, char * const argv[] )
 			}
 		}
 	}
-#endif
 	memory_free(
 	 buffer );
 

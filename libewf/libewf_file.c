@@ -329,9 +329,6 @@ libewf_handle_t *libewf_open(
 
 		return( NULL );
 	}
-#ifndef TEST
-	libewf_set_notify_values( stderr, 1 );
-#endif
 	internal_handle = libewf_internal_handle_alloc(
 	                   flags );
 

@@ -138,7 +138,7 @@ Next release(s):
 
 * change libewf_notify_set_values in libewf_file.c to notify_set_values
 
-FIX
+FIXES
 * MacOS-X package should install in /usr/
 * unnecessary reopen of delta segement file in libewf_segment_table_create_segment_file
   add truncate flag?
@@ -162,7 +162,7 @@ CLOSED
   checks out ok
 
 Version: 20080330
-* Fixed bugs in read write mode, delta files were initiallity opened without read access
+* Fixed multiple bugs in read write mode, delta files were initiallity opened without read access
 * Worked on ewfalter to handle more complex RW scenarios
 * Changed libewf_read_chunk_data no longer to copy to buffer if buffer is the chunk cache data
 
