@@ -757,6 +757,10 @@ int main( int argc, char * const argv[] )
 		{
 			libewf_common_free( notes );
 		}
+		if( acquiry_operating_system != NULL )
+		{
+			libewf_common_free( acquiry_operating_system );
+		}
 		return( EXIT_FAILURE );
 	}
 	/* Set case number
@@ -800,6 +804,10 @@ int main( int argc, char * const argv[] )
 		if( notes != NULL )
 		{
 			libewf_common_free( notes );
+		}
+		if( acquiry_operating_system != NULL )
+		{
+			libewf_common_free( acquiry_operating_system );
 		}
 		return( EXIT_FAILURE );
 	}
@@ -846,6 +854,10 @@ int main( int argc, char * const argv[] )
 		{
 			libewf_common_free( notes );
 		}
+		if( acquiry_operating_system != NULL )
+		{
+			libewf_common_free( acquiry_operating_system );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( description != NULL )
@@ -887,6 +899,10 @@ int main( int argc, char * const argv[] )
 		{
 			libewf_common_free( notes );
 		}
+		if( acquiry_operating_system != NULL )
+		{
+			libewf_common_free( acquiry_operating_system );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( evidence_number != NULL )
@@ -924,6 +940,10 @@ int main( int argc, char * const argv[] )
 		{
 			libewf_common_free( notes );
 		}
+		if( acquiry_operating_system != NULL )
+		{
+			libewf_common_free( acquiry_operating_system );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( examiner_name != NULL )
@@ -956,6 +976,10 @@ int main( int argc, char * const argv[] )
 		if( notes != NULL )
 		{
 			libewf_common_free( notes );
+		}
+		if( acquiry_operating_system != NULL )
+		{
+			libewf_common_free( acquiry_operating_system );
 		}
 		return( EXIT_FAILURE );
 	}

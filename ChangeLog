@@ -155,6 +155,11 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20080107
+* added more verbose output for raw write
+* added check for read sub handle in libewf_write_buffer and
+  libewf_raw_write_buffer
+
 Version: 20080106
 * worked on removing type definition
 

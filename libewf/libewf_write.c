@@ -2049,12 +2049,24 @@ ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t siz
 
 		return( -1 );
 	}
+	LIBEWF_VERBOSE_PRINT( "%s: writing chunk: %d of total: %d.\n",
+	 function, ( internal_handle->current_chunk + 1 ), internal_handle->offset_table->amount );
+	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %zd with data of size: %zd.\n",
+	 function, size, data_size );
+
 	/* Check if chunk has already been created within a segment file
 	 */
 	if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
 	 && ( internal_handle->offset_table->chunk_offset != NULL )
 	 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].segment_file_handle != NULL ) )
 	{
+		if( internal_handle->read == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: cannot rewrite existing chunk.\n",
+			 function );
+
+			return( -1 );
+		}
 		write_count = libewf_raw_write_chunk_existing(
 		               internal_handle,
 		               internal_handle->current_chunk,
@@ -2190,6 +2202,13 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 		 && ( internal_handle->offset_table->chunk_offset != NULL )
 		 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].segment_file_handle != NULL ) )
 		{
+			if( internal_handle->read == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: cannot rewrite existing chunk.\n",
+				 function );
+
+				return( -1 );
+			}
 			write_count = libewf_write_chunk_data_existing(
 			               internal_handle,
 			               internal_handle->current_chunk,
