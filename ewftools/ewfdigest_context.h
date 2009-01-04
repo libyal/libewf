@@ -76,9 +76,19 @@ struct ewfdigest_context
 
 #endif
 
-int ewfdigest_context_initialize( EWFDIGEST_CONTEXT *digest_context, uint8_t type );
-int ewfdigest_context_update( EWFDIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size );
-int ewfdigest_context_finalize( EWFDIGEST_CONTEXT *digest_context, EWFDIGEST_HASH *digest_hash, size_t *size );
+int ewfdigest_context_initialize(
+     EWFDIGEST_CONTEXT *digest_context,
+     uint8_t type );
+
+int ewfdigest_context_update(
+     EWFDIGEST_CONTEXT *digest_context,
+     uint8_t *buffer,
+     size_t size );
+
+int ewfdigest_context_finalize(
+     EWFDIGEST_CONTEXT *digest_context,
+     ewfdigest_hash_t *digest_hash,
+     size_t *size );
 
 #if defined( __cplusplus )
 }

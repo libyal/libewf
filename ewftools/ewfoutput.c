@@ -291,7 +291,7 @@ void ewfoutput_version_fprint(
 		return;
 	}
 	fprintf( stream, "%" PRIs_EWF " %" PRIs_EWF " (libewf %" PRIs_EWF ", zlib %s",
-	 program, LIBEWF_VERSION, LIBEWF_VERSION, ZLIB_VERSION );
+	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING, ZLIB_VERSION );
 
 #if defined( HAVE_LIBCRYPTO )
 	fprintf( stream, ", libcrypto %s", SHLIB_VERSION_NUMBER );
@@ -816,7 +816,7 @@ void ewfoutput_hash_values_fprint(
 {
 	libewf_char_t hash_identifier[ 32 ];
 	libewf_char_t hash_value[ 128 ];
-	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
 	libewf_char_t *stored_md5_hash_string = NULL;
 	static char *function                 = "ewfoutput_hash_values_fprint";

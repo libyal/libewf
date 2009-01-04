@@ -27,6 +27,7 @@ libewf_la_SOURCES = \
 	libewf_compression.c libewf_compression.h \
 	libewf_debug.c libewf_debug.h \
 	libewf_endian.c libewf_endian.h \
+	libewf_error.c libewf_error.h \
 	libewf_error_sector.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \

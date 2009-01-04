@@ -34,12 +34,14 @@
 #if !defined( _LIBEWF_DEFINIONS_H )
 #define _LIBEWF_DEFINIONS_H
 
-/* The libewf version
+#define LIBEWF_VERSION				@VERSION@
+
+/* The libewf version string
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@
-#define LIBEWF_VERSION				L"@VERSION@"
+#define LIBEWF_VERSION_STRING			L"@VERSION@"
 #else
-#define LIBEWF_VERSION				"@VERSION@"
+#define LIBEWF_VERSION_STRING			"@VERSION@"
 #endif
 
 /* The libewf file access

@@ -1118,8 +1118,8 @@ ssize64_t ewfcommon_read_verify(
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
 
-	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data               = NULL;
 	uint8_t *uncompressed_data  = NULL;
@@ -1444,8 +1444,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
 
-	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
 	uint8_t *data_buffer        = NULL;
 	static char *function       = "ewfcommon_write_from_file_descriptor";
@@ -2132,8 +2132,8 @@ ssize64_t ewfcommon_export_ewf(
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
 
-	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
-	EWFDIGEST_HASH sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
+	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	ewfdigest_hash_t sha1_hash[ EWFDIGEST_HASH_SIZE_SHA1 ];
 
 	libewf_char_t md5_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_MD5 ];
 	libewf_char_t sha1_hash_string[ EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ];

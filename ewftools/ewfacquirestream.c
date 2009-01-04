@@ -577,7 +577,7 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	acquiry_operating_system = ewfcommon_determine_operating_system();
-	acquiry_software_version = LIBEWF_VERSION;
+	acquiry_software_version = LIBEWF_VERSION_STRING;
 
 	fprintf( stdout, "Using the following acquiry parameters:\n" );
 

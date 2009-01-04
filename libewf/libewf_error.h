@@ -1,5 +1,5 @@
 /*
- * crypographic hash for ewftools
+ * libewf error
  *
  * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,26 +31,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _EWFDIGEST_HASH_H )
-#define _EWFDIGEST_HASH_H
+#if !defined( _LIBEWF_ERROR_H )
+#define _LIBEWF_ERROR_H
 
-#include "../libewf/libewf_includes.h"
-#include "../libewf/libewf_char.h"
+#include "libewf_includes.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define EWFDIGEST_HASH_SIZE_MD5		(size_t) ( sizeof( ewfdigest_hash_t ) * 16 )
-#define EWFDIGEST_HASH_SIZE_SHA1	(size_t) ( sizeof( ewfdigest_hash_t ) * 20 )
+#define LIBEWF_ERROR_NONE		0
+#define LIBEWF_ERROR_INVALID_ARGUMENT	1
+#define LIBEWF_ERROR_MEMORY_FAILURE	2
+#define LIBEWF_ERROR_IO_FAILURE		3
 
-typedef uint8_t ewfdigest_hash_t;
-
-int ewfdigest_copy_to_string(
-     ewfdigest_hash_t *digest_hash,
-     size_t size_digest_hash,
-     libewf_char_t *string,
-     size_t size_string );
+extern int libewf_error;
 
 #if defined( __cplusplus )
 }

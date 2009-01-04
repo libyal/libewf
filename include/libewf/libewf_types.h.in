@@ -87,6 +87,8 @@ typedef __int64			off64_t;
 
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
 
+#define LIBEWF_WIDE_CHARACTER_TYPE	1
+
 #if @HAVE_WCHAR_H@ || defined( HAVE_WCHAR_H )
 
 /* __USE_UNIX98 is required to add swprintf definition
@@ -118,6 +120,10 @@ typedef __int64			off64_t;
 #else
 #error Missing wide character type definition (wchar.h)
 #endif
+
+#else
+
+#define LIBEWF_WIDE_CHARACTER_TYPE	0
 
 #endif
 

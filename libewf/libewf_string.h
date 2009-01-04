@@ -201,29 +201,71 @@ typedef char libewf_string_t;
 #define LIBEWF_STRING_LITTLE_ENDIAN	(uint8_t) 'l'
 #define LIBEWF_STRING_BIG_ENDIAN	(uint8_t) 'b'
 
-libewf_char_t *libewf_string_duplicate( libewf_char_t *string, size_t size );
+libewf_char_t *libewf_string_duplicate(
+                libewf_char_t *string, size_t size );
 
-int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size );
-uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size );
+int64_t libewf_string_to_int64(
+         const libewf_char_t *string,
+         size_t size );
 
-libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_char_t delimiter, uint32_t *amount );
-void libewf_string_split_values_free( libewf_char_t **split_values, uint32_t amount );
+uint64_t libewf_string_to_uint64(
+          const libewf_char_t *string,
+          size_t size );
 
-int libewf_string_copy_utf16_to_ascii( libewf_char_t *utf16_string, size_t size_utf16, libewf_char_t* ascii_string, size_t size_ascii );
-int libewf_string_copy_ascii_to_utf16( libewf_char_t *ascii_string, size_t size_ascii, libewf_char_t *utf16_string, size_t size_utf16, uint8_t byte_order );
+libewf_char_t **libewf_string_split(
+                 libewf_char_t *string,
+                 size_t size,
+                 libewf_char_t delimiter,
+                 uint32_t *amount );
 
-int libewf_string_copy_from_ewf_char( libewf_char_t *string, size_t size_string, ewf_char_t *ewf_char_string, size_t size_ewf_char_string );
-int libewf_string_copy_to_ewf_char( libewf_char_t *string, size_t size_string, ewf_char_t *ewf_char_string, size_t size_ewf_char_string );
+void libewf_string_split_values_free(
+      libewf_char_t **split_values,
+      uint32_t amount );
+
+int libewf_string_copy_utf16_to_ascii(
+     libewf_char_t *utf16_string,
+     size_t size_utf16,
+     libewf_char_t* ascii_string,
+     size_t size_ascii );
+
+int libewf_string_copy_ascii_to_utf16(
+     libewf_char_t *ascii_string,
+     size_t size_ascii,
+     libewf_char_t *utf16_string,
+     size_t size_utf16,
+     uint8_t byte_order );
+
+int libewf_string_copy_from_ewf_char(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *ewf_char_string,
+     size_t size_ewf_char_string );
+
+int libewf_string_copy_to_ewf_char(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *ewf_char_string,
+     size_t size_ewf_char_string );
 
 #define libewf_string_copy_from_header( string, size_string, header, size_header ) \
 	libewf_string_copy_from_ewf_char( string, size_string, header, size_header )
 #define libewf_string_copy_to_header( string, size_string, header, size_header ) \
 	libewf_string_copy_to_ewf_char( string, size_string, header, size_header )
 
-int libewf_string_copy_from_header2( libewf_char_t *string, size_t size_string, ewf_char_t *header2, size_t size_header2 );
-int libewf_string_copy_to_header2( libewf_char_t *string, size_t size_string, ewf_char_t *header2, size_t size_header2 );
+int libewf_string_copy_from_header2(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *header2,
+     size_t size_header2 );
 
-libewf_char_t *libewf_string_ctime( const time_t *timestamp );
+int libewf_string_copy_to_header2(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *header2,
+     size_t size_header2 );
+
+libewf_char_t *libewf_string_ctime(
+                const time_t *timestamp );
 
 #if defined( __cplusplus )
 }

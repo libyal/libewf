@@ -44,7 +44,9 @@
 /* Duplicates a string
  * Returns the pointer to the duplicate string, or NULL on error
  */
-libewf_char_t *libewf_string_duplicate( libewf_char_t *string, size_t size )
+libewf_char_t *libewf_string_duplicate(
+                libewf_char_t *string,
+                size_t size )
 {
 	libewf_char_t *duplicate = NULL;
 	static char *function    = "libewf_string_duplicate";
@@ -78,12 +80,15 @@ libewf_char_t *libewf_string_duplicate( libewf_char_t *string, size_t size )
 
 		return( NULL );
 	}
-	if( libewf_string_copy( duplicate, string, size ) == NULL )
+	if( libewf_string_copy(
+	     duplicate,
+	     string, size ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set duplicate string.\n",
 		 function );
 
-		libewf_common_free( duplicate );
+		libewf_common_free(
+		 duplicate );
 
 		return( NULL );
 	}
@@ -122,7 +127,9 @@ libewf_char_t *libewf_string_duplicate( libewf_char_t *string, size_t size )
 
 /* Returns the value represented by a string, returns 0 error
  */
-int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
+int64_t libewf_string_to_int64(
+         const libewf_char_t *string,
+         size_t size )
 {
 	libewf_char_t *end_of_string = NULL;
 	static char *function        = "libewf_string_to_int64";
@@ -152,7 +159,10 @@ int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
 	end_of_string = (libewf_char_t *) &string[ size - 1 ];
 
 #if defined( libewf_string_to_signed_long_long )
-	value = libewf_string_to_signed_long_long( string, &end_of_string, 0 );
+	value = libewf_string_to_signed_long_long(
+	         string,
+	         &end_of_string,
+	         0 );
 #else
 #error Missing equivalent of strtoll
 #endif
@@ -197,7 +207,9 @@ int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
 
 /* Returns the value represented by a string, returns 0 on error
  */
-uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size )
+uint64_t libewf_string_to_uint64(
+          const libewf_char_t *string,
+          size_t size )
 {
 	libewf_char_t *end_of_string = NULL;
 	static char *function        = "libewf_string_to_uint64";
@@ -227,7 +239,10 @@ uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size )
 	end_of_string = (libewf_char_t *) &string[ size - 1 ];
 
 #if defined( libewf_string_to_unsigned_long_long )
-	value = libewf_string_to_unsigned_long_long( string, &end_of_string, 0 );
+	value = libewf_string_to_unsigned_long_long(
+	         string,
+	         &end_of_string,
+	         0 );
 #else
 #error Missing equivalent of strtoull
 #endif
@@ -245,7 +260,11 @@ uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size )
 /* Split a string into elements using a delimiter character
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_char_t delimiter, uint32_t *amount )
+libewf_char_t **libewf_string_split(
+                 libewf_char_t *string,
+                 size_t size,
+                 libewf_char_t delimiter,
+                 uint32_t *amount )
 {
 	libewf_char_t **lines     = NULL;
 	libewf_char_t *line_start = NULL;
@@ -291,7 +310,10 @@ libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_
 
 	do
 	{
-		line_end = (libewf_char_t *) libewf_string_search( line_start, delimiter, size_string );
+		line_end = (libewf_char_t *) libewf_string_search(
+		                              line_start,
+		                              delimiter,
+		                              size_string );
 
 		iterator++;
 
@@ -315,7 +337,8 @@ libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_
 	while( line_end != NULL );
 
 	*amount = iterator;
-	lines   = (libewf_char_t **) libewf_common_alloc( ( sizeof( libewf_char_t * ) * *amount ) );
+	lines   = (libewf_char_t **) libewf_common_alloc(
+	                              ( sizeof( libewf_char_t * ) * *amount ) );
 
 	if( lines == NULL )
 	{
@@ -324,7 +347,10 @@ libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_
 
 		return( NULL );
 	}
-	if( libewf_common_memset( lines, 0, *amount ) == NULL )
+	if( libewf_common_memset(
+	     lines,
+	     0,
+	     *amount ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic array lines.\n",
 		 function );
@@ -341,7 +367,10 @@ libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_
 		{
 			line_start = line_end + 1;
 		}
-		line_end = (libewf_char_t *) libewf_string_search( line_start, delimiter, size_string );
+		line_end = (libewf_char_t *) libewf_string_search(
+		                              line_start,
+		                              delimiter,
+		                              size_string );
 
 		/* Check for last value
 		 */
@@ -365,16 +394,23 @@ libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_
 			LIBEWF_WARNING_PRINT( "%s: unable to allocate line string.\n",
 			 function );
 
-			libewf_string_split_values_free( lines, ( iterator - 1 ) );
+			libewf_string_split_values_free(
+			 lines,
+			 ( iterator - 1 ) );
 
 			return( NULL );
 		}
-		if( libewf_string_copy( lines[ iterator ], line_start, line_size ) == NULL )
+		if( libewf_string_copy(
+		     lines[ iterator ],
+		     line_start,
+		     line_size ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set dynamic array lines.\n",
 			 function );
 
-			libewf_string_split_values_free( lines, iterator );
+			libewf_string_split_values_free(
+			 lines,
+			 iterator );
 
 			return( NULL );
 		}
@@ -396,7 +432,9 @@ libewf_char_t **libewf_string_split( libewf_char_t *string, size_t size, libewf_
 
 /* Clears a split values array
  */
-void libewf_string_split_values_free( libewf_char_t **split_values, uint32_t amount )
+void libewf_string_split_values_free(
+      libewf_char_t **split_values,
+      uint32_t amount )
 {
 	static char *function = "libewf_string_split_values_free";
 	uint32_t iterator     = 0;
@@ -417,7 +455,8 @@ void libewf_string_split_values_free( libewf_char_t **split_values, uint32_t amo
 		}
 		else
 		{
-			libewf_common_free( split_values[ iterator ] );
+			libewf_common_free(
+			 split_values[ iterator ] );
 		}
 	}
 	libewf_common_free( split_values );
@@ -426,7 +465,11 @@ void libewf_string_split_values_free( libewf_char_t **split_values, uint32_t amo
 /* Copies a multi byte UTF16 string to a single byte ASCII string
  * Returns 1 if successful, on -1 on error
  */
-int libewf_string_copy_utf16_to_ascii( libewf_char_t *utf16_string, size_t size_utf16, libewf_char_t* ascii_string, size_t size_ascii )
+int libewf_string_copy_utf16_to_ascii(
+     libewf_char_t *utf16_string,
+     size_t size_utf16,
+     libewf_char_t* ascii_string,
+     size_t size_ascii )
 {
 	static char *function = "libewf_string_copy_utf16_to_ascii";
 	size_t utf16_iterator = 2;
@@ -542,7 +585,12 @@ int libewf_string_copy_utf16_to_ascii( libewf_char_t *utf16_string, size_t size_
 /* Copies a single byte ASCII string to a multi byte UTF16 string
  * Returns 1 if successful, on -1 on error
  */
-int libewf_string_copy_ascii_to_utf16( libewf_char_t *ascii_string, size_t size_ascii, libewf_char_t *utf16_string, size_t size_utf16, uint8_t byte_order )
+int libewf_string_copy_ascii_to_utf16(
+     libewf_char_t *ascii_string,
+     size_t size_ascii,
+     libewf_char_t *utf16_string,
+     size_t size_utf16,
+     uint8_t byte_order )
 {
 	static char *function = "libewf_string_copy_ascii_to_utf16";
 	size_t ascii_iterator = 0;
@@ -624,7 +672,11 @@ int libewf_string_copy_ascii_to_utf16( libewf_char_t *ascii_string, size_t size_
 /* Converts an EWF character string to a LIBEWF character string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int libewf_string_copy_from_ewf_char( libewf_char_t *string, size_t size_string, ewf_char_t *ewf_char_string, size_t size_ewf_char_string )
+int libewf_string_copy_from_ewf_char(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *ewf_char_string,
+     size_t size_ewf_char_string )
 {
 	static char *function = "libewf_string_copy_from_ewf_char";
 	size_t iterator       = 0;
@@ -661,7 +713,8 @@ int libewf_string_copy_from_ewf_char( libewf_char_t *string, size_t size_string,
 	for( iterator = 0; iterator < size_ewf_char_string; iterator++ )
 	{
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-		string[ iterator ] = btowc( (int) ewf_char_string[ iterator ] );
+		string[ iterator ] = btowc(
+		                      (int) ewf_char_string[ iterator ] );
 #else
 		string[ iterator ] = (char) ewf_char_string[ iterator ];
 #endif
@@ -674,7 +727,11 @@ int libewf_string_copy_from_ewf_char( libewf_char_t *string, size_t size_string,
 /* Converts a LIBEWF character string to an EWF character string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int libewf_string_copy_to_ewf_char( libewf_char_t *string, size_t size_string, ewf_char_t *ewf_char_string, size_t size_ewf_char_string )
+int libewf_string_copy_to_ewf_char(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *ewf_char_string,
+     size_t size_ewf_char_string )
 {
 	static char *function = "libewf_string_copy_to_ewf_char";
 	size_t iterator       = 0;
@@ -711,7 +768,8 @@ int libewf_string_copy_to_ewf_char( libewf_char_t *string, size_t size_string, e
 	for( iterator = 0; iterator < size_string; iterator++ )
 	{
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-		ewf_char_string[ iterator ] = (ewf_char_t) wctob( string[ iterator ] );
+		ewf_char_string[ iterator ] = (ewf_char_t) wctob(
+		                                            string[ iterator ] );
 
 		/* If character is out of the basic ASCII range use '_' as a place holder
 		 */
@@ -731,7 +789,11 @@ int libewf_string_copy_to_ewf_char( libewf_char_t *string, size_t size_string, e
 /* Converts an EWF header2 to a string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int libewf_string_copy_from_header2( libewf_char_t *string, size_t size_string, ewf_char_t *header2, size_t size_header2 )
+int libewf_string_copy_from_header2(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *header2,
+     size_t size_header2 )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
@@ -820,7 +882,11 @@ int libewf_string_copy_from_header2( libewf_char_t *string, size_t size_string, 
 /* Converts a string to an EWF header2
  * Returns 1 if successful, 0 if header2 was not set, or -1 on error
  */
-int libewf_string_copy_to_header2( libewf_char_t *string, size_t size_string, ewf_char_t *header2, size_t size_header2 )
+int libewf_string_copy_to_header2(
+     libewf_char_t *string,
+     size_t size_string,
+     ewf_char_t *header2,
+     size_t size_header2 )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
@@ -867,7 +933,8 @@ int libewf_string_copy_to_header2( libewf_char_t *string, size_t size_string, ew
 
 		return( -1 );
 	}
-	if( mbsinit( &conversion_state ) == 0 )
+	if( mbsinit(
+	     &conversion_state ) == 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
 		 function );
@@ -911,7 +978,8 @@ int libewf_string_copy_to_header2( libewf_char_t *string, size_t size_string, ew
 /* Generate ctime string
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_string_ctime( const time_t *timestamp )
+libewf_char_t *libewf_string_ctime(
+                const time_t *timestamp )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
         char *narrow_ctime_string   = NULL;
@@ -929,12 +997,15 @@ libewf_char_t *libewf_string_ctime( const time_t *timestamp )
         /* The libewf_common_ctime function returns a string of length 32
 	 */
 #if !defined( HAVE_WIDE_CHARACTER_TYPE )
-        ctime_string = libewf_common_ctime( timestamp );
+        ctime_string = libewf_common_ctime(
+	                timestamp );
 
 #elif defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-        ctime_string = libewf_common_wide_ctime( timestamp );
+        ctime_string = libewf_common_wide_ctime(
+	                timestamp );
 #else
-        narrow_ctime_string = libewf_common_ctime( timestamp );
+        narrow_ctime_string = libewf_common_ctime(
+	                       timestamp );
 
         if( narrow_ctime_string == NULL )
         {
@@ -951,21 +1022,28 @@ libewf_char_t *libewf_string_ctime( const time_t *timestamp )
                 LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
                  function );
 
-		libewf_common_free( narrow_ctime_string );
+		libewf_common_free(
+		 narrow_ctime_string );
 
                 return( NULL );
         }
-        if( libewf_common_copy_char_to_wchar( ctime_string, narrow_ctime_string, 32 ) != 1 )
+        if( libewf_common_copy_char_to_wchar(
+	     ctime_string,
+	     narrow_ctime_string,
+	     32 ) != 1 )
         {
                 LIBEWF_WARNING_PRINT( "%s: unable to copy narrow ctime string to ctime string.\n",
                  function );
 
-		libewf_common_free( narrow_ctime_string );
-		libewf_common_free( ctime_string );
+		libewf_common_free(
+		 narrow_ctime_string );
+		libewf_common_free(
+		 ctime_string );
 
                 return( NULL );
         }
-	libewf_common_free( narrow_ctime_string );
+	libewf_common_free(
+	 narrow_ctime_string );
 #endif
 	return( ctime_string );
 }

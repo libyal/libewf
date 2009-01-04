@@ -42,7 +42,9 @@
 /* Initializes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_initialize( EWFDIGEST_CONTEXT *digest_context, uint8_t type )
+int ewfdigest_context_initialize(
+     EWFDIGEST_CONTEXT *digest_context,
+     uint8_t type )
 {
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 	const EVP_MD *digest_type = NULL;
@@ -146,7 +148,10 @@ int ewfdigest_context_initialize( EWFDIGEST_CONTEXT *digest_context, uint8_t typ
 /* Updates the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_update( EWFDIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size )
+int ewfdigest_context_update(
+     EWFDIGEST_CONTEXT *digest_context,
+     uint8_t *buffer,
+     size_t size )
 {
 	static char *function = "ewfdigest_context_update";
 
@@ -201,7 +206,10 @@ int ewfdigest_context_update( EWFDIGEST_CONTEXT *digest_context, uint8_t *buffer
 /* Finalizes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_finalize( EWFDIGEST_CONTEXT *digest_context, EWFDIGEST_HASH *digest_hash, size_t *size )
+int ewfdigest_context_finalize(
+     EWFDIGEST_CONTEXT *digest_context,
+     ewfdigest_hash_t *digest_hash,
+     size_t *size )
 {
 	static char *function = "ewfdigest_context_finalize";
 

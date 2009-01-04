@@ -99,7 +99,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	EWFDIGEST_HASH md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
+	ewfdigest_hash_t md5_hash[ EWFDIGEST_HASH_SIZE_MD5 ];
 
 #if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob                              = NULL;

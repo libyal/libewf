@@ -42,7 +42,11 @@
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful, 0 if hash was not set, or -1 on error
  */
-int ewfdigest_copy_to_string( EWFDIGEST_HASH *digest_hash, size_t size_digest_hash, libewf_char_t *string, size_t size_string )
+int ewfdigest_copy_to_string(
+     ewfdigest_hash_t *digest_hash,
+     size_t size_digest_hash,
+     libewf_char_t *string,
+     size_t size_string )
 {
 	static char *function       = "ewfdigest_copy_to_string";
 	size_t string_iterator      = 0;

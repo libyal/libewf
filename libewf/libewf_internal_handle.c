@@ -697,7 +697,7 @@ int libewf_internal_handle_create_header_values(
 	libewf_char_t *examiner_name            = _S_LIBEWF_CHAR( "Examiner Name" );
 	libewf_char_t *notes                    = _S_LIBEWF_CHAR( "Notes" );
 	libewf_char_t *acquiry_operating_system = _S_LIBEWF_CHAR( "Undetermined" );
-	libewf_char_t *acquiry_software_version = LIBEWF_VERSION;
+	libewf_char_t *acquiry_software_version = LIBEWF_VERSION_STRING;
 	static char *function                   = "libewf_internal_handle_create_header_values";
 
 	if( internal_handle == NULL )

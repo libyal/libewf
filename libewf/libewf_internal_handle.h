@@ -147,6 +147,10 @@ struct libewf_internal_handle
 	/* Value to indicate if abort was signalled
 	 */
 	int abort;
+
+	/* Value to indicate if and what error occcurred
+	 */
+	int error_number;
 };
 
 /* Additional subhandle for read specific parameters
