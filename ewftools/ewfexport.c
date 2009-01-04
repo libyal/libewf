@@ -593,16 +593,22 @@ int main( int argc, char * const argv[] )
 		{
 			/* Target filename
 			 */
-			while( target_filename == NULL )
-			{
-				target_filename = ewfinput_get_variable_system_character(
-				                   stderr,
-				                   _CHARACTER_T_STRING( "Target path and filename without extension" ) );
+			target_filename = (character_t *) memory_allocate(
+			                                   1024 );
 
-				if( target_filename == NULL )
-				{
-					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
-				}
+			if( target_filename == NULL )
+			{
+				fprintf( stderr, "Unable to create target filename string.\n" );
+
+				return( EXIT_FAILURE );
+			}
+			while( ewfinput_get_variable_string_system_character(
+				stderr,
+				_CHARACTER_T_STRING( "Target path and filename without extension" ),
+			        target_filename,
+			        1024 ) != 1 )
+			{
+				fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 			}
 			if( argument_set_compression == 0 )
 			{
@@ -683,16 +689,22 @@ int main( int argc, char * const argv[] )
 		{
 			/* Target filename
 			 */
-			while( target_filename == NULL )
-			{
-				target_filename = ewfinput_get_variable_system_character(
-				                   stderr,
-				                   _CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ) );
+			target_filename = (character_t *) memory_allocate(
+			                                   1024 );
 
-				if( target_filename == NULL )
-				{
-					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
-				}
+			if( target_filename == NULL )
+			{
+				fprintf( stderr, "Unable to create target filename string.\n" );
+
+				return( EXIT_FAILURE );
+			}
+			while( ewfinput_get_variable_string_system_character(
+				stderr,
+				_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
+			        target_filename,
+			        1024 ) != 1 )
+			{
+				fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
 		if( argument_set_offset == 0 )

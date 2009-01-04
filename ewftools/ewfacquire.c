@@ -495,47 +495,173 @@ int main( int argc, char * const argv[] )
 
 		/* Output filename
 		 */
-		while( filename == NULL )
-		{
-			filename = ewfinput_get_variable_system_character(
-			            stdout,
-			            _CHARACTER_T_STRING( "Image path and filename without extension" ) );
+		filename = (character_t *) memory_allocate(
+		                            1024 );
 
-			if( filename == NULL )
-			{
-				fprintf( stdout, "Filename is required, please try again or terminate using Ctrl^C.\n" );
-			}
+		if( filename == NULL )
+		{
+			fprintf( stderr, "Unable to create output filename string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		while( ewfinput_get_variable_string_system_character(
+			stdout,
+			_CHARACTER_T_STRING( "Image path and filename without extension" ),
+			filename,
+			1024 ) != 1 )
+		{
+			fprintf( stdout, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 		}
 		/* Case number
 		 */
-		case_number = ewfinput_get_variable(
-		               stdout,
-		               _CHARACTER_T_STRING( "Case number" ) );
+		case_number = (character_t *) memory_allocate(
+		                               256 );
 
+		if( case_number == NULL )
+		{
+			fprintf( stderr, "Unable to create case number string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_variable_string(
+		     stdout,
+		     _CHARACTER_T_STRING( "Case number" ),
+		     case_number,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set case number string.\n" );
+
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
+		}
 		/* Description
 		 */
-		description = ewfinput_get_variable(
-		               stdout,
-		               _CHARACTER_T_STRING( "Description" ) );
+		description = (character_t *) memory_allocate(
+		                               256 );
 
+		if( description == NULL )
+		{
+			fprintf( stderr, "Unable to create description string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_variable_string(
+		     stdout,
+		     _CHARACTER_T_STRING( "Description" ),
+		     description,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set description string.\n" );
+
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
+		}
 		/* Evidence number
 		 */
-		evidence_number = ewfinput_get_variable(
-		                   stdout,
-		                   _CHARACTER_T_STRING( "Evidence number" ) );
+		evidence_number = (character_t *) memory_allocate(
+		                                   256 );
 
+		if( evidence_number == NULL )
+		{
+			fprintf( stderr, "Unable to create evidence number string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_variable_string(
+		     stdout,
+		     _CHARACTER_T_STRING( "Evidence number" ),
+		     evidence_number,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set evidence number string.\n" );
+
+			memory_free(
+			 evidence_number );
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
+		}
 		/* Examiner name
 		 */
-		examiner_name = ewfinput_get_variable(
-		                 stdout,
-		                 _CHARACTER_T_STRING( "Examiner name" ) );
+		examiner_name = (character_t *) memory_allocate(
+		                                 256 );
 
+		if( examiner_name == NULL )
+		{
+			fprintf( stderr, "Unable to create examiner name string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_variable_string(
+		     stdout,
+		     _CHARACTER_T_STRING( "Examiner name" ),
+		     examiner_name,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set examiner name string.\n" );
+
+			memory_free(
+			 examiner_name );
+			memory_free(
+			 evidence_number );
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
+		}
 		/* Notes
 		 */
-		notes = ewfinput_get_variable(
-		         stdout,
-		         _CHARACTER_T_STRING( "Notes" ) );
+		notes = (character_t *) memory_allocate(
+		                         256 );
 
+		if( notes == NULL )
+		{
+			fprintf( stderr, "Unable to create notes string.\n" );
+
+			return( EXIT_FAILURE );
+		}
+		if( ewfinput_get_variable_string(
+		     stdout,
+		     _CHARACTER_T_STRING( "Notes" ),
+		     notes,
+		     256 ) != 1 )
+		{
+			fprintf( stderr, "Unable to set notes string.\n" );
+
+			memory_free(
+			 notes );
+			memory_free(
+			 examiner_name );
+			memory_free(
+			 evidence_number );
+			memory_free(
+			 description );
+			memory_free(
+			 case_number );
+			memory_free(
+			 filename );
+
+			return( EXIT_FAILURE );
+		}
 		/* Media type
 		 */
 		user_input = ewfinput_get_fixed_value(

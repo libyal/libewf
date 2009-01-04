@@ -40,7 +40,7 @@ To do/think about:
 * ewfacquire: allow for variable read buffer size, this should allow performance testing
 * ewfacquire: allow for multiple raw files as input
   - make a generic media access solution also useable for revit?
-* ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
+* ewfexport: calculate the MD5 hash of exported data and validate this with the stored hash?
 * ewfexport: log hashes to file -l option
 * ewfverify: verify against all available hashes that can be verified, print others
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
@@ -126,8 +126,6 @@ Next release(s):
 
 * have segment file number in libewf_raw_read_chunk for warning output?
 
-* improve way to determine if a segment file has been closed after write
-
 * remove file io pool from lower levels and pass file io handle ?
 
 * ewfinfo check wchar in/output
@@ -135,11 +133,10 @@ Next release(s):
 * create floppy-table-errors.E01 for testing purpose
   - error in primary offset table
   - error in secondary offset table
-
-* remove error_tollerance, just be error tollerant ?
-
 * improve offset table correction
   - add error flag ?
+
+* remove error_tollerance, just be error tollerant ?
 
 * implement libuca
   - handle codepage in ewftools use -p option
@@ -204,6 +201,7 @@ Version: 20080905
 * worked on refactoring code
 * rewrote _alloc() functions into _initialize() functions with corresponding _free() functions
 * worked on file io pooling
+* improved way to determine if a segment file has been closed after write
 
 Version: 20080904
 * worked on refactoring function in ewfinput
@@ -789,8 +787,8 @@ Version: 20070908
 * worked on remove of MD5 calculation from library
   - implemented MD5 calculation in ewfcommon for ewfacquire and ewfacquirestream
   - removed libewf_set_media_values, calculated_md5_hash and libewf_raw_update_md5 from API
-  - removed digest context and md5 from library
-  - removed calculated md5 hash and md5 context from internal handle
+  - removed digest context and MD5 from library
+  - removed calculated MD5 hash and MD5 context from internal handle
   - added macros libewf_get_hash_value_md5 and libewf_get_hash_value_sha1 to API
   - added macros libewf_set_hash_value_md5 and libewf_set_hash_value_sha1 to API
   - removed libewf_get_md5_hash from API
@@ -1101,7 +1099,7 @@ Version: 20070120
   - added get and set funtions for hash values
   - updated libewf.3 manual page
 * created a more generic digest_context and EWF digest hash to support SHA1
-  - replaces md5 context and hash by digest context and hash
+  - replaces MD5 context and hash by digest context and hash
 * an option was added to allow for SHA1 calculation from ewfacquire and ewfacquirestream
   - updated manuals
 * added print of additional hashes to ewfinfo
@@ -1567,7 +1565,7 @@ Version: 20061025
 * made one type (error sector) for crc and acquiry read error sectors
 * Worked on Win32 native port
   - fix for file open - not using the right parameters for Windows
-  - fix for crypto API calls for md5 context
+  - fix for crypto API calls for MD5 context
   - rewrote some API functions to pass buffers from the application to the library
     so allocation and de-allocation is handled within the same program space
 
@@ -1735,7 +1733,7 @@ Version: 20060929
 
 Version: 20060928
 * did some refactoring of write function
-* ewfacquire: print md5 hash when completed - added
+* ewfacquire: print MD5 hash when completed - added
   removed index build check from libewf_data_md5hash function - this function checks if hash is set ananyway
 
 Version: 20060927

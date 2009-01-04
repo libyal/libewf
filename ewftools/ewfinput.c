@@ -1067,103 +1067,71 @@ int ewfinput_determine_yes_no(
 	return( result );
 }
 
-/* Get variable input from the user
- * with a maximum of 1023 characters
+/* Get a variable string
+ * Returns 1 if successful or -1 on error
  */
-character_t *ewfinput_get_variable(
-              FILE *stream,
-              character_t *request_string )
+int ewfinput_get_variable_string(
+     FILE *stream, 
+     character_t *request_string,
+     character_t *variable_string,
+     size_t variable_string_size )
 {
-	character_t user_input_buffer[ 1024 ];
-
-	character_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
-	character_t *user_input            = NULL;
-	character_t *end_of_input          = NULL;
-	static char *function              = "ewfinput_get_variable";
-	size_t input_length                = 0;
+	character_t *end_of_input  = NULL;
+	character_t *result_string = NULL;
+	static char *function      = "ewfinput_get_variabl_string";
+	size_t input_size          = 0;
 
 	if( stream == NULL )
 	{
 		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
 	if( request_string == NULL )
 	{
 		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
+	/* Safe guard the end of the input string
+	 */
+	variable_string[ variable_string_size ] = 0;
+
 	while( 1 )
 	{
-		fprintf( stream, "%" PRIs ": ", request_string );
+		fprintf(
+		 stream,
+		 "%" PRIs ": ",
+		 request_string );
 
-		user_input_buffer_ptr = string_get_from_stream(
-		                         user_input_buffer_ptr,
-		                         1023,
-		                         stdin );
+		result_string = string_get_from_stream(
+		                 variable_string,
+		                 variable_string_size - 1,
+		                 stdin );
 
-		if( user_input_buffer_ptr != NULL )
+		if( result_string != NULL )
 		{
 			end_of_input = string_search(
-			                user_input_buffer_ptr,
+			                variable_string,
 			                (character_t) '\n',
-			                1023 );
+			                variable_string_size );
 
 			if( end_of_input == NULL )
 			{
-				return( NULL );
+				return( -1 );
 			}
-			input_length = (uint32_t) ( end_of_input - user_input_buffer_ptr );
+			input_size = (size_t) ( end_of_input - variable_string );
 
-			if( input_length <= 0 )
+			if( input_size <= 0 )
 			{
-				return( NULL );
-			}
-#if defined( MEMWATCH )
-			/* One additional character required for end of string
-			 */
-			user_input = memory_allocate(
-			              sizeof( character_t ) * ( input_length + 1 ) );
-
-			if( user_input == NULL )
-			{
-				notify_warning_printf( "%s: unable to create string.\n",
-				 function );
-
-				return( NULL );
-			}
-			if( string_copy(
-			     user_input,
-			     user_input_buffer_ptr,
-			     input_length ) == NULL  )
-			{
-				notify_warning_printf( "%s: unable to copy string.\n",
-				 function );
-
-				memory_free(
-				 user_input );
-
-				return( NULL );
+				return( -1 );
 			}
 			/* Make sure the string is terminated with an end of string character
 			 */
-			user_input[ input_length ] = 0;
-#else
-			user_input = string_duplicate(
-			              user_input_buffer_ptr,
-			              input_length + 1 );
+			variable_string[ input_size ] = 0;
 
-			if( user_input == NULL )
-			{
-				notify_warning_printf( "%s: unable to create string.\n",
-				 function );
-
-				return( NULL );
-			}
-#endif
 			break;
 		}
 		else
@@ -1171,71 +1139,73 @@ character_t *ewfinput_get_variable(
 			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
 		}
 	}
-	return( user_input );
+	return( 1 );
 }
 
-/* Get variable input from the user
- * with a maximum of 1023 characters
+/* Get a variable string
+ * Returns 1 if successful or -1 on error
  */
-system_character_t *ewfinput_get_variable_system_character(
-                     FILE *stream,
-                     character_t *request_string )
+int ewfinput_get_variable_string_system_character(
+     FILE *stream,
+     character_t *request_string,
+     system_character_t *variable_string,
+     size_t variable_string_size )
 {
-	character_t *user_input                         = NULL;
-	system_character_t *user_input_system_character = NULL;
-	static char *function                           = "ewfinput_get_variable_system_character";
-	size_t user_input_length                        = 0;
+	system_character_t *result_string = NULL;
+	static char *function             = "ewfinput_get_variable_string_system_character";
 
-	user_input = ewfinput_get_variable(
-	              stream,
-	              request_string );
-
-	if( sizeof( system_character_t ) == sizeof( character_t ) )
+	if( sizeof( system_character_t ) != sizeof( character_t ) )
 	{
-		return( (system_character_t *) user_input );
-	}
-	if( sizeof( system_character_t ) < sizeof( character_t ) )
-	{
-		user_input_length = string_length(
-		                     user_input );
+		result_string = (character_t *) memory_allocate(
+		                                 sizeof( character_t ) * variable_string_size );
 
-		user_input_system_character = (system_character_t *) memory_allocate(
-		                                                      sizeof( system_character_t ) * ( user_input_length + 1 ) );
-
-		if( user_input_system_character == NULL )
+		if( result_string == NULL )
 		{
 			notify_warning_printf( "%s: unable to create conversion string.\n",
 			 function );
 
-			memory_free(
-			 user_input );
-
-			return( NULL );
+			return( -1 );
 		}
+	}
+	else
+	{
+		result_string = variable_string;
+	}
+	if( ewfinput_get_variable_string(
+	     stream,
+	     request_string,
+	     result_string,
+	     variable_string_size ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to get variable string.\n",
+		 function );
+
+		if( sizeof( system_character_t ) != sizeof( character_t ) )
+		{
+			memory_free(
+			 result_string );
+		}
+		return( -1 );
+	}
+	if( sizeof( system_character_t ) != sizeof( character_t ) )
+	{
 		if( ewfstring_copy_character_string_to_system_string(
-		     user_input_system_character,
-		     user_input,
-		     ( user_input_length + 1 ) ) != 1 )
+		     variable_string,
+		     result_string,
+		     variable_string_size ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set conversion string.\n",
 			 function );
 
 			memory_free(
-			 user_input );
-			memory_free(
-			 user_input_system_character );
+			 result_string );
 
-			return( NULL );
+			return( -1 );
 		}
 		memory_free(
-		 user_input );
-
-		return( user_input_system_character );
+		 result_string );
 	}
-	notify_warning_printf( "%s: character conversion unsupported.\n",
-	 function );
-
-	return( NULL );
+	return( 1 );
 }
 
 /* Get variable containing a size definition input from the user

@@ -112,13 +112,17 @@ int ewfinput_determine_yes_no(
      const character_t *argument,
      uint8_t *yes_no_value );
 
-character_t *ewfinput_get_variable(
-              FILE *stream,
-              character_t *request_string );
+int ewfinput_get_variable_string(
+     FILE *stream,
+     character_t *request_string,
+     character_t *variable_string,
+     size_t variable_string_size );
 
-system_character_t *ewfinput_get_variable_system_character(
-                     FILE *stream,
-                     character_t *request_string );
+int ewfinput_get_variable_string_system_character(
+     FILE *stream,
+     character_t *request_string,
+     system_character_t *variable_string,
+     size_t variable_string_size );
 
 uint64_t ewfinput_get_size_variable(
           FILE *stream,
