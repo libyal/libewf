@@ -1589,6 +1589,17 @@ ssize_t libewf_raw_write_chunk_existing(
 
 					return( -1 );
 				}
+				if( libewf_section_list_values_free(
+				     last_list_element->value ) != 1 )
+				{
+					notify_warning_printf( "%s: unable to free last section values.\n",
+					 function );
+
+					memory_free(
+					 last_list_element );
+
+					return( -1 );
+				}
 				memory_free(
 				 last_list_element );
 

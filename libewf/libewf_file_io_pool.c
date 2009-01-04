@@ -305,13 +305,6 @@ int libewf_file_io_pool_create_file_io_handle(
 
 		return( -1 );
 	}
-	if( file_io_pool->file_io_handle == NULL )
-	{
-		notify_warning_printf( "%s: invalid file io pool - missing file io handles.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( file_io_handle == NULL )
 	{
 		notify_warning_printf( "%s: invalid file io handle.\n",

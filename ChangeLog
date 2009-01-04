@@ -200,6 +200,7 @@ Version: 20080907
 * ewfacquirestream: fixed issue not being able to terminate by CTRL+C due to
   block by reading from stding - stdin is now forced to close in the signal handler
 * file io pool now allows to be initialize with 0 file io handles
+* fixed memory leak due to section list rewrite
 
 Version: 20080906
 * refactored section list to use list type
