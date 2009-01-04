@@ -273,8 +273,8 @@ int libewf_segment_file_create_extension( uint16_t segment_number, int16_t maxim
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type.\n",
-		 function );
+		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type: %c.\n",
+		 function, (char) segment_file_type );
 
 		return( -1 );
 	}
@@ -454,18 +454,20 @@ char *libewf_segment_file_create_filename( uint16_t segment_number, int16_t maxi
 	return( filename );
 }
 
-/* Creates a new segment file entry within the specified segment table
- * Returns 1 on success, -1 on error
+/* Creates a new segment file and opens it for writing
+ * The necessary sections at the start of the segment file are written
+ * Returns 1 if successful, or -1 on error
  */
-int libewf_segment_file_create_file_entry( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
+int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	wchar_t *filename      = NULL;
 #else
 	char *filename         = NULL;
 #endif
-	static char *function  = "libewf_write_create_segment_file_entry";
+	static char *function  = "libewf_segment_file_create";
 	size_t filename_length = 0;
+	int file_descriptor    = -1;
 
 	if( segment_table == NULL )
 	{
@@ -481,16 +483,23 @@ int libewf_segment_file_create_file_entry( LIBEWF_SEGMENT_TABLE *segment_table, 
 
 		return( -1 );
 	}
-	if( segment_table->file_descriptor == NULL )
+	if( segment_table->file_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file offsets.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( segment_number == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment 0.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_number > segment_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment number value out of range.\n",
 		 function );
 
 		return( -1 );
@@ -498,13 +507,11 @@ int libewf_segment_file_create_file_entry( LIBEWF_SEGMENT_TABLE *segment_table, 
 
 	/* Check if one additional entry in the segment table is needed
 	 */
-	if( segment_number >= segment_table->amount )
+	if( segment_number == segment_table->amount )
 	{
 		/* Add one additional entry because the 0 entry is used for the basename
 		 */
-		if( libewf_segment_table_realloc(
-		     segment_table,
-		     ( segment_number + 1 ) ) != 1 )
+		if( libewf_segment_table_realloc( segment_table, ( segment_number + 1 ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate segment table.\n",
 			 function );
@@ -557,11 +564,10 @@ int libewf_segment_file_create_file_entry( LIBEWF_SEGMENT_TABLE *segment_table, 
 		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
 		 function );
 
+		libewf_common_free( filename );
+
 		return( -1 );
 	}
-	segment_table->filename[ segment_number ]        = filename;
-	segment_table->file_descriptor[ segment_number ] = -1;
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 	LIBEWF_VERBOSE_PRINT( "%s: segment file created: %" PRIu32 " with name: %ls.\n",
 	 function, segment_number, filename );
@@ -569,6 +575,28 @@ int libewf_segment_file_create_file_entry( LIBEWF_SEGMENT_TABLE *segment_table, 
 	LIBEWF_VERBOSE_PRINT( "%s: segment file created: %" PRIu32 " with name: %s.\n",
 	 function, segment_number, filename );
 #endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+	file_descriptor = libewf_common_wide_open( filename, LIBEWF_OPEN_WRITE );
+#else
+	file_descriptor = libewf_common_open( filename, LIBEWF_OPEN_WRITE );
+#endif
+
+	if( file_descriptor == -1 )
+	{
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+		 function, filename );
+#else
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
+		 function, filename );
+#endif
+		libewf_common_free( filename );
+
+		return( -1 );
+	}
+	segment_table->filename[ segment_number ]        = filename;
+	segment_table->file_descriptor[ segment_number ] = file_descriptor;
 
 	return( 1 );
 }
@@ -2260,125 +2288,6 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		total_write_count                                             += write_count;
 	}
 	return( total_write_count );
-}
-
-/* Creates and opens a new segment file and writes the necessary sections at the start of the segment file
- * Returns the amount of bytes written, or -1 on error
- */
-ssize_t libewf_segment_file_write_open_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int16_t maximum_amount_of_segments )
-{
-	static char *function = "libewf_segment_file_write_open_new";
-	ssize_t write_count   = 0;
-	int file_descriptor   = -1;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number: 0.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number > internal_handle->segment_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-
-	/* Create a new segment file
-	 */
-	if( libewf_segment_file_create_file_entry(
-	     internal_handle->segment_table,
-	     segment_number,
-	     maximum_amount_of_segments,
-	     LIBEWF_SEGMENT_FILE_TYPE_EWF,
-	     internal_handle->ewf_format,
-	     internal_handle->format ) == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create entry for segment file: %" PRIu32 ".\n",
-		 function, segment_number );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->filename[ segment_number ] == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename for segment file: %" PRIu32 ".\n",
-		 function, segment_number );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	file_descriptor = libewf_common_wide_open(
-	                   internal_handle->segment_table->filename[ segment_number ],
-	                   LIBEWF_OPEN_WRITE );
-#else
-	file_descriptor = libewf_common_open(
-	                   internal_handle->segment_table->filename[ segment_number ],
-	                   LIBEWF_OPEN_WRITE );
-#endif
-
-	if( file_descriptor == -1 )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-		 function, internal_handle->segment_table->filename[ segment_number ] );
-#else
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-		 function, internal_handle->segment_table->filename[ segment_number ] );
-#endif
-
-		return( -1 );
-	}
-	internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
-
-	/* Write the start of the segment file
-	 * like the file header, the header, volume and/or data section, etc.
-	 */
-	write_count = libewf_segment_file_write_start(
-	               internal_handle,
-	               segment_number,
-	               file_descriptor,
-	               internal_handle->segment_table->section_list[ segment_number ] );
-
-	if( write_count == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write segment file start.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-
-	return( write_count );
 }
 
 /* Closes the segment file, necessary sections at the end of the segment file will be written

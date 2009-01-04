@@ -63,7 +63,7 @@ wchar_t *libewf_segment_file_create_wide_filename( uint16_t segment_number, int1
 char *libewf_segment_file_create_filename( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, char *basename );
 #endif
 
-int libewf_segment_file_create_file_entry( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format );
+int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format );
 
 int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *internal_handle );
@@ -85,7 +85,6 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, off_t chunks_section_offset, size_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks );
 
-ssize_t libewf_segment_file_write_open_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, int16_t maximum_amount_of_segments );
 ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )

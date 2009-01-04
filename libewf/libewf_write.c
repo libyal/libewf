@@ -1049,18 +1049,39 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		LIBEWF_VERBOSE_PRINT( "%s: creating segment file with segment number: %" PRIu16 ".\n",
 		 function, segment_number );
 
-		write_count = libewf_segment_file_write_open_new(
-		               internal_handle,
-		               segment_number,
-		               internal_handle->write->maximum_amount_of_segments );
-
-		if( write_count == -1 )
+		if( libewf_segment_file_create(
+		     internal_handle->segment_table,
+		     segment_number,
+		     internal_handle->write->maximum_amount_of_segments,
+		     LIBEWF_SEGMENT_FILE_TYPE_EWF,
+		     internal_handle->ewf_format,
+		     internal_handle->format ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to create segment file for segment: %" PRIu16 ".\n",
 			 function, segment_number );
 
 			return( -1 );
 		}
+		file_descriptor = internal_handle->segment_table->file_descriptor[ segment_number ];
+
+		/* Write the start of the segment file
+		 * like the file header, the header, volume and/or data section, etc.
+		 */
+		write_count = libewf_segment_file_write_start(
+		               internal_handle,
+		               segment_number,
+		               file_descriptor,
+		               internal_handle->segment_table->section_list[ segment_number ] );
+
+		if( write_count == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write segment file start.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->segment_table->file_offset[ segment_number ] += write_count;
+
 		internal_handle->write->write_count += write_count;
 
 		internal_handle->write->chunks_per_segment = libewf_write_calculate_chunks_per_segment(
@@ -1076,8 +1097,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 		}
 		LIBEWF_VERBOSE_PRINT( "%s: calculated amount of chunks for segment: %" PRIu32 ".\n",
 		 function, internal_handle->write->chunks_per_segment );
-
-		file_descriptor = internal_handle->segment_table->file_descriptor[ segment_number ];
 	}
 	/* Check if another chunk section should be created
 	 */

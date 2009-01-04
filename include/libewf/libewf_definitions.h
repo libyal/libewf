@@ -128,9 +128,9 @@
 
 /* Libewf segment file type definitions
  */
-#define LIBEWF_SEGMENT_FILE_TYPE_DWF		(uint8_t) "d"
-#define LIBEWF_SEGMENT_FILE_TYPE_EWF		(uint8_t) "E"
-#define LIBEWF_SEGMENT_FILE_TYPE_LWF		(uint8_t) "L"
+#define LIBEWF_SEGMENT_FILE_TYPE_DWF		(uint8_t) 'd'
+#define LIBEWF_SEGMENT_FILE_TYPE_EWF		(uint8_t) 'E'
+#define LIBEWF_SEGMENT_FILE_TYPE_LWF		(uint8_t) 'L'
 
 /* The length of hash strings
  */
