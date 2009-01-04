@@ -366,7 +366,7 @@ int ewfinput_determine_sectors_per_chunk(
 		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	if( sectors_per_chunk == NULL )
 	{
@@ -473,7 +473,7 @@ int ewfinput_determine_sectors_per_chunk_system_character(
 		notify_warning_printf( "%s: invalid argument string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	if( sectors_per_chunk == NULL )
 	{
@@ -1095,6 +1095,20 @@ int ewfinput_get_string_variable(
 
 		return( -1 );
 	}
+	if( string_variable == NULL )
+	{
+		notify_warning_printf( "%s: invalid string variable.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_variable_size > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid string variable size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
 	/* Safe guard the end of the input string
 	 */
 	string_variable[ string_variable_size ] = 0;
@@ -1397,14 +1411,28 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: invalid output stream.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
+	}
+	if( input_buffer == NULL )
+	{
+		notify_warning_printf( "%s: invalid input buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( input_buffer_size > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
 	}
 	if( request_string == NULL )
 	{
 		notify_warning_printf( "%s: invalid request string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	if( byte_size_variable == NULL )
 	{
@@ -1422,7 +1450,7 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: unable to create minimum byte size string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	if( ewfbyte_size_string_create(
 	     default_size_string,
@@ -1433,7 +1461,7 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: unable to create default byte size string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	if( ewfbyte_size_string_create(
 	     maximum_size_string,
@@ -1444,7 +1472,7 @@ int ewfinput_get_byte_size_variable(
 		notify_warning_printf( "%s: unable to create maximum byte size string.\n",
 		 function );
 
-		return( 0 );
+		return( -1 );
 	}
 	/* Safe guard the end of the input buffer
 	 */
@@ -1516,6 +1544,169 @@ int ewfinput_get_byte_size_variable(
 			{
 				fprintf( stream, "Value not within specified range, please try again or terminate using Ctrl^C.\n" );
 			}
+		}
+		else
+		{
+			fprintf( stream, "Error reading input, please try again or terminate using Ctrl^C.\n" );
+		}
+	}
+	return( 1 );
+}
+
+/* Get a fixed value string variable
+ * Returns 1 if successful, 0 if no input was provided or -1 on error
+ */
+int ewfinput_get_fixed_string_variable(
+     FILE *stream,
+     character_t *input_buffer,
+     size_t input_buffer_size,
+     character_t *request_string,
+     character_t **values,
+     uint8_t amount_of_values,
+     uint8_t default_value,
+     character_t **fixed_string_variable )
+{
+
+	character_t *end_of_input  = NULL;
+	character_t *result_string = NULL;
+	static char *function      = "ewfinput_get_fixed_value";
+	size_t value_length        = 0;
+	ssize_t input_size         = 0;
+	uint8_t value_iterator     = 0;
+
+	if( stream == NULL )
+	{
+		notify_warning_printf( "%s: invalid output stream.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( input_buffer == NULL )
+	{
+		notify_warning_printf( "%s: invalid input buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( input_buffer_size > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid input buffer size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( request_string == NULL )
+	{
+		notify_warning_printf( "%s: invalid request string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( default_value >= amount_of_values )
+	{
+		notify_warning_printf( "%s: default value exceeds amount.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( fixed_string_variable == NULL )
+	{
+		notify_warning_printf( "%s: invalid fixed string variable.\n",
+		 function );
+
+		return( -1 );
+	}
+	while( 1 )
+	{
+		fprintf(
+		 stream,
+		 "%" PRIs " (",
+		 request_string );
+
+		for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
+		{
+			if( value_iterator > 0 )
+			{
+				fprintf( stream, ", " );
+			}
+			fprintf(
+			 stream,
+			 "%" PRIs "",
+			 values[ value_iterator ] );
+		}
+		fprintf(
+		 stream,
+		 ") [%" PRIs "]: ",
+		 values[ default_value ] );
+
+		result_string = string_get_from_stream(
+		                 input_buffer,
+		                 input_buffer_size - 1,
+		                 stdin );
+
+		if( result_string != NULL )
+		{
+			end_of_input = string_search(
+			                input_buffer,
+			                (character_t) '\n',
+			                input_buffer_size );
+
+			/* Input was larger than size of buffer
+			 */
+			if( end_of_input == NULL )
+			{
+				/* Flush the stdin stream
+				 */
+				while( end_of_input == NULL )
+				{
+					result_string = string_get_from_stream(
+					                 input_buffer,
+					                 input_buffer_size - 1,
+					                 stdin );
+
+					end_of_input = string_search(
+					                input_buffer,
+					                (character_t) '\n',
+					                input_buffer_size );
+
+				}
+				return( -1 );
+			}
+			input_size = (ssize_t) ( end_of_input - input_buffer );
+
+			if( input_size < 0 )
+			{
+				return( -1 );
+			}
+			else if( input_size == 0 )
+			{
+				*fixed_string_variable = values[ default_value ];
+
+				return( 0 );
+			}
+			for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
+			{
+				value_length = string_length(
+						values[ value_iterator ] );
+
+				if( string_compare(
+				     input_buffer,
+				     values[ value_iterator ],
+				     value_length ) == 0 )
+				{
+					/* Make sure no trailing characters were given
+					 */
+					if( input_buffer[ value_length ] == (character_t) '\n' )
+					{
+fprintf( stderr, "X: %d =? %d\n", input_size, value_length );
+
+						*fixed_string_variable = values[ value_iterator ];
+
+						break;
+					}
+				}
+			}
+			fprintf( stream, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
 		}
 		else
 		{

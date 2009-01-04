@@ -35,14 +35,10 @@ To do/think about:
 * ewfacquire: add native Windows support for accessing devices
 * ewfacquire: read from pipe
   - what about input size?
-* ewfacquire: non interactive mode - read settings from file?
-  - no, but perhaps commandline parameters?
-* ewfacquire: allow for variable read buffer size, this should allow performance testing
+* ewfacquire: non interactive mode
+  - read settings from file? no, but perhaps commandline parameters?
 * ewfacquire: allow for multiple raw files as input
   - make a generic media access solution also useable for revit?
-* ewfexport: calculate the MD5 hash of exported data and validate this with the stored hash?
-* ewfexport: log hashes to file -l option
-* ewfverify: verify against all available hashes that can be verified, print others
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
 * windows port: improve globbing support ?
@@ -86,7 +82,7 @@ Possible performance improvements:
 * remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
   - currently used for verbose output
 * reduce amount of write by aligining chunk data and CRC
-  (requires rewrite of some functions, CRC should be passed as buffer)
+  - requires rewrite of some functions, CRC should be passed as buffer
 
 Code clean up
 * remove internal_handle passing from most functions
@@ -124,11 +120,19 @@ Known issues:
 
 Next release(s):
 
+* rewrite ewfinput determine functions to pass value as argument
+  and have return value be 1, 0 or -1
+* handle overflow in input buffer by flushing stdin before requesting user
+  input (+/-)
+
+* ewfacquire, ewfacquirestream, ewfexport, ewfverify: allow for variable read buffer size, this should allow performance testing
+* ewfexport: calculate the MD5 hash of exported data and validate this with the stored hash?
+* ewfexport: log hashes to file -l option
+* ewfverify: verify against all available hashes that can be verified, print others
+
 * have segment file number in libewf_raw_read_chunk for warning output?
 
 * remove file io pool from lower levels and pass file io handle ?
-
-* ewfinfo check wchar in/output
 
 * create floppy-table-errors.E01 for testing purpose
   - error in primary offset table
@@ -142,14 +146,11 @@ Next release(s):
   - handle codepage in ewftools use -p option
   - add '-p list' option? to list codepages
   - what about LC_TYPE setting in ewftools
+* ewftools check char/wchar in/output
 
-* rewrite ewfinput determine functions to pass value as argument
-  and have return value be 1 or -1
-* handle overflow in input buffer by flushing stdin before requesting user
-  input (+/-)
-
-* rename length into size, make sure string size contains end of string
-  character
+* rename length into size, make sure string size contains end of string character
+  - length is used when the value does not contain the EOS
+  - size is used when the value contains the EOS or otherwise
 
 * implement low memory usage option
   - trade off IO versus memory use
@@ -190,6 +191,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080907
+* worked on refactoring functions in ewfinput, too large input is now flushed
+
 Version: 20080906
 * refactored section list to use list type
 * refactored libewf_values_table
@@ -206,7 +210,7 @@ Version: 20080905
 * improved way to determine if a segment file has been closed after write
 
 Version: 20080904
-* worked on refactoring function in ewfinput
+* worked on refactoring functions in ewfinput
 * combined empty block compression and other compressions in ewftools
 * change empty_block to empty-block the former remains to work
 * fixed error in UTF-8 handling (libuca)
