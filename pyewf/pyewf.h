@@ -33,10 +33,10 @@
 extern "C" {
 #endif
 
-static PyObject* pyewf_open(
-                  PyObject *self,
-                  PyObject *arguments,
-                  PyObject *keywords );
+PyObject* pyewf_open(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
 
 PyMODINIT_FUNC initpyewf(
                 void );

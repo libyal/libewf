@@ -501,41 +501,48 @@ off64_t libewf_seek_offset(
 
 		return( -1 );
 	}
-	/* Determine the chunk that is requested
-	 */
-	chunk = offset / internal_handle->media_values->chunk_size;
-
-	if( chunk >= (uint64_t) INT32_MAX )
+	if( offset < (off64_t) internal_handle->media_values->media_size )
 	{
-		notify_warning_printf( "%s: invalid chunk value exceeds maximum.\n",
-		 function );
+		/* Determine the chunk that is requested
+		 */
+		chunk = offset / internal_handle->media_values->chunk_size;
 
-		return( -1 );
+		if( chunk >= (uint64_t) INT32_MAX )
+		{
+			notify_warning_printf( "%s: invalid chunk value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_offset_table_seek_chunk_offset(
+		     internal_handle->offset_table,
+		     (uint32_t) chunk ) == -1 )
+		{
+			notify_warning_printf( "%s: unable to seek chunk offset.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->current_chunk = (uint32_t) chunk;
+
+		/* Determine the offset within the decompressed chunk that is requested
+		 */
+		chunk_offset = offset % internal_handle->media_values->chunk_size;
+
+		if( chunk_offset >= (uint64_t) INT32_MAX )
+		{
+			notify_warning_printf( "%s: invalid chunk offset value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->current_chunk_offset = (uint32_t) chunk_offset;
 	}
-	if( libewf_offset_table_seek_chunk_offset(
-	     internal_handle->offset_table,
-	     (uint32_t) chunk ) == -1 )
+	else
 	{
-		notify_warning_printf( "%s: unable to seek chunk offset.\n",
-		 function );
-
-		return( -1 );
+		internal_handle->current_chunk        = internal_handle->offset_table->amount;
+		internal_handle->current_chunk_offset = 0;
 	}
-	internal_handle->current_chunk = (uint32_t) chunk;
-
-	/* Determine the offset within the decompressed chunk that is requested
-	 */
-	chunk_offset = offset % internal_handle->media_values->chunk_size;
-
-	if( chunk_offset >= (uint64_t) INT32_MAX )
-	{
-		notify_warning_printf( "%s: invalid chunk offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->current_chunk_offset = (uint32_t) chunk_offset;
-
 	return( offset );
 }
 

@@ -34,7 +34,7 @@
 #include "pyewf.h"
 #include "pyewf_file.h"
 
-static PyMethodDef pyewf_object_methods[] = {
+PyMethodDef pyewf_object_methods[] = {
 	{ "close",
 	  (PyCFunction) pyewf_file_close,
 	  METH_NOARGS,
@@ -60,7 +60,7 @@ static PyMethodDef pyewf_object_methods[] = {
 	  METH_VARARGS | METH_KEYWORDS,
 	  "Retrieve a header value by its name" },
 
-	{ "get_headers",
+	{ "get_header_values",
 	  (PyCFunction) pyewf_file_get_header_values,
 	  METH_NOARGS,
 	  "Retrieve all header values" },
@@ -69,7 +69,7 @@ static PyMethodDef pyewf_object_methods[] = {
 	{ NULL }
 };
 
-static PyTypeObject pyewf_type_object = {
+PyTypeObject pyewf_type_object = {
 	PyObject_HEAD_INIT( NULL )
 
 	/* ob_size */
@@ -147,13 +147,13 @@ static PyTypeObject pyewf_type_object = {
 	/* tp_alloc */
 	0,
 	/* tp_new */
-	0,
+	0
 };
 
-static PyObject* pyewf_open(
-                  PyObject *self,
-                  PyObject *arguments,
-                  PyObject *keywords )
+PyObject* pyewf_open(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords )
 {
 	PyObject *files             = NULL;
 	PyObject *file_arguments    = NULL;
@@ -167,7 +167,7 @@ static PyObject* pyewf_open(
 	     keywords,
 	     "O",
 	     keyword_list,
-	     &files ) != 0 )
+	     &files ) == 0 )
 	{
 		return( NULL );
 	}
@@ -214,7 +214,7 @@ static PyObject* pyewf_open(
 
 /* These are the module methods
  */
-static PyMethodDef pyewf_module_methods[] = {
+PyMethodDef pyewf_module_methods[] = {
 	{ "open",
 	  (PyCFunction)pyewf_open,
 	  METH_VARARGS|METH_KEYWORDS,
@@ -237,7 +237,7 @@ PyMODINIT_FUNC initpyewf(
                 void ) 
 {
 	PyObject* module          = NULL;
-	PyTypeObject* type_object = NULL;
+	PyTypeObject *type_object = NULL;
 
 	/* Create module
 	 */
@@ -264,5 +264,9 @@ PyMODINIT_FUNC initpyewf(
 	 module,
 	"pyewf_file",
 	(PyObject *) type_object );
+
+	libewf_set_notify_values(
+	 stderr,
+	 1 );
 }
 

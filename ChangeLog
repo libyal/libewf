@@ -158,6 +158,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080810
+* fixes to the python bindings based on patch by David Collett
+
 Version: 20080809
 * Synchronised branches
 * Fixed seek end of file based on patch by David Collett
