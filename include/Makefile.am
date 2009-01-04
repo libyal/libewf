@@ -1,13 +1,13 @@
 include_HEADERS = \
-        libewf.h
+	libewf.h
 
 pkginclude_HEADERS = \
-        libewf/definitions.h \
-        libewf/error.h \
-        libewf/extern.h \
-        libewf/features.h \
-        libewf/handle.h \
-        libewf/types.h
+	libewf/definitions.h \
+	libewf/error.h \
+	libewf/extern.h \
+	libewf/features.h \
+	libewf/handle.h \
+	libewf/types.h
 
 EXTRA_DIST = \
 	libewf.h.in \

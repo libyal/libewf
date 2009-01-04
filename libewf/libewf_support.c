@@ -48,7 +48,7 @@ int libewf_signal_abort(
      libewf_handle_t *handle )
 {
 	liberror_error_t *error = NULL;
-	static char *function = "libewf_signal_abort";
+	static char *function   = "libewf_signal_abort";
 
 	if( handle == NULL )
 	{

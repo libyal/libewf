@@ -24,7 +24,9 @@
 #define _LIBEWF_LIST_TYPE_H
 
 #include <common.h>
-#include <memory.h>
+#include <types.h>
+
+#include <liberror.h>
 
 #if defined( __cplusplus )
 extern "C" {
