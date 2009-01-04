@@ -99,13 +99,8 @@ ssize_t libewf_section_start_read( int file_descriptor, EWF_SECTION *section, ui
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( section->padding, 40 ); );
 #endif
 
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
 
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, section->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -200,13 +195,8 @@ ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type,
 
 		return( -1 );
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) &section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( &section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
 
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, section.crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
@@ -533,15 +523,8 @@ ssize_t libewf_section_volume_s01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown3, 45 ); );
 #endif
 
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) volume, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( volume );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -767,15 +750,8 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 		volume->signature[ 3 ] = (uint8_t) 'R';
 		volume->signature[ 4 ] = (uint8_t) 'T';
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) volume, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( volume );
-
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
@@ -896,15 +872,8 @@ ssize_t libewf_section_volume_e01_read( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->signature, 5 ); );
 #endif
 
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( volume );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -1177,15 +1146,8 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 			return( -1 );
 		}
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( volume );
-
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, volume->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
@@ -1365,19 +1327,8 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 
 	/* The table size contains the size of the CRC (4 bytes)
 	 */
-	if( ewf_crc_calculate(
-	     &calculated_crc,
-	     (uint8_t *) table,
-	     ( EWF_TABLE_SIZE - EWF_CRC_SIZE ),
-	     1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( table );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, table->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -1468,15 +1419,8 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 		{
 			/* Check if the offset table CRC matches
 			 */
-			if( ewf_crc_calculate( &calculated_crc, (uint8_t *) offsets, offsets_size, 1 ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-				 function );
+			calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
 
-				libewf_common_free( offsets );
-
-				return( -1 );
-			}
 			read_count = libewf_common_read(
 			              file_descriptor,
 			              stored_crc_buffer,
@@ -1726,15 +1670,8 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( table );
-
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, table->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
@@ -1829,16 +1766,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( write_crc == 1 )
 	{
-		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) offsets, offsets_size, 1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-			 function );
-
-			libewf_common_free( table );
-			libewf_common_free( offsets );
-
-			return( -1 );
-		}
+		calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
 	}
 	section_write_count = libewf_section_start_write(
 	                       file_descriptor,
@@ -2163,19 +2091,8 @@ ssize_t libewf_section_session_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( session->unknown, 68 ); );
 #endif
 
-	if( ewf_crc_calculate(
-	     &calculated_crc,
-	     (uint8_t *) session,
-	     ( EWF_SESSION_SIZE - EWF_CRC_SIZE ),
-	     1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( session, ( EWF_SESSION_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( session );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, session->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -2286,15 +2203,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown7, 963 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->signature, 5 ); );
 #endif
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( data );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, data->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -2596,16 +2506,8 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 				return( -1 );
 			}
 		}
-		if( ewf_crc_calculate(
-		     &calculated_crc,
-		     (uint8_t *) internal_handle->write->data_section,
-		     ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-			 function );
+		calculated_crc = ewf_crc_calculate( internal_handle->write->data_section, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
 
-			return( -1 );
-		}
 		if( libewf_endian_revert_32bit(
 		     calculated_crc,
 		     internal_handle->write->data_section->crc ) != 1 )
@@ -2714,15 +2616,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) error2_sectors, sectors_size ); );
 #endif
 
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( error2 );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, error2->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -2785,15 +2680,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 			return( -1 );
 		}
-		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2_sectors, sectors_size, 1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-			 function );
+		calculated_crc = ewf_crc_calculate( error2_sectors, sectors_size, 1 );
 
-			libewf_common_free( error2_sectors );
-
-			return( -1 );
-		}
 		read_count = libewf_common_read(
 		              file_descriptor,
 		              stored_crc_buffer,
@@ -2948,15 +2836,8 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 		return( -1 );
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( error2 );
-
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, error2->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
@@ -3004,16 +2885,8 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 			return( -1 );
 		}
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2_sectors, sectors_size, 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( error2_sectors, sectors_size, 1 );
 
-		libewf_common_free( error2 );
-		libewf_common_free( error2_sectors );
-
-		return( -1 );
-	}
 	section_write_count = libewf_section_start_write(
 	                       file_descriptor,
 	                       (EWF_CHAR *) "error2",
@@ -3140,18 +3013,8 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( hash->unknown1, 16 ); );
 #endif
 
-	if( ewf_crc_calculate(
-	     &calculated_crc,
-	     (uint8_t *) hash,
-	     ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( hash );
-
-		return( -1 );
-	}
 	if( libewf_endian_convert_32bit( &stored_crc, hash->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
@@ -3245,15 +3108,8 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
 
-		libewf_common_free( hash );
-
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, hash->crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
@@ -3374,13 +3230,8 @@ ssize_t libewf_section_last_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) &section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	calculated_crc = ewf_crc_calculate( &section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
 
-		return( -1 );
-	}
 	if( libewf_endian_revert_32bit( calculated_crc, section.crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",

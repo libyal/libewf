@@ -803,13 +803,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	else
 	{
-		if( ewf_crc_calculate( chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
-		{
-			LIBEWF_VERBOSE_PRINT( "%s: unable to calculate CRC.\n",
-			 function );
-
-			return( -1 );
-		}
+		*chunk_crc      = ewf_crc_calculate( chunk_data, chunk_data_size, 1 );
 		data_write_size = chunk_data_size;
 		*is_compressed  = 0;
 
@@ -1551,13 +1545,8 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	/* Calculate the new CRC
 	 */
-	if( ewf_crc_calculate( &chunk_crc, (uint8_t *) chunk_data, chunk_data_size, 1 ) != 1 )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: unable to calculate CRC.\n",
-		 function );
+	chunk_crc = ewf_crc_calculate( chunk_data, chunk_data_size, 1 );
 
-		return( -1 );
-	}
 	/* Check if the chunk does not already exists in a delta segment file
 	 */
 	if( internal_handle->offset_table->dirty[ chunk ] == 0 )

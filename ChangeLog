@@ -142,6 +142,7 @@ TODO
 * what about the crc errors in read_raw?
 
 * remove files from MSVC++ project
+  ewf_crc.c
   ewf_data.c
   ewf_hash.c
   ewf_section.c

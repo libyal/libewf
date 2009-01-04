@@ -6,7 +6,7 @@ libewf_la_SOURCES = \
 	ewf_char.h \
 	ewf_chunk.h \
 	ewf_compress.c ewf_compress.h \
-	ewf_crc.c ewf_crc.h \
+	ewf_crc.h \
 	ewf_data.h \
 	ewf_definitions.h \
 	ewf_digest_hash.h \

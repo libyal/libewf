@@ -78,15 +78,8 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	}
 	if( is_compressed == 0 )
 	{
-		buffer_size = chunk_data_size;
-
-		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) chunk_data, buffer_size, 1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
-			 function );
-
-			return( -1 );
-		}
+		buffer_size    = chunk_data_size;
+		calculated_crc = ewf_crc_calculate( chunk_data, buffer_size, 1 );
 	}
 	else
 	{
