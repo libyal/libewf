@@ -33,8 +33,6 @@
 
 #include "libewf_includes.h"
 
-#include <errno.h>
-
 #include <libewf/libewf_definitions.h>
 
 #include "libewf_common.h"
@@ -122,7 +120,7 @@ libewf_char_t *libewf_string_duplicate( libewf_char_t *string, size_t size )
 
 #endif
 
-/* Returns the value represented by a string, returns 0 and sets errno on error
+/* Returns the value represented by a string, returns 0 error
  */
 int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
 {
@@ -135,8 +133,6 @@ int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
 		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
 		 function );
 
-		errno = EINVAL;
-
 		return( 0 );
 	}
 	if( size == 0 )
@@ -144,16 +140,12 @@ int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
 		LIBEWF_WARNING_PRINT( "%s: string is emtpy.\n",
 		 function );
 
-		errno = EINVAL;
-
 		return( 0 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
-
-		errno = EINVAL;
 
 		return( 0 );
 	}
@@ -203,7 +195,7 @@ int64_t libewf_string_to_int64( const libewf_char_t *string, size_t size )
 
 #endif
 
-/* Returns the value represented by a string, returns 0 and sets errno on error
+/* Returns the value represented by a string, returns 0 on error
  */
 uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size )
 {
@@ -216,8 +208,6 @@ uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size )
 		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
 		 function );
 
-		errno = EINVAL;
-
 		return( 0 );
 	}
 	if( size == 0 )
@@ -225,16 +215,12 @@ uint64_t libewf_string_to_uint64( const libewf_char_t *string, size_t size )
 		LIBEWF_WARNING_PRINT( "%s: string is emtpy.\n",
 		 function );
 
-		errno = EINVAL;
-
 		return( 0 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
-
-		errno = EINVAL;
 
 		return( 0 );
 	}

@@ -141,6 +141,9 @@ Next release:
 * change ewf_char/string into byte_char/string
 * create common functions i.e. for libewf_char/string
 
+TODO
+* create libewf_create_handle and libewf_destroy_handle functions?
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -154,6 +157,10 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20080112
+* removed errno from library
+* fixed error regarding hours in ewfoutput_timestamp_fprint
 
 Version: 20080107
 * added more verbose output for raw write

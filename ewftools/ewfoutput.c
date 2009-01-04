@@ -90,7 +90,8 @@
 
 /* Returns a structured representation of a time using UTC (GMT), or NULL on error
  */
-struct tm *ewfoutput_gmtime( const time_t *timestamp )
+struct tm *ewfoutput_gmtime(
+            const time_t *timestamp )
 {
 #if !defined( ewfoutput_gmtime_r ) && defined( HAVE_GMTIME )
 	struct tm *static_time_elements = NULL;
@@ -158,7 +159,8 @@ struct tm *ewfoutput_gmtime( const time_t *timestamp )
 /* Determines the units strings of a certain factor value
  * http://nl.wikipedia.org/wiki/Mebibyte
  */
-libewf_char_t *ewfoutput_determine_units_string( int factor )
+libewf_char_t *ewfoutput_determine_units_string(
+                int factor )
 {
 	switch( factor )
 	{
@@ -189,7 +191,8 @@ libewf_char_t *ewfoutput_determine_units_string( int factor )
 /* Determines the human readable size as a string
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *ewfoutput_determine_human_readable_size_string( uint64_t size )
+libewf_char_t *ewfoutput_determine_human_readable_size_string(
+                uint64_t size )
 {
 	libewf_char_t *size_string  = NULL;
 	libewf_char_t *units_string = NULL;
@@ -267,7 +270,9 @@ libewf_char_t *ewfoutput_determine_human_readable_size_string( uint64_t size )
 
 /* Print the version information to a stream
  */
-void ewfoutput_version_fprint( FILE *stream, libewf_char_t *program )
+void ewfoutput_version_fprint(
+      FILE *stream,
+      libewf_char_t *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -301,7 +306,8 @@ void ewfoutput_version_fprint( FILE *stream, libewf_char_t *program )
 
 /* Prints the executable version information
  */
-void ewfoutput_copyright_fprint( FILE *stream )
+void ewfoutput_copyright_fprint(
+      FILE *stream )
 {
 	static char *function = "ewfoutput_copyright_fprint";
 
@@ -319,7 +325,26 @@ void ewfoutput_copyright_fprint( FILE *stream )
 
 /* Prints an overview of the aquiry parameters
  */
-void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, libewf_char_t *case_number, libewf_char_t *description, libewf_char_t *evidence_number, libewf_char_t *examiner_name, libewf_char_t *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
+void ewfoutput_acquiry_parameters_fprint(
+      FILE *stream,
+      CHAR_T *filename,
+      libewf_char_t *case_number,
+      libewf_char_t *description,
+      libewf_char_t *evidence_number,
+      libewf_char_t *examiner_name,
+      libewf_char_t *notes,
+      uint8_t media_type,
+      uint8_t volume_type,
+      int8_t compression_level,
+      uint8_t compress_empty_block,
+      uint8_t libewf_format,
+      off64_t acquiry_offset,
+      size64_t acquiry_size,
+      size64_t segment_file_size,
+      uint32_t sectors_per_chunk,
+      uint32_t sector_error_granularity,
+      uint8_t read_error_retry,
+      uint8_t wipe_block_on_read_error )
 {
 	static char *function = "ewfoutput_acquiry_parameters_fprint";
 
@@ -508,7 +533,9 @@ void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, libewf
 
 /* Print the acquiry read errors (error2) to a stream
  */
-void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
+void ewfoutput_acquiry_errors_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle )
 {
 	static char *function      = "ewfoutput_acquiry_errors_fprint";
 	off64_t sector             = 0;
@@ -561,7 +588,9 @@ void ewfoutput_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 /* Print the read (CRC) errors to a stream
  */
-void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
+void ewfoutput_crc_errors_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle )
 {
 	static char *function      = "ewfoutput_crc_errors_fprint";
 	off64_t sector             = 0;
@@ -614,7 +643,9 @@ void ewfoutput_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 /* Print the header values to a stream
  */
-void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
+void ewfoutput_header_values_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle )
 {
 	libewf_char_t header_identifier[ 64 ];
 	libewf_char_t header_value[ 128 ];
@@ -756,7 +787,9 @@ void ewfoutput_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 /* Print the hash values to a stream
  */
-void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
+void ewfoutput_hash_values_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle )
 {
 	libewf_char_t hash_identifier[ 32 ];
 	libewf_char_t hash_value[ 128 ];
@@ -849,7 +882,9 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 /* Prints a time stamp (with a leading space) to a stream
  */
-void ewfoutput_timestamp_fprint( FILE *stream, time_t timestamp )
+void ewfoutput_timestamp_fprint(
+      FILE *stream,
+      time_t timestamp )
 {
 	struct tm *time_elements = NULL;
 
@@ -863,15 +898,20 @@ void ewfoutput_timestamp_fprint( FILE *stream, time_t timestamp )
 	{
 		fprintf( stream, " in" );
 
+		if( time_elements->tm_isdst != 0 )
+		{
+			time_elements->tm_hour -= 1;
+			time_elements->tm_isdst = 0;	
+		}
 		if( time_elements->tm_yday > 0 )
 		{
 			fprintf( stream, " %i day(s), %i hour(s), %i minute(s) and",
-			 time_elements->tm_yday, ( time_elements->tm_hour - 1 ), time_elements->tm_min );
+			 time_elements->tm_yday, time_elements->tm_hour, time_elements->tm_min );
 		}
-		else if( time_elements->tm_hour > 1 )
+		else if( time_elements->tm_hour > 0 )
 		{
 			fprintf( stream, " %i hour(s), %i minute(s) and",
-			 ( time_elements->tm_hour - 1 ), time_elements->tm_min );
+			 time_elements->tm_hour, time_elements->tm_min );
 		}
 		else if( time_elements->tm_min > 0 )
 		{
@@ -887,7 +927,10 @@ void ewfoutput_timestamp_fprint( FILE *stream, time_t timestamp )
 
 /* Prints the amount of bytes per second (with a leading space) to a stream
  */
-void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t seconds )
+void ewfoutput_bytes_per_second_fprint(
+      FILE *stream,
+      size64_t bytes,
+      time_t seconds )
 {
 	libewf_char_t *bytes_per_second_string = NULL;
 	size64_t bytes_per_second              = 0;
@@ -924,7 +967,9 @@ void ewfoutput_bytes_per_second_fprint( FILE *stream, size64_t bytes, time_t sec
 /* Prints the amount of bytes (with a leading space) to a stream
  * Creates a human readable version of the amount of bytes if possible
  */
-void ewfoutput_bytes_fprint( FILE *stream, size64_t bytes )
+void ewfoutput_bytes_fprint(
+      FILE *stream,
+      size64_t bytes )
 {
 	libewf_char_t *bytes_string = NULL;
 
@@ -959,7 +1004,10 @@ uint64_t ewfoutput_process_status_last_bytes_total = 0;
 
 /* Initializes the status information of the process
  */
-void ewfoutput_process_status_initialize( FILE *stream, libewf_char_t *string, time_t timestamp_start )
+void ewfoutput_process_status_initialize(
+      FILE *stream,
+      libewf_char_t *string,
+      time_t timestamp_start )
 {
 	ewfoutput_process_status_stream          = stream;
 	ewfoutput_process_status_string          = string;
@@ -969,7 +1017,9 @@ void ewfoutput_process_status_initialize( FILE *stream, libewf_char_t *string, t
 
 /* Prints status information of the process
  */
-void ewfoutput_process_status_fprint( size64_t bytes_read, size64_t bytes_total )
+void ewfoutput_process_status_fprint(
+      size64_t bytes_read,
+      size64_t bytes_total )
 {
 	time_t seconds_current   = 0;
 	time_t seconds_total     = 0;
@@ -1038,7 +1088,9 @@ void ewfoutput_process_status_fprint( size64_t bytes_read, size64_t bytes_total 
 
 /* Prints status information of the stream process
  */
-void ewfoutput_stream_process_status_fprint( size64_t bytes_read, size64_t bytes_total )
+void ewfoutput_stream_process_status_fprint(
+      size64_t bytes_read,
+      size64_t bytes_total )
 {
 	time_t seconds_current   = 0;
 	time_t timestamp_current = 0;
@@ -1087,7 +1139,12 @@ void ewfoutput_stream_process_status_fprint( size64_t bytes_read, size64_t bytes
 
 /* Prints summary information of the process
  */
-void ewfoutput_process_summary_fprint( FILE *stream, libewf_char_t *string, ssize64_t byte_count, time_t timestamp_start, time_t timestamp_end )
+void ewfoutput_process_summary_fprint(
+      FILE *stream,
+      libewf_char_t *string,
+      ssize64_t byte_count,
+      time_t timestamp_start,
+      time_t timestamp_end )
 {
 	time_t timestamp_acquiry = 0;
 

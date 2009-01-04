@@ -37,8 +37,6 @@
 #include <unistd.h>
 #endif
 
-#include <errno.h>
-
 #include <libewf/libewf_definitions.h>
 
 #include "libewf_common.h"
