@@ -120,10 +120,8 @@ Known issues:
 
 Next release(s):
 
-* rewrite ewfinput determine functions to pass value as argument
-  and have return value be 1, 0 or -1
-* handle overflow in input buffer by flushing stdin before requesting user
-  input (+/-)
+* ewfinput have ewfinput_get_string_variable_system_character get its own
+  input without the conversion function?
 
 * ewfacquire, ewfacquirestream, ewfexport, ewfverify: allow for variable read buffer size, this should allow performance testing
 * ewfexport: calculate the MD5 hash of exported data and validate this with the stored hash?
@@ -193,6 +191,7 @@ CLOSED
 
 Version: 20080907
 * worked on refactoring functions in ewfinput, too large input is now flushed
+* refactored ewfcommon_determine_operating_system
 
 Version: 20080906
 * refactored section list to use list type

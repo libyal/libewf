@@ -52,9 +52,6 @@ extern "C" {
 #endif
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
-#define ewfcommon_ctime( timestamp, string, length ) \
-	date_time_wctime( timestamp, string, length )
-
 #define ewfcommon_strerror( error_number ) \
         error_string_wcserror( error_number )
 
@@ -62,9 +59,6 @@ extern "C" {
 	file_stream_io_wfopen( filename, mode )
 
 #else
-#define ewfcommon_ctime( timestamp, string, length ) \
-	date_time_ctime( timestamp, string, length )
-
 #define ewfcommon_strerror( error_number ) \
         error_string_strerror( error_number )
 
@@ -83,12 +77,13 @@ int ewfcommon_swap_byte_pairs(
      uint8_t *buffer,
      size_t size );
 
-character_t *ewfcommon_determine_operating_system(
-              void );
+int ewfcommon_determine_operating_system_string(
+     character_t *operating_system_string,
+     size_t operating_system_string_size );
 
-int8_t ewfcommon_determine_guid(
-        uint8_t *guid,
-        uint8_t libewf_format );
+int ewfcommon_determine_guid(
+     uint8_t *guid,
+     uint8_t libewf_format );
 
 int ewfcommon_initialize_write(
      libewf_handle_t *handle,

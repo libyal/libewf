@@ -173,6 +173,8 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	character_t acquiry_operating_system[ 32 ];
+
 	system_character_t *filenames[ 1 ]         = { _SYSTEM_CHARACTER_T_STRING( "stream" ) };
 
 	character_t *calculated_md5_hash_string    = NULL;
@@ -182,7 +184,6 @@ int main( int argc, char * const argv[] )
 	character_t *evidence_number               = NULL;
 	character_t *examiner_name                 = NULL;
 	character_t *notes                         = NULL;
-	character_t *acquiry_operating_system      = NULL;
 	character_t *acquiry_software_version      = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfacquirestream" );
 
@@ -604,7 +605,14 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		acquiry_operating_system = ewfcommon_determine_operating_system();
+		if( ewfcommon_determine_operating_system_string(
+		     acquiry_operating_system,
+		     32 ) != 1 )
+		{
+			fprintf( stdout, "Unable to determine operating system string.\n" );
+
+			ewfcommon_abort = 1;
+		}
 		acquiry_software_version = LIBEWF_VERSION_STRING;
 
 		fprintf( stdout, "Using the following acquiry parameters:\n" );
@@ -689,11 +697,6 @@ int main( int argc, char * const argv[] )
 	{
 		memory_free(
 		 notes );
-	}
-	if( acquiry_operating_system != NULL )
-	{
-		memory_free(
-		 acquiry_operating_system );
 	}
 	if( error_abort != 0 )
 	{

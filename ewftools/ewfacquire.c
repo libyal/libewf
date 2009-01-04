@@ -292,13 +292,13 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	character_t acquiry_operating_system[ 32 ];
 	character_t input_buffer[ EWFACQUIRE_INPUT_BUFFER_SIZE ];
 
 	struct stat input_file_stat;
 
 	system_character_t *filenames[ 1 ]       = { NULL };
 
-	character_t *acquiry_operating_system    = NULL;
 	character_t *acquiry_software_version    = NULL;
 	character_t *calculated_md5_hash_string  = NULL;
 	character_t *calculated_sha1_hash_string = NULL;
@@ -949,7 +949,14 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		acquiry_operating_system = ewfcommon_determine_operating_system();
+		if( ewfcommon_determine_operating_system_string(
+		     acquiry_operating_system,
+		     32 ) != 1 )
+		{
+			fprintf( stdout, "Unable to determine operating system string.\n" );
+
+			ewfcommon_abort = 1;
+		}
 		acquiry_software_version = LIBEWF_VERSION_STRING;
 
 		/* Set up the libewf handle
@@ -989,11 +996,6 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to initialize settings for EWF file(s).\n" );
 
 			error_abort = 1;
-		}
-		if( acquiry_operating_system != NULL )
-		{
-			memory_free(
-			 acquiry_operating_system );
 		}
 	}
 	memory_free(

@@ -24,6 +24,7 @@
 #include <character_string.h>
 #include <file_io.h>
 #include <memory.h>
+#include <narrow_string.h>
 #include <notify.h>
 #include <system_string.h>
 #include <types.h>
@@ -136,18 +137,22 @@ int ewfcommon_swap_byte_pairs(
 	return( 1 );
 }
 
-/* Determines the current platform, or NULL on error
+/* Determines the operating system string
+ * Return 1 if successful or -1 on error
  */
-character_t *ewfcommon_determine_operating_system(
-              void )
+int ewfcommon_determine_operating_system_string(
+     character_t *operating_system_string,
+     size_t operating_system_string_size )
 {
-	character_t *string    = NULL;
-	char *operating_system = NULL;
-	size_t length          = 0;
-
 #if defined( HAVE_SYS_UTSNAME_H )
 	struct utsname utsname_buffer;
+#endif
 
+	char *operating_system         = NULL;
+	static char *function          = "ewfcommon_determine_operating_system_string";
+	size_t operating_system_length = 0;
+
+#if defined( HAVE_SYS_UTSNAME_H )
 	/* Determine the operating system
 	 */
 	if( uname(
@@ -162,34 +167,35 @@ character_t *ewfcommon_determine_operating_system(
 #else
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
-	length = strlen(
-	          operating_system );
+	operating_system_length = narrow_string_length(
+	                           operating_system );
 
-	string = (character_t *) memory_allocate(
-	                          sizeof( character_t ) * ( length + 1 ) );
 
-	if( ( string != NULL )
-	 && ( string_copy_from_char(
-	       string,
-	       operating_system,
-	       length ) != 1 ) )
+	if( operating_system_string_size < ( operating_system_length + 1 ) )
 	{
-		memory_free(
-	         string );
-	
-		return( NULL );
-	}
-	string[ length ] = 0;
+		notify_warning_printf( "%s: operating system string too small.\n",
+		 function );
 
-	return( string );
+		return( -1 );
+	}	
+	if( string_copy_from_char(
+	     operating_system_string,
+	     operating_system,
+	     operating_system_length ) != 1 )
+	{
+		return( -1 );
+	}
+	operating_system_string[ operating_system_length ] = 0;
+
+	return( 1 );
 }
 
 /* Determines the GUID
  * Returns 1 if successful, or -1 on error
  */
-int8_t ewfcommon_determine_guid(
-        uint8_t *guid,
-        uint8_t libewf_format )
+int ewfcommon_determine_guid(
+     uint8_t *guid,
+     uint8_t libewf_format )
 {
 	static char *function = "ewfcommon_determine_guid";
 

@@ -166,6 +166,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
+	character_t acquiry_operating_system[ 32 ];
 	character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
 #if !defined( HAVE_GLOB_H )
@@ -174,7 +175,6 @@ int main( int argc, char * const argv[] )
 	system_character_t *filenames[ 1 ]         = { NULL };
 
 	libewf_handle_t *export_handle             = NULL;
-	character_t *acquiry_operating_system      = NULL;
 	character_t *acquiry_software_version      = NULL;
 	character_t *fixed_string_variable         = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfexport" );
@@ -923,7 +923,14 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			acquiry_operating_system = ewfcommon_determine_operating_system();
+			if( ewfcommon_determine_operating_system_string(
+			     acquiry_operating_system,
+			     32 ) != 1 )
+			{
+				fprintf( stderr, "Unable to determine operating system string.\n" );
+
+				ewfcommon_abort = 1;
+			}
 			acquiry_software_version = LIBEWF_VERSION_STRING;
 
 			export_count = ewfcommon_export_ewf(
@@ -945,11 +952,6 @@ int main( int argc, char * const argv[] )
 			                acquiry_software_version,
 			                callback );
 
-			if( acquiry_operating_system != NULL )
-			{
-				memory_free(
-				 acquiry_operating_system );
-			}
 			if( libewf_close(
 			     export_handle ) != 0 )
 			{
