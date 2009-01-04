@@ -254,10 +254,9 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_ewf_char(
+	if( string_copy_from_char(
 	     xml_hash_string,
-	     size,
-	     xhash,
+	     (char *) xhash,
 	     size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to copy xhash to xml hash string.\n",
@@ -344,13 +343,10 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 		return( -1 );
 	}
-	*hash_length = hash_string_length;
-
-	if( libewf_string_copy_to_ewf_char(
+	if( string_copy_to_char(
+	     (char *) *hash,
 	     hash_string,
-	     hash_string_length,
-	     *hash,
-	     *hash_length ) != 1 )
+	     hash_string_length ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set hash.\n",
 		 function );
@@ -363,6 +359,8 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 		return( -1 );
 	}
+	*hash_length = hash_string_length;
+
 	return( 1 );
 }
 

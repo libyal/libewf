@@ -35,6 +35,7 @@
 #define _CHARACTER_STRING_H
 
 #include "common.h"
+#include "string_conversion.h"
 
 #include <libewf/types.h>
 
@@ -321,26 +322,6 @@ uint64_t libewf_string_to_uint64(
 
 #define string_to_uint64( string, size ) \
 	 libewf_string_to_uint64( string, size )
-
-#if defined( HAVE_WIDE_CHARACTER_T )
-
-int libewf_string_copy_wchar_to_char(
-     char *destination,
-     const wchar_t *source,
-     size_t length );
-
-#define string_copy_wchar_to_char( destination, source, length ) \
-	libewf_string_copy_wchar_to_char( destination, source, length )
-
-int libewf_string_copy_char_to_wchar(
-     wchar_t *destination,
-     const char *source,
-     size_t length );
-
-#define string_copy_char_to_wchar( destination, source, length ) \
-	libewf_string_copy_char_to_wchar( destination, source, length )
-
-#endif
 
 #if defined( HAVE_WIDE_CHARACTER_T )
 #define string_copy_from_char( destination, source, length ) \

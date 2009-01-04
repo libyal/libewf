@@ -11,6 +11,7 @@ libcommon_la_SOURCES = \
 	file_io.c file_io.h \
 	memory.h \
 	notify.c notify.h \
+	string_conversion.c string_conversion.h \
 	system_string.c system_string.h \
 	types.h
 

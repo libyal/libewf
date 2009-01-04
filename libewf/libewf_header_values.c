@@ -1204,10 +1204,9 @@ int libewf_header_values_parse_header(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_header(
+	if( string_copy_from_char(
 	     header_string,
-	     size,
-	     header,
+	     (char *) header,
 	     size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to copy header to header string.\n",
@@ -1350,13 +1349,10 @@ int libewf_header_values_convert_header_string_to_header(
 
 		return( -1 );
 	}
-	*header_length = header_string_length;
-
-	if( libewf_string_copy_to_header(
+	if( string_copy_to_char(
+	     (char *) *header,
 	     header_string,
-	     header_string_length,
-	     *header,
-	     *header_length ) != 1 )
+	     header_string_length ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header.\n",
 		 function );
@@ -1369,6 +1365,8 @@ int libewf_header_values_convert_header_string_to_header(
 
 		return( -1 );
 	}
+	*header_length = header_string_length;
+
 	return( 1 );
 }
 
@@ -4573,10 +4571,9 @@ int libewf_header_values_parse_xheader(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_header(
+	if( string_copy_from_char(
              xml_header_string,
-             size,
-             xheader,
+             (char *) xheader,
              size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to copy xheader to xml header string.\n",

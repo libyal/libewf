@@ -176,10 +176,10 @@ void libewf_debug_header_print(
 
 		return;
 	}
-	if( libewf_string_copy_from_header(
+	if( string_copy_from_char(
 	     header_string,
-	     size,
-	     header, size ) != 1 )
+	     (char *) header,
+	     size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to copy header to header string.\n",
 		 function );
@@ -227,7 +227,8 @@ void libewf_debug_header2_print(
 	if( libewf_string_copy_from_header2(
 	     header_string,
 	     header_size,
-	     header2, size ) != 1 )
+	     header2,
+	     size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to copy header2 to header string.\n",
 		 function );
