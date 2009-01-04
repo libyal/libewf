@@ -99,8 +99,6 @@ struct ewf_volume_smart
 	uint8_t crc[ 4 ];
 };
 
-ssize_t ewf_volume_smart_read( EWF_VOLUME_SMART *volume, int file_descriptor );
-ssize_t ewf_volume_smart_write( EWF_VOLUME_SMART *volume, int file_descriptor );
 ssize32_t ewf_volume_smart_calculate_chunk_size( EWF_VOLUME_SMART *volume );
 
 #if defined( __cplusplus )

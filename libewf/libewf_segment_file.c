@@ -58,7 +58,7 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	static char *function = "libewf_segment_file_check_file_signature";
 	ssize_t read_count    = 0;
 
-	if( file_descriptor <= -1 )
+	if( file_descriptor == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
@@ -108,7 +108,7 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	static char *function = "libewf_segment_file_read_file_header";
 	ssize_t read_count    = 0;
 
-	if( file_descriptor <= -1 )
+	if( file_descriptor == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
@@ -129,9 +129,9 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 
 		return( -1 );
 	}
-	read_count = ewf_file_header_read( &file_header, file_descriptor );
+	read_count = libewf_common_read( file_descriptor, &file_header, EWF_FILE_HEADER_SIZE );
 
-	if( read_count <= -1 )
+	if( read_count != (ssize_t) EWF_FILE_HEADER_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read file header.\n",
 		 function );
@@ -830,7 +830,7 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 
 		return( -1 );
 	}
-	if( file_descriptor <= -1 )
+	if( file_descriptor == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
@@ -1387,7 +1387,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( segment_table->file_descriptor[ segment_number ] <= -1 )
+	if( segment_table->file_descriptor[ segment_number ] == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
@@ -1443,11 +1443,12 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	/* Write segment file header
 	 */
-	write_count = ewf_file_header_write(
+	write_count = libewf_common_write(
+	               segment_table->file_descriptor[ segment_number ],
 	               &file_header,
-	               segment_table->file_descriptor[ segment_number ] );
+	               EWF_FILE_HEADER_SIZE );
 
-	if( write_count == -1 )
+	if( write_count != (ssize_t) EWF_FILE_HEADER_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write file header to file.\n",
 		 function );

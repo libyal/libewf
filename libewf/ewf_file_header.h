@@ -79,9 +79,6 @@ int dwf_file_header_check_signature( uint8_t *signature );
 int ewf_file_header_check_signature( uint8_t *signature );
 int lwf_file_header_check_signature( uint8_t *signature );
 
-ssize_t ewf_file_header_read( EWF_FILE_HEADER *file_header, int file_descriptor );
-ssize_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor );
-
 #if defined( __cplusplus )
 }
 #endif

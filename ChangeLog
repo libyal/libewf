@@ -153,6 +153,10 @@ CLOSED
   - if so remove libewf_string include from ewfacquire
   not needed
 
+Version: 20071015
+* Worked on file io handler
+* Worked on cleaning up ewf struct read and write functions
+
 Version: 20071009
 * Worked on file io handler
 

@@ -1,5 +1,5 @@
 /*
- * libewf file io handler
+ * libewf file io pool
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_FILE_IO_HANDLER_H )
-#define _LIBEWF_FILE_IO_HANDLER_H
+#if !defined( _LIBEWF_FILE_IO_POOL_H )
+#define _LIBEWF_FILE_IO_POOL_H
 
 #include "libewf_includes.h"
 #include "libewf_char.h"
@@ -43,24 +43,24 @@
 extern "C" {
 #endif
 
-#define LIBEWF_FILE_IO_HANDLER				libewf_file_io_handler_t
-#define LIBEWF_FILE_IO_HANDLER_SIZE			sizeof( LIBEWF_FILE_IO_HANDLER )
+#define LIBEWF_FILE_IO_POOL				libewf_file_io_pool_t
+#define LIBEWF_FILE_IO_POOL_SIZE			sizeof( LIBEWF_FILE_IO_POOL )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-#define LIBEWF_FILE_IO_HANDLER_FILENAME_SIZE		sizeof( wchar_t* )
+#define LIBEWF_FILE_IO_POOL_FILENAME_SIZE		sizeof( wchar_t* )
 #else
-#define LIBEWF_FILE_IO_HANDLER_FILENAME_SIZE		sizeof( char* )
+#define LIBEWF_FILE_IO_POOL_FILENAME_SIZE		sizeof( char* )
 #endif
 
-#define LIBEWF_FILE_IO_HANDLER_DESCRIPTOR_SIZE		sizeof( int )
-#define LIBEWF_FILE_IO_HANDLER_OFFSET_SIZE		sizeof( off64_t )
-#define LIBEWF_FILE_IO_HANDLER_FLAGS_SIZE		sizeof( int )
+#define LIBEWF_FILE_IO_POOL_DESCRIPTOR_SIZE		sizeof( int )
+#define LIBEWF_FILE_IO_POOL_OFFSET_SIZE			sizeof( off64_t )
+#define LIBEWF_FILE_IO_POOL_FLAGS_SIZE			sizeof( int )
 
-typedef struct libewf_file_io_handler libewf_file_io_handler_t;
+typedef struct libewf_file_io_pool libewf_file_io_pool_t;
 
-struct libewf_file_io_handler
+struct libewf_file_io_pool
 {
-	/* The amount of files in the handler
+	/* The amount of files in the pool
 	 */
 	size_t amount;
 
@@ -89,27 +89,20 @@ struct libewf_file_io_handler
 	int *flags;
 };
 
-LIBEWF_FILE_IO_HANDLER *libewf_file_io_handler_alloc( size_t amount );
-int libewf_file_io_handler_realloc( LIBEWF_FILE_IO_HANDLER *handler, size_t amount );
-void libewf_file_io_handler_free( LIBEWF_FILE_IO_HANDLER *handler );
+LIBEWF_FILE_IO_POOL *libewf_file_io_pool_alloc( size_t amount );
+int libewf_file_io_pool_realloc( LIBEWF_FILE_IO_POOL *pool, size_t amount );
+void libewf_file_io_pool_free( LIBEWF_FILE_IO_POOL *pool );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_handler_get_wide_filename( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, wchar_t *filename, size_t length_filename );
+int libewf_file_io_pool_wide_open( LIBEWF_FILE_IO_POOL *pool, wchar_t *filename, int flags );
 #else
-int libewf_file_io_handler_get_filename( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, char *filename, size_t length_filename );
+int libewf_file_io_pool_open( LIBEWF_FILE_IO_POOL *pool, char *filename, int flags );
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_handler_set_wide_filename( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, const wchar_t *filename, size_t length_filename );
-#else
-int libewf_file_io_handler_set_filename( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, const char *filename, size_t length_filename );
-#endif
-
-int libewf_file_io_handler_open( LIBEWF_FILE_IO_HANDLER *handler, size_t entry );
-ssize_t libewf_file_io_handler_read( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, uint8_t *buffer, size_t size );
-ssize_t libewf_file_io_handler_write( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, uint8_t *buffer, size_t size );
-off64_t libewf_file_io_handler_seek( LIBEWF_FILE_IO_HANDLER *handler, size_t entry, off64_t offset, int whence );
-int libewf_file_io_handler_close( LIBEWF_FILE_IO_HANDLER *handler, size_t entry );
+ssize_t libewf_file_io_pool_read( LIBEWF_FILE_IO_POOL *pool, size_t entry, uint8_t *buffer, size_t size );
+ssize_t libewf_file_io_pool_write( LIBEWF_FILE_IO_POOL *pool, size_t entry, uint8_t *buffer, size_t size );
+off64_t libewf_file_io_pool_seek( LIBEWF_FILE_IO_POOL *pool, size_t entry, off64_t offset, int whence );
+int libewf_file_io_pool_close( LIBEWF_FILE_IO_POOL *pool, size_t entry );
 
 #if defined( __cplusplus )
 }
