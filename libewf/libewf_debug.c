@@ -144,7 +144,7 @@ void libewf_debug_header_print(
 	header_string_size = string_size_from_byte_stream(
 	                      header,
 	                      header_size,
-	                      LIBUCA_CODEPAGE_ASCII );
+	                      LIBUNA_CODEPAGE_ASCII );
 
 	if( header_string_size < 0 )
 	{
@@ -168,7 +168,7 @@ void libewf_debug_header_print(
 	     header_string_size,
 	     (uint8_t *) header,
 	     header_size,
-	     LIBUCA_CODEPAGE_ASCII ) != 1 )
+	     LIBUNA_CODEPAGE_ASCII ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
@@ -205,7 +205,7 @@ void libewf_debug_header2_print(
 	header_string_size = string_size_from_utf16_stream(
 	                      header2,
 	                      header2_size,
-	                      LIBUCA_ENDIAN_LITTLE );
+	                      LIBUNA_ENDIAN_LITTLE );
 
 	if( header_string_size < 0 )
 	{
@@ -229,7 +229,7 @@ void libewf_debug_header2_print(
 	     (size_t) header_string_size,
 	     header2,
 	     header2_size,
-	     LIBUCA_ENDIAN_LITTLE ) != 1 )
+	     LIBUNA_ENDIAN_LITTLE ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );

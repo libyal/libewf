@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080908],
+ [20080909],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080908])
+ [20080909])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -522,241 +522,241 @@ dnl Check for printf conversion specifier support
 LIBEWF_CHECK_PRINTF_JD
 LIBEWF_CHECK_PRINTF_ZD
 
-dnl Check for enabling libuca for Unicode string support
+dnl Check for enabling libuna for Unicode string support
 AC_CHECK_HEADERS(
- [libuca.h],
+ [libuna.h],
  [],
- [ac_libewf_have_libuca=no])
+ [ac_libewf_have_libuna=no])
 
 AS_IF(
-	[test "x$ac_libewf_have_libuca" != xno],
-	[ac_libewf_have_libuca=yes
+	[test "x$ac_libewf_have_libuna" != xno],
+	[ac_libewf_have_libuna=yes
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_get_version,
+	 libuna_get_version,
 	 [],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 
 	dnl Byte stream functions
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_string_size_from_byte_stream,
+	 libuna_utf8_string_size_from_byte_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_string_copy_from_byte_stream,
+	 libuna_utf8_string_copy_from_byte_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_byte_stream_size_from_utf8,
+	 libuna_byte_stream_size_from_utf8,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_byte_stream_copy_from_utf8,
+	 libuna_byte_stream_copy_from_utf8,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_string_size_from_byte_stream,
+	 libuna_utf16_string_size_from_byte_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_string_copy_from_byte_stream,
+	 libuna_utf16_string_copy_from_byte_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_byte_stream_size_from_utf16,
+	 libuna_byte_stream_size_from_utf16,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_byte_stream_copy_from_utf16,
+	 libuna_byte_stream_copy_from_utf16,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf32_string_size_from_byte_stream,
+	 libuna_utf32_string_size_from_byte_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf32_string_copy_from_byte_stream,
+	 libuna_utf32_string_copy_from_byte_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_byte_stream_size_from_utf32,
+	 libuna_byte_stream_size_from_utf32,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_byte_stream_copy_from_utf32,
+	 libuna_byte_stream_copy_from_utf32,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 
 	dnl UTF-8 stream functions
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_string_size_from_utf8_stream,
+	 libuna_utf8_string_size_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_string_copy_from_utf8_stream,
+	 libuna_utf8_string_copy_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_stream_size_from_utf8,
+	 libuna_utf8_stream_size_from_utf8,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_stream_copy_from_utf8,
+	 libuna_utf8_stream_copy_from_utf8,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_string_size_from_utf8_stream,
+	 libuna_utf16_string_size_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_string_copy_from_utf8_stream,
+	 libuna_utf16_string_copy_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_stream_size_from_utf16,
+	 libuna_utf8_stream_size_from_utf16,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_stream_copy_from_utf16,
+	 libuna_utf8_stream_copy_from_utf16,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf32_string_size_from_utf8_stream,
+	 libuna_utf32_string_size_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf32_string_copy_from_utf8_stream,
+	 libuna_utf32_string_copy_from_utf8_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_stream_size_from_utf32,
+	 libuna_utf8_stream_size_from_utf32,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_stream_copy_from_utf32,
+	 libuna_utf8_stream_copy_from_utf32,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 
 	dnl UTF-16 stream functions
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_string_size_from_utf16_stream,
+	 libuna_utf8_string_size_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf8_string_copy_from_utf16_stream,
+	 libuna_utf8_string_copy_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_stream_size_from_utf8,
+	 libuna_utf16_stream_size_from_utf8,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_stream_copy_from_utf8,
+	 libuna_utf16_stream_copy_from_utf8,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_string_size_from_utf16_stream,
+	 libuna_utf16_string_size_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_string_copy_from_utf16_stream,
+	 libuna_utf16_string_copy_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_stream_size_from_utf16,
+	 libuna_utf16_stream_size_from_utf16,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_stream_copy_from_utf16,
+	 libuna_utf16_stream_copy_from_utf16,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf32_string_size_from_utf16_stream,
+	 libuna_utf32_string_size_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf32_string_copy_from_utf16_stream,
+	 libuna_utf32_string_copy_from_utf16_stream,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_stream_size_from_utf32,
+	 libuna_utf16_stream_size_from_utf32,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	AC_CHECK_LIB(
 	 uca,
-	 libuca_utf16_stream_copy_from_utf32,
+	 libuna_utf16_stream_copy_from_utf32,
 	 [ac_libewf_dummy=yes],
-	 [ac_libewf_have_libuca=no])
+	 [ac_libewf_have_libuna=no])
 	])
 
 AS_IF(
-	[test "x$ac_libewf_have_libuca" = xyes],
+	[test "x$ac_libewf_have_libuna" = xyes],
 	[AC_SUBST(
-	  [libewf_pc_libs_private_libuca],
+	  [libewf_pc_libs_private_libuna],
 	  [-luca])
 	 AC_SUBST(
-	  [libewf_spec_requires_libuca],
-	  [libuca])
+	  [libewf_spec_requires_libuna],
+	  [libuna])
 	 AC_SUBST(
-	  [libewf_spec_build_requires_libuca],
-	  [libuca-devel]) ],
-	[dnl If libuca is not available use the (local) version that came with libewf
+	  [libewf_spec_build_requires_libuna],
+	  [libuna-devel]) ],
+	[dnl If libuna is not available use the (local) version that came with libewf
 	AC_DEFINE(
-	 [HAVE_LOCAL_LIBUCA],
+	 [HAVE_LOCAL_LIBUNA],
 	 [1],
-	 [Define to 1 if the local version of libuca is used.])
+	 [Define to 1 if the local version of libuna is used.])
 	AC_SUBST(
-	 [HAVE_LOCAL_LIBUCA],
+	 [HAVE_LOCAL_LIBUNA],
 	 [1])
 	AC_SUBST(
-	 [libewf_pc_libs_private_libuca],
+	 [libewf_pc_libs_private_libuna],
 	 [])
 	AC_SUBST(
-	 [libewf_spec_requires_libuca],
+	 [libewf_spec_requires_libuna],
 	 [])
 	AC_SUBST(
-	 [libewf_spec_build_requires_libuca],
+	 [libewf_spec_build_requires_libuna],
 	 [])
-	ac_libewf_have_libuca=local])
+	ac_libewf_have_libuna=local])
 
 AM_CONDITIONAL(
- [HAVE_LOCAL_LIBUCA],
- [test "x$ac_libewf_have_libuca" = xlocal])
+ [HAVE_LOCAL_LIBUNA],
+ [test "x$ac_libewf_have_libuna" = xlocal])
 
 dnl Check for enabling libcrypto EVP support
 AC_CHECK_HEADERS(
@@ -1127,7 +1127,7 @@ CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([common/Makefile])
-AC_CONFIG_FILES([libuca/Makefile])
+AC_CONFIG_FILES([libuna/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([manuals/Makefile])
@@ -1151,7 +1151,7 @@ AC_OUTPUT
 dnl Print a summary
 AC_MSG_NOTICE([
 Building:
-   libuca support:                          $ac_libewf_have_libuca
+   libuna support:                          $ac_libewf_have_libuna
    libcrypto EVP support:                   $ac_libewf_have_libcrypto_evp
    libcrypto MD5 support:                   $ac_libewf_have_libcrypto_md5
    libcrypto SHA1 support:                  $ac_libewf_have_libcrypto_sha1

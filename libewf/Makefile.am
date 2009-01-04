@@ -1,5 +1,5 @@
-if HAVE_LOCAL_LIBUCA
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/libuca
+if HAVE_LOCAL_LIBUNA
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/libuna
 else
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common
 endif
@@ -26,6 +26,7 @@ libewf_la_SOURCES = \
 	libewf_chunk_offset.h \
 	libewf_compression.c libewf_compression.h \
 	libewf_debug.c libewf_debug.h \
+	libewf_error.c libewf_error.h \
 	libewf_extern.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \
@@ -52,8 +53,8 @@ libewf_la_SOURCES = \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 
-if HAVE_LOCAL_LIBUCA
-libewf_la_LIBADD  = ../common/libcommon.la ../libuca/libuca.la
+if HAVE_LOCAL_LIBUNA
+libewf_la_LIBADD  = ../common/libcommon.la ../libuna/libuna.la
 else
 libewf_la_LIBADD  = ../common/libcommon.la
 endif

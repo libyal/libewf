@@ -1555,7 +1555,7 @@ int libewf_header_values_parse_header2(
 	header_string_size = string_size_from_utf16_stream(
 	                      header2,
 	                      header2_size,
-	                      LIBUCA_ENDIAN_LITTLE );
+	                      LIBUNA_ENDIAN_LITTLE );
 
 	if( header_string_size < 0 )
 	{
@@ -1579,7 +1579,7 @@ int libewf_header_values_parse_header2(
 	     (size_t) header_string_size,
 	     header2,
 	     header2_size,
-	     LIBUCA_ENDIAN_LITTLE ) != 1 )
+	     LIBUNA_ENDIAN_LITTLE ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
@@ -1757,7 +1757,7 @@ int libewf_header_values_convert_header_string_to_header2(
 	if( utf16_stream_copy_from_string(
 	     *header2,
 	     (size_t) utf16_stream_size,
-	     LIBUCA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE,
 	     header_string,
 	     header_string_size ) != 1 )
 	{

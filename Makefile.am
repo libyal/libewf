@@ -1,6 +1,6 @@
 SUBDIRS = \
 	common \
-	libuca \
+	libuna \
 	libewf \
 	ewftools \
 	pyewf \
@@ -116,6 +116,7 @@ include_HEADERS = \
 
 pkginclude_HEADERS = \
 	include/libewf/definitions.h \
+	include/libewf/error.h \
 	include/libewf/extern.h \
 	include/libewf/features.h \
 	include/libewf/handle.h \
@@ -128,7 +129,7 @@ lib: library
 
 library:
 	cd $(srcdir)/common && $(MAKE) $(AM_MAKEFLAGS)
-	cd $(srcdir)/libuca && $(MAKE) $(AM_MAKEFLAGS)
+	cd $(srcdir)/libuna && $(MAKE) $(AM_MAKEFLAGS)
 	cd $(srcdir)/libewf && $(MAKE) $(AM_MAKEFLAGS)
 
 distclean: clean

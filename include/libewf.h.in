@@ -24,7 +24,9 @@
 #define _LIBEWF_H
 
 #include <libewf/definitions.h>
+#include <libewf/error.h>
 #include <libewf/extern.h>
+#include <libewf/features.h>
 #include <libewf/handle.h>
 #include <libewf/types.h>
 
