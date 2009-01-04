@@ -55,11 +55,11 @@
 extern "C" {
 #endif
 
-ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t read_crc );
+ssize_t libewf_read_process_chunk_data( libewf_internal_handle_t *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t read_crc );
 
-ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, int8_t *is_compressed, ewf_crc_t *chunk_crc, int8_t *read_crc );
+ssize_t libewf_raw_read_chunk( libewf_internal_handle_t *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, int8_t *is_compressed, ewf_crc_t *chunk_crc, int8_t *read_crc );
 
-ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, ewf_char_t *buffer, size_t size );
+ssize_t libewf_read_chunk_data( libewf_internal_handle_t *internal_handle, uint32_t chunk, uint32_t chunk_offset, ewf_char_t *buffer, size_t size );
 
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, uint32_t chunk_crc, int8_t read_crc );
 

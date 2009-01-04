@@ -45,9 +45,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_HASH_SECTIONS	 	libewf_hash_sections_t
-#define LIBEWF_HASH_SECTIONS_SIZE	sizeof( LIBEWF_HASH_SECTIONS )
-
 typedef struct libewf_hash_sections libewf_hash_sections_t;
 
 /* Additional subhandle for media specific parameters
@@ -71,9 +68,9 @@ struct libewf_hash_sections
 	uint8_t md5_hash_set;
 };
 
-LIBEWF_HASH_SECTIONS *libewf_hash_sections_alloc( void );
+libewf_hash_sections_t *libewf_hash_sections_alloc( void );
 
-void libewf_hash_sections_free( LIBEWF_HASH_SECTIONS *hash_sections );
+void libewf_hash_sections_free( libewf_hash_sections_t *hash_sections );
 
 #if defined( __cplusplus )
 }

@@ -44,12 +44,13 @@
 /* Allocates memory for a new header sections struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void )
+libewf_header_sections_t *libewf_header_sections_alloc( void )
 {
-	LIBEWF_HEADER_SECTIONS *header_sections = NULL;
-	static char *function                   = "libewf_header_sections_alloc";
+	libewf_header_sections_t *header_sections = NULL;
+	static char *function                     = "libewf_header_sections_alloc";
 
-	header_sections = (LIBEWF_HEADER_SECTIONS *) libewf_common_alloc( LIBEWF_HEADER_SECTIONS_SIZE );
+	header_sections = (libewf_header_sections_t *) libewf_common_alloc(
+	                                                sizeof( libewf_header_sections_t ) );
 
 	if( header_sections == NULL )
 	{
@@ -61,7 +62,7 @@ LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void )
 	if( libewf_common_memset(
 	     header_sections,
 	     0,
-	     LIBEWF_HEADER_SECTIONS_SIZE ) == NULL )
+	     sizeof( libewf_header_sections_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear header sections.\n",
 		 function );
@@ -75,7 +76,7 @@ LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void )
 
 /* Frees memory of a header sections struct including elements
  */
-void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections )
+void libewf_header_sections_free( libewf_header_sections_t *header_sections )
 {
         static char *function = "libewf_header_sections_free";
 
@@ -104,7 +105,7 @@ void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections )
 /* Create the header sections from the header values
  * Returns 1 on success, -1 on error
  */
-int libewf_header_sections_create( LIBEWF_HEADER_SECTIONS *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format )
+int libewf_header_sections_create( libewf_header_sections_t *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format )
 {
 	static char *function = "libewf_header_sections_create";
 	time_t timestamp      = time( NULL );

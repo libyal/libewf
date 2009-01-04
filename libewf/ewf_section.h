@@ -43,9 +43,6 @@
 extern "C" {
 #endif
 
-#define EWF_SECTION ewf_section_t
-#define EWF_SECTION_SIZE sizeof( EWF_SECTION )
-
 typedef struct ewf_section ewf_section_t;
 
 struct ewf_section

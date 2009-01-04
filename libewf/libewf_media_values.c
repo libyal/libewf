@@ -42,12 +42,13 @@
 /* Allocates memory for a new handle media struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_MEDIA_VALUES *libewf_media_values_alloc( void )
+libewf_media_values_t *libewf_media_values_alloc( void )
 {
-	LIBEWF_MEDIA_VALUES *media_values = NULL;
-	static char *function             = "libewf_media_values_alloc";
+	libewf_media_values_t *media_values = NULL;
+	static char *function               = "libewf_media_values_alloc";
 
-	media_values = (LIBEWF_MEDIA_VALUES *) libewf_common_alloc( LIBEWF_MEDIA_VALUES_SIZE );
+	media_values = (libewf_media_values_t *) libewf_common_alloc(
+	                                          sizeof( libewf_media_values_t ) );
 
 	if( media_values == NULL )
 	{
@@ -59,7 +60,7 @@ LIBEWF_MEDIA_VALUES *libewf_media_values_alloc( void )
 	if( libewf_common_memset(
 	     media_values,
 	     0,
-	     LIBEWF_MEDIA_VALUES_SIZE ) == NULL )
+	     sizeof( libewf_media_values_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear media values.\n",
 		 function );

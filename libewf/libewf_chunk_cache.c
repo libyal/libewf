@@ -39,12 +39,13 @@
 /* Allocates memory for the chunk cache cache
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
+libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size )
 {
-	LIBEWF_CHUNK_CACHE *chunk_cache = NULL;
-	static char *function           = "libewf_chunk_cache_alloc";
+	libewf_chunk_cache_t *chunk_cache = NULL;
+	static char *function             = "libewf_chunk_cache_alloc";
 
-	chunk_cache = (LIBEWF_CHUNK_CACHE *) libewf_common_alloc( LIBEWF_CHUNK_CACHE_SIZE );
+	chunk_cache = (libewf_chunk_cache_t *) libewf_common_alloc(
+	                                        sizeof( libewf_chunk_cache_t ) );
 
 	if( chunk_cache == NULL )
 	{
@@ -97,7 +98,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 /* Reallocates and wipes memory for the chunk cache cache
  * Returns 1 if successful, or -1 on error
  */
-int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
+int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size )
 {
 	ewf_char_t *reallocation = NULL;
 	static char *function    = "libewf_chunk_cache_realloc";
@@ -156,7 +157,7 @@ int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 
 /* Frees memory of a chunk cache struct including elements
  */
-void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache )
+void libewf_chunk_cache_free( libewf_chunk_cache_t *chunk_cache )
 {
 	static char *function = "libewf_chunk_cache_free";
 

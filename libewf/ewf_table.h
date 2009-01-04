@@ -40,12 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_TABLE ewf_table_t
-#define EWF_TABLE_SIZE sizeof( EWF_TABLE )
-
-#define EWF_TABLE_OFFSET ewf_table_offset_t
-#define EWF_TABLE_OFFSET_SIZE sizeof( EWF_TABLE_OFFSET )
-
 typedef struct ewf_table ewf_table_t;
 typedef struct ewf_table_offset ewf_table_offset_t;
 

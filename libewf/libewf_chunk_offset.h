@@ -44,9 +44,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_CHUNK_OFFSET libewf_chunk_offset_t
-#define LIBEWF_CHUNK_OFFSET_SIZE sizeof( LIBEWF_CHUNK_OFFSET )
-
 typedef struct libewf_chunk_offset libewf_chunk_offset_t;
 
 struct libewf_chunk_offset

@@ -42,9 +42,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_CHUNK_CACHE libewf_chunk_cache_t
-#define LIBEWF_CHUNK_CACHE_SIZE sizeof( LIBEWF_CHUNK_CACHE )
-
 typedef struct libewf_chunk_cache libewf_chunk_cache_t;
 
 struct libewf_chunk_cache
@@ -78,9 +75,9 @@ struct libewf_chunk_cache
 	ewf_char_t *data;
 };
 
-LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size );
-int libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size );
-void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache );
+libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size );
+int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size );
+void libewf_chunk_cache_free( libewf_chunk_cache_t *chunk_cache );
 
 #if defined( __cplusplus )
 }

@@ -40,12 +40,13 @@
 /* Allocates memory for a new hash sections struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_HASH_SECTIONS *libewf_hash_sections_alloc( void )
+libewf_hash_sections_t *libewf_hash_sections_alloc( void )
 {
-	LIBEWF_HASH_SECTIONS *hash_sections = NULL;
-	static char *function                   = "libewf_hash_sections_alloc";
+	libewf_hash_sections_t *hash_sections = NULL;
+	static char *function                 = "libewf_hash_sections_alloc";
 
-	hash_sections = (LIBEWF_HASH_SECTIONS *) libewf_common_alloc( LIBEWF_HASH_SECTIONS_SIZE );
+	hash_sections = (libewf_hash_sections_t *) libewf_common_alloc(
+	                                            sizeof( libewf_hash_sections_t ) );
 
 	if( hash_sections == NULL )
 	{
@@ -57,7 +58,7 @@ LIBEWF_HASH_SECTIONS *libewf_hash_sections_alloc( void )
 	if( libewf_common_memset(
 	     hash_sections,
 	     0,
-	     LIBEWF_HASH_SECTIONS_SIZE ) == NULL )
+	     sizeof( libewf_hash_sections_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear hash sections.\n",
 		 function );
@@ -71,7 +72,7 @@ LIBEWF_HASH_SECTIONS *libewf_hash_sections_alloc( void )
 
 /* Frees memory of a hash sections struct including elements
  */
-void libewf_hash_sections_free( LIBEWF_HASH_SECTIONS *hash_sections )
+void libewf_hash_sections_free( libewf_hash_sections_t *hash_sections )
 {
         static char *function = "libewf_hash_sections_free";
 

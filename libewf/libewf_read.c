@@ -51,7 +51,7 @@
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
-ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t read_crc )
+ssize_t libewf_read_process_chunk_data( libewf_internal_handle_t *internal_handle, ewf_char_t *chunk_data, size_t chunk_data_size, ewf_char_t *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed, ewf_crc_t chunk_crc, int8_t read_crc )
 {
 	static char *function    = "libewf_read_process_chunk_data";
 	ewf_crc_t calculated_crc = 0;
@@ -146,7 +146,7 @@ ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle,
  * 4 last bytes of the buffer, used for uncompressed chunks only
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
-ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, int8_t *is_compressed, ewf_crc_t *chunk_crc, int8_t *read_crc )
+ssize_t libewf_raw_read_chunk( libewf_internal_handle_t *internal_handle, uint32_t chunk, ewf_char_t *chunk_buffer, size_t chunk_size, int8_t *is_compressed, ewf_crc_t *chunk_crc, int8_t *read_crc )
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
@@ -368,7 +368,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
  * Will read until the requested size is filled or the entire chunk is read
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
-ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, ewf_char_t *buffer, size_t size )
+ssize_t libewf_read_chunk_data( libewf_internal_handle_t *internal_handle, uint32_t chunk, uint32_t chunk_offset, ewf_char_t *buffer, size_t size )
 {
 	ewf_char_t *chunk_data     = NULL;
 	ewf_char_t *chunk_read     = NULL;
@@ -638,9 +638,9 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
  */
 ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, uint32_t chunk_crc, int8_t read_crc )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_raw_read_prepare_buffer";
-	ssize_t chunk_data_size                 = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_raw_read_prepare_buffer";
+	ssize_t chunk_data_size                   = 0;
 
 	if( handle == NULL )
 	{
@@ -649,7 +649,7 @@ ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, siz
 
 		return( -1 );
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+	internal_handle = (libewf_internal_handle_t *) handle;
 
 	if( internal_handle->chunk_cache == NULL )
 	{
@@ -701,9 +701,9 @@ ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, siz
  */
 ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_raw_read_buffer";
-	ssize_t read_count                      = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_raw_read_buffer";
+	ssize_t read_count                        = 0;
 
 	if( handle == NULL )
 	{
@@ -712,7 +712,7 @@ ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size
 
 		return( -1 );
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+	internal_handle = (libewf_internal_handle_t *) handle;
 
 	if( internal_handle->chunk_cache == NULL )
 	{
@@ -753,11 +753,11 @@ ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size
  */
 ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_read_buffer";
-	ssize_t chunk_read_count                = 0;
-	ssize_t total_read_count                = 0;
-	size_t chunk_data_size                  = 0;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_read_buffer";
+	ssize_t chunk_read_count                  = 0;
+	ssize_t total_read_count                  = 0;
+	size_t chunk_data_size                    = 0;
 
 	if( handle == NULL )
 	{
@@ -766,7 +766,7 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 
 		return( -1 );
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+	internal_handle = (libewf_internal_handle_t *) handle;
 
 	if( internal_handle->media_values == NULL )
 	{

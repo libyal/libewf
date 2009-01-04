@@ -42,9 +42,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_MEDIA_VALUES		libewf_media_values_t
-#define LIBEWF_MEDIA_VALUES_SIZE	sizeof( LIBEWF_MEDIA_VALUES )
-
 typedef struct libewf_media_values libewf_media_values_t;
 
 /* Additional subhandle for media specific parameters
@@ -92,7 +89,7 @@ struct libewf_media_values
         uint8_t guid[ 16 ];
 };
 
-LIBEWF_MEDIA_VALUES *libewf_media_values_alloc( void );
+libewf_media_values_t *libewf_media_values_alloc( void );
 
 #define libewf_media_values_free( media_values ) \
 	libewf_common_free( media_values )

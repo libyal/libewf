@@ -51,12 +51,13 @@
 /* Allocates memory for a new handle struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
+libewf_internal_handle_t *libewf_internal_handle_alloc( uint8_t flags )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_internal_handle_alloc";
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_internal_handle_alloc";
 
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_SIZE );
+	internal_handle = (libewf_internal_handle_t *) libewf_common_alloc(
+	                                                sizeof( libewf_internal_handle_t ) );
 
 	if( internal_handle == NULL )
 	{
@@ -280,7 +281,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 /* Frees memory of a handle struct including elements
  */
-void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
+void libewf_internal_handle_free( libewf_internal_handle_t *internal_handle )
 {
 	static char *function = "libewf_internal_handle_free";
 
@@ -349,12 +350,13 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 /* Allocates memory for a new handle read struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void )
+libewf_internal_handle_read_t *libewf_internal_handle_read_alloc( void )
 {
-	LIBEWF_INTERNAL_HANDLE_READ *handle_read = NULL;
-	static char *function                    = "libewf_internal_handle_read_alloc";
+	libewf_internal_handle_read_t *handle_read = NULL;
+	static char *function                      = "libewf_internal_handle_read_alloc";
 
-	handle_read = (LIBEWF_INTERNAL_HANDLE_READ *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_READ_SIZE );
+	handle_read = (libewf_internal_handle_read_t *) libewf_common_alloc(
+	                                                 sizeof( libewf_internal_handle_read_t ) );
 
 	if( handle_read == NULL )
 	{
@@ -382,7 +384,7 @@ LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void )
 
 /* Frees memory of a handle read struct including elements
  */
-void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read )
+void libewf_internal_handle_read_free( libewf_internal_handle_read_t *handle_read )
 {
 	static char *function = "libewf_internal_handle_read_free";
 
@@ -403,12 +405,13 @@ void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read 
 /* Allocates memory for a new handle write struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
+libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 {
-	LIBEWF_INTERNAL_HANDLE_WRITE *handle_write = NULL;
-	static char *function                      = "libewf_internal_handle_write_alloc";
+	libewf_internal_handle_write_t *handle_write = NULL;
+	static char *function                        = "libewf_internal_handle_write_alloc";
 
-	handle_write = (LIBEWF_INTERNAL_HANDLE_WRITE *) libewf_common_alloc( LIBEWF_INTERNAL_HANDLE_WRITE_SIZE );
+	handle_write = (libewf_internal_handle_write_t *) libewf_common_alloc(
+	                                                   sizeof( libewf_internal_handle_write_t ) );
 
 	if( handle_write == NULL )
 	{
@@ -442,7 +445,7 @@ LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void )
 
 /* Frees memory of a handle write struct including elements
  */
-void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_write )
+void libewf_internal_handle_write_free( libewf_internal_handle_write_t *handle_write )
 {
 	static char *function = "libewf_internal_handle_write_free";
 
@@ -462,7 +465,7 @@ void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_wri
 
 /* Returns the maximum amount of supported segment files to write, or -1 on error
  */
-int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( libewf_internal_handle_t *internal_handle )
 {
 	static char *function = "libewf_internal_handle_get_write_maximum_amount_of_segments";
 
@@ -497,7 +500,7 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 /* Determines the EWF file format based on known characteristics
  * Returns 1 if the format was determined, -1 on errror
  */
-int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_SECTIONS *header_sections )
+int libewf_internal_handle_determine_format( libewf_internal_handle_t *internal_handle, libewf_header_sections_t *header_sections )
 {
 	static char *function = "libewf_internal_handle_determine_format";
 
@@ -678,7 +681,7 @@ int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_ha
 /* Create the default header values
  * Returns 1 on success, -1 on error
  */
-int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_create_header_values( libewf_internal_handle_t *internal_handle )
 {
 	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "Case Number" );
 	libewf_char_t *description              = _S_LIBEWF_CHAR( "Description" );
@@ -805,7 +808,7 @@ int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *interna
 /* Initializes the read values
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_read_initialize( libewf_internal_handle_t *internal_handle )
 {
 	static char *function = "libewf_internal_handle_read_initialize";
 
@@ -829,7 +832,7 @@ int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_han
 /* Initializes the write values
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_handle )
 {
 	static char *function               = "libewf_internal_handle_write_initialize";
 	int64_t required_amount_of_segments = 0;

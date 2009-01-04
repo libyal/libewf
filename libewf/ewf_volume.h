@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_VOLUME ewf_volume_t
-#define EWF_VOLUME_SIZE sizeof( EWF_VOLUME )
-
 typedef struct ewf_volume ewf_volume_t;
 
 struct ewf_volume

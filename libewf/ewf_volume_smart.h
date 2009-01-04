@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_VOLUME_SMART ewf_volume_smart_t
-#define EWF_VOLUME_SMART_SIZE sizeof( EWF_VOLUME_SMART )
-
 typedef struct ewf_volume_smart ewf_volume_smart_t;
 
 struct ewf_volume_smart

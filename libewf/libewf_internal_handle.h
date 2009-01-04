@@ -56,15 +56,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_INTERNAL_HANDLE libewf_internal_handle_t
-#define LIBEWF_INTERNAL_HANDLE_SIZE sizeof( LIBEWF_INTERNAL_HANDLE )
-
-#define LIBEWF_INTERNAL_HANDLE_READ libewf_internal_handle_read_t
-#define LIBEWF_INTERNAL_HANDLE_READ_SIZE sizeof( LIBEWF_INTERNAL_HANDLE_READ )
-
-#define LIBEWF_INTERNAL_HANDLE_WRITE libewf_internal_handle_write_t
-#define LIBEWF_INTERNAL_HANDLE_WRITE_SIZE sizeof( LIBEWF_INTERNAL_HANDLE_WRITE )
-
 typedef struct libewf_internal_handle libewf_internal_handle_t;
 typedef struct libewf_internal_handle_read libewf_internal_handle_read_t;
 typedef struct libewf_internal_handle_write libewf_internal_handle_write_t;
@@ -73,15 +64,15 @@ struct libewf_internal_handle
 {
 	/* A specific subhandle for read specific values
 	 */
-	LIBEWF_INTERNAL_HANDLE_READ *read;
+	libewf_internal_handle_read_t *read;
 
 	/* A specific subhandle for write specific values
 	 */
-	LIBEWF_INTERNAL_HANDLE_WRITE *write;
+	libewf_internal_handle_write_t *write;
 
 	/* The media values
 	 */
-	LIBEWF_MEDIA_VALUES *media_values;
+	libewf_media_values_t *media_values;
 
 	/* The list of segment files
 	 */
@@ -102,15 +93,15 @@ struct libewf_internal_handle
 	/* A simple cache is implemented here to avoid having to read and decompress the
 	 * same chunk while reading the data.
 	 */
-	LIBEWF_CHUNK_CACHE *chunk_cache;
+	libewf_chunk_cache_t *chunk_cache;
 
 	/* The stored header sections
 	 */
-	LIBEWF_HEADER_SECTIONS *header_sections;
+	libewf_header_sections_t *header_sections;
 
 	/* The stored hash sections
 	 */
-	LIBEWF_HASH_SECTIONS *hash_sections;
+	libewf_hash_sections_t *hash_sections;
 
 	/* The header values
 	 */
@@ -253,23 +244,23 @@ struct libewf_internal_handle_write
 	uint8_t write_finalized;
 };
 
-LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags );
-void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle );
+libewf_internal_handle_t *libewf_internal_handle_alloc( uint8_t flags );
+void libewf_internal_handle_free( libewf_internal_handle_t *internal_handle );
 
-LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void );
-void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read );
+libewf_internal_handle_read_t *libewf_internal_handle_read_alloc( void );
+void libewf_internal_handle_read_free( libewf_internal_handle_read_t *handle_read );
 
-LIBEWF_INTERNAL_HANDLE_WRITE *libewf_internal_handle_write_alloc( void );
-void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_write );
+libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void );
+void libewf_internal_handle_write_free( libewf_internal_handle_write_t *handle_write );
 
-int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( libewf_internal_handle_t *internal_handle );
 
-int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_SECTIONS *header_sections );
+int libewf_internal_handle_determine_format( libewf_internal_handle_t *internal_handle, libewf_header_sections_t *header_sections );
 
-int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int libewf_internal_handle_create_header_values( libewf_internal_handle_t *internal_handle );
 
-int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int libewf_internal_handle_read_initialize( libewf_internal_handle_t *internal_handle );
+int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_handle );
 
 #if defined( __cplusplus )
 }

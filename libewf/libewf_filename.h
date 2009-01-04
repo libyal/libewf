@@ -46,8 +46,6 @@ extern "C" {
 
 typedef wchar_t libewf_filename_t;
 
-#define LIBEWF_FILENAME		wchar_t
-#define LIBEWF_FILENAME_SIZE	sizeof( wchar_t )
 #define PRIs_EWF_filename	"ls"
 
 #define libewf_filename_length( filename ) \
@@ -63,8 +61,6 @@ typedef wchar_t libewf_filename_t;
 
 typedef char libewf_filename_t;
 
-#define LIBEWF_FILENAME		char
-#define LIBEWF_FILENAME_SIZE	sizeof( char )
 #define PRIs_EWF_filename	"s"
 
 #define libewf_filename_length( filename ) \

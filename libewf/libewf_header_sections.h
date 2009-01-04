@@ -44,9 +44,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_HEADER_SECTIONS	 	libewf_header_sections_t
-#define LIBEWF_HEADER_SECTIONS_SIZE	sizeof( LIBEWF_HEADER_SECTIONS )
-
 typedef struct libewf_header_sections libewf_header_sections_t;
 
 /* Additional subhandle for media specific parameters
@@ -82,11 +79,11 @@ struct libewf_header_sections
 	uint8_t amount_of_header_sections;
 };
 
-LIBEWF_HEADER_SECTIONS *libewf_header_sections_alloc( void );
+libewf_header_sections_t *libewf_header_sections_alloc( void );
 
-void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections );
+void libewf_header_sections_free( libewf_header_sections_t *header_sections );
 
-int libewf_header_sections_create( LIBEWF_HEADER_SECTIONS *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format );
+int libewf_header_sections_create( libewf_header_sections_t *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format );
 
 #if defined( __cplusplus )
 }

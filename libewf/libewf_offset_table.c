@@ -64,7 +64,8 @@ libewf_offset_table_t *libewf_offset_table_alloc( uint32_t amount )
 
 	if( amount > 0 )
 	{
-		offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) libewf_common_alloc( LIBEWF_CHUNK_OFFSET_SIZE * amount );
+		offset_table->chunk_offset = (libewf_chunk_offset_t *) libewf_common_alloc(
+		                                                        sizeof( libewf_chunk_offset_t ) * amount );
 
 		if( offset_table->chunk_offset == NULL )
 		{
@@ -78,7 +79,7 @@ libewf_offset_table_t *libewf_offset_table_alloc( uint32_t amount )
 		if( libewf_common_memset(
 		     offset_table->chunk_offset,
 		     0,
-		     ( LIBEWF_CHUNK_OFFSET_SIZE * amount ) ) == NULL )
+		     ( sizeof( libewf_chunk_offset_t ) * amount ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to clear chunk offsets.\n",
 			 function );
@@ -119,7 +120,7 @@ int libewf_offset_table_realloc( libewf_offset_table_t *offset_table, uint32_t a
 	}
 	reallocation = libewf_common_realloc(
 	                offset_table->chunk_offset,
-	                ( LIBEWF_CHUNK_OFFSET_SIZE * amount ) );
+	                ( sizeof( libewf_chunk_offset_t ) * amount ) );
 
 	if( reallocation == NULL )
 	{
@@ -128,12 +129,12 @@ int libewf_offset_table_realloc( libewf_offset_table_t *offset_table, uint32_t a
 
 		return( -1 );
 	}
-	offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) reallocation;
+	offset_table->chunk_offset = (libewf_chunk_offset_t *) reallocation;
 
 	if( libewf_common_memset(
 	     &( offset_table->chunk_offset[ offset_table->amount ] ),
 	     0,
-	     ( LIBEWF_CHUNK_OFFSET_SIZE * ( amount - offset_table->amount ) ) ) == NULL )
+	     ( sizeof( libewf_chunk_offset_t ) * ( amount - offset_table->amount ) ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear chunk offsets.\n",
 		 function );
@@ -170,7 +171,7 @@ void libewf_offset_table_free( libewf_offset_table_t *offset_table )
 /* Fills the offset table
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_fill( libewf_offset_table_t *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, libewf_segment_file_handle_t *segment_file_handle, uint8_t error_tollerance )
+int libewf_offset_table_fill( libewf_offset_table_t *offset_table, off64_t base_offset, ewf_table_offset_t *offsets, uint32_t amount_of_chunks, libewf_segment_file_handle_t *segment_file_handle, uint8_t error_tollerance )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *chunk_type        = NULL;

@@ -43,9 +43,6 @@
 extern "C" {
 #endif
 
-#define EWF_LTREE ewf_ltree_t
-#define EWF_LTREE_SIZE sizeof( EWF_LTREE )
-
 typedef struct ewf_ltree ewf_ltree_t;
 
 struct ewf_ltree

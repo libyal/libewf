@@ -61,14 +61,14 @@ struct libewf_offset_table
 
 	/* Dynamic array of chunk offsets
 	 */
-	LIBEWF_CHUNK_OFFSET *chunk_offset;
+	libewf_chunk_offset_t *chunk_offset;
 };
 
 libewf_offset_table_t *libewf_offset_table_alloc( uint32_t amount );
 int libewf_offset_table_realloc( libewf_offset_table_t *offset_table, uint32_t amount );
 void libewf_offset_table_free( libewf_offset_table_t *offset_table );
 
-int libewf_offset_table_fill( libewf_offset_table_t *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, libewf_segment_file_handle_t *segment_file_handle, uint8_t error_tollerance );
+int libewf_offset_table_fill( libewf_offset_table_t *offset_table, off64_t base_offset, ewf_table_offset_t *offsets, uint32_t amount_of_chunks, libewf_segment_file_handle_t *segment_file_handle, uint8_t error_tollerance );
 int libewf_offset_table_calculate_last_offset( libewf_offset_table_t *offset_table, libewf_section_list_t *section_list, uint8_t error_tollerance );
 int libewf_offset_table_compare( libewf_offset_table_t *offset_table1, libewf_offset_table_t *offset_table2 );
 
