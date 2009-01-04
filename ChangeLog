@@ -134,16 +134,12 @@ Next release:
 * API function get current chunk size?
 * do not finalize on write error?
 
-* refactor segment table to table of segment files
-  this reduces the amount of reallocs
-  - fix allocation problem in segment table
-* refactor the offset/chunk table to a table of chunk offsets?
-  this reduces the amount of reallocs
 * refactor chunk offset segment_number and file_descriptor to
   reference of segment_file struct
   - dirty still needed?
-  - remove libewf_offset_table_set_values
+  - remove libewf_offset_table_set_values?
 * remove common alloc/realloc cleared
+* is libewf_segment_file_write_open used? i.e. by libewf_open?
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

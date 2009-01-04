@@ -262,15 +262,13 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 			return( NULL );
 		}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		if( libewf_segment_table_set_wide_filename(
-		     internal_handle->segment_table,
-		     0,
+		if( libewf_segment_file_set_wide_filename(
+		     &( internal_handle->segment_table->segment_file[ 0 ] ),
 		     filenames[ iterator ],
 		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 #else
-		if( libewf_segment_table_set_filename(
-		     internal_handle->segment_table,
-		     0,
+		if( libewf_segment_file_set_filename(
+		     &( internal_handle->segment_table->segment_file[ 0 ] ),
 		     filenames[ iterator ],
 		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
 #endif
@@ -978,7 +976,8 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_t *filename,
 int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length )
 #endif
 {
-	static char *function = "libewf_get_delta_segment_filename";
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_delta_segment_filename";
 
 	if( handle == NULL )
 	{
@@ -987,16 +986,23 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, si
 
 		return( -1 );
 	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	return( libewf_segment_table_set_wide_filename(
-	         ( (LIBEWF_INTERNAL_HANDLE *) handle )->delta_segment_table,
-	         0,
+	return( libewf_segment_file_get_wide_filename(
+	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	         filename,
 	         length ) );
 #else
-	return( libewf_segment_table_set_filename(
-	         ( (LIBEWF_INTERNAL_HANDLE *) handle )->delta_segment_table,
-	         0,
+	return( libewf_segment_file_get_filename(
+	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	         filename,
 	         length ) );
 #endif
@@ -1650,16 +1656,21 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, si
 
 		return( -1 );
 	}
+	if( internal_handle->delta_segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	return( libewf_segment_table_set_wide_filename(
-	         internal_handle->delta_segment_table,
-	         0,
+	return( libewf_segment_file_set_wide_filename(
+	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	         filename,
 	         length ) );
 #else
-	return( libewf_segment_table_set_filename(
-	         internal_handle->delta_segment_table,
-	         0,
+	return( libewf_segment_file_set_filename(
+	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	         filename,
 	         length ) );
 #endif
