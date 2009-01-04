@@ -210,6 +210,20 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value is zero.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( is_compressed == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid is compressed.\n",
@@ -227,20 +241,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	if( read_crc == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid read crc.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value is zero.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -293,7 +293,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
 	if( segment_file->filename == NULL )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - missing filename.\n",
@@ -301,7 +300,6 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-#endif
 	/* Make sure the segment file offset is in the right place
 	 */
 	if( libewf_segment_file_seek_offset(
@@ -327,33 +325,28 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	/* Determine if the chunk is not compressed
+	/* Determine if the CRC should be read seperately
 	 */
-	if( *is_compressed == 0 )
+	if( *read_crc != 0 )
 	{
-		/* Determine if the CRC should be read seperately
-		 */
-		if( *read_crc != 0 )
+		crc_read_count = libewf_segment_file_read(
+				  segment_file,
+				  stored_crc_buffer,
+				  EWF_CRC_SIZE );
+
+		if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
 		{
-			crc_read_count = libewf_segment_file_read(
-					  segment_file,
-					  stored_crc_buffer,
-					  EWF_CRC_SIZE );
+			LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
+			 function, chunk, segment_number, segment_file->filename );
 
-			if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
-			{
-				LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
-				 function, chunk, segment_number, segment_file->filename );
+			return( -1 );
+		}
+		if( libewf_endian_convert_32bit( chunk_crc, stored_crc_buffer ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
+			 function );
 
-				return( -1 );
-			}
-			if( libewf_endian_convert_32bit( chunk_crc, stored_crc_buffer ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
-				 function );
-
-				return( -1 );
-			}
+			return( -1 );
 		}
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
@@ -365,10 +358,11 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	{
 		chunk_type = "COMPRESSED";
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s.\n",
-	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
+	LIBEWF_VERBOSE_PRINT( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %zd.\n",
+	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type,
+	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
-	return( chunk_read_count + crc_read_count );
+	return( chunk_read_count );
 }
 
 /* Reads a certain chunk of data from the segment file(s)
@@ -481,8 +475,10 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 		}
 		chunk_data = internal_handle->chunk_cache->data;
 
-#if defined( HAVE_BUFFER_PASSTHROUGH )
-		/* Determine if the chunk data should be put directly in the buffer
+		/* Directly read to the buffer if
+		 *  the buffer isn't the chunk cache
+		 *  and no data was previously copied into the chunk cache
+		 *  and the buffer contains the necessary amount of bytes to fill a chunk
 		 */
 		if( ( buffer != internal_handle->chunk_cache->data )
 		 && ( chunk_offset == 0 )
@@ -497,8 +493,6 @@ ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_
 				chunk_data_size -= EWF_CRC_SIZE;
 			}
 		}
-#endif
-
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */

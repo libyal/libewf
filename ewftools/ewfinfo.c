@@ -361,6 +361,10 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stdout, "\tMedia type:\t\tfixed disk\n" );
 			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_CDROM )
+			{
+				fprintf( stdout, "\tMedia type:\t\tCD-ROM\n" );
+			}
 			else
 			{
 				fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n", media_type );

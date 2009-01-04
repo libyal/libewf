@@ -95,19 +95,19 @@ LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( HAVE_WCSTOL )
-#define libewf_string_to_signed_long( string, end_of_string, base ) \
-	(int64_t) wcstol( string, end_of_string, base )
+#if defined( HAVE_WCSTOLL )
+#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
+	(int64_t) wcstoll( string, end_of_string, base )
 #endif
 
 #else
 
-#if defined( HAVE_STRTOL )
-#define libewf_string_to_signed_long( string, end_of_string, base ) \
-	(int64_t) strtol( string, end_of_string, base )
-#elif defined( HAVE_ATOL )
-#define libewf_string_to_signed_long( string, end_of_string, base ) \
-	(int64_t) atol( string )
+#if defined( HAVE_STRTOLL )
+#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
+	(int64_t) strtoll( string, end_of_string, base )
+#elif defined( HAVE_ATOLL )
+#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
+	(int64_t) atoll( string )
 #endif
 
 #endif
@@ -149,10 +149,10 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 	}
 	end_of_string = (LIBEWF_CHAR *) &string[ size - 1 ];
 
-#if defined( libewf_string_to_signed_long )
-	value = libewf_string_to_signed_long( string, &end_of_string, 0 );
+#if defined( libewf_string_to_signed_long_long )
+	value = libewf_string_to_signed_long_long( string, &end_of_string, 0 );
 #else
-#error Missing equivalent of strtol
+#error Missing equivalent of strtoll
 #endif
 
 	if( value == (int64_t) LONG_MAX )
@@ -167,19 +167,19 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( HAVE_WCSTOUL )
-#define libewf_string_to_unsigned_long( string, end_of_string, base ) \
-	(uint64_t) wcstoul( string, end_of_string, base )
+#if defined( HAVE_WCSTOULL )
+#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
+	(uint64_t) wcstoull( string, end_of_string, base )
 #endif
 
 #else
 
-#if defined( HAVE_STRTOUL )
-#define libewf_string_to_unsigned_long( string, end_of_string, base ) \
-	(uint64_t) strtoul( string, end_of_string, base )
-#elif defined( HAVE_ATOL )
-#define libewf_string_to_unsigned_long( string, end_of_string, base ) \
-	(uint64_t) atol( string )
+#if defined( HAVE_STRTOULL )
+#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
+	(uint64_t) strtoull( string, end_of_string, base )
+#elif defined( HAVE_ATOLL )
+#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
+	(uint64_t) atoll( string )
 #endif
 
 #endif
@@ -221,10 +221,10 @@ uint64_t libewf_string_to_uint64( const LIBEWF_CHAR *string, size_t size )
 	}
 	end_of_string = (LIBEWF_CHAR *) &string[ size - 1 ];
 
-#if defined( libewf_string_to_unsigned_long )
-	value = libewf_string_to_unsigned_long( string, &end_of_string, 0 );
+#if defined( libewf_string_to_unsigned_long_long )
+	value = libewf_string_to_unsigned_long_long( string, &end_of_string, 0 );
 #else
-#error Missing equivalent of strtoul
+#error Missing equivalent of strtoull
 #endif
 
 	if( value == (uint64_t) LONG_MAX )

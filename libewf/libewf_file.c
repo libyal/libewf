@@ -1611,10 +1611,24 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 	}
 	if( internal_handle->delta_segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment table.\n",
 		 function );
 
 		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->segment_file[ 0 ] == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing first segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->delta_segment_table->segment_file[ 0 ]->filename != NULL )
+	{
+		libewf_common_free( internal_handle->delta_segment_table->segment_file[ 0 ]->filename );
+
+		internal_handle->delta_segment_table->segment_file[ 0 ]->filename        = NULL;
+		internal_handle->delta_segment_table->segment_file[ 0 ]->length_filename = 0;
 	}
 	return( libewf_segment_file_set_filename(
 	         internal_handle->delta_segment_table->segment_file[ 0 ],
@@ -2092,6 +2106,8 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 	LIBEWF_INTERNAL_HANDLE *internal_handle    = NULL;
 	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
 	static char *function                      = "libewf_add_acquiry_error";
+	off64_t last_sector                        = 0;
+	off64_t last_range_sector                  = 0;
 	uint32_t iterator                          = 0;
 
 	if( handle == NULL )
@@ -2127,8 +2143,18 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
 		 */
 		for( iterator = 0; iterator < internal_handle->amount_of_acquiry_errors; iterator++ )
 		{
-			if( internal_handle->acquiry_error_sectors[ iterator ].sector == sector )
+			last_range_sector = internal_handle->acquiry_error_sectors[ iterator ].sector
+			                  + internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors;
+
+			if( ( sector >= internal_handle->acquiry_error_sectors[ iterator ].sector )
+			 && ( sector <= last_range_sector ) )
 			{
+				last_sector = sector + amount_of_sectors;
+
+				if( last_sector > last_range_sector )
+				{
+					internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors += last_sector - last_range_sector;
+				}
 				return( 1 );
 			}
 		}
@@ -2161,6 +2187,8 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	LIBEWF_ERROR_SECTOR *crc_error_sectors  = NULL;
 	static char *function                   = "libewf_add_crc_error";
+	off64_t last_sector                     = 0;
+	off64_t last_range_sector               = 0;
 	uint32_t iterator                       = 0;
 
 	if( handle == NULL )
@@ -2196,8 +2224,18 @@ int libewf_add_crc_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount
 		 */
 		for( iterator = 0; iterator < internal_handle->read->crc_amount_of_errors; iterator++ )
 		{
-			if( internal_handle->read->crc_error_sectors[ iterator ].sector == sector )
+			last_range_sector = internal_handle->read->crc_error_sectors[ iterator ].sector
+			                  + internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors;
+
+			if( ( sector >= internal_handle->read->crc_error_sectors[ iterator ].sector )
+			 && ( sector <= last_range_sector ) )
 			{
+				last_sector = sector + amount_of_sectors;
+
+				if( last_sector > last_range_sector )
+				{
+					internal_handle->read->crc_error_sectors[ iterator ].amount_of_sectors += last_sector - last_range_sector;
+				}
 				return( 1 );
 			}
 		}

@@ -70,13 +70,17 @@
  */
 void usage( void )
 {
-	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -f format ] [ -o offset ]\n" );
-	fprintf( stderr, "                 [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
+	fprintf( stderr, "Usage: ewfexport [ -b amount_of_sectors ] [ -B amount_of_bytes ] [ -c compression_type ] [ -d digest_type ] [ -f format ]\n" );
+	fprintf( stderr, "                 [ -o offset ] [ -S segment_file_size ] [ -t target ] [ -hsquvVw ] ewf_files\n\n" );
 
 	fprintf( stderr, "\t-b: specify the amount of sectors to read at once (per chunk), options: 64 (default),\n" );
 	fprintf( stderr, "\t    128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
+	fprintf( stdout, "\t    (not used for raw format)\n" );
 	fprintf( stderr, "\t-B: specify the amount of bytes to export (default is all bytes)\n" );
 	fprintf( stderr, "\t-c: specify the compression type, options: none (is default), empty_block, fast, best\n" );
+	fprintf( stdout, "\t    (not used for raw format)\n" );
+	fprintf( stdout, "\t-d: calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stdout, "\t    (not used for raw format)\n" );
 	fprintf( stderr, "\t-f: specify the file format to write to, options: raw (default), ewf, smart,\n" );
 	fprintf( stderr, "\t    encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx\n" );
 	fprintf( stderr, "\t-h: shows this help\n" );
@@ -86,11 +90,13 @@ void usage( void )
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stderr, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
 	fprintf( stderr, "\t    stdout is only supported for the raw format\n" );
-	fprintf( stderr, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
-	 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
-#if defined( SPLIT_EXPORT )
-	fprintf( stderr, "\t    or the limit of the raw file size (default is no limit)" );
-#endif
+	fprintf( stdout, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
+	 (uint32_t) ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
+	fprintf( stdout, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other EWF formats)\n",
+	 (uint32_t) ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
+	 (uint64_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT / 1024 ),
+	 (uint32_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT / 1024 ) );
+	fprintf( stdout, "\t    (not used for raw format)\n" );
 	fprintf( stderr, "\t-u: unattended mode (disables user interaction)\n" );
 	fprintf( stderr, "\t-v: verbose output to stderr\n" );
 	fprintf( stderr, "\t-V: print version\n" );
@@ -128,11 +134,12 @@ int main( int argc, char * const argv[] )
 	size_t string_length               = 0;
 	time_t timestamp_start             = 0;
 	time_t timestamp_end               = 0;
-	int64_t count                      = 0;
+	uint64_t maximum_segment_file_size = 0;
+	uint64_t segment_file_size         = 0;
 	uint64_t export_offset             = 0;
 	uint64_t export_size               = 0;
 	uint64_t sectors_per_chunk         = 64;
-	int64_t segment_file_size          = 0;
+	int64_t count                      = 0;
 	uint8_t libewf_format              = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs            = 0;
 	uint8_t wipe_chunk_on_error        = 0;
@@ -146,6 +153,8 @@ int main( int argc, char * const argv[] )
 	int argument_set_segment_file_size = 0;
 	int argument_set_size              = 0;
 	int interactive_mode               = 1;
+	uint8_t calculate_md5              = 1;
+	uint8_t calculate_sha1             = 0;
 	int output_raw                     = 1;
 
 	LIBEWF_CHAR *ewfexport_format_types[ 13 ] = \
@@ -167,7 +176,7 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_version_fprint( stderr, program );
 
-	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
+	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "b:B:c:d:f:ho:qsS:t:uvVw" ) ) ) != (INT_T) -1 )
 	{
 		switch( option )
 		{
@@ -220,6 +229,17 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
+			case (INT_T) 'd':
+				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "sha1" ), 4 ) == 0 )
+				{
+					calculate_sha1 = 1;
+				}
+				else
+				{
+					fprintf( stderr, "Unsupported digest type.\n" );
+				}
+				break;
+
 			case (INT_T) 'f':
 				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "raw" ), 3 ) == 0 )
 				{
@@ -266,11 +286,23 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'S':
-				string_length     = CHAR_T_LENGTH( optarg );
-				end_of_string     = &optarg[ string_length - 1 ];
-				segment_file_size = CHAR_T_TOLONG( optarg, &end_of_string, 0 );
-				argument_set_size = 1;
+				string_length      = CHAR_T_LENGTH( optarg );
+				end_of_string      = &optarg[ string_length - 1 ];
+				segment_file_size  = (uint64_t) CHAR_T_TOLONG( optarg, &end_of_string, 0 );
+				argument_set_size  = 1;
+				segment_file_size *= 1024;
 
+				if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+				 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
+				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
+				{
+					fprintf( stderr, "Unsupported segment file size defaulting to %" PRIu32 ".\n",
+					 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+
+					segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+				}
 				break;
 
 			case (INT_T) 't':
@@ -502,6 +534,16 @@ int main( int argc, char * const argv[] )
 			{
 				/* Segment file size
 				 */
+				if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+				{
+					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
+				}
+				else
+				{
+					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
+				}
+				/* Segment file size
+				 */
 				segment_file_size = ewfinput_get_size_variable(
 						     stderr,
 						     _S_LIBEWF_CHAR( "Evidence segment file size in kibitytes (KiB)" ),
@@ -511,11 +553,11 @@ int main( int argc, char * const argv[] )
 
 				segment_file_size *= 1024;
 
-				/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
+				/* Make sure the segment file size is smaller than or equal to the maximum
 				 */
-				if( segment_file_size >= (int64_t) INT32_MAX )
+				if( segment_file_size > maximum_segment_file_size )
 				{
-					segment_file_size = (int64_t) INT32_MAX - 1;
+					segment_file_size = maximum_segment_file_size;
 				}
 			}
 			if( argument_set_sectors_per_chunk == 0 )
@@ -549,21 +591,6 @@ int main( int argc, char * const argv[] )
 					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 				}
 			}
-#if defined( SPLIT_EXPORT )
-	 		if( CHAR_T_COMPARE( target_filename, _S_CHAR_T( "-" ), 1 ) != 0 )
-			{
-				/* Segment file size
-				 */
-				segment_file_size = ewfinput_get_size_variable(
-						     stderr,
-						     _S_LIBEWF_CHAR( "Maximum export file size in kibibytes (KiB) or 0 for no limit" ),
-						     0,
-						     ( INT64_MAX / 1024 ),
-						     ( 2 * 1024 * 1024 ) );
-
-				segment_file_size *= 1024;
-			}
-#endif
 		}
 		if( argument_set_offset == 0 )
 		{
@@ -719,6 +746,8 @@ int main( int argc, char * const argv[] )
 		         export_handle,
 		         export_size,
 		         export_offset,
+		         calculate_md5,
+		         calculate_sha1,
 		         swap_byte_pairs,
 		         wipe_chunk_on_error,
 		         callback );

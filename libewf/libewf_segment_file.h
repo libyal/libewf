@@ -50,12 +50,13 @@ extern "C" {
 int libewf_segment_file_check_file_signature( int file_descriptor );
 
 LIBEWF_SEGMENT_FILE *libewf_segment_file_alloc( void );
-LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, uint8_t flags );
+int libewf_segment_file_open( LIBEWF_SEGMENT_FILE *segment_file, uint8_t flags );
+int libewf_segment_file_reopen( LIBEWF_SEGMENT_FILE *segment_file, uint8_t flags );
 ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffer, size_t size );
 ssize_t libewf_segment_file_write( LIBEWF_SEGMENT_FILE *segment_file, void *buffer, size_t size );
 off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset );
 
-ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *segment_number, uint8_t *segment_file_type );
+ssize_t libewf_segment_file_read_file_header( LIBEWF_SEGMENT_FILE *segment_file, uint16_t *segment_number, uint8_t *segment_file_type );
 
 int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format );
 
@@ -73,7 +74,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 
 ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc );
 
-ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t chunks_section_offset, size_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks );
+ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, off64_t chunks_section_offset, size64_t chunks_section_size, uint32_t amount_of_chunks, uint32_t section_amount_of_chunks );
 
 ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc );
 

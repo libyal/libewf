@@ -1,14 +1,11 @@
 /* libewf/libewf_config.h.  Generated from libewf_config.h.in by configure.  */
 /* libewf/libewf_config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `atol' function. */
-#define HAVE_ATOL 1
+/* Define to 1 if you have the `atoll' function. */
+#define HAVE_ATOLL 1
 
 /* Define to 1 if you have the `btowc' function. */
 /* #undef HAVE_BTOWC */
-
-/* Defines if buffer passthrough should be used */
-/* #undef HAVE_BUFFER_PASSTHROUGH */
 
 /* Defines if compressBound funtion is present in zlib. */
 #define HAVE_COMPRESS_BOUND 1
@@ -26,7 +23,7 @@
 /* #undef HAVE_CYGWIN_FS_H */
 
 /* Defines if debug output should be used */
-/* #undef HAVE_DEBUG_OUTPUT */
+#define HAVE_DEBUG_OUTPUT 1
 
 /* Define to 1 if you have the declaration of `memrchr ', and to 0 if you
    don't. */
@@ -128,7 +125,7 @@
 
 /* Defines if libewf's read and write raw functionality should be used in the
    ewf tools */
-/* #undef HAVE_RAW_ACCESS */
+#define HAVE_RAW_ACCESS 1
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
@@ -187,11 +184,11 @@
 /* Define to 1 if you have the `strrchr' function. */
 #define HAVE_STRRCHR 1
 
-/* Define to 1 if you have the `strtol' function. */
-#define HAVE_STRTOL 1
+/* Define to 1 if you have the `strtoll' function. */
+#define HAVE_STRTOLL 1
 
-/* Define to 1 if you have the `strtoul' function. */
-#define HAVE_STRTOUL 1
+/* Define to 1 if you have the `strtoull' function. */
+#define HAVE_STRTOULL 1
 
 /* Define to 1 if you have the `swprintf' function. */
 /* #undef HAVE_SWPRINTF */
@@ -274,11 +271,11 @@
 /* Define to 1 if you have the `wcsrtombs' function. */
 /* #undef HAVE_WCSRTOMBS */
 
-/* Define to 1 if you have the `wcstol' function. */
-/* #undef HAVE_WCSTOL */
+/* Define to 1 if you have the `wcstoll' function. */
+/* #undef HAVE_WCSTOLL */
 
-/* Define to 1 if you have the `wcstoul' function. */
-/* #undef HAVE_WCSTOUL */
+/* Define to 1 if you have the `wcstoull' function. */
+/* #undef HAVE_WCSTOULL */
 
 /* Define to 1 if you have the `wctob' function. */
 /* #undef HAVE_WCTOB */
@@ -317,13 +314,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20071123"
+#define PACKAGE_STRING "libewf 20071124"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20071123"
+#define PACKAGE_VERSION "20071124"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -335,7 +332,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20071123"
+#define VERSION "20071124"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20071123], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20071124], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20071123])
+AM_INIT_AUTOMAKE([libewf], [20071124])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -83,7 +83,6 @@ AC_SYS_LARGEFILE
 
 dnl Check for configure arguments
 LIBEWF_TEST_ENABLE([wide-character-type], [wide_character_type], [enable wide character type support], [no])
-LIBEWF_TEST_ENABLE([buffer-passthrough], [buffer_passthrough], [minimize the usage of the chunk cache by directly accessing data buffers], [no])
 LIBEWF_TEST_ENABLE([raw-access], [raw_access], [use libewf's raw read and write functionality in the ewf tools], [no])
 LIBEWF_TEST_ENABLE([verbose-output], [verbose_output], [enable verbose output], [no])
 LIBEWF_TEST_ENABLE([debug-output], [debug_output], [enable debug output], [no])
@@ -166,7 +165,7 @@ AC_CHECK_TYPE([off64_t],[AC_SUBST([HAVE_OFF64_T],[1])],[AC_SUBST([HAVE_OFF64_T],
 AC_CHECK_TYPES([ssize_t, u64])
 
 dnl Check for functions
-AC_CHECK_FUNCS( atol ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset mktime snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )
+AC_CHECK_FUNCS([atoll ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset mktime snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtoll strtoull uname])
 
 AC_FUNC_MEMCMP
 AC_FUNC_STRERROR_R
@@ -191,7 +190,7 @@ AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
 
 AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
 	[AC_DEFINE([HAVE_WIDE_CHARACTER_TYPE],[1],[Defines if wide character type should be used])
-		AC_CHECK_FUNCS([btowc fgetws mbsinit mbsrtowcs swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstol wcstoul])
+		AC_CHECK_FUNCS([btowc fgetws mbsinit mbsrtowcs swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstoll wcstoull])
 		AC_CHECK_HEADERS([wchar.h],
 			[AC_DEFINE([HAVE_WCHAR_H],[1],[Define to 1 if you have the <wchar.h> header file.])
 			AC_SUBST([HAVE_WCHAR_H],[1])],
@@ -200,9 +199,6 @@ AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
 		AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[1])],
 	[AC_SUBST([HAVE_WIDE_CHARACTER_TYPE],[0])
 	AC_SUBST([HAVE_WCHAR_H],[0])])
-
-AS_IF([test "x$ac_libewf_enable_buffer_passthrough" != xno ],
-	[AC_DEFINE( [HAVE_BUFFER_PASSTHROUGH], [1], [Defines if buffer passthrough should be used] ) ] )
 
 AS_IF([test "x$ac_libewf_enable_raw_access" != xno ],
 	[AC_DEFINE( [HAVE_RAW_ACCESS], [1], [Defines if libewf's read and write raw functionality should be used in the ewf tools] ) ] )

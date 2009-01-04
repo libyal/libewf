@@ -592,27 +592,26 @@ int main( int argc, char * const argv[] )
 		 */
 		if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 		{
-			maximum_segment_file_size = ULONG_MAX;
+			maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
 		}
 		else
 		{
-			maximum_segment_file_size = INT32_MAX;
+			maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 		}
-
 		segment_file_size = ewfinput_get_size_variable(
 		                     stdout,
 		                     _S_LIBEWF_CHAR( "Evidence segment file size in kibibytes (KiB)" ),
-		                     1440,
+		                     ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
 		                     ( maximum_segment_file_size / 1024 ),
-		                     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+		                     ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
 
 		segment_file_size *= 1024;
 
-		/* Make sure the segment file size is 1 byte smaller than the maximum
+		/* Make sure the segment file size is smaller than or equal to the maximum
 		 */
-		if( segment_file_size >= maximum_segment_file_size )
+		if( segment_file_size > maximum_segment_file_size )
 		{
-			segment_file_size = maximum_segment_file_size - 1;
+			segment_file_size = maximum_segment_file_size;
 		}
 
 		/* Chunk size (sectors per block)

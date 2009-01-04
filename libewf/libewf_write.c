@@ -648,7 +648,7 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( chunk_data_size > (size_t) internal_handle->media_values->chunk_size )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data size value exceeds chunk size.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk data size value exceeds media values chunk size.\n",
 		 function );
 
 		return( -1 );
@@ -1105,7 +1105,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 	}
 	else if( result == 1 )
 	{
-		LIBEWF_VERBOSE_PRINT( "%s: closing chunks section amount of data written: %" PRIi32 ".\n",
+		LIBEWF_VERBOSE_PRINT( "%s: closing chunks section amount of data written: %" PRIi64 ".\n",
 		 function, internal_handle->write->chunks_section_write_count );
 
 		/* Correct the offset, size in the chunks section
@@ -1114,7 +1114,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
 		               internal_handle->write->chunks_section_offset,
-		               (size_t) internal_handle->write->chunks_section_write_count,
+		               (size64_t) internal_handle->write->chunks_section_write_count,
 		               internal_handle->write->amount_of_chunks,
 		               internal_handle->write->section_amount_of_chunks );
 
@@ -1317,17 +1317,15 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 */
 			if( segment_file->file_offset != segment_file->section_list->last->start_offset )
 			{
-				if( libewf_common_lseek(
-				     segment_file->file_descriptor,
-				     segment_file->section_list->last->start_offset,
-				     SEEK_SET ) == -1 )
+				if( libewf_segment_file_seek_offset(
+				     segment_file,
+				     segment_file->section_list->last->start_offset ) == -1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
 					 function, segment_file->section_list->last->start_offset );
 
 					return( -1 );
 				}
-				segment_file->file_offset = segment_file->section_list->last->start_offset;
 			}
 
 			/* Check if chunk fits in exisiting delta segment file
@@ -1572,24 +1570,18 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
 
 		return( -1 );
 	}
-	/* Check if the chunk cache data is directly being passed (for finalize)
+	/* Directy write the buffer if
+	 *  the chunk cache data is directly being passed (for finalize)
+	 *  or no data was previously copied into the chunk cache
+	 *   and the buffer contains the necessary amount of bytes to fill a chunk
 	 */
-	if( buffer == internal_handle->chunk_cache->data )
+	if( ( buffer == internal_handle->chunk_cache->data )
+	 || ( ( internal_handle->chunk_cache->offset == 0 )
+	 && ( data_size >= (size_t) internal_handle->media_values->chunk_size ) ) )
 	{
 		chunk_data = (EWF_CHAR *) buffer;
 		write_size = read_size;
 	}
-#if defined( HAVE_BUFFER_PASSTHROUGH )
-	/* Check if buffer contain the necessary amount of bytes to fill a chunk
-	 * and no data was previously copied into the chunk cache
-	 */
-	else if( ( internal_handle->chunk_cache->offset == 0 )
-	 && ( data_size >= (size_t) internal_handle->media_values->chunk_size ) )
-	{
-		chunk_data = (EWF_CHAR *) buffer;
-		write_size = read_size;
-	}
-#endif
 	else
 	{
 		/* Check if data is present in the chunk cache
@@ -2394,7 +2386,7 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				       internal_handle,
 				       segment_file,
 				       internal_handle->write->chunks_section_offset,
-				       (size_t) internal_handle->write->chunks_section_write_count,
+				       (size64_t) internal_handle->write->chunks_section_write_count,
 				       internal_handle->write->amount_of_chunks,
 				       internal_handle->write->section_amount_of_chunks );
 
@@ -2499,10 +2491,9 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 					LIBEWF_VERBOSE_PRINT( "%s: correcting volume section.\n",
 					 function );
 
-					if( libewf_common_lseek(
-					     segment_file->file_descriptor,
-					     list_entry_iterator->start_offset,
-					     SEEK_SET ) == -1 )
+					if( libewf_segment_file_seek_offset(
+					     segment_file,
+					     list_entry_iterator->start_offset ) == -1 )
 					{
 						LIBEWF_WARNING_PRINT( "%s: unable to find offset to correct volume section.\n",
 						 function );
@@ -2547,10 +2538,9 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 					LIBEWF_VERBOSE_PRINT( "%s: correcting data section.\n",
 					 function );
 
-					if( libewf_common_lseek(
-					     segment_file->file_descriptor,
-					     list_entry_iterator->start_offset,
-					     SEEK_SET ) == -1 )
+					if( libewf_segment_file_seek_offset(
+					     segment_file,
+					     list_entry_iterator->start_offset ) == -1 )
 					{
 						LIBEWF_WARNING_PRINT( "%s: unable to find offset to data volume section.\n",
 						 function );

@@ -114,11 +114,11 @@ extern "C" {
 #error Missing wide character string search function (wmemchr and wcschr)
 #endif
 
-#if defined( HAVE_WCSTOL )
+#if defined( HAVE_WCSTOLL )
 #define CHAR_T_TOLONG( string, end_of_string, base ) \
-	(int64_t) wcstol( string, end_of_string, base )
+	(int64_t) wcstoll( string, end_of_string, base )
 #else
-#error Missing wide character string to long (wcstol)
+#error Missing wide character string to long (wcstoll)
 #endif
 
 #if defined( HAVE_FGETWS )
@@ -195,14 +195,14 @@ extern "C" {
 #error Missing string search function (memchr and strchr)
 #endif
 
-#if defined( HAVE_STRTOL )
+#if defined( HAVE_STRTOLL )
 #define CHAR_T_TOLONG( string, end_of_string, base ) \
-	(int64_t) strtol( string, end_of_string, base )
-#elif defined( HAVE_ATOL )
+	(int64_t) strtoll( string, end_of_string, base )
+#elif defined( HAVE_ATOLL )
 #define CHAR_T_TOLONG( string, end_of_string, base ) \
-	(int64_t) atol( string )
+	(int64_t) atoll( string )
 #else
-#error Missing string to long function (strtol and atol)
+#error Missing string to long long function (strtoll and atoll)
 #endif
 
 #if defined( HAVE_FGETS )

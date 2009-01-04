@@ -241,7 +241,7 @@ struct libewf_internal_handle_write
 
 	/* The amount of bytes written to a section containing chunks
 	 */
-	ssize32_t chunks_section_write_count;
+	ssize64_t chunks_section_write_count;
 
         /* The amount of chunks written
          */
