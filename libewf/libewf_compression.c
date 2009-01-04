@@ -36,7 +36,7 @@
 #include "ewf_definitions.h"
 
 /* Compresses data, wraps zlib uncompress function
- * Returns 1 on success, -1 on error
+ * Returns 1 on success or -1 on error
  */
 int libewf_compress(
      uint8_t *compressed_data,
@@ -152,7 +152,7 @@ int libewf_compress(
 }
 
 /* Uncompresses data, wraps zlib uncompress function
- * Returns 1 on success, 0 on failure, -1 on error
+ * Returns 1 on success, 0 on failure or -1 on error
  */
 int libewf_uncompress(
      uint8_t *uncompressed_data,

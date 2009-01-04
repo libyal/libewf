@@ -29,62 +29,16 @@
 
 #include "libewf_file_io_pool.h"
 
-/* Allocates memory for a file io pool struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the file io pool
+ * Returns 1 if successful or -1 on error
  */
-libewf_file_io_pool_t *libewf_file_io_pool_alloc(
-                        size_t amount )
+int libewf_file_io_pool_initialize(
+     libewf_file_io_pool_t **file_io_pool,
+     size_t amount_of_files )
 {
-	libewf_file_io_pool_t *file_io_pool = NULL;
-	static char *function               = "libewf_file_io_pool_alloc";
-	size_t iterator                     = 0;
-
-	file_io_pool = (libewf_file_io_pool_t *) memory_allocate(
-	                                          sizeof( libewf_file_io_pool_t ) );
-
-	if( file_io_pool == NULL )
-	{
-		notify_warning_printf( "%s: unable to allocate file io pool.\n",
-		 function );
-
-		return( NULL );
-	}
-	file_io_pool->handle = (libewf_file_io_handle_t *) memory_allocate(
-	                                                    sizeof( libewf_file_io_handle_t ) * amount );
-
-	if( file_io_pool->handle == NULL )
-	{
-		notify_warning_printf( "%s: unable to allocate file io handles.\n",
-		 function );
-
-		memory_free(
-		 file_io_pool );
-
-		return( NULL );
-	}
-	for( iterator = 0; iterator < amount; iterator++ )
-	{
-		file_io_pool->handle[ iterator ].filename        = NULL;
-		file_io_pool->handle[ iterator ].file_descriptor = -1;
-		file_io_pool->handle[ iterator ].file_offset     = 0;
-		file_io_pool->handle[ iterator ].flags           = 0;
-	}
-	file_io_pool->amount     = amount;
-	file_io_pool->open_files = 0;
-
-	return( file_io_pool );
-}
-
-/* Reallocates memory for the file io pool entries
- * Returns 1 if successful, or -1 on error
- */
-int libewf_file_io_pool_realloc(
-     libewf_file_io_pool_t *file_io_pool,
-     size_t amount )
-{
-	void *reallocation    = NULL;
-	static char *function = "libewf_file_io_pool_realloc";
-	size_t iterator       = 0;
+	static char *function    = "libewf_file_io_pool_initialize";
+	size_t iterator          = 0;
+	size_t file_io_pool_size = 0;
 
 	if( file_io_pool == NULL )
 	{
@@ -93,42 +47,81 @@ int libewf_file_io_pool_realloc(
 
 		return( -1 );
 	}
-	if( file_io_pool->amount >= amount )
+	if( amount_of_files > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: new amount must be greater than previous amount.\n",
+		notify_warning_printf( "%s: invalid amount of files value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	reallocation = memory_reallocate(
-	                file_io_pool->handle,
-	                ( sizeof( libewf_file_io_handle_t ) * amount ) );
-
-	if( reallocation == NULL )
+	if( *file_io_pool == NULL )
 	{
-		notify_warning_printf( "%s: unable to reallocate dynamic file io handles array.\n",
-		 function );
+		file_io_pool_size = sizeof( libewf_file_io_handle_t ) * amount_of_files;
 
-		return( -1 );
+		if( file_io_pool_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid file io pool size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		*file_io_pool = (libewf_file_io_pool_t *) memory_allocate(
+		                                           sizeof( libewf_file_io_pool_t ) );
+
+		if( *file_io_pool == NULL )
+		{
+			notify_warning_printf( "%s: unable to create file io pool.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *file_io_pool,
+		     0,
+		     sizeof( libewf_file_io_pool_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear file io pool.\n",
+			 function );
+
+			memory_free(
+			 *file_io_pool );
+
+			*file_io_pool = NULL;
+
+			return( -1 );
+		}
+		( *file_io_pool )->handle = (libewf_file_io_handle_t *) memory_allocate(
+		                                                         file_io_pool_size );
+
+		if( ( *file_io_pool )->handle == NULL )
+		{
+			notify_warning_printf( "%s: unable to create file io handles.\n",
+			 function );
+
+			memory_free(
+			 *file_io_pool );
+
+			*file_io_pool = NULL;
+
+			return( -1 );
+		}
+		for( iterator = 0; iterator < amount_of_files; iterator++ )
+		{
+			( *file_io_pool )->handle[ iterator ].filename        = NULL;
+			( *file_io_pool )->handle[ iterator ].file_descriptor = -1;
+			( *file_io_pool )->handle[ iterator ].file_offset     = 0;
+			( *file_io_pool )->handle[ iterator ].flags           = 0;
+		}
+		( *file_io_pool )->amount_of_files = amount_of_files;
 	}
-	file_io_pool->handle = (libewf_file_io_handle_t *) reallocation;
-
-	for( iterator = file_io_pool->amount; iterator < amount; iterator++ )
-	{
-		file_io_pool->handle[ iterator ].filename        = NULL;
-		file_io_pool->handle[ iterator ].file_descriptor = -1;
-		file_io_pool->handle[ iterator ].file_offset     = 0;
-		file_io_pool->handle[ iterator ].flags           = 0;
-	}
-	file_io_pool->amount = amount;
-
 	return( 1 );
 }
 
-/* Frees memory of a file io pool
+/* Frees the file io pool including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_file_io_pool_free(
-      libewf_file_io_pool_t *file_io_pool )
+int libewf_file_io_pool_free(
+     libewf_file_io_pool_t **file_io_pool )
 {
 	static char *function = "libewf_file_io_pool_free";
 	size_t iterator       = 0;
@@ -138,20 +131,88 @@ void libewf_file_io_pool_free(
 		notify_warning_printf( "%s: invalid file io pool.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	for( iterator = 0; iterator < file_io_pool->amount; iterator++ )
+	if( *file_io_pool != NULL )
 	{
-		if( file_io_pool->handle[ iterator ].filename != NULL )
+		for( iterator = 0; iterator < ( *file_io_pool )->amount_of_files; iterator++ )
 		{
-			memory_free(
-			 file_io_pool->handle[ iterator ].filename );
+			if( ( *file_io_pool )->handle[ iterator ].filename != NULL )
+			{
+				memory_free(
+				 ( *file_io_pool )->handle[ iterator ].filename );
+			}
 		}
+		memory_free(
+		 ( *file_io_pool )->handle );
+		memory_free(
+		 *file_io_pool );
+
+		*file_io_pool = NULL;
 	}
-	memory_free(
-	 file_io_pool->handle );
-	memory_free(
-	 file_io_pool );
+	return( 1 );
+}
+
+/* Resized the file io pool
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_file_io_pool_realloc(
+     libewf_file_io_pool_t *file_io_pool,
+     size_t amount_of_files )
+{
+	void *reallocation       = NULL;
+	static char *function    = "libewf_file_io_pool_realloc";
+	size_t iterator          = 0;
+	size_t file_io_pool_size = 0;
+
+	if( file_io_pool == NULL )
+	{
+		notify_warning_printf( "%s: invalid file io pool.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_files > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid amount of files value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( file_io_pool->amount_of_files < amount_of_files )
+	{
+		file_io_pool_size = sizeof( libewf_file_io_handle_t ) * amount_of_files;
+
+		if( file_io_pool_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid file io pool size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		reallocation = memory_reallocate(
+				file_io_pool->handle,
+				file_io_pool_size );
+
+		if( reallocation == NULL )
+		{
+			notify_warning_printf( "%s: unable to resize file io pool.\n",
+			 function );
+
+			return( -1 );
+		}
+		file_io_pool->handle = (libewf_file_io_handle_t *) reallocation;
+
+		for( iterator = file_io_pool->amount_of_files; iterator < amount_of_files; iterator++ )
+		{
+			file_io_pool->handle[ iterator ].filename        = NULL;
+			file_io_pool->handle[ iterator ].file_descriptor = -1;
+			file_io_pool->handle[ iterator ].file_offset     = 0;
+			file_io_pool->handle[ iterator ].flags           = 0;
+		}
+		file_io_pool->amount_of_files = amount_of_files;
+	}
+	return( 1 );
 }
 
 int libewf_file_io_pool_open(

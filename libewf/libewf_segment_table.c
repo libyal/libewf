@@ -54,7 +54,7 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 
 	if( segment_table == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate segment table.\n",
+		notify_warning_printf( "%s: unable to create segment table.\n",
 		 function );
 
 		return( NULL );
@@ -64,7 +64,7 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 
 	if( segment_table->segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate dynamic segment file array.\n",
+		notify_warning_printf( "%s: unable to create dynamic segment file array.\n",
 		 function );
 
 		memory_free(
@@ -124,7 +124,7 @@ int libewf_segment_table_realloc(
 
 	if( reallocation == NULL )
 	{
-		notify_warning_printf( "%s: unable to reallocate dynamic segment file array.\n",
+		notify_warning_printf( "%s: unable to resize file handle array.\n",
 		 function );
 
 		return( -1 );
@@ -136,7 +136,7 @@ int libewf_segment_table_realloc(
 	     0, 
 	     ( ( amount - segment_table->amount ) * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear segment file array.\n",
+		notify_warning_printf( "%s: unable to clear file handle array.\n",
 		 function );
 
 		return( 1 );
@@ -163,10 +163,11 @@ void libewf_segment_table_free(
 	}
 	for( iterator = 0; iterator < segment_table->amount; iterator++ )
 	{
-		if( segment_table->segment_file_handle[ iterator ] != NULL )
+		if( libewf_segment_file_handle_free(
+		     &( segment_table->segment_file_handle[ iterator ] ) ) != 1 )
 		{
-			libewf_segment_file_handle_free(
-			 segment_table->segment_file_handle[ iterator ] );
+			notify_warning_printf( "%s: unable to free segment file handle: %" PRIu16 ".\n",
+			 function, ( iterator + 1 ) );
 		}
 	}
 	memory_free(
@@ -491,15 +492,14 @@ int libewf_segment_table_read_open(
 		 function, filenames[ iterator ] );
 #endif
 
-		segment_file_handle = libewf_segment_file_handle_alloc();
-
-		if( segment_file_handle == NULL )
+		if( libewf_segment_file_handle_initialize(
+		     &segment_file_handle ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create segment file handle.\n",
 			 function );
 
 			libewf_segment_file_handle_free(
-			 segment_file_handle );
+			 &segment_file_handle );
 
 			return( -1 );
 		}
@@ -513,7 +513,7 @@ int libewf_segment_table_read_open(
 			 function );
 
 			libewf_segment_file_handle_free(
-			 segment_file_handle );
+			 &segment_file_handle );
 
 			return( -1 );
 		}
@@ -525,7 +525,7 @@ int libewf_segment_table_read_open(
 			 function, filenames[ iterator ] );
 
 			libewf_segment_file_handle_free(
-			 segment_file_handle );
+			 &segment_file_handle );
 
 			return( -1 );
 		}
@@ -537,7 +537,7 @@ int libewf_segment_table_read_open(
 			 function, filenames[ iterator ] );
 
 			libewf_segment_file_handle_free(
-			 segment_file_handle );
+			 &segment_file_handle );
 
 			return( -1 );
 		}
@@ -547,7 +547,7 @@ int libewf_segment_table_read_open(
 			 function );
 
 			libewf_segment_file_handle_free(
-			 segment_file_handle );
+			 &segment_file_handle );
 
 			return( -1 );
 		}
@@ -557,7 +557,7 @@ int libewf_segment_table_read_open(
 			 function );
 
 			libewf_segment_file_handle_free(
-			 segment_file_handle );
+			 &segment_file_handle );
 
 			return( -1 );
 		}
@@ -570,7 +570,7 @@ int libewf_segment_table_read_open(
 				     segment_table,
 				     ( segment_number + 1 ) ) != 1 )
 				{
-					notify_warning_printf( "%s: unable to reallocate the segment table.\n",
+					notify_warning_printf( "%s: unable to resize the segment table.\n",
 					 function );
 
 					return( -1 );
@@ -606,7 +606,7 @@ int libewf_segment_table_read_open(
 				     delta_segment_table,
 				     ( segment_number + 1 ) ) != 1 )
 				{
-					notify_warning_printf( "%s: unable to reallocate the delta segment table.\n",
+					notify_warning_printf( "%s: unable to resize the delta segment table.\n",
 					 function );
 
 					return( -1 );
@@ -863,7 +863,7 @@ int libewf_segment_table_create_segment_file(
 		     segment_table,
 		     ( segment_number + 1 ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate segment table.\n",
+			notify_warning_printf( "%s: unable to resize segment table.\n",
 			 function );
 
 			return( -1 );
@@ -878,16 +878,15 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-	segment_file_handle = libewf_segment_file_handle_alloc();
-
-	if( segment_file_handle == NULL )
+	if( libewf_segment_file_handle_initialize(
+	     &( segment_table->segment_file_handle[ segment_number ] ) ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create segment file handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_table->segment_file_handle[ segment_number ] = segment_file_handle;
+	segment_file_handle = segment_table->segment_file_handle[ segment_number ];
 
 	if( libewf_filename_create(
 	     &( segment_file_handle->filename ),

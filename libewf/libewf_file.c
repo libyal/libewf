@@ -267,7 +267,7 @@ int libewf_glob(
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to reallocate filenames.\n",
+			notify_warning_printf( "%s: unable to resize filenames.\n",
 			 function );
 
 			memory_free(
@@ -549,7 +549,7 @@ off64_t libewf_seek_offset(
 	}
 	else
 	{
-		internal_handle->current_chunk        = internal_handle->offset_table->amount;
+		internal_handle->current_chunk        = internal_handle->offset_table->amount_of_chunk_offsets;
 		internal_handle->current_chunk_offset = 0;
 	}
 	return( offset );

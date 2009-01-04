@@ -186,7 +186,7 @@ int libewf_chunk_cache_resize(
 
 	if( reallocation == NULL )
 	{
-		notify_warning_printf( "%s: unable to realloc chunk cache compressed.\n",
+		notify_warning_printf( "%s: unable to resize chunk cache compressed.\n",
 		 function );
 
 		return( -1 );
@@ -198,7 +198,7 @@ int libewf_chunk_cache_resize(
 
 	if( reallocation == NULL )
 	{
-		notify_warning_printf( "%s: unable to realloc chunk cache data.\n",
+		notify_warning_printf( "%s: unable to resize chunk cache data.\n",
 		 function );
 
 		return( -1 );

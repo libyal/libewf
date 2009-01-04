@@ -33,7 +33,7 @@
 
 /* Opens a file io handle
  * Sets the filename and the file descriptor in the file io handle struct
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_file_io_handle_open(
      libewf_file_io_handle_t *file_io_handle,
@@ -200,7 +200,7 @@ ssize_t libewf_file_io_handle_write(
 }
 
 /* Seeks a certain offset within the a file io handle
- * Returns the offset if the seek is successful, or -1 on error
+ * Returns the offset if the seek is successful or -1 on error
  */
 off64_t libewf_file_io_handle_seek_offset(
          libewf_file_io_handle_t *file_io_handle,

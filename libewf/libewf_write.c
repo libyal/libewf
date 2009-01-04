@@ -89,7 +89,7 @@ int libewf_write_test_empty_block(
 }
 
 /* Calculates an estimate of the amount of chunks that fit within a segment file
- * Returns the amount of chunks that could fit in the segment file, or -1 on error
+ * Returns the amount of chunks that could fit in the segment file or -1 on error
  */
 int64_t libewf_write_calculate_chunks_per_segment_file(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -346,7 +346,7 @@ uint32_t libewf_write_calculate_chunks_per_chunks_section(
 }
 
 /* Tests if the current segment file is full
- * Returns 1 if full, 0 if not, -1 on error
+ * Returns 1 if full, 0 if not or -1 on error
  */
 int libewf_write_test_segment_file_full(
      ssize64_t remaining_segment_file_size,
@@ -427,7 +427,7 @@ int libewf_write_test_segment_file_full(
 }
 
 /* Tests if the current chunks section is full
- * Returns 1 if full, 0 if not, -1 on error
+ * Returns 1 if full, 0 if not or -1 on error
  */
 int libewf_write_test_chunks_section_full(
      off64_t chunks_section_offset,
@@ -570,7 +570,7 @@ int libewf_write_test_chunks_section_full(
 }
 
 /* Processes the chunk data, applies compression if necessary and calculates the CRC
- * Returns the amount of bytes of the processed chunk data, or -1 on error
+ * Returns the amount of bytes of the processed chunk data or -1 on error
  */
 ssize_t libewf_write_process_chunk_data(
          libewf_chunk_cache_t *chunk_cache,
@@ -808,7 +808,7 @@ ssize_t libewf_write_process_chunk_data(
 
 /* Writes a new chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * Returns the amount of bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_raw_write_chunk_new(
          libewf_internal_handle_t *internal_handle,
@@ -875,7 +875,7 @@ ssize_t libewf_raw_write_chunk_new(
 
 		return( -1 );
 	}
-	if( ( chunk < internal_handle->offset_table->amount )
+	if( ( chunk < internal_handle->offset_table->amount_of_chunk_offsets )
 	 && ( internal_handle->offset_table->chunk_offset != NULL )
 	 && ( internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle != NULL ) )
 	{
@@ -887,13 +887,13 @@ ssize_t libewf_raw_write_chunk_new(
 	/* Allocate the necessary amount of chunk offsets
 	 * this reduces the amount of reallocations
 	 */
-	if( internal_handle->offset_table->amount < internal_handle->media_values->amount_of_chunks )
+	if( internal_handle->offset_table->amount_of_chunk_offsets < internal_handle->media_values->amount_of_chunks )
         {
-		if( libewf_offset_table_realloc(
+		if( libewf_offset_table_resize(
 		     internal_handle->offset_table,
 		     internal_handle->media_values->amount_of_chunks ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to resize offset table.\n",
 			 function );
 
 			return( -1 );
@@ -1355,7 +1355,7 @@ ssize_t libewf_raw_write_chunk_new(
 
 /* Writes an existing chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_raw_write_chunk_existing(
          libewf_internal_handle_t *internal_handle,
@@ -1411,7 +1411,7 @@ ssize_t libewf_raw_write_chunk_existing(
 
 		return( -1 );
 	}
-	if( chunk >= internal_handle->offset_table->amount )
+	if( chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
 	{
 		notify_warning_printf( "%s: invalid chunk does not exists.\n",
 		 function );
@@ -1679,7 +1679,7 @@ ssize_t libewf_raw_write_chunk_existing(
 
 /* Writes a new chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_write_chunk_data_new(
          libewf_internal_handle_t *internal_handle,
@@ -1906,7 +1906,7 @@ ssize_t libewf_write_chunk_data_new(
 
 /* Writes an existing chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
- * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_write_chunk_data_existing(
          libewf_internal_handle_t *internal_handle,
@@ -1959,7 +1959,7 @@ ssize_t libewf_write_chunk_data_existing(
 
 		return( -1 );
 	}
-	if( chunk >= internal_handle->offset_table->amount )
+	if( chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
 	{
 		notify_warning_printf( "%s: invalid chunk does not exists.\n",
 		 function );
@@ -2087,7 +2087,7 @@ ssize_t libewf_write_chunk_data_existing(
  * intended for raw write
  * The buffer size cannot be larger than the chunk size
  * The function sets the chunk crc, is compressed and write crc values
- * Returns the resulting chunk size, or -1 on error
+ * Returns the resulting chunk size or -1 on error
  */
 ssize_t libewf_raw_write_prepare_buffer(
          libewf_handle_t *handle,
@@ -2164,7 +2164,7 @@ ssize_t libewf_raw_write_prepare_buffer(
  * size contains the size of the data within the buffer while
  * data size contains the size of the actual input data
  * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_raw_write_buffer(
          libewf_handle_t *handle,
@@ -2243,14 +2243,14 @@ ssize_t libewf_raw_write_buffer(
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: writing chunk: %d of total: %d.\n",
-	 function, ( internal_handle->current_chunk + 1 ), internal_handle->offset_table->amount );
+	 function, ( internal_handle->current_chunk + 1 ), internal_handle->offset_table->amount_of_chunk_offsets );
 	notify_verbose_printf( "%s: writing buffer of size: %" PRIzd " with data of size: %" PRIzd ".\n",
 	 function, size, data_size );
 #endif
 
 	/* Check if chunk has already been created within a segment file
 	 */
-	if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
+	if( ( internal_handle->current_chunk < internal_handle->offset_table->amount_of_chunk_offsets )
 	 && ( internal_handle->offset_table->chunk_offset != NULL )
 	 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].segment_file_handle != NULL ) )
 	{
@@ -2298,7 +2298,7 @@ ssize_t libewf_raw_write_buffer(
 /* Writes data in EWF format from a buffer at the current offset
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_write_buffer(
          libewf_handle_t *handle,
@@ -2400,7 +2400,7 @@ ssize_t libewf_write_buffer(
 	{
 		/* Check if chunk has already been created within a segment file
 		 */
-		if( ( internal_handle->current_chunk < internal_handle->offset_table->amount )
+		if( ( internal_handle->current_chunk < internal_handle->offset_table->amount_of_chunk_offsets )
 		 && ( internal_handle->offset_table->chunk_offset != NULL )
 		 && ( internal_handle->offset_table->chunk_offset[ internal_handle->current_chunk ].segment_file_handle != NULL ) )
 		{
@@ -2468,7 +2468,7 @@ ssize_t libewf_write_buffer(
 /* Writes data in EWF format from a buffer at an specific offset,
  * the necessary settings of the write values must have been made
  * Will initialize write if necessary
- * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 ssize_t libewf_write_random(
          libewf_handle_t *handle,
@@ -2505,7 +2505,7 @@ ssize_t libewf_write_random(
 
 /* Finalizes the write by correcting the EWF the meta data in the segment files
  * This function is required after write from stream
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_write_finalize(
          libewf_handle_t *handle )

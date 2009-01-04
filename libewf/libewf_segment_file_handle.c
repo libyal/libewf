@@ -30,54 +30,73 @@
 #include "libewf_filename.h"
 #include "libewf_segment_file_handle.h"
 
-/* Allocates memory for a segment file handle struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the segment file handle
+ * Returns 1 if successful or -1 on error
  */
-libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
-                               void )
+int libewf_segment_file_handle_initialize(
+     libewf_segment_file_handle_t **segment_file_handle )
 {
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	static char *function                             = "libewf_segment_file_handle_alloc";
-
-	segment_file_handle = (libewf_segment_file_handle_t *) memory_allocate(
-	                                                        sizeof( libewf_segment_file_handle_t ) );
+	static char *function = "libewf_segment_file_handle_initialize";
 
 	if( segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: unable to create segment file handle.\n",
+		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	segment_file_handle->section_list = (libewf_section_list_t *) memory_allocate(
-	                                                               sizeof( libewf_section_list_t ) );
-
-	if( segment_file_handle->section_list == NULL )
+	if( *segment_file_handle == NULL )
 	{
-		notify_warning_printf( "%s: unable to create section list.\n",
-		 function );
+		*segment_file_handle = (libewf_segment_file_handle_t *) memory_allocate(
+		                                                         sizeof( libewf_segment_file_handle_t ) );
 
-		memory_free(
-		 segment_file_handle );
+		if( *segment_file_handle == NULL )
+		{
+			notify_warning_printf( "%s: unable to create segment file handle.\n",
+			 function );
 
-		return( NULL );
+			return( -1 );
+		}
+		if( memory_set(
+		     *segment_file_handle,
+		     0,
+		     sizeof( libewf_segment_file_handle_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear segment file handle.\n",
+			 function );
+
+			memory_free(
+			 *segment_file_handle );
+
+			*segment_file_handle = NULL;
+
+			return( -1 );
+		}
+		( *segment_file_handle )->section_list = (libewf_section_list_t *) memory_allocate(
+		                                                                    sizeof( libewf_section_list_t ) );
+
+		if( ( *segment_file_handle )->section_list == NULL )
+		{
+			notify_warning_printf( "%s: unable to create section list.\n",
+			 function );
+
+			memory_free(
+			 *segment_file_handle );
+
+			*segment_file_handle = NULL;
+
+			return( -1 );
+		}
+		( *segment_file_handle )->file_descriptor = -1;
 	}
-	segment_file_handle->file_descriptor     = -1;
-	segment_file_handle->filename            = NULL;
-	segment_file_handle->length_filename     = 0;
-	segment_file_handle->file_offset         = 0;
-	segment_file_handle->amount_of_chunks    = 0;
-	segment_file_handle->section_list->first = NULL;
-	segment_file_handle->section_list->last  = NULL;
-	segment_file_handle->file_type           = 0;
-
-	return( segment_file_handle );
+	return( 1 );
 }
 
-/* Frees memory of a segment file handle struct including elements
+/* Frees the segment file handle including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_segment_file_handle_free(
-      libewf_segment_file_handle_t *segment_file_handle )
+int libewf_segment_file_handle_free(
+     libewf_segment_file_handle_t **segment_file_handle )
 {
         libewf_section_list_entry_t *section_list_entry         = NULL;
         libewf_section_list_entry_t *current_section_list_entry = NULL;
@@ -88,34 +107,40 @@ void libewf_segment_file_handle_free(
 		notify_warning_printf( "%s: invalid segment file handle.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	if( segment_file_handle->filename != NULL )
+	if( *segment_file_handle != NULL )
 	{
-		memory_free(
-		 segment_file_handle->filename );
-	}
-	if( segment_file_handle->section_list != NULL )
-	{
-		section_list_entry = segment_file_handle->section_list->first;
-
-		while( section_list_entry != NULL )
+		if( ( *segment_file_handle )->filename != NULL )
 		{
-			current_section_list_entry = section_list_entry;
-			section_list_entry         = section_list_entry->next;
-
 			memory_free(
-			 current_section_list_entry );
+			 ( *segment_file_handle )->filename );
+		}
+		if( ( *segment_file_handle )->section_list != NULL )
+		{
+			section_list_entry = ( *segment_file_handle )->section_list->first;
+
+			while( section_list_entry != NULL )
+			{
+				current_section_list_entry = section_list_entry;
+				section_list_entry         = section_list_entry->next;
+
+				memory_free(
+				 current_section_list_entry );
+			}
+			memory_free(
+			 ( *segment_file_handle )->section_list );
 		}
 		memory_free(
-		 segment_file_handle->section_list );
+		 *segment_file_handle );
+
+		*segment_file_handle = NULL;
 	}
-	memory_free(
-	 segment_file_handle );
+	return( 1 );
 }
 
 /* Retrieves a filename of a certain segment file handle
- * Returns 1 if succesful, or -1 on error
+ * Returns 1 if succesful or -1 on error
  */
 int libewf_segment_file_handle_get_filename(
      libewf_segment_file_handle_t *segment_file_handle,
@@ -174,7 +199,7 @@ int libewf_segment_file_handle_get_filename(
 
 /* Sets a filename for a specific segment file handle
  * Creates a duplicate of the string
- * Returns 1 if succesful, or -1 on error
+ * Returns 1 if succesful or -1 on error
  */
 int libewf_segment_file_handle_set_filename(
      libewf_segment_file_handle_t *segment_file_handle,
@@ -255,7 +280,7 @@ int libewf_segment_file_handle_set_filename(
 
 /* Opens a segment file handle
  * Sets the filename and the file descriptor in the segment file handle struct
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_open(
      libewf_segment_file_handle_t *segment_file_handle,
@@ -292,7 +317,7 @@ int libewf_segment_file_handle_open(
 }
 
 /* Re-opens a segment file handle
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_segment_file_handle_reopen(
      libewf_segment_file_handle_t *segment_file_handle,
@@ -475,7 +500,7 @@ ssize_t libewf_segment_file_handle_write(
 }
 
 /* Seeks a certain offset within the a segment file handle
- * Returns 1 if the seek is successful, or -1 on error
+ * Returns 1 if the seek is successful or -1 on error
  */
 off64_t libewf_segment_file_handle_seek_offset(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -534,7 +559,7 @@ off64_t libewf_segment_file_handle_seek_offset(
 }
 
 /* Closes a segment file handle
- * Returns 0 if successful, or -1 on error
+ * Returns 0 if successful or -1 on error
  */
 int libewf_segment_file_handle_close(
      libewf_segment_file_handle_t *segment_file_handle )

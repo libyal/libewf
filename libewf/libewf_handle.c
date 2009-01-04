@@ -114,9 +114,9 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-		internal_handle->offset_table = libewf_offset_table_alloc( 0 );
-
-		if( internal_handle->offset_table == NULL )
+		if( libewf_offset_table_initialize(
+		     &( internal_handle->offset_table ),
+		     0 ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create offset table.\n",
 			 function );
@@ -130,15 +130,15 @@ int libewf_handle_initialize(
 
 			return( -1 );
 		}
-		internal_handle->secondary_offset_table = libewf_offset_table_alloc( 0 );
-
-		if( internal_handle->secondary_offset_table == NULL )
+		if( libewf_offset_table_initialize(
+		     &( internal_handle->secondary_offset_table ),
+		     0 ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to create secondary offset table.\n",
 			 function );
 
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -156,9 +156,9 @@ int libewf_handle_initialize(
 			 function );
 
 			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -177,9 +177,9 @@ int libewf_handle_initialize(
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
 			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -200,9 +200,9 @@ int libewf_handle_initialize(
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
 			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -225,9 +225,9 @@ int libewf_handle_initialize(
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
 			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -253,9 +253,9 @@ int libewf_handle_initialize(
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
 			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -283,9 +283,9 @@ int libewf_handle_initialize(
 			libewf_chunk_cache_free(
 			 &( internal_handle->chunk_cache ) );
 			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			 &( internal_handle->secondary_offset_table ) );
 			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			 &( internal_handle->offset_table ) );
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
@@ -316,9 +316,9 @@ int libewf_handle_initialize(
 				libewf_chunk_cache_free(
 				 &( internal_handle->chunk_cache ) );
 				libewf_offset_table_free(
-				 internal_handle->secondary_offset_table );
+				 &( internal_handle->secondary_offset_table ) );
 				libewf_offset_table_free(
-				 internal_handle->offset_table );
+				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
 				 internal_handle->delta_segment_table );
 				libewf_segment_table_free(
@@ -352,9 +352,9 @@ int libewf_handle_initialize(
 				libewf_chunk_cache_free(
 				 &( internal_handle->chunk_cache ) );
 				libewf_offset_table_free(
-				 internal_handle->secondary_offset_table );
+				 &( internal_handle->secondary_offset_table ) );
 				libewf_offset_table_free(
-				 internal_handle->offset_table );
+				 &( internal_handle->offset_table ) );
 				libewf_segment_table_free(
 				 internal_handle->delta_segment_table );
 				libewf_segment_table_free(
@@ -418,15 +418,17 @@ int libewf_handle_free(
 			libewf_segment_table_free(
 			 internal_handle->delta_segment_table );
 		}
-		if( internal_handle->offset_table != NULL )
+		if( libewf_offset_table_free(
+		     &( internal_handle->offset_table ) ) != 1 )
 		{
-			libewf_offset_table_free(
-			 internal_handle->offset_table );
+			notify_warning_printf( "%s: unable to free offset table.\n",
+			 function );
 		}
-		if( internal_handle->secondary_offset_table != NULL )
+		if( libewf_offset_table_free(
+		     &( internal_handle->secondary_offset_table ) ) != 1 )
 		{
-			libewf_offset_table_free(
-			 internal_handle->secondary_offset_table );
+			notify_warning_printf( "%s: unable to free secondary offset table.\n",
+			 function );
 		}
 		if( internal_handle->sessions != NULL )
 		{
@@ -654,7 +656,7 @@ int libewf_internal_handle_subhandle_write_free(
 }
 
 /* Retrieves the maximum amount of supported segment files to write
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_internal_handle_get_write_maximum_amount_of_segments(
      uint8_t ewf_format,
@@ -871,7 +873,7 @@ int libewf_internal_handle_initialize_format(
 }
 
 /* Create the default header values
- * Returns 1 on success, -1 on error
+ * Returns 1 on success or -1 on error
  */
 int libewf_internal_handle_create_header_values(
      libewf_internal_handle_t *internal_handle )
@@ -1015,7 +1017,7 @@ int libewf_internal_handle_create_header_values(
 }
 
 /* Initializes the write values
- * Returns 1 if successful, -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_internal_handle_write_initialize(
      libewf_internal_handle_t *internal_handle )

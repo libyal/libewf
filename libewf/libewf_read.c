@@ -39,7 +39,7 @@
 #include "ewf_file_header.h"
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
- * Returns the amount of bytes of the processed chunk data, or -1 on error
+ * Returns the amount of bytes of the processed chunk data or -1 on error
  */
 ssize_t libewf_read_process_chunk_data(
          libewf_internal_handle_t *internal_handle,
@@ -143,7 +143,7 @@ ssize_t libewf_read_process_chunk_data(
  * Will read until the requested size is filled or the entire chunk is read
  * read_crc is set if the crc has been read into chunk_crc instead of the
  * 4 last bytes of the buffer, used for uncompressed chunks only
- * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
+ * Returns the amount of bytes read, 0 if no bytes can be read or -1 on error
  */
 ssize_t libewf_raw_read_chunk(
          libewf_internal_handle_t *internal_handle,
@@ -252,7 +252,7 @@ ssize_t libewf_raw_read_chunk(
 	}
 	/* Check if the chunk is available
 	 */
-	if( chunk >= internal_handle->offset_table->amount )
+	if( chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
 	{
 		return( 0 );
 	}
@@ -360,7 +360,7 @@ ssize_t libewf_raw_read_chunk(
 		chunk_type = "COMPRESSED";
 	}
 	notify_verbose_printf( "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
-	 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type,
+	 function, ( chunk + 1 ), internal_handle->offset_table->amount_of_chunk_offsets, chunk_type,
 	 internal_handle->offset_table->chunk_offset[ chunk ].size );
 #endif
 	return( chunk_read_count );
@@ -368,7 +368,7 @@ ssize_t libewf_raw_read_chunk(
 
 /* Reads a certain chunk of data from the segment file(s)
  * Will read until the requested size is filled or the entire chunk is read
- * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
+ * Returns the amount of bytes read, 0 if no bytes can be read or -1 on error
  */
 ssize_t libewf_read_chunk_data(
          libewf_internal_handle_t *internal_handle,
@@ -651,7 +651,7 @@ ssize_t libewf_read_chunk_data(
 /* Prepares a buffer with chunk data after reading it according to the handle settings
  * intended for raw read
  * The buffer size cannot be larger than the chunk size
- * Returns the resulting chunk size, or -1 on error
+ * Returns the resulting chunk size or -1 on error
  */
 ssize_t libewf_raw_read_prepare_buffer(
          libewf_handle_t *handle,
@@ -722,7 +722,7 @@ ssize_t libewf_raw_read_prepare_buffer(
 /* Reads 'raw' data from the curent offset into a buffer
  * size contains the size of the buffer
  * The function sets the chunk crc, is compressed and read crc values
- * Returns the amount of bytes read, or -1 on error
+ * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_raw_read_buffer(
          libewf_handle_t *handle,
@@ -780,7 +780,7 @@ ssize_t libewf_raw_read_buffer(
 }
 
 /* Reads media data from the last current into a buffer
- * Returns the amount of bytes read, or -1 on error
+ * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_read_buffer(
          libewf_handle_t *handle,
@@ -911,7 +911,7 @@ ssize_t libewf_read_buffer(
 }
 
 /* Reads media data from an offset into a buffer
- * Returns the amount of bytes read, or -1 on error
+ * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_read_random(
          libewf_handle_t *handle,

@@ -34,7 +34,7 @@
 
 /* Creates the filename extension for a certain segment file
  * For EWF-E01, EWF-S01 segment file extension naming schema
- * Returns 1 on success, -1 on error
+ * Returns 1 on success or -1 on error
  */
 int libewf_filename_set_extension(
      system_character_t *extension,
@@ -146,7 +146,7 @@ int libewf_filename_set_extension(
 }
 
 /* Creates a filename for a certain segment file
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_filename_create(
      system_character_t **filename,
@@ -204,7 +204,7 @@ int libewf_filename_create(
 
 	if( new_filename == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate filename.\n",
+		notify_warning_printf( "%s: unable to create filename.\n",
 		 function );
 
 		return( -1 );
@@ -216,7 +216,7 @@ int libewf_filename_create(
 	     basename,
 	     ( length_basename + 1 ) ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to copy basename.\n",
+		notify_warning_printf( "%s: unable to set basename.\n",
 		 function );
 
 		memory_free(

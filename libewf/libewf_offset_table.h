@@ -43,26 +43,27 @@ struct libewf_offset_table
 	/* Stores the amount of chunks in the table
 	 * There is an offset per chunk in the table
 	 */
-	uint32_t amount;
+	uint32_t amount_of_chunk_offsets;
 
-	/* The last chunk that was defined
+	/* The last chunk offset that was defined
 	 */
-	uint32_t last;
+	uint32_t last_chunk_offset;
 
 	/* Dynamic array of chunk offsets
 	 */
 	libewf_chunk_offset_t *chunk_offset;
 };
 
-libewf_offset_table_t *libewf_offset_table_alloc(
-                        uint32_t amount );
+int libewf_offset_table_initialize(
+     libewf_offset_table_t **offset_table,
+     uint32_t amount_of_chunk_offsets );
 
-int libewf_offset_table_realloc(
+int libewf_offset_table_free(
+     libewf_offset_table_t **offset_table );
+
+int libewf_offset_table_resize(
      libewf_offset_table_t *offset_table,
-     uint32_t amount );
-
-void libewf_offset_table_free(
-      libewf_offset_table_t *offset_table );
+     uint32_t amount_of_chunk_offsets );
 
 int libewf_offset_table_fill(
      libewf_offset_table_t *offset_table,

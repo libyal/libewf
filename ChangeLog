@@ -108,7 +108,13 @@ Code clean up
   - most of the internal library code has been removed
 * merge alloc and realloc blocks
 
+Python bindings
+* rewrite to match libewf API
+
 Next release(s):
+
+* remove secondary offset table from handle
+  but check and mark differences with primary offset table
 
 * implement libuca
   - handle codepage in ewftools use -p option

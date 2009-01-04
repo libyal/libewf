@@ -39,26 +39,27 @@ struct libewf_file_io_pool
 {
 	/* The amount of files in the pool
 	 */
-	size_t amount;
+	size_t amount_of_files;
 
 	/* The amount of open file descriptors
 	 */
-	size_t open_files;
+	size_t amount_of_open_files;
 
 	/* A dynamic array containting the file io handles
 	 */
 	libewf_file_io_handle_t *handle;
 };
 
-libewf_file_io_pool_t *libewf_file_io_pool_alloc( 
-                        size_t amount );
+int libewf_file_io_pool_initialize(
+     libewf_file_io_pool_t **file_io_pool,
+     size_t amount_of_files );
 
-int libewf_file_io_pool_realloc(
+int libewf_file_io_pool_free(
+     libewf_file_io_pool_t **file_io_pool );
+
+int libewf_file_io_pool_resize(
      libewf_file_io_pool_t *file_io_pool,
-     size_t amount );
-
-void libewf_file_io_pool_free(
-      libewf_file_io_pool_t *file_io_pool );
+     size_t amount_of_files );
 
 int libewf_file_io_pool_open(
      libewf_file_io_pool_t *file_io_pool,

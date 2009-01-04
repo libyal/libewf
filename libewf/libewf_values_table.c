@@ -81,7 +81,7 @@ int libewf_values_table_initialize(
 
 		if( ( *values_table )->identifiers == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate identifiers.\n",
+			notify_warning_printf( "%s: unable to create identifiers.\n",
 			 function );
 
 			memory_free(
@@ -109,7 +109,7 @@ int libewf_values_table_initialize(
 
 		if( ( *values_table )->values == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate values.\n",
+			notify_warning_printf( "%s: unable to create values.\n",
 			 function );
 
 			memory_free(
@@ -197,10 +197,9 @@ int libewf_values_table_resize(
      libewf_values_table_t *values_table,
      uint32_t amount_of_values )
 {
-	character_t **reallocation        = NULL;
-	static char *function             = "libewf_values_table_resize";
-	size_t values_table_size          = 0;
-	size_t previous_values_table_size = 0;
+	character_t **reallocation = NULL;
+	static char *function      = "libewf_values_table_resize";
+	size_t values_table_size   = 0;
 
 	if( values_table == NULL )
 	{
@@ -227,15 +226,13 @@ int libewf_values_table_resize(
 
 			return( -1 );
 		}
-		previous_values_table_size = values_table->amount_of_values * sizeof( character_t * );
-
 		reallocation = (character_t **) memory_reallocate(
 		                                 values_table->identifiers,
 		                                 values_table_size );
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to reallocate identifiers.\n",
+			notify_warning_printf( "%s: unable to resize identifiers.\n",
 			 function );
 
 			return( -1 );
@@ -245,7 +242,7 @@ int libewf_values_table_resize(
 		if( memory_set(
 		     &( values_table->identifiers[ values_table->amount_of_values ] ),
 		     0,
-		     ( values_table_size - previous_values_table_size ) ) == NULL )
+		     sizeof( character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear identifiers.\n",
 			 function );
@@ -258,7 +255,7 @@ int libewf_values_table_resize(
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to reallocate values.\n",
+			notify_warning_printf( "%s: unable to resize values.\n",
 			 function );
 
 			return( -1 );
@@ -268,7 +265,7 @@ int libewf_values_table_resize(
 		if( memory_set(
 		     &( values_table->values[ values_table->amount_of_values ] ),
 		     0,
-		     ( values_table_size - previous_values_table_size ) ) == NULL )
+		     sizeof( character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
 			notify_warning_printf( "%s: unable to clear values.\n",
 			 function );
@@ -280,7 +277,7 @@ int libewf_values_table_resize(
 	return( 1 );
 }
 
-/* Retrieves the value index number, or -1 on error
+/* Retrieves the value index number or -1 on error
  * The index number will be larger than the amount when the identifier is not present in the values table
  */
 int32_t libewf_values_table_get_index(
@@ -554,7 +551,7 @@ int libewf_values_table_set_value(
 		     values_table,
 		     ( index + 1 ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate values table.\n",
+			notify_warning_printf( "%s: unable to resize values table.\n",
 			 function );
 
 			return( -1 );

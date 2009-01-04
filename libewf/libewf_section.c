@@ -308,7 +308,7 @@ ssize_t libewf_section_compressed_string_read(
 
 	if( uncompressed == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate uncompressed string.\n",
+		notify_warning_printf( "%s: unable to create uncompressed string.\n",
 		 function );
 
 		memory_free(
@@ -331,7 +331,7 @@ ssize_t libewf_section_compressed_string_read(
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to reallocate uncompressed string.\n",
+			notify_warning_printf( "%s: unable to resize uncompressed string.\n",
 			 function );
 
 			memory_free(
@@ -436,7 +436,7 @@ ssize_t libewf_section_write_compressed_string(
 
 		if( reallocation == NULL )
 		{
-			notify_warning_printf( "%s: unable to reallocate compressed string.\n",
+			notify_warning_printf( "%s: unable to resize compressed string.\n",
 			 function );
 
 			memory_free(
@@ -821,7 +821,7 @@ ssize_t libewf_section_volume_s01_read(
 
 	if( volume == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate volume.\n",
+		notify_warning_printf( "%s: unable to create volume.\n",
 		 function );
 
 		return( -1 );
@@ -1563,13 +1563,13 @@ ssize_t libewf_section_table_read(
 	/* Allocate the necessary amount of chunk offsets
 	 * this reduces the amount of reallocations
 	 */
-	if( offset_table->amount < media_amount_of_chunks )
+	if( offset_table->amount_of_chunk_offsets < media_amount_of_chunks )
 	{
-		if( libewf_offset_table_realloc(
+		if( libewf_offset_table_resize(
 		     offset_table,
 		     media_amount_of_chunks ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to resize offset table.\n",
 			 function );
 
 			return( -1 );
@@ -2118,7 +2118,7 @@ ssize_t libewf_section_ltree_read(
 
 	if( ltree == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate ltree.\n",
+		notify_warning_printf( "%s: unable to create ltree.\n",
 		 function );
 
 		return( -1 );
@@ -2166,7 +2166,7 @@ ssize_t libewf_section_ltree_read(
 
 	if( ltree_data == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate ltree data.\n",
+		notify_warning_printf( "%s: unable to create ltree data.\n",
 		 function );
 
 		return( -1 );
@@ -2326,7 +2326,7 @@ ssize_t libewf_section_session_read(
 
 		if( ewf_sessions == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate session data.\n",
+			notify_warning_printf( "%s: unable to create session data.\n",
 			 function );
 
 			return( -1 );
@@ -3152,7 +3152,7 @@ ssize_t libewf_section_error2_read(
 
 		if( error2_sectors == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate error2 sectors.\n",
+			notify_warning_printf( "%s: unable to create error2 sectors.\n",
 			 function );
 
 			return( -1 );
@@ -4077,7 +4077,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 	chunk -= 1;
 
-	if( chunk >= offset_table->amount )
+	if( chunk >= offset_table->amount_of_chunk_offsets )
 	{
 		notify_warning_printf( "%s: invalid delta chunk: %" PRIu32 " value outside offset table.\n",
 		 function, chunk );
@@ -4338,7 +4338,7 @@ ssize_t libewf_section_debug_read(
 
 	if( data == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate data.\n",
+		notify_warning_printf( "%s: unable to create data.\n",
 		 function );
 
 		return( -1 );
@@ -4363,7 +4363,7 @@ ssize_t libewf_section_debug_read(
 
 	if( uncompressed_data == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate uncompressed data.\n",
+		notify_warning_printf( "%s: unable to create uncompressed data.\n",
 		 function );
 
 		memory_free(
@@ -4419,7 +4419,7 @@ ssize_t libewf_section_debug_read(
 
 /* Reads and processes a section
  * The section start offset will be updated
- * Returns 1 if successful, -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_section_read(
      libewf_segment_file_handle_t *segment_file_handle,

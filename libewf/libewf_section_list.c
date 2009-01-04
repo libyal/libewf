@@ -123,7 +123,7 @@ libewf_section_list_t *libewf_section_list_append(
 }
 
 /* Removes the last entry from the section list
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_section_list_remove_last(
      libewf_section_list_t *section_list )

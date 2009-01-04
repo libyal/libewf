@@ -120,7 +120,7 @@ int libewf_header_sections_free(
 }
 
 /* Create the header sections from the header values
- * Returns 1 on success, -1 on error
+ * Returns 1 on success or -1 on error
  */
 int libewf_header_sections_create(
      libewf_header_sections_t *header_sections,

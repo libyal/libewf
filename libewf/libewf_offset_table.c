@@ -32,120 +32,104 @@
 
 #include "ewf_definitions.h"
 
-/* Allocates memory for a new offset table struct
- * Returns a pointer to the new instance, NULL on error
+/* Initialize the offset table
+ * Returns 1 if successful or -1 on error
  */
-libewf_offset_table_t *libewf_offset_table_alloc(
-                        uint32_t amount )
+int libewf_offset_table_initialize(
+     libewf_offset_table_t **offset_table,
+     uint32_t amount_of_chunk_offsets )
 {
-	libewf_offset_table_t *offset_table = NULL;
-	static char *function               = "libewf_offset_table_alloc";
-
-	offset_table = (libewf_offset_table_t *) memory_allocate(
-	                                          sizeof( libewf_offset_table_t ) );
+	static char *function    = "libewf_offset_table_initialize";
+	size_t chunk_offset_size = 0;
 
 	if( offset_table == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate offset table.\n",
+		notify_warning_printf( "%s: invalid offset table.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	offset_table->chunk_offset = NULL;
-
-	if( amount > 0 )
+	if( *offset_table == NULL )
 	{
-		offset_table->chunk_offset = (libewf_chunk_offset_t *) memory_allocate(
-		                                                        sizeof( libewf_chunk_offset_t ) * amount );
+		chunk_offset_size = sizeof( libewf_chunk_offset_t ) * amount_of_chunk_offsets;
 
-		if( offset_table->chunk_offset == NULL )
+		if( chunk_offset_size > (size_t) SSIZE_MAX )
 		{
-			notify_warning_printf( "%s: unable to allocate chunk offsets.\n",
+			notify_warning_printf( "%s: invalid chunk offset size value exceeds maximum.\n",
 			 function );
 
-			memory_free(
-			 offset_table );
+			return( -1 );
+		}
+		*offset_table = (libewf_offset_table_t *) memory_allocate(
+		                                           sizeof( libewf_offset_table_t ) );
 
-			return( NULL );
+		if( *offset_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create offset table.\n",
+			 function );
+
+			return( -1 );
 		}
 		if( memory_set(
-		     offset_table->chunk_offset,
+		     *offset_table,
 		     0,
-		     ( sizeof( libewf_chunk_offset_t ) * amount ) ) == NULL )
+		     sizeof( libewf_offset_table_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear chunk offsets.\n",
+			notify_warning_printf( "%s: unable to clear offset table.\n",
 			 function );
 
 			memory_free(
-			 offset_table->chunk_offset );
-			memory_free(
-			 offset_table );
+			 *offset_table );
 
-			return( NULL );
+			*offset_table = NULL;
+
+			return( -1 );
 		}
+		if( amount_of_chunk_offsets > 0 )
+		{
+			( *offset_table )->chunk_offset = (libewf_chunk_offset_t *) memory_allocate(
+			                                                             chunk_offset_size );
+
+			if( ( *offset_table )->chunk_offset == NULL )
+			{
+				notify_warning_printf( "%s: unable to create chunk offsets.\n",
+				 function );
+
+				memory_free(
+				 *offset_table );
+
+				*offset_table = NULL;
+
+				return( -1 );
+			}
+			if( memory_set(
+			     ( *offset_table )->chunk_offset,
+			     0,
+			     chunk_offset_size ) == NULL )
+			{
+				notify_warning_printf( "%s: unable to clear chunk offsets.\n",
+				 function );
+
+				memory_free(
+				 ( *offset_table )->chunk_offset );
+				memory_free(
+				 *offset_table );
+
+				*offset_table = NULL;
+
+				return( -1 );
+			}
+		}
+		( *offset_table )->amount_of_chunk_offsets = amount_of_chunk_offsets;
 	}
-	offset_table->amount = amount;
-        offset_table->last   = 0;
-
-	return( offset_table );
-}
-
-/* Reallocates memory for the dynamic file descriptor, offset and size array
- * Returns 1 if successful, or -1 on error
- */
-int libewf_offset_table_realloc(
-     libewf_offset_table_t *offset_table,
-     uint32_t amount )
-{
-	void *reallocation    = NULL;
-	static char *function = "libewf_offset_table_realloc";
-
-	if( offset_table == NULL )
-	{
-		notify_warning_printf( "%s: invalid offset_table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table->amount >= amount )
-	{
-		notify_warning_printf( "%s: new amount must be greater than previous amount.\n",
-		 function );
-
-		return( -1 );
-	}
-	reallocation = memory_reallocate(
-	                offset_table->chunk_offset,
-	                ( sizeof( libewf_chunk_offset_t ) * amount ) );
-
-	if( reallocation == NULL )
-	{
-		notify_warning_printf( "%s: unable to reallocate chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	offset_table->chunk_offset = (libewf_chunk_offset_t *) reallocation;
-
-	if( memory_set(
-	     &( offset_table->chunk_offset[ offset_table->amount ] ),
-	     0,
-	     ( sizeof( libewf_chunk_offset_t ) * ( amount - offset_table->amount ) ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to clear chunk offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	offset_table->amount = amount;
-
 	return( 1 );
 }
 
-/* Frees memory of a offset table struct including elements
+/* Frees the offset table including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_offset_table_free(
-      libewf_offset_table_t *offset_table )
+int libewf_offset_table_free(
+     libewf_offset_table_t **offset_table )
 {
 	static char *function = "libewf_offset_table_free";
 
@@ -154,21 +138,84 @@ void libewf_offset_table_free(
 		notify_warning_printf( "%s: invalid offset table.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	/* The segment file reference is freed in the segment table
-	 */
-	if( offset_table->chunk_offset != NULL )
+	if( *offset_table != NULL )
 	{
+		/* The segment file references are freed in the segment table
+		 */
+		if( ( *offset_table )->chunk_offset != NULL )
+		{
+			memory_free(
+			 ( *offset_table )->chunk_offset );
+		}
 		memory_free(
-		 offset_table->chunk_offset );
+		 *offset_table );
+
+		*offset_table = NULL;
 	}
-	memory_free(
-	 offset_table );
+	return( 1 );
+}
+
+/* Resizes the offset table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_offset_table_resize(
+     libewf_offset_table_t *offset_table,
+     uint32_t amount_of_chunk_offsets )
+{
+	void *reallocation       = NULL;
+	static char *function    = "libewf_offset_table_resize";
+	size_t chunk_offset_size = 0;
+
+	if( offset_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid offset_table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table->amount_of_chunk_offsets < amount_of_chunk_offsets )
+	{
+		chunk_offset_size = sizeof( libewf_chunk_offset_t ) * amount_of_chunk_offsets;
+
+		if( chunk_offset_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid chunk offset size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		reallocation = memory_reallocate(
+				offset_table->chunk_offset,
+				chunk_offset_size );
+
+		if( reallocation == NULL )
+		{
+			notify_warning_printf( "%s: unable to resize chunk offsets.\n",
+			 function );
+
+			return( -1 );
+		}
+		offset_table->chunk_offset = (libewf_chunk_offset_t *) reallocation;
+
+		if( memory_set(
+		     &( offset_table->chunk_offset[ offset_table->amount_of_chunk_offsets ] ),
+		     0,
+		     ( sizeof( libewf_chunk_offset_t ) * ( amount_of_chunk_offsets - offset_table->amount_of_chunk_offsets ) ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear chunk offsets.\n",
+			 function );
+
+			return( -1 );
+		}
+		offset_table->amount_of_chunk_offsets = amount_of_chunk_offsets;
+	}
+	return( 1 );
 }
 
 /* Fills the offset table from the table offsets
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_offset_table_fill(
      libewf_offset_table_t *offset_table,
@@ -214,20 +261,20 @@ int libewf_offset_table_fill(
 	/* Correct the last offset, to fill the table it should point to the first empty entry
 	 * the the last filled entry
 	 */
-	if( offset_table->last > 0 )
+	if( offset_table->last_chunk_offset > 0 )
 	{
-		offset_table->last++;
+		offset_table->last_chunk_offset++;
 	}
 	/* Allocate additional entries in the offset table if needed
 	 * - a single reallocation saves processing time
 	 */
-	if( offset_table->amount < ( offset_table->last + amount_of_chunks ) )
+	if( offset_table->amount_of_chunk_offsets < ( offset_table->last_chunk_offset + amount_of_chunks ) )
 	{
-		if( libewf_offset_table_realloc(
+		if( libewf_offset_table_resize(
 		     offset_table,
-		     ( offset_table->last + amount_of_chunks ) ) != 1 )
+		     ( offset_table->last_chunk_offset + amount_of_chunks ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to resize offset table.\n",
 			 function );
 
 			return( -1 );
@@ -304,12 +351,12 @@ int libewf_offset_table_fill(
 
 			return( -1 );
 		}
-		offset_table->chunk_offset[ offset_table->last ].segment_file_handle = segment_file_handle;
-		offset_table->chunk_offset[ offset_table->last ].file_offset         = (off64_t) ( base_offset + current_offset );
-		offset_table->chunk_offset[ offset_table->last ].size                = (size_t) chunk_size;
-		offset_table->chunk_offset[ offset_table->last ].compressed          = compressed;
+		offset_table->chunk_offset[ offset_table->last_chunk_offset ].segment_file_handle = segment_file_handle;
+		offset_table->chunk_offset[ offset_table->last_chunk_offset ].file_offset         = (off64_t) ( base_offset + current_offset );
+		offset_table->chunk_offset[ offset_table->last_chunk_offset ].size                = (size_t) chunk_size;
+		offset_table->chunk_offset[ offset_table->last_chunk_offset ].compressed          = compressed;
 
-		offset_table->last++;
+		offset_table->last_chunk_offset++;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 		if( compressed == 0 )
@@ -321,7 +368,7 @@ int libewf_offset_table_fill(
 			chunk_type = "compressed";
 		}
 		notify_verbose_printf( "%s: %s chunk %" PRIu32 " read with: base %" PRIu64 ", offset %" PRIu32 " and size %" PRIu32 ".\n",
-		 function, chunk_type, offset_table->last, base_offset, current_offset, chunk_size );
+		 function, chunk_type, offset_table->last_chunk_offset, base_offset, current_offset, chunk_size );
 #endif
 		/* This is to compensate for the crappy >2Gb segment file
 		 * solution in EnCase 6
@@ -352,9 +399,9 @@ int libewf_offset_table_fill(
 	{
 		current_offset = raw_offset;
 	}
-	offset_table->chunk_offset[ offset_table->last ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ offset_table->last ].file_offset         = (off64_t) ( base_offset + current_offset );
-	offset_table->chunk_offset[ offset_table->last ].compressed          = compressed;
+	offset_table->chunk_offset[ offset_table->last_chunk_offset ].segment_file_handle = segment_file_handle;
+	offset_table->chunk_offset[ offset_table->last_chunk_offset ].file_offset         = (off64_t) ( base_offset + current_offset );
+	offset_table->chunk_offset[ offset_table->last_chunk_offset ].compressed          = compressed;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( compressed == 0 )
@@ -366,7 +413,7 @@ int libewf_offset_table_fill(
 		chunk_type = "compressed";
 	}
 	notify_verbose_printf( "%s: %s last chunk %" PRIu32 " read with: base %" PRIu64 " and offset %" PRIu32 ".\n",
-	 function, chunk_type, ( offset_table->last + 1 ), base_offset, current_offset );
+	 function, chunk_type, ( offset_table->last_chunk_offset + 1 ), base_offset, current_offset );
 #endif
 
 	return( 1 );
@@ -374,7 +421,7 @@ int libewf_offset_table_fill(
 
 /* Fills the offsets from the offset table
  * amount_of_chunk_offsets contains the amount of chunk offsets to fill
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_offset_table_fill_offsets(
      libewf_offset_table_t *offset_table,
@@ -451,7 +498,7 @@ int libewf_offset_table_fill_offsets(
 }
 
 /* Calculate the last offset
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_offset_table_calculate_last_offset(
      libewf_offset_table_t *offset_table,
@@ -490,7 +537,7 @@ int libewf_offset_table_calculate_last_offset(
 	 * The size of the last chunk is determined by subtracting the last offset from the offset of the section that follows.
 	 */
 	section_list_entry = section_list->first;
-	last_offset        = offset_table->chunk_offset[ offset_table->last ].file_offset;
+	last_offset        = offset_table->chunk_offset[ offset_table->last_chunk_offset ].file_offset;
 
 	while( section_list_entry != NULL )
 	{
@@ -528,11 +575,11 @@ int libewf_offset_table_calculate_last_offset(
 
 				return( -1 );
 			}
-			offset_table->chunk_offset[ offset_table->last ].size = (size_t) chunk_size;
+			offset_table->chunk_offset[ offset_table->last_chunk_offset ].size = (size_t) chunk_size;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: last chunk %" PRIu32 " calculated with offset: %" PRIu64 " and size %" PRIzu ".\n",
-			 function, ( offset_table->last + 1 ), last_offset, (size_t) chunk_size );
+			 function, ( offset_table->last_chunk_offset + 1 ), last_offset, (size_t) chunk_size );
 #endif
 			break;
 		}
@@ -542,7 +589,7 @@ int libewf_offset_table_calculate_last_offset(
 }
 
 /* Compare the offsets in tablel and table2 sections
- * Returns 1 if tables match, 0 if table differ, or -1 on error
+ * Returns 1 if tables match, 0 if table differ or -1 on error
  */
 int libewf_offset_table_compare(
      libewf_offset_table_t *offset_table1,
@@ -581,7 +628,7 @@ int libewf_offset_table_compare(
 	}
 	/* Check if table and table2 have the same amount of chunk offsets
 	 */
-	if( offset_table1->amount != offset_table2->amount )
+	if( offset_table1->amount_of_chunk_offsets != offset_table2->amount_of_chunk_offsets )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		notify_verbose_printf( "%s: offset tables differ in size.\n",
@@ -592,7 +639,7 @@ int libewf_offset_table_compare(
 	}
 	/* Check if the file offsets of the chunk offsets are the same
 	 */
-	for( iterator = 0; iterator < offset_table1->amount; iterator++ )
+	for( iterator = 0; iterator < offset_table1->amount_of_chunk_offsets; iterator++ )
 	{
 		if( offset_table1->chunk_offset[ iterator ].file_offset != offset_table2->chunk_offset[ iterator ].file_offset )
 		{
@@ -608,7 +655,7 @@ int libewf_offset_table_compare(
 }
 
 /* Seeks a certain chunk offset within the offset table
- * Returns the chunk segment file offset if the seek is successful, or -1 on error
+ * Returns the chunk segment file offset if the seek is successful or -1 on error
  */
 off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,
@@ -630,7 +677,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 
 		return( -1 );
 	}
-	if( chunk >= offset_table->amount )
+	if( chunk >= offset_table->amount_of_chunk_offsets )
 	{
 		notify_warning_printf( "%s: chunk: %" PRIu32 " not in offset table.\n",
 		 function, chunk );

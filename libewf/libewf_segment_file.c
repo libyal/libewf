@@ -43,7 +43,7 @@ const uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF,
 const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
- * Returns 1 if true, 0 if not, or -1 on error
+ * Returns 1 if true, 0 if not or -1 on error
  */
 int libewf_segment_file_check_file_signature(
      int file_descriptor )
@@ -182,7 +182,7 @@ ssize_t libewf_segment_file_read_file_header(
 
 /* Reads all sections from a segment file into the section list specific
  * for the segment file in the segment table in the handle
- * Returns 1 if successful, 0 if not, or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
@@ -275,7 +275,7 @@ int libewf_segment_file_read_sections(
 }
 
 /* Write the headers to file
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_headers(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -533,7 +533,7 @@ ssize_t libewf_segment_file_write_headers(
 }
 
 /* Write the last section at the end of the segment file
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_last_section(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -580,7 +580,7 @@ ssize_t libewf_segment_file_write_last_section(
 }
 
 /* Write the necessary sections at the start of the segment file
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_start(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -777,7 +777,7 @@ ssize_t libewf_segment_file_write_start(
 }
 
 /* Write the necessary sections before the actual data chunks to file
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -824,13 +824,13 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	}
 	/* The segment_chunk_amount contains the estimated amount of chunks for this section
 	 */
-	if( offset_table->amount < ( total_chunk_amount + segment_chunk_amount ) )
+	if( offset_table->amount_of_chunk_offsets < ( total_chunk_amount + segment_chunk_amount ) )
 	{
-		if( libewf_offset_table_realloc(
+		if( libewf_offset_table_resize(
 		     offset_table,
 		     ( total_chunk_amount + segment_chunk_amount ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to resize offset table.\n",
 			 function );
 
 			return( -1 );
@@ -886,7 +886,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 /* Write a chunk of data to a segment file and update the offset table
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_chunks_data(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -949,13 +949,13 @@ ssize_t libewf_segment_file_write_chunks_data(
 	}
 	/* Make sure the chunk is available in the offset table
 	 */
-	if( offset_table->amount < ( chunk + 1 ) )
+	if( offset_table->amount_of_chunk_offsets < ( chunk + 1 ) )
 	{
-		if( libewf_offset_table_realloc(
+		if( libewf_offset_table_resize(
 		     offset_table,
 		     ( chunk + 1 ) ) != 1 )
 		{
-			notify_warning_printf( "%s: unable to reallocate offset table.\n",
+			notify_warning_printf( "%s: unable to resize offset table.\n",
 			 function );
 
 			return( -1 );
@@ -1026,7 +1026,7 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 /* Correct the sections before the actual data chunks
  * Also write the necessary sections after the actual data chunks to file (like table and table2 sections for EWF-E01 format)
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_chunks_correction(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -1228,7 +1228,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 }
 
 /* Write a delta chunk of data to a segment file and update the offset table
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -1259,7 +1259,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	}
 	/* Make sure the chunk is available in the offset table
 	 */
-	if( chunk >= offset_table->amount )
+	if( chunk >= offset_table->amount_of_chunk_offsets )
 	{
 		notify_warning_printf( "%s: chunk not in offset table.\n",
 		 function );
@@ -1300,7 +1300,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 }
 
 /* Closes the segment file, necessary sections at the end of the segment file will be written
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_handle_t *segment_file_handle,

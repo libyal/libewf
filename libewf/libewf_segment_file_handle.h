@@ -66,11 +66,11 @@ struct libewf_segment_file_handle
 	uint8_t file_type;
 };
 
-libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
-                               void );
+int libewf_segment_file_handle_initialize(
+     libewf_segment_file_handle_t **segment_file_handle );
 
-void libewf_segment_file_handle_free(
-      libewf_segment_file_handle_t *segment_file_handle );
+int libewf_segment_file_handle_free(
+     libewf_segment_file_handle_t **segment_file_handle );
 
 int libewf_segment_file_handle_get_filename(
      libewf_segment_file_handle_t *segment_file_handle,

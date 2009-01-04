@@ -40,7 +40,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 	if( sector_table == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate sector table.\n",
+		notify_warning_printf( "%s: unable to create sector table.\n",
 		 function );
 
 		return( NULL );
@@ -54,7 +54,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 		if( sector_table->sector == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate dynamic sector array.\n",
+			notify_warning_printf( "%s: unable to create dynamic sector array.\n",
 			 function );
 
 			memory_free(
@@ -113,7 +113,7 @@ int libewf_sector_table_realloc(
 
 	if( reallocation == NULL )
 	{
-		notify_warning_printf( "%s: unable to reallocate dynamic sector array.\n",
+		notify_warning_printf( "%s: unable to resize sector array.\n",
 		 function );
 
 		return( -1 );
@@ -125,7 +125,7 @@ int libewf_sector_table_realloc(
 	     0, 
 	     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear dynamic sector array.\n",
+		notify_warning_printf( "%s: unable to clear sector array.\n",
 		 function );
 
 		return( 1 );
@@ -215,7 +215,7 @@ int libewf_sector_table_get_sector(
 }
 
 /* Add a sector
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libewf_sector_table_add_sector(
      libewf_sector_table_t *sector_table,
