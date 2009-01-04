@@ -35,6 +35,9 @@
 #define _LIBEWF_STRING_H
 
 #include "libewf_includes.h"
+
+#include <stdio.h>
+
 #include "libewf_char.h"
 
 #include "ewf_char.h"

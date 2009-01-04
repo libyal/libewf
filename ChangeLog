@@ -124,10 +124,14 @@ Next release:
   - update ewfexport man page
 * ewfacquire
   - account for backspace in user input
+  - ewfinput_get_size_variable uses strtoul, max is ULONG_MAX
+    change to full 64bit value support?
 * ewfalter
   - allow to set delta segment file path/basename
     test if no delta files were added before change
   - allow to set maximum delta file size default 4Gb?
+* ewfacquirestream
+  - > 2Gb segment file support
 
 * make buffer passthrough default behavior?
 * work on TODO in write

@@ -75,96 +75,6 @@ int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values )
 	return( 1 );
 }
 
-/* Sets a 2 digit value for a certain index in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
-{
-	static char *function = "libewf_date_string_set_2digit_value";
-	size_t string_length  = 0;
-
-	if( date_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( date_elements == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid date elements.\n",
-		 function );
-
-		return( -1 );
-	}
-	string_length = libewf_string_length( date_elements[ index ] );
-
-	if( string_length == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: empty string at index: %" PRIu8 " in date elements.\n",
-		 function, index );
-
-		return( -1 );
-	}
-	else if( string_length == 1 )
-	{
-		date_string[ 0 ] = (LIBEWF_CHAR) '0';
-		date_string[ 1 ] = (LIBEWF_CHAR) date_elements[ index ][ 0 ];
-	}
-	else
-	{
-		date_string[ 0 ] = (LIBEWF_CHAR) date_elements[ index ][ 0 ];
-		date_string[ 1 ] = (LIBEWF_CHAR) date_elements[ index ][ 1 ];
-	}
-	return( 1 );
-}
-
-/* Sets a 4 digit value for a certain index in the date element at the start of the date string
- * Returns 1 if successful, -1 otherwise
- */
-int libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index )
-{
-	static char *function = "libewf_date_string_set_4digit_value";
-	size_t string_length  = 0;
-
-	if( date_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( date_elements == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid date elements.\n",
-		 function );
-
-		return( -1 );
-	}
-	string_length = libewf_string_length( date_elements[ index ] );
-
-	if( string_length == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: empty string in date elements.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_length < 4 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid string in date elements.\n",
-		 function );
-
-		return( -1 );
-	}
-	date_string[ 0 ] = (LIBEWF_CHAR) date_elements[ index ][ 0 ];
-	date_string[ 1 ] = (LIBEWF_CHAR) date_elements[ index ][ 1 ];
-	date_string[ 2 ] = (LIBEWF_CHAR) date_elements[ index ][ 2 ];
-	date_string[ 3 ] = (LIBEWF_CHAR) date_elements[ index ][ 3 ];
-
-	return( 1 );
-}
-
 /* Convert a time stamp into a date string
  * Returns a pointer to the new instance, NULL on error
  */
@@ -3241,9 +3151,6 @@ LIBEWF_CHAR *libewf_convert_date_xheader_value( LIBEWF_CHAR *header_value, size_
  */
 LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	char *ctime_string       = NULL;
-#endif
 	LIBEWF_CHAR *date_string = NULL;
 	LIBEWF_CHAR *newline     = NULL;
 	static char *function    = "libewf_generate_date_xheader_value";

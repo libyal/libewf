@@ -1973,7 +1973,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		/* Swap byte pairs
 		 */
 		if( ( swap_byte_pairs == 1 )
-		 && ( ewfcommon_swap_byte_pairs( data, read_count ) != 1 ) )
+		 && ( ewfcommon_swap_byte_pairs( uncompressed_data, read_count ) != 1 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 			 function );
@@ -1988,7 +1988,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 		 */
 		if( calculate_md5 == 1 )
 		{
-			ewfmd5_update( &md5_context, data, read_count );
+			ewfmd5_update( &md5_context, uncompressed_data, read_count );
 		}
 		write_count = libewf_write_buffer(
 		               export_handle,
@@ -2001,6 +2001,9 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 			 function );
 
 			libewf_common_free( data );
+#if defined( HAVE_RAW_ACCESS )
+			libewf_common_free( raw_read_data );
+#endif
 
 			return( -1 );
 		}

@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_HASHVALUES_H )
-#define _LIBEWF_HASHVALUES_H
+#if !defined( _LIBEWF_HASH_VALUES_H )
+#define _LIBEWF_HASH_VALUES_H
 
 #include "libewf_includes.h"
 #include "libewf_char.h"

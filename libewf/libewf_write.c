@@ -1143,6 +1143,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		total_write_count                             += write_count;
 		internal_handle->write->write_count           += write_count;
 		internal_handle->write->create_chunks_section  = 1;
+		internal_handle->write->chunks_section_offset  = 0;
 	}
 	/* Check if the current segment file is full, if so close the current segment file
 	 */
@@ -1182,9 +1183,8 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 				return( -1 );
 			}
-			total_write_count                             += write_count;
-			internal_handle->write->write_count           += write_count;
-			internal_handle->write->chunks_section_offset  = 0;
+			total_write_count                   += write_count;
+			internal_handle->write->write_count += write_count;
 		}
 	}
 	return( total_write_count );

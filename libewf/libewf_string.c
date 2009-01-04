@@ -930,7 +930,7 @@ LIBEWF_CHAR *libewf_string_ctime( const time_t *timestamp )
 
                 return( NULL );
         }
-        ctime__string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 32 );
+        ctime_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 32 );
 
         if( ctime_string == NULL )
         {
