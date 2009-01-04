@@ -57,6 +57,11 @@ extern "C" {
 	fwrite( data, 1, size, stream )
 #endif
 
+#if defined( HAVE_FEOF )
+#define file_stream_io_feof( stream ) \
+        feof( stream )
+#endif
+
 #if defined( __cplusplus )
 }
 #endif

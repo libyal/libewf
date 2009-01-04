@@ -322,6 +322,13 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 AC_CHECK_FUNCS(
+ [feof],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing functions: feof],
+  [1]) ])
+
+AC_CHECK_FUNCS(
  [fopen],
  [],
  [AC_MSG_FAILURE(
