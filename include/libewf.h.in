@@ -330,7 +330,7 @@ LIBEWF_EXTERN int libewf_get_guid(
                    size_t size );
 
 /* Retrieves the MD5 hash
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, 0 if value not present, or -1 on error
  */
 LIBEWF_EXTERN int libewf_get_md5_hash(
                    LIBEWF_HANDLE *handle,
