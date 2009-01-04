@@ -35,7 +35,6 @@
 #define _LIBEWF_SEGMENT_TABLE_H
 
 #include "libewf_includes.h"
-#include "libewf_char.h"
 
 #include "libewf_filename.h"
 #include "libewf_section_list.h"

@@ -1159,17 +1159,18 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 			/* Finish and close the segment file
 			 */
 			write_count = libewf_segment_file_write_close(
-			               internal_handle,
 			               internal_handle->segment_table->segment_file[ segment_number ],
 			               segment_number,
 			               internal_handle->write->segment_amount_of_chunks,
 			               0,
 			               internal_handle->hash_sections,
+			               internal_handle->hash_values,
 			               internal_handle->media_values,
 			               internal_handle->acquiry_errors,
 			               internal_handle->compression_level,
 			               internal_handle->format,
-			               internal_handle->ewf_format );
+			               internal_handle->ewf_format,
+			               &( internal_handle->write->data_section ) );
 
 			if( write_count == -1 )
 			{
@@ -2406,17 +2407,18 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		 function );
 
 		write_count = libewf_segment_file_write_close(
-		               internal_handle,
 		               segment_file,
 		               segment_number,
 		               internal_handle->write->segment_amount_of_chunks,
 		               1,
 		               internal_handle->hash_sections,
+		               internal_handle->hash_values,
 		               internal_handle->media_values,
 		               internal_handle->acquiry_errors,
 		               internal_handle->compression_level,
 		               internal_handle->format,
-		               internal_handle->ewf_format );
+		               internal_handle->ewf_format,
+		               &( internal_handle->write->data_section ) );
 
 		if( write_count == -1 )
 		{

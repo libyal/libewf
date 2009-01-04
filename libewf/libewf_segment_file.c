@@ -607,22 +607,14 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, int *last_segment_file )
+int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE *segment_file, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance  )
 {
 	EWF_SECTION section;
 
-	static char *function       = "libewf_segment_file_read_sections";
-	size64_t *segment_file_size = NULL;
-	off64_t previous_offset     = 0;
-	int result                  = 0;
+	static char *function   = "libewf_segment_file_read_sections";
+	off64_t previous_offset = 0;
+	int result              = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -637,10 +629,6 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 
 		return( -1 );
 	}
-	if( internal_handle->write != NULL )
-	{
-		segment_file_size = &( internal_handle->write->segment_file_size );
-	}
 	*last_segment_file = 0;
 
 	/* The first offset is directly after the file header (13 byte)
@@ -651,19 +639,19 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	{
 		result = libewf_section_read(
 		          segment_file,
-		          internal_handle->header_sections,
-		          internal_handle->hash_sections,
-		          internal_handle->media_values,
-		          internal_handle->offset_table,
-		          internal_handle->secondary_offset_table,
-		          internal_handle->acquiry_errors,
-		          &( internal_handle->compression_level ),
-		          &( internal_handle->format ),
-		          &( internal_handle->ewf_format ),
+		          header_sections,
+		          hash_sections,
+		          media_values,
+		          offset_table,
+		          secondary_offset_table,
+		          acquiry_errors,
+		          compression_level,
+		          format,
+		          ewf_format,
 		          segment_file_size,
 		          &section,
 		          &previous_offset,
-		          internal_handle->error_tollerance );
+		          error_tollerance );
 
 		if( result != 1 )
 		{
@@ -1636,26 +1624,12 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE *segment_file
 /* Closes the segment file, necessary sections at the end of the segment file will be written
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format )
+ssize_t libewf_segment_file_write_close( LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
 {
 	static char *function     = "libewf_segment_file_write_close";
 	ssize_t total_write_count = 0;
 	ssize_t write_count       = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -1696,7 +1670,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				       media_values,
 				       compression_level,
 				       format,
-				       &( internal_handle->write->data_section ),
+				       cached_data_section,
 				       0 );
 
 			if( write_count == -1 )
@@ -1762,7 +1736,7 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				libewf_common_free( hash_sections->xhash );
 			}
 			hash_sections->xhash = libewf_hash_values_generate_xhash_string_ewfx(
-			                        internal_handle->hash_values,
+			                        hash_values,
 			                        &( hash_sections->xhash_size ) );
 
 			if( hash_sections->xhash == NULL )
@@ -1952,10 +1926,11 @@ int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const L
  */
 int libewf_segment_table_build( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_TABLE *segment_table )
 {
-	static char *function   = "libewf_segment_table_build";
-	uint16_t segment_number = 0;
-	int last_segment_file   = 0;
-	int result              = 0;
+	static char *function       = "libewf_segment_table_build";
+	size64_t *segment_file_size = NULL;
+	uint16_t segment_number     = 0;
+	int last_segment_file       = 0;
+	int result                  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1978,6 +1953,10 @@ int libewf_segment_table_build( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_
 
 		return( -1 );
 	}
+	if( internal_handle->write != NULL )
+	{
+		segment_file_size = &( internal_handle->write->segment_file_size );
+	}
 	/* Read the segment and offset table from the segment file(s)
 	 */
 	for( segment_number = 1; segment_number < segment_table->amount; segment_number++ )
@@ -1986,9 +1965,19 @@ int libewf_segment_table_build( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_
 		 function, segment_number );
 
 		result = libewf_segment_file_read_sections(
-		          internal_handle,
 		          segment_table->segment_file[ segment_number ],
-		          &last_segment_file );
+		          &last_segment_file,
+		          internal_handle->header_sections,
+		          internal_handle->hash_sections,
+		          internal_handle->media_values,
+		          internal_handle->offset_table,
+		          internal_handle->secondary_offset_table,
+		          internal_handle->acquiry_errors,
+		          &( internal_handle->compression_level ),
+		          &( internal_handle->format ),
+		          &( internal_handle->ewf_format ),
+		          segment_file_size,
+		          internal_handle->error_tollerance );
 
 		if( result == -1 )
 		{
