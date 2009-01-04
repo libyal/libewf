@@ -101,7 +101,8 @@ ewfglob_t *ewfglob_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
 		 function );
 
-		libewf_common_free( glob );
+		memory_free(
+		 glob );
 
 		return( NULL );
 	}
@@ -155,7 +156,7 @@ ewfglob_t *ewfglob_realloc(
 	}
 	else
 	{
-		reallocation  = (CHAR_T **) libewf_common_realloc(
+		reallocation  = (CHAR_T **) memory_reallocate(
 		                             glob->results,
 		                             new_size );
 	}
@@ -204,14 +205,14 @@ void ewfglob_free(
 		{
 			if( glob->results[ iterator ] != NULL )
 			{
-				libewf_common_free(
+				memory_free(
 				 glob->results[ iterator ] );
 			}
 		}
-		libewf_common_free(
+		memory_free(
 		 glob->results );
 	}
-	libewf_common_free(
+	memory_free(
 	 glob );
 }
 

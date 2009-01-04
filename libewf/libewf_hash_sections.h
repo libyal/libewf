@@ -68,9 +68,11 @@ struct libewf_hash_sections
 	uint8_t md5_hash_set;
 };
 
-libewf_hash_sections_t *libewf_hash_sections_alloc( void );
+libewf_hash_sections_t *libewf_hash_sections_alloc(
+                         void );
 
-void libewf_hash_sections_free( libewf_hash_sections_t *hash_sections );
+void libewf_hash_sections_free(
+      libewf_hash_sections_t *hash_sections );
 
 #if defined( __cplusplus )
 }

@@ -76,7 +76,7 @@ libewf_offset_table_t *libewf_offset_table_alloc(
 			LIBEWF_WARNING_PRINT( "%s: unable to allocate chunk offsets.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 offset_table );
 
 			return( NULL );
@@ -89,9 +89,9 @@ libewf_offset_table_t *libewf_offset_table_alloc(
 			LIBEWF_WARNING_PRINT( "%s: unable to clear chunk offsets.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 offset_table->chunk_offset );
-			libewf_common_free(
+			memory_free(
 			 offset_table );
 
 			return( NULL );
@@ -127,7 +127,7 @@ int libewf_offset_table_realloc(
 
 		return( -1 );
 	}
-	reallocation = libewf_common_realloc(
+	reallocation = memory_reallocate(
 	                offset_table->chunk_offset,
 	                ( sizeof( libewf_chunk_offset_t ) * amount ) );
 
@@ -173,10 +173,10 @@ void libewf_offset_table_free(
 	 */
 	if( offset_table->chunk_offset != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 offset_table->chunk_offset );
 	}
-	libewf_common_free(
+	memory_free(
 	 offset_table );
 }
 

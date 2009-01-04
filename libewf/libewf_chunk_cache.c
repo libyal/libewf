@@ -75,7 +75,8 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache compressed.\n",
 		 function );
 
-		libewf_common_free( chunk_cache );
+		memory_free(
+		 chunk_cache );
 
 		return( NULL );
 	}
@@ -87,8 +88,10 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache data.\n",
 		 function );
 
-		libewf_common_free( chunk_cache->compressed );
-		libewf_common_free( chunk_cache );
+		memory_free(
+		 chunk_cache->compressed );
+		memory_free(
+		 chunk_cache );
 
 		return( NULL );
 	}
@@ -134,7 +137,7 @@ int libewf_chunk_cache_realloc(
 
 		return( -1 );
 	}
-	reallocation = (ewf_char_t *) libewf_common_realloc(
+	reallocation = (ewf_char_t *) memory_reallocate(
 	                               (void *) chunk_cache->compressed,
 	                                size );
 
@@ -146,7 +149,7 @@ int libewf_chunk_cache_realloc(
 		return( -1 );
 	}
 	chunk_cache->compressed = reallocation;
-	reallocation            = (ewf_char_t *) libewf_common_realloc(
+	reallocation            = (ewf_char_t *) memory_reallocate(
 	                                          (void *) chunk_cache->data,
 	                                          size );
 
@@ -181,11 +184,11 @@ void libewf_chunk_cache_free(
 
 		return;
 	}
-	libewf_common_free(
+	memory_free(
 	 chunk_cache->compressed );
-	libewf_common_free(
+	memory_free(
 	 chunk_cache->data );
-	libewf_common_free(
+	memory_free(
 	 chunk_cache );
 }
 

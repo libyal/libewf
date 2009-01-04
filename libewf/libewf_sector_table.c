@@ -71,7 +71,8 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 			LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic sector array.\n",
 			 function );
 
-			libewf_common_free( sector_table );
+			memory_free(
+			 sector_table );
 
 			return( NULL );
 		}
@@ -83,9 +84,9 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 			LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic sector array.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 sector_table->sector );
-			libewf_common_free(
+			memory_free(
 			 sector_table );
 
 			return( NULL );
@@ -120,7 +121,7 @@ int libewf_sector_table_realloc(
 
 		return( -1 );
 	}
-	reallocation = libewf_common_realloc(
+	reallocation = memory_reallocate(
 	                sector_table->sector,
 	                ( sizeof( libewf_sector_table_entry_t ) * amount ) );
 
@@ -164,10 +165,10 @@ void libewf_sector_table_free(
 	}
 	if( sector_table->sector != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 sector_table->sector );
 	}
-	libewf_common_free(
+	memory_free(
 	 sector_table );
 }
 
@@ -283,7 +284,7 @@ int libewf_sector_table_add_sector(
 	}
 	/* Create a new sector
 	 */
-	reallocation = (libewf_sector_table_entry_t *) libewf_common_realloc(
+	reallocation = (libewf_sector_table_entry_t *) memory_reallocate(
 	                                                sector_table->sector,
 	                                                ( sizeof( libewf_sector_table_entry_t ) * ( sector_table->amount + 1 ) ) );
 

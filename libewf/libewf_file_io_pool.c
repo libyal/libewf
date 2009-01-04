@@ -46,7 +46,8 @@
 /* Allocates memory for a file io pool struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount )
+libewf_file_io_pool_t *libewf_file_io_pool_alloc(
+                        size_t amount )
 {
 	libewf_file_io_pool_t *file_io_pool = NULL;
 	static char *function               = "libewf_file_io_pool_alloc";
@@ -70,7 +71,8 @@ libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount )
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate file io handles.\n",
 		 function );
 
-		libewf_common_free( file_io_pool );
+		memory_free(
+		 file_io_pool );
 
 		return( NULL );
 	}
@@ -90,7 +92,9 @@ libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount )
 /* Reallocates memory for the file io pool entries
  * Returns 1 if successful, or -1 on error
  */
-int libewf_file_io_pool_realloc( libewf_file_io_pool_t *file_io_pool, size_t amount )
+int libewf_file_io_pool_realloc(
+     libewf_file_io_pool_t *file_io_pool,
+     size_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_file_io_pool_realloc";
@@ -110,7 +114,7 @@ int libewf_file_io_pool_realloc( libewf_file_io_pool_t *file_io_pool, size_t amo
 
 		return( -1 );
 	}
-	reallocation = libewf_common_realloc(
+	reallocation = memory_reallocate(
 	                file_io_pool->handle,
 	                ( sizeof( libewf_file_io_handle_t ) * amount ) );
 
@@ -137,7 +141,8 @@ int libewf_file_io_pool_realloc( libewf_file_io_pool_t *file_io_pool, size_t amo
 
 /* Frees memory of a file io pool
  */
-void libewf_file_io_pool_free( libewf_file_io_pool_t *file_io_pool )
+void libewf_file_io_pool_free(
+      libewf_file_io_pool_t *file_io_pool )
 {
 	static char *function = "libewf_file_io_pool_free";
 	size_t iterator       = 0;
@@ -153,17 +158,40 @@ void libewf_file_io_pool_free( libewf_file_io_pool_t *file_io_pool )
 	{
 		if( file_io_pool->handle[ iterator ].filename != NULL )
 		{
-			libewf_common_free( file_io_pool->handle[ iterator ].filename );
+			memory_free(
+			 file_io_pool->handle[ iterator ].filename );
 		}
 	}
-	libewf_common_free( file_io_pool->handle );
-	libewf_common_free( file_io_pool );
+	memory_free(
+	 file_io_pool->handle );
+	memory_free(
+	 file_io_pool );
 }
 
-int libewf_file_io_pool_open( libewf_file_io_pool_t *file_io_pool, libewf_filename_t *filename, int flags );
+int libewf_file_io_pool_open(
+     libewf_file_io_pool_t *file_io_pool,
+     libewf_filename_t *filename,
+     int flags );
 
-ssize_t libewf_file_io_pool_read( libewf_file_io_pool_t *pool, size_t entry, uint8_t *buffer, size_t size );
-ssize_t libewf_file_io_pool_write( libewf_file_io_pool_t *pool, size_t entry, uint8_t *buffer, size_t size );
-off64_t libewf_file_io_pool_seek( libewf_file_io_pool_t *pool, size_t entry, off64_t offset, int whence );
-int libewf_file_io_pool_close( libewf_file_io_pool_t *pool, size_t entry );
+ssize_t libewf_file_io_pool_read(
+         libewf_file_io_pool_t *pool,
+         size_t entry,
+         uint8_t *buffer,
+         size_t size );
+
+ssize_t libewf_file_io_pool_write(
+         libewf_file_io_pool_t *pool,
+         size_t entry,
+         uint8_t *buffer,
+         size_t size );
+
+off64_t libewf_file_io_pool_seek(
+         libewf_file_io_pool_t *pool,
+         size_t entry,
+         off64_t offset,
+         int whence );
+
+int libewf_file_io_pool_close(
+     libewf_file_io_pool_t *pool,
+     size_t entry );
 

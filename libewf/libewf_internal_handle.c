@@ -102,7 +102,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to create segment table.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -118,7 +118,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -134,7 +134,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->segment_table );
 		libewf_segment_table_free(
 		 internal_handle->delta_segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -152,7 +152,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -173,7 +173,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -195,7 +195,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -219,7 +219,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -245,7 +245,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -273,7 +273,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -303,7 +303,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 		 internal_handle->delta_segment_table );
 		libewf_segment_table_free(
 		 internal_handle->segment_table );
-		libewf_common_free(
+		memory_free(
 		 internal_handle );
 
 		return( NULL );
@@ -337,7 +337,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
 			 internal_handle->segment_table );
-			libewf_common_free(
+			memory_free(
 			 internal_handle );
 
 			return( NULL );
@@ -377,7 +377,7 @@ libewf_internal_handle_t *libewf_internal_handle_alloc(
 			 internal_handle->delta_segment_table );
 			libewf_segment_table_free(
 			 internal_handle->segment_table );
-			libewf_common_free(
+			memory_free(
 			 internal_handle );
 
 			return( NULL );
@@ -470,7 +470,7 @@ void libewf_internal_handle_free(
 		libewf_chunk_cache_free(
 		 internal_handle->chunk_cache );
 	}
-	libewf_common_free(
+	memory_free(
 	 internal_handle );
 }
 
@@ -500,7 +500,8 @@ libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate crc errors.\n",
 		 function );
 
-		libewf_common_free( handle_read );
+		memory_free(
+		 handle_read );
 
 		return( NULL );
 	}
@@ -527,7 +528,8 @@ void libewf_internal_handle_read_free(
 	{
 		libewf_sector_table_free( handle_read->crc_errors );
 	}
-	libewf_common_free( handle_read );
+	memory_free(
+	 handle_read );
 }
 
 /* Allocates memory for a new handle write struct
@@ -588,9 +590,11 @@ void libewf_internal_handle_write_free(
 	}
 	if( handle_write->data_section != NULL )
 	{
-		libewf_common_free( handle_write->data_section );
+		memory_free(
+		 handle_write->data_section );
 	}
-	libewf_common_free( handle_write );
+	memory_free(
+	 handle_write );
 }
 
 /* Retrieves the maximum amount of supported segment files to write

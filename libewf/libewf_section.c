@@ -315,7 +315,8 @@ ssize_t libewf_section_compressed_string_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read compressed string.\n",
 		 function );
 
-		libewf_common_free( compressed_string );
+		memory_free(
+		 compressed_string );
 
 		return( -1 );
 	}
@@ -333,7 +334,8 @@ ssize_t libewf_section_compressed_string_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate uncompressed string.\n",
 		 function );
 
-		libewf_common_free( compressed_string );
+		memory_free(
+		 compressed_string );
 
 		return( -1 );
 	}
@@ -348,7 +350,7 @@ ssize_t libewf_section_compressed_string_read(
 	{
 		/* Add a byte for the end of string
 		 */
-		reallocation = (ewf_char_t *) libewf_common_realloc(
+		reallocation = (ewf_char_t *) memory_reallocate(
 		                               uncompressed,
 		                               ( sizeof( ewf_char_t ) * ( *uncompressed_string_size + 1 ) ) );
 
@@ -357,8 +359,10 @@ ssize_t libewf_section_compressed_string_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate uncompressed string.\n",
 			 function );
 
-			libewf_common_free( compressed_string );
-			libewf_common_free( uncompressed );
+			memory_free(
+			 compressed_string );
+			memory_free(
+			 uncompressed );
 
 			return( -1 );
 		}
@@ -370,14 +374,16 @@ ssize_t libewf_section_compressed_string_read(
 		          (uint8_t *) compressed_string,
 		          compressed_string_size );
 	}
-	libewf_common_free( compressed_string );
+	memory_free(
+	 compressed_string );
 
 	if( result == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to uncompress string.\n",
 		 function );
 
-		libewf_common_free( uncompressed );
+		memory_free(
+		 uncompressed );
 
 		return( -1 );
 	}
@@ -452,7 +458,7 @@ ssize_t libewf_section_write_compressed_string(
 	if( ( result == -1 )
 	 && ( compressed_string_size > 0 ) )
 	{
-		reallocation = (ewf_char_t *) libewf_common_realloc(
+		reallocation = (ewf_char_t *) memory_reallocate(
 		                               compressed_string,
 		                               ( sizeof( ewf_char_t ) * compressed_string_size ) );
 
@@ -461,7 +467,8 @@ ssize_t libewf_section_write_compressed_string(
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate compressed string.\n",
 			 function );
 
-			libewf_common_free( compressed_string );
+			memory_free(
+			 compressed_string );
 
 			return( -1 );
 		}
@@ -479,7 +486,8 @@ ssize_t libewf_section_write_compressed_string(
 		LIBEWF_WARNING_PRINT( "%s: unable to compress string.\n",
 		 function );
 
-		libewf_common_free( compressed_string );
+		memory_free(
+		 compressed_string );
 
 		return( -1 );
 	}
@@ -494,7 +502,8 @@ ssize_t libewf_section_write_compressed_string(
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
 
-		libewf_common_free( compressed_string );
+		memory_free(
+		 compressed_string );
 
 		return( -1 );
 	}
@@ -503,7 +512,8 @@ ssize_t libewf_section_write_compressed_string(
 	               compressed_string,
 	               compressed_string_size );
 
-	libewf_common_free( compressed_string );
+	memory_free(
+	 compressed_string );
 
 	if( write_count != (ssize_t) compressed_string_size )
 	{
@@ -603,7 +613,8 @@ ssize_t libewf_section_header_read(
 	}
 	else
 	{
-		libewf_common_free( header );
+		memory_free(
+		 header );
 	}
 	return( read_count );
 }
@@ -724,7 +735,8 @@ ssize_t libewf_section_header2_read(
 	}
 	else
 	{
-		libewf_common_free( header2 );
+		memory_free(
+		 header2 );
 	}
 	return( read_count );
 }
@@ -827,7 +839,8 @@ ssize_t libewf_section_volume_s01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read volume.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -843,7 +856,8 @@ ssize_t libewf_section_volume_s01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -854,7 +868,8 @@ ssize_t libewf_section_volume_s01_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( volume );
+			memory_free(
+			 volume );
 
 			return( -1 );
 		}
@@ -872,7 +887,8 @@ ssize_t libewf_section_volume_s01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -883,7 +899,8 @@ ssize_t libewf_section_volume_s01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -894,7 +911,8 @@ ssize_t libewf_section_volume_s01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -905,7 +923,8 @@ ssize_t libewf_section_volume_s01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -920,7 +939,8 @@ ssize_t libewf_section_volume_s01_read(
 	{
 		*format = LIBEWF_FORMAT_EWF;
 	}
-	libewf_common_free( volume );
+	memory_free(
+	 volume );
 
 	return( read_count );
 }
@@ -976,7 +996,8 @@ ssize_t libewf_section_volume_s01_write(
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear volume.\n" );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -989,7 +1010,8 @@ ssize_t libewf_section_volume_s01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1000,7 +1022,8 @@ ssize_t libewf_section_volume_s01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1011,7 +1034,8 @@ ssize_t libewf_section_volume_s01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1022,7 +1046,8 @@ ssize_t libewf_section_volume_s01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1046,7 +1071,8 @@ ssize_t libewf_section_volume_s01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1067,7 +1093,8 @@ ssize_t libewf_section_volume_s01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1076,7 +1103,8 @@ ssize_t libewf_section_volume_s01_write(
 	               volume,
 	               sizeof( ewf_volume_smart_t ) );
 
-	libewf_common_free( volume );
+	memory_free(
+	 volume );
 
 	if( write_count != (ssize_t) sizeof( ewf_volume_smart_t ) )
 	{
@@ -1161,7 +1189,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read volume.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1177,7 +1206,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1188,7 +1218,8 @@ ssize_t libewf_section_volume_e01_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( volume );
+			memory_free(
+			 volume );
 
 			return( -1 );
 		}
@@ -1211,7 +1242,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1222,7 +1254,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1233,7 +1266,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1244,7 +1278,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1255,7 +1290,8 @@ ssize_t libewf_section_volume_e01_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert error granularity value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1273,12 +1309,14 @@ ssize_t libewf_section_volume_e01_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( volume );
+			memory_free(
+			 volume );
 
 			return( -1 );
 		}
 	}
-	libewf_common_free( volume );
+	memory_free(
+	 volume );
 
 	return( read_count );
 }
@@ -1336,7 +1374,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear volume.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1357,7 +1396,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1368,7 +1408,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1379,7 +1420,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1390,7 +1432,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1410,7 +1453,8 @@ ssize_t libewf_section_volume_e01_write(
 			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
 			 function );
 
-			libewf_common_free( volume );
+			memory_free(
+			 volume );
 
 			return( -1 );
 		}
@@ -1421,7 +1465,8 @@ ssize_t libewf_section_volume_e01_write(
 			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
 			 function );
 
-			libewf_common_free( volume );
+			memory_free(
+			 volume );
 
 			return( -1 );
 		}
@@ -1438,7 +1483,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1459,7 +1505,8 @@ ssize_t libewf_section_volume_e01_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
 
-		libewf_common_free( volume );
+		memory_free(
+		 volume );
 
 		return( -1 );
 	}
@@ -1468,7 +1515,8 @@ ssize_t libewf_section_volume_e01_write(
 	               volume,
 	               sizeof( ewf_volume_t ) );
 
-	libewf_common_free( volume );
+	memory_free(
+	 volume );
 
 	if( write_count != (ssize_t) sizeof( ewf_volume_t ) )
 	{
@@ -1779,7 +1827,8 @@ ssize_t libewf_section_table_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to read table offsets.\n",
 			 function );
 
-			libewf_common_free( offsets );
+			memory_free(
+			 offsets );
 
 			return( -1 );
 		}
@@ -1803,7 +1852,8 @@ ssize_t libewf_section_table_read(
 				LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 				 function );
 
-				libewf_common_free( offsets );
+				memory_free(
+				 offsets );
 
 				return( -1 );
 			}
@@ -1814,7 +1864,8 @@ ssize_t libewf_section_table_read(
 				LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
 				 function );
 
-				libewf_common_free( offsets );
+				memory_free(
+				 offsets );
 
 				return( -1 );
 			}
@@ -1825,7 +1876,8 @@ ssize_t libewf_section_table_read(
 
 				if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 				{
-					libewf_common_free( offsets );
+					memory_free(
+					 offsets );
 
 					return( -1 );
 				}
@@ -1842,11 +1894,13 @@ ssize_t libewf_section_table_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to fill offset table.\n",
 			 function );
 
-			libewf_common_free( offsets );
+			memory_free(
+			 offsets );
 
 			return( -1 );
 		}
-		libewf_common_free( offsets );
+		memory_free(
+		 offsets );
 
 		if( libewf_offset_table_calculate_last_offset(
 		     offset_table,
@@ -2013,7 +2067,8 @@ ssize_t libewf_section_table_write(
 			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value.\n",
 			 function );
 
-			libewf_common_free( offsets );
+			memory_free(
+			 offsets );
 
 			return( -1 );
 		}
@@ -2030,7 +2085,8 @@ ssize_t libewf_section_table_write(
 				LIBEWF_WARNING_PRINT( "%s: unable to write compressed chunks after chunk overflow.\n",
 				 function );
 
-				libewf_common_free( offsets );
+				memory_free(
+				 offsets );
 
 				return( -1 );
 			}
@@ -2040,7 +2096,8 @@ ssize_t libewf_section_table_write(
 			LIBEWF_WARNING_PRINT( "%s: unable to revert start offset.\n",
 			 function );
 
-			libewf_common_free( offsets );
+			memory_free(
+			 offsets );
 
 			return( -1 );
 		}
@@ -2063,7 +2120,8 @@ ssize_t libewf_section_table_write(
 				LIBEWF_WARNING_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
 				 function, offset64_value );
 
-				libewf_common_free( offsets );
+				memory_free(
+				 offsets );
 
 				return( -1 );
 			}
@@ -2084,7 +2142,8 @@ ssize_t libewf_section_table_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write section: %s to file.\n",
 		 function, (char *) section_type );
 
-		libewf_common_free( offsets );
+		memory_free(
+		 offsets );
 
 		return( -1 );
 	}
@@ -2098,7 +2157,8 @@ ssize_t libewf_section_table_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write table to file.\n",
 		 function );
 
-		libewf_common_free( offsets );
+		memory_free(
+		 offsets );
 
 		return( -1 );
 	}
@@ -2109,7 +2169,8 @@ ssize_t libewf_section_table_write(
 	               offsets,
 	               offsets_size );
 
-	libewf_common_free( offsets );
+	memory_free(
+	 offsets );
 
 	if( write_count != (ssize_t) offsets_size )
 	{
@@ -2336,7 +2397,8 @@ ssize_t libewf_section_ltree_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read ltree.\n",
 		 function );
 
-		libewf_common_free( ltree );
+		memory_free(
+		 ltree );
 
 		return( -1 );
 	}
@@ -2346,7 +2408,8 @@ ssize_t libewf_section_ltree_read(
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->unknown3, 4 ); );
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->unknown4, 20 ); );
 
-	libewf_common_free( ltree );
+	memory_free(
+	 ltree );
 
 	ltree_data_size = section_size - sizeof( ewf_ltree_t );
 
@@ -2370,7 +2433,8 @@ ssize_t libewf_section_ltree_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read ltree data.\n",
 		 function );
 
-		libewf_common_free( ltree_data );
+		memory_free(
+		 ltree_data );
 
 		return( -1 );
 	}
@@ -2378,7 +2442,7 @@ ssize_t libewf_section_ltree_read(
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, ltree_data, ltree_data_size ); );
 
-	libewf_common_free(
+	memory_free(
 	 ltree_data );
 
 	return( read_count );
@@ -2522,7 +2586,7 @@ ssize_t libewf_section_session_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to read session data.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 ewf_sessions );
 
 			return( -1 );
@@ -2544,7 +2608,7 @@ ssize_t libewf_section_session_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 ewf_sessions );
 
 			return( -1 );
@@ -2558,7 +2622,7 @@ ssize_t libewf_section_session_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 ewf_sessions );
 
 			return( -1 );
@@ -2570,7 +2634,7 @@ ssize_t libewf_section_session_read(
 
 			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
-				libewf_common_free(
+				memory_free(
 				 ewf_sessions );
 
 				return( -1 );
@@ -2584,7 +2648,7 @@ ssize_t libewf_section_session_read(
 			LIBEWF_VERBOSE_PRINT( "%s: session entries already set in handle - removing previous one.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 sessions->sector );
 
 			sessions->amount = 0;
@@ -2597,7 +2661,7 @@ ssize_t libewf_section_session_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to create session entries.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 ewf_sessions );
 
 			return( -1 );
@@ -2613,7 +2677,7 @@ ssize_t libewf_section_session_read(
 				LIBEWF_WARNING_PRINT( "%s: unable to convert first sector value.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 ewf_sessions );
 
 				return( -1 );
@@ -2624,7 +2688,7 @@ ssize_t libewf_section_session_read(
 			 */
 			sessions->sector[ iterator ].amount_of_sectors = 0;
 		}
-		libewf_common_free(
+		memory_free(
 		 ewf_sessions );
 	}
 	return( section_read_count );
@@ -2722,7 +2786,7 @@ ssize_t libewf_section_session_write(
 			LIBEWF_WARNING_PRINT( "%s: unable to revert first sector value.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 ewf_sessions );
 
 			return( -1 );
@@ -2744,7 +2808,7 @@ ssize_t libewf_section_session_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write section: %s to file.\n",
 		 function, (char *) section_type );
 
-		libewf_common_free(
+		memory_free(
 		 ewf_sessions );
 
 		return( -1 );
@@ -2759,7 +2823,7 @@ ssize_t libewf_section_session_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write session to file.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 ewf_sessions );
 
 		return( -1 );
@@ -2771,7 +2835,7 @@ ssize_t libewf_section_session_write(
 	               ewf_sessions,
 	               ewf_sessions_size );
 
-	libewf_common_free(
+	memory_free(
 	 ewf_sessions );
 
 	if( write_count != (ssize_t) ewf_sessions_size )
@@ -2893,7 +2957,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read data.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -2904,7 +2969,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -2915,7 +2981,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -2939,7 +3006,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -2949,7 +3017,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -2960,7 +3029,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -2970,7 +3040,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -2981,7 +3052,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -2991,7 +3063,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -3002,7 +3075,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -3012,7 +3086,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -3023,7 +3098,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -3033,7 +3109,8 @@ ssize_t libewf_section_data_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to convert error granularity value.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -3044,7 +3121,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -3056,7 +3134,8 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
@@ -3068,12 +3147,14 @@ ssize_t libewf_section_data_read(
 
 		if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
-			libewf_common_free( data );
+			memory_free(
+			 data );
 
 			return( -1 );
 		}
 	}
-	libewf_common_free( data );
+	memory_free(
+	 data );
 
 	return( read_count );
 }
@@ -3413,7 +3494,7 @@ ssize_t libewf_section_error2_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to read error2 sectors.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 error2_sectors );
 
 			return( -1 );
@@ -3435,7 +3516,7 @@ ssize_t libewf_section_error2_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 error2_sectors );
 
 			return( -1 );
@@ -3449,7 +3530,7 @@ ssize_t libewf_section_error2_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to convert CRC value.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 error2_sectors );
 
 			return( -1 );
@@ -3461,7 +3542,7 @@ ssize_t libewf_section_error2_read(
 
 			if( error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
-				libewf_common_free(
+				memory_free(
 				 error2_sectors );
 
 				return( -1 );
@@ -3475,7 +3556,7 @@ ssize_t libewf_section_error2_read(
 			LIBEWF_VERBOSE_PRINT( "%s: acquiry error sectors already set in handle - removing previous one.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 acquiry_errors->sector );
 
 			acquiry_errors->amount = 0;
@@ -3488,7 +3569,7 @@ ssize_t libewf_section_error2_read(
 			LIBEWF_WARNING_PRINT( "%s: unable to create acquiry error sectors.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 error2_sectors );
 
 			return( -1 );
@@ -3504,7 +3585,7 @@ ssize_t libewf_section_error2_read(
 				LIBEWF_WARNING_PRINT( "%s: unable to convert first sector value.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 error2_sectors );
 
 				return( -1 );
@@ -3518,13 +3599,13 @@ ssize_t libewf_section_error2_read(
 				LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 error2_sectors );
 
 				return( -1 );
 			}
 		}
-		libewf_common_free(
+		memory_free(
 		 error2_sectors );
 	}
 	return( section_read_count );
@@ -3622,7 +3703,7 @@ ssize_t libewf_section_error2_write(
 			LIBEWF_WARNING_PRINT( "%s: unable to revert first sector value.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 error2_sectors );
 
 			return( -1 );
@@ -3634,7 +3715,7 @@ ssize_t libewf_section_error2_write(
 			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 error2_sectors );
 
 			return( -1 );
@@ -3656,7 +3737,7 @@ ssize_t libewf_section_error2_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write section: %s to file.\n",
 		 function, (char *) section_type );
 
-		libewf_common_free(
+		memory_free(
 		 error2_sectors );
 
 		return( -1 );
@@ -3671,7 +3752,7 @@ ssize_t libewf_section_error2_write(
 		LIBEWF_WARNING_PRINT( "%s: unable to write error2 to file.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 error2_sectors );
 
 		return( -1 );
@@ -3683,7 +3764,7 @@ ssize_t libewf_section_error2_write(
 	               error2_sectors,
 	               sectors_size );
 
-	libewf_common_free(
+	memory_free(
 	 error2_sectors );
 
 	if( write_count != (ssize_t) sectors_size )
@@ -4109,7 +4190,8 @@ ssize_t libewf_section_xheader_read(
 	}
 	else
 	{
-		libewf_common_free( xheader );
+		memory_free(
+		 xheader );
 	}
 	return( read_count );
 }
@@ -4230,7 +4312,8 @@ ssize_t libewf_section_xhash_read(
 	}
 	else
 	{
-		libewf_common_free( xhash );
+		memory_free(
+		 xhash );
 	}
 	return( read_count );
 }
@@ -4655,7 +4738,8 @@ ssize_t libewf_section_debug_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to read section data.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -4667,7 +4751,8 @@ ssize_t libewf_section_debug_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate uncompressed data.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -4700,13 +4785,17 @@ ssize_t libewf_section_debug_read(
 		LIBEWF_WARNING_PRINT( "%s: unable to uncompress data.\n",
 		 function );
 
-		libewf_common_free( data );
-		libewf_common_free( uncompressed_data );
+		memory_free(
+		 data );
+		memory_free(
+		 uncompressed_data );
 
 		return( -1 );
 	}
-	libewf_common_free( data );
-	libewf_common_free( uncompressed_data );
+	memory_free(
+	 data );
+	memory_free(
+	 uncompressed_data );
 
 	return( read_count );
 }

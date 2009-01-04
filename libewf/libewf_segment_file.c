@@ -1419,7 +1419,7 @@ ssize_t libewf_segment_file_write_close(
 				LIBEWF_WARNING_PRINT( "%s: xhash already set - cleaning previous defintion.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 hash_sections->xhash );
 
 				hash_sections->xhash = NULL;

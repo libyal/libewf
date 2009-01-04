@@ -69,7 +69,8 @@ libewf_media_values_t *libewf_media_values_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear media values.\n",
 		 function );
 
-		libewf_common_free( media_values );
+		memory_free(
+		 media_values );
 
 		return( NULL );
 	}

@@ -230,7 +230,8 @@ int libewf_filename_create(
 		LIBEWF_WARNING_PRINT( "%s: unable to copy basename.\n",
 		 function );
 
-		libewf_common_free( new_filename );
+		memory_free(
+		 new_filename );
 
 		return( -1 );
 	}
@@ -247,7 +248,8 @@ int libewf_filename_create(
 		LIBEWF_WARNING_PRINT( "%s: unable to set extension.\n",
 		 function );
 
-		libewf_common_free( new_filename );
+		memory_free(
+		 new_filename );
 
 		return( -1 );
 	}

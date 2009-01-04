@@ -90,7 +90,7 @@ libewf_char_t *libewf_string_duplicate(
 		LIBEWF_WARNING_PRINT( "%s: unable to set duplicate string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 duplicate );
 
 		return( NULL );
@@ -458,11 +458,12 @@ void libewf_string_split_values_free(
 		}
 		else
 		{
-			libewf_common_free(
+			memory_free(
 			 split_values[ iterator ] );
 		}
 	}
-	libewf_common_free( split_values );
+	memory_free(
+	 split_values );
 }
 
 /* Copies a multi byte UTF16 string to a single byte string
@@ -1040,7 +1041,7 @@ int libewf_string_ctime(
                 LIBEWF_WARNING_PRINT( "%s: unable to create ctime string.\n",
                  function );
 
-		libewf_common_free(
+		memory_free(
 		 narrow_ctime_string );
 
 		*ctime_string_length = 0;
@@ -1055,9 +1056,9 @@ int libewf_string_ctime(
                 LIBEWF_WARNING_PRINT( "%s: unable to copy narrow ctime string to ctime string.\n",
                  function );
 
-		libewf_common_free(
+		memory_free(
 		 narrow_ctime_string );
-		libewf_common_free(
+		memory_free(
 		 *ctime_string );
 
 		*ctime_string        = NULL;
@@ -1065,7 +1066,7 @@ int libewf_string_ctime(
 
                 return( -1 );
         }
-	libewf_common_free(
+	memory_free(
 	 narrow_ctime_string );
 #endif
 	return( 1 );

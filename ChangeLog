@@ -174,7 +174,7 @@ CLOSED
 
 Version: 20080306
 * worked on seperating common code
-  - refactored libewf_common_alloc
+  - refactored libewf_common_alloc, libewf_common_realloc
 
 Version: 20080305
 * worked on signal handling

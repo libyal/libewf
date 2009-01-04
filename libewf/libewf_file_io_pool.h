@@ -60,16 +60,42 @@ struct libewf_file_io_pool
 	libewf_file_io_handle_t *handle;
 };
 
-libewf_file_io_pool_t *libewf_file_io_pool_alloc( size_t amount );
-int libewf_file_io_pool_realloc( libewf_file_io_pool_t *file_io_pool, size_t amount );
-void libewf_file_io_pool_free( libewf_file_io_pool_t *file_io_pool );
+libewf_file_io_pool_t *libewf_file_io_pool_alloc( 
+                        size_t amount );
 
-int libewf_file_io_pool_open( libewf_file_io_pool_t *file_io_pool, libewf_filename_t *filename, int flags );
+int libewf_file_io_pool_realloc(
+     libewf_file_io_pool_t *file_io_pool,
+     size_t amount );
 
-ssize_t libewf_file_io_pool_read( libewf_file_io_pool_t *file_io_pool, size_t entry, uint8_t *buffer, size_t size );
-ssize_t libewf_file_io_pool_write( libewf_file_io_pool_t *file_io_pool, size_t entry, uint8_t *buffer, size_t size );
-off64_t libewf_file_io_pool_seek( libewf_file_io_pool_t *file_io_pool, size_t entry, off64_t offset, int whence );
-int libewf_file_io_pool_close( libewf_file_io_pool_t *file_io_pool, size_t entry );
+void libewf_file_io_pool_free(
+      libewf_file_io_pool_t *file_io_pool );
+
+int libewf_file_io_pool_open(
+     libewf_file_io_pool_t *file_io_pool,
+     libewf_filename_t *filename,
+     int flags );
+
+ssize_t libewf_file_io_pool_read(
+         libewf_file_io_pool_t *pool,
+         size_t entry,
+         uint8_t *buffer,
+         size_t size );
+
+ssize_t libewf_file_io_pool_write(
+         libewf_file_io_pool_t *pool,
+         size_t entry,
+         uint8_t *buffer,
+         size_t size );
+
+off64_t libewf_file_io_pool_seek(
+         libewf_file_io_pool_t *pool,
+         size_t entry,
+         off64_t offset,
+         int whence );
+
+int libewf_file_io_pool_close(
+     libewf_file_io_pool_t *pool,
+     size_t entry );
 
 #if defined( __cplusplus )
 }

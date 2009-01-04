@@ -275,7 +275,7 @@ int libewf_glob(
 			LIBEWF_WARNING_PRINT( "%s: unable to copy filename.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 segment_filename );
 
 			return( -1 );
@@ -295,7 +295,7 @@ int libewf_glob(
 			LIBEWF_WARNING_PRINT( "%s: unable to set extension.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 segment_filename );
 
 			return( -1 );
@@ -308,7 +308,7 @@ int libewf_glob(
 
 		if( file_descriptor == -1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 segment_filename );
 
 			break;
@@ -318,7 +318,7 @@ int libewf_glob(
 		libewf_common_close(
 		 file_descriptor );
 
-		reallocation = libewf_common_realloc(
+		reallocation = memory_reallocate(
 		                *filenames,
 		                sizeof( libewf_filename_t * ) * amount_of_files );
 
@@ -327,7 +327,7 @@ int libewf_glob(
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate filenames.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 segment_filename );
 
 			return( -1 );
@@ -2358,7 +2358,8 @@ int libewf_set_delta_segment_filename(
 	}
 	if( internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename != NULL )
 	{
-		libewf_common_free( internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename );
+		memory_free(
+		 internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename );
 
 		internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename        = NULL;
 		internal_handle->delta_segment_table->segment_file_handle[ 0 ]->length_filename = 0;

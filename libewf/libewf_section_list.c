@@ -98,7 +98,7 @@ libewf_section_list_t *libewf_section_list_append(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear section list entry.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 section_list_entry );
 
 		return( NULL );
@@ -111,7 +111,7 @@ libewf_section_list_t *libewf_section_list_append(
 		LIBEWF_WARNING_PRINT( "%s: unable to set section list entry type.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 section_list_entry );
 
 		return( NULL );
@@ -172,7 +172,7 @@ int libewf_section_list_remove_last(
 
 			return( -1 );
 		}
-		libewf_common_free(
+		memory_free(
 		 section_list->last );
 
 		section_list->first = NULL;
@@ -184,7 +184,7 @@ int libewf_section_list_remove_last(
 		section_list->last       = section_list_entry->previous;
 		section_list->last->next = NULL;
 
-		libewf_common_free(
+		memory_free(
 		 section_list_entry );
 	}
 	return( 1 );

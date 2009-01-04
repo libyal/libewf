@@ -78,7 +78,8 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic segment file array.\n",
 		 function );
 
-		libewf_common_free( segment_table );
+		memory_free(
+		 segment_table );
 
 		return( NULL );
 	}
@@ -90,8 +91,10 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic segment file array.\n",
 		 function );
 
-		libewf_common_free( segment_table->segment_file_handle );
-		libewf_common_free( segment_table );
+		memory_free(
+		 segment_table->segment_file_handle );
+		memory_free(
+		 segment_table );
 
 		return( NULL );
 	} 
@@ -124,7 +127,7 @@ int libewf_segment_table_realloc(
 
 		return( -1 );
 	}
-	reallocation = libewf_common_realloc(
+	reallocation = memory_reallocate(
 	                segment_table->segment_file_handle,
 	                ( amount * sizeof( libewf_segment_file_handle_t * ) ) );
 
@@ -175,9 +178,9 @@ void libewf_segment_table_free(
 			 segment_table->segment_file_handle[ iterator ] );
 		}
 	}
-	libewf_common_free(
+	memory_free(
 	 segment_table->segment_file_handle );
-	libewf_common_free(
+	memory_free(
 	 segment_table );
 }
 

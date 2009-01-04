@@ -740,7 +740,7 @@ libewf_char_t *ewfinput_get_variable(
 				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 user_input );
 
 				return( NULL );
@@ -804,7 +804,7 @@ CHAR_T *ewfinput_get_variable_char_t(
 			LIBEWF_WARNING_PRINT( "%s: unable to create conversion string.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 user_input );
 
 			return( NULL );
@@ -817,14 +817,14 @@ CHAR_T *ewfinput_get_variable_char_t(
 			LIBEWF_WARNING_PRINT( "%s: unable to set conversion string.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 user_input );
-			libewf_common_free(
+			memory_free(
 			 user_input_char_t );
 
 			return( NULL );
 		}
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		return( user_input_char_t );
@@ -1157,7 +1157,7 @@ libewf_char_t *ewfinput_get_fixed_value(
 				LIBEWF_WARNING_PRINT( "%s: unable to copy string.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 user_input );
 
 				return( NULL );

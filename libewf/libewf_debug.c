@@ -220,7 +220,7 @@ void libewf_debug_header_fprint(
 		LIBEWF_WARNING_PRINT( "%s: unable to copy header to header string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 header_string );
 
 		return;
@@ -229,7 +229,7 @@ void libewf_debug_header_fprint(
 	 stream,
 	 header_string );
 
-	libewf_common_free(
+	memory_free(
 	 header_string );
 }
 
@@ -270,7 +270,7 @@ void libewf_debug_header2_fprint(
 		LIBEWF_WARNING_PRINT( "%s: unable to copy header2 to header string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 header_string );
 
 		return;
@@ -279,7 +279,7 @@ void libewf_debug_header2_fprint(
 	 stream,
 	 header_string );
 
-	libewf_common_free(
+	memory_free(
 	 header_string );
 }
 

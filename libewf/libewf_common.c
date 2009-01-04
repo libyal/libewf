@@ -283,7 +283,7 @@ struct tm *libewf_common_localtime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_elements );
 
 		return( NULL );
@@ -298,7 +298,7 @@ struct tm *libewf_common_localtime(
 		LIBEWF_WARNING_PRINT( "%s: unable to create static time elements.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_elements );
 
 		return( NULL );
@@ -311,7 +311,7 @@ struct tm *libewf_common_localtime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_elements );
 
 		return( NULL );
@@ -382,7 +382,7 @@ char *libewf_common_ctime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_string );
 
 		return( NULL );
@@ -397,7 +397,7 @@ char *libewf_common_ctime(
 		LIBEWF_WARNING_PRINT( "%s: unable to create static time string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_string );
 
 		return( NULL );
@@ -410,7 +410,7 @@ char *libewf_common_ctime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_string );
 
 		return( NULL );
@@ -466,7 +466,7 @@ wchar_t *libewf_common_wide_ctime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 time_string );
 
 		return( NULL );

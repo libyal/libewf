@@ -68,7 +68,8 @@ libewf_segment_file_handle_t *libewf_segment_file_handle_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to create section list.\n",
 		 function );
 
-		libewf_common_free( segment_file_handle );
+		memory_free(
+		 segment_file_handle );
 
 		return( NULL );
 	}
@@ -102,7 +103,7 @@ void libewf_segment_file_handle_free(
 	}
 	if( segment_file_handle->filename != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 segment_file_handle->filename );
 	}
 	if( segment_file_handle->section_list != NULL )
@@ -114,11 +115,14 @@ void libewf_segment_file_handle_free(
 			current_section_list_entry = section_list_entry;
 			section_list_entry         = section_list_entry->next;
 
-			libewf_common_free( current_section_list_entry );
+			memory_free(
+			 current_section_list_entry );
 		}
-		libewf_common_free( segment_file_handle->section_list );
+		memory_free(
+		 segment_file_handle->section_list );
 	}
-	libewf_common_free( segment_file_handle );
+	memory_free(
+	 segment_file_handle );
 }
 
 /* Retrieves a filename of a certain segment file handle
@@ -245,7 +249,7 @@ int libewf_segment_file_handle_set_filename(
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 segment_file_handle->filename );
 
 		segment_file_handle->filename = NULL;

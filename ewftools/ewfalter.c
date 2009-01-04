@@ -229,7 +229,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
 			 error_string );
 
-			libewf_common_free(
+			memory_free(
 			 error_string );
 		}
 		else
@@ -307,7 +307,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			libewf_common_free(
+			memory_free(
 			 buffer );
 
 			return( EXIT_FAILURE );
@@ -326,7 +326,7 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf( stderr, "Unable to close EWF file(s).\n" );
 				}
-				libewf_common_free(
+				memory_free(
 				 buffer );
 
 				return( EXIT_FAILURE );
@@ -360,7 +360,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
-		libewf_common_free(
+		memory_free(
 		 buffer );
 
 		return( EXIT_FAILURE );
@@ -375,7 +375,7 @@ int main( int argc, char * const argv[] )
 			 (size_t) alter_size,
 			 alter_offset );
 	}
-	libewf_common_free(
+	memory_free(
 	 buffer );
 
 	if( count <= -1 )

@@ -73,7 +73,8 @@ libewf_header_sections_t *libewf_header_sections_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear header sections.\n",
 		 function );
 
-		libewf_common_free( header_sections );
+		memory_free(
+		 header_sections );
 
 		return( NULL );
 	}
@@ -96,17 +97,21 @@ void libewf_header_sections_free(
 	}
 	if( header_sections->header != NULL )
 	{
-		libewf_common_free( header_sections->header );
+		memory_free(
+		 header_sections->header );
 	}
 	if( header_sections->header2 != NULL )
 	{
-		libewf_common_free( header_sections->header2 );
+		memory_free(
+		 header_sections->header2 );
 	}
 	if( header_sections->xheader != NULL )
 	{
-		libewf_common_free( header_sections->xheader );
+		memory_free(
+		 header_sections->xheader );
 	}
-	libewf_common_free( header_sections );
+	memory_free(
+	 header_sections );
 }
 
 /* Create the header sections from the header values
@@ -212,7 +217,7 @@ int libewf_header_sections_create(
 			LIBEWF_WARNING_PRINT( "%s: unable to create header2 section.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 header_sections->header );
 
 			header_sections->header      = NULL;
@@ -243,7 +248,7 @@ int libewf_header_sections_create(
 			LIBEWF_WARNING_PRINT( "%s: unable to create header2 sections.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 header_sections->header );
 
 			header_sections->header      = NULL;
@@ -274,7 +279,7 @@ int libewf_header_sections_create(
 			LIBEWF_WARNING_PRINT( "%s: unable to create header2 sections.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 header_sections->header );
 
 			header_sections->header      = NULL;
@@ -333,7 +338,7 @@ int libewf_header_sections_create(
 			LIBEWF_WARNING_PRINT( "%s: unable to create header2 section.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 header_sections->header );
 
 			header_sections->header      = NULL;
@@ -350,9 +355,9 @@ int libewf_header_sections_create(
 			LIBEWF_WARNING_PRINT( "%s: unable to create xheader section.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 header_sections->header );
-			libewf_common_free(
+			memory_free(
 			 header_sections->header2 );
 
 			header_sections->header       = NULL;

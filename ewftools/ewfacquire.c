@@ -187,7 +187,7 @@ int confirm_input(
 		input_confirmed = ewfinput_determine_yes_no(
 		                   user_input );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		if( input_confirmed <= -1 )	
@@ -441,7 +441,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Error opening file or device: %" PRIs " with failure: %" PRIs ".\n",
 			 argv[ optind ], error_string );
 
-			libewf_common_free(
+			memory_free(
 			 error_string );
 		}
 		else
@@ -492,27 +492,27 @@ int main( int argc, char * const argv[] )
 	{
 		if( case_number != NULL )
 		{
-			libewf_common_free(
+			memory_free(
 			 case_number );
 		}
 		if( description != NULL )
 		{
-			libewf_common_free(
+			memory_free(
 			 description );
 		}
 		if( evidence_number != NULL )
 		{
-			libewf_common_free(
+			memory_free(
 			 evidence_number );
 		}
 		if( examiner_name != NULL )
 		{
-			libewf_common_free(
+			memory_free(
 			 examiner_name );
 		}
 		if( notes != NULL )
 		{
-			libewf_common_free(
+			memory_free(
 			 notes );
 		}
 
@@ -575,7 +575,7 @@ int main( int argc, char * const argv[] )
 		media_type = ewfinput_determine_media_type(
 		              user_input );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		if( media_type <= -1 )
@@ -597,7 +597,7 @@ int main( int argc, char * const argv[] )
 		volume_type = ewfinput_determine_volume_type(
 		               user_input );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		if( volume_type <= -1 )
@@ -619,7 +619,7 @@ int main( int argc, char * const argv[] )
 		compression_level = ewfinput_determine_compression_level(
 		                     user_input );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		if( compression_level <= -1 )
@@ -643,7 +643,7 @@ int main( int argc, char * const argv[] )
 			compress_empty_block = ewfinput_determine_yes_no(
 			                        user_input );
 
-			libewf_common_free(
+			memory_free(
 			 user_input );
 
 			if( compress_empty_block <= -1 )
@@ -666,7 +666,7 @@ int main( int argc, char * const argv[] )
 		libewf_format = ewfinput_determine_libewf_format(
 		                 user_input );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		if( libewf_format == 0 )
@@ -729,7 +729,7 @@ int main( int argc, char * const argv[] )
 		                     user_input,
 		                     libewf_string_length( user_input ) );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		/* Error granularity
@@ -762,7 +762,7 @@ int main( int argc, char * const argv[] )
 		wipe_chunk_on_error = ewfinput_determine_yes_no(
 		                       user_input );
 
-		libewf_common_free(
+		memory_free(
 		 user_input );
 
 		if( wipe_chunk_on_error <= -1 )
@@ -815,7 +815,7 @@ int main( int argc, char * const argv[] )
 			                   1,
 			                   LIBEWF_OPEN_WRITE );
 
-		libewf_common_free(
+		memory_free(
 		 filename );
 
 		if( ewfcommon_libewf_handle == NULL )
@@ -831,7 +831,7 @@ int main( int argc, char * const argv[] )
 				fprintf( stderr, "Unable to create EWF file(s) with failure: %" PRIs ".\n",
 				 error_string );
 
-				libewf_common_free(
+				memory_free(
 				 error_string );
 			}
 			else
@@ -868,32 +868,32 @@ int main( int argc, char * const argv[] )
 	}
 	if( case_number != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 case_number );
 	}
 	if( description != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 description );
 	}
 	if( evidence_number != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 evidence_number );
 	}
 	if( examiner_name != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 examiner_name );
 	}
 	if( notes != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 notes );
 	}
 	if( acquiry_operating_system != NULL )
 	{
-		libewf_common_free(
+		memory_free(
 		 acquiry_operating_system );
 	}
 	if( error_abort != 0 )
@@ -941,7 +941,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
 
-			libewf_common_free(
+			memory_free(
 			 calculated_md5_hash_string );
 
 			if( libewf_close(
@@ -970,7 +970,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stdout, "Acquiry started at: %" PRIs "\n",
 			 time_string );
 
-			libewf_common_free(
+			memory_free(
 			 time_string );
 		}
 		else
@@ -1020,12 +1020,12 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 calculated_sha1_hash_string );
 		}
 		return( EXIT_FAILURE );
@@ -1043,7 +1043,7 @@ int main( int argc, char * const argv[] )
 				fprintf( stdout, "Acquiry failed at: %" PRIs "\n",
 				 time_string );
 
-				libewf_common_free(
+				memory_free(
 				 time_string );
 			}
 			else
@@ -1057,12 +1057,12 @@ int main( int argc, char * const argv[] )
 			}
 			if( calculate_md5 == 1 )
 			{
-				libewf_common_free(
+				memory_free(
 				 calculated_md5_hash_string );
 			}
 			if( calculate_sha1 == 1 )
 			{
-				libewf_common_free(
+				memory_free(
 				 calculated_sha1_hash_string );
 			}
 			return( EXIT_FAILURE );
@@ -1072,7 +1072,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stdout, "Acquiry completed at: %" PRIs "\n",
 			 time_string );
 
-			libewf_common_free(
+			memory_free(
 			 time_string );
 		}
 		else
@@ -1120,12 +1120,12 @@ int main( int argc, char * const argv[] )
 
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 calculated_sha1_hash_string );
 		}
 		if( log_file_stream != NULL )
@@ -1146,12 +1146,12 @@ int main( int argc, char * const argv[] )
 
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 calculated_sha1_hash_string );
 		}
 		if( log_file_stream != NULL )
@@ -1171,7 +1171,7 @@ int main( int argc, char * const argv[] )
 			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
 			 calculated_md5_hash_string );
 		}
-		libewf_common_free(
+		memory_free(
 		 calculated_md5_hash_string );
 	}
 	if( calculate_sha1 == 1 )
@@ -1184,7 +1184,7 @@ int main( int argc, char * const argv[] )
 			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
 			 calculated_sha1_hash_string );
 		}
-		libewf_common_free(
+		memory_free(
 		 calculated_sha1_hash_string );
 	}
 	if( log_file_stream != NULL )

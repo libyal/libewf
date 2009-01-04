@@ -280,7 +280,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
 			 error_string );
 
-			libewf_common_free(
+			memory_free(
 			 error_string );
 		}
 		else
@@ -311,7 +311,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
 
-			libewf_common_free(
+			memory_free(
 			 stored_md5_hash_string );
 
 			return( EXIT_FAILURE );
@@ -328,9 +328,9 @@ int main( int argc, char * const argv[] )
 
 			if( calculate_md5 == 1 )
 			{
-				libewf_common_free(
+				memory_free(
 				 stored_md5_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_md5_hash_string );
 			}
 			return( EXIT_FAILURE );
@@ -344,12 +344,12 @@ int main( int argc, char * const argv[] )
 
 			if( calculate_md5 == 1 )
 			{
-				libewf_common_free(
+				memory_free(
 				 stored_md5_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_md5_hash_string );
 			}
-			libewf_common_free(
+			memory_free(
 			 stored_sha1_hash_string );
 
 			return( EXIT_FAILURE );
@@ -368,7 +368,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stdout, "Verify started at: %" PRIs "\n",
 			 time_string );
 
-			libewf_common_free(
+			memory_free(
 			 time_string );
 		}
 		else
@@ -417,7 +417,7 @@ int main( int argc, char * const argv[] )
 				fprintf( stdout, "Verify failed at: %" PRIs "\n",
 				 time_string );
 
-				libewf_common_free(
+				memory_free(
 				 time_string );
 			}
 			else
@@ -431,16 +431,16 @@ int main( int argc, char * const argv[] )
 			}
 			if( calculate_md5 == 1 )
 			{
-				libewf_common_free(
+				memory_free(
 				 stored_md5_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_md5_hash_string );
 			}
 			if( calculate_sha1 == 1 )
 			{
-				libewf_common_free(
+				memory_free(
 				 stored_sha1_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_sha1_hash_string );
 			}
 			return( EXIT_FAILURE );
@@ -450,7 +450,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stdout, "Verify completed at: %" PRIs "\n",
 			 time_string );
 
-			libewf_common_free(
+			memory_free(
 			 time_string );
 		}
 		else
@@ -482,16 +482,16 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf( stderr, "Unable to close EWF file(s).\n" );
 				}
-				libewf_common_free(
+				memory_free(
 				 stored_md5_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_md5_hash_string );
 
 				if( calculate_sha1 == 1 )
 				{
-					libewf_common_free(
+					memory_free(
 					 stored_sha1_hash_string );
-					libewf_common_free(
+					memory_free(
 					 calculated_sha1_hash_string );
 				}
 				return( EXIT_FAILURE );
@@ -509,16 +509,16 @@ int main( int argc, char * const argv[] )
 				{
 					fprintf( stderr, "Unable to close EWF file(s).\n" );
 				}
-				libewf_common_free(
+				memory_free(
 				 stored_md5_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_md5_hash_string );
 
 				if( calculate_sha1 == 1 )
 				{
-					libewf_common_free(
+					memory_free(
 					 stored_sha1_hash_string );
-					libewf_common_free(
+					memory_free(
 					 calculated_sha1_hash_string );
 				}
 				return( EXIT_FAILURE );
@@ -543,14 +543,14 @@ int main( int argc, char * const argv[] )
 				}
 				if( calculate_md5 == 1 )
 				{
-					libewf_common_free(
+					memory_free(
 					 stored_md5_hash_string );
-					libewf_common_free(
+					memory_free(
 					 calculated_md5_hash_string );
 				}
-				libewf_common_free(
+				memory_free(
 				 stored_sha1_hash_string );
-				libewf_common_free(
+				memory_free(
 				 calculated_sha1_hash_string );
 
 				return( EXIT_FAILURE );
@@ -588,16 +588,16 @@ int main( int argc, char * const argv[] )
 
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 stored_md5_hash_string );
-			libewf_common_free(
+			memory_free(
 			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 stored_sha1_hash_string );
-			libewf_common_free(
+			memory_free(
 			 calculated_sha1_hash_string );
 		}
 		if( log_file_stream != NULL )
@@ -618,16 +618,16 @@ int main( int argc, char * const argv[] )
 
 		if( calculate_md5 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 stored_md5_hash_string );
-			libewf_common_free(
+			memory_free(
 			 calculated_md5_hash_string );
 		}
 		if( calculate_sha1 == 1 )
 		{
-			libewf_common_free(
+			memory_free(
 			 stored_sha1_hash_string );
-			libewf_common_free(
+			memory_free(
 			 calculated_sha1_hash_string );
 		}
 		if( log_file_stream != NULL )
@@ -672,9 +672,9 @@ int main( int argc, char * const argv[] )
 		                    calculated_md5_hash_string,
 		                    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
 
-		libewf_common_free(
+		memory_free(
 		 stored_md5_hash_string );
-		libewf_common_free(
+		memory_free(
 		 calculated_md5_hash_string );
 	}
 	if( calculate_sha1 == 1 )
@@ -712,9 +712,9 @@ int main( int argc, char * const argv[] )
 		                     calculated_sha1_hash_string,
 		                     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
 
-		libewf_common_free(
+		memory_free(
 		 stored_sha1_hash_string );
-		libewf_common_free(
+		memory_free(
 		 calculated_sha1_hash_string );
 	}
 	if( log_file_stream != NULL )

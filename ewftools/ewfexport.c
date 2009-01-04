@@ -32,6 +32,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <common.h>
+#include <memory.h>
+
 #include "../libewf/libewf_includes.h"
 
 #include <errno.h>
@@ -436,7 +439,7 @@ int main( int argc, char * const argv[] )
 		usage_fprint(
 		 stderr );
 
-		libewf_common_free(
+		memory_free(
 		 target_filename );
 
 		return( EXIT_FAILURE );
@@ -457,7 +460,7 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to create glob.\n" );
 
-		libewf_common_free(
+		memory_free(
 		 target_filename );
 
 		return( EXIT_FAILURE );
@@ -473,7 +476,7 @@ int main( int argc, char * const argv[] )
 
 		ewfglob_free(
 		 glob );
-		libewf_common_free(
+		memory_free(
 		 target_filename );
 
 		return( EXIT_FAILURE );
@@ -506,7 +509,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
 			 error_string );
 
-			libewf_common_free(
+			memory_free(
 			 error_string );
 		}
 		else
@@ -517,7 +520,7 @@ int main( int argc, char * const argv[] )
 		fprintf( stderr, "Unable to open EWF file(s).\n" );
 #endif
 
-		libewf_common_free(
+		memory_free(
 		 target_filename );
 
 		return( EXIT_FAILURE );
@@ -535,7 +538,7 @@ int main( int argc, char * const argv[] )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			libewf_common_free(
+			memory_free(
 			 target_filename );
 
 			return( EXIT_FAILURE );
@@ -588,9 +591,9 @@ int main( int argc, char * const argv[] )
 					{
 						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
-					libewf_common_free(
+					memory_free(
 					 target_filename );
-					libewf_common_free(
+					memory_free(
 					 user_input );
 
 					exit( EXIT_FAILURE );
@@ -600,7 +603,7 @@ int main( int argc, char * const argv[] )
 					output_raw = 0;
 				}
 			}
-			libewf_common_free(
+			memory_free(
 			 user_input );
 		}
 		if( output_raw == 0 )
@@ -641,12 +644,12 @@ int main( int argc, char * const argv[] )
 					{
 						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
-					libewf_common_free(
+					memory_free(
 					 target_filename );
 
 					return( EXIT_FAILURE );
 				}
-				libewf_common_free(
+				memory_free(
 				 user_input );
 
 				/* Empty block compression
@@ -663,7 +666,7 @@ int main( int argc, char * const argv[] )
 					compress_empty_block = ewfinput_determine_yes_no(
 					                        user_input );
 
-					libewf_common_free(
+					memory_free(
 					 user_input );
 
 					if( compress_empty_block <= -1 )
@@ -675,7 +678,7 @@ int main( int argc, char * const argv[] )
 						{
 							fprintf( stderr, "Unable to close EWF file(s).\n" );
 						}
-						libewf_common_free(
+						memory_free(
 						 target_filename );
 
 						return( EXIT_FAILURE );
@@ -726,7 +729,7 @@ int main( int argc, char * const argv[] )
 				                     libewf_string_length(
 				                      user_input ) );
 
-				libewf_common_free(
+				memory_free(
 				 user_input );
 			}
 		}
@@ -793,7 +796,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Export started at: %" PRIs "\n",
 			 time_string );
 
-			libewf_common_free(
+			memory_free(
 			 time_string );
 		}
 		else
@@ -818,7 +821,7 @@ int main( int argc, char * const argv[] )
 					 1,
 					 LIBEWF_OPEN_WRITE );
 
-			libewf_common_free(
+			memory_free(
 			 target_filename );
 
 			if( export_handle == NULL )
@@ -834,7 +837,7 @@ int main( int argc, char * const argv[] )
 					fprintf( stderr, "Unable to open export EWF file(s) with failure: %" PRIs ".\n",
 					 error_string );
 
-					libewf_common_free(
+					memory_free(
 					 error_string );
 				}
 				else
@@ -887,7 +890,7 @@ int main( int argc, char * const argv[] )
 				 wipe_chunk_on_error,
 				 callback );
 
-			libewf_common_free(
+			memory_free(
 			 target_filename );
 		}
 		timestamp_end = time( NULL );
@@ -901,7 +904,7 @@ int main( int argc, char * const argv[] )
 				fprintf( stderr, "Export failed at: %" PRIs "\n",
 				 time_string );
 
-				libewf_common_free(
+				memory_free(
 				 time_string );
 			}
 			else
@@ -920,7 +923,7 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Export completed at: %" PRIs "\n",
 			 time_string );
 
-			libewf_common_free(
+			memory_free(
 			 time_string );
 		}
 		else

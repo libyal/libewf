@@ -183,7 +183,7 @@ libewf_char_t *ewfcommon_determine_operating_system(
 	       operating_system,
 	       length ) != 1 ) )
 	{
-		libewf_common_free(
+		memory_free(
 	         string );
 	
 		return( NULL );
@@ -623,7 +623,8 @@ ssize32_t ewfcommon_read_input(
 						LIBEWF_WARNING_PRINT( "%s: error reading data: %s.\n",
 						 function, error_string );
 
-						libewf_common_free( error_string );
+						memory_free(
+						 error_string );
 					}
 					return( -1 );
 				}
@@ -834,7 +835,8 @@ ssize32_t ewfcommon_read_input(
 						LIBEWF_WARNING_PRINT( "%s: unable skip %" PRIu32 " bytes after sector with error - %s.\n",
 						 function, error_skip_bytes, error_string );
 
-						libewf_common_free( error_string );
+						memory_free(
+						 error_string );
 					}
 #else
 					LIBEWF_WARNING_PRINT( "%s: unable skip %" PRIu32 " bytes after sector with error.\n",
@@ -1305,7 +1307,8 @@ ssize64_t ewfcommon_read_verify(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate raw read data.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -1346,9 +1349,11 @@ ssize64_t ewfcommon_read_verify(
 			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -1358,9 +1363,11 @@ ssize64_t ewfcommon_read_verify(
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -1370,9 +1377,11 @@ ssize64_t ewfcommon_read_verify(
 			LIBEWF_WARNING_PRINT( "%s: more bytes read than requested.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -1395,9 +1404,11 @@ ssize64_t ewfcommon_read_verify(
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 			return( -1 );
 		}
@@ -1413,9 +1424,11 @@ ssize64_t ewfcommon_read_verify(
 			break;
 		}
   	}
-	libewf_common_free( data );
+	memory_free(
+	 data );
 #if defined( HAVE_RAW_ACCESS )
-	libewf_common_free( raw_read_data );
+	memory_free(
+	 raw_read_data );
 #endif
 
 	if( calculate_md5 == 1 )
@@ -1652,7 +1665,8 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate compressed raw data buffer.\n",
 		 function );
 
-		libewf_common_free( data_buffer );
+		memory_free(
+		 data_buffer );
 
 		return( -1 );
 	}
@@ -1681,9 +1695,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 			LIBEWF_WARNING_PRINT( "%s: error reading data from input.\n",
 			 function );
 
-			libewf_common_free( data_buffer );
+			memory_free(
+			 data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_data_buffer );
+			memory_free(
+			 raw_data_buffer );
 #endif
 
 			return( -1 );
@@ -1695,9 +1711,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 				LIBEWF_WARNING_PRINT( "%s: unexpected end of input.\n",
 				 function );
 
-				libewf_common_free( data_buffer );
+				memory_free(
+				 data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-				libewf_common_free( raw_data_buffer );
+				memory_free(
+				 raw_data_buffer );
 #endif
 				return( -1 );
 			}
@@ -1749,9 +1767,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 			LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
 			 function );
 
-			libewf_common_free( data_buffer );
+			memory_free(
+			 data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_data_buffer );
+			memory_free(
+			 raw_data_buffer );
 #endif
 
 			return( -1 );
@@ -1771,9 +1791,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 			break;
 		}
 	}
-	libewf_common_free( data_buffer );
+	memory_free(
+	 data_buffer );
 #if defined( HAVE_RAW_ACCESS )
-	libewf_common_free( raw_data_buffer );
+	memory_free(
+	 raw_data_buffer );
 #endif
 
 	if( calculate_md5 == 1 )
@@ -2044,7 +2066,8 @@ ssize64_t ewfcommon_export_raw(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate raw read data.\n",
 		 function );
 
-		libewf_common_free( data );
+		memory_free(
+		 data );
 
 		return( -1 );
 	}
@@ -2085,9 +2108,11 @@ ssize64_t ewfcommon_export_raw(
 			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -2097,9 +2122,11 @@ ssize64_t ewfcommon_export_raw(
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -2109,9 +2136,11 @@ ssize64_t ewfcommon_export_raw(
 			LIBEWF_WARNING_PRINT( "%s: more bytes read than requested.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -2128,9 +2157,11 @@ ssize64_t ewfcommon_export_raw(
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -2145,9 +2176,11 @@ ssize64_t ewfcommon_export_raw(
 			LIBEWF_WARNING_PRINT( "%s: error writing data.\n",
 			 function );
 
-			libewf_common_free( data );
+			memory_free(
+			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free( raw_read_data );
+			memory_free(
+			 raw_read_data );
 #endif
 
 			return( -1 );
@@ -2163,9 +2196,11 @@ ssize64_t ewfcommon_export_raw(
 			break;
 		}
   	}
-	libewf_common_free( data );
+	memory_free(
+	 data );
 #if defined( HAVE_RAW_ACCESS )
-	libewf_common_free( raw_read_data );
+	memory_free(
+	 raw_read_data );
 #endif
 	return( total_read_count );
 }
@@ -2463,7 +2498,7 @@ ssize64_t ewfcommon_export_ewf(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate raw read data.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 data );
 
 		return( -1 );
@@ -2477,9 +2512,9 @@ ssize64_t ewfcommon_export_ewf(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate raw write data.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 raw_read_data );
-		libewf_common_free(
+		memory_free(
 		 data );
 
 		return( -1 );
@@ -2521,12 +2556,12 @@ ssize64_t ewfcommon_export_ewf(
 			LIBEWF_WARNING_PRINT( "%s: unable to read data from file.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free(
+			memory_free(
 			 raw_read_data );
-			libewf_common_free(
+			memory_free(
 			 raw_write_data );
 #endif
 
@@ -2537,12 +2572,12 @@ ssize64_t ewfcommon_export_ewf(
 			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free(
+			memory_free(
 			 raw_read_data );
-			libewf_common_free(
+			memory_free(
 			 raw_write_data );
 #endif
 
@@ -2553,12 +2588,12 @@ ssize64_t ewfcommon_export_ewf(
 			LIBEWF_WARNING_PRINT( "%s: more bytes read than requested.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free(
+			memory_free(
 			 raw_read_data );
-			libewf_common_free(
+			memory_free(
 			 raw_write_data );
 #endif
 
@@ -2576,12 +2611,12 @@ ssize64_t ewfcommon_export_ewf(
 			LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free(
+			memory_free(
 			 raw_read_data );
-			libewf_common_free(
+			memory_free(
 			 raw_write_data );
 #endif
 			return( -1 );
@@ -2622,12 +2657,12 @@ ssize64_t ewfcommon_export_ewf(
 			LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
 			 function );
 
-			libewf_common_free(
+			memory_free(
 			 data );
 #if defined( HAVE_RAW_ACCESS )
-			libewf_common_free(
+			memory_free(
 			 raw_read_data );
-			libewf_common_free(
+			memory_free(
 			 raw_write_data );
 #endif
 
@@ -2646,12 +2681,12 @@ ssize64_t ewfcommon_export_ewf(
 			break;
 		}
   	}
-	libewf_common_free(
+	memory_free(
 	 data );
 #if defined( HAVE_RAW_ACCESS )
-	libewf_common_free(
+	memory_free(
 	 raw_read_data );
-	libewf_common_free(
+	memory_free(
 	 raw_write_data );
 #endif
 

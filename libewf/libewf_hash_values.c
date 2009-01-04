@@ -264,7 +264,7 @@ int libewf_hash_values_parse_xhash(
 		LIBEWF_WARNING_PRINT( "%s: unable to copy xhash to xml hash string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 xml_hash_string );
 
 		return( -1 );
@@ -279,7 +279,7 @@ int libewf_hash_values_parse_xhash(
 		LIBEWF_WARNING_PRINT( "%s: unable to parse xml hash string.\n",
 		 function );
 	}
-	libewf_common_free(
+	memory_free(
 	 xml_hash_string );
 
 	return( result );
@@ -356,7 +356,7 @@ int libewf_hash_values_convert_hash_string_to_hash(
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 *hash );
 
 		*hash        = NULL;
@@ -474,7 +474,7 @@ int libewf_hash_values_generate_hash_string_xml(
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 *hash_string );
 
 		*hash_string        = NULL;
@@ -510,7 +510,7 @@ int libewf_hash_values_generate_hash_string_xml(
 				LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
 				 function );
 
-				libewf_common_free(
+				memory_free(
 				 *hash_string );
 
 				*hash_string        = NULL;
@@ -532,7 +532,7 @@ int libewf_hash_values_generate_hash_string_xml(
 		LIBEWF_WARNING_PRINT( "%s: unable to set hash string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 *hash_string );
 
 		*hash_string        = NULL;
@@ -580,7 +580,7 @@ int libewf_hash_values_generate_xhash_string_ewfx(
 		LIBEWF_WARNING_PRINT( "%s: unable to create xhash.\n",
 		 function );
 	}
-	libewf_common_free(
+	memory_free(
 	 hash_string );
 
 	return( result );

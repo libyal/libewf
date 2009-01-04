@@ -72,7 +72,8 @@ libewf_values_table_t *libewf_values_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		libewf_common_free( values_table );
+		memory_free(
+		 values_table );
 
 		return( NULL );
 	}
@@ -84,7 +85,8 @@ libewf_values_table_t *libewf_values_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate identifiers.\n",
 		 function );
 
-		libewf_common_free( values_table );
+		memory_free(
+		 values_table );
 
 		return( NULL );
 	}
@@ -96,8 +98,10 @@ libewf_values_table_t *libewf_values_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear identifiers.\n",
 		 function );
 
-		libewf_common_free( values_table->identifiers );
-		libewf_common_free( values_table );
+		memory_free(
+		 values_table->identifiers );
+		memory_free(
+		 values_table );
 
 		return( NULL );
 	}
@@ -109,8 +113,10 @@ libewf_values_table_t *libewf_values_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate values.\n",
 		 function );
 
-		libewf_common_free( values_table->identifiers );
-		libewf_common_free( values_table );
+		memory_free(
+		 values_table->identifiers );
+		memory_free(
+		 values_table );
 
 		return( NULL );
 	}
@@ -122,9 +128,12 @@ libewf_values_table_t *libewf_values_table_alloc(
 		LIBEWF_WARNING_PRINT( "%s: unable to clear values.\n",
 		 function );
 
-		libewf_common_free( values_table->identifiers );
-		libewf_common_free( values_table->values );
-		libewf_common_free( values_table );
+		memory_free(
+		 values_table->identifiers );
+		memory_free(
+		 values_table->values );
+		memory_free(
+		 values_table );
 
 		return( NULL );
 	}
@@ -176,7 +185,7 @@ int libewf_values_table_realloc(
 
 		return( -1 );
 	}
-	reallocation = (libewf_char_t **) libewf_common_realloc(
+	reallocation = (libewf_char_t **) memory_reallocate(
 	                                   values_table->identifiers,
 	                                   new_size );
 
@@ -199,7 +208,7 @@ int libewf_values_table_realloc(
 
                 return( -1 );
         }
-	reallocation = (libewf_char_t **) libewf_common_realloc(
+	reallocation = (libewf_char_t **) memory_reallocate(
 	                                   values_table->values,
 	                                   new_size );
 
@@ -246,22 +255,27 @@ void libewf_values_table_free(
 	{
 		if( values_table->identifiers[ iterator ] != NULL )
 		{
-			libewf_common_free( values_table->identifiers[ iterator ] );
+			memory_free(
+			 values_table->identifiers[ iterator ] );
 		}
 		if( values_table->values[ iterator ] != NULL )
 		{
-			libewf_common_free( values_table->values[ iterator ] );
+			memory_free(
+			 values_table->values[ iterator ] );
 		}
 	}
 	if( values_table->identifiers != NULL )
 	{
-		libewf_common_free( values_table->identifiers );
+		memory_free(
+		 values_table->identifiers );
 	}
 	if( values_table->values != NULL )
 	{
-		libewf_common_free( values_table->values );
+		memory_free(
+		 values_table->values );
 	}
-	libewf_common_free( values_table );
+	memory_free(
+	 values_table );
 }
 
 /* Retrieves the value index number, or -1 on error
@@ -552,7 +566,8 @@ int libewf_values_table_set_value(
 			LIBEWF_WARNING_PRINT( "%s: unable to set identifier.\n",
 			 function );
 
-			libewf_common_free( values_table->identifiers[ index ] );
+			memory_free(
+			 values_table->identifiers[ index ] );
 
 			values_table->identifiers[ index ] = NULL;
 
@@ -563,7 +578,8 @@ int libewf_values_table_set_value(
 	 */
 	if( values_table->values[ index ] != NULL )
 	{
-		libewf_common_free( values_table->values[ index ] );
+		memory_free(
+		 values_table->values[ index ] );
 
 		values_table->values[ index ] = NULL;
 	}
@@ -586,7 +602,8 @@ int libewf_values_table_set_value(
 		LIBEWF_WARNING_PRINT( "%s: unable to set value.\n",
 		 function );
 
-		libewf_common_free( values_table->values[ index ] );
+		memory_free(
+		 values_table->values[ index ] );
 
 		values_table->values[ index ] = NULL;
 

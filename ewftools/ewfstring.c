@@ -114,7 +114,7 @@ char *ewfstring_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 error_string );
 
 		return( NULL );
@@ -130,7 +130,7 @@ char *ewfstring_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to create static error string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 error_string );
 
 		return( NULL );
@@ -143,7 +143,7 @@ char *ewfstring_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 error_string );
 
 		return( NULL );
@@ -196,7 +196,7 @@ wchar_t *ewfstring_wide_strerror(
 		LIBEWF_WARNING_PRINT( "%s: unable to set error string.\n",
 		 function );
 
-		libewf_common_free(
+		memory_free(
 		 error_string );
 
 		return( NULL );

@@ -130,7 +130,8 @@ struct tm *ewfoutput_gmtime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
 		 function );
 
-		libewf_common_free( time_elements );
+		memory_free(
+		 time_elements );
 
 		return( NULL );
 	}
@@ -143,7 +144,8 @@ struct tm *ewfoutput_gmtime(
 		LIBEWF_WARNING_PRINT( "%s: unable to create static time elements.\n",
 		 function );
 
-		libewf_common_free( time_elements );
+		memory_free(
+		 time_elements );
 
 		return( NULL );
 	}
@@ -152,7 +154,8 @@ struct tm *ewfoutput_gmtime(
 		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
 		 function );
 
-		libewf_common_free( time_elements );
+		memory_free(
+		 time_elements );
 
 		return( NULL );
 	}
@@ -876,7 +879,8 @@ void ewfoutput_hash_values_fprint(
 		fprintf( stream, "\tMD5 hash in file:\t%" PRIs_EWF "\n",
 		 stored_md5_hash_string );
 
-		libewf_common_free( stored_md5_hash_string );
+		memory_free(
+		 stored_md5_hash_string );
 	}
 	else
 	{
@@ -973,7 +977,7 @@ void ewfoutput_timestamp_fprint(
 		 " %i second(s)",
 		 time_elements->tm_sec );
 
-		libewf_common_free(
+		memory_free(
 		 time_elements );
 	}
 }

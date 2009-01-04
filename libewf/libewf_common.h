@@ -129,12 +129,6 @@
 extern "C" {
 #endif
 
-#define libewf_common_realloc( buffer, size ) \
-	realloc( (void *) buffer, size )
-
-#define libewf_common_free( buffer ) \
-	free( (void *) buffer )
-
 #if defined( HAVE_MEMCMP )
 #define libewf_common_memcmp( buffer1, buffer2, size ) \
 	memcmp( (const void *) buffer1, (const void *) buffer2, size )

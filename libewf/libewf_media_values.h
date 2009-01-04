@@ -34,9 +34,9 @@
 #if !defined( _LIBEWF_MEDIA_VALUES_H )
 #define _LIBEWF_MEDIA_VALUES_H
 
-#include "libewf_includes.h"
-
-#include "libewf_common.h"
+#include <common.h>
+#include <memory.h>
+#include <types.h>
 
 #if defined( __cplusplus )
 extern "C" {
@@ -89,10 +89,11 @@ struct libewf_media_values
         uint8_t guid[ 16 ];
 };
 
-libewf_media_values_t *libewf_media_values_alloc( void );
+libewf_media_values_t *libewf_media_values_alloc(
+                        void );
 
 #define libewf_media_values_free( media_values ) \
-	libewf_common_free( media_values )
+	memory_free( media_values )
 
 #if defined( __cplusplus )
 }
