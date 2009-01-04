@@ -182,18 +182,6 @@ LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file
 		{
 			segment_file_size = &( internal_handle->write->segment_file_size );
 		}
-		/* Initialize the internal handle for reading
-		 */
-		if( libewf_internal_handle_read_initialize(
-		     internal_handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
 		if( libewf_segment_table_read_open(
 		     internal_handle->segment_table, 
 		     internal_handle->delta_segment_table, 
@@ -219,13 +207,13 @@ LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file
 
 			return( NULL );
 		}
-		/* Determine the EWF file format
+		/* Determine the EWF format
 		 */
 		if( libewf_internal_handle_determine_format(
 		     internal_handle,
 		     internal_handle->header_sections ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to determine format.\n",
 			 function );
 		}
 		/* Calculate the media size
@@ -247,6 +235,14 @@ LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file
 
 			return( NULL );
 		}
+	}
+	/* Make sure format specific values are set
+	 */
+	if( libewf_internal_handle_initialize_format(
+	     internal_handle ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize format specific values.\n",
+		 function );
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
 	 function );
@@ -1363,10 +1359,13 @@ int libewf_get_hash_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, lib
 /* Sets the amount of sectors per chunk in the media information
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk )
+int libewf_set_sectors_per_chunk(
+     LIBEWF_HANDLE *handle,
+     uint32_t sectors_per_chunk )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_sectors_per_chunk";
+	size32_t chunk_size                       = 0;
 
 	if( handle == NULL )
 	{
@@ -1400,12 +1399,20 @@ int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_ch
 
 		return( -1 );
 	}
-	internal_handle->media_values->sectors_per_chunk = sectors_per_chunk;
-
         /* Determine the chunk size
 	 */
-	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
-	                                          * internal_handle->media_values->bytes_per_sector;
+	chunk_size = sectors_per_chunk * internal_handle->media_values->bytes_per_sector;
+
+	if( ( chunk_size == 0 )
+	 || ( chunk_size > (size32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media_values->sectors_per_chunk = sectors_per_chunk;
+	internal_handle->media_values->chunk_size        = chunk_size;
 
 	return( 1 );
 }
@@ -1413,10 +1420,13 @@ int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_ch
 /* Sets the amount of bytes per sector in the media information
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector )
+int libewf_set_bytes_per_sector(
+     LIBEWF_HANDLE *handle,
+     uint32_t bytes_per_sector )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_bytes_per_sector";
+	size32_t chunk_size                       = 0;
 
 	if( handle == NULL )
 	{
@@ -1450,12 +1460,20 @@ int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_secto
 
 		return( -1 );
 	}
-	internal_handle->media_values->bytes_per_sector = bytes_per_sector;
-
         /* Determine the chunk size
 	 */
-	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
-	                                          * internal_handle->media_values->bytes_per_sector;
+	chunk_size = internal_handle->media_values->sectors_per_chunk * bytes_per_sector;
+
+	if( ( chunk_size == 0 )
+	 || ( chunk_size > (size32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media_values->bytes_per_sector = bytes_per_sector;
+	internal_handle->media_values->chunk_size       = chunk_size;
 
 	return( 1 );
 }
@@ -1534,14 +1552,17 @@ int libewf_set_compression_values( LIBEWF_HANDLE *handle, int8_t compression_lev
 
 		return( -1 );
 	}
-	if( compression_level <= -1 )
+	if( ( compression_level != EWF_COMPRESSION_NONE )
+	 && ( compression_level != EWF_COMPRESSION_FAST )
+	 && ( compression_level != EWF_COMPRESSION_BEST ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid compression level only positive values are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: unsupported compression level.\n",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->compression_level = compression_level;
+	internal_handle->compression_level    = compression_level;
+	internal_handle->compress_empty_block = 0;
 
 	/* Compress empty block is only useful when no compression is used
 	 */
@@ -1559,6 +1580,7 @@ int libewf_set_media_size( LIBEWF_HANDLE *handle, size64_t media_size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_media_size";
+	size64_t maximum_input_file_size          = 0;
 
 	if( handle == NULL )
 	{
@@ -1597,6 +1619,18 @@ int libewf_set_media_size( LIBEWF_HANDLE *handle, size64_t media_size )
 
 		return( -1 );
 	}
+	/* Check if the input file size does not exceed the maximum input file size
+	 */
+	maximum_input_file_size = (size64_t) internal_handle->media_values->chunk_size
+	                          * (size64_t) UINT32_MAX;
+
+	if( internal_handle->media_values->media_size > maximum_input_file_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
+		 function, maximum_input_file_size, internal_handle->media_values->chunk_size );
+
+		return( -1 );
+	}
 	internal_handle->media_values->media_size = media_size;
 
 	return( 1 );
@@ -1605,7 +1639,9 @@ int libewf_set_media_size( LIBEWF_HANDLE *handle, size64_t media_size )
 /* Sets the segment file size
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size )
+int libewf_set_segment_file_size(
+     LIBEWF_HANDLE *handle,
+     size64_t segment_file_size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_segment_file_size";
@@ -1636,7 +1672,14 @@ int libewf_set_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_s
 	if( ( segment_file_size == 0 )
 	 || ( segment_file_size > (size64_t) INT64_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value segment file value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum segment file size.\n",
 		 function );
 
 		return( -1 );
@@ -1750,7 +1793,9 @@ int libewf_set_volume_type( LIBEWF_HANDLE *handle, uint8_t volume_type )
 /* Sets the output format
  * Returns 1 if successful, or -1 on error
  */
-int libewf_set_format( LIBEWF_HANDLE *handle, uint8_t format )
+int libewf_set_format(
+     LIBEWF_HANDLE *handle,
+     uint8_t format )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_format";
@@ -1778,8 +1823,42 @@ int libewf_set_format( LIBEWF_HANDLE *handle, uint8_t format )
 
 		return( -1 );
 	}
+	if( internal_handle->format == LIBEWF_FORMAT_LVF )
+	{
+		LIBEWF_WARNING_PRINT( "%s: writing format LVF currently not supported.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( format != LIBEWF_FORMAT_ENCASE1 )
+	 && ( format != LIBEWF_FORMAT_ENCASE2 )
+	 && ( format != LIBEWF_FORMAT_ENCASE3 )
+	 && ( format != LIBEWF_FORMAT_ENCASE4 )
+	 && ( format != LIBEWF_FORMAT_ENCASE5 )
+	 && ( format != LIBEWF_FORMAT_ENCASE6 )
+	 && ( format != LIBEWF_FORMAT_LINEN5 )
+	 && ( format != LIBEWF_FORMAT_LINEN6 )
+	 && ( format != LIBEWF_FORMAT_SMART )
+	 && ( format != LIBEWF_FORMAT_FTK )
+	 && ( format != LIBEWF_FORMAT_LVF )
+	 && ( format != LIBEWF_FORMAT_EWF )
+	 && ( format != LIBEWF_FORMAT_EWFX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported format.\n",
+		 function );
+
+		return( -1 );
+	}
 	internal_handle->format = format;
 
+	if( libewf_internal_handle_initialize_format(
+	     internal_handle ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize format specific values.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

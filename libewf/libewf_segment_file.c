@@ -262,7 +262,11 @@ int libewf_segment_file_read_sections( libewf_segment_file_handle_t *segment_fil
 /* Write the headers to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_headers( libewf_segment_file_handle_t *segment_file_handle, libewf_header_sections_t *header_sections, int8_t compression_level, uint8_t format )
+ssize_t libewf_segment_file_write_headers(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_header_sections_t *header_sections,
+         int8_t compression_level,
+         uint8_t format )
 {
 	static char *function     = "libewf_segment_file_write_headers";
 	ssize_t write_count       = 0;
@@ -559,7 +563,16 @@ ssize_t libewf_segment_file_write_last_section( libewf_segment_file_handle_t *se
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_start( libewf_segment_file_handle_t *segment_file_handle, uint16_t segment_number, uint8_t segment_file_type, libewf_media_values_t *media_values, libewf_header_sections_t *header_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format, ewf_data_t **cached_data_section )
+ssize_t libewf_segment_file_write_start(
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint16_t segment_number,
+         uint8_t segment_file_type,
+         libewf_media_values_t *media_values,
+         libewf_header_sections_t *header_sections,
+         int8_t compression_level,
+         uint8_t format,
+         uint8_t ewf_format,
+         ewf_data_t **cached_data_section )
 {
 	ewf_file_header_t file_header;
 

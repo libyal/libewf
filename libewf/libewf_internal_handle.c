@@ -423,8 +423,8 @@ libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void )
 	handle_write->data_section                     = NULL;
 	handle_write->input_write_count                = 0;
 	handle_write->write_count                      = 0;
-	handle_write->maximum_segment_file_size        = 0;
-	handle_write->segment_file_size                = 0;
+	handle_write->maximum_segment_file_size        = INT32_MAX;
+	handle_write->segment_file_size                = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
 	handle_write->maximum_amount_of_segments       = 0;
 	handle_write->chunks_section_write_count       = 0;
 	handle_write->amount_of_chunks                 = 0;
@@ -500,7 +500,9 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( libewf_inte
 /* Determines the EWF file format based on known characteristics
  * Returns 1 if the format was determined, -1 on errror
  */
-int libewf_internal_handle_determine_format( libewf_internal_handle_t *internal_handle, libewf_header_sections_t *header_sections )
+int libewf_internal_handle_determine_format(
+     libewf_internal_handle_t *internal_handle,
+     libewf_header_sections_t *header_sections )
 {
 	static char *function = "libewf_internal_handle_determine_format";
 
@@ -678,6 +680,56 @@ int libewf_internal_handle_determine_format( libewf_internal_handle_t *internal_
 	return( 1 );
 }
 
+/* Inializes internal values based on the EWF file format
+ * Returns 1 if the values were successfully initialized, -1 on errror
+ */
+int libewf_internal_handle_initialize_format(
+     libewf_internal_handle_t *internal_handle )
+{
+	static char *function = "libewf_internal_handle_initialize_format";
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->format == LIBEWF_FORMAT_EWF )
+	 || ( internal_handle->format == LIBEWF_FORMAT_SMART ) )
+	{
+		internal_handle->ewf_format = EWF_FORMAT_S01;
+	}
+	else if( internal_handle->format == LIBEWF_FORMAT_LVF )
+	{
+		internal_handle->ewf_format = EWF_FORMAT_L01;
+	}
+	else
+	{
+		internal_handle->ewf_format = EWF_FORMAT_E01;
+	}
+	if( internal_handle->write != NULL )
+	{
+		if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		{
+			internal_handle->write->maximum_segment_file_size        = INT64_MAX;
+			internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6;
+		}
+		else if( internal_handle->format == LIBEWF_FORMAT_EWFX )
+		{
+			internal_handle->write->unrestrict_offset_amount         = 1;
+			internal_handle->write->maximum_segment_file_size        = INT32_MAX;
+			internal_handle->write->maximum_section_amount_of_chunks = INT32_MAX;
+		}
+		else
+		{
+			internal_handle->write->maximum_segment_file_size        = INT32_MAX;
+			internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
+		}
+	}
+	return( 1 );
+}
+
 /* Create the default header values
  * Returns 1 on success, -1 on error
  */
@@ -805,30 +857,6 @@ int libewf_internal_handle_create_header_values( libewf_internal_handle_t *inter
 	return( 1 );
 }
 
-/* Initializes the read values
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_read_initialize( libewf_internal_handle_t *internal_handle )
-{
-	static char *function = "libewf_internal_handle_read_initialize";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->read == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
 /* Initializes the write values
  * Returns 1 if successful, -1 on error
  */
@@ -838,7 +866,9 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 	int64_t required_amount_of_segments = 0;
 	int64_t amount_of_chunks            = 0;
 	int64_t amount_of_sectors           = 0;
+#ifdef REFACTOR
 	uint64_t maximum_input_file_size    = 0;
+#endif
 
 	if( internal_handle == NULL )
 	{
@@ -882,6 +912,7 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
+#ifdef REFACTOR
 	/* Determine the chunk size
 	 */
 	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
@@ -1012,6 +1043,7 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
+#endif
 	/* Determine the maximum amount of segments allowed to write
 	 */
 	internal_handle->write->maximum_amount_of_segments = libewf_internal_handle_get_write_maximum_amount_of_segments( internal_handle );
@@ -1120,6 +1152,7 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 			return( -1 );
 		}
 	}
+#ifdef REFACTOR
 	/* Create the headers if required
 	 */
 	if( internal_handle->header_sections == NULL )
@@ -1158,6 +1191,7 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 			return( -1 );
 		}
 	}
+#endif
 	/* Flag that the write values were initialized
 	 */
 	internal_handle->write->values_initialized = 1;

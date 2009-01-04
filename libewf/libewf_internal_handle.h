@@ -244,23 +244,39 @@ struct libewf_internal_handle_write
 	uint8_t write_finalized;
 };
 
-libewf_internal_handle_t *libewf_internal_handle_alloc( uint8_t flags );
-void libewf_internal_handle_free( libewf_internal_handle_t *internal_handle );
+libewf_internal_handle_t *libewf_internal_handle_alloc(
+                           uint8_t flags );
 
-libewf_internal_handle_read_t *libewf_internal_handle_read_alloc( void );
-void libewf_internal_handle_read_free( libewf_internal_handle_read_t *handle_read );
+void libewf_internal_handle_free(
+      libewf_internal_handle_t *internal_handle );
 
-libewf_internal_handle_write_t *libewf_internal_handle_write_alloc( void );
-void libewf_internal_handle_write_free( libewf_internal_handle_write_t *handle_write );
+libewf_internal_handle_read_t *libewf_internal_handle_read_alloc(
+                                void );
 
-int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( libewf_internal_handle_t *internal_handle );
+void libewf_internal_handle_read_free(
+      libewf_internal_handle_read_t *handle_read );
 
-int libewf_internal_handle_determine_format( libewf_internal_handle_t *internal_handle, libewf_header_sections_t *header_sections );
+libewf_internal_handle_write_t *libewf_internal_handle_write_alloc(
+                                 void );
 
-int libewf_internal_handle_create_header_values( libewf_internal_handle_t *internal_handle );
+void libewf_internal_handle_write_free(
+      libewf_internal_handle_write_t *handle_write );
 
-int libewf_internal_handle_read_initialize( libewf_internal_handle_t *internal_handle );
-int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_handle );
+int16_t libewf_internal_handle_get_write_maximum_amount_of_segments(
+         libewf_internal_handle_t *internal_handle );
+
+int libewf_internal_handle_determine_format(
+     libewf_internal_handle_t *internal_handle,
+     libewf_header_sections_t *header_sections );
+
+int libewf_internal_handle_initialize_format(
+     libewf_internal_handle_t *internal_handle );
+
+int libewf_internal_handle_create_header_values(
+     libewf_internal_handle_t *internal_handle );
+
+int libewf_internal_handle_write_initialize( 
+     libewf_internal_handle_t *internal_handle );
 
 #if defined( __cplusplus )
 }

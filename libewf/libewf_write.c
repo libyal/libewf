@@ -960,6 +960,45 @@ ssize_t libewf_raw_write_chunk_new(
 	if( ( segment_number == 0 )
 	 || ( internal_handle->segment_table->segment_file_handle[ segment_number ]->file_descriptor == -1 ) )
 	{
+		/* Create the headers if required
+		 */
+		if( internal_handle->header_sections == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing header sections.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( ( internal_handle->header_sections->header == NULL )
+		 && ( internal_handle->header_sections->header2 == NULL )
+		 && ( internal_handle->header_sections->xheader == NULL ) )
+		{
+			if( internal_handle->header_values == NULL )
+			{
+				LIBEWF_WARNING_PRINT( "%s: empty header values - using default.\n",
+				 function );
+
+				if( libewf_internal_handle_create_header_values(
+				     internal_handle ) != 1 )
+				{
+					LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
+					 function );
+
+					return( -1 );
+				}
+			}
+			if( libewf_header_sections_create(
+			     internal_handle->header_sections,
+			     internal_handle->header_values,
+			     internal_handle->compression_level,
+			     internal_handle->format ) == -1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to create header(s).\n",
+				 function );
+
+				return( -1 );
+			}
+		}
 		internal_handle->write->create_chunks_section     = 1;
 		internal_handle->write->chunks_section_number     = 0;
 		internal_handle->write->chunks_per_chunks_section = 0;
