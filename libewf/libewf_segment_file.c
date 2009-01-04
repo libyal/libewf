@@ -39,7 +39,6 @@
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
-#include "libewf_filename.h"
 #include "libewf_hash_values.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
@@ -238,7 +237,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-	filename = libewf_filename_create_filename(
+	filename = libewf_filename_create(
 	            segment_number,
 	            maximum_amount_of_segments,
 	            segment_file_type,
@@ -1865,6 +1864,133 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 	return( total_write_count );
 }
 
+/* Retrieves a filename of a certain segment
+ * Returns 1 if succesful, or -1 on error
+ */
+int libewf_segment_file_get_filename( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_FILENAME *filename, size_t length_filename )
+{
+	static char *function  = "libewf_segment_file_get_filename";
+	size_t filename_length = 0;
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	filename_length = libewf_filename_length( segment_file->filename );
+
+	/* Add one additional character for the end of line
+	 */
+	filename_length += 1;
+
+	if( length_filename < filename_length )
+	{
+		LIBEWF_WARNING_PRINT( "%s: filename too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_filename_copy(
+	     filename,
+	     segment_file->filename,
+	     filename_length ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Sets a filename for a specific segment file
+ * Creates a duplicate of the string
+ * Returns 1 if succesful, or -1 on error
+ */
+int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const LIBEWF_FILENAME *filename, size_t length_filename )
+{
+	static char *function = "libewf_segment_file_set_filename";
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->filename != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: filename already set: %" PRIs_EWF_filename ".\n",
+		 function, segment_file->filename );
+
+		return( -1 );
+	}
+	if( length_filename == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename length is zero.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( length_filename >= (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid filename length value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* One additional byte for the end of string character is needed
+	 */
+	segment_file->filename = (LIBEWF_FILENAME *) libewf_common_alloc( LIBEWF_FILENAME_SIZE * ( length_filename + 1 ) );
+
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_filename_copy( segment_file->filename, filename, length_filename ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
+		 function );
+
+		libewf_common_free( segment_file->filename );
+
+		segment_file->filename = NULL;
+
+		return( -1 );
+	}
+	/* Make sure the string is terminated
+	 */
+	segment_file->filename[ length_filename ] = '\0';
+
+	return( 1 );
+}
+
 /* Initializes the segment table
  * opens EWF segment files for reading
  * and EWF delta segment files for reading and writing
@@ -1940,8 +2066,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 		return( -1 );
 	}
-	if( libewf_filename_set(
-	     &( internal_handle->segment_table->segment_file[ 0 ].filename ),
+	if( libewf_segment_file_set_filename(
+	     &( internal_handle->segment_table->segment_file[ 0 ] ),
 	     filenames[ iterator ],
 	     ( filename_length - 4 ) ) != 1 )
 	{
@@ -1950,8 +2076,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 		return( -1 );
 	}
-	if( libewf_filename_set(
-	     &( internal_handle->delta_segment_table->segment_file[ 0 ].filename ),
+	if( libewf_segment_file_set_filename(
+	     &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	     filenames[ iterator ],
 	     ( filename_length - 4 ) ) != 1 )
 	{
@@ -2024,8 +2150,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 				return( -1 );
 			}
 
-			if( libewf_filename_set(
-			     &( internal_handle->segment_table->segment_file[ segment_number ].filename ),
+			if( libewf_segment_file_set_filename(
+			     &( internal_handle->segment_table->segment_file[ segment_number ] ),
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 			{
@@ -2060,6 +2186,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 					 function, filenames[ iterator ] );
+
 					return( -1 );
 				}
 				/* Seek after file header
@@ -2093,8 +2220,9 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 				return( -1 );
 			}
-			if( libewf_filename_set(
-			     &( internal_handle->delta_segment_table->segment_file[ segment_number ].filename ),
+
+			if( libewf_segment_file_set_filename(
+			     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
 			{
@@ -2181,8 +2309,8 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 		return( -1 );
 	}
 
-	if( libewf_filename_set(
-	     &( internal_handle->segment_table->segment_file[ 0 ].filename ),
+	if( libewf_segment_file_set_filename(
+	     &( internal_handle->segment_table->segment_file[ 0 ] ),
 	     filenames[ 0 ],
 	     filename_length ) != 1 )
 	{

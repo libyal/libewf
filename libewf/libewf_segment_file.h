@@ -39,17 +39,13 @@
 #include <libewf/libewf_handle.h>
 
 #include "libewf_internal_handle.h"
-#include "libewf_filename.h"
 #include "libewf_section_list.h"
-#include "libewf_segment_table.h"
 
 #include "ewf_crc.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
-
-void libewf_segment_file_free_values( LIBEWF_SEGMENT_FILE *segment_file );
 
 int libewf_segment_file_check_file_signature( int file_descriptor );
 
@@ -76,6 +72,9 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc );
 
 ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file );
+
+int libewf_segment_file_get_filename( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_FILENAME *filename, size_t length_filename );
+int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const LIBEWF_FILENAME *filename, size_t length_filename );
 
 int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags );
 int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount );

@@ -45,12 +45,14 @@
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 #include "libewf_file.h"
+#include "libewf_filename.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file.h"
+#include "libewf_segment_table.h"
 #include "libewf_string.h"
 #include "libewf_write.h"
 
@@ -931,15 +933,15 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->delta_segment_filename == NULL )
+	if( internal_handle->delta_segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment filename.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
 		 function );
 
 		return( -1 );
 	}
-	return( libewf_filename_get(
-	         internal_handle->delta_segment_filename,
+	return( libewf_segment_file_get_filename(
+	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	         filename,
 	         length ) );
 }
@@ -1588,15 +1590,15 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_filename == NULL )
+	if( internal_handle->delta_segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment filename.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
 		 function );
 
 		return( -1 );
 	}
-	return( libewf_filename_set(
-	         &( internal_handle->delta_segment_filename ),
+	return( libewf_segment_file_set_filename(
+	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
 	         filename,
 	         length ) );
 }

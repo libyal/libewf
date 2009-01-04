@@ -46,6 +46,7 @@
 #include "libewf_common.h"
 #include "libewf_endian.h"
 #include "libewf_file.h"
+#include "libewf_filename.h"
 #include "libewf_notify.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
@@ -2448,7 +2449,6 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 					 function, internal_handle->segment_table->segment_file[ segment_table_iterator ].filename );
-
 					return( -1 );
 				}
 				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %" PRIs_EWF_filename ".\n",

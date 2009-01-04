@@ -38,7 +38,6 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_error_sector.h"
-#include "libewf_filename.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
 #include "libewf_values_table.h"
@@ -84,29 +83,13 @@ struct libewf_internal_handle
 	 */
 	libewf_internal_handle_write_t *write;
 
-	/* The segment filename without extension
+	/* The list of segment files
 	 */
-	LIBEWF_FILENAME *segment_filename;
+	LIBEWF_SEGMENT_TABLE *segment_table;
 
-	/* A dynamic array of segment files
+	/* The list of delta segment files
 	 */
-	LIBEWF_SEGMENT_FILE *segment_files;
-
-	/* The amount of segment files in the dynamic array
-	 */
-	uint16_t amount_of_segment_files;
-
-	/* The delta segment filename without extension
-	 */
-	LIBEWF_FILENAME *delta_segment_filename;
-
-	/* A dynamic array of delta segment files
-	 */
-	LIBEWF_SEGMENT_FILE *delta_segment_files;
-
-	/* The amount of delta segment files in the dynamic array
-	 */
-	uint16_t amount_of_delta_segment_files;
+	LIBEWF_SEGMENT_TABLE *delta_segment_table;
 
 	/* The list of offsets within the segment files within the table sections
 	 */
