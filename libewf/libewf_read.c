@@ -231,6 +231,13 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value is zero.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( chunk_size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",

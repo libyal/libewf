@@ -481,20 +481,13 @@ ssize_t libewf_section_write_compressed_string( LIBEWF_SEGMENT_FILE *segment_fil
 /* Reads a header section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size )
+ssize_t libewf_section_header_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_header, size_t *cached_header_size )
 {
 	EWF_CHAR *header      = NULL;
 	static char *function = "libewf_section_header_read";
 	ssize_t read_count    = 0;
 	size_t header_size    = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -505,6 +498,20 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 	if( section_size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached header.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_header_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached header size.\n",
 		 function );
 
 		return( -1 );
@@ -534,17 +541,15 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, header, header_size ); );
 
-	if( internal_handle->header == NULL )
+	if( *cached_header == NULL )
 	{
-		internal_handle->header      = header;
-		internal_handle->header_size = header_size;
+		*cached_header = header;
+		*cached_header_size = header_size;
 	}
 	else
 	{
 		libewf_common_free( header );
 	}
-	internal_handle->amount_of_header_sections++;
-
 	return( read_count );
 }
 
@@ -590,20 +595,13 @@ ssize_t libewf_section_header_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR
 /* Reads a header2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size )
+ssize_t libewf_section_header2_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_header2, size_t *cached_header2_size )
 {
 	EWF_CHAR *header2     = NULL;
 	static char *function = "libewf_section_header2_read";
 	ssize_t read_count    = 0;
 	size_t header2_size   = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -614,6 +612,20 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 	if( section_size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_header2 == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached header2.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_header2_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached header2 size.\n",
 		 function );
 
 		return( -1 );
@@ -643,17 +655,15 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, header2, header2_size ); );
 
-	if( internal_handle->header2 == NULL )
+	if( *cached_header2 == NULL )
 	{
-		internal_handle->header2      = header2;
-		internal_handle->header2_size = header2_size;
+		*cached_header2      = header2;
+		*cached_header2_size = header2_size;
 	}
 	else
 	{
 		libewf_common_free( header2 );
 	}
-	internal_handle->amount_of_header_sections++;
-
 	return( read_count );
 }
 
@@ -3555,20 +3565,13 @@ ssize_t libewf_section_last_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *
 /* Reads a xheader section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size )
+ssize_t libewf_section_xheader_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_xheader, size_t *cached_xheader_size )
 {
 	EWF_CHAR *xheader     = NULL;
 	static char *function = "libewf_section_xheader_read";
 	ssize_t read_count    = 0;
 	size_t xheader_size   = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -3579,6 +3582,20 @@ ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 	if( section_size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_xheader == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached xheader.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_xheader_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached xheader size.\n",
 		 function );
 
 		return( -1 );
@@ -3608,17 +3625,15 @@ ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LI
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, xheader, xheader_size ); );
 
-	if( internal_handle->xheader == NULL )
+	if( *cached_xheader == NULL )
 	{
-		internal_handle->xheader      = xheader;
-		internal_handle->xheader_size = xheader_size;
+		*cached_xheader      = xheader;
+		*cached_xheader_size = xheader_size;
 	}
 	else
 	{
 		libewf_common_free( xheader );
 	}
-	internal_handle->amount_of_header_sections++;
-
 	return( read_count );
 }
 
@@ -3664,20 +3679,13 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHA
 /* Reads a xhash section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size )
+ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_xhash, size_t *cached_xhash_size )
 {
 	EWF_CHAR *xhash       = NULL;
 	static char *function = "libewf_section_xhash_read";
 	ssize_t read_count    = 0;
 	size_t xhash_size     = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -3688,6 +3696,20 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 	if( section_size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_xhash == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached xhash.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( cached_xhash_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid cached xhash size.\n",
 		 function );
 
 		return( -1 );
@@ -3717,10 +3739,10 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBE
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, xhash, xhash_size ); );
 
-	if( internal_handle->xhash == NULL )
+	if( *cached_xhash == NULL )
 	{
-		internal_handle->xhash      = xhash;
-		internal_handle->xhash_size = xhash_size;
+		*cached_xhash      = xhash;
+		*cached_xhash_size = xhash_size;
 	}
 	else
 	{
@@ -4163,9 +4185,12 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "header2", 8 ) == 0 )
 	{
 		read_count = libewf_section_header2_read(
-		              internal_handle,
 		              segment_file,
-		              (size_t) size );
+		              (size_t) size,
+		              &( internal_handle->header2 ),
+		              &( internal_handle->header2_size ) );
+
+		internal_handle->amount_of_header_sections++;
 	}
 	/* Read the header section
 	 * The \0 byte is included in the compare
@@ -4173,9 +4198,12 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "header", 7 ) == 0 )
 	{
 		read_count = libewf_section_header_read(
-		              internal_handle,
 		              segment_file,
-		              (size_t) size );
+		              (size_t) size,
+		              &( internal_handle->header ),
+		              &( internal_handle->header_size ) );
+
+		internal_handle->amount_of_header_sections++;
 	}
 	/* Read the xheader section
 	 * The \0 byte is included in the compare
@@ -4183,9 +4211,12 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "xheader", 8 ) == 0 )
 	{
 		read_count = libewf_section_xheader_read(
-		              internal_handle,
 		              segment_file,
-		              (size_t) size );
+		              (size_t) size,
+		              &( internal_handle->xheader ),
+		              &( internal_handle->xheader_size ) );
+
+		internal_handle->amount_of_header_sections++;
 	}
 	/* Read the volume or disk section
 	 * The \0 byte is included in the compare
@@ -4309,9 +4340,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "xhash", 6 ) == 0 )
 	{
 		read_count = libewf_section_xhash_read(
-		              internal_handle,
 		              segment_file,
-		              (size_t) size );
+		              (size_t) size,
+		              &( internal_handle->xhash ),
+		              &( internal_handle->xhash_size ) );
 	}
 	/* Read the error2 section
 	 * The \0 byte is included in the compare

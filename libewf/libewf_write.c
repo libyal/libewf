@@ -899,6 +899,13 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 
 		return( -1 );
 	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value is zero.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( chunk_size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
@@ -1227,6 +1234,13 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 	if( chunk_buffer == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value is zero.\n",
 		 function );
 
 		return( -1 );

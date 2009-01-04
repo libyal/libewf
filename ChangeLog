@@ -160,6 +160,13 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071121
+* worked on refactoring code
+* libewf no longer allows to raw read/write a chunk of 0 bytes
+
+Version: 20071120
+* worked on refactoring code
+
 Version: 20071119
 * worked on refactoring to use segment file struct in section
 * changed stored delta segment number to 1 ... x count instead of 0 ... x count
