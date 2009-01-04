@@ -82,8 +82,15 @@ struct libewf_section_list
 	libewf_section_list_entry_t *last;
 };
 
-libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset );
-int libewf_section_list_remove_last( libewf_section_list_t *section_list );
+libewf_section_list_t *libewf_section_list_append(
+                        libewf_section_list_t *section_list,
+                        uint8_t *type,
+                        size_t type_length,
+                        off64_t start_offset,
+                        off64_t end_offset );
+
+int libewf_section_list_remove_last(
+     libewf_section_list_t *section_list );
 
 #if defined( __cplusplus )
 }

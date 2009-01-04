@@ -114,9 +114,11 @@ Next release(s):
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
 
-* implement session section write
+* implement session section
+  - write
+  - api functions
 
-* Try to correct the table
+* Try to correct the offset table
   - add error flag
 
 * create libewf_create_handle and libewf_destroy_handle functions?

@@ -272,23 +272,39 @@ AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
 	AC_SUBST([HAVE_WCHAR_H],[0])])
 
 dnl Check if ewftools should be build with raw read and write support
-AS_IF([test "x$ac_libewf_enable_raw_access" != xno ],
-	[AC_DEFINE( [HAVE_RAW_ACCESS], [1], [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
+AS_IF(
+	[test "x$ac_libewf_enable_raw_access" != xno ],
+	[AC_DEFINE(
+	 [HAVE_RAW_ACCESS],
+	 [1],
+	 [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
 	ac_libewf_enable_raw_access=yes])
 
 dnl Check if libewf should be build with reduced memory usage
-AS_IF([test "x$ac_libewf_enable_low_memory_usage" != xno ],
-	[AC_DEFINE( [HAVE_LOW_MEMORY_USAGE], [1], [Defines if libewf should be build with low memory usage] )
+AS_IF(
+	[test "x$ac_libewf_enable_low_memory_usage" != xno ],
+	[AC_DEFINE(
+	 [HAVE_LOW_MEMORY_USAGE],
+	 [1],
+	 [Defines if libewf should be build with low memory usage] )
 	ac_libewf_enable_low_memory_usage=yes])
 
 dnl Check if libewf should be build with verbose output
-AS_IF([test "x$ac_libewf_enable_verbose_output" != xno ],
-	[AC_DEFINE( [HAVE_VERBOSE_OUTPUT], [1], [Defines if verbose output should be used] )
+AS_IF(
+	[test "x$ac_libewf_enable_verbose_output" != xno ],
+	[AC_DEFINE(
+	 [HAVE_VERBOSE_OUTPUT],
+	 [1],
+	 [Defines if verbose output should be used] )
 	ac_libewf_enable_verbose_output=yes])
 
 dnl Check if libewf should be build with debug output
-AS_IF([test "x$ac_libewf_enable_debug_output" != xno ],
-	[AC_DEFINE( [HAVE_DEBUG_OUTPUT], [1], [Defines if debug output should be used] )
+AS_IF(
+	[test "x$ac_libewf_enable_debug_output" != xno ],
+	[AC_DEFINE(
+	 [HAVE_DEBUG_OUTPUT],
+	 [1],
+	 [Defines if debug output should be used] )
 	ac_libewf_enable_debug_output=yes])
 
 dnl Check for the operation system will be used as a fall back in the ewftools

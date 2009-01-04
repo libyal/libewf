@@ -1527,8 +1527,6 @@ ssize_t libewf_raw_write_chunk_existing(
 			if( ( segment_file_handle->file_offset + (off64_t) chunk_size + (off64_t) sizeof( ewf_crc_t ) + (off64_t) sizeof( ewf_section_t ) )
 			    > (off64_t) internal_handle->write->segment_file_size )
 			{
-				result = 0;
-
 				/* Make sure to write a next section in the the previous delta segment file
 				 * The segment file offset is updated by the function
 				 */
@@ -1546,20 +1544,10 @@ ssize_t libewf_raw_write_chunk_existing(
 					return( -1 );
 				}
 				total_write_count += write_count;
+				result             = 0;
 			}
-			/* Check if a delta segment already exists
-			 */
 			else
 			{
-				/* refactor */
-				if( segment_file_handle->file_descriptor == -1 )
-				{
-					result = 0;
-				}
-				else
-				{
-					result = 1;
-				}
 				if( libewf_section_list_remove_last(
 				     segment_file_handle->section_list ) != 1 )
 				{
@@ -1568,6 +1556,7 @@ ssize_t libewf_raw_write_chunk_existing(
 
 					return( -1 );
 				}
+				result = 1;
 			}
 		}
 		else

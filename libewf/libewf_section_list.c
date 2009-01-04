@@ -39,7 +39,12 @@
 /* Append an entry to the section list
  * Returns a pointer to the instance, NULL on error
  */
-libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *section_list, uint8_t *type, size_t type_length, off64_t start_offset, off64_t end_offset )
+libewf_section_list_t *libewf_section_list_append(
+                        libewf_section_list_t *section_list,
+                        uint8_t *type,
+                        size_t type_length,
+                        off64_t start_offset,
+                        off64_t end_offset )
 {
 	libewf_section_list_entry_t *section_list_entry = NULL;
 	static char *function                           = "libewf_section_list_append";
@@ -90,7 +95,8 @@ libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *sectio
 		LIBEWF_WARNING_PRINT( "%s: unable to clear section list entry.\n",
 		 function );
 
-		libewf_common_free( section_list_entry );
+		libewf_common_free(
+		 section_list_entry );
 
 		return( NULL );
 	}
@@ -102,7 +108,8 @@ libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *sectio
 		LIBEWF_WARNING_PRINT( "%s: unable to set section list entry type.\n",
 		 function );
 
-		libewf_common_free( section_list_entry );
+		libewf_common_free(
+		 section_list_entry );
 
 		return( NULL );
 	}
@@ -128,7 +135,8 @@ libewf_section_list_t *libewf_section_list_append( libewf_section_list_t *sectio
 /* Removes the last entry from the section list
  * Returns 1 if successful, or -1 on error
  */
-int libewf_section_list_remove_last( libewf_section_list_t *section_list )
+int libewf_section_list_remove_last(
+     libewf_section_list_t *section_list )
 {
 	libewf_section_list_entry_t *section_list_entry = NULL;
 	static char *function                           = "libewf_section_list_remove_last";
@@ -161,7 +169,8 @@ int libewf_section_list_remove_last( libewf_section_list_t *section_list )
 
 			return( -1 );
 		}
-		libewf_common_free( section_list->last );
+		libewf_common_free(
+		 section_list->last );
 
 		section_list->first = NULL;
 		section_list->last  = NULL;
@@ -172,7 +181,8 @@ int libewf_section_list_remove_last( libewf_section_list_t *section_list )
 		section_list->last       = section_list_entry->previous;
 		section_list->last->next = NULL;
 
-		libewf_common_free( section_list_entry );
+		libewf_common_free(
+		 section_list_entry );
 	}
 	return( 1 );
 }

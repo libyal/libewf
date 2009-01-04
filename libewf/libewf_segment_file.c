@@ -918,13 +918,6 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 		return( -1 );
 	}
-	if( chunk_data == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( chunk_crc == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk CRC.\n",
@@ -1228,7 +1221,6 @@ ssize_t libewf_segment_file_write_delta_chunk(
          uint8_t write_crc )
 {
 	static char *function = "libewf_segment_file_write_delta_chunk";
-	ssize_t write_count   = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -1244,33 +1236,14 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
-	if( chunk_data == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_crc == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk CRC.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* Make sure the chunk is available in the offset table
 	 */
-	if( offset_table->amount < ( chunk + 1 ) )
+	if( chunk >= offset_table->amount )
 	{
-		if( libewf_offset_table_realloc(
-		     offset_table,
-		     ( chunk + 1 ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
-			 function );
+		LIBEWF_WARNING_PRINT( "%s: chunk not in offset table.\n",
+		 function );
 
-			return( -1 );
-		}
+		return( -1 );
 	}
 	/* Set the values in the offset table
 	 */
@@ -1280,26 +1253,14 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 	/* Write the chunk in the delta segment file
 	 */
-	write_count = libewf_section_delta_chunk_write(
-		       segment_file_handle,
-		       chunk, 
-		       chunk_data, 
-		       chunk_size, 
-		       chunk_crc,
-	               write_crc,
-	               0 );
-
-	/* refactor
-	 */
-
-	if( write_count == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write delta chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( write_count );
+	return( libewf_section_delta_chunk_write(
+		 segment_file_handle,
+		 chunk, 
+		 chunk_data, 
+		 chunk_size, 
+		 chunk_crc,
+	         write_crc,
+	         0 ) );
 }
 
 /* Closes the segment file, necessary sections at the end of the segment file will be written
