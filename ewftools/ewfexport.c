@@ -63,6 +63,8 @@
 #include "ewfprocess_status.h"
 #include "ewfsignal.h"
 
+#define EWFEXPORT_INPUT_BUFFER_SIZE	64
+
 /* Prints the executable usage information to the stream
  */
 void usage_fprint(
@@ -164,7 +166,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	character_t input_buffer[ 64 ];
+	character_t input_buffer[ EWFEXPORT_INPUT_BUFFER_SIZE ];
 
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                            = NULL;
@@ -174,7 +176,7 @@ int main( int argc, char * const argv[] )
 	libewf_handle_t *export_handle             = NULL;
 	character_t *acquiry_operating_system      = NULL;
 	character_t *acquiry_software_version      = NULL;
-	character_t *user_input                    = NULL;
+	character_t *fixed_string_variable         = NULL;
 	character_t *program                       = _CHARACTER_T_STRING( "ewfexport" );
 
 	system_character_t * const *argv_filenames = NULL;
@@ -185,6 +187,7 @@ int main( int argc, char * const argv[] )
 	system_integer_t option                    = 0;
 	size64_t media_size                        = 0;
 	ssize64_t export_count                     = 0;
+	size_t target_filename_length              = 0;
 	uint64_t maximum_segment_file_size         = 0;
 	uint64_t export_offset                     = 0;
 	uint64_t export_size                       = 0;
@@ -259,6 +262,11 @@ int main( int argc, char * const argv[] )
 				usage_fprint(
 				 stderr );
 
+				if( target_filename != NULL )
+				{
+					memory_free(
+					 target_filename );
+				}
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'b':
@@ -320,21 +328,18 @@ int main( int argc, char * const argv[] )
 					output_raw          = 1;
 					argument_set_format = 1;
 				}
+				else if( ewfinput_determine_libewf_format_system_character(
+				          optarg,
+				          &libewf_format ) != 1 )
+				{
+					fprintf( stderr, "Unsupported file format type defaulting to: raw.\n" );
+
+					output_raw = 1;
+				}
 				else
 				{
-					if( ewfinput_determine_libewf_format_system_character(
-					     optarg,
-					     &libewf_format ) != 1 )
-					{
-						fprintf( stderr, "Unsupported file format type defaulting to: raw.\n" );
-
-						output_raw = 1;
-					}
-					else
-					{
-						output_raw          = 0;
-						argument_set_format = 1;
-					}
+					output_raw          = 0;
+					argument_set_format = 1;
 				}
 				break;
 
@@ -342,6 +347,11 @@ int main( int argc, char * const argv[] )
 				usage_fprint(
 				 stderr );
 
+				if( target_filename != NULL )
+				{
+					memory_free(
+					 target_filename );
+				}
 				return( EXIT_SUCCESS );
 
 			case (system_integer_t) 'o':
@@ -388,10 +398,36 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 't':
-				target_filename = system_string_duplicate(
-				                   optarg,
-				                   system_string_length(
-				                    optarg ) );
+				target_filename_length = system_string_length(
+				                          optarg );
+
+				if( target_filename != NULL )
+				{
+					memory_free(
+					 target_filename );
+				}
+				target_filename = (system_character_t *) memory_allocate(
+				                                          sizeof( system_character_t ) * ( target_filename_length + 1 ) );
+
+				if( target_filename == NULL )
+				{
+					fprintf( stderr, "Unable to create target filename.\n" );
+
+					return( EXIT_FAILURE );
+				}
+				if( system_string_copy(
+				     target_filename,
+				     optarg,
+				     target_filename_length ) == NULL )
+				{
+					fprintf( stderr, "Unable to set target filename.\n" );
+
+					memory_free(
+					 target_filename );
+
+					return( EXIT_FAILURE );
+				}
+				target_filename[ target_filename_length ] = 0;
 
 				break;
 
@@ -409,6 +445,11 @@ int main( int argc, char * const argv[] )
 				ewfoutput_copyright_fprint(
 				 stderr );
 
+				if( target_filename != NULL )
+				{
+					memory_free(
+					 target_filename );
+				}
 				return( EXIT_SUCCESS );
 
 			case (system_integer_t) 'w':
@@ -424,9 +465,11 @@ int main( int argc, char * const argv[] )
 		usage_fprint(
 		 stderr );
 
-		memory_free(
-		 target_filename );
-
+		if( target_filename != NULL )
+		{
+			memory_free(
+			 target_filename );
+		}
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
@@ -460,9 +503,12 @@ int main( int argc, char * const argv[] )
 
 		ewfglob_free(
 		 &glob );
-		memory_free(
-		 target_filename );
 
+		if( target_filename != NULL )
+		{
+			memory_free(
+			 target_filename );
+		}
 		return( EXIT_FAILURE );
 	}
 	argv_filenames = glob->result;
@@ -487,9 +533,12 @@ int main( int argc, char * const argv[] )
 			ewfglob_free(
 			 &glob );
 #endif
-			memory_free(
-			 target_filename );
 
+			if( target_filename != NULL )
+			{
+				memory_free(
+				 target_filename );
+			}
 			return( EXIT_FAILURE );
 		}
 		argv_filenames = (system_character_t * const *) ewf_filenames;
@@ -518,9 +567,11 @@ int main( int argc, char * const argv[] )
 		ewfoutput_error_fprint(
 		 stderr, "Unable to open EWF file(s)" );
 
-		memory_free(
-		 target_filename );
-
+		if( target_filename != NULL )
+		{
+			memory_free(
+			 target_filename );
+		}
 		return( EXIT_FAILURE );
 	}
 	if( ewfcommon_abort == 0 )
@@ -534,9 +585,11 @@ int main( int argc, char * const argv[] )
 			libewf_close(
 			 ewfcommon_libewf_handle );
 
-			memory_free(
-			 target_filename );
-
+			if( target_filename != NULL )
+			{
+				memory_free(
+				 target_filename );
+			}
 			return( EXIT_FAILURE );
 		}
 		if( ( export_size == 0 )
@@ -560,44 +613,51 @@ int main( int argc, char * const argv[] )
 		{
 			/* File format
 			 */
-			user_input = ewfinput_get_fixed_value(
-				      stderr,
-				      _CHARACTER_T_STRING( "Export to file format" ),
-				      ewfexport_format_types,
-				      13,
-				      0 );
-
-			if( string_compare(
-			     user_input,
-			     _CHARACTER_T_STRING( "raw" ),
-			     3 ) == 0 )
+			if( ewfinput_get_fixed_string_variable(
+			     stderr,
+			     input_buffer,
+			     EWFEXPORT_INPUT_BUFFER_SIZE,
+			     _CHARACTER_T_STRING( "Export to file format" ),
+			     ewfexport_format_types,
+			     13,
+			     0,
+			     &fixed_string_variable ) == -1 )
 			{
+				fprintf( stderr, "Unable to determine file format defaulting to: raw.\n" );
+
+				output_raw = 1;
+			}
+			else if( string_compare(
+			          fixed_string_variable,
+			          _CHARACTER_T_STRING( "raw" ),
+			          3 ) == 0 )
+			{
+				output_raw = 1;
+			}
+			else if( ewfinput_determine_libewf_format(
+			          fixed_string_variable,
+			          &libewf_format ) != 1 )
+			{
+				fprintf( stderr, "Unsupported file format defaulting to: raw.\n" );
+
 				output_raw = 1;
 			}
 			else
 			{
-				if( ewfinput_determine_libewf_format(
-				     user_input,
-				     &libewf_format ) != 1 )
-				{
-					fprintf( stderr, "Unsupported file format defaulting to: raw.\n" );
-
-					output_raw = 1;
-				}
-				else
-				{
-					output_raw = 0;
-				}
+				output_raw = 0;
 			}
-			memory_free(
-			 user_input );
 		}
 		if( output_raw == 0 )
 		{
 			/* Target filename
 			 */
-			target_filename = (character_t *) memory_allocate(
-			                                   1024 );
+			if( target_filename != NULL )
+			{
+				memory_free(
+				 target_filename );
+			}
+			target_filename = (system_character_t *) memory_allocate(
+			                                          sizeof( system_character_t ) * 1024 );
 
 			if( target_filename == NULL )
 			{
@@ -617,25 +677,31 @@ int main( int argc, char * const argv[] )
 			{
 				/* Compression
 				 */
-				user_input = ewfinput_get_fixed_value(
-					      stderr,
-					      _CHARACTER_T_STRING( "Use compression" ),
-					      ewfinput_compression_levels,
-					      EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
-					      EWFINPUT_COMPRESSION_LEVELS_DEFAULT );
+				if( ewfinput_get_fixed_string_variable(
+				     stderr,
+				     input_buffer,
+				     EWFEXPORT_INPUT_BUFFER_SIZE,
+				     _CHARACTER_T_STRING( "Use compression" ),
+				     ewfinput_compression_levels,
+				     EWFINPUT_COMPRESSION_LEVELS_AMOUNT,
+				     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf( stderr, "Unable to determine compression type defaulting to: none.\n" );
 
-				if( ewfinput_determine_compression_level(
-				     user_input,
-				     &compression_level,
-				     &compress_empty_block ) != 1 )
+					compression_level    = LIBEWF_COMPRESSION_NONE;
+					compress_empty_block = 0;
+				}
+				else if( ewfinput_determine_compression_level(
+				          fixed_string_variable,
+				          &compression_level,
+				          &compress_empty_block ) != 1 )
 				{
 					fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
 
 					compression_level    = LIBEWF_COMPRESSION_NONE;
 					compress_empty_block = 0;
 				}
-				memory_free(
-				 user_input );
 			}
 			if( argument_set_segment_file_size == 0 )
 			{
@@ -654,7 +720,7 @@ int main( int argc, char * const argv[] )
 				if( ewfinput_get_byte_size_variable(
 				     stderr,
 				     input_buffer,
-				     64,
+				     EWFEXPORT_INPUT_BUFFER_SIZE,
 				     _CHARACTER_T_STRING( "Evidence segment file size in bytes" ),
 				     EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE,
 				     maximum_segment_file_size,
@@ -677,31 +743,41 @@ int main( int argc, char * const argv[] )
 			{
 				/* Chunk size (sectors per block)
 				 */
-				user_input = ewfinput_get_fixed_value(
-					      stderr,
-					      _CHARACTER_T_STRING( "The amount of sectors to read at once" ),
-					      ewfinput_sector_per_block_sizes,
-					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
-					      EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
+				if( ewfinput_get_fixed_string_variable(
+				     stderr,
+				     input_buffer,
+				     EWFEXPORT_INPUT_BUFFER_SIZE,
+				     _CHARACTER_T_STRING( "The amount of sectors to read at once" ),
+				     ewfinput_sector_per_block_sizes,
+				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
+				     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
+				     &fixed_string_variable ) == -1 )
+				{
+					fprintf( stderr, "Unable to determine sectors per chunk on error defaulting to: 64.\n" );
 
-				if( ewfinput_determine_sectors_per_chunk(
-				     user_input,
-				     &sectors_per_chunk ) != 1 )
+					sectors_per_chunk = 64;
+				}
+				else if( ewfinput_determine_sectors_per_chunk(
+				          fixed_string_variable,
+				          &sectors_per_chunk ) != 1 )
 				{
 					fprintf( stderr, "Unsupported sectors per chunk on error defaulting to: 64.\n" );
 
 					sectors_per_chunk = 64;
 				}
-				memory_free(
-				 user_input );
 			}
 		}
 		else
 		{
 			/* Target filename
 			 */
-			target_filename = (character_t *) memory_allocate(
-			                                   1024 );
+			if( target_filename != NULL )
+			{
+				memory_free(
+				 target_filename );
+			}
+			target_filename = (system_character_t *) memory_allocate(
+			                                          sizeof( system_character_t ) * 1024 );
 
 			if( target_filename == NULL )
 			{
@@ -718,41 +794,37 @@ int main( int argc, char * const argv[] )
 				fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
-		if( argument_set_offset == 0 )
+		if( ( argument_set_offset == 0 )
+		 && ( ewfinput_get_size_variable(
+		       stderr,
+		       input_buffer,
+		       EWFEXPORT_INPUT_BUFFER_SIZE,
+		       _CHARACTER_T_STRING( "Start export at offset" ),
+		       0,
+		       media_size,
+		       export_offset,
+		       &export_offset ) == -1 ) )
 		{
-			if( ewfinput_get_size_variable(
-			     stderr,
-			     input_buffer,
-			     64,
-			     _CHARACTER_T_STRING( "Start export at offset" ),
-			     0,
-			     media_size,
-			     export_offset,
-			     &export_offset ) == -1 )
-			{
-				export_offset = 0;
+			export_offset = 0;
 
-				fprintf( stderr, "Unable to determine export offset defaulting to: %" PRIu64 ".\n",
-				 export_offset );
-			}
+			fprintf( stderr, "Unable to determine export offset defaulting to: %" PRIu64 ".\n",
+			 export_offset );
 		}
-		if( argument_set_size == 0 )
+		if( ( argument_set_size == 0 )
+		 && ( ewfinput_get_size_variable(
+		       stderr,
+		       input_buffer,
+		       EWFEXPORT_INPUT_BUFFER_SIZE,
+		       _CHARACTER_T_STRING( "Amount of bytes to export" ),
+		       0,
+		       ( media_size - export_offset ),
+		       export_size,
+		       &export_size ) == -1 ) )
 		{
-			if( ewfinput_get_size_variable(
-			     stderr,
-			     input_buffer,
-			     64,
-			     _CHARACTER_T_STRING( "Amount of bytes to export" ),
-			     0,
-			     ( media_size - export_offset ),
-			     export_size,
-			     &export_size ) == -1 )
-			{
-				export_size = media_size - export_offset;
+			export_size = media_size - export_offset;
 
-				fprintf( stderr, "Unable to determine export size defaulting to: %" PRIu64 ".\n",
-				 export_size );
-			}
+			fprintf( stderr, "Unable to determine export size defaulting to: %" PRIu64 ".\n",
+			 export_size );
 		}
 		if( ewfsignal_attach(
 		     ewfcommon_signal_handler ) != 1 )
@@ -766,9 +838,28 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Missing target filename defaulting to: export.\n" );
 
-			target_filename = system_string_duplicate(
-			                   _SYSTEM_CHARACTER_T_STRING( "export" ),
-			                   6 );
+
+			target_filename = (system_character_t *) memory_allocate(
+			                                          sizeof( system_character_t ) * 7 );
+
+			if( target_filename == NULL )
+			{
+				fprintf( stderr, "Unable to create target filename.\n" );
+
+				return( EXIT_FAILURE );
+			}
+			if( system_string_copy(
+			     target_filename,
+			     _SYSTEM_CHARACTER_T_STRING( "export" ),
+			     6 ) == NULL )
+			{
+				fprintf( stderr, "Unable to set target filename.\n" );
+
+				memory_free(
+				 target_filename );
+
+				return( EXIT_FAILURE );
+			}
 		}
 		fprintf( stderr, "\n" );
 

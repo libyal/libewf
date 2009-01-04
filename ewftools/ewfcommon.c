@@ -162,11 +162,11 @@ character_t *ewfcommon_determine_operating_system(
 #else
 	operating_system = LIBEWF_OPERATING_SYSTEM;
 #endif
-	length = 1 + strlen(
-	              operating_system );
+	length = strlen(
+	          operating_system );
 
 	string = (character_t *) memory_allocate(
-	                          sizeof( character_t ) * length );
+	                          sizeof( character_t ) * ( length + 1 ) );
 
 	if( ( string != NULL )
 	 && ( string_copy_from_char(
@@ -179,6 +179,8 @@ character_t *ewfcommon_determine_operating_system(
 	
 		return( NULL );
 	}
+	string[ length ] = 0;
+
 	return( string );
 }
 

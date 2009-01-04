@@ -154,13 +154,6 @@ int ewfinput_get_fixed_string_variable(
      uint8_t default_value,
      character_t **fixed_string_variable );
 
-character_t *ewfinput_get_fixed_value(
-              FILE *stream,
-              character_t *request_string,
-              character_t **values,
-              uint8_t amount,
-              uint8_t default_value );
-
 #if defined( __cplusplus )
 }
 #endif
