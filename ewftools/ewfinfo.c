@@ -23,7 +23,6 @@
 
 #include <common.h>
 #include <memory.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <stdio.h>
@@ -53,6 +52,7 @@
 #include "ewfsignal.h"
 #include "glob.h"
 #include "guid.h"
+#include "system_string.h"
 
 /* Prints the executable usage information
  */

@@ -31,6 +31,7 @@
 #include <errno.h>
 
 #include "libewf_file_io.h"
+#include "libewf_libuna.h"
 
 /* Function to open a file
  * Returns the file descriptor or -1 on error 
@@ -152,11 +153,21 @@ int libewf_file_io_open_wide(
 	filename_size = 1 + wide_string_length(
 	                     filename );
 
-	if( narrow_string_size_from_libewf_string(
-	     filename,
+#if SIZEOF_WCHAR_T == 4
+	if( libuna_utf8_string_size_from_utf32(
+	     (libuna_utf32_character_t *) filename,
 	     filename_size,
 	     &narrow_filename_size,
 	     error ) != 1 )
+#elif SIZEOF_WCHAR_T == 2
+	if( libuna_utf8_string_size_from_utf16(
+	     (libuna_utf16_character_t *) filename,
+	     filename_size,
+	     &narrow_filename_size,
+	     error ) != 2 )
+#else
+#error Unsupported size of wchar_t
+#endif
 	{
 		liberror_error_set(
 		 error,
@@ -181,12 +192,23 @@ int libewf_file_io_open_wide(
 
 		return( -1 );
 	}
-	if( narrow_string_copy_from_libewf_string(
-	     narrow_filename,
+#if SIZEOF_WCHAR_T == 4
+	if( libuna_utf8_string_copy_from_utf32(
+	     (libuna_utf8_character_t *) narrow_filename,
 	     narrow_filename_size,
-	     filename,
+	     (libuna_utf32_character_t *) filename,
 	     filename_size,
 	     error ) != 1 )
+#elif SIZEOF_WCHAR_T == 2
+	if( libuna_utf8_string_copy_from_utf16(
+	     (libuna_utf8_character_t *) narrow_filename,
+	     narrow_filename_size,
+	     (libuna_utf16_character_t *) filename,
+	     filename_size,
+	     error ) != 1 )
+#else
+#error Unsupported size of wchar_t
+#endif
 	{
 		liberror_error_set(
 		 error,

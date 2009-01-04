@@ -201,7 +201,7 @@ int ewfcommon_determine_operating_system_string(
 }
 
 /* Determines the GUID
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int ewfcommon_determine_guid(
      uint8_t *guid,
@@ -238,8 +238,262 @@ int ewfcommon_determine_guid(
 	return( 1 );
 }
 
+/* Sets a header value in the libewf handle
+ * Returns 1 if successful or -1 on error
+ */
+int ewfcommon_set_header_value(
+     libewf_handle_t *handle,
+     const char *utf8_header_value_identifier,
+     character_t *header_value, 
+     liberror_error_t **error )
+{
+	char *utf8_header_value         = NULL;
+	static char *function           = "ewfcommon_set_header_value";
+	size_t header_value_length      = 0;
+	size_t utf8_header_value_length = 0;
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_header_value_identifier == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid header value identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( header_value == NULL )
+	{
+		header_value_length = 0;
+	}
+	else
+	{
+		header_value_length = string_length(
+		                       header_value );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		if( utf8_string_size_from_string(
+	             header_value,
+		     header_value_length + 1,
+		     &utf8_header_value_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to determine UTF-8 header value size.",
+			 function );
+
+			return( -1 );
+		}
+		utf8_header_value = (char *) memory_allocate(
+		                              sizeof( char ) * utf8_header_value_length );
+
+		if( utf8_header_value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create UTF-8 header value.",
+			 function );
+
+			return( -1 );
+		}
+		if( utf8_string_copy_from_string(
+		     utf8_header_value,
+		     utf8_header_value_length,
+	             header_value,
+		     header_value_length + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to set UTF-8 header value.",
+			 function );
+
+			memory_free(
+			 utf8_header_value );
+
+			return( -1 );
+		}
+#else
+		utf8_header_value        = header_value;
+		utf8_header_value_length = header_value_length;
+#endif
+	}
+	if( libewf_set_header_value(
+	     handle,
+	     utf8_header_value_identifier,
+	     utf8_header_value,
+	     utf8_header_value_length ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set header value: %s in handle.",
+		 function,
+		 utf8_header_value );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		memory_free(
+		 utf8_header_value );
+#endif
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+	memory_free(
+	 utf8_header_value );
+#endif
+	return( 1 );
+}
+
+/* Sets a hash value in the libewf handle
+ * Returns 1 if successful or -1 on error
+ */
+int ewfcommon_set_hash_value(
+     libewf_handle_t *handle,
+     const char *utf8_hash_value_identifier,
+     character_t *hash_value, 
+     liberror_error_t **error )
+{
+	char *utf8_hash_value         = NULL;
+	static char *function         = "ewfcommon_set_hash_value";
+	size_t hash_value_length      = 0;
+	size_t utf8_hash_value_length = 0;
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_hash_value_identifier == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash value identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_value == NULL )
+	{
+		hash_value_length = 0;
+	}
+	else
+	{
+		hash_value_length = string_length(
+		                     hash_value );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		if( utf8_string_size_from_string(
+	             hash_value,
+		     hash_value_length + 1,
+		     &utf8_hash_value_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to determine UTF-8 hash value size.",
+			 function );
+
+			return( -1 );
+		}
+		utf8_hash_value = (char *) memory_allocate(
+		                            sizeof( char ) * utf8_hash_value_length );
+
+		if( utf8_hash_value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create UTF-8 hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( utf8_string_copy_from_string(
+		     utf8_hash_value,
+		     utf8_hash_value_length,
+	             hash_value,
+		     hash_value_length + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to set UTF-8 hash value.",
+			 function );
+
+			memory_free(
+			 utf8_hash_value );
+
+			return( -1 );
+		}
+#else
+		utf8_hash_value        = hash_value;
+		utf8_hash_value_length = hash_value_length;
+#endif
+	}
+	if( libewf_set_hash_value(
+	     handle,
+	     utf8_hash_value_identifier,
+	     utf8_hash_value,
+	     utf8_hash_value_length ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set hash value: %s in handle.",
+		 function,
+		 utf8_hash_value );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		memory_free(
+		 utf8_hash_value );
+#endif
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+	memory_free(
+	 utf8_hash_value );
+#endif
+	return( 1 );
+}
+
 /* Initialize the libewf handle for writing
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int ewfcommon_initialize_write(
      libewf_handle_t *handle,
@@ -263,7 +517,6 @@ int ewfcommon_initialize_write(
 	uint8_t guid[ 16 ];
 #endif
 	static char *function = "ewfcommon_ewfcommon_initialize_write";
-	size_t string_length  = 0;
 
 	if( handle == NULL )
 	{
@@ -274,19 +527,11 @@ int ewfcommon_initialize_write(
 	}
 	/* Set case number
 	 */
-	if( case_number == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = string_length(
-		                 case_number );
-	}
-	if( ewfcommon_set_header_value_case_number(
+	if( ewfcommon_set_header_value(
 	     handle,
+	     "case_number",
 	     case_number,
-	     string_length ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value case number in handle.\n",
 		 function );
@@ -295,19 +540,11 @@ int ewfcommon_initialize_write(
 	}
 	/* Set description
 	 */
-	if( description == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = string_length(
-		                 description );
-	}
-	if( ewfcommon_set_header_value_description(
+	if( ewfcommon_set_header_value(
 	     handle,
+	     "description",
 	     description,
-	     string_length ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value description in handle.\n",
 		 function );
@@ -316,19 +553,11 @@ int ewfcommon_initialize_write(
 	}
 	/* Set evidence number
 	 */
-	if( evidence_number == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = string_length(
-		                 evidence_number );
-	}
-	if( ewfcommon_set_header_value_evidence_number(
+	if( ewfcommon_set_header_value(
 	     handle,
+	     "evidence_number",
 	     evidence_number,
-	     string_length ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value evidence number in handle.\n",
 		 function );
@@ -337,19 +566,11 @@ int ewfcommon_initialize_write(
 	}
 	/* Set examiner name
 	 */
-	if( examiner_name == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = string_length(
-		                 examiner_name );
-	}
-	if( ewfcommon_set_header_value_examiner_name(
+	if( ewfcommon_set_header_value(
 	     handle,
+	     "examiner_name",
 	     examiner_name,
-	     string_length ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value examiner name in handle.\n",
 		 function );
@@ -358,19 +579,11 @@ int ewfcommon_initialize_write(
 	}
 	/* Set notes
 	 */
-	if( notes == NULL )
-	{
-		string_length = 0;
-	}
-	else
-	{
-		string_length = string_length(
-		                 notes );
-	}
-	if( ewfcommon_set_header_value_notes(
+	if( ewfcommon_set_header_value(
 	     handle,
+	     "notes",
 	     notes,
-	     string_length ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value notes in handle.\n",
 		 function );
@@ -384,11 +597,11 @@ int ewfcommon_initialize_write(
 	 */
 
 	if( ( acquiry_operating_system != NULL )
-	 && ( ewfcommon_set_header_value_acquiry_operating_system(
+	 && ( ewfcommon_set_header_value(
 	       handle,
+	       "acquiry_operating_system",
 	       acquiry_operating_system,
-	       string_length(
-	        acquiry_operating_system ) ) != 1 ) )
+	       NULL ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry operating system in handle.\n",
 		 function );
@@ -397,21 +610,20 @@ int ewfcommon_initialize_write(
 	}
 	if( ewfcommon_set_header_value(
 	     handle,
-	     _CHARACTER_T_STRING( "acquiry_software" ),
+	     "acquiry_software",
 	     acquiry_software,
-	     string_length(
-	      acquiry_software ) ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry software in handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ewfcommon_set_header_value_acquiry_software_version(
+	if( ewfcommon_set_header_value(
 	     handle,
+	     "acquiry_software_version",
 	     acquiry_software_version,
-	     string_length(
-	      acquiry_software_version ) ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry software version number in handle.\n",
 		 function );
@@ -475,7 +687,7 @@ int ewfcommon_initialize_write(
 
 		return( -1 );
 	}
-#if defined(HAVE_UUID_UUID_H) && defined(HAVE_LIBUUID)
+#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 	/* Add a system GUID if necessary
 	 */
 	if( ewfcommon_determine_guid(
@@ -502,7 +714,7 @@ int ewfcommon_initialize_write(
 }
 
 /* Reads data from a file descriptor into the chunk cache
- * Returns the amount of bytes read, 0 if at end of input, or -1 on error
+ * Returns the amount of bytes read, 0 if at end of input or -1 on error
  */
 ssize32_t ewfcommon_read_input(
            libewf_handle_t *handle,
@@ -963,7 +1175,7 @@ ssize32_t ewfcommon_read_input(
 /* Reads the data from an EWF file
  * using the raw access functions
  * buffer will be set to the buffer containing the uncompressed data
- * Returns the amount of bytes read, 0 if no more data can be read, or -1 on error
+ * Returns the amount of bytes read, 0 if no more data can be read or -1 on error
  */
 ssize_t ewfcommon_raw_read_ewf(
          libewf_handle_t *handle,
@@ -1113,7 +1325,7 @@ ssize_t ewfcommon_raw_read_ewf(
 
 /* Writes the data to an EWF file
  * using the raw access functions
- * Returns the amount of bytes written, 0 if no more data can be written, or -1 on error
+ * Returns the amount of bytes written, 0 if no more data can be written or -1 on error
  */
 ssize_t ewfcommon_raw_write_ewf(
          libewf_handle_t *handle,
@@ -1213,7 +1425,7 @@ ssize_t ewfcommon_raw_write_ewf(
 #endif
 
 /* Reads the data to calculate the MD5 and SHA1 integrity hashes
- * Returns the amount of bytes read if successful, or -1 on error
+ * Returns the amount of bytes read if successful or -1 on error
  */
 ssize64_t ewfcommon_read_verify(
            libewf_handle_t *handle,
@@ -1629,7 +1841,7 @@ ssize64_t ewfcommon_read_verify(
 }
 
 /* Writes data in EWF format from a file descriptor
- * Returns the amount of bytes written, or -1 on error
+ * Returns the amount of bytes written or -1 on error
  */
 ssize64_t ewfcommon_write_from_file_descriptor(
            libewf_handle_t *handle,
@@ -2036,10 +2248,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 #if defined( USE_LIBEWF_SET_HASH_VALUE_MD5 )
 		/* The MD5 hash string must be set before write finalized is used
 		 */
-		if( ewfcommon_set_hash_value_md5(
+		if( ewfcommon_set_hash_value(
 		     handle,
+		     "MD5",
 		     md5_hash_string,
-		     md5_hash_string_length ) != 1 )
+		     NULL ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash string in handle.\n",
 			 function );
@@ -2081,10 +2294,11 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		}
 		/* The SHA1 hash string must be set before write finalized is used
 		 */
-		if( ewfcommon_set_hash_value_sha1(
+		if( ewfcommon_set_hash_value(
 		     handle,
+		     "SHA1",
 		     sha1_hash_string,
-		     sha1_hash_string_length ) != 1 )
+		     NULL ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string in handle.\n",
 			 function );
@@ -2789,11 +3003,11 @@ ssize64_t ewfcommon_export_ewf(
 		return( -1 );
 	}
 	if( ( acquiry_operating_system != NULL )
-	 && ( ewfcommon_set_header_value_acquiry_operating_system(
+	 && ( ewfcommon_set_header_value(
 	       export_handle,
+	       "acquiry_operating_system",
 	       acquiry_operating_system,
-	       string_length(
-	        acquiry_operating_system ) ) != 1 ) )
+	       NULL ) != 1 ) )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry operating system in export handle.\n",
 		 function );
@@ -2802,21 +3016,20 @@ ssize64_t ewfcommon_export_ewf(
 	}
 	if( ewfcommon_set_header_value(
 	     export_handle,
-	     _CHARACTER_T_STRING( "acquiry_software" ),
+	     "acquiry_software",
 	     acquiry_software,
-	     string_length(
-	      acquiry_software ) ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry software in export handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( ewfcommon_set_header_value_acquiry_software_version(
+	if( ewfcommon_set_header_value(
 	     export_handle,
+	     "acquiry_software_version",
 	     acquiry_software_version,
-	     string_length(
-	      acquiry_software_version ) ) != 1 )
+	     NULL ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header value acquiry software version number in export handle.\n",
 		 function );
@@ -3242,10 +3455,11 @@ ssize64_t ewfcommon_export_ewf(
 #if defined( USE_LIBEWF_SET_HASH_VALUE_MD5 )
 		/* The MD5 hash string must be set before write finalized is used
 		 */
-		if( ewfcommon_set_hash_value_md5(
+		if( ewfcommon_set_hash_value(
 		     export_handle,
+		     "MD5",
 		     md5_hash_string,
-		     md5_hash_string_length ) != 1 )
+		     NULL ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash string in handle.\n",
 			 function );
@@ -3287,10 +3501,11 @@ ssize64_t ewfcommon_export_ewf(
 		}
 		/* The SHA1 hash string must be set before write finalized is used
 		 */
-		if( ewfcommon_set_hash_value_sha1(
+		if( ewfcommon_set_hash_value(
 		     export_handle,
+		     "SHA1",
 		     sha1_hash_string,
-		     sha1_hash_string_length ) != 1 )
+		     NULL ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash string in handle.\n",
 			 function );

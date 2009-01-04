@@ -672,9 +672,9 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				acquiry_offset = system_string_to_int64(
-				                  optarg,
-				                  input_size_variable );
+				input_size_variable = system_string_to_int64(
+				                       optarg,
+				                       string_length );
 
 				if( input_size_variable > 255 )
 				{

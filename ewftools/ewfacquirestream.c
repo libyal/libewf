@@ -22,9 +22,7 @@
  */
 
 #include <common.h>
-#include <file_stream_io.h>
 #include <memory.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <stdio.h>
@@ -64,12 +62,14 @@
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "glob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "process_status.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
+#include "file_stream_io.h"
+#include "glob.h"
+#include "process_status.h"
+#include "system_string.h"
 
 /* Prints the executable usage information to the stream
  */

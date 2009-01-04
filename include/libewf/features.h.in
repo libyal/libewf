@@ -23,14 +23,8 @@
 #if !defined( _LIBEWF_FEATURES_H )
 #define _LIBEWF_FEATURES_H
 
-/* The libewf type support features
- */
-#if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( WINAPI ) ||  @HAVE_WIDE_CHARACTER_TYPE@
 #define LIBEWF_WIDE_CHARACTER_TYPE      1
-
-#if @HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS@ || defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-#define LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS    1
-#endif
 
 #endif
 

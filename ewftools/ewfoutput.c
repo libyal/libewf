@@ -50,10 +50,10 @@
 
 #include <libewf/features.h>
 
-#if defined( HAVE_LIBUNA_H )
-#include <libuna.h>
-#elif defined( HAVE_LOCAL_LIBUNA )
+#if defined( HAVE_LOCAL_LIBUNA )
 #include <libuna_definitions.h>
+#elif defined( HAVE_LIBUNA_H )
+#include <libuna.h>
 #endif
 
 #if defined( HAVE_ZLIB_H )
@@ -861,6 +861,145 @@ void ewfoutput_sessions_fprint(
 		}
 		fprintf( stream, "\n" );
 	}
+}
+
+/* Retrieves the header value from the libewf handle
+ * Returns 1 if successful or -1 on error
+ */
+int ewfoutput_get_header_value(
+     libewf_handle_t *handle,
+     const char *utf8_header_value_identifier,
+     character_t *header_value,
+     size_t header_value_size,
+     liberror_error_t **error );
+
+/* Retrieves the hash value from the libewf handle
+ * Returns 1 if successful or -1 on error
+ */
+int ewfoutput_get_hash_value(
+     libewf_handle_t *handle,
+     const char *utf8_hash_value_identifier,
+     character_t *hash_value,
+     size_t hash_value_size,
+     liberror_error_t **error )
+{
+	char utf8_hash_value[ 128 ];
+
+	static char *function         = "ewfoutput_get_hash_value";
+	size_t hash_value_length      = 0;
+	size_t utf8_hash_value_length = 128;
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_hash_value_identifier == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash value identifier.",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_value == NULL )
+	{
+		hash_value_length = 0;
+	}
+	else
+	{
+		hash_value_length = string_length(
+		                     hash_value );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		if( utf8_string_size_from_string(
+	             hash_value,
+		     hash_value_length + 1,
+		     &utf8_hash_value_length,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to determine UTF-8 hash value size.",
+			 function );
+
+			return( -1 );
+		}
+		utf8_hash_value = (char *) memory_allocate(
+		                            sizeof( char ) * utf8_hash_value_length );
+
+		if( utf8_hash_value == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create UTF-8 hash value.",
+			 function );
+
+			return( -1 );
+		}
+		if( utf8_string_copy_from_string(
+		     utf8_hash_value,
+		     utf8_hash_value_length,
+	             hash_value,
+		     hash_value_length + 1,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to set UTF-8 hash value.",
+			 function );
+
+			memory_free(
+			 utf8_hash_value );
+
+			return( -1 );
+		}
+#else
+		utf8_hash_value        = hash_value;
+		utf8_hash_value_length = hash_value_length;
+#endif
+	}
+	if( libewf_set_hash_value(
+	     handle,
+	     utf8_hash_value_identifier,
+	     utf8_hash_value,
+	     utf8_hash_value_length ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set hash value: %s in handle.",
+		 function,
+		 utf8_hash_value );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		memory_free(
+		 utf8_hash_value );
+#endif
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+	memory_free(
+	 utf8_hash_value );
+#endif
+	return( 1 );
 }
 
 /* Print the header values to a stream

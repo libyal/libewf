@@ -1,4 +1,4 @@
-.Dd September 28, 2008
+.Dd October 11, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -370,13 +370,10 @@ If the system has wide character support functions like wmain and wopen pass the
 
 When wide character support functions like wmain and wopen are present on the system and libewf is compiled with
 .Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
- to the compiler. Currently only MSVS C++ supports this feature. When 
-.Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
- is defined the definition
-.Ar LIBEWF_WIDE_CHARACTER_FILE_FUNCTIONS
- is enabled in libewf/features.h. Make sure that for MSVS C++ the code that includes libewf defines LIBEWF_DLL_IMPORT and these macros if wide character and/or wide character support functions are used.
+ to the compiler. Currently only MSVS C++ supports this feature.
+Make sure that for MSVS C++ the code that includes libewf as a DLL defines LIBEWF_DLL_IMPORT before including <libewf.h>.
 
-Libewf uses UTF encoded strings as of version 20080903. The type of UTF is determined by the size of the string character.
+As of version 20080903 libewf uses UTF-8 encoded strings except for filenames.
 
 The header in a set of EWF files contains an extended ASCII string using the codepage of the system it was created on. The function 
 .Ar libewf_set_header_codepage

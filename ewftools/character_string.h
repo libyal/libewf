@@ -28,6 +28,12 @@
 #include <types.h>
 #include <wide_string.h>
 
+#if defined( HAVE_LOCAL_LIBUNA )
+#include <libuna_definitions.h>
+#elif defined( HAVE_LIBUNA_H )
+#include <libuna.h>
+#endif
+
 #include "date_time.h"
 #include "string_conversion.h"
 
@@ -165,6 +171,50 @@ character_t *string_ctime(
 #elif defined( date_time_ctime )
 #define string_ctime( timestamp, string, size ) \
 	date_time_ctime( timestamp, string, size )
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* The string type contains UTF-32
+ */
+#if SIZEOF_WCHAR_T == 4
+
+/* UTF-8 string conversion functions
+ */
+#define string_size_from_utf8_string( utf8_string, utf8_string_size, string_size, error ) \
+	libuna_utf32_string_size_from_utf8( (libuna_utf8_character_t *) utf8_string, utf8_string_size, string_size, error )
+
+#define string_copy_from_utf8_string( string, string_size, utf8_string, utf8_string_size, error ) \
+	libuna_utf32_string_copy_from_utf8( (libuna_utf32_character_t *) string, string_size, (libuna_utf8_character_t *) utf8_string, utf8_string_size, error )
+
+#define utf8_string_size_from_string( string, string_size, utf8_string_size, error ) \
+	libuna_utf8_string_size_from_utf32( (libuna_utf32_character_t *) string, string_size, utf8_string_size, error )
+
+#define utf8_string_copy_from_string( utf8_string, utf8_string_size, string, string_size, error ) \
+	libuna_utf8_string_copy_from_utf32( (libuna_utf8_character_t *) utf8_string, utf8_string_size, (libuna_utf32_character_t *) string, string_size, error )
+
+/* The string type contains UTF-16
+ */
+#elif SIZEOF_WCHAR_T == 2
+
+/* UTF-8 string conversion functions
+ */
+#define string_size_from_utf8_string( utf8_string, utf8_string_size, string_size, error ) \
+	libuna_utf16_string_size_from_utf8( utf8_string, (libuna_utf8_character_t *) utf8_string_size, string_size, error )
+
+#define string_copy_from_utf8_string( string, string_size, utf8_string, utf8_string_size, error ) \
+	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) string, string_size, (libuna_utf8_character_t *) utf8_string, utf8_string_size, error )
+
+#define utf8_string_size_from_string( string, string_size, utf8_string_size, error ) \
+	libuna_utf8_string_size_from_utf16( (libuna_utf16_character_t *) string, string_size, utf8_string_size, error )
+
+#define utf8_string_copy_from_string( utf8_string, utf8_string_size, string, string_size, error ) \
+	libuna_utf8_string_copy_from_utf16( (libuna_utf8_character_t *) utf8_string, utf8_string_size, (libuna_utf16_character_t *) string, string_size, error )
+
+#else
+#error Unsupported size of wchar_t
+#endif
+
 #endif
 
 #if defined( __cplusplus )

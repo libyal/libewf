@@ -59,11 +59,20 @@
 #undef HAVE_PRINTF_JD
 #undef HAVE_PRINTF_ZD
 
+/* Windows does not have <sys/time.h>
+ */
+#undef TIME_WITH_SYS_TIME
+#undef HAVE_SYS_TIME_H
+
 /* Windows does not have <unistd.h> but uses <io.h> and <share.h> instead
  */
 #undef HAVE_UNISTD_H
 #define HAVE_IO_H	1
 #define HAVE_SHARE_H	1
+
+#if !defined( HAVE_FCNTL_H )
+#define HAVE_FCNTL_H	1
+#endif
 
 /* Windows does not have <sys/ioctl.h> and <sys/utsname.h>
  */
@@ -96,7 +105,6 @@
 /* If wide character support was enabled
  * make use of the wide character support functions
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if !defined( HAVE_WCHAR_H )
 #define HAVE_WCHAR_H            1
 #endif
@@ -107,37 +115,26 @@
 
 #define SIZEOF_WCHAR_T		2
 
-#define HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS	1
-#endif
-
 /* Make sure the function definitions are available
  * these should be normally defined in config.h
  * use the following defintions to control the function
  * definitions per source file in common
  */
 #define HAVE_DATE_TIME		1
-#undef HAVE_DIRECTORY_IO
 #define HAVE_ERROR_STRING	1
 #define HAVE_FILE_IO		1
 #define HAVE_FILE_STREAM_IO	1
 #define HAVE_NARROW_STRING	1
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
 #define HAVE_WIDE_STRING	1
-#else
-#undef HAVE_WIDE_STRING
-#endif
 
-/* Functions in common/date_time.h
+/* Functions in ewftools/date_time.h
  *  */
 #if defined( HAVE_DATE_TIME )
 #if !defined( HAVE_CTIME_R )
 #define HAVE_CTIME_R		1
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 #define HAVE_WCTIME_R		1
-#endif
 
 #if !defined( HAVE_GMTIME_R )
 #define HAVE_GMTIME_R		1
@@ -164,48 +161,28 @@
 #undef HAVE_TIME
 #endif
 
-/* Functions in common/directory_io.h
- */
-#if defined( HAVE_DIRECTORY_IO )
-#if !defined( HAVE_MKDIR )
-#define HAVE_MKDIR		1
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-#define HAVE_WMKDIR		1
-#endif
-
-#else
-#undef HAVE_MKDIR
-#undef HAVE_WMKDIR
-#endif
-
-/* Functions in common/error_string.h
+/* Functions in ewftools/error_string.h
  *  */
 #if defined( HAVE_ERROR_STRING )
 #if !defined( HAVE_STRERROR_R )
 #define HAVE_STRERROR_R		1
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 #define HAVE_WCSERROR_R		1
-#endif
 
 #else
 #undef HAVE_STRERROR_R
 #undef HAVE_WCSERROR_R
 #endif
 
-/* Functions in common/file_io.h
+/* Functions in ewftools/file_io.h
  *  */
 #if defined( HAVE_FILE_IO )
 #if !defined( HAVE_OPEN )
 #define HAVE_OPEN		1
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 #define HAVE_WOPEN		1
-#endif
 
 #if !defined( HAVE_CLOSE )
 #define HAVE_CLOSE		1
@@ -232,16 +209,14 @@
 #undef HAVE_WRITE
 #endif
 
-/* Functions in common/file_stream_io.h
+/* Functions in ewftools/file_stream_io.h
  *  */
 #if defined( HAVE_FILE_STREAM_IO )
 #if !defined( HAVE_FOPEN )
 #define HAVE_FOPEN		1
 #endif
 
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 #define HAVE_WFOPEN		1
-#endif
 
 #if !defined( HAVE_FCLOSE )
 #define HAVE_FCLOSE		1
@@ -307,7 +282,7 @@
 #endif
 
 /* Functions in common/wide_string.h
- *  */
+ */
 #if defined( HAVE_WIDE_STRING )
 #if !defined( HAVE_WCSLEN )
 #define HAVE_WCSLEN		1

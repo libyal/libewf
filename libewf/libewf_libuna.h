@@ -25,20 +25,9 @@
 
 #include <common.h>
 
-#if defined( HAVE_LIBUNA_H )
-
-/* If libtool DLL support is enabled set LIBUNA_DLL_IMPORT
- * before including libuna.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBUNA_DLL_IMPORT
-#endif
-
-#include <libuna.h>
-
 /* Define HAVE_LOCAL_LIBUNA for local use of libuna
  */
-#elif( HAVE_LOCAL_LIBUNA )
+#if( HAVE_LOCAL_LIBUNA )
 
 #include <libuna_byte_stream.h>
 #include <libuna_compare.h>
@@ -50,6 +39,17 @@
 #include <libuna_utf16_string.h>
 #include <libuna_utf32_stream.h>
 #include <libuna_utf32_string.h>
+
+#elif defined( HAVE_LIBUNA_H )
+
+/* If libtool DLL support is enabled set LIBUNA_DLL_IMPORT
+ * before including libuna.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT )
+#define LIBUNA_DLL_IMPORT
+#endif
+
+#include <libuna.h>
 
 #else
 #error Missing libuna.h

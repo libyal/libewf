@@ -5,7 +5,9 @@ EXTRA_DIST = \
 	ewfexport/ewfexport.vcproj \
 	ewfinfo/ewfinfo.vcproj \
 	ewfverify/ewfverify.vcproj \
+	liberror/liberror.vcproj \
 	libewf_dll/libewf_dll.vcproj \
+	libuna/libuna.vcproj \
 	libewf.sln
 
 distclean: clean

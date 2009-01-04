@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="ewfinfo"
 	ProjectGUID="{A7545354-5D50-49F6-A3D0-1F97F6228955}"
 	RootNamespace="ewfinfo"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -15,85 +16,6 @@
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_IMPORT"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
-				CompileAs="1"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib libuca.lib libewf.lib"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
@@ -119,12 +41,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\zlib\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
 				CompileAs="1"
 			/>
@@ -139,13 +61,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="advapi32.lib libuca.lib libewf.lib"
+				AdditionalDependencies="advapi32.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -167,9 +91,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -183,19 +104,27 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\common\character_string.c"
+				RelativePath="..\..\ewftools\byte_size_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\date_time.c"
+				RelativePath="..\..\ewftools\character_string.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\error_string.c"
+				RelativePath="..\..\ewftools\date_time.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfbyte_size_string.c"
+				RelativePath="..\..\ewftools\digest_context.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\digest_hash.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\error_string.c"
 				>
 			</File>
 			<File
@@ -203,23 +132,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfdigest_context.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfdigest_hash.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfgetopt.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfglob.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfguid.c"
 				>
 			</File>
 			<File
@@ -227,11 +140,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfoutput.c"
+				RelativePath="..\..\ewftools\ewfinput.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfprocess_status.c"
+				RelativePath="..\..\ewftools\ewfoutput.c"
 				>
 			</File>
 			<File
@@ -243,19 +156,31 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\file_io.c"
+				RelativePath="..\..\ewftools\file_io.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\notify.c"
+				RelativePath="..\..\ewftools\glob.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\string_conversion.c"
+				RelativePath="..\..\ewftools\guid.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\system_string.c"
+				RelativePath="..\..\ewftools\notify.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\process_status.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\string_conversion.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\system_string.c"
 				>
 			</File>
 		</Filter>
@@ -265,31 +190,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\common\character_string.h"
+				RelativePath="..\..\ewftools\byte_size_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\common.h"
+				RelativePath="..\..\ewftools\character_string.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\config.h"
+				RelativePath="..\..\ewftools\date_time.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\config_windows.h"
+				RelativePath="..\..\ewftools\digest_context.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\date_time.h"
+				RelativePath="..\..\ewftools\digest_hash.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\error_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfbyte_size_string.h"
+				RelativePath="..\..\ewftools\error_string.h"
 				>
 			</File>
 			<File
@@ -297,39 +218,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfdigest_context.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfdigest_hash.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfgetopt.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfglob.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfguid.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfmd5.h"
+				RelativePath="..\..\ewftools\ewfinput.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfprocess_status.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfsha1.h"
 				>
 			</File>
 			<File
@@ -341,31 +238,43 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\file_io.h"
+				RelativePath="..\..\ewftools\file_io.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\libewf.h"
+				RelativePath="..\..\ewftools\file_stream_io.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\memory.h"
+				RelativePath="..\..\ewftools\glob.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\notify.h"
+				RelativePath="..\..\ewftools\guid.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\string_conversion.h"
+				RelativePath="..\..\ewftools\md5.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\system_string.h"
+				RelativePath="..\..\ewftools\notify.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\types.h"
+				RelativePath="..\..\ewftools\process_status.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\sha1.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\string_conversion.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\system_string.h"
 				>
 			</File>
 		</Filter>

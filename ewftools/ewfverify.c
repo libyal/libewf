@@ -147,13 +147,13 @@ int main( int argc, char * const argv[] )
 	uint8_t swap_byte_pairs                    = 0;
 	uint8_t wipe_chunk_on_error                = 0;
 	uint8_t verbose                            = 0;
-	int8_t stored_md5_hash_result              = 0;
-	int8_t stored_sha1_hash_result             = 0;
 	int amount_of_filenames                    = 0;
 	int match_md5_hash                         = 0;
 	int match_sha1_hash                        = 0;
 	int result                                 = 0;
 	int status                                 = 0;
+	int stored_md5_hash_result                 = 0;
+	int stored_sha1_hash_result                = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -501,7 +501,7 @@ int main( int argc, char * const argv[] )
 		                EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
 		                swap_byte_pairs,
 		                wipe_chunk_on_error,
-		                process_buffer_size,
+		                (size_t) process_buffer_size,
 		                callback );
 
 		if( verify_count <= -1 )

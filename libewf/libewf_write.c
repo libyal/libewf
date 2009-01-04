@@ -250,7 +250,7 @@ int libewf_write_calculate_chunks_per_segment(
 	{
 		calculated_chunks_per_segment = UINT32_MAX;
 	}
-	*chunks_per_segment = calculated_chunks_per_segment;
+	*chunks_per_segment = (uint32_t) calculated_chunks_per_segment;
 
 	return( 1 );
 }

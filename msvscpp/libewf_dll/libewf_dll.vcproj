@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="9,00"
 	Name="libewf_dll"
 	ProjectGUID="{B5225323-AC67-411D-8FBA-199E9467FAB5}"
 	RootNamespace="libewf"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -14,88 +15,6 @@
 	<ToolFiles>
 	</ToolFiles>
 	<Configurations>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common;..\..\libewf"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_EXPORT"
-				SmallerTypeCheck="true"
-				RuntimeLibrary="3"
-				WarningLevel="4"
-				WarnAsError="false"
-				Detect64BitPortabilityProblems="true"
-				CompileAs="1"
-				ForcedIncludeFiles=""
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				UseLibraryDependencyInputs="true"
-				AdditionalDependencies="libuca.lib zdll.lib"
-				OutputFile="$(OutDir)\libewf.dll"
-				Version=""
-				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;..\zlib\lib"
-				IgnoreAllDefaultLibraries="false"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				ImportLibrary="$(OutDir)\libewf.lib"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
@@ -119,9 +38,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\zlib\include;..\..\include;..\..\common;..\..\libewf"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_CONFIG_WINDOWS_H;HAVE_WINDOWS_INLINE;HAVE_LOCAL_LIBUCA;LIBEWF_DLL_EXPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libewf;..\zlib\include"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
+				WarningLevel="4"
 				CompileAs="1"
 			/>
 			<Tool
@@ -135,9 +55,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libuca.lib zdll.lib"
+				AdditionalDependencies="zdll.lib"
 				OutputFile="$(OutDir)\libewf.dll"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;;..\zlib\lib"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(OutDir)\libewf.lib"
 			/>
 			<Tool
@@ -159,9 +81,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -175,22 +94,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\common\character_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\date_time.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\error_string.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\file_io.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf.c"
 				>
 			</File>
@@ -203,11 +106,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_date_time.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_debug.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_file.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io_pool.c"
 				>
 			</File>
 			<File
@@ -239,7 +158,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_list_type.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_media_values.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_notify.c"
 				>
 			</File>
 			<File
@@ -290,44 +217,12 @@
 				RelativePath="..\..\libewf\libewf_write.c"
 				>
 			</File>
-			<File
-				RelativePath="..\..\common\notify.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\string_conversion.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\system_string.c"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\common\character_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\common.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\date_time.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\endian.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\error_string.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\libewf\ewf_crc.h"
 				>
@@ -385,10 +280,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\common\file_io.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_chunk_cache.h"
 				>
 			</File>
@@ -401,11 +292,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_config_windows.h"
+				RelativePath="..\..\libewf\libewf_date_time.h"
 				>
 			</File>
 			<File
@@ -413,11 +300,31 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_error_sector.h"
+				RelativePath="..\..\libewf\libewf_definitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_error.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_extern.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io_pool.h"
 				>
 			</File>
 			<File
@@ -445,15 +352,23 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_includes.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_interface.h"
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_list_type.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_media_values.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_notify.h"
 				>
 			</File>
 			<File
@@ -497,31 +412,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_system_string.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_values_table.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_write.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\notify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\string_conversion.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\system_string.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\common\types.h"
 				>
 			</File>
 		</Filter>

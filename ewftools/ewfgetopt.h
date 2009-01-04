@@ -24,7 +24,9 @@
 #define _EWFGETOPT_H
 
 #include <common.h>
-#include <system_string.h>
+#include <types.h>
+
+#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {

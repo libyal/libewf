@@ -23,7 +23,6 @@
 
 #include <common.h>
 #include <memory.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <stdio.h>
@@ -66,6 +65,7 @@
 #include "md5.h"
 #include "process_status.h"
 #include "sha1.h"
+#include "system_string.h"
 
 #define EWFEXPORT_INPUT_BUFFER_SIZE	64
 

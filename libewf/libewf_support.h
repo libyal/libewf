@@ -43,7 +43,7 @@ LIBEWF_EXTERN const char *libewf_get_version(
 LIBEWF_EXTERN int libewf_signal_abort(
                    libewf_handle_t *handle );
 
-LIBEWF_EXTERN void liberror_error_free(
+LIBEWF_EXTERN void libewf_error_free(
                     libewf_error_t **error );
 
 LIBEWF_EXTERN void libewf_error_fprint(
