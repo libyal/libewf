@@ -179,7 +179,7 @@ int libewf_filename_set(
 int libewf_filename_set_extension(
      libewf_filename_t *extension,
      uint16_t segment_number,
-     int16_t maximum_amount_of_segments,
+     uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format )
@@ -202,14 +202,7 @@ int libewf_filename_set_extension(
 
 		return( -1 );
 	}
-	if( maximum_amount_of_segments <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid maximum amount of segment files.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number > (uint16_t) maximum_amount_of_segments )
+	if( segment_number > maximum_amount_of_segments )
 	{
 		LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " exceeds the maximum amount of segment files: %" PRIu16 ".\n",
 		 function, segment_number, maximum_amount_of_segments );
@@ -301,7 +294,7 @@ int libewf_filename_create(
      libewf_filename_t *basename,
      size_t length_basename,
      uint16_t segment_number,
-     int16_t maximum_amount_of_segments,
+     uint16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
      uint8_t ewf_format )

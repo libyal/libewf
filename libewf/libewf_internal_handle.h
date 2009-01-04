@@ -188,7 +188,7 @@ struct libewf_internal_handle_write
 
 	/* The maximum amount of segments
 	 */
-	int16_t maximum_amount_of_segments;
+	uint16_t maximum_amount_of_segments;
 
 	/* The amount of bytes written to a section containing chunks
 	 */
@@ -270,6 +270,12 @@ int libewf_internal_handle_determine_format(
      libewf_header_sections_t *header_sections,
      uint8_t ewf_format,
      uint8_t *format );
+
+int libewf_internal_handle_initialize_media_values(
+     libewf_internal_handle_t *internal_handle,
+     uint32_t sectors_per_chunk,
+     uint32_t bytes_per_sector,
+     size64_t media_size );
 
 int libewf_internal_handle_initialize_format(
      libewf_internal_handle_t *internal_handle );

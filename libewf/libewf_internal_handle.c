@@ -685,6 +685,124 @@ int libewf_internal_handle_determine_format(
 	return( 1 );
 }
 
+/* Inializes the media values
+ * Returns 1 if the values were successfully initialized, -1 on errror
+ */
+int libewf_internal_handle_initialize_media_values(
+     libewf_internal_handle_t *internal_handle, 
+     uint32_t sectors_per_chunk, 
+     uint32_t bytes_per_sector, 
+     size64_t media_size )
+{
+	static char *function            = "libewf_internal_handle_initialize_format";
+	size32_t chunk_size              = 0;
+	size64_t maximum_input_file_size = 0;
+	int64_t amount_of_chunks         = 0;
+	int64_t amount_of_sectors        = 0;
+
+	if( internal_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( sectors_per_chunk == 0 )
+	 || ( sectors_per_chunk > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( bytes_per_sector == 0 )
+	 || ( bytes_per_sector > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_size > (size64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Determine the chunk size
+	 */
+	chunk_size = sectors_per_chunk * bytes_per_sector;
+
+	if( ( chunk_size == 0 )
+	 || ( chunk_size > (size32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if the input file size does not exceed the maximum possible input file size
+	 * for the chunk size
+	 */
+	maximum_input_file_size = (size64_t) chunk_size * (size64_t) UINT32_MAX;
+
+	if( media_size > maximum_input_file_size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
+		 function, maximum_input_file_size, chunk_size );
+
+		return( -1 );
+	}
+	internal_handle->media_values->sectors_per_chunk = sectors_per_chunk;
+	internal_handle->media_values->bytes_per_sector  = bytes_per_sector;
+	internal_handle->media_values->chunk_size        = chunk_size;
+	internal_handle->media_values->media_size        = media_size;
+
+	/* If a media size was provided
+	 */
+	if( media_size > 0 )
+	{
+		/* Determine the amount of chunks to write
+		 */
+		amount_of_chunks = (int64_t) media_size / (int64_t) chunk_size;
+
+		if( ( media_size % chunk_size ) != 0 )
+		{
+			amount_of_chunks += 1;
+		}
+		if( amount_of_chunks > (int64_t) UINT32_MAX )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->media_values->amount_of_chunks = (uint32_t) amount_of_chunks;
+
+		/* Determine the amount of sectors to write
+		 */
+		amount_of_sectors = (int64_t) media_size / (int64_t) bytes_per_sector;
+
+		if( amount_of_chunks > (int64_t) UINT32_MAX )
+		{
+			LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->media_values->amount_of_sectors = (uint32_t) amount_of_sectors;
+	}
+	return( 1 );
+}
+
 /* Inializes internal values based on the EWF file format
  * Returns 1 if the values were successfully initialized, -1 on errror
  */
@@ -880,11 +998,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 {
 	static char *function               = "libewf_internal_handle_write_initialize";
 	int64_t required_amount_of_segments = 0;
-	int64_t amount_of_chunks            = 0;
-	int64_t amount_of_sectors           = 0;
-#ifdef REFACTOR
-	uint64_t maximum_input_file_size    = 0;
-#endif
 
 	if( internal_handle == NULL )
 	{
@@ -893,6 +1006,7 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
+#ifdef REFACTOR
 	if( internal_handle->chunk_cache == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
@@ -900,16 +1014,10 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
+#endif
 	if( internal_handle->media_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
 		 function );
 
 		return( -1 );
@@ -928,64 +1036,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
-#ifdef REFACTOR
-	/* Determine the chunk size
-	 */
-	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
-	                                          * internal_handle->media_values->bytes_per_sector;
-
-	if( internal_handle->media_values->chunk_size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: the media chunk size cannot be zero - using default media values.\n",
-		 function );
-
-		internal_handle->media_values->sectors_per_chunk = 64;
-		internal_handle->media_values->bytes_per_sector  = 512;
-		internal_handle->media_values->chunk_size        = EWF_MINIMUM_CHUNK_SIZE;
-	}
-	if( internal_handle->media_values->chunk_size > (uint32_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media chunk size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values->bytes_per_sector > (uint32_t) INT32_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->compression_level != EWF_COMPRESSION_NONE )
-	 && ( internal_handle->compression_level != EWF_COMPRESSION_FAST )
-	 && ( internal_handle->compression_level != EWF_COMPRESSION_BEST ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported compression level - using default.\n",
-		 function );
-
-		internal_handle->compression_level    = EWF_COMPRESSION_NONE;
-		internal_handle->compress_empty_block = 1;
-	}
-	/* Check if the input file size does not exceed the maximum input file size
-	 */
-	maximum_input_file_size = (uint64_t) internal_handle->media_values->chunk_size
-	                        * (uint64_t) UINT32_MAX;
-
-	if( internal_handle->media_values->media_size > maximum_input_file_size )
-	{
-		LIBEWF_WARNING_PRINT( "%s: media size cannot be larger than size: %" PRIu64 " with a chunk size of: %" PRIu32 ".\n",
-		 function, maximum_input_file_size, internal_handle->media_values->chunk_size );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values->media_size > (uint64_t) INT64_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
 	/* Determine the EWF file format
 	 */
 	if( internal_handle->format == LIBEWF_FORMAT_LVF )
@@ -995,82 +1045,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
-	if( ( internal_handle->format != LIBEWF_FORMAT_ENCASE1 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE2 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE3 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE4 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE5 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_ENCASE6 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_LINEN5 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_LINEN6 )
-	 && ( internal_handle->format != LIBEWF_FORMAT_SMART )
-	 && ( internal_handle->format != LIBEWF_FORMAT_FTK )
-	 && ( internal_handle->format != LIBEWF_FORMAT_LVF )
-	 && ( internal_handle->format != LIBEWF_FORMAT_EWF )
-	 && ( internal_handle->format != LIBEWF_FORMAT_EWFX ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported format - using default.\n",
-		 function );
-
-		internal_handle->format = LIBEWF_FORMAT_ENCASE5;
-	}
-	if( ( internal_handle->format == LIBEWF_FORMAT_EWF )
-	 || ( internal_handle->format == LIBEWF_FORMAT_SMART ) )
-	{
-		internal_handle->ewf_format = EWF_FORMAT_S01;
-	}
-	else if( internal_handle->format == LIBEWF_FORMAT_LVF )
-	{
-		internal_handle->ewf_format = EWF_FORMAT_L01;
-	}
-	else
-	{
-		internal_handle->ewf_format = EWF_FORMAT_E01;
-	}
-	if( internal_handle->format == LIBEWF_FORMAT_ENCASE6 )
-	{
-		internal_handle->write->maximum_segment_file_size        = INT64_MAX;
-		internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE_ENCASE6;
-	}
-	else if( internal_handle->format == LIBEWF_FORMAT_EWFX )
-	{
-		internal_handle->write->unrestrict_offset_amount         = 1;
-		internal_handle->write->maximum_segment_file_size        = INT32_MAX;
-		internal_handle->write->maximum_section_amount_of_chunks = INT32_MAX;
-	}
-	else
-	{
-		internal_handle->write->maximum_segment_file_size        = INT32_MAX;
-		internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
-	}
-	/* Determine if the segment file size is in allowed ranges
-	 */
-	if( internal_handle->write->segment_file_size == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: the segment file size cannot be zero - using default value.\n",
-		 function );
-
-		internal_handle->write->segment_file_size = LIBEWF_DEFAULT_SEGMENT_FILE_SIZE;
-	}
-	if( internal_handle->write->segment_file_size > internal_handle->write->maximum_segment_file_size )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Determine the maximum amount of segments allowed to write
-	 */
-	internal_handle->write->maximum_amount_of_segments = libewf_internal_handle_get_write_maximum_amount_of_segments( internal_handle );
-
-	if( internal_handle->write->maximum_amount_of_segments == -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine the maximum amount of allowed segment files.\n",
-		 function );
-
-		return( -1 );
-	}
-#endif
 	/* If no input write size was provided check if EWF file format allows for streaming
 	 */
 	if( internal_handle->media_values->media_size == 0 )
@@ -1107,53 +1081,8 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 			return( -1 );
 		}
-		/* Determine the amount of chunks to write
-		 */
-		amount_of_chunks = (int64_t) internal_handle->media_values->media_size
-		                 / (int64_t) internal_handle->media_values->chunk_size;
-
-		if( ( internal_handle->media_values->media_size % internal_handle->media_values->chunk_size ) != 0 )
-		{
-			amount_of_chunks += 1;
-		}
-		if( amount_of_chunks > (int64_t) UINT32_MAX )
-		{
-			LIBEWF_WARNING_PRINT( "%s: the settings exceed the maximum amount of allowed chunks.\n",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->media_values->amount_of_chunks = (uint32_t) amount_of_chunks;
-
-		/* Determine the amount of sectors to write
-		 */
-		amount_of_sectors = (int64_t) internal_handle->media_values->media_size
-		                  / (int64_t) internal_handle->media_values->bytes_per_sector;
-
-		if( amount_of_chunks > (int64_t) UINT32_MAX )
-		{
-			LIBEWF_WARNING_PRINT( "%s: the settings exceed the maximum amount of allowed sectors.\n",
-			 function );
-
-			return( -1 );
-		}
-		internal_handle->media_values->amount_of_sectors = (uint32_t) amount_of_sectors;
 	}
-        /* Allocate the necessary amount of chunk offsets
-	 * this reduces the amount of reallocations
-	 */
-	if( internal_handle->offset_table->amount < amount_of_chunks )
-	{
-		if( libewf_offset_table_realloc(
-		     internal_handle->offset_table,
-		     (uint32_t) amount_of_chunks ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
+#ifdef REFACTOR
 	/* Make sure the chuck cache is large enough
 	 */
 	if( ( internal_handle->media_values->chunk_size + sizeof( ewf_crc_t ) ) > internal_handle->chunk_cache->allocated_size )
@@ -1163,45 +1092,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 		     ( internal_handle->media_values->chunk_size + sizeof( ewf_crc_t ) ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-#ifdef REFACTOR
-	/* Create the headers if required
-	 */
-	if( internal_handle->header_sections == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing header sections.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->header_sections->header == NULL )
-	 && ( internal_handle->header_sections->header2 == NULL )
-	 && ( internal_handle->header_sections->xheader == NULL ) )
-	{
-		if( internal_handle->header_values == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: empty header values - using default.\n",
-			 function );
-
-			if( libewf_internal_handle_create_header_values( internal_handle ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
-				 function );
-
-				return( -1 );
-			}
-		}
-		if( libewf_header_sections_create(
-		     internal_handle->header_sections,
-		     internal_handle->header_values,
-		     internal_handle->compression_level,
-		     internal_handle->format ) == -1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create header(s).\n",
 			 function );
 
 			return( -1 );

@@ -144,8 +144,6 @@ Next release:
 TODO
 * create libewf_create_handle and libewf_destroy_handle functions?
 * refactor write initialize into seperate functions
-* write function for format specific write values
-* write function for chunk size specific write values
 * rename/move libewf_internal_handle_determine_format and 
   libewf_internal_handle_get_write_maximum_amount_of_segments
 
@@ -165,6 +163,8 @@ CLOSED
 
 Version: 20080115
 * worked on refactoring write initialize
+* added initialize function for format specific write values
+* added initialize function for media values specific write values
 
 Version: 20080114
 * removed initialize write in libewf_raw_write_prepare_buffer

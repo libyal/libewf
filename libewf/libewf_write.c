@@ -819,7 +819,9 @@ ssize_t libewf_write_process_chunk_data(
 		 */
 		if( chunk_data == internal_handle->chunk_cache->data )
 		{
-			if( libewf_endian_revert_32bit( *chunk_crc, (uint8_t *) &( chunk_data[ chunk_data_size ] ) ) != 1 )
+			if( libewf_endian_revert_32bit(
+			     *chunk_crc,
+			     (uint8_t *) &( chunk_data[ chunk_data_size ] ) ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 				 function );
@@ -912,6 +914,21 @@ ssize_t libewf_raw_write_chunk_new(
 		 function, chunk );
 
 		return( -1 );
+	}
+	/* Allocate the necessary amount of chunk offsets
+	 * this reduces the amount of reallocations
+	 */
+	if( internal_handle->offset_table->amount < internal_handle->media_values->amount_of_chunks )
+        {
+		if( libewf_offset_table_realloc(
+		     internal_handle->offset_table,
+		     internal_handle->media_values->amount_of_chunks ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	if( chunk_buffer == NULL )
 	{
@@ -2221,7 +2238,8 @@ ssize_t libewf_write_buffer(
 	}
 	if( internal_handle->write->values_initialized == 0 )
 	{
-		if( libewf_internal_handle_write_initialize( internal_handle ) != 1 )
+		if( libewf_internal_handle_write_initialize(
+		     internal_handle ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize write values.\n",
 			 function );
@@ -2275,7 +2293,9 @@ ssize_t libewf_write_buffer(
 		LIBEWF_VERBOSE_PRINT( "%s: reallocating chunk data size: %zu.\n",
 		 function, chunk_data_size );
 
-		if( libewf_chunk_cache_realloc( internal_handle->chunk_cache, chunk_data_size ) != 1 )
+		if( libewf_chunk_cache_realloc(
+		     internal_handle->chunk_cache,
+		     chunk_data_size ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate chunk cache.\n",
 			 function );

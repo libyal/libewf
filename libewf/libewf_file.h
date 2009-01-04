@@ -62,31 +62,79 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_read( void );
 LIBEWF_EXTERN uint8_t libewf_get_flags_read_write( void );
 LIBEWF_EXTERN uint8_t libewf_get_flags_write( void );
 
-LIBEWF_EXTERN int libewf_check_file_signature( const libewf_filename_t *filename );
+LIBEWF_EXTERN int libewf_check_file_signature(
+                   const libewf_filename_t *filename );
 
-LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file_amount, uint8_t flags );
+LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
+                              libewf_filename_t * const filenames[],
+                              uint16_t file_amount,
+                              uint8_t flags );
 
-LIBEWF_EXTERN int libewf_close( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_close(
+                   LIBEWF_HANDLE *handle );
 
-LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset );
+LIBEWF_EXTERN off64_t libewf_seek_offset(
+                       LIBEWF_HANDLE *handle, off64_t offset );
 
-LIBEWF_EXTERN int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk );
-LIBEWF_EXTERN int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector );
-LIBEWF_EXTERN int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors );
-LIBEWF_EXTERN int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size );
-LIBEWF_EXTERN int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity );
-LIBEWF_EXTERN int libewf_get_compression_values( LIBEWF_HANDLE *handle, int8_t *compression_level, uint8_t *compress_empty_block );
-LIBEWF_EXTERN int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size );
+LIBEWF_EXTERN int libewf_get_sectors_per_chunk(
+                   LIBEWF_HANDLE *handle,
+                   uint32_t *sectors_per_chunk );
 
-LIBEWF_EXTERN int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type );
-LIBEWF_EXTERN int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags );
-LIBEWF_EXTERN int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type );
-LIBEWF_EXTERN int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format );
+LIBEWF_EXTERN int libewf_get_bytes_per_sector(
+                   LIBEWF_HANDLE *handle,
+                   uint32_t *bytes_per_sector );
 
-LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
-LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
+LIBEWF_EXTERN int libewf_get_amount_of_sectors(
+                   LIBEWF_HANDLE *handle,
+                   uint32_t *amount_of_sectors );
 
-LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, libewf_filename_t *filename, size_t length );
+LIBEWF_EXTERN int libewf_get_chunk_size(
+                   LIBEWF_HANDLE *handle,
+                   size32_t *chunk_size );
+
+LIBEWF_EXTERN int libewf_get_error_granularity(
+                   LIBEWF_HANDLE *handle,
+                   uint32_t *error_granularity );
+
+LIBEWF_EXTERN int libewf_get_compression_values(
+                   LIBEWF_HANDLE *handle,
+                   int8_t *compression_level,
+                   uint8_t *compress_empty_block );
+
+LIBEWF_EXTERN int libewf_get_media_size(
+                   LIBEWF_HANDLE *handle,
+                   size64_t *media_size );
+
+LIBEWF_EXTERN int libewf_get_media_type(
+                   LIBEWF_HANDLE *handle,
+                   int8_t *media_type );
+
+LIBEWF_EXTERN int libewf_get_media_flags(
+                   LIBEWF_HANDLE *handle,
+                   int8_t *media_flags );
+
+LIBEWF_EXTERN int libewf_get_volume_type(
+                   LIBEWF_HANDLE *handle,
+                   int8_t *volume_type );
+
+LIBEWF_EXTERN int libewf_get_format(
+                   LIBEWF_HANDLE *handle,
+                   int8_t *format );
+
+LIBEWF_EXTERN int libewf_get_guid(
+                   LIBEWF_HANDLE *handle,
+                   uint8_t *guid,
+                   size_t size );
+
+LIBEWF_EXTERN int libewf_get_md5_hash(
+                   LIBEWF_HANDLE *handle,
+                   uint8_t *md5_hash,
+                   size_t size );
+
+LIBEWF_EXTERN int libewf_get_delta_segment_filename(
+                   LIBEWF_HANDLE *handle,
+                   libewf_filename_t *filename,
+                   size_t length );
 
 LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors );
 LIBEWF_EXTERN int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors  );
