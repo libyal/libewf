@@ -157,6 +157,7 @@ CLOSED
 
 Version: 20080323
 * Moved functions in libewf_file to libewf_interface and libewf_support
+* Renamed libewf_internal_handle to libewf_handle
 
 Version: 20080322
 * implemented endian conversion macros

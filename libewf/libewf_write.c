@@ -2083,7 +2083,7 @@ ssize_t libewf_write_chunk_data_existing(
  * Returns the resulting chunk size, or -1 on error
  */
 ssize_t libewf_raw_write_prepare_buffer(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
          void *compressed_buffer,
@@ -2160,7 +2160,7 @@ ssize_t libewf_raw_write_prepare_buffer(
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_raw_write_buffer(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t size,
          size_t data_size,
@@ -2294,7 +2294,7 @@ ssize_t libewf_raw_write_buffer(
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_buffer(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t size )
 {
@@ -2464,7 +2464,7 @@ ssize_t libewf_write_buffer(
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
 ssize_t libewf_write_random(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t size,
          off64_t offset )
@@ -2501,7 +2501,7 @@ ssize_t libewf_write_random(
  * Returns the amount of bytes written, or -1 on error
  */
 ssize_t libewf_write_finalize(
-         LIBEWF_HANDLE *handle )
+         libewf_handle_t *handle )
 {
 	libewf_internal_handle_t *internal_handle         = NULL;
 	libewf_section_list_entry_t *list_entry_iterator  = NULL;

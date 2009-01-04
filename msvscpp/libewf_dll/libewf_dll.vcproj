@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_hash_sections.c"
 				>
 			</File>
@@ -227,7 +231,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_internal_handle.c"
+				RelativePath="..\..\libewf\libewf_interface.c"
 				>
 			</File>
 			<File
@@ -268,6 +272,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_string.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_support.c"
 				>
 			</File>
 			<File
@@ -421,6 +429,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_handle.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_hash_sections.h"
 				>
 			</File>
@@ -441,7 +453,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_internal_handle.h"
+				RelativePath="..\..\libewf\libewf_interface.h"
 				>
 			</File>
 			<File
@@ -482,6 +494,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_string.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_support.h"
 				>
 			</File>
 			<File

@@ -583,7 +583,7 @@ ssize_t libewf_read_chunk_data(
 				amount_of_sectors = (uint32_t) ( (off64_t) internal_handle->media_values->amount_of_sectors - sector );
 			}
 			if( libewf_add_crc_error(
-			     (LIBEWF_HANDLE *) internal_handle,
+			     (libewf_handle_t *) internal_handle,
 			     sector,
 			     amount_of_sectors ) != 1 )
 			{
@@ -664,7 +664,7 @@ ssize_t libewf_read_chunk_data(
  * Returns the resulting chunk size, or -1 on error
  */
 ssize_t libewf_raw_read_prepare_buffer(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t buffer_size,
          void *uncompressed_buffer,
@@ -735,7 +735,7 @@ ssize_t libewf_raw_read_prepare_buffer(
  * Returns the amount of bytes read, or -1 on error
  */
 ssize_t libewf_raw_read_buffer(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t size,
          int8_t *is_compressed,
@@ -793,7 +793,7 @@ ssize_t libewf_raw_read_buffer(
  * Returns the amount of bytes read, or -1 on error
  */
 ssize_t libewf_read_buffer(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t size )
 {
@@ -924,7 +924,7 @@ ssize_t libewf_read_buffer(
  * Returns the amount of bytes read, or -1 on error
  */
 ssize_t libewf_read_random(
-         LIBEWF_HANDLE *handle,
+         libewf_handle_t *handle,
          void *buffer,
          size_t size,
          off64_t offset )

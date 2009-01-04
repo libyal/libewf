@@ -26,12 +26,12 @@ libewf_la_SOURCES = \
 	libewf_debug.c libewf_debug.h \
 	libewf_file.c libewf_file.h \
 	libewf_filename.c libewf_filename.h \
+	libewf_handle.c libewf_handle.h \
 	libewf_hash_sections.c libewf_hash_sections.h \
 	libewf_hash_values.c libewf_hash_values.h \
 	libewf_header_sections.c libewf_header_sections.h \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_interface.c libewf_interface.h \
-	libewf_internal_handle.c libewf_internal_handle.h \
 	libewf_media_values.c libewf_media_values.h \
 	libewf_offset_table.c libewf_offset_table.h \
 	libewf_read.c libewf_read.h \

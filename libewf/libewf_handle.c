@@ -39,8 +39,8 @@
 
 #include <libewf/definitions.h>
 
+#include "libewf_handle.h"
 #include "libewf_header_values.h"
-#include "libewf_internal_handle.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"

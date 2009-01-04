@@ -46,7 +46,7 @@
 #include <libewf/extern.h>
 #include <libewf/handle.h>
 
-#include "libewf_internal_handle.h"
+#include "libewf_handle.h"
 
 #include "ewf_char.h"
 #include "ewf_crc.h"
@@ -82,7 +82,7 @@ ssize_t libewf_read_chunk_data(
          size_t size );
 
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t buffer_size,
                        void *uncompressed_buffer,
@@ -92,7 +92,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
                        int8_t read_crc );
 
 LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
                        int8_t *is_compressed,
@@ -100,12 +100,12 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
                        int8_t *read_crc );
 
 LIBEWF_EXTERN ssize_t libewf_read_buffer(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t size );
 
 LIBEWF_EXTERN ssize_t libewf_read_random(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
                        off64_t offset );

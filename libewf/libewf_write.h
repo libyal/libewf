@@ -47,7 +47,7 @@
 #include <libewf/handle.h>
 
 #include "libewf_chunk_cache.h"
-#include "libewf_internal_handle.h"
+#include "libewf_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_segment_file_handle.h"
 
@@ -155,7 +155,7 @@ ssize_t libewf_write_chunk_data_existing(
          size_t chunk_data_size );
 
 LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t buffer_size,
                        void *compressed_buffer,
@@ -165,7 +165,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        int8_t *write_crc );
 
 LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
                        size_t data_size,
@@ -174,18 +174,18 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
                        int8_t write_crc );
 
 LIBEWF_EXTERN ssize_t libewf_write_buffer(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t size );
 
 LIBEWF_EXTERN ssize_t libewf_write_random(
-                       LIBEWF_HANDLE *handle,
+                       libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
                        off64_t offset );
 
 LIBEWF_EXTERN ssize_t libewf_write_finalize(
-                       LIBEWF_HANDLE *handle );
+                       libewf_handle_t *handle );
 
 #if defined( __cplusplus )
 }
