@@ -107,12 +107,12 @@ int main( int argc, char * const argv[] )
 	uint32_t bytes_per_sector    = 0;
 	uint32_t amount_of_sectors   = 0;
 	uint32_t error_granularity   = 0;
-	int8_t format                = 0;
 	int8_t compression_level     = 0;
 	int8_t media_type            = 0;
 	int8_t media_flags           = 0;
 	int8_t volume_type           = 0;
 	uint8_t compress_empty_block =  0;
+	uint8_t format               = 0;
 	uint8_t verbose              = 0;
 	uint8_t date_format          = LIBEWF_DATE_FORMAT_CTIME;
 	char info_option             = 'a';
@@ -215,7 +215,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	libewf_set_notify_values( stderr, verbose );
+	libewf_set_notify_values(
+	 stderr,
+	 verbose );
 
 #if !defined( HAVE_GLOB_H )
 	glob = ewfglob_alloc();
@@ -226,21 +228,32 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	glob_count = ewfglob_resolve( glob, &argv[ optind ], ( argc - optind ) );
+	glob_count = ewfglob_resolve(
+	              glob,
+	              &argv[ optind ],
+	              ( argc - optind ) );
 
 	if( glob_count <= 0 )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free( glob );
+		ewfglob_free(
+		 glob );
 
 		return( EXIT_FAILURE );
 	}
-	handle = libewf_open( glob->results, glob->amount, LIBEWF_OPEN_READ );
+	handle = libewf_open(
+	          glob->results,
+	          glob->amount,
+	          LIBEWF_OPEN_READ );
 
-	ewfglob_free( glob );
+	ewfglob_free(
+	 glob );
 #else
-	handle = libewf_open( &argv[ optind ], ( argc - optind ), LIBEWF_OPEN_READ );
+	handle = libewf_open(
+	          &argv[ optind ],
+	          ( argc - optind ),
+	          LIBEWF_OPEN_READ );
 #endif
 
 	if( handle == NULL )
@@ -248,14 +261,16 @@ int main( int argc, char * const argv[] )
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 		if( errno != 0 )
 		{
-			error_string = ewfstring_strerror( errno );
+			error_string = ewfstring_strerror(
+			                errno );
 		}
 		if( error_string != NULL )
 		{
 			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
 			 error_string );
 
-			libewf_common_free( error_string );
+			libewf_common_free(
+			 error_string );
 		}
 		else
 		{
@@ -267,11 +282,15 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_parse_header_values( handle, date_format ) != 1 )
+	if( libewf_parse_header_values(
+	     handle,
+	     date_format ) != 1 )
 	{
 		fprintf( stderr, "Unable to parse header values.\n" );
 	}
-	if( libewf_get_format( handle, &format ) != 1 )
+	if( libewf_get_format(
+	     handle,
+	     &format ) != 1 )
 	{
 		fprintf( stderr, "Unable to determine format.\n" );
 	}

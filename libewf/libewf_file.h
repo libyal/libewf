@@ -134,7 +134,7 @@ LIBEWF_EXTERN int libewf_get_volume_type(
 
 LIBEWF_EXTERN int libewf_get_format(
                    LIBEWF_HANDLE *handle,
-                   int8_t *format );
+                   uint8_t *format );
 
 LIBEWF_EXTERN int libewf_get_guid(
                    LIBEWF_HANDLE *handle,

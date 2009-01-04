@@ -1053,7 +1053,7 @@ int libewf_get_volume_type(
  */
 int libewf_get_format(
      LIBEWF_HANDLE *handle,
-     int8_t *format )
+     uint8_t *format )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_volume_type";
