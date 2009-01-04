@@ -175,6 +175,7 @@ CLOSED
 
 Version: 20080830
 * removed errno.h include from ewftools where not used
+* Improved common and configure.ac
 
 Version: 20080821
 * ewfalter now support single segment file as argument

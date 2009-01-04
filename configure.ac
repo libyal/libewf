@@ -160,9 +160,6 @@ AC_CHECK_HEADERS([zlib.h])
 
 AC_HEADER_STDC
 
-dnl Check for declarations
-AC_CHECK_DECLS( memrchr )
-
 dnl Check for type definitions
 AC_STRUCT_TM
 
@@ -222,43 +219,193 @@ AC_CHECK_SIZEOF([off_t])
 AC_CHECK_SIZEOF([size_t])
 
 dnl Check for functions
-AC_CHECK_FUNCS([atoll])
-AC_CHECK_FUNCS([ctime])
+dnl TODO like libpff
 AC_CHECK_FUNCS([fclose])
-AC_CHECK_FUNCS([fgets])
 AC_CHECK_FUNCS([fopen])
 AC_CHECK_FUNCS([getopt])
-AC_CHECK_FUNCS([gmtime])
-AC_CHECK_FUNCS([gmtime_r])
-AC_CHECK_FUNCS([localtime])
-AC_CHECK_FUNCS([localtime_r])
-AC_CHECK_FUNCS([memchr])
-AC_CHECK_FUNCS([memcmp])
-AC_CHECK_FUNCS([memcpy])
-AC_CHECK_FUNCS([memrchr])
-AC_CHECK_FUNCS([memset])
-AC_CHECK_FUNCS([mktime])
-AC_CHECK_FUNCS([snprintf])
-AC_CHECK_FUNCS([sprintf])
-AC_CHECK_FUNCS([strchr])
-AC_CHECK_FUNCS([strcmp])
-AC_CHECK_FUNCS([strcpy])
 AC_CHECK_FUNCS([strdup])
-AC_CHECK_FUNCS([strerror])
-AC_CHECK_FUNCS([strerror_r])
-AC_CHECK_FUNCS([strlen])
-AC_CHECK_FUNCS([strncmp])
-AC_CHECK_FUNCS([strncpy])
-AC_CHECK_FUNCS([strrchr])
-AC_CHECK_FUNCS([strtoll])
-AC_CHECK_FUNCS([strtoull])
 AC_CHECK_FUNCS([uname])
 
-AC_FUNC_MEMCMP
-AC_FUNC_STRERROR_R
-AC_FUNC_VPRINTF
+dnl Memory functions used in common/memory.h
+AC_CHECK_FUNCS(
+ [free],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: free],
+  [1]) ])
 
+AC_CHECK_FUNCS(
+ [malloc],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: malloc],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [memcmp],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: memcmp],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [memcpy],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: memcpy],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [memset],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: memset],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [realloc],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: realloc],
+  [1]) ])
+
+dnl Date and time functions used in common/date_time.h
+AC_CHECK_FUNCS(
+ [ctime],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: ctime],
+  [1]) ])
+
+dnl TODO combine with check for ctime ?
 LIBEWF_FUNC_CTIME_R
+
+AC_CHECK_FUNCS(
+ [gmtime_r],
+ [],
+ [AC_CHECK_FUNCS(
+  [gmtime],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: gmtime_r and gmtime],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [localtime_r],
+ [],
+ [AC_CHECK_FUNCS(
+  [localtime],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: localtime_r and localtime],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [mktime],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: mktime],
+  [1]) ])
+
+dnl Narrow character string functions used in common/narrow_string.h
+AC_CHECK_FUNCS(
+ [fgets],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing functions: fgets],
+  [1]) ]) 
+
+AC_CHECK_FUNCS(
+ [snprintf],
+ [],
+ [AC_CHECK_FUNCS(
+  [sprintf],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: snprintf and sprintf],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [strlen],
+ [],
+ [AC_MSG_FAILURE(
+  [Missing function: strlen],
+  [1]) ])
+
+AC_CHECK_FUNCS(
+ [strchr],
+ [],
+ [AC_CHECK_FUNCS(
+  [memchr],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strchr and memchr],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [strncmp],
+ [],
+ [AC_CHECK_FUNCS(
+  [strcmp],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strncmp and strcmp],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [strncpy],
+ [],
+ [AC_CHECK_FUNCS(
+  [strcpy],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strncpy and strcpy],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [strrchr],
+ [],
+ [AC_CHECK_FUNCS(
+  [memrchr],
+  [AC_CHECK_DECLS(
+   [memrchr],
+   [],
+   [AC_MSG_FAILURE(
+    [Missing declaration for function memrchr],
+    [1]) ]) ],
+  [AC_MSG_FAILURE(
+   [Missing functions: strrchr and memrchr],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [strtoll],
+ [],
+ [AC_CHECK_FUNCS(
+  [atoll],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strtoll and atoll],
+   [1]) ]) ])
+
+AC_CHECK_FUNCS(
+ [strtoull],
+ [],
+ [AC_CHECK_FUNCS(
+  [atoll],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strtoull and atoll],
+   [1]) ]) ])
+
+dnl Check for error string functions used in common/error_string.h
+AC_FUNC_STRERROR_R(
+ [],
+ [AC_CHECK_FUNCS(
+  [strerror],
+  [],
+  [AC_MSG_FAILURE(
+   [Missing functions: strerror_r and strerror],
+   [1]) ]) ])
 
 dnl Check for printf conversion specifier support
 LIBEWF_PRINTF_JD
@@ -444,37 +591,8 @@ AS_IF(
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
-	[test "x$ac_libewf_enable_wide_character_type" != xno],
-	[AC_DEFINE(
-	 [HAVE_WIDE_CHARACTER_TYPE],
-	 [1],
-	 [Defines if wide character type should be used])
-	dnl Determine wide character byte size
-	AC_CHECK_SIZEOF([wchar_t])
-	dnl Check for wide character string functions
-	AC_CHECK_FUNCS([btowc])
-	AC_CHECK_FUNCS([fgetws])
-	AC_CHECK_FUNCS([mbsinit])
-	AC_CHECK_FUNCS([mbrtowc])
-	AC_CHECK_FUNCS([swprintf])
-	AC_CHECK_FUNCS([wmain])
-	AC_CHECK_FUNCS([wmemchr])
-	AC_CHECK_FUNCS([wmemcmp])
-	AC_CHECK_FUNCS([wmemcpy])
-	AC_CHECK_FUNCS([wmemrchr])
-	AC_CHECK_FUNCS([wctob])
-	AC_CHECK_FUNCS([wcschr])
-	AC_CHECK_FUNCS([wcscmp])
-	AC_CHECK_FUNCS([wcscpy])
-	AC_CHECK_FUNCS([wcsdup])
-	AC_CHECK_FUNCS([wcslen])
-	AC_CHECK_FUNCS([wcsncmp])
-	AC_CHECK_FUNCS([wcsncpy])
-	AC_CHECK_FUNCS([wcsrchr])
-	AC_CHECK_FUNCS([wcrtomb])
-	AC_CHECK_FUNCS([wcstoll])
-	AC_CHECK_FUNCS([wcstoull])
-	dnl Check for the wide character header
+	[test "x$ac_libpff_enable_wide_character_type" != xno ],
+	[dnl Check for the wide character header
 	AC_CHECK_HEADERS(
 	 [wchar.h],
 	 [AC_DEFINE(
@@ -483,20 +601,128 @@ AS_IF(
 	  [Define to 1 if you have the <wchar.h> header file.])
 	 AC_SUBST(
 	  [HAVE_WCHAR_H],
-	  [1])],
-	 [AC_SUBST(
-	  [HAVE_WCHAR_H],
-	  [0])])
+	  [1]) ],
+	 [AC_MSG_FAILURE(
+	  [Missing header: wchar.h],
+	  [1]) ])
+
+	dnl Determine wide character byte size
+	AC_CHECK_SIZEOF([wchar_t])
+
+	dnl Check for wide character string functions
+	dnl Wide character string functions used in common/string_conversion.h
+	AC_CHECK_FUNCS(
+	 [btowc],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: btowc],
+	  [1]) ])
+
+	AC_CHECK_FUNCS(
+	 [wctob],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: wctob],
+	  [1]) ])
+
+	dnl Wide character string functions used in common/wide_string.h
+	AC_CHECK_FUNCS(
+	 [fgetws],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: fgetws],
+	  [1]) ])
+
+	AC_CHECK_FUNCS(
+	 [swprintf],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: swprintf],
+	  [1]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcschr],
+	 [],
+	 [AC_CHECK_FUNCS(
+	  [wmemchr],
+	  [],
+	  [AC_MSG_FAILURE(
+	   [Missing functions: wcschr and wmemchr],
+	   [1]) ]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcsncmp],
+	 [],
+	 [AC_CHECK_FUNCS(
+	  [wmemcmp],
+	  [],
+	  [AC_CHECK_FUNCS(
+	   [wcscmp],
+	   [],
+	   [AC_MSG_FAILURE(
+	    [Missing functions: wcsncmp, wmemcmp and wcscmp],
+	    [1]) ]) ]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcsncpy],
+	 [],
+	 [AC_CHECK_FUNCS(
+	  [wmemcpy],
+	  [],
+	  [AC_CHECK_FUNCS(
+	   [wcscpy],
+	   [],
+	   [AC_MSG_FAILURE(
+	    [Missing functions: wcsncpy, wmemcpy and wcscpy],
+	    [1]) ]) ]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcslen],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: wcslen],
+	  [1]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcsrchr],
+	 [],
+	 [AC_CHECK_FUNCS(
+	  [wmemrchr],
+	  [],
+	  [AC_MSG_FAILURE(
+	   [Missing functions: wcsrchr and wmemrchr],
+	   [1]) ]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcstoll],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: wcstoll],
+	  [1]) ])
+
+	AC_CHECK_FUNCS(
+	 [wcstoull],
+	 [],
+	 [AC_MSG_FAILURE(
+	  [Missing functions: wcstoull],
+	  [1]) ])
+
+	dnl Make the necessary definitions
+	AC_DEFINE(
+	 [HAVE_WIDE_CHARACTER_TYPE],
+	 [1],
+	 [Defines if wide character type should be used])
 	AC_SUBST(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [1])
-	ac_libewf_enable_wide_character_type=yes],
+	ac_libpff_enable_wide_character_type=yes],
+
 	[AC_SUBST(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [0])
 	AC_SUBST(
 	 [HAVE_WCHAR_H],
-	 [0])])
+	 [0]) ])
 
 AC_SUBST(
  [HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS],

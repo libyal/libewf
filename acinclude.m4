@@ -13,13 +13,13 @@ AC_DEFUN([LIBEWF_TEST_ENABLE],
 	  [ac_libewf_enable_$2=$4])dnl
 ])
 
-dnl Function to detect if printf conversion specifier "%jd" is available
+dnl Function to detect whether printf conversion specifier "%jd" is available
 AC_DEFUN([LIBEWF_PRINTF_JD],
 	[SAVE_CFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -Wall -Werror"
 	AC_LANG_PUSH(C)
 	AC_MSG_CHECKING(
-	 [if printf supports the conversion specifier "%jd"])
+	 [whether printf supports the conversion specifier "%jd"])
 	dnl First try to see if compilation and linkage without a parameter succeeds
 	AC_LINK_IFELSE(
 		[AC_LANG_PROGRAM(
@@ -46,7 +46,7 @@ if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
 				AC_DEFINE(
 				 [HAVE_PRINTF_JD],
 				 [1],
-				 [Define to 1 if printf supports the conversion specifier "%jd".] )],
+				 [Define to 1 whether printf supports the conversion specifier "%jd".] )],
 				[AC_MSG_RESULT(
 				 [no])],
 				[AC_MSG_RESULT(
@@ -56,13 +56,13 @@ if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
 	AC_LANG_POP(C)
 	CFLAGS="$SAVE_CFLAGS"])
 
-dnl Function to detect if printf conversion specifier "%zd" is available
+dnl Function to detect whether printf conversion specifier "%zd" is available
 AC_DEFUN([LIBEWF_PRINTF_ZD],
 	[SAVE_CFLAGS="$CFLAGS"
 	 CFLAGS="$CFLAGS -Wall -Werror"
 	 AC_LANG_PUSH(C)
 	 AC_MSG_CHECKING(
-	  [if printf supports the conversion specifier "%zd"])
+	  [whether printf supports the conversion specifier "%zd"])
 	dnl First try to see if compilation and linkage without a parameter succeeds
 	AC_LINK_IFELSE(
 		[AC_LANG_PROGRAM(
@@ -89,7 +89,7 @@ if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
 				AC_DEFINE(
 				 [HAVE_PRINTF_ZD],
 				 [1],
-				 [Define to 1 if printf supports the conversion specifier "%zd".] )],
+				 [Define to 1 whether printf supports the conversion specifier "%zd".] )],
 				[AC_MSG_RESULT(
 				 [no])],
 				[AC_MSG_RESULT(
