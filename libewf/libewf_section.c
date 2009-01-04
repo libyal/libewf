@@ -3704,7 +3704,7 @@ ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR 
 /* Reads a delta chunk section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint8_t error_tollerance )
+ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, uint8_t error_tollerance )
 {
 	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 
@@ -3808,6 +3808,18 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size
 	offset_table->chunk_offset[ chunk ].compressed   = 0;
 	offset_table->chunk_offset[ chunk ].dirty        = 1;
 
+	/* Update the chunk data in the secondary offset table
+	 * if necessary
+	 */
+	if( secondary_offset_table != NULL )
+	{
+		secondary_offset_table->chunk_offset[ chunk ].segment_file = segment_file;
+		secondary_offset_table->chunk_offset[ chunk ].file_offset  = segment_file->file_offset;
+		secondary_offset_table->chunk_offset[ chunk ].size         = chunk_size;
+		secondary_offset_table->chunk_offset[ chunk ].compressed   = 0;
+		secondary_offset_table->chunk_offset[ chunk ].dirty        = 1;
+	}
+
 	/* Skip the chunk data within the section
 	 */
 	if( libewf_segment_file_seek_offset(
@@ -3838,6 +3850,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 	ssize_t write_count         = 0;
 	size_t section_type_length  = 11;
 	size_t section_size         = 0;
+	size_t chunk_data_size      = 0;
 
 	if( segment_file == NULL )
 	{
@@ -3862,15 +3875,25 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 
 		return( -1 );
 	}
+	chunk_data_size = chunk_size;
+
+	if( write_crc != 0 )
+	{
+		chunk_data_size += EWF_CRC_SIZE;
+	}
 	/* The chunk value is stored + 1 count in the file
 	 */
-	if( libewf_endian_revert_32bit( ( chunk + 1 ), delta_chunk_header.chunk ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     ( chunk + 1 ),
+	     delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk value.\n" );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( (uint32_t) chunk_size, delta_chunk_header.chunk_size ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     (uint32_t) chunk_data_size,
+	     delta_chunk_header.chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk size value.\n" );
 
@@ -3894,12 +3917,8 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 
 		return( -1 );
 	}
-	section_size = EWFX_DELTA_CHUNK_HEADER_SIZE + chunk_size;
+	section_size = EWFX_DELTA_CHUNK_HEADER_SIZE + chunk_data_size;
 
-	if( write_crc != 0 )
-	{
-		section_size += EWF_CRC_SIZE;
-	}
 	section_write_count = libewf_section_start_write(
 	                       segment_file,
 	                       section_type,
@@ -4115,13 +4134,6 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 
 		return( -1 );
 	}
-	if( internal_handle->header_sections == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing header sections.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -4249,10 +4261,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_header2_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header_sections->header2 ),
-		              &( internal_handle->header_sections->header2_size ) );
+		              &( internal_handle->header2 ),
+		              &( internal_handle->header2_size ) );
 
-		internal_handle->header_sections->amount_of_header_sections++;
+		internal_handle->amount_of_header_sections++;
 	}
 	/* Read the header section
 	 * The \0 byte is included in the compare
@@ -4262,10 +4274,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_header_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header_sections->header ),
-		              &( internal_handle->header_sections->header_size ) );
+		              &( internal_handle->header ),
+		              &( internal_handle->header_size ) );
 
-		internal_handle->header_sections->amount_of_header_sections++;
+		internal_handle->amount_of_header_sections++;
 	}
 	/* Read the xheader section
 	 * The \0 byte is included in the compare
@@ -4275,10 +4287,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_xheader_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header_sections->xheader ),
-		              &( internal_handle->header_sections->xheader_size ) );
+		              &( internal_handle->xheader ),
+		              &( internal_handle->xheader_size ) );
 
-		internal_handle->header_sections->amount_of_header_sections++;
+		internal_handle->amount_of_header_sections++;
 	}
 	/* Read the volume or disk section
 	 * The \0 byte is included in the compare
@@ -4300,7 +4312,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		 * output of unexpected additional data in table section
 		 */
 		if( ( internal_handle->ewf_format == EWF_FORMAT_E01 )
-		 && ( internal_handle->header_sections->amount_of_header_sections == 1 ) )
+		 && ( internal_handle->amount_of_header_sections == 1 ) )
 		{
 			internal_handle->format = LIBEWF_FORMAT_ENCASE1;
 		}
@@ -4353,6 +4365,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
  		              segment_file,
  		              (size_t) size,
  		              internal_handle->offset_table,
+ 		              internal_handle->secondary_offset_table,
  		              internal_handle->error_tollerance );
 	}
 	/* Read the ltree section

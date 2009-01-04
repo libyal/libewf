@@ -96,7 +96,7 @@ ssize_t libewf_section_xheader_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHA
 ssize_t libewf_section_xhash_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, EWF_CHAR **cached_xhash, size_t *cached_xhash_size );
 ssize_t libewf_section_xhash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *xhash, size_t xhash_size, int8_t compression_level );
 
-ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, uint8_t error_tollerance );
+ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, uint8_t error_tollerance );
 ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc, uint8_t no_section_append );
 
 #if defined( HAVE_DEBUG_OUTPUT )

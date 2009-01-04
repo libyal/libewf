@@ -149,6 +149,10 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071129
+* worked on refactoring code
+* fixed error in delta chunk size
+
 Version: 20071128
 * worked on refactoring code
 

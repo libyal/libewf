@@ -38,7 +38,6 @@
 #include "libewf_char.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_error_sector.h"
-#include "libewf_header_sections.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
@@ -102,9 +101,29 @@ struct libewf_internal_handle
 	 */
 	LIBEWF_CHUNK_CACHE *chunk_cache;
 
-	/* The stored header sections
+	/* The stored header
 	 */
-	LIBEWF_HEADER_SECTIONS *header_sections;
+	EWF_CHAR *header;
+
+	/* The size of the stored header
+	 */
+	size_t header_size;
+
+	/* The stored header2
+	 */
+	EWF_CHAR *header2;
+
+	/* The size of the stored header2
+	 */
+	size_t header2_size;
+
+	/* The stored xheader
+	 */
+	EWF_CHAR *xheader;
+
+	/* The size of the stored xheader
+	 */
+	size_t xheader_size;
 
 	/* The stored xhash
 	 */
@@ -149,6 +168,10 @@ struct libewf_internal_handle
 	/* value to indicate if the MD5 hash was set
 	 */
 	int8_t md5_hash_set;
+
+	/* value to indicate how much header sections were found
+	 */
+	uint8_t amount_of_header_sections;
 
 	/* value to indicate which file format is used
 	 */
@@ -289,7 +312,7 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int libewf_internal_handle_create_headers( LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_VALUES_TABLE *header_values, int8_t compression_level, uint8_t format );
+int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_VALUES_TABLE *header_values );
 
 int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
