@@ -30,7 +30,7 @@ ewfalter_SOURCES = \
 	ewfsha1.h \
 	ewfalter.c
 
-ewfalter_LDADD = ../libewf/libewf.la
+ewfalter_LDADD  = ../libewf/libewf.la
 
 ewfexport_SOURCES = \
 	ewfcommon.c ewfcommon.h \
@@ -50,7 +50,7 @@ ewfinfo_SOURCES = \
 	ewfsha1.h \
 	ewfinfo.c
 
-ewfinfo_LDADD = ../libewf/libewf.la
+ewfinfo_LDADD  = ../libewf/libewf.la
 
 ewfverify_SOURCES = \
 	ewfcommon.c ewfcommon.h \
@@ -60,5 +60,5 @@ ewfverify_SOURCES = \
 	ewfsha1.h \
 	ewfverify.c
 
-ewfverify_LDADD = ../libewf/libewf.la
+ewfverify_LDADD  = ../libewf/libewf.la
 

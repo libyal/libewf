@@ -68,6 +68,18 @@ const LIBEWF_CHAR *libewf_get_version( void )
 	return( (const LIBEWF_CHAR *) LIBEWF_VERSION );
 }
 
+#if defined( LIBEWF_DLL_IMPORT )
+
+/* Return if libewf was build as a DLL
+ * the function will not be build otherwise
+ */
+int libewf_is_dll( void )
+{
+	return( 1 );
+}
+
+#endif
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
 /* Detects if a file is an EWF file (check for the EWF file signature)

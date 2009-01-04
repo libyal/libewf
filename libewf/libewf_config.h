@@ -112,13 +112,13 @@
 #define HAVE_OPENSSL_EVP_H 1
 
 /* Define to 1 if you have the <openssl/md5.h> header file. */
-#define HAVE_OPENSSL_MD5_H 1
+/* #undef HAVE_OPENSSL_MD5_H */
 
 /* Define to 1 if you have the <openssl/opensslv.h> header file. */
 #define HAVE_OPENSSL_OPENSSLV_H 1
 
 /* Define to 1 if you have the <openssl/sha.h> header file. */
-#define HAVE_OPENSSL_SHA_H 1
+/* #undef HAVE_OPENSSL_SHA_H */
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1
@@ -307,13 +307,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20070708"
+#define PACKAGE_STRING "libewf 20070713"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20070708"
+#define PACKAGE_VERSION "20070713"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -325,7 +325,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20070708"
+#define VERSION "20070713"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64

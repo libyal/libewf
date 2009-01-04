@@ -1,4 +1,4 @@
-.Dd May 12, 2007
+.Dd Juny 13, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -78,6 +78,8 @@
 When the library was compiled with narrow character support (default) the following functions are available
 .Ft const char *
 .Fn libewf_get_version "void"
+.Ft int
+.Fn libewf_is_dll "void"
 .Ft int8_t
 .Fn libewf_get_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int8_t

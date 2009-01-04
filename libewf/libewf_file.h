@@ -38,6 +38,13 @@
 
 #include <stdio.h>
 
+/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
+ * before including libewf_extern.h
+ */
+#if defined( _WIN32 ) && defined( DLL_EXPORT )
+#define LIBEWF_DLL_EXPORT
+#endif
+
 #include <libewf/libewf_extern.h>
 #include <libewf/libewf_handle.h>
 
@@ -49,6 +56,10 @@ extern "C" {
 #endif
 
 LIBEWF_EXTERN const LIBEWF_CHAR *libewf_get_version( void );
+
+#if defined( LIBEWF_DLL_IMPORT )
+LIBEWF_EXTERN int libewf_is_dll( void );
+#endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 LIBEWF_EXTERN int8_t libewf_check_file_signature( const wchar_t *filename );

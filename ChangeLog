@@ -102,8 +102,9 @@ Next release:
 * refactor function names into static char *
 
 Version: 20070713
-* worked on libtool DLL support
-  with help by David Loveall
+* worked on libtool DLL support with help by David Loveall
+  - changed macros in libewf_extern.h into LIBEWF_DLL_EXPORT and _INPORT without the S
+* made libcrypto EVP interface default, use MD5 and SHA1 as fallback
 
 Version: 20070710
 * worked on function name refactoring

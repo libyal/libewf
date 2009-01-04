@@ -36,15 +36,15 @@
 #ifndef _LIBEWF_EXTERN_H
 #define _LIBEWF_EXTERN_H
 
-/* To export functions from the libewf DLL define LIBEWF_DLL_EXPORTS
- * To import functions from the libewf DLL define LIBEWF_DLL_IMPORTS
+/* To export functions from the libewf DLL define LIBEWF_DLL_EXPORT
+ * To import functions from the libewf DLL define LIBEWF_DLL_IMPORT
  * Otherwise use default extern statement
  */
-#if defined( LIBEWF_DLL_EXPORTS )
+#if defined( LIBEWF_DLL_EXPORT )
 #define LIBEWF_EXTERN __declspec(dllexport)
 #else
-#if defined( LIBEWF_DLL_IMPORTS )
-#define LIBEWF_EXTERN __declspec(dllimport)
+#if defined( LIBEWF_DLL_IMPORT )
+#define LIBEWF_EXTERN extern __declspec(dllimport)
 #else
 #define LIBEWF_EXTERN extern
 #endif
