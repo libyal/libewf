@@ -142,6 +142,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
         char *chunk_type           = NULL;
 #endif
 	static char *function      = "libewf_read_chunk";
+	off64_t sector             = 0;
 	ssize_t chunk_read_count   = 0;
 	ssize_t crc_read_count     = 0;
 	size_t chunk_data_size     = 0;
@@ -453,19 +454,14 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				}
 				/* Add CRC error
 				 */
-				amount_of_sectors = chunk_read_count / internal_handle->media->sectors_per_chunk;
+				sector            = (off64_t) chunk * (off64_t) internal_handle->media->sectors_per_chunk;
+				amount_of_sectors = internal_handle->media->sectors_per_chunk;
 
-				if( ( chunk_read_count % internal_handle->media->sectors_per_chunk ) != 0 )
+				if( ( sector + amount_of_sectors ) > internal_handle->media->amount_of_sectors )
 				{
-					LIBEWF_WARNING_PRINT( "%s: read count was no multitude of sectors per chunk.\n",
-					 function );
-
-					amount_of_sectors++;
+					amount_of_sectors = internal_handle->media->amount_of_sectors - sector;
 				}
-				if( libewf_add_crc_error(
-				     (LIBEWF_HANDLE *) internal_handle,
-				     ( (off64_t) chunk * (off64_t) internal_handle->media->sectors_per_chunk ),
-				     amount_of_sectors ) != 1 )
+				if( libewf_add_crc_error( (LIBEWF_HANDLE *) internal_handle, sector, amount_of_sectors ) != 1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to set CRC error.\n",
 					 function );
@@ -476,6 +472,7 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				{
 					return( -1 );
 				}
+				chunk_data_size = amount_of_sectors * internal_handle->media->bytes_per_sector;
 			}
 		}
 		/* Flag that the chunk was cached
