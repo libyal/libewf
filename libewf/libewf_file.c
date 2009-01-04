@@ -171,7 +171,6 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_open";
-	uint32_t iterator                       = 0;
 
 	if( filenames == NULL )
 	{
@@ -252,28 +251,19 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
-		if( internal_handle->segment_table == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( internal_handle );
-
-			return( NULL );
-		}
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		if( libewf_segment_file_set_wide_filename(
-		     &( internal_handle->segment_table->segment_file[ 0 ] ),
-		     filenames[ iterator ],
-		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+		if( libewf_segment_file_write_wide_open(
+		     internal_handle, 
+		     filenames, 
+		     file_amount ) != 1 )
 #else
-		if( libewf_segment_file_set_filename(
-		     &( internal_handle->segment_table->segment_file[ 0 ] ),
-		     filenames[ iterator ],
-		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+		if( libewf_segment_file_write_open(
+		     internal_handle, 
+		     filenames, 
+		     file_amount ) != 1 )
 #endif
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
 			 function );
 
 			libewf_internal_handle_free( internal_handle );
