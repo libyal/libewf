@@ -178,15 +178,19 @@ AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
 	[AC_CHECK_HEADERS([openssl/evp.h])
 	AC_MSG_NOTICE([Support for libcrypto EVP will be build.])
 	ac_libewf_have_libcrypto_evp=yes ],
+
+	dnl Check for libcrypto MD5 and SHA1 support
 	[AS_IF([test "x$ac_libewf_have_libcrypto_md5" == xno],
-		[AC_MSG_NOTICE([No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])],
+		[AC_MSG_NOTICE([No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])]
 		[AC_CHECK_HEADERS([openssl/md5.h])
-		AC_MSG_NOTICE([Support for calculating MD5 hashes will be build.])] )
+		AC_MSG_NOTICE([Support for calculating MD5 hashes will be build.])
+		ac_libewf_have_libcrypto_md5=yes])
 
 	AS_IF([test "x$ac_libewf_have_libcrypto_sha1" == xno],
-		[AC_MSG_NOTICE([No support for calculating SHA1 hashes, if required install libcrypto with SHA1 support.])],
+		[AC_MSG_NOTICE([No support for calculating SHA1 hashes, if required install libcrypto with SHA1 support.])]
 		[AC_CHECK_HEADERS([openssl/sha.h])
-		AC_MSG_NOTICE([Support for calculating SHA1 hashes will be build.])] )
+		AC_MSG_NOTICE([Support for calculating SHA1 hashes will be build.])
+		ac_libewf_have_libcrypto_sha1=yes])
 	])
 
 dnl Check for enabling libuuid support
@@ -237,6 +241,8 @@ dnl Print a summary
 AC_MSG_RESULT([
 Building:
    libcrypto EVP support:                   $ac_libewf_have_libcrypto_evp
+   libcrypto MD5 support:                   $ac_libewf_have_libcrypto_md5
+   libcrypto SHA1 support:                  $ac_libewf_have_libcrypto_sha1
    libuuid support:                         $ac_libewf_have_libuuid
 
 Features:

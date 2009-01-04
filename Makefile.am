@@ -100,8 +100,8 @@ distclean: clean
 	/bin/rm -f config.status config.cache config.log
 	/bin/rm -f libewf.pc
 	/bin/rm -f libewf.spec
-	/bin/rm -f debian/changelog
-	/bin/rm -f debian/shlibs.local.ex
+	# /bin/rm -f debian/changelog
+	# /bin/rm -f debian/shlibs.local.ex
 	/bin/rm -f include/libewf.h
 	/bin/rm -f include/libewf/libewf_definitions.h
 	/bin/rm -f include/libewf/libewf_types.h
