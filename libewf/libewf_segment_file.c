@@ -1363,11 +1363,10 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		/* Write sectors section start
 		 */
 		write_count = libewf_section_start_write(
-		               segment_file->file_descriptor,
+		               segment_file,
 		               (EWF_CHAR *) "sectors",
 		               7,
-		               section_size,
-		               segment_file->file_offset );
+		               section_size );
 
 		if( write_count == -1 )
 		{
@@ -1376,7 +1375,6 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 
 			return( -1 );
 		}
-		segment_file->file_offset += write_count;
 	}
 	return( write_count );
 }
@@ -1615,11 +1613,10 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		/* Rewrite sectors section start
 		 */
 		write_count = libewf_section_start_write(
-		               segment_file->file_descriptor,
+		               segment_file,
 		               (EWF_CHAR *) "sectors",
 		               7,
-		               chunks_section_size,
-		               chunks_section_offset );
+		               chunks_section_size );
 
 		if( write_count == -1 )
 		{

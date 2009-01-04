@@ -52,7 +52,7 @@ extern "C" {
 #endif
 
 ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTION *section, uint8_t error_tollerance );
-ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type, size_t section_type_length, size_t section_data_size, off64_t start_offset );
+ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, size_t section_data_size );
 
 ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE *segment_file, size_t compressed_string_size, EWF_CHAR **uncompressed_string, size_t *uncompressed_string_size );
 ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, EWF_CHAR *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level );

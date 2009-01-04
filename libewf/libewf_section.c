@@ -122,7 +122,7 @@ ssize_t libewf_section_start_read( LIBEWF_SEGMENT_FILE *segment_file, EWF_SECTIO
 /* Writes a section start to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type, size_t section_type_length, size_t section_data_size, off64_t start_offset )
+ssize_t libewf_section_start_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, size_t section_data_size )
 {
 	EWF_SECTION section;
 
@@ -132,9 +132,9 @@ ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type,
 	uint64_t section_size   = 0;
 	uint64_t section_offset = 0;
 
-	if( file_descriptor == -1 )
+	if( segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
@@ -177,7 +177,7 @@ ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type,
 		return( -1 );
 	}
 	section_size   = EWF_SECTION_SIZE + section_data_size;
-	section_offset = start_offset + section_size;
+	section_offset = segment_file->file_offset + section_size;
 
 	if( libewf_endian_revert_64bit( section_size, section.size ) != 1 )
 	{
@@ -202,7 +202,10 @@ ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type,
 
 		return( -1 );
 	}
-	write_count = libewf_common_write( file_descriptor, &section, EWF_SECTION_SIZE );
+	write_count = libewf_segment_file_write(
+	               segment_file,
+	               &section,
+	               EWF_SECTION_SIZE );
 
 	if( write_count != EWF_SECTION_SIZE )
 	{
@@ -429,11 +432,10 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_fil
 		return( -1 );
 	}
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       compressed_string_size,
-	                       segment_file->file_offset );
+	                       compressed_string_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -444,9 +446,6 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_fil
 
 		return( -1 );
 	}
-	/* refactor */
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               compressed_string,
@@ -1001,11 +1000,10 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
 
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       6,
-	                       EWF_VOLUME_SMART_SIZE,
-	                       segment_file->file_offset );
+	                       EWF_VOLUME_SMART_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -1016,9 +1014,6 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	/* refactor */
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               volume,
@@ -1399,11 +1394,10 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	 internal_handle->media->bytes_per_sector, internal_handle->media->amount_of_sectors );
 
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       6,
-	                       EWF_VOLUME_SIZE,
-	                       segment_file->file_offset );
+	                       EWF_VOLUME_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -1414,9 +1408,6 @@ ssize_t libewf_section_volume_e01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	/* refactor */
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               volume,
@@ -2096,11 +2087,10 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t b
 		calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
 	}
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       section_type_length,
-	                       section_size,
-	                       section_offset );
+	                       section_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -2111,8 +2101,6 @@ ssize_t libewf_section_table_write( LIBEWF_SEGMENT_FILE *segment_file, off64_t b
 
 		return( -1 );
 	}
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               &table,
@@ -2892,11 +2880,10 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 		}
 	}
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       4,
-	                       EWF_DATA_SIZE,
-	                       section_offset );
+	                       EWF_DATA_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -2905,8 +2892,6 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE *segment_file, uint32_t a
 
 		return( -1 );
 	}
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               *cached_data_section,
@@ -3244,11 +3229,10 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 	calculated_crc = ewf_crc_calculate( error2_sectors, sectors_size, 1 );
 
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       6,
-	                       section_size,
-	                       section_offset );
+	                       section_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3259,8 +3243,6 @@ ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_E
 
 		return( -1 );
 	}
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               &error2,
@@ -3449,11 +3431,10 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_DIGEST
 		return( -1 );
 	}
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       4,
-	                       EWF_HASH_SIZE,
-	                       segment_file->file_offset );
+	                       EWF_HASH_SIZE );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3462,8 +3443,6 @@ ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_DIGEST
 
 		return( -1 );
 	}
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               &hash,
@@ -3983,11 +3962,10 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 		section_size += EWF_CRC_SIZE;
 	}
 	section_write_count = libewf_section_start_write(
-	                       segment_file->file_descriptor,
+	                       segment_file,
 	                       section_type,
 	                       11,
-	                       section_size,
-        	               segment_file->file_offset );
+	                       section_size );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3996,9 +3974,6 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 
 		return( -1 );
 	}
-	/* refactor */
-	segment_file->file_offset += section_write_count;
-
 	write_count = libewf_segment_file_write(
 	               segment_file,
 	               &delta_chunk_header,
