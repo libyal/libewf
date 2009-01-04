@@ -52,12 +52,6 @@ extern "C" {
 struct tm *ewfoutput_gmtime(
             const time_t *timestamp );
 
-libewf_char_t *ewfoutput_determine_units_string(
-                int factor );
-
-libewf_char_t *ewfoutput_determine_human_readable_size_string(
-                uint64_t size );
-
 void ewfoutput_version_fprint(
       FILE *stream,
       libewf_char_t *program );

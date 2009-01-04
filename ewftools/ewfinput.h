@@ -67,23 +67,61 @@ extern libewf_char_t *ewfinput_yes_no[ 2 ];
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
 
-uint8_t ewfinput_determine_libewf_format( const libewf_char_t *argument );
-uint8_t ewfinput_determine_libewf_format_char_t( const CHAR_T *argument );
+uint8_t ewfinput_determine_libewf_format(
+         const libewf_char_t *argument );
 
-uint32_t ewfinput_determine_sectors_per_chunk( const libewf_char_t *argument );
-uint32_t ewfinput_determine_sectors_per_chunk_char_t( const CHAR_T *argument );
+uint8_t ewfinput_determine_libewf_format_char_t(
+         const CHAR_T *argument );
 
-int8_t ewfinput_determine_compression_level( const libewf_char_t *argument );
-int8_t ewfinput_determine_compression_level_char_t( const CHAR_T *argument );
+uint32_t ewfinput_determine_sectors_per_chunk(
+          const libewf_char_t *argument );
 
-int8_t ewfinput_determine_media_type( const libewf_char_t *argument );
-int8_t ewfinput_determine_volume_type( const libewf_char_t *argument );
-int8_t ewfinput_determine_yes_no( const libewf_char_t *argument );
+uint32_t ewfinput_determine_sectors_per_chunk_char_t(
+          const CHAR_T *argument );
 
-libewf_char_t *ewfinput_get_variable( FILE *stream, libewf_char_t *request_string );
-CHAR_T *ewfinput_get_variable_char_t( FILE *stream, libewf_char_t *request_string );
-uint64_t ewfinput_get_size_variable( FILE *stream, libewf_char_t *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value );
-libewf_char_t *ewfinput_get_fixed_value( FILE *stream, libewf_char_t *request_string, libewf_char_t **values, uint8_t amount, uint8_t default_value );
+int8_t ewfinput_determine_compression_level(
+        const libewf_char_t *argument );
+
+int8_t ewfinput_determine_compression_level_char_t(
+        const CHAR_T *argument );
+
+int8_t ewfinput_determine_media_type(
+        const libewf_char_t *argument );
+
+int8_t ewfinput_determine_volume_type(
+        const libewf_char_t *argument );
+
+int8_t ewfinput_determine_yes_no(
+        const libewf_char_t *argument );
+
+libewf_char_t *ewfinput_get_variable(
+                FILE *stream,
+                libewf_char_t *request_string );
+
+CHAR_T *ewfinput_get_variable_char_t(
+         FILE *stream,
+         libewf_char_t *request_string );
+
+uint64_t ewfinput_get_size_variable(
+          FILE *stream,
+          libewf_char_t *request_string,
+          uint64_t minimum,
+          uint64_t maximum,
+          uint64_t default_value );
+
+uint64_t ewfinput_get_byte_size_variable(
+          FILE *stream,
+          libewf_char_t *request_string,
+          uint64_t minimum,
+          uint64_t maximum,
+          uint64_t default_value );
+
+libewf_char_t *ewfinput_get_fixed_value(
+                FILE *stream,
+                libewf_char_t *request_string,
+                libewf_char_t **values,
+                uint8_t amount,
+                uint8_t default_value );
 
 #if defined( __cplusplus )
 }
