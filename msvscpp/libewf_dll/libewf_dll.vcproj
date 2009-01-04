@@ -203,10 +203,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_endian.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_file.c"
 				>
 			</File>
@@ -313,6 +309,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\common\endian.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\common\error_string.h"
 				>
 			</File>
@@ -406,10 +406,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_debug.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_endian.h"
 				>
 			</File>
 			<File

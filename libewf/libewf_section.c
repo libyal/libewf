@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
@@ -3644,9 +3645,9 @@ ssize_t libewf_section_last_write(
 
 	static char *function       = "libewf_section_last_write";
 	ewf_crc_t calculated_crc    = 0;
-	off64_t section_offset      = 0;
 	ssize_t section_write_count = 0;
-	size_t section_size         = 0;
+	uint64_t section_size        = 0;
+	uint64_t section_offset      = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3691,9 +3692,9 @@ ssize_t libewf_section_last_write(
 	if( ( ewf_format == EWF_FORMAT_S01 )
 	 || ( format == LIBEWF_FORMAT_FTK ) )
 	{
-		section_size = sizeof( ewf_section_t );
+		section_size = (uint64_t) sizeof( ewf_section_t );
 	}
-	section_offset = segment_file_handle->file_offset;
+	section_offset = (uint64_t) segment_file_handle->file_offset;
 
 	if( ewf_string_copy(
 	     section.type,

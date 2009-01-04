@@ -32,6 +32,7 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
