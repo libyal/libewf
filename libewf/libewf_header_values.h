@@ -74,9 +74,11 @@ int libewf_header_values_realloc(
 void libewf_header_values_free(
       libewf_values_table_t *header_values );
 
-libewf_char_t *libewf_convert_date_timestamp(
-                time_t timestamp,
-                uint8_t date_format );
+int libewf_convert_timestamp(
+     time_t timestamp,
+     uint8_t date_format,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 libewf_char_t *libewf_convert_date_header_value(
                 libewf_char_t *header_value,
@@ -233,10 +235,12 @@ ewf_char_t *libewf_header_values_generate_header2_string_encase6(
              time_t timestamp,
              size_t *header2_length );
 
-libewf_char_t *libewf_convert_date_xheader_value(
-                libewf_char_t *header_value,
-                size_t header_value_length,
-                uint8_t date_format );
+int libewf_convert_date_xheader_value(
+     libewf_char_t *header_value,
+     size_t header_value_length,
+     uint8_t date_format,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 int libewf_generate_date_xheader_value(
      time_t timestamp,
