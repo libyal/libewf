@@ -40,8 +40,6 @@
 extern "C" {
 #endif
 
-#define LIBEWF_CHAR libewf_char_t
-
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 typedef wchar_t libewf_char_t;

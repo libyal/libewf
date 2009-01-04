@@ -198,10 +198,10 @@ wchar_t *ewfstring_wide_strerror( int error_number )
  * Terminates the destination string with \0 at ( length - 1 )
  * Returns 1 if successful, -1 on error
  */
-int8_t ewfstring_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const CHAR_T *source, size_t length )
+int8_t ewfstring_copy_libewf_char_from_char_t( libewf_char_t *destination, const CHAR_T *source, size_t length )
 {
 	static char *function = "ewfstring_copy_libewf_char_from_char_t";
-	ssize_t conversion    = (ssize_t) ( sizeof( LIBEWF_CHAR ) - sizeof( CHAR_T ) );
+	ssize_t conversion    = (ssize_t) ( sizeof( libewf_char_t ) - sizeof( CHAR_T ) );
 	size_t iterator       = 0;
 
 	if( source == NULL )
@@ -222,16 +222,16 @@ int8_t ewfstring_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const C
 	{
 		if( conversion == 0 )
 		{
-			destination[ iterator ] = (LIBEWF_CHAR) source[ iterator ];
+			destination[ iterator ] = (libewf_char_t) source[ iterator ];
 		}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 		else if( conversion > 0 )
 		{
-			destination[ iterator ] = (LIBEWF_CHAR) btowc( (int) source[ iterator ] );
+			destination[ iterator ] = (libewf_char_t) btowc( (int) source[ iterator ] );
 		}
 		else if( conversion < 0 )
 		{
-			destination[ iterator ] = (LIBEWF_CHAR) wctob( (wint_t) source[ iterator ] );
+			destination[ iterator ] = (libewf_char_t) wctob( (wint_t) source[ iterator ] );
 
 			/* If character is out of the basic ASCII range use '_' as a place holder
 			 */
@@ -249,7 +249,7 @@ int8_t ewfstring_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const C
 			return( -1 );
 		}
 	}
-	destination[ length - 1 ] = (LIBEWF_CHAR) '\0';
+	destination[ length - 1 ] = (libewf_char_t) '\0';
 
 	return( 1 );
 }
@@ -258,10 +258,10 @@ int8_t ewfstring_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const C
  * Terminates the destination string with \0 at ( length - 1 )
  * Returns 1 if successful, -1 on error
  */
-int8_t ewfstring_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *destination, size_t length )
+int8_t ewfstring_copy_libewf_char_to_char_t( const libewf_char_t *source, CHAR_T *destination, size_t length )
 {
 	static char *function = "ewfstring_copy_libewf_char_to_char_t";
-	ssize_t conversion    = (ssize_t) ( sizeof( LIBEWF_CHAR ) - sizeof( CHAR_T ) );
+	ssize_t conversion    = (ssize_t) ( sizeof( libewf_char_t ) - sizeof( CHAR_T ) );
 	size_t iterator       = 0;
 
 	if( source == NULL )

@@ -59,12 +59,12 @@
 
 /* Input selection defintions
  */
-LIBEWF_CHAR *ewfinput_compression_levels[ 3 ] = \
+libewf_char_t *ewfinput_compression_levels[ 3 ] = \
  { _S_LIBEWF_CHAR( "none" ),
    _S_LIBEWF_CHAR( "fast" ),
    _S_LIBEWF_CHAR( "best" ) };
 
-LIBEWF_CHAR *ewfinput_format_types[ 12 ] = \
+libewf_char_t *ewfinput_format_types[ 12 ] = \
  { _S_LIBEWF_CHAR( "ewf" ),
    _S_LIBEWF_CHAR( "smart" ),
    _S_LIBEWF_CHAR( "ftk" ),
@@ -78,15 +78,15 @@ LIBEWF_CHAR *ewfinput_format_types[ 12 ] = \
    _S_LIBEWF_CHAR( "linen6" ),
    _S_LIBEWF_CHAR( "ewfx" ) };
 
-LIBEWF_CHAR *ewfinput_media_types[ 2 ] = \
+libewf_char_t *ewfinput_media_types[ 2 ] = \
  { _S_LIBEWF_CHAR( "fixed" ),
    _S_LIBEWF_CHAR( "removable" ) };
 
-LIBEWF_CHAR *ewfinput_volume_types[ 2 ] = \
+libewf_char_t *ewfinput_volume_types[ 2 ] = \
  { _S_LIBEWF_CHAR( "logical" ),
    _S_LIBEWF_CHAR( "physical" ) };
 
-LIBEWF_CHAR *ewfinput_sector_per_block_sizes[ 10 ] = \
+libewf_char_t *ewfinput_sector_per_block_sizes[ 10 ] = \
  { _S_LIBEWF_CHAR( "64" ),
    _S_LIBEWF_CHAR( "128" ),
    _S_LIBEWF_CHAR( "256" ),
@@ -98,14 +98,14 @@ LIBEWF_CHAR *ewfinput_sector_per_block_sizes[ 10 ] = \
    _S_LIBEWF_CHAR( "16384" ),
    _S_LIBEWF_CHAR( "32768" ) };
 
-LIBEWF_CHAR *ewfinput_yes_no[ 2 ] = \
+libewf_char_t *ewfinput_yes_no[ 2 ] = \
  { _S_LIBEWF_CHAR( "yes" ),
    _S_LIBEWF_CHAR( "no" ) };
 
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint8_t ewfinput_determine_libewf_format( const LIBEWF_CHAR *argument )
+uint8_t ewfinput_determine_libewf_format( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_libewf_format";
 
@@ -239,7 +239,7 @@ uint8_t ewfinput_determine_libewf_format_char_t( const CHAR_T *argument )
 /* Determines the sectors per chunk value from an argument string
  * Returns the sectors per chunk value, or 0 on error
  */
-uint32_t ewfinput_determine_sectors_per_chunk( const LIBEWF_CHAR *argument )
+uint32_t ewfinput_determine_sectors_per_chunk( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_sectors_per_chunk";
 
@@ -353,7 +353,7 @@ uint32_t ewfinput_determine_sectors_per_chunk_char_t( const CHAR_T *argument )
 /* Determines the compression level value from an argument string
  * Returns the compression level value, or -1 on error
  */
-int8_t ewfinput_determine_compression_level( const LIBEWF_CHAR *argument )
+int8_t ewfinput_determine_compression_level( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_compression_level";
 
@@ -411,7 +411,7 @@ int8_t ewfinput_determine_compression_level_char_t( const CHAR_T *argument )
 /* Determines the media type value from an argument string
  * Returns the media type value, or -1 on error
  */
-int8_t ewfinput_determine_media_type( const LIBEWF_CHAR *argument )
+int8_t ewfinput_determine_media_type( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_media_type";
 
@@ -436,7 +436,7 @@ int8_t ewfinput_determine_media_type( const LIBEWF_CHAR *argument )
 /* Determines the volume type value from an argument string
  * Returns the volume type value, or -1 on error
  */
-int8_t ewfinput_determine_volume_type( const LIBEWF_CHAR *argument )
+int8_t ewfinput_determine_volume_type( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_volume_type";
 
@@ -461,7 +461,7 @@ int8_t ewfinput_determine_volume_type( const LIBEWF_CHAR *argument )
 /* Determines the yes or no value from an argument string
  * Returns 1 if yes, 0 if no, or -1 on error
  */
-int8_t ewfinput_determine_yes_no( const LIBEWF_CHAR *argument )
+int8_t ewfinput_determine_yes_no( const libewf_char_t *argument )
 {
 	static char *function = "ewfinput_determine_yes_no";
 
@@ -486,15 +486,15 @@ int8_t ewfinput_determine_yes_no( const LIBEWF_CHAR *argument )
 /* Get variable input from the user
  * with a maximum of 1023 characters
  */
-LIBEWF_CHAR *ewfinput_get_variable( FILE *stream, LIBEWF_CHAR *request_string )
+libewf_char_t *ewfinput_get_variable( FILE *stream, libewf_char_t *request_string )
 {
-	LIBEWF_CHAR user_input_buffer[ 1024 ];
+	libewf_char_t user_input_buffer[ 1024 ];
 
-	LIBEWF_CHAR *user_input_buffer_ptr = &user_input_buffer[ 0 ];
-	LIBEWF_CHAR *user_input            = NULL;
-	LIBEWF_CHAR *end_of_input          = NULL;
-	static char *function              = "ewfinput_get_variable";
-	size_t input_length                = 0;
+	libewf_char_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
+	libewf_char_t *user_input            = NULL;
+	libewf_char_t *end_of_input          = NULL;
+	static char *function                = "ewfinput_get_variable";
+	size_t input_length                  = 0;
 
 	if( stream == NULL )
 	{
@@ -518,7 +518,7 @@ LIBEWF_CHAR *ewfinput_get_variable( FILE *stream, LIBEWF_CHAR *request_string )
 
 		if( user_input_buffer_ptr != NULL )
 		{
-			end_of_input = libewf_string_search( user_input_buffer_ptr, (LIBEWF_CHAR) '\n', 1023 );
+			end_of_input = libewf_string_search( user_input_buffer_ptr, (libewf_char_t) '\n', 1023 );
 
 			if( end_of_input == NULL )
 			{
@@ -554,20 +554,20 @@ LIBEWF_CHAR *ewfinput_get_variable( FILE *stream, LIBEWF_CHAR *request_string )
 /* Get variable input from the user
  * with a maximum of 1023 characters
  */
-CHAR_T *ewfinput_get_variable_char_t( FILE *stream, LIBEWF_CHAR *request_string )
+CHAR_T *ewfinput_get_variable_char_t( FILE *stream, libewf_char_t *request_string )
 {
-	LIBEWF_CHAR *user_input   = NULL;
+	libewf_char_t *user_input = NULL;
 	CHAR_T *user_input_char_t = NULL;
 	static char *function     = "ewfinput_get_variable_char_t";
 	size_t user_input_length  = 0;
 
 	user_input = ewfinput_get_variable( stream, request_string );
 
-	if( sizeof( CHAR_T ) == sizeof( LIBEWF_CHAR ) )
+	if( sizeof( CHAR_T ) == sizeof( libewf_char_t ) )
 	{
 		return( (CHAR_T *) user_input );
 	}
-	if( sizeof( CHAR_T ) < sizeof( LIBEWF_CHAR ) )
+	if( sizeof( CHAR_T ) < sizeof( libewf_char_t ) )
 	{
 		user_input_length = libewf_string_length( user_input );
 		user_input_char_t = libewf_common_alloc( ( user_input_length + 1 ) * sizeof( CHAR_T ) );
@@ -597,14 +597,14 @@ CHAR_T *ewfinput_get_variable_char_t( FILE *stream, LIBEWF_CHAR *request_string 
 /* Get variable containing a size definnition input from the user
  * with a maximum of 1023 characters
  */
-uint64_t ewfinput_get_size_variable( FILE *stream, LIBEWF_CHAR *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value )
+uint64_t ewfinput_get_size_variable( FILE *stream, libewf_char_t *request_string, uint64_t minimum, uint64_t maximum, uint64_t default_value )
 {
-	LIBEWF_CHAR user_input_buffer[ 1024 ];
+	libewf_char_t user_input_buffer[ 1024 ];
 
-	LIBEWF_CHAR *user_input_buffer_ptr = &user_input_buffer[ 0 ];
-	static char *function              = "ewfinput_get_size_variable";
-	size_t input_length                = 0;
-	uint64_t size_value                = 0;
+	libewf_char_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
+	static char *function                = "ewfinput_get_size_variable";
+	size_t input_length                  = 0;
+	uint64_t size_value                  = 0;
 
 	if( stream == NULL )
 	{
@@ -658,17 +658,17 @@ uint64_t ewfinput_get_size_variable( FILE *stream, LIBEWF_CHAR *request_string, 
 /* Get fixed value input from the user
  * The first value is considered the default value
  */
-LIBEWF_CHAR *ewfinput_get_fixed_value( FILE *stream, LIBEWF_CHAR *request_string, LIBEWF_CHAR **values, uint8_t amount, uint8_t default_value )
+libewf_char_t *ewfinput_get_fixed_value( FILE *stream, libewf_char_t *request_string, libewf_char_t **values, uint8_t amount, uint8_t default_value )
 {
-	LIBEWF_CHAR user_input_buffer[ 1024 ];
+	libewf_char_t user_input_buffer[ 1024 ];
 
-	LIBEWF_CHAR *user_input_buffer_ptr = &user_input_buffer[ 0 ];
-	LIBEWF_CHAR *user_input            = NULL;
-	static char *function              = "ewfinput_get_fixed_value";
-	size_t input_length                = 0;
-	size_t value_length                = 0;
-	uint8_t iterator                   = 0;
-	uint8_t value_match                = 0;
+	libewf_char_t *user_input_buffer_ptr = &user_input_buffer[ 0 ];
+	libewf_char_t *user_input            = NULL;
+	static char *function                = "ewfinput_get_fixed_value";
+	size_t input_length                  = 0;
+	size_t value_length                  = 0;
+	uint8_t iterator                     = 0;
+	uint8_t value_match                  = 0;
 
 	if( stream == NULL )
 	{
@@ -733,7 +733,7 @@ LIBEWF_CHAR *ewfinput_get_fixed_value( FILE *stream, LIBEWF_CHAR *request_string
 					{
 						/* Make sure no trailing characters were given
 						 */
-						if( user_input_buffer_ptr[ value_length ] == (LIBEWF_CHAR) '\n' )
+						if( user_input_buffer_ptr[ value_length ] == (libewf_char_t) '\n' )
 						{
 							value_match = 1;
 

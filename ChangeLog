@@ -139,6 +139,7 @@ Next release:
 
 * change uppercase type definitions to lowercase _t type definitions
 * change ewf_char/string into byte_char/string
+* create common functions i.e. for libewf_char/string
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?

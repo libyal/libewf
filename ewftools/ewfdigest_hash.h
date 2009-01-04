@@ -47,7 +47,7 @@ extern "C" {
 
 typedef uint8_t ewfdigest_hash_t;
 
-int ewfdigest_copy_to_string( EWFDIGEST_HASH *digest_hash, size_t size_digest_hash, LIBEWF_CHAR *string, size_t size_string );
+int ewfdigest_copy_to_string( EWFDIGEST_HASH *digest_hash, size_t size_digest_hash, libewf_char_t *string, size_t size_string );
 
 #if defined( __cplusplus )
 }

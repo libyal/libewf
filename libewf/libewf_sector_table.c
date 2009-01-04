@@ -130,7 +130,7 @@ int libewf_sector_table_realloc( libewf_sector_table_t *sector_table, uint32_t a
 	     0, 
 	     ( ( amount - sector_table->amount ) * LIBEWF_ERROR_SECTOR_SIZE ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear segment file array.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to clear dynamic error sector array.\n",
 		 function );
 
 		return( 1 );

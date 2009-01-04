@@ -91,7 +91,7 @@ int main( int argc, char * const argv[] )
 {
 	uint8_t guid[ 16 ];
 
-	LIBEWF_CHAR *program         = _S_LIBEWF_CHAR( "ewfinfo" );
+	libewf_char_t *program       = _S_LIBEWF_CHAR( "ewfinfo" );
 
 #if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob                = NULL;

@@ -231,8 +231,8 @@ char *ewfstring_strerror( int error_number );
 wchar_t *ewfstring_wide_strerror( int error_number );
 #endif
 
-int8_t ewfstring_copy_libewf_char_from_char_t( LIBEWF_CHAR *destination, const CHAR_T *source, size_t length );
-int8_t ewfstring_copy_libewf_char_to_char_t( const LIBEWF_CHAR *source, CHAR_T *destination, size_t length );
+int8_t ewfstring_copy_libewf_char_from_char_t( libewf_char_t *destination, const CHAR_T *source, size_t length );
+int8_t ewfstring_copy_libewf_char_to_char_t( const libewf_char_t *source, CHAR_T *destination, size_t length );
 
 #if defined( __cplusplus )
 }

@@ -92,7 +92,7 @@ int main( int argc, char * const argv[] )
 	int32_t glob_count         = 0;
 #endif
 
-	LIBEWF_CHAR *program       = _S_LIBEWF_CHAR( "ewfalter" );
+	libewf_char_t *program     = _S_LIBEWF_CHAR( "ewfalter" );
 
 	CHAR_T *target_filename    = NULL;
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )

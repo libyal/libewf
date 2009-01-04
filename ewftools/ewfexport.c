@@ -119,8 +119,8 @@ int main( int argc, char * const argv[] )
 
 	LIBEWF_HANDLE *handle              = NULL;
 	LIBEWF_HANDLE *export_handle       = NULL;
-	LIBEWF_CHAR *user_input            = NULL;
-	LIBEWF_CHAR *program               = _S_LIBEWF_CHAR( "ewfexport" );
+	libewf_char_t *user_input          = NULL;
+	libewf_char_t *program             = _S_LIBEWF_CHAR( "ewfexport" );
 
 	CHAR_T *end_of_string              = NULL;
 	CHAR_T *target_filename            = NULL;
@@ -157,7 +157,7 @@ int main( int argc, char * const argv[] )
 	uint8_t calculate_sha1             = 0;
 	int output_raw                     = 1;
 
-	LIBEWF_CHAR *ewfexport_format_types[ 13 ] = \
+	libewf_char_t *ewfexport_format_types[ 13 ] = \
 	 { _S_LIBEWF_CHAR( "raw" ),
 	   _S_LIBEWF_CHAR( "ewf" ),
 	   _S_LIBEWF_CHAR( "smart" ),
