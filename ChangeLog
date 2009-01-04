@@ -117,7 +117,6 @@ TODO
 * make buffer passthroug default behavior
 * remove libewf_common_string_copy and libewf_common_wide_string_copy ?
   use memcpy instead
-* remove libewf_write_process_chunk_data ?
   move its chunk data pointer assignment to libewf_write_prepare_chunk_data ?
 * have compound reallocation functions return an integer as result
 * remove internal_handle passing from most functions
@@ -139,6 +138,7 @@ Version: 20070818
 * write optimalisation:
   - the data section is cached for multiple writes
   - refactored libewf_get_chunk_size out of ewfcommon_read_input
+* removed libewf_write_process_chunk_data no longer needed
 
 Version: 20070816
 * worked on restructuring to improve internal structure

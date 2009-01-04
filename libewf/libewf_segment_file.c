@@ -3074,9 +3074,6 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 	offset          = internal_handle->offset_table->offset[ chunk ];
 	segment_number  = internal_handle->offset_table->segment_number[ chunk ];
 
-	LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
-	 function, file_descriptor, segment_number, offset );
-
 	if( offset > (off_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
@@ -3088,6 +3085,9 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 	{
 		if( internal_handle->segment_table->file_offset[ segment_number ] != offset )
 		{
+			LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
+			 function, file_descriptor, segment_number, offset );
+
 			if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
@@ -3102,6 +3102,9 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 	{
 		if( internal_handle->delta_segment_table->file_offset[ segment_number ] != offset )
 		{
+			LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for delta segment: %" PRIu16 " for offset: %jd.\n",
+			 function, file_descriptor, segment_number, offset );
+
 			if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",

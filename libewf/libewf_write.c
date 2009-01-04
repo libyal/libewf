@@ -796,133 +796,6 @@ ssize_t libewf_write_prepare_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
 	return( (ssize_t) data_write_size );
 }
 
-/* Processed the chunk data, i.e. compression, byte swap
- * This function swaps byte pairs if necessary
- * Returns the amount of bytes of the processed chunk data, or -1 on error
- */
-ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK **chunk_data, size_t chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc )
-{
-	static char *function             = "libewf_write_process_chunk_data";
-	size_t compressed_chunk_data_size = 0;
-	ssize_t data_write_size           = 0;
-	int chunk_cache_data_used         = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_data == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( *chunk_data == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data buffer.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( *chunk_data == internal_handle->chunk_cache->compressed )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk data buffer - same as chunk cache compressed.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_crc == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk CRC.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( is_compressed == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid is compressed.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( write_crc == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid write CRC.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Swap bytes if necessary
-	 */
-	if( ( internal_handle->swap_byte_pairs == 1 )
-	 && ( libewf_endian_swap_byte_pairs( *chunk_data, chunk_data_size ) != 1 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Update the MD5 hash
-	 */
-	if( libewf_md5_update( &internal_handle->md5_context, *chunk_data, chunk_data_size ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
-		 function );
-
-		return( -1 );
-	}
-	chunk_cache_data_used = (int) ( *chunk_data == internal_handle->chunk_cache->data );
-
-	/* The compressed data size contains the maximum allowed buffer size
-	 */
-	compressed_chunk_data_size = internal_handle->chunk_cache->allocated_size;
-
-	/* Compress the chunk if necessary and determine its CRC
-	 */
-	data_write_size = libewf_write_prepare_chunk_data(
-			   internal_handle, 
-			   *chunk_data,
-			   chunk_data_size,
-			   internal_handle->chunk_cache->compressed,
-			   &compressed_chunk_data_size,
-			   is_compressed,
-			   chunk_crc,
-			   write_crc );
-
-	if( data_write_size <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to prepare chunk data.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Make sure to update the chunk_data pointer if 
-	 * internal_handle->chunk_cache->data has been reallocated by
-	 * libewf_write_prepare_chunk_data()
-	 */
-	if( ( chunk_cache_data_used == 1 )
-	 && ( *chunk_data != internal_handle->chunk_cache->data ) )
-	{
-		*chunk_data = internal_handle->chunk_cache->data;
-	}
-	if( *is_compressed != 0 )
-	{
-		*chunk_data = internal_handle->chunk_cache->compressed;
-	}
-	return( (ssize_t) data_write_size );
-}
-
 /* Writes a new chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
  * This function swaps byte pairs if necessary
@@ -930,18 +803,20 @@ ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle
  */
 ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
 {
-	EWF_CHUNK *chunk_data       = NULL;
-	static char *function       = "libewf_write_new_chunk";
-	ssize_t chunk_data_size     = 0;
-	ssize_t write_count         = 0;
-	size_t write_size           = 0;
-	size_t read_size            = 0;
-	size_t remaining_chunk_size = 0;
-	size_t chunk_cache_offset   = 0;
-	uint16_t segment_number     = 0;
-	uint8_t last_segment_file   = 0;
-	int file_descriptor         = -1;
-	int result                  = 0;
+	EWF_CHUNK *chunk_data             = NULL;
+	static char *function             = "libewf_write_new_chunk";
+	ssize_t chunk_data_size           = 0;
+	ssize_t write_count               = 0;
+	size_t write_size                 = 0;
+	size_t read_size                  = 0;
+	size_t remaining_chunk_size       = 0;
+	size_t chunk_cache_offset         = 0;
+	size_t compressed_chunk_data_size = 0;
+	uint16_t segment_number           = 0;
+	uint8_t last_segment_file         = 0;
+	int chunk_cache_data_used         = 0;
+	int file_descriptor               = -1;
+	int result                        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1249,20 +1124,62 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 	{
 		if( raw_access == 0 )
 		{
-			chunk_data_size = libewf_write_process_chunk_data(
-					   internal_handle,
-					   &chunk_data,
+			/* Swap bytes if necessary
+			 */
+			if( ( internal_handle->swap_byte_pairs == 1 )
+			 && ( libewf_endian_swap_byte_pairs( chunk_data, write_size ) != 1 ) )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to swap byte pairs.\n",
+				 function );
+
+				return( -1 );
+			}
+			/* Update the MD5 hash
+			 */
+			if( libewf_md5_update( &internal_handle->md5_context, chunk_data, write_size ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
+				 function );
+
+				return( -1 );
+			}
+			chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
+
+			/* The compressed data size contains the maximum allowed buffer size
+			 */
+			compressed_chunk_data_size = internal_handle->chunk_cache->allocated_size;
+
+			/* Compress the chunk if necessary and determine its CRC
+			 */
+			chunk_data_size = libewf_write_prepare_chunk_data(
+					   internal_handle, 
+					   chunk_data,
 					   write_size,
+					   internal_handle->chunk_cache->compressed,
+					   &compressed_chunk_data_size,
 					   &is_compressed,
 					   &chunk_crc,
 					   &write_crc );
 
 			if( chunk_data_size <= -1 )
 			{
-				LIBEWF_WARNING_PRINT( "%s: unable to process chunk data.\n",
+				LIBEWF_WARNING_PRINT( "%s: unable to prepare chunk data.\n",
 				 function );
 
 				return( -1 );
+			}
+			/* Make sure to update the chunk_data pointer if 
+			 * internal_handle->chunk_cache->data has been reallocated by
+			 * libewf_write_prepare_chunk_data()
+			 */
+			if( ( chunk_cache_data_used == 1 )
+			 && ( chunk_data != internal_handle->chunk_cache->data ) )
+			{
+				chunk_data = internal_handle->chunk_cache->data;
+			}
+			if( is_compressed != 0 )
+			{
+				chunk_data = internal_handle->chunk_cache->compressed;
 			}
 		}
 		else

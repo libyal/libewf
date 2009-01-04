@@ -1620,7 +1620,8 @@ void ewfcommon_process_status_fprint( size64_t bytes_read, size64_t bytes_total 
 	{
 		return;
 	}
-	if( ( bytes_total > 0 ) && ( bytes_read > 0 ) )
+	if( ( bytes_total > 0 )
+	 && ( bytes_read > 0 ) )
 	{
 		new_percentage = (int8_t) ( ( bytes_read * 100 ) / bytes_total );
 	}
