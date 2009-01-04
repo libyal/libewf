@@ -140,14 +140,15 @@ Next release:
   - for some sections not useful
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
-* remove ewf_compress and ewf_string.c
 * libewf_section_list_append add section_type length parameter
 * pass media values struct to section volume/data functions
-* section make sure read count is returned instead of section_size
 * move libewf_section_read to segment file
 
 * Try to correct the table
   - add error flag
+
+WIN32
+* remove ewf_compress and ewf_string.c
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -170,6 +171,7 @@ Version: 20071123
 * added chunk size to delta chunk for redundancy
 * removed internal handle from most functions in section
 * ewfexport added argument set detection for interactive mode
+* section read count is returned instead of section size when possible
 
 Version: 20071121
 * worked on refactoring code

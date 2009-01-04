@@ -171,14 +171,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\libewf\ewf_compress.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf.c"
 				>
 			</File>
@@ -188,6 +180,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_common.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_compression.c"
 				>
 			</File>
 			<File
@@ -203,6 +199,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_file_io_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io_pool.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_filename.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_hash_values.c"
 				>
 			</File>
@@ -212,6 +220,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_internal_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_media_values.c"
 				>
 			</File>
 			<File
@@ -262,10 +274,6 @@
 			>
 			<File
 				RelativePath="..\..\libewf\ewf_char.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\ewf_compress.h"
 				>
 			</File>
 			<File
@@ -341,6 +349,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_compression.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_config.h"
 				>
 			</File>
@@ -365,6 +377,18 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_file_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_file_io_pool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_filename.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_hash_values.h"
 				>
 			</File>
@@ -378,6 +402,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_internal_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_media_values.h"
 				>
 			</File>
 			<File

@@ -3599,7 +3599,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size
 
 		return( -1 );
 	}
-	if( section_size > (size_t) SSIZE_MAX )
+	if( section_size > (size_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section size value exceeds maximum.\n",
 		 function );
@@ -3676,7 +3676,7 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, size
 		{
 			return( -1 );
 		}
-		chunk_size = section_size - EWFX_DELTA_CHUNK_HEADER_SIZE;
+		chunk_size = (uint32_t) ( section_size - EWFX_DELTA_CHUNK_HEADER_SIZE );
 	}
 	/* Update the chunk data in the offset table
 	 */
@@ -3747,7 +3747,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE *segment_file, uin
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( chunk_size, delta_chunk_header.chunk_size ) != 1 )
+	if( libewf_endian_revert_32bit( (uint32_t) chunk_size, delta_chunk_header.chunk_size ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk size value.\n" );
 

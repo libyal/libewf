@@ -143,7 +143,7 @@ LIBEWF_SEGMENT_FILE *libewf_segment_file_alloc( void )
  * Sets the filename and the file descriptor in the segment file struct
  * Returns a pointer to the segment file if successful, or NULL on error
  */
-LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, int flags )
+LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t length_filename, uint8_t flags )
 {
 	LIBEWF_SEGMENT_FILE *segment_file = NULL;
 	static char *function             = "libewf_segment_file_open";
