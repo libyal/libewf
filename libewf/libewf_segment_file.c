@@ -565,24 +565,24 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	}
 	segment_table->segment_file[ segment_number ] = segment_file;
 
-	segment_file->filename = libewf_filename_create(
-	                          segment_number,
-	                          maximum_amount_of_segments,
-	                          segment_file_type,
-	                          ewf_format,
-	                          format,
-	                          segment_table->segment_file[ 0 ]->filename );
-
-	if( segment_file->filename == NULL )
+	if( libewf_filename_create(
+	     &( segment_file->filename ),
+	     &( segment_file->length_filename ),
+	     segment_table->segment_file[ 0 ]->filename,
+	     segment_table->segment_file[ 0 ]->length_filename,
+	     segment_number,
+	     maximum_amount_of_segments,
+	     segment_file_type,
+	     ewf_format,
+	     format ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create segment file filename.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_file->length_filename = libewf_filename_length( segment_file->filename );
-
-	if( segment_file->length_filename == 0 )
+	if( ( segment_file->filename == NULL )
+	 || ( segment_file->length_filename == 0 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: filename is empty.\n",
 		 function );

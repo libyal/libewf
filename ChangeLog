@@ -123,6 +123,8 @@ Next release:
 * API function get current chunk size? for raw read?
 * do not finalize on write error?
 
+* what to do with libewf_filename_get and libewf_filename_set
+
 * offset table dirty still needed?
   only needed for write
   need to determine if a chunks is stored in a delta segment file
@@ -131,8 +133,6 @@ Next release:
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
 * move libewf_section_read to segment file
-
-* libewf_filename_create set string and length as parameters?
 
 * Try to correct the table
   - add error flag
@@ -161,6 +161,7 @@ Version: 20071124
 * ewfcommon_export_ewf added raw access write support
 * change string to (u)int64 conversion routines to use long long equivalents
 * ewfacquirestream and ewfexport added > 2 GiB segment file support
+* libewf_filename_create now takes string and length as parameters
 
 Version: 20071123
 * worked on refactoring code
