@@ -107,6 +107,7 @@ int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32
 
 int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance );
 int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance );
+int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
 
 #if defined( __cplusplus )
 }

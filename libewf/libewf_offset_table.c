@@ -671,3 +671,44 @@ int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table
 	return( 1 );
 }
 
+/* Compare the offsets in tablel and table2 sections
+ * Returns 1 if tables match, 0 if table differ, or -1 on error
+ */
+int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 )
+{
+	static char *function = "libewf_offset_table_compare";
+	uint64_t iterator     = 0;
+
+	if( ( offset_table1 == NULL )
+	 || ( offset_table2 == NULL ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if table and table2 are the same
+	 */
+	if( offset_table1->amount != offset_table2->amount )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in size.\n",
+		 function );
+
+		return( 0 );
+	}
+	else
+	{
+		for( iterator = 0; iterator < offset_table1->amount; iterator++ )
+		{
+			if( offset_table1->offset[ iterator ] != offset_table2->offset[ iterator ] )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n",
+				 function, iterator, offset_table1->offset[ iterator ], offset_table2->offset[ iterator ] );
+
+				return( 0 );
+			}
+		}
+	}
+	return( 1 );
+}
+

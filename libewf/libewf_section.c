@@ -1154,7 +1154,8 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding, 8 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding1, 4 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding2, 4 ); );
 #endif
 
 	/* The table size contains the size of the CRC (4 bytes)
@@ -1323,9 +1324,10 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 		}
 	}
 	/* Skip the chunk data within the section
+	 * for chunks after the table section
 	 */
 	if( ( size > 0 )
-	 && ( size <= (uint64_t) INT32_MAX ) )
+	 && ( size <= (size_t) INT32_MAX ) )
 	{
 		if( libewf_common_lseek( file_descriptor, size, SEEK_CUR ) == -1 )
 		{
@@ -1333,47 +1335,6 @@ int libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_
 			 function );
 
 			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
-/* Compare the offsets in tabel and table2 sections
- * Returns 1 if tables match, 0 if table differ, or -1 on error
- */
-int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 )
-{
-	static char *function = "libewf_offset_table_compare";
-	uint64_t iterator     = 0;
-
-	if( ( offset_table1 == NULL )
-	 || ( offset_table2 == NULL ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Check if table and table2 are the same
-	 */
-	if( offset_table1->amount != offset_table2->amount )
-	{
-		LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in size.\n",
-		 function );
-
-		return( 0 );
-	}
-	else
-	{
-		for( iterator = 0; iterator < offset_table1->amount; iterator++ )
-		{
-			if( offset_table1->offset[ iterator ] != offset_table2->offset[ iterator ] )
-			{
-				LIBEWF_VERBOSE_PRINT( "%s: offset tables differ in offset for chunk: %" PRIu64 " (table1: %" PRIu64 ", table2: %" PRIu64 ").\n",
-				 function, iterator, offset_table1->offset[ iterator ], offset_table2->offset[ iterator ] );
-
-				return( 0 );
-			}
 		}
 	}
 	return( 1 );

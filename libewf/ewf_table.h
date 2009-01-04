@@ -56,16 +56,22 @@ struct ewf_table
 	 */
 	uint8_t amount_of_chunks[ 4 ];
 
+	/* Padding
+	 * consists of 4 bytes
+	 * value should be 0x00
+	 */
+	uint8_t padding1[ 4 ];
+
 	/* The base offset
 	 * consists of 8 bytes
 	 */
 	uint8_t base_offset[ 8 ];
 
 	/* Padding
-	 * consists of 8 bytes (16 byte in EWF files before EnCase 6)
+	 * consists of 4 bytes
 	 * value should be 0x00
 	 */
-	uint8_t padding[ 8 ];
+	uint8_t padding2[ 4 ];
 
 	/* The section crc of all (previous) table data
 	 * consits of 4 bytes
