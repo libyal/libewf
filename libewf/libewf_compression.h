@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include "libewf_error.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -35,13 +37,15 @@ int libewf_compress(
      size_t *compressed_size,
      uint8_t *uncompressed_data,
      size_t uncompressed_size,
-     int8_t compression_level );
+     int8_t compression_level,
+     libewf_error_t **error );
 
 int libewf_uncompress(
      uint8_t *uncompressed_data,
      size_t *uncompressed_size,
      uint8_t *compressed_data,
-     size_t compressed_size );
+     size_t compressed_size,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

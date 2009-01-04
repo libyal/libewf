@@ -65,14 +65,16 @@ int libewf_segment_file_read_sections(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance );
+     uint8_t error_tollerance,
+     libewf_error_t **error );
 
 ssize_t libewf_segment_file_write_headers(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_file_io_pool_t *file_io_pool,
          libewf_header_sections_t *header_sections,
          int8_t compression_level,
-         uint8_t format );
+         uint8_t format,
+         libewf_error_t **error );
 
 ssize_t libewf_segment_file_write_last_section(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -91,7 +93,8 @@ ssize_t libewf_segment_file_write_start(
          int8_t compression_level,
          uint8_t format,
          uint8_t ewf_format,
-         ewf_data_t **cached_data_section );
+         ewf_data_t **cached_data_section,
+         libewf_error_t **error );
 
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,

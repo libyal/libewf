@@ -121,8 +121,8 @@ int libewf_chunk_cache_initialize(
 		{
 			libewf_error_set(
 			 error,
-			 LIBEWF_ERROR_DOMAIN_RUNTIME,
-			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 LIBEWF_ERROR_DOMAIN_MEMORY,
+			 LIBEWF_MEMORY_ERROR_INSUFFICIENT,
 			 "%s: unable to create chunk cache data.\n",
 			 function );
 

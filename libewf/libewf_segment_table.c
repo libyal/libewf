@@ -358,7 +358,8 @@ int libewf_segment_table_build(
 		          format,
 		          ewf_format,
 		          segment_file_size,
-		          error_tollerance );
+		          error_tollerance,
+		          error );
 
 		if( result == -1 )
 		{

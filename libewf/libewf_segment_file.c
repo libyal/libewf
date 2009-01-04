@@ -28,6 +28,7 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_file_io_pool.h"
 #include "libewf_hash_values.h"
 #include "libewf_section.h"
@@ -201,7 +202,8 @@ int libewf_segment_file_read_sections(
      uint8_t *format,
      uint8_t *ewf_format,
      size64_t *segment_file_size,
-     uint8_t error_tollerance  )
+     uint8_t error_tollerance,
+     libewf_error_t **error )
 {
 	ewf_section_t section;
 
@@ -246,7 +248,8 @@ int libewf_segment_file_read_sections(
 		          segment_file_size,
 		          &section,
 		          &previous_offset,
-		          error_tollerance );
+		          error_tollerance,
+		          error );
 
 		if( result != 1 )
 		{
@@ -285,7 +288,8 @@ ssize_t libewf_segment_file_write_headers(
          libewf_file_io_pool_t *file_io_pool,
          libewf_header_sections_t *header_sections,
          int8_t compression_level,
-         uint8_t format )
+         uint8_t format,
+         libewf_error_t **error )
 {
 	static char *function     = "libewf_segment_file_write_headers";
 	ssize_t write_count       = 0;
@@ -331,7 +335,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
-		               compression_level );
+		               compression_level,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -358,7 +363,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -374,7 +380,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -411,7 +418,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -427,7 +435,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -446,7 +455,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -491,7 +501,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->xheader,
 		               header_sections->xheader_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -510,7 +521,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -529,7 +541,8 @@ ssize_t libewf_segment_file_write_headers(
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
-		               EWF_COMPRESSION_DEFAULT );
+		               EWF_COMPRESSION_DEFAULT,
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -607,7 +620,8 @@ ssize_t libewf_segment_file_write_start(
          int8_t compression_level,
          uint8_t format,
          uint8_t ewf_format,
-         ewf_data_t **cached_data_section )
+         ewf_data_t **cached_data_section,
+         libewf_error_t **error )
 {
 	ewf_file_header_t file_header;
 
@@ -715,7 +729,8 @@ ssize_t libewf_segment_file_write_start(
 				       file_io_pool,
 				       header_sections,
 				       compression_level,
-				       format );
+				       format,
+			               error );
 
 			if( write_count == -1 )
 			{
@@ -1534,7 +1549,8 @@ ssize_t libewf_segment_file_write_close(
 			               segment_file_handle,
 			               hash_sections->xhash,
 			               hash_sections->xhash_size,
-			               EWF_COMPRESSION_DEFAULT );
+			               EWF_COMPRESSION_DEFAULT,
+			               error );
 
 			if( write_count == -1 )
 			{

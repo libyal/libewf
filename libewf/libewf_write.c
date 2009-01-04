@@ -801,7 +801,8 @@ ssize_t libewf_write_process_chunk_data(
 			  compressed_chunk_data_size,
 			  (uint8_t *) chunk_data,
 			  chunk_data_size,
-			  chunk_compression_level );
+			  chunk_compression_level,
+		          error );
 
 		/* Check if the compressed buffer was too small
 		 * and the chunk cache is used to store the compressed chunk
@@ -841,7 +842,8 @@ ssize_t libewf_write_process_chunk_data(
 				  compressed_chunk_data_size,
 				  (uint8_t *) chunk_data,
 				  chunk_data_size,
-				  chunk_compression_level );
+				  chunk_compression_level,
+			          error );
 		}
 		if( result != 1 )
 		{
@@ -1216,7 +1218,8 @@ ssize_t libewf_raw_write_chunk_new(
 		               internal_handle->compression_level,
 		               internal_handle->format,
 		               internal_handle->ewf_format,
-		               &( internal_handle->write->data_section ) );
+		               &( internal_handle->write->data_section ),
+		               error );
 
 		if( write_count == -1 )
 		{
@@ -2045,7 +2048,8 @@ ssize_t libewf_raw_write_chunk_existing(
 				       internal_handle->compression_level,
 				       internal_handle->format,
 				       internal_handle->ewf_format,
-			               &( internal_handle->write->data_section ) );
+			               &( internal_handle->write->data_section ),
+			               error );
 
 			if( write_count == -1 )
 			{

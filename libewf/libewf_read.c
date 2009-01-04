@@ -158,7 +158,8 @@ ssize_t libewf_read_process_chunk_data(
 		     uncompressed_chunk_data,
 		     uncompressed_chunk_data_size,
 		     chunk_data,
-		     chunk_data_size ) != 1 )
+		     chunk_data_size,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,

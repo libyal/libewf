@@ -28,8 +28,10 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_compression.h"
 #include "libewf_debug.h"
+#include "libewf_error.h"
 #include "libewf_header_values.h"
 #include "libewf_section.h"
 
@@ -257,7 +259,8 @@ ssize_t libewf_section_compressed_string_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t compressed_string_size,
          uint8_t **uncompressed_string,
-         size_t *uncompressed_string_size )
+         size_t *uncompressed_string_size,
+         libewf_error_t **error )
 {
 	uint8_t *compressed_string = NULL;
 	uint8_t *uncompressed      = NULL;
@@ -342,7 +345,8 @@ ssize_t libewf_section_compressed_string_read(
 	          uncompressed,
 	          uncompressed_string_size,
 	          compressed_string,
-	          compressed_string_size );
+	          compressed_string_size,
+	          error );
 
 	while( ( result == -1 )
 	 && ( *uncompressed_string_size > 0 ) )
@@ -369,7 +373,8 @@ ssize_t libewf_section_compressed_string_read(
 		          uncompressed,
 		          uncompressed_string_size,
 		          compressed_string,
-		          compressed_string_size );
+		          compressed_string_size,
+		          error );
 	}
 	memory_free(
 	 compressed_string );
@@ -399,7 +404,8 @@ ssize_t libewf_section_write_compressed_string(
          size_t section_type_length,
          uint8_t *uncompressed_string,
          size_t uncompressed_string_size,
-         int8_t compression_level )
+         int8_t compression_level,
+         libewf_error_t **error )
 {
 	uint8_t *compressed_string    = NULL;
 	static char *function         = "libewf_section_write_compressed_string";
@@ -457,7 +463,8 @@ ssize_t libewf_section_write_compressed_string(
 	          &compressed_string_size,
 	          uncompressed_string,
 	          uncompressed_string_size,
-	          compression_level );
+	          compression_level,
+	          error );
 
 	if( ( result == -1 )
 	 && ( compressed_string_size > 0 ) )
@@ -483,7 +490,8 @@ ssize_t libewf_section_write_compressed_string(
 		          &compressed_string_size,
 		          uncompressed_string,
 		          uncompressed_string_size,
-		          compression_level );
+		          compression_level,
+		          error );
 	}
 	if( result == -1 )
 	{
@@ -553,7 +561,8 @@ ssize_t libewf_section_header_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_header,
-         size_t *cached_header_size )
+         size_t *cached_header_size,
+         libewf_error_t **error )
 {
 	uint8_t *header       = NULL;
 	static char *function = "libewf_section_header_read";
@@ -593,7 +602,8 @@ ssize_t libewf_section_header_read(
 	              segment_file_handle,
 	              section_size,
 	              &header,
-	              &header_size );
+	              &header_size,
+	              error );
 
 	if( read_count != (ssize_t) section_size )
 	{
@@ -641,7 +651,8 @@ ssize_t libewf_section_header_write(
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *header,
          size_t header_size,
-         int8_t compression_level )
+         int8_t compression_level,
+         libewf_error_t **error )
 {
 	static char *function       = "libewf_section_header_write";
 	ssize_t section_write_count = 0;
@@ -672,7 +683,8 @@ ssize_t libewf_section_header_write(
 	                       6,
 	                       header,
 	                       header_size,
-	                       compression_level );
+	                       compression_level,
+	                       error );
 
 	if( section_write_count == -1 )
 	{
@@ -692,7 +704,8 @@ ssize_t libewf_section_header2_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_header2,
-         size_t *cached_header2_size )
+         size_t *cached_header2_size,
+         libewf_error_t **error )
 {
 	uint8_t *header2      = NULL;
 	static char *function = "libewf_section_header2_read";
@@ -732,7 +745,8 @@ ssize_t libewf_section_header2_read(
 	              segment_file_handle,
 	              section_size,
 	              &header2,
-	              &header2_size );
+	              &header2_size,
+	              error );
 
 	if( read_count != (ssize_t) section_size )
 	{
@@ -780,7 +794,8 @@ ssize_t libewf_section_header2_write(
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *header2,
          size_t header2_size,
-         int8_t compression_level )
+         int8_t compression_level,
+         libewf_error_t **error )
 {
 	static char *function       = "libewf_section_header2_write";
 	ssize_t section_write_count = 0;
@@ -810,7 +825,8 @@ ssize_t libewf_section_header2_write(
 	                       7,
 	                       header2,
 	                       header2_size,
-	                       compression_level );
+	                       compression_level,
+	                       error );
 
 	if( section_write_count == -1 )
 	{
@@ -4230,7 +4246,8 @@ ssize_t libewf_section_xheader_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_xheader,
-         size_t *cached_xheader_size )
+         size_t *cached_xheader_size,
+         libewf_error_t **error )
 {
 	uint8_t *xheader      = NULL;
 	static char *function = "libewf_section_xheader_read";
@@ -4270,7 +4287,8 @@ ssize_t libewf_section_xheader_read(
 	              segment_file_handle,
 	              section_size,
 	              &xheader,
-	              &xheader_size );
+	              &xheader_size,
+	              error );
 
 	if( read_count != (ssize_t) section_size )
 	{
@@ -4318,7 +4336,8 @@ ssize_t libewf_section_xheader_write(
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *xheader,
          size_t xheader_size,
-         int8_t compression_level )
+         int8_t compression_level,
+         libewf_error_t **error )
 {
 	static char *function       = "libewf_section_xheader_write";
 	ssize_t section_write_count = 0;
@@ -4348,7 +4367,8 @@ ssize_t libewf_section_xheader_write(
 	                       7,
 	                       xheader,
 	                       xheader_size,
-	                       compression_level );
+	                       compression_level,
+	                       error );
 
 	if( section_write_count == -1 )
 	{
@@ -4368,7 +4388,8 @@ ssize_t libewf_section_xhash_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_xhash,
-         size_t *cached_xhash_size )
+         size_t *cached_xhash_size,
+         libewf_error_t **error )
 {
 	uint8_t *xhash        = NULL;
 	static char *function = "libewf_section_xhash_read";
@@ -4408,7 +4429,8 @@ ssize_t libewf_section_xhash_read(
 	              segment_file_handle,
 	              section_size,
 	              &xhash,
-	              &xhash_size );
+	              &xhash_size,
+	              error );
 
 	if( read_count != (ssize_t) section_size )
 	{
@@ -4456,7 +4478,8 @@ ssize_t libewf_section_xhash_write(
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *xhash,
          size_t xhash_size,
-         int8_t compression_level )
+         int8_t compression_level,
+         libewf_error_t **error )
 {
 	static char *function       = "libewf_section_xhash_write";
 	ssize_t section_write_count = 0;
@@ -4486,7 +4509,8 @@ ssize_t libewf_section_xhash_write(
 	                       5,
 	                       xhash,
 	                       xhash_size,
-	                       compression_level );
+	                       compression_level,
+	                       error );
 
 	if( section_write_count == -1 )
 	{
@@ -4952,7 +4976,8 @@ int libewf_section_read(
      size64_t *segment_file_size,
      ewf_section_t *section,
      off64_t *section_start_offset,
-     uint8_t error_tollerance )
+     uint8_t error_tollerance,
+     libewf_error_t **error )
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;
@@ -5144,7 +5169,8 @@ int libewf_section_read(
 		              segment_file_handle,
 		              (size_t) size,
 		              &( header_sections->header2 ),
-		              &( header_sections->header2_size ) );
+		              &( header_sections->header2_size ),
+		              error );
 
 		header_sections->amount_of_header_sections++;
 	}
@@ -5161,7 +5187,8 @@ int libewf_section_read(
 		              segment_file_handle,
 		              (size_t) size,
 		              &( header_sections->header ),
-		              &( header_sections->header_size ) );
+		              &( header_sections->header_size ),
+		              error );
 
 		header_sections->amount_of_header_sections++;
 	}
@@ -5178,7 +5205,8 @@ int libewf_section_read(
 		              segment_file_handle,
 		              (size_t) size,
 		              &( header_sections->xheader ),
-		              &( header_sections->xheader_size ) );
+		              &( header_sections->xheader_size ),
+		              error );
 
 		header_sections->amount_of_header_sections++;
 	}
@@ -5357,7 +5385,8 @@ int libewf_section_read(
 		              segment_file_handle,
 		              (size_t) size,
 		              &( hash_sections->xhash ),
-		              &( hash_sections->xhash_size ) );
+		              &( hash_sections->xhash_size ),
+		              error );
 	}
 	/* Read the error2 section
 	 * The \0 byte is included in the compare
