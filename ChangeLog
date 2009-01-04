@@ -149,7 +149,6 @@ Next stable:
   function
   - functions basically use libewf_section_compressed_string_read
 
-* implement TODO in ewfexport
 * check TODOs
 
 CLOSED
@@ -174,6 +173,7 @@ Version: 20080228
 * Worked on not finalizing on error
 * Refactored libewf_header_values_parse_header and libewf_header_values_parse_header2
 * Removed dirty value from offset table entry, reduces memory usage
+* worked on export to EWF
 
 Version: 20080227
 * refactored ewfdigest_hash

@@ -784,86 +784,16 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_set_sectors_per_chunk(
-		     export_handle,
-		     (uint32_t) sectors_per_chunk ) != 1 )
-		{
-			fprintf( stderr, "Unable to set sectors per chunk in handle.\n" );
-
-			if( libewf_close(
-			     export_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			if( libewf_close(
-			     handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		if( libewf_set_segment_file_size(
-		     export_handle,
-		     (uint32_t) segment_file_size ) != 1 )
-		{
-			fprintf( stderr, "Unable to set segment file size in handle.\n" );
-
-			if( libewf_close(
-			     export_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			if( libewf_close(
-			     handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		if( libewf_set_compression_values(
-		     export_handle,
-		     compression_level,
-		     (uint8_t) compress_empty_block ) != 1 )
-		{
-			fprintf( stderr, "Unable to set compression values in handle.\n" );
-
-			if( libewf_close(
-			     export_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			if( libewf_close(
-			     handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		if( libewf_set_format(
-		     export_handle,
-		     libewf_format ) != 1 )
-		{
-			fprintf( stderr, "Unable to set format in handle.\n" );
-
-			if( libewf_close(
-			     export_handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			if( libewf_close(
-			     handle ) != 0 )
-			{
-				fprintf( stderr, "Unable to close EWF file(s).\n" );
-			}
-			return( EXIT_FAILURE );
-		}
-		/* TODO copy the necessary metadata
-		 */
 		count = ewfcommon_export_ewf(
 		         handle,
 		         export_handle,
+		         compression_level,
+		         (uint8_t) compress_empty_block,
+		         libewf_format,
+		         segment_file_size,
 		         export_size,
 		         export_offset,
+		         (uint32_t) sectors_per_chunk,
 		         calculate_md5,
 		         calculate_sha1,
 		         swap_byte_pairs,

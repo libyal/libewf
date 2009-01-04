@@ -42,7 +42,8 @@
 /* Allocates memory for a new handle media struct
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_media_values_t *libewf_media_values_alloc( void )
+libewf_media_values_t *libewf_media_values_alloc(
+                        void )
 {
 	libewf_media_values_t *media_values = NULL;
 	static char *function               = "libewf_media_values_alloc";

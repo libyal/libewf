@@ -1936,6 +1936,59 @@ int libewf_set_segment_file_size(
 	return( 1 );
 }
 
+/* Sets the delta segment file size
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_set_delta_segment_file_size(
+     LIBEWF_HANDLE *handle,
+     size64_t delta_segment_file_size )
+{
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_delta_segment_file_size";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->values_initialized != 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( delta_segment_file_size == 0 )
+	 || ( delta_segment_file_size > (size64_t) INT64_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid delta segment file size value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->write->delta_segment_file_size > (size64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid delta segment file size value exceeds maximum segment file size.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->write->delta_segment_file_size = delta_segment_file_size;
+
+	return( 1 );
+}
+
 /* Sets the media type
  * Returns 1 if successful, or -1 on error
  */
@@ -2290,59 +2343,6 @@ int libewf_set_delta_segment_filename(
 	         internal_handle->delta_segment_table->segment_file_handle[ 0 ],
 	         filename,
 	         length ) );
-}
-
-/* Sets the delta segment file size
- * Returns 1 if successful, or -1 on error
- */
-int libewf_set_delta_segment_file_size(
-     LIBEWF_HANDLE *handle,
-     size64_t delta_segment_file_size )
-{
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_set_delta_segment_file_size";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( delta_segment_file_size == 0 )
-	 || ( delta_segment_file_size > (size64_t) INT64_MAX ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->delta_segment_file_size > (size64_t) INT64_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid delta segment file size value exceeds maximum segment file size.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->write->delta_segment_file_size = delta_segment_file_size;
-
-	return( 1 );
 }
 
 /* Sets the read wipe chunk on error
@@ -2746,6 +2746,61 @@ int libewf_copy_header_values(
 	return( libewf_header_values_copy(
 	         internal_destination_handle->header_values,
 	         internal_source_handle->header_values ) );
+}
+
+/* Copies the media values from the source to the destination handle
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_copy_media_values(
+     LIBEWF_HANDLE *destination_handle,
+     LIBEWF_HANDLE *source_handle )
+{
+	libewf_internal_handle_t *internal_destination_handle = NULL;
+	libewf_internal_handle_t *internal_source_handle      = NULL;
+	static char *function                                 = "libewf_copy_media_values";
+
+	if( destination_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid destination handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_destination_handle = (libewf_internal_handle_t *) destination_handle;
+	internal_source_handle      = (libewf_internal_handle_t *) source_handle;
+
+	if( internal_source_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_destination_handle->media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid destination handle - missing media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_common_memcpy(
+	     internal_destination_handle->media_values,
+	     internal_source_handle->media_values,
+	     sizeof( libewf_media_values_t ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to copy media values.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Set the notify values

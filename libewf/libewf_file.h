@@ -232,6 +232,10 @@ LIBEWF_EXTERN int libewf_set_segment_file_size(
                    LIBEWF_HANDLE *handle,
                    size64_t segment_file_size );
 
+LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
+                   LIBEWF_HANDLE *handle,
+                   size64_t delta_segment_file_size );
+
 LIBEWF_EXTERN int libewf_set_media_type(
                    LIBEWF_HANDLE *handle,
                    uint8_t media_type );
@@ -258,10 +262,6 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    LIBEWF_HANDLE *handle,
                    libewf_filename_t *filename,
                    size_t length );
-
-LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
-                   LIBEWF_HANDLE *handle,
-                   size64_t delta_segment_file_size );
 
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error(
                    LIBEWF_HANDLE *handle,
@@ -297,6 +297,10 @@ LIBEWF_EXTERN int libewf_add_crc_error(
                    uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN int libewf_copy_header_values(
+                   LIBEWF_HANDLE *destination_handle,
+                   LIBEWF_HANDLE *source_handle );
+
+LIBEWF_EXTERN int libewf_copy_media_values(
                    LIBEWF_HANDLE *destination_handle,
                    LIBEWF_HANDLE *source_handle );
 

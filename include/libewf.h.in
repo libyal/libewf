@@ -681,6 +681,13 @@ LIBEWF_EXTERN int libewf_set_segment_file_size(
                    LIBEWF_HANDLE *handle,
                    size64_t segment_file_size );
 
+/* Sets the delta segment file size
+ * Returns 1 if successful, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
+                   LIBEWF_HANDLE *handle,
+                   size64_t delta_segment_file_size );
+
 /* Sets the media type
  * Returns 1 if successful, or -1 on error
  */
@@ -732,13 +739,6 @@ LIBEWF_EXTERN int libewf_set_delta_segment_filename(
                    char *filename,
                    size_t length );
 #endif
-
-/* Sets the delta segment file size
- * Returns 1 if successful, or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
-                   LIBEWF_HANDLE *handle,
-                   size64_t delta_segment_file_size );
 
 /* Sets the read wipe chunk on error
  * The chunk is not wiped if read raw is used
@@ -981,6 +981,13 @@ LIBEWF_EXTERN int libewf_add_crc_error(
  * Returns 1 if successful, or -1 on error
  */
 LIBEWF_EXTERN int libewf_copy_header_values(
+                   LIBEWF_HANDLE *destination_handle,
+                   LIBEWF_HANDLE *source_handle );
+
+/* Copies the media values from the source to the destination handle
+ * Returns 1 if successful, or -1 on error
+ */
+LIBEWF_EXTERN int libewf_copy_media_values(
                    LIBEWF_HANDLE *destination_handle,
                    LIBEWF_HANDLE *source_handle );
 

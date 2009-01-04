@@ -168,8 +168,13 @@ ssize64_t ewfcommon_export_raw(
 ssize64_t ewfcommon_export_ewf(
            LIBEWF_HANDLE *handle,
            LIBEWF_HANDLE *export_handle,
+           int8_t compression_level,
+           uint8_t compress_empty_block,
+           uint8_t libewf_format,
+           size64_t segment_file_size,
            size64_t export_size,
            off64_t read_offset,
+           uint32_t export_sectors_per_chunk,
            uint8_t calculate_md5,
            uint8_t calculate_sha1,
            uint8_t swap_byte_pairs,
