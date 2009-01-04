@@ -112,6 +112,8 @@ Code clean up
 * merge alloc and realloc blocks
 
 Next release(s):
+* relicense to LGPL
+
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
@@ -145,10 +147,6 @@ Next release(s):
 * implement features.h like libsmio
 * remove libewf_filename.[ch]
 
-* check possible infinite loop for uncompress buffer enlargement
-
-* check missing debug output in Cygwin
-
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -166,8 +164,11 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
-Version: 20080609
-* Changes for EnCase 6.11 winen file format and memory image
+Version: 20080705
+* added ewfouput_error_fprint
+
+Version: 20080704
+* added fopen and fclose to configure
 
 Version: 20080511
 * minor changes

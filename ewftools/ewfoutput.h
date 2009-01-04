@@ -55,6 +55,11 @@ void ewfoutput_version_fprint(
 void ewfoutput_copyright_fprint(
       FILE *stream );
 
+void ewfoutput_error_fprint(
+      FILE *stream,
+      char *format,
+      ... );
+
 void ewfoutput_acquiry_parameters_fprint(
       FILE *stream,
       system_character_t *filename,

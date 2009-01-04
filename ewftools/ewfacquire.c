@@ -299,9 +299,6 @@ int main( int argc, char * const argv[] )
 
 	system_character_t *filename             = NULL;
 	system_character_t *log_filename         = NULL;
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-	system_character_t *error_string         = NULL;
-#endif
 
 	FILE *log_file_stream                    = NULL;
 	void *callback                           = &ewfoutput_process_status_fprint;
@@ -439,29 +436,10 @@ int main( int argc, char * const argv[] )
 
 	if( file_descriptor == -1 )
 	{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-		if( errno != 0 )
-		{
-			error_string = ewfcommon_strerror(
-			                errno );
-		}
-		if( error_string != NULL )
-		{
-			fprintf( stderr, "Error opening file or device: %" PRIs_SYSTEM " with failure: %" PRIs_SYSTEM ".\n",
-			 argv[ optind ], error_string );
-
-			memory_free(
-			 error_string );
-		}
-		else
-		{
-			fprintf( stderr, "Error opening file or device: %" PRIs_SYSTEM ".\n",
-			 argv[ optind ] );
-		}
-#else
-		fprintf( stderr, "Error opening file or device: %" PRIs_SYSTEM ".\n",
+		ewfoutput_error_fprint(
+		 stderr, "Error opening file or device: %" PRIs_SYSTEM "",
 		 argv[ optind ] );
-#endif
+
 		return( EXIT_FAILURE );
 	}
 	/* Check the input file or device size
@@ -825,27 +803,9 @@ int main( int argc, char * const argv[] )
 
 		if( ewfcommon_libewf_handle == NULL )
 		{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-			if( errno != 0 )
-			{
-				error_string = ewfcommon_strerror(
-						errno );
-			}
-			if( error_string != NULL )
-			{
-				fprintf( stderr, "Unable to create EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
-				 error_string );
+			ewfoutput_error_fprint(
+			 stderr, "Unable to create EWF file(s)" );
 
-				memory_free(
-				 error_string );
-			}
-			else
-			{
-				fprintf( stderr, "Unable to create EWF file(s).\n" );
-			}
-#else
-			fprintf( stderr, "Unable to create EWF file(s).\n" );
-#endif
 			error_abort = 1;
 		}
 		else if( ewfcommon_initialize_write(

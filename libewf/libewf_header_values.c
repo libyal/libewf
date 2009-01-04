@@ -112,16 +112,8 @@ int libewf_header_values_initialize(
 	                                    13 );
 
 	header_values->identifiers[ 13 ] = string_duplicate(
-	                                    _CHARACTER_T_STRING( "unknown_pid" ),
-	                                    11 );
-
-	header_values->identifiers[ 14 ] = string_duplicate(
 	                                    _CHARACTER_T_STRING( "unknown_dc" ),
 	                                    10 );
-
-	header_values->identifiers[ 15 ] = string_duplicate(
-	                                    _CHARACTER_T_STRING( "unknown_ext" ),
-	                                    11 );
 
 	return( 1 );
 }
@@ -777,8 +769,7 @@ int libewf_header_values_parse_header_string(
 	character_t **values       = NULL;
 	character_t *date_string   = NULL;
 	static char *function      = "libewf_header_values_parse_header_string";
-	size_t type_string_length  = 0;
-	size_t value_string_length = 0;
+	size_t string_length       = 0;
 	size_t date_string_length  = 0;
 	uint32_t line_count        = 0;
 	uint32_t type_count        = 0;
@@ -895,372 +886,317 @@ int libewf_header_values_parse_header_string(
 		{
 			continue;
 		}
-		type_string_length = string_length(
-		                      types[ iterator ] );
-
-		value_string_length = string_length(
-		                       values[ iterator ] );
+		string_length = string_length(
+		                 values[ iterator ] );
 
 		/* Remove trailing white space
 		 */
-		if( ( type_string_length > 0 )
-		 && ( types[ iterator ][ type_string_length - 1 ] == (character_t) '\r' ) )
+		if( ( string_length > 0 )
+		 && ( values[ iterator ][ string_length - 1 ] == (character_t) '\r' ) )
 		{
-			type_string_length -= 1;
+			string_length -= 1;
 		}
-		if( ( value_string_length > 0 )
-		 && ( values[ iterator ][ value_string_length - 1 ] == (character_t) '\r' ) )
+		if( string_compare(
+		     types[ iterator ],
+		     _CHARACTER_T_STRING( "av" ),
+		     2 ) == 0 )
 		{
-			value_string_length -= 1;
-		}
-		if( type_string_length == 3 )
-		{
-			if( string_compare(
-			     types[ iterator ],
-			     _CHARACTER_T_STRING( "ext" ),
-			     3 ) == 0 )
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "acquiry_software_version" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "unknown_ext" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set unknown: ext.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set acquiry software version.\n",
+				 function );
 #endif
-				}
-			}
-			else if( string_compare(
-			          types[ iterator ],
-			          _CHARACTER_T_STRING( "pid" ),
-			          3 ) == 0 )
-			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "unknown_pid" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set unknown: pid.\n",
-					 function );
-#endif
-				}
 			}
 		}
-		else if( type_string_length == 2 )
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "dc" ),
+		          2 ) == 0 )
 		{
-			if( string_compare(
-			     types[ iterator ],
-			     _CHARACTER_T_STRING( "av" ),
-			     2 ) == 0 )
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "unknown_dc" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "acquiry_software_version" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set acquiry software version.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set unknown: dc.\n",
+				 function );
 #endif
-				}
-			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "dc" ),
-				  2 ) == 0 )
-			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "unknown_dc" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set unknown: dc.\n",
-					 function );
-#endif
-				}
-			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "md" ),
-				  2 ) == 0 )
-			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "model" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set model.\n",
-					 function );
-#endif
-				}
-			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "ov" ),
-				  2 ) == 0 )
-			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "acquiry_operating_system" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set acquiry operating system.\n",
-					 function );
-#endif
-				}
-			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "sn" ),
-				  2 ) == 0 )
-			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "serial_number" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
-#if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set serial_number.\n",
-					 function );
-#endif
-				}
 			}
 		}
-		else if( type_string_length == 1 )
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "md" ),
+		          2 ) == 0 )
 		{
-			if( ( string_compare(
-			       types[ iterator ],
-			       _CHARACTER_T_STRING( "m" ),
-			       1 ) == 0 )
-			 || ( string_compare(
-			       types[ iterator ],
-			       _CHARACTER_T_STRING( "u" ),
-			       1 ) == 0 ) )
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "model" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				/* If the date string contains spaces it's in the old header
-				 * format otherwise is in new header2 format
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf( "%s: unable to set model.\n",
+				 function );
+#endif
+			}
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "ov" ),
+		          2 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "acquiry_operating_system" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf( "%s: unable to set acquiry operating system.\n",
+				 function );
+#endif
+			}
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "sn" ),
+		          2 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "serial_number" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf( "%s: unable to set serial_number.\n",
+				 function );
+#endif
+			}
+		}
+		else if( ( string_compare(
+		            types[ iterator ],
+		            _CHARACTER_T_STRING( "m" ),
+		            1 ) == 0 )
+		      || ( string_compare(
+		            types[ iterator ],
+		            _CHARACTER_T_STRING( "u" ),
+		            1 ) == 0 ) )
+		{
+			/* If the date string contains spaces it's in the old header
+			 * format otherwise is in new header2 format
+			 */
+			if( string_search(
+			     values[ iterator ],
+			     (character_t) ' ',
+			     string_length ) != NULL )
+			{
+				result = libewf_convert_date_header_value(
+				          values[ iterator ],
+				          string_length,
+				          date_format,
+				          &date_string,
+				          &date_string_length );
+			}
+			else
+			{
+				result = libewf_convert_date_header2_value(
+				          values[ iterator ],
+				          string_length,
+				          date_format,
+				          &date_string,
+				          &date_string_length );
+			}
+			if( result != 1 )
+			{
+				notify_warning_printf( "%s: unable to create date string.\n",
+				 function );
+			}
+			else
+			{
+				/* The string length of the date string is needed
 				 */
-				if( string_search(
-				     values[ iterator ],
-				     (character_t) ' ',
-				     value_string_length ) != NULL )
-				{
-					result = libewf_convert_date_header_value(
-						  values[ iterator ],
-						  value_string_length,
-						  date_format,
-						  &date_string,
-						  &date_string_length );
-				}
-				else if( value_string_length != 0 )
-				{
-					result = libewf_convert_date_header2_value(
-						  values[ iterator ],
-						  value_string_length,
-						  date_format,
-						  &date_string,
-						  &date_string_length );
-				}
-				if( ( value_string_length != 0 )
-				 && ( result != 1 ) )
-				{
-					notify_warning_printf( "%s: unable to create date string.\n",
-					 function );
-				}
-				else
-				{
-					/* The string length of the date string is needed
-					 */
-					if( value_string_length != 0 )
-					{
-						value_string_length = string_length(
-								       date_string );
+				string_length = string_length(
+				                 date_string );
 
-					}
-					if( string_compare(
-					     types[ iterator ],
-					     _CHARACTER_T_STRING( "m" ),
-					     1 ) == 0 )
-					{
-						if( libewf_values_table_set_value(
-						     *header_values,
-						     _CHARACTER_T_STRING( "acquiry_date" ),
-						     date_string,
-						     value_string_length ) != 1 )
-						{
-#if defined( HAVE_VERBOSE_OUTPUT )
-							notify_verbose_printf( "%s: unable to set acquiry date.\n",
-							 function );
-#endif
-						}
-					}
-					else if( string_compare(
-						  types[ iterator ],
-						  _CHARACTER_T_STRING( "u" ),
-						  1 ) == 0 )
-					{
-						if( libewf_values_table_set_value(
-						     *header_values,
-						     _CHARACTER_T_STRING( "system_date" ),
-						     date_string,
-						     value_string_length ) != 1 )
-						{
-#if defined( HAVE_VERBOSE_OUTPUT )
-							notify_verbose_printf( "%s: unable to set system date.\n",
-							 function );
-#endif
-						}
-					}
-					memory_free(
-					 date_string );
-
-					date_string = NULL;
-				}
-			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "p" ),
-				  1 ) == 0 )
-			{
-				if( value_string_length == 0 )
-				{
-					/* Empty hash do nothing
-					 */
-				}
-				else if( ( value_string_length == 1 )
-				 && ( values[ iterator ][ 0 ] == (character_t) '0' ) )
-				{
-					/* Empty hash do nothing
-					 */
-				}
-				else
+				if( string_compare(
+				     types[ iterator ],
+				     _CHARACTER_T_STRING( "m" ),
+				     1 ) == 0 )
 				{
 					if( libewf_values_table_set_value(
 					     *header_values,
-					     _CHARACTER_T_STRING( "password" ),
-					     values[ iterator ],
-					     value_string_length ) != 1 )
+					     _CHARACTER_T_STRING( "acquiry_date" ),
+					     date_string,
+					     string_length ) != 1 )
 					{
 #if defined( HAVE_VERBOSE_OUTPUT )
-						notify_verbose_printf( "%s: unable to set password.\n",
+						notify_verbose_printf( "%s: unable to set acquiry date.\n",
 						 function );
 #endif
 					}
 				}
+				else if( string_compare(
+				          types[ iterator ],
+				          _CHARACTER_T_STRING( "u" ),
+				          1 ) == 0 )
+				{
+					if( libewf_values_table_set_value(
+					     *header_values,
+					     _CHARACTER_T_STRING( "system_date" ),
+					     date_string,
+					     string_length ) != 1 )
+					{
+#if defined( HAVE_VERBOSE_OUTPUT )
+						notify_verbose_printf( "%s: unable to set system date.\n",
+						 function );
+#endif
+					}
+				}
+				memory_free(
+				 date_string );
+
+				date_string = NULL;
 			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "a" ),
-				  1 ) == 0 )
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "p" ),
+		          1 ) == 0 )
+		{
+			if( string_length == 0 )
+			{
+				/* Empty hash do nothing
+				 */
+			}
+			else if( ( string_length == 1 )
+			 && ( values[ iterator ][ 0 ] == (character_t) '0' ) )
+			{
+				/* Empty hash do nothing
+				 */
+			}
+			else
 			{
 				if( libewf_values_table_set_value(
 				     *header_values,
-				     _CHARACTER_T_STRING( "description" ),
+				     _CHARACTER_T_STRING( "password" ),
 				     values[ iterator ],
-				     value_string_length ) != 1 )
+				     string_length ) != 1 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set description.\n",
+					notify_verbose_printf( "%s: unable to set password.\n",
 					 function );
 #endif
 				}
 			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "c" ),
-				  1 ) == 0 )
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "a" ),
+		          1 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "description" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "case_number" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set case number.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set description.\n",
+				 function );
 #endif
-				}
 			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "n" ),
-				  1 ) == 0 )
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "c" ),
+		          1 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "case_number" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "evidence_number" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set evidence number.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set case number.\n",
+				 function );
 #endif
-				}
 			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "e" ),
-				  1 ) == 0 )
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "n" ),
+		          1 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "evidence_number" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "examiner_name" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set examiner name.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set evidence number.\n",
+				 function );
 #endif
-				}
 			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "t" ),
-				  1 ) == 0 )
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "e" ),
+		          1 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "examiner_name" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "notes" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set notes.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set examiner name.\n",
+				 function );
 #endif
-				}
 			}
-			else if( string_compare(
-				  types[ iterator ],
-				  _CHARACTER_T_STRING( "r" ),
-				  1 ) == 0 )
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "t" ),
+		          1 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "notes" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
 			{
-				if( libewf_values_table_set_value(
-				     *header_values,
-				     _CHARACTER_T_STRING( "compression_type" ),
-				     values[ iterator ],
-				     value_string_length ) != 1 )
-				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: unable to set compression type.\n",
-					 function );
+				notify_verbose_printf( "%s: unable to set notes.\n",
+				 function );
 #endif
-				}
+			}
+		}
+		else if( string_compare(
+		          types[ iterator ],
+		          _CHARACTER_T_STRING( "r" ),
+		          1 ) == 0 )
+		{
+			if( libewf_values_table_set_value(
+			     *header_values,
+			     _CHARACTER_T_STRING( "compression_type" ),
+			     values[ iterator ],
+			     string_length ) != 1 )
+			{
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf( "%s: unable to set compression type.\n",
+				 function );
+#endif
 			}
 		}
 		else

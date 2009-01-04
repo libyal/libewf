@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20080609],
+ [20080705],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20080609])
+ [20080705])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -401,7 +401,9 @@ AC_CHECK_SIZEOF([size_t])
 dnl Check for functions
 AC_CHECK_FUNCS([atoll])
 AC_CHECK_FUNCS([ctime])
+AC_CHECK_FUNCS([fclose])
 AC_CHECK_FUNCS([fgets])
+AC_CHECK_FUNCS([fopen])
 AC_CHECK_FUNCS([getopt])
 AC_CHECK_FUNCS([gmtime])
 AC_CHECK_FUNCS([gmtime_r])

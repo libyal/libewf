@@ -100,9 +100,7 @@ int main( int argc, char * const argv[] )
 	character_t *program                = _CHARACTER_T_STRING( "ewfalter" );
 
 	system_character_t *target_filename = NULL;
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        system_character_t *error_string    = NULL;
-#endif
+
 	uint8_t *buffer                     = NULL;
 	system_integer_t option             = 0;
 	off64_t write_offset                = 0;
@@ -227,27 +225,8 @@ int main( int argc, char * const argv[] )
 	if( ( ewfcommon_abort == 0 )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-		if( errno != 0 )
-		{
-			error_string = ewfcommon_strerror(
-			                errno );
-		}
-		if( error_string != NULL )
-		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
-			 error_string );
-
-			memory_free(
-			 error_string );
-		}
-		else
-		{
-			fprintf( stderr, "Unable to open EWF file(s).\n" );
-		}
-#else
-		fprintf( stderr, "Unable to open EWF file(s).\n" );
-#endif
+		ewfoutput_error_fprint(
+		 stderr, "Unable to open EWF file(s)" );
 
 		return( EXIT_FAILURE );
 	}

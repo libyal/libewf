@@ -112,9 +112,6 @@ int main( int argc, char * const argv[] )
 	character_t *program                     = _CHARACTER_T_STRING( "ewfverify" );
 
 	system_character_t *log_filename         = NULL;
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        system_character_t *error_string         = NULL;
-#endif
 
 	FILE *log_file_stream                    = NULL;
 	void *callback                           = &ewfoutput_process_status_fprint;
@@ -265,27 +262,8 @@ int main( int argc, char * const argv[] )
 	if( ( ewfcommon_abort == 0 )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-		if( errno != 0 )
-		{
-			error_string = ewfcommon_strerror(
-			                errno );
-		}
-		if( error_string != NULL )
-		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
-			 error_string );
-
-			memory_free(
-			 error_string );
-		}
-		else
-		{
-			fprintf( stderr, "Unable to open EWF image file(s).\n" );
-		}
-#else
-		fprintf( stderr, "Unable to open EWF image file(s).\n" );
-#endif
+		ewfoutput_error_fprint(
+		 stderr, "Unable to open EWF image file(s)" );
 
 		return( EXIT_FAILURE );
 	}

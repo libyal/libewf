@@ -104,8 +104,6 @@
 
 #define LIBEWF_MEDIA_TYPE_CD			0x03
 
-#define LIBEWF_MEDIA_TYPE_RAM			0x10
-
 /* Libewf volume type definitions
  */
 #define LIBEWF_VOLUME_TYPE_LOGICAL		0x00

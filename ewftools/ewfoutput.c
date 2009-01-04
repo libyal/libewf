@@ -35,10 +35,13 @@
 #include <common.h>
 #include <character_string.h>
 #include <date_time.h>
+#include <error_string.h>
 #include <memory.h>
 #include <notify.h>
 #include <system_string.h>
 #include <types.h>
+
+#include <errno.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
@@ -52,15 +55,23 @@
 #include <sys/utsname.h>
 #endif
 
-#if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBZ )
+#if defined( HAVE_STDARG_H )
+#include <stdarg.h>
+#elif defined( HAVE_VARARGS_H )
+#include <varargs.h>
+#else
+#error No variable argument support available
+#endif
+
+#if defined( HAVE_ZLIB_H )
 #include <zlib.h>
 #endif
 
-#if defined( HAVE_OPENSSL_OPENSSLV_H ) && defined( HAVE_LIBCRYPTO )
+#if defined( HAVE_OPENSSL_OPENSSLV_H )
 #include <openssl/opensslv.h>
 #endif
 
-#if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
+#if defined( HAVE_UUID_UUID_H )
 #include <uuid/uuid.h>
 #endif
 
@@ -105,8 +116,12 @@ void ewfoutput_version_fprint(
 
 		return;
 	}
-	fprintf( stream, "%" PRIs " %" PRIs " (libewf %" PRIs ", zlib %s",
-	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING, ZLIB_VERSION );
+	fprintf( stream, "%" PRIs " %" PRIs " (libewf %" PRIs "",
+	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING );
+
+#if defined( HAVE_LIBZ )
+	fprintf( stream, ", zlib %s", ZLIB_VERSION );
+#endif
 
 #if defined( HAVE_LIBCRYPTO )
 	fprintf( stream, ", libcrypto %s", SHLIB_VERSION_NUMBER );
@@ -138,6 +153,80 @@ void ewfoutput_copyright_fprint(
 	fprintf( stream, "This is free software; see the source for copying conditions. There is NO\n" );
 	fprintf( stream, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 }
+
+#if defined( HAVE_STDARG_H )
+#define VARIABLE_ARGUMENTS_FUNCTION( function, type, argument ) \
+        function( FILE *stream, type argument, ... )
+#define VARIABLE_ARGUMENTS_START( argument_list, type, name ) \
+        va_start( argument_list, name )
+#define VARIABLE_ARGUMENTS_END( argument_list ) \
+        va_end( argument_list )
+
+#elif defined( HAVE_VARARGS_H )
+#define VARIABLE_ARGUMENTS_FUNCTION( function, type, argument ) \
+        function( FILE *stream, va_alist ) va_dcl
+#define VARIABLE_ARGUMENTS_START( argument_list, type, name ) \
+        { type name; va_start( argument_list ); name = va_arg( argument_list, type )
+#define VARIABLE_ARGUMENTS_END( argument_list ) \
+        va_end( argument_list ); }
+
+#endif
+
+void VARIABLE_ARGUMENTS_FUNCTION(
+      ewfoutput_error_fprint,
+      char *,
+      format )
+{
+	va_list argument_list;
+
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+        system_character_t *error_string = NULL;
+#endif
+
+	if( stream == NULL )
+	{
+		return;
+	}
+	VARIABLE_ARGUMENTS_START(
+	 argument_list,
+	 char *,
+       	 format );
+
+	vfprintf(
+       	 stream,
+	 format,
+       	 argument_list );
+
+	VARIABLE_ARGUMENTS_END(
+       	 argument_list );
+
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+	if( errno != 0 )
+	{
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+		error_string = error_string_wcserror(
+		                errno );
+#else
+		error_string = error_string_strerror(
+		                errno );
+#endif
+
+		if( error_string != NULL )
+		{
+			fprintf( stream, " with error: %" PRIs_SYSTEM "",
+			 error_string );
+
+			memory_free(
+			 error_string );
+		}
+	}
+#endif
+	fprintf( stream, ".\n" );
+}
+
+#undef VARIABLE_ARGUMENTS_FUNCTION
+#undef VARIABLE_ARGUMENTS_START
+#undef VARIABLE_ARGUMENTS_END
 
 /* Prints an overview of the aquiry parameters
  */
@@ -785,29 +874,11 @@ void ewfoutput_header_values_fprint(
 	 */
 	if( libewf_get_header_value(
 	     handle,
-	     _CHARACTER_T_STRING( "unknown_pid" ),
-	     header_value,
-	     header_value_length ) == 1 )
-	{
-		fprintf( stream, "\tUnknown value pid:\t%" PRIs "\n",
-		 header_value );
-	}
-	if( libewf_get_header_value(
-	     handle,
 	     _CHARACTER_T_STRING( "unknown_dc" ),
 	     header_value,
 	     header_value_length ) == 1 )
 	{
 		fprintf( stream, "\tUnknown value dc:\t%" PRIs "\n",
-		 header_value );
-	}
-	if( libewf_get_header_value(
-	     handle,
-	     _CHARACTER_T_STRING( "unknown_ext" ),
-	     header_value,
-	     header_value_length ) == 1 )
-	{
-		fprintf( stream, "\tUnknown value ext:\t%" PRIs "\n",
 		 header_value );
 	}
 	if( amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )

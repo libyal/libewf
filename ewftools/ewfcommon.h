@@ -67,7 +67,7 @@ extern "C" {
 	date_time_wctime( timestamp, string, length )
 
 #define ewfcommon_strerror( error_number ) \
-	error_string_wcserror( error_number )
+        error_string_wcserror( error_number )
 
 #define ewfcommon_fopen( filename, mode ) \
 	file_io_wfopen( filename, mode )
@@ -77,7 +77,7 @@ extern "C" {
 	date_time_ctime( timestamp, string, length )
 
 #define ewfcommon_strerror( error_number ) \
-	error_string_strerror( error_number )
+        error_string_strerror( error_number )
 
 #define ewfcommon_fopen( filename, mode ) \
 	file_io_fopen( filename, mode )

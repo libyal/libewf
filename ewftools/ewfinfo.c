@@ -105,9 +105,6 @@ int main( int argc, char * const argv[] )
 	ewfglob_t *glob                   = NULL;
 	int32_t glob_count                = 0;
 #endif
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-        system_character_t *error_string  = NULL;
-#endif
 	char *file_format_string          = NULL;
 	system_integer_t option           = 0;
 	size64_t media_size               = 0;
@@ -301,27 +298,8 @@ int main( int argc, char * const argv[] )
 	if( ( ewfcommon_abort == 0 )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
-#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
-		if( errno != 0 )
-		{
-			error_string = ewfcommon_strerror(
-			                errno );
-		}
-		if( error_string != NULL )
-		{
-			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs_SYSTEM ".\n",
-			 error_string );
-
-			memory_free(
-			 error_string );
-		}
-		else
-		{
-			fprintf( stderr, "Unable to open EWF file(s).\n" );
-		}
-#else
-		fprintf( stderr, "Unable to open EWF file(s).\n" );
-#endif
+		ewfoutput_error_fprint(
+		 stderr, "Unable to open EWF file(s)" );
 
 		return( EXIT_FAILURE );
 	}
@@ -437,11 +415,7 @@ int main( int argc, char * const argv[] )
 			}
 			else if( media_type == LIBEWF_MEDIA_TYPE_CD )
 			{
-				fprintf( stdout, "\tMedia type:\t\tCD/DVD/BD\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_RAM )
-			{
-				fprintf( stdout, "\tMedia type:\t\tRAM\n" );
+				fprintf( stdout, "\tMedia type:\t\tCD/DVD\n" );
 			}
 			else
 			{
