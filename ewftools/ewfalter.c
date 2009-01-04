@@ -239,77 +239,65 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_get_media_size(
-	     ewfcommon_libewf_handle,
-	     &media_size ) != 1 )
+	if( ( ewfcommon_abort == 0 )
+	 && ( libewf_get_media_size(
+		     ewfcommon_libewf_handle,
+		     &media_size ) != 1 ) )
 	{
 		fprintf( stderr, "Unable to determine media size.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	/* Request the necessary case data
-	 */
-	fprintf( stdout, "Information for alter required, please provide the necessary input\n" );
-
-	alter_offset = ewfinput_get_size_variable(
-	                stdout,
-	                _S_LIBEWF_CHAR( "Start altering at offset" ),
-	                0,
-	                media_size,
-	                0 );
-
-	alter_size = ewfinput_get_size_variable(
-	              stdout,
-	              _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
-	              0,
-	              ( media_size - alter_offset ),
-	              ( media_size - alter_offset ) );
-
-	if( alter_size > (size_t) SSIZE_MAX )
+	if( ewfcommon_abort == 0 )
 	{
-		fprintf( stderr, "Invalid amount of bytes to alter value exceeds maximum.\n" );
-
-		return( EXIT_FAILURE );
-	}
-	buffer = libewf_common_alloc(
-	          alter_size );
-
-	if( buffer == NULL )
-	{
-		fprintf( stderr, "Unable to allocate buffer.\n" );
-
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
+		if( ewfsignal_detach() != 1 )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
+			fprintf( stderr, "Unable to detach signal handler.\n" );
 		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_common_memset(
-	     buffer,
-	     'X',
-	     (size_t) alter_size ) == NULL )
-	{
-		fprintf( stderr, "Unable to set buffer.\n" );
+		/* Request the necessary case data
+		 */
+		fprintf( stdout, "Information for alter required, please provide the necessary input\n" );
 
-		if( libewf_close(
-		     ewfcommon_libewf_handle ) != 0 )
+		alter_offset = ewfinput_get_size_variable(
+				stdout,
+				_S_LIBEWF_CHAR( "Start altering at offset" ),
+				0,
+				media_size,
+				0 );
+
+		alter_size = ewfinput_get_size_variable(
+			      stdout,
+			      _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
+			      0,
+			      ( media_size - alter_offset ),
+			      ( media_size - alter_offset ) );
+	
+		if( alter_size > (size_t) SSIZE_MAX )
 		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
+			fprintf( stderr, "Invalid amount of bytes to alter value exceeds maximum.\n" );
+
+			return( EXIT_FAILURE );
 		}
-		libewf_common_free(
-		 buffer );
+		buffer = libewf_common_alloc(
+		          alter_size );
 
-		return( EXIT_FAILURE );
-	}
-	if( target_filename != NULL )
-	{
-		if( libewf_set_delta_segment_filename(
-		     ewfcommon_libewf_handle,
-		     target_filename,
-		     CHAR_T_LENGTH( target_filename ) ) != 1 )
+		if( buffer == NULL )
 		{
-			fprintf( stderr, "Unable to set delta segment filename in handle.\n" );
+			fprintf( stderr, "Unable to allocate buffer.\n" );
+
+			if( libewf_close(
+			     ewfcommon_libewf_handle ) != 0 )
+			{
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
+			}
+			return( EXIT_FAILURE );
+		}
+		if( libewf_common_memset(
+		     buffer,
+		     'X',
+		     (size_t) alter_size ) == NULL )
+		{
+			fprintf( stderr, "Unable to set buffer.\n" );
 
 			if( libewf_close(
 			     ewfcommon_libewf_handle ) != 0 )
@@ -321,17 +309,45 @@ int main( int argc, char * const argv[] )
 
 			return( EXIT_FAILURE );
 		}
+		if( target_filename != NULL )
+		{
+			if( libewf_set_delta_segment_filename(
+			     ewfcommon_libewf_handle,
+			     target_filename,
+			     CHAR_T_LENGTH( target_filename ) ) != 1 )
+			{
+				fprintf( stderr, "Unable to set delta segment filename in handle.\n" );
+
+				if( libewf_close(
+				     ewfcommon_libewf_handle ) != 0 )
+				{
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
+				}
+				libewf_common_free(
+				 buffer );
+
+				return( EXIT_FAILURE );
+			}
+		}
+		fprintf( stderr, "\n" );
+
+		if( ewfsignal_attach(
+		     ewfcommon_signal_handler ) != 1 )
+		{
+			fprintf( stderr, "Unable to attach signal handler.\n" );
+		}
 	}
-	fprintf( stderr, "\n" );
+	if( ewfcommon_abort == 0 )
+	{
+		/* First alteration run
+		 */
+		count = libewf_write_random(
+			 ewfcommon_libewf_handle,
+			 buffer,
+			 (size_t) alter_size,
+			 alter_offset );
 
-	/* First alteration run
-	 */
-	count = libewf_write_random(
-	         ewfcommon_libewf_handle,
-	         buffer,
-	         (size_t) alter_size,
-	         alter_offset );
-
+	}
 	if( count <= -1 )
 	{
 		fprintf( stdout, "Alteration failed.\n" );
@@ -346,14 +362,16 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	/* Second alteration run
-	 */
-	count = libewf_write_random(
-	         ewfcommon_libewf_handle,
-	         buffer,
-	         (size_t) alter_size,
-	         alter_offset );
-
+	if( ewfcommon_abort == 0 )
+	{
+		/* Second alteration run
+		 */
+		count = libewf_write_random(
+			 ewfcommon_libewf_handle,
+			 buffer,
+			 (size_t) alter_size,
+			 alter_offset );
+	}
 	libewf_common_free(
 	 buffer );
 
