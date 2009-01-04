@@ -37,6 +37,7 @@
 #include "libewf_includes.h"
 
 #include "libewf_section_list.h"
+#include "libewf_segment_table.h"
 
 #include "ewf_table.h"
 
@@ -51,6 +52,10 @@ typedef struct libewf_chunk_offset libewf_chunk_offset_t;
 
 struct libewf_chunk_offset
 {
+	/* A reference to the segment file
+	 */
+	LIBEWF_SEGMENT_FILE *segment_file;
+
 	/* The number of the segment file
 	 */
 	uint16_t segment_number;
@@ -102,7 +107,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
 int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
 
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, int file_descriptor, uint16_t segment_number, uint8_t error_tollerance );
+int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t error_tollerance );
 int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance );
 int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
 

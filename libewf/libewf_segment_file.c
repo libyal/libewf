@@ -103,6 +103,69 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	return( 0 );
 }
 
+/* Reads a buffer from a segment file
+ * Updates the segment file offset
+ * Returns the amount of bytes read if successful, or -1 on errror
+ */
+ssize_t libewf_segment_file_read( LIBEWF_SEGMENT_FILE *segment_file, void *buffer, size_t size )
+{
+	static char *function = "libewf_segment_file_read";
+	ssize_t read_count    = 0;
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_common_read(
+	              segment_file->file_descriptor,
+	              buffer,
+	              size );
+
+	if( read_count > 0 )
+	{
+		segment_file->file_offset += (off64_t) read_count;
+	}
+	if( read_count != (ssize_t) size )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read from segment file: %" PRIs_EWF_filename ".\n",
+		 function, segment_file->filename );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror
  */
@@ -468,9 +531,8 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	{
 		result = libewf_section_read(
 		          internal_handle,
-		          segment_file->file_descriptor,
+		          segment_file,
 		          &section,
-		          segment_file->section_list,
 		          segment_number,
 		          &previous_offset );
 
