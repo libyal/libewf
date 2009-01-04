@@ -37,31 +37,39 @@
 #include <errno.h>
 #include <stdio.h>
 
-#ifdef HAVE_SYS_IOCTL_H
+#if defined( HAVE_SYS_IOCTL_H )
 #include <sys/ioctl.h>
 #endif
 
-#ifdef HAVE_UNISTD_H
+#if defined( HAVE_UNISTD_H )
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_STDLIB_H
+#if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
-#ifdef HAVE_CYGWIN_FS_H
+#if defined( HAVE_CYGWIN_FS_H )
 #include <cygwin/fs.h>
 #endif
 
-#ifdef HAVE_LINUX_FS_H
+#if defined( HAVE_LINUX_FS_H )
+
+/* Required for Linux platforms that use a sizeof( u64 )
+ * in linux/fs.h but have no typedef of it
+ */
+#if ! defined( HAVE_U64 )
+typedef size_t u64;
+#endif
+
 #include <linux/fs.h>
 #endif
 
-#ifdef HAVE_SYS_DISK_H
+#if defined( HAVE_SYS_DISK_H )
 #include <sys/disk.h>
 #endif
 
-#ifdef HAVE_SYS_DISKLABEL_H
+#if defined( HAVE_SYS_DISKLABEL_H )
 #include <sys/disklabel.h>
 #endif
 

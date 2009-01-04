@@ -1,7 +1,7 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070609], [forensics@hoffmannbv.nl])
-AM_INIT_AUTOMAKE([libewf], [20070609])
+AC_INIT([libewf], [20070707], [forensics@hoffmannbv.nl])
+AM_INIT_AUTOMAKE([libewf], [20070707])
 
 dnl Function to test if the current directory contains spaces
 AC_DEFUN([LIBEWF_TEST_PWD],
@@ -161,7 +161,7 @@ AC_STRUCT_TM
 AC_TYPE_MODE_T
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
-AC_CHECK_TYPE(ssize_t, signed)
+AC_CHECK_TYPES([ssize_t, u64])
 
 dnl Check for functions
 AC_CHECK_FUNCS( atol ctime fgets getopt memchr memcmp memcpy memrchr memset localtime localtime_r snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )

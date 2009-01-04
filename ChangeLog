@@ -99,6 +99,9 @@ Next release:
 * use off_t for size values instead of uint64_t
 * check printf %jd and %zu for Cygwin
 
+Version: 20070707
+* added fix for missing type definition u64 in linux/fs.h on some platforms
+
 Version: 20070526
 * removed the advertisement clause from the license
 

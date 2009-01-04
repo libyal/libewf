@@ -129,6 +129,9 @@
 /* Define to 1 if you have the `sprintf' function. */
 #define HAVE_SPRINTF 1
 
+/* Define to 1 if the system has the type `ssize_t'. */
+#define HAVE_SSIZE_T 1
+
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define HAVE_STDARG_H 1
 
@@ -203,6 +206,9 @@
 
 /* Define to 1 if you have the <sys/utsname.h> header file. */
 #define HAVE_SYS_UTSNAME_H 1
+
+/* Define to 1 if the system has the type `u64'. */
+/* #undef HAVE_U64 */
 
 /* Define to 1 if you have the `uname' function. */
 #define HAVE_UNAME 1
@@ -301,13 +307,13 @@
 #define PACKAGE_NAME "libewf"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libewf 20070609"
+#define PACKAGE_STRING "libewf 20070707"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libewf"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "20070609"
+#define PACKAGE_VERSION "20070707"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -319,7 +325,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "20070609"
+#define VERSION "20070707"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #define _FILE_OFFSET_BITS 64
@@ -338,9 +344,6 @@
 
 /* Define to `unsigned' if <sys/types.h> does not define. */
 /* #undef size_t */
-
-/* Define to `signed' if <sys/types.h> does not define. */
-/* #undef ssize_t */
 
 /* Define to empty if the keyword `volatile' does not work. Warning: valid
    code using `volatile' can become incorrect without. Disable with care. */
