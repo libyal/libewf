@@ -55,15 +55,15 @@ shows this help
 .It Fl l Ar log_filename
 logs verification errors and the digest (hash) to the log filename
 .It Fl o Ar offset
-specify the offset to start the export (default is 0)
+the offset to start the export (default is 0)
 .It Fl p Ar process_buffer_size
-specify the process buffer size (default is the chunk size)
+the process buffer size (default is the chunk size)
 .It Fl s
 swap byte pairs of the media data (from AB to BA) (use this for big to little endian conversion and vice versa)
 .It Fl S Ar segment_file_size
 the segment file size in bytes (default is 1.4 GiB) (minimum is 1.0 MiB, maximum is 7.9 EiB for encase6 format and 1.9 GiB for other formats) (not used for raw format)
 .It Fl t Ar target
-specify the target file to export to, use - for stdout (default is export) stdout is only supported for the raw format
+the target file to export to, use - for stdout (default is export) stdout is only supported for the raw format
 .It Fl u
 unattended mode (disables user interaction)
 .It Fl v

@@ -419,9 +419,9 @@ int main( int argc, char * const argv[] )
 				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (uint64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
-
-					segment_file_size = (uint64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 				{
+					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+
 					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
 					 segment_file_size );
 				}

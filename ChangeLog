@@ -2,11 +2,11 @@ Roadmap:
 * low level and high level api
   - to allow raw access to sections etc. (for recovery)
 * xsignature section to sign xhash and/or hash
-* create iso2ewf tool?
-* resume write i.e. system failure (check to which part EWF files ok)
+* resume write i.e. system failure (check to which part of the EWF files is ok)
 * lvf support
 * library/tools enhancements (getoptlong)
 * internationalisation (gettext)
+  - UTF support
 * enhance thread safety
   - protect writing to internal data structures
   - protect reading when writing to internal data structures
@@ -23,22 +23,12 @@ To do/think about:
 * all: add LVF support - ltree section
 * all: check for race conditions especially on change of data elements
 * all: allow for multiple language support - what about gettext?
-* reduce open file descriptors allows reading a lot of segment files
-  - make sure to detect when a file is closed and when a new segment file needs to be created
-  - use io pooling
-* implement raw split support in ewfexport and ewfacquire?
-* add function to retrieve the segment file names and amount?
-
 * ewftools: add getoptlong
 * ewfacquire: restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
 * ewfacquire: warn if values exceed maximum segment count
 * ewfacquire: add native Windows support for accessing devices
 * ewfacquire: read from pipe
   - what about input size?
-* ewfacquire: non interactive mode
-  - read settings from file? no, but perhaps commandline parameters?
-* ewfacquire: allow for multiple raw files as input
-  - make a generic media access solution also useable for revit?
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
 * windows port: reduce _s function to pre MVC 2005 variants provides for wider support
 * windows port: improve globbing support ?
@@ -66,35 +56,36 @@ Additional (integrity) checks:
   - correct size
 
 Possible performance improvements:
-* create a offset table per segment file - create it on demand - section list per segment table is done
+* create a offset table per segment file
+  - create it on demand
   - map offset table start entry from segment table as a pointer or index number ?
-* build offset table while reading ?
-  - only read first and last segment file for index build
+* fill offset table while reading ?
+  - only read first and last segment file for index build?
   - add offsets of other segment files when needed
-* remove write_buffer copy to chunk_cache read - chunk cache read really required?
 * tune read and write buffer sizes
   - read/write block size seems to have little effect for dd on average
 * reduce alloc, realloc and free (this reduces breaks) use strace to analyze
   - pass values as parameters or use of handle
 * what allocation causes the break in strace of ewfacquire with compression libewf? zlib?
 * optimize empty block test
-* optimize string functions - pass size as much as possible
+* optimize string functions
+  - pass length/size as much as possible
 * remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
-  - currently used for verbose output
+  - currently only used for verbose output
 * reduce amount of write by aligining chunk data and CRC
   - requires rewrite of some functions, CRC should be passed as buffer
 
 Code clean up
-* remove internal_handle passing from most functions
-  only pass the necessary values
 * rewrite ewfglob marcros to function macros (including arguments)
+
+Error handling
+* improve error handling
+  - store error in handle? or additional parameter?
+  - useful to store error/warning string
 * what about setting errno for API set and get function i.e. for size too small
-* have ewftools only use API ?
-  - most of the internal library code has been removed
-* merge alloc and realloc blocks
 
 Python bindings
-* rewrite to match libewf API
+* rewrite pyewf to match libewf API
 
 API
 * make libewf_handle_initialize and libewf_handle_free available
@@ -105,12 +96,17 @@ API
   - file structure API
 * LVF
   - libewf_add/remove_file for LVF
+* add function to retrieve the segment file names and amount?
+
+Something for libsmio/smiotools
+* create iso2ewf tool?
+* implement raw split support in ewfexport and ewfacquire?
+* ewfacquire: allow for multiple raw files as input
+  - make a generic media access solution also useable for revit?
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
   virtualisation could be part of the problem
-* output redirection of ewfexport under Windows XP replaces \n with \r\n - No problem under Windows 2000 ?
-  - binary mode of the stdout file descriptor
 * The library needs to be compiled with /MD under Visual Studio, because stderr is passed from the executables
 * check chunk size for > 2 GiB table offsets
   the current assumption is that these chunks only can be uncompressed
@@ -123,13 +119,15 @@ Next release(s):
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?
 
+* ewfexport implement more ewfacquire acquiry parameters?
+
 * ewfverify: verify against all available hashes that can be verified, print others
 
 * have segment file number in libewf_raw_read_chunk for warning output?
 
 * remove file io pool from lower levels and pass file io handle ?
 
-* add export sha1 to automated tests
+* add export unattended to automated tests
 * create floppy-table-errors.E01 for testing purpose
   - error in primary offset table
   - error in secondary offset table
@@ -151,10 +149,6 @@ Next release(s):
 * implement low memory usage option
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
-
-* improve error handling
-  - store error in handle? or additional parameter?
-  - useful to store error/warning string
 
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
@@ -201,6 +195,12 @@ Version: 20080907
   block by reading from stding - stdin is now forced to close in the signal handler
 * file io pool now allows to be initialize with 0 file io handles
 * fixed memory leak due to section list rewrite
+* ewfacquire: worked on non interactive mode
+* fixed error in byte size calculation for values with 2 digits after the separator
+* added acquire unattended to automated tests (separate test cycle)
+* added export sha1 to automated tests (part of alter test cycle)
+* fixed issue where last segment file contained next section when acquired
+  with ewfacquirestream
 
 Version: 20080906
 * refactored section list to use list type

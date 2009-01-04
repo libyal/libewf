@@ -214,8 +214,11 @@ int libewf_file_io_pool_free(
 			notify_warning_printf( "%s: unable to free last used list.\n",
 			 function );
 		}
-		memory_free(
-		 ( *file_io_pool )->file_io_handle );
+		if( ( *file_io_pool )->file_io_handle != NULL )
+		{
+			memory_free(
+			 ( *file_io_pool )->file_io_handle );
+		}
 		memory_free(
 		 *file_io_pool );
 

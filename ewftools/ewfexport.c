@@ -198,6 +198,7 @@ int main( int argc, char * const argv[] )
 	system_character_t * const *argv_filenames = NULL;
 	system_character_t **ewf_filenames         = NULL;
 	system_character_t *log_filename           = NULL;
+	system_character_t *option_target_filename = NULL;
 	system_character_t *target_filename        = NULL;
 
 	FILE *log_file_stream                      = NULL;
@@ -229,6 +230,7 @@ int main( int argc, char * const argv[] )
 	int argument_set_sectors_per_chunk         = 0;
 	int argument_set_segment_file_size         = 0;
 	int argument_set_size                      = 0;
+	int error_abort                            = 0;
 	int interactive_mode                       = 1;
 	int output_raw                             = 1;
 	int result                                 = 1;
@@ -282,11 +284,6 @@ int main( int argc, char * const argv[] )
 				usage_fprint(
 				 stderr );
 
-				if( target_filename != NULL )
-				{
-					memory_free(
-					 target_filename );
-				}
 				return( EXIT_FAILURE );
 
 			case (system_integer_t) 'b':
@@ -298,13 +295,21 @@ int main( int argc, char * const argv[] )
 
 					sectors_per_chunk = 64;
 				}
+				else
+				{
+					argument_set_sectors_per_chunk = 1;
+				}
 				break;
 
 			case (system_integer_t) 'B':
+				string_length = system_string_length(
+				                 optarg );
+
 				export_size = libewf_system_string_to_uint64(
 				               optarg,
-				               system_string_length(
-				                optarg ) );
+				               string_length );
+
+				argument_set_size = 1;
 
 				break;
 
@@ -367,11 +372,6 @@ int main( int argc, char * const argv[] )
 				usage_fprint(
 				 stderr );
 
-				if( target_filename != NULL )
-				{
-					memory_free(
-					 target_filename );
-				}
 				return( EXIT_SUCCESS );
 
 			case (system_integer_t) 'l':
@@ -380,10 +380,12 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'o':
+				string_length = system_string_length(
+				                 optarg );
+
 				export_offset = libewf_system_string_to_int64(
 				                 optarg,
-				                 system_string_length(
-				                  optarg ) );
+				                 string_length );
 
 				argument_set_offset = 1;
 
@@ -418,13 +420,15 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'S':
+				string_length = system_string_length(
+				                 optarg );
+
 				result = ewfbyte_size_string_convert_system_character(
 				          optarg,
-				          system_string_length(
-				           optarg ),
+				          string_length,
 				          &segment_file_size );
 
-				argument_set_size  = 1;
+				argument_set_segment_file_size = 1;
 
 				if( ( result != 1 )
 				 || ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
@@ -433,44 +437,15 @@ int main( int argc, char * const argv[] )
 				 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
 				  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 				{
-					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu32 ".\n",
-					 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
-					segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
+					 segment_file_size );
 				}
 				break;
 
 			case (system_integer_t) 't':
-				string_length = system_string_length(
-				                 optarg );
-
-				if( target_filename != NULL )
-				{
-					memory_free(
-					 target_filename );
-				}
-				target_filename = (system_character_t *) memory_allocate(
-				                                          sizeof( system_character_t ) * ( string_length + 1 ) );
-
-				if( target_filename == NULL )
-				{
-					fprintf( stderr, "Unable to create target filename.\n" );
-
-					return( EXIT_FAILURE );
-				}
-				if( system_string_copy(
-				     target_filename,
-				     optarg,
-				     string_length ) == NULL )
-				{
-					fprintf( stderr, "Unable to set target filename.\n" );
-
-					memory_free(
-					 target_filename );
-
-					return( EXIT_FAILURE );
-				}
-				target_filename[ string_length ] = 0;
+				option_target_filename = optarg;
 
 				break;
 
@@ -488,11 +463,6 @@ int main( int argc, char * const argv[] )
 				ewfoutput_copyright_fprint(
 				 stderr );
 
-				if( target_filename != NULL )
-				{
-					memory_free(
-					 target_filename );
-				}
 				return( EXIT_SUCCESS );
 
 			case (system_integer_t) 'w':
@@ -508,11 +478,6 @@ int main( int argc, char * const argv[] )
 		usage_fprint(
 		 stderr );
 
-		if( target_filename != NULL )
-		{
-			memory_free(
-			 target_filename );
-		}
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
@@ -547,11 +512,6 @@ int main( int argc, char * const argv[] )
 		ewfglob_free(
 		 &glob );
 
-		if( target_filename != NULL )
-		{
-			memory_free(
-			 target_filename );
-		}
 		return( EXIT_FAILURE );
 	}
 	argv_filenames = glob->result;
@@ -577,11 +537,6 @@ int main( int argc, char * const argv[] )
 			 &glob );
 #endif
 
-			if( target_filename != NULL )
-			{
-				memory_free(
-				 target_filename );
-			}
 			return( EXIT_FAILURE );
 		}
 		argv_filenames = (system_character_t * const *) ewf_filenames;
@@ -610,11 +565,6 @@ int main( int argc, char * const argv[] )
 		ewfoutput_error_fprint(
 		 stderr, "Unable to open EWF file(s)" );
 
-		if( target_filename != NULL )
-		{
-			memory_free(
-			 target_filename );
-		}
 		return( EXIT_FAILURE );
 	}
 	if( ewfcommon_abort == 0 )
@@ -628,11 +578,6 @@ int main( int argc, char * const argv[] )
 			libewf_close(
 			 ewfcommon_libewf_handle );
 
-			if( target_filename != NULL )
-			{
-				memory_free(
-				 target_filename );
-			}
 			return( EXIT_FAILURE );
 		}
 		if( ( export_size == 0 )
@@ -640,6 +585,72 @@ int main( int argc, char * const argv[] )
 		{
 			export_size = media_size - export_offset;
 		}
+	}
+	/* Create the input buffers
+	 */
+	if( option_target_filename != NULL )
+	{
+		string_length = system_string_length(
+				 option_target_filename );
+
+		if( string_length > 0 )
+		{
+			string_length  += 1;
+			target_filename = (character_t *) memory_allocate(
+			                                   sizeof( character_t ) * string_length );
+
+			if( target_filename == NULL )
+			{
+				fprintf( stderr, "Unable to create target filename string.\n" );
+
+				error_abort = 1;
+			}
+			else if( ewfstring_copy_system_string_to_character_string(
+				  target_filename,
+				  option_target_filename,
+				  string_length ) != 1 )
+			{
+				fprintf( stderr, "Unable to set target filename string.\n" );
+
+				error_abort = 1;
+			}
+		}
+	}
+	else
+	{
+		target_filename = (system_character_t *) memory_allocate(
+		                                          sizeof( system_character_t ) * 1024 );
+
+		if( target_filename == NULL )
+		{
+			fprintf( stderr, "Unable to create target filename string.\n" );
+
+			error_abort = 1;
+		}
+		/* Make sure to set the target filename if in unattended mode
+		 */
+		else if( interactive_mode == 0 )
+		{
+			if( string_copy(
+			     target_filename,
+			     _CHARACTER_T_STRING( "export" ),
+			     7 ) == NULL )
+			{
+				fprintf( stderr, "Unable to set target filename string.\n" );
+
+				error_abort = 1;
+			}
+			target_filename[ 7 ] = 0;
+		}
+	}
+	if( error_abort != 0 )
+	{
+		if( target_filename != NULL )
+		{
+			memory_free(
+			 target_filename );
+		}
+		return( EXIT_FAILURE );
 	}
 	/* Request the necessary case data
 	 */
@@ -652,10 +663,10 @@ int main( int argc, char * const argv[] )
 		}
 		fprintf( stderr, "Information for export required, please provide the necessary input\n" );
 
+		/* File format
+		 */
 		if( argument_set_format == 0 )
 		{
-			/* File format
-			 */
 			if( ewfinput_get_fixed_string_variable(
 			     stderr,
 			     input_buffer,
@@ -694,32 +705,21 @@ int main( int argc, char * const argv[] )
 		{
 			/* Target filename
 			 */
-			if( target_filename != NULL )
+			if( option_target_filename == NULL )
 			{
-				memory_free(
-				 target_filename );
+				while( ewfinput_get_string_variable_system_character(
+					stderr,
+					_CHARACTER_T_STRING( "Target path and filename without extension" ),
+				        target_filename,
+				        1024 ) != 1 )
+				{
+					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				}
 			}
-			target_filename = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * 1024 );
-
-			if( target_filename == NULL )
-			{
-				fprintf( stderr, "Unable to create target filename string.\n" );
-
-				return( EXIT_FAILURE );
-			}
-			while( ewfinput_get_string_variable_system_character(
-				stderr,
-				_CHARACTER_T_STRING( "Target path and filename without extension" ),
-			        target_filename,
-			        1024 ) != 1 )
-			{
-				fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
-			}
+			/* Compression
+			 */
 			if( argument_set_compression == 0 )
 			{
-				/* Compression
-				 */
 				if( ewfinput_get_fixed_string_variable(
 				     stderr,
 				     input_buffer,
@@ -746,10 +746,10 @@ int main( int argc, char * const argv[] )
 					compress_empty_block = 0;
 				}
 			}
+			/* Segment file size
+			 */
 			if( argument_set_segment_file_size == 0 )
 			{
-				/* Segment file size
-				 */
 				if( libewf_format == LIBEWF_FORMAT_ENCASE6 )
 				{
 					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT;
@@ -758,8 +758,6 @@ int main( int argc, char * const argv[] )
 				{
 					maximum_segment_file_size = EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT;
 				}
-				/* Segment file size
-				 */
 				if( ewfinput_get_byte_size_variable(
 				     stderr,
 				     input_buffer,
@@ -782,10 +780,10 @@ int main( int argc, char * const argv[] )
 					segment_file_size = maximum_segment_file_size;
 				}
 			}
+			/* Chunk size (sectors per block)
+			 */
 			if( argument_set_sectors_per_chunk == 0 )
 			{
-				/* Chunk size (sectors per block)
-				 */
 				if( ewfinput_get_fixed_string_variable(
 				     stderr,
 				     input_buffer,
@@ -814,29 +812,20 @@ int main( int argc, char * const argv[] )
 		{
 			/* Target filename
 			 */
-			if( target_filename != NULL )
+			if( option_target_filename == NULL )
 			{
-				memory_free(
-				 target_filename );
-			}
-			target_filename = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * 1024 );
-
-			if( target_filename == NULL )
-			{
-				fprintf( stderr, "Unable to create target filename string.\n" );
-
-				return( EXIT_FAILURE );
-			}
-			while( ewfinput_get_string_variable_system_character(
-				stderr,
-				_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
-			        target_filename,
-			        1024 ) != 1 )
-			{
-				fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				while( ewfinput_get_string_variable_system_character(
+					stderr,
+					_CHARACTER_T_STRING( "Target path and filename with extension or - for stdout" ),
+					target_filename,
+					1024 ) != 1 )
+				{
+					fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				}
 			}
 		}
+                /* Offset of data to export
+		 */
 		if( ( argument_set_offset == 0 )
 		 && ( ewfinput_get_size_variable(
 		       stderr,
@@ -853,6 +842,8 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to determine export offset defaulting to: %" PRIu64 ".\n",
 			 export_offset );
 		}
+                /* Size of data to export
+		 */
 		if( ( argument_set_size == 0 )
 		 && ( ewfinput_get_size_variable(
 		       stderr,
@@ -912,59 +903,6 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort == 0 )
 	{
-		if( target_filename == NULL )
-		{
-			fprintf( stderr, "Missing target filename defaulting to: export.\n" );
-
-
-			target_filename = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * 7 );
-
-			if( target_filename == NULL )
-			{
-				fprintf( stderr, "Unable to create target filename.\n" );
-
-				if( calculate_sha1 == 1 )
-				{
-					memory_free(
-					 calculated_sha1_hash_string );
-				}
-				if( calculate_md5 == 1 )
-				{
-					memory_free(
-					 calculated_md5_hash_string );
-				}
-				libewf_close(
-				 ewfcommon_libewf_handle );
-			
-				return( EXIT_FAILURE );
-			}
-			if( system_string_copy(
-			     target_filename,
-			     _SYSTEM_CHARACTER_T_STRING( "export" ),
-			     6 ) == NULL )
-			{
-				fprintf( stderr, "Unable to set target filename.\n" );
-
-				memory_free(
-				 target_filename );
-
-				if( calculate_sha1 == 1 )
-				{
-					memory_free(
-					 calculated_sha1_hash_string );
-				}
-				if( calculate_md5 == 1 )
-				{
-					memory_free(
-					 calculated_md5_hash_string );
-				}
-				libewf_close(
-				 ewfcommon_libewf_handle );
-			
-				return( EXIT_FAILURE );
-			}
-		}
 		fprintf( stderr, "\n" );
 
 		if( ewfprocess_status_initialize(

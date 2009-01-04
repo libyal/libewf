@@ -2939,6 +2939,55 @@ ssize_t libewf_write_finalize(
 						return( -1 );
 					}
 				}
+				/* The last segment file should be terminated with a done section and not with a next section
+				 */
+				else if( ( segment_table_iterator == ( internal_handle->segment_table->amount - 1 ) )
+				      && ( memory_compare(
+				            section_list_values->type,
+				            "next",
+				            4 ) == 0 ) )
+		
+				{
+#if defined( HAVE_VERBOSE_OUTPUT )
+					notify_verbose_printf( "%s: correcting next section - closing last segment file.\n",
+					 function );
+#endif
+
+					if( libewf_file_io_pool_seek_offset(
+					     internal_handle->file_io_pool,
+					     segment_file_handle->file_io_pool_entry,
+					     section_list_values->start_offset,
+					     SEEK_SET ) == -1 )
+					{
+						notify_warning_printf( "%s: unable to find offset to data volume section.\n",
+						 function );
+
+						return( -1 );
+					}
+					write_count = libewf_segment_file_write_close(
+						       segment_file_handle,
+						       internal_handle->file_io_pool,
+						       segment_number,
+						       internal_handle->write->segment_amount_of_chunks,
+						       1,
+						       internal_handle->hash_sections,
+						       internal_handle->hash_values,
+						       internal_handle->media_values,
+						       internal_handle->sessions,
+						       internal_handle->acquiry_errors,
+						       internal_handle->compression_level,
+						       internal_handle->format,
+						       internal_handle->ewf_format,
+						       &( internal_handle->write->data_section ) );
+
+					if( write_count == -1 )
+					{
+						notify_warning_printf( "%s: unable to close segment file.\n",
+						 function );
+
+						return( -1 );
+					}
+				}
 				list_element = list_element->next;
 			}
 			if( libewf_file_io_pool_close(
