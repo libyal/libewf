@@ -178,9 +178,14 @@ ssize_t libewf_section_ltree_read(
 
 ssize_t libewf_section_session_read(
          libewf_segment_file_handle_t *segment_file_handle,
+         libewf_sector_table_t *sessions,
          size_t section_size,
          uint8_t ewf_format,
          uint8_t error_tollerance );
+
+ssize_t libewf_section_session_write(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_sector_table_t *sessions );
 
 ssize_t libewf_section_data_read(
          libewf_segment_file_handle_t *segment_file_handle,
@@ -200,6 +205,7 @@ ssize_t libewf_section_data_write(
 ssize_t libewf_section_error2_read(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_sector_table_t *acquiry_errors,
+         size_t section_size,
          uint8_t ewf_format,
          uint8_t error_tollerance );
 
@@ -277,6 +283,7 @@ int libewf_section_read(
      libewf_offset_table_t *offset_table,
      libewf_offset_table_t *secondary_offset_table,
      libewf_sector_table_t *acquiry_errors,
+     libewf_sector_table_t *sessions,
      int8_t *compression_level,
      uint8_t *format,
      uint8_t *ewf_format,

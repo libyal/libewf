@@ -96,6 +96,11 @@ void ewfoutput_crc_errors_fprint(
       LIBEWF_HANDLE *handle,
       uint32_t *amount_of_errors );
 
+void ewfoutput_sessions_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_sessions );
+
 void ewfoutput_header_values_fprint(
       FILE *stream,
       LIBEWF_HANDLE *handle );

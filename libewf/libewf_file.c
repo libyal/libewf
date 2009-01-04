@@ -419,6 +419,7 @@ LIBEWF_HANDLE *libewf_open(
 		     internal_handle->offset_table,
 		     internal_handle->secondary_offset_table,
 		     internal_handle->acquiry_errors,
+		     internal_handle->sessions,
 		     &( internal_handle->compression_level ),
 		     &( internal_handle->format ),
 		     &( internal_handle->ewf_format ),

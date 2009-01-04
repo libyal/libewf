@@ -318,7 +318,8 @@ void ewfoutput_copyright_fprint(
 
 		return;
 	}
-	fprintf( stream, "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n", PACKAGE_BUGREPORT );
+	fprintf( stream, "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n",
+	 PACKAGE_BUGREPORT );
 	fprintf( stream, "This is free software; see the source for copying conditions. There is NO\n" );
 	fprintf( stream, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 }
@@ -539,7 +540,7 @@ void ewfoutput_acquiry_errors_fprint(
       uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_acquiry_errors_fprint";
-	off64_t sector             = 0;
+	off64_t first_sector       = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t iterator          = 0;
 
@@ -584,17 +585,17 @@ void ewfoutput_acquiry_errors_fprint(
 			if( libewf_get_acquiry_error(
 			     handle,
 			     iterator,
-			     &sector,
+			     &first_sector,
 			     &amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
 				 function, iterator );
 
-				sector            = 0;
+				first_sector      = 0;
 				amount_of_sectors = 0;
 			}
 			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
+			 (uint64_t) first_sector, (uint64_t) ( first_sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}
@@ -608,7 +609,7 @@ void ewfoutput_crc_errors_fprint(
       uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_crc_errors_fprint";
-	off64_t sector             = 0;
+	off64_t first_sector       = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t iterator          = 0;
 
@@ -637,7 +638,7 @@ void ewfoutput_crc_errors_fprint(
 	     handle,
 	     amount_of_errors ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of CRC errors.\n",
 		 function );
 
 		return;
@@ -649,16 +650,88 @@ void ewfoutput_crc_errors_fprint(
 
 		for( iterator = 0; iterator < *amount_of_errors; iterator++ )
 		{
-			if( libewf_get_crc_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
+			if( libewf_get_crc_error(
+			     handle,
+			     iterator,
+			     &first_sector,
+			     &amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
 				 function, iterator );
 
-				sector            = 0;
+				first_sector      = 0;
 				amount_of_sectors = 0;
 			}
 			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
-			 (uint64_t) sector, (uint64_t) ( sector + amount_of_sectors ), amount_of_sectors );
+			 (uint64_t) first_sector, (uint64_t) ( first_sector + amount_of_sectors ), amount_of_sectors );
+		}
+		fprintf( stream, "\n" );
+	}
+}
+
+/* Print the sessions to a stream
+ */
+void ewfoutput_sessions_fprint(
+      FILE *stream,
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_sessions )
+{
+	static char *function      = "ewfoutput_sessions_fprint";
+	off64_t first_sector       = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t iterator          = 0;
+
+	if( stream == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
+
+		return;
+	}
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return;
+	}
+	if( amount_of_sessions == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of sessions.\n",
+		 function );
+
+		return;
+	}
+	if( libewf_get_amount_of_sessions(
+	     handle,
+	     amount_of_sessions ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of sessions.\n",
+		 function );
+
+		return;
+	}
+	if( *amount_of_sessions > 0 )
+	{
+		fprintf( stream, "Sessions:\n" );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", *amount_of_sessions );
+
+		for( iterator = 0; iterator < *amount_of_sessions; iterator++ )
+		{
+			if( libewf_get_session(
+			     handle,
+			     iterator,
+			     &first_sector,
+			     &amount_of_sectors ) != 1 )
+			{
+				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
+				 function, iterator );
+
+				first_sector      = 0;
+				amount_of_sectors = 0;
+			}
+			fprintf( stream, "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 (uint64_t) first_sector, (uint64_t) ( first_sector + amount_of_sectors ), amount_of_sectors );
 		}
 		fprintf( stream, "\n" );
 	}

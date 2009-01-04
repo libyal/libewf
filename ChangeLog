@@ -1,5 +1,4 @@
 Roadmap:
-* add read/write support for CD/DVD session section - partial read support
 * create iso2ewf tool?
 * resume write i.e. system failure (check to which part EWF files ok)
   - requires (some form of) read and write mode
@@ -117,11 +116,6 @@ Next release(s):
   - trade off IO versus memory use
   - for write only offset table is not needed etc.
 
-* implement session section
-  - internal storage type
-  - write
-  - api functions
-
 * Try to correct the offset table
   - add error flag
 
@@ -143,6 +137,7 @@ Next stable:
   - allow to set maximum delta file size default 4 GiB?
 
 * test abort
+* test session section functionality
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -165,6 +160,7 @@ CLOSED
 Version: 20080302
 * Code clean up
 * worked on session support
+* ewfinfo will now output session information if present part of media information
 
 Version: 20080301
 * Code clean up
