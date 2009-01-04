@@ -748,8 +748,6 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 			return( -1 );
 		}
-fprintf( stderr, "X: %zd\n", raw_read_count );
-
 		uncompressed_size = buffer_size;
 
 		read_count = libewf_raw_read_prepare_buffer(

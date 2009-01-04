@@ -158,6 +158,9 @@ WORKING
 * fix chunk_data_size = internal_handle->offset_table->size[ chunk ]; in libewf_read_chunk
   wrong size is returned for compressed reads
 
+Version: 20071030
+* fixed input handling of format in ewfexport wide string support
+
 Version: 20071028
 * fixed error in write finalize for ewfacquirestream, due to restrictive check
 * fixed error for handling wide character delta segment filenames

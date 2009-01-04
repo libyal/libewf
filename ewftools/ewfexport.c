@@ -371,7 +371,7 @@ int main( int argc, char * const argv[] )
 		              13,
 		              0 );
 
-		if( CHAR_T_COMPARE( user_input, _S_CHAR_T( "raw" ), 3 ) == 0 )
+		if( libewf_string_compare( user_input, _S_LIBEWF_CHAR( "raw" ), 3 ) == 0 )
 		{
 			output_raw = 1;
 		}

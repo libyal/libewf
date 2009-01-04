@@ -248,9 +248,11 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 	{
 		return( 0 );
 	}
-	/* Check if the chunk is cached
+	/* Check if raw access is used
+	 * or the chunk is not cached
 	 */
-	if( ( internal_handle->chunk_cache->chunk != chunk )
+	if( ( raw_access != 0 )
+	 || ( internal_handle->chunk_cache->chunk != chunk )
 	 || ( internal_handle->chunk_cache->cached == 0 ) )
 	{
 		segment_number = internal_handle->offset_table->segment_number[ chunk ];
@@ -285,33 +287,45 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		}
 		chunk_data = internal_handle->chunk_cache->data;
 
+		if( raw_access != 0 )
+		{
+			chunk_data = (EWF_CHAR *) buffer;
+
+			/* The CRC is read seperately for uncompressed chunks
+			 */
+			if( internal_handle->offset_table->compressed[ chunk ] == 0 )
+			{
+				chunk_data_size -= EWF_CRC_SIZE;
+			}
+		}
 #if defined( HAVE_BUFFER_PASSTHROUGH )
 		/* Determine if the chunk data should be put directly in the buffer
 		 */
-		if( ( buffer != internal_handle->chunk_cache->data )
+		else if( ( buffer != internal_handle->chunk_cache->data )
 		 && ( chunk_offset == 0 )
 		 && ( size >= (size_t) internal_handle->media->chunk_size ) )
 		{
 			chunk_data = (EWF_CHAR *) buffer;
+
+			/* The CRC is read seperately for uncompressed chunks
+			 */
+			if( internal_handle->offset_table->compressed[ chunk ] == 0 )
+			{
+				chunk_data_size -= EWF_CRC_SIZE;
+			}
 		}
 #endif
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */
-		if( internal_handle->offset_table->compressed[ chunk ] == 1 )
+		if( ( raw_access == 0 )
+		 && ( internal_handle->offset_table->compressed[ chunk ] == 1 ) )
 		{
 			chunk_read = internal_handle->chunk_cache->compressed;
 		}
 		else
 		{
 			chunk_read = chunk_data;
-		}
-		/* If buffer passthrough is used the CRC is read seperately
-		 */
-		if( ( chunk_read != internal_handle->chunk_cache->compressed )
-		 && ( chunk_read != internal_handle->chunk_cache->data ) )
-		{
-			chunk_data_size -= EWF_CRC_SIZE;
 		}
 		/* Make sure the file offset is in the right place
 		 */
@@ -428,6 +442,8 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 		 function, ( chunk + 1 ), internal_handle->offset_table->amount, chunk_type );
 #endif
 
+		/* Check if raw access is used
+		 */
 		if( raw_access == 0 )
 		{
 			if( libewf_read_process_chunk_data(
@@ -484,15 +500,6 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_a
 				internal_handle->chunk_cache->cached = 1;
 			}
 		}
-	}
-	else if( ( raw_access != 0 )
-	 && ( internal_handle->offset_table->compressed[ chunk ] == 1 ) )
-	{
-		chunk_data      = internal_handle->chunk_cache->compressed;
-		chunk_data_size = internal_handle->offset_table->size[ chunk ];
-		*is_compressed  = 1;
-		*chunk_crc      = 0;
-		*read_crc       = 0;
 	}
 	else
 	{
