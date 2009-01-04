@@ -40,12 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_ERROR2 ewf_error2_t
-#define EWF_ERROR2_SIZE sizeof( EWF_ERROR2 )
-
-#define EWF_ERROR2_SECTOR ewf_error2_sector_t
-#define EWF_ERROR2_SECTOR_SIZE sizeof( EWF_ERROR2_SECTOR )
-
 typedef struct ewf_error2 ewf_error2_t;
 typedef struct ewf_error2_sector ewf_error2_sector_t;
 

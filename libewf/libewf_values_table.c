@@ -45,13 +45,14 @@
 /* Allocates memory for a new values table struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
+libewf_values_table_t *libewf_values_table_alloc( uint32_t amount )
 {
-	LIBEWF_VALUES_TABLE *values_table = NULL;
-	static char *function           = "libewf_values_table_alloc";
-	size_t values_table_size         = 0;
+	libewf_values_table_t *values_table = NULL;
+	static char *function               = "libewf_values_table_alloc";
+	size_t values_table_size            = 0;
 
-	values_table = (LIBEWF_VALUES_TABLE *) libewf_common_alloc( LIBEWF_VALUES_TABLE_SIZE );
+	values_table = (libewf_values_table_t *) libewf_common_alloc(
+	                                          sizeof( libewf_values_table_t ) );
 
 	if( values_table == NULL )
 	{
@@ -123,7 +124,7 @@ LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount )
 /* Reallocates memory for the values table
  * Returns 1 if successful, or -1 on error
  */
-int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t previous_amount, uint32_t new_amount )
+int libewf_values_table_realloc( libewf_values_table_t *values_table, uint32_t previous_amount, uint32_t new_amount )
 {
 	libewf_char_t **reallocation = NULL;
 	static char *function        = "libewf_values_table_realloc";
@@ -209,7 +210,7 @@ int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t pre
 
 /* Frees memory of a values table struct including elements
  */
-void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table )
+void libewf_values_table_free( libewf_values_table_t *values_table )
 {
 	static char *function = "libewf_values_table_free";
 	uint32_t iterator     = 0;
@@ -246,7 +247,7 @@ void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table )
 /* Retrieves the value index number, or -1 on error
  * The index number will be larger than the amount when the identifier is not present in the values table
  */
-int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier )
+int32_t libewf_values_table_get_index( libewf_values_table_t *values_table, libewf_char_t *identifier )
 {
 	static char *function    = "libewf_values_table_get_index";
 	size_t string_length     = 0;
@@ -317,7 +318,7 @@ int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, libewf
  * Length should contain the amount of characters in the string
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, libewf_char_t *identifier, size_t length )
+int libewf_values_table_get_identifier( libewf_values_table_t *values_table, uint32_t index, libewf_char_t *identifier, size_t length )
 {
 	static char *function    = "libewf_values_table_get_identifier";
 	size_t identifier_length = 0;
@@ -389,7 +390,7 @@ int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint3
  * Length should contain the amount of characters in the string
  * Returns 1 if successful, 0 if value not present, -1 on error
  */
-int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length )
+int libewf_values_table_get_value( libewf_values_table_t *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	static char *function = "libewf_values_table_get_value";
 	size_t value_length   = 0;
@@ -455,7 +456,7 @@ int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, libewf_cha
  * Frees the previous value if necessary
  * Returns 1 if successful, -1 on error
  */
-int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length )
+int libewf_values_table_set_value( libewf_values_table_t *values_table, libewf_char_t *identifier, libewf_char_t *value, size_t length )
 {
 	static char *function = "libewf_values_table_set_value";
 	size_t string_length  = 0;

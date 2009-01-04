@@ -104,7 +104,7 @@ void libewf_header_sections_free( LIBEWF_HEADER_SECTIONS *header_sections )
 /* Create the header sections from the header values
  * Returns 1 on success, -1 on error
  */
-int libewf_header_sections_create( LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_VALUES_TABLE *header_values, int8_t compression_level, uint8_t format )
+int libewf_header_sections_create( LIBEWF_HEADER_SECTIONS *header_sections, libewf_values_table_t *header_values, int8_t compression_level, uint8_t format )
 {
 	static char *function = "libewf_header_sections_create";
 	time_t timestamp      = time( NULL );

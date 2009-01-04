@@ -45,7 +45,7 @@
 /* Initializes the header values
  * Returns 1 if successful, or -1 otherwise
  */
-int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values )
+int libewf_header_values_initialize( libewf_values_table_t *header_values )
 {
 	static char *function = "libewf_header_values_initialize";
 
@@ -483,7 +483,7 @@ libewf_char_t *libewf_generate_date_header2_value( time_t timestamp )
 /* Copies the header values from the source to the destination
  * Returns 1 if successful, -1 on error
  */
-int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, LIBEWF_VALUES_TABLE *source_header_values )
+int libewf_header_values_copy( libewf_values_table_t *destination_header_values, libewf_values_table_t *source_header_values )
 {
 	static char *function = "libewf_header_values_copy";
 	size_t string_length  = 0;
@@ -571,7 +571,7 @@ int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, L
 /* Parse a header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( libewf_char_t *header_string, size_t length, uint8_t date_format )
+libewf_values_table_t *libewf_header_values_parse_header_string( libewf_char_t *header_string, size_t length, uint8_t date_format )
 {
 	libewf_values_table_t *header_values = NULL;
 	libewf_char_t **lines                = NULL;
@@ -907,7 +907,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( libewf_char_t *he
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( ewf_char_t *header, size_t size, uint8_t date_format )
+libewf_values_table_t *libewf_header_values_parse_header( ewf_char_t *header, size_t size, uint8_t date_format )
 {
 	libewf_values_table_t *header_values = NULL;
 	libewf_char_t *header_string         = NULL;
@@ -949,7 +949,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( ewf_char_t *header, size
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( ewf_char_t *header2, size_t size, uint8_t date_format )
+libewf_values_table_t *libewf_header_values_parse_header2( ewf_char_t *header2, size_t size, uint8_t date_format )
 {
 	libewf_values_table_t *header_values = NULL;
 	libewf_char_t *header_string         = NULL;
@@ -1108,7 +1108,7 @@ ewf_char_t *libewf_header_values_convert_header_string_to_header2( libewf_char_t
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type1( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string    = NULL;
 	libewf_char_t *case_number      = _S_LIBEWF_CHAR( "" );
@@ -1339,7 +1339,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type2( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string            = NULL;
 	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
@@ -1584,7 +1584,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type3( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string            = NULL;
 	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
@@ -1798,7 +1798,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type4( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string            = NULL;
 	libewf_char_t *case_number              = _S_LIBEWF_CHAR( "" );
@@ -2007,7 +2007,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type5( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string            = NULL;
 	libewf_char_t *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
@@ -2224,7 +2224,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type6( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string            = NULL;
 	libewf_char_t *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
@@ -2454,7 +2454,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_type7( libewf_values_table_t *header_values, time_t timestamp, libewf_char_t *header_string_head, libewf_char_t *header_string_tail, size_t *string_length )
 {
 	libewf_char_t *header_string            = NULL;
 	libewf_char_t *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
@@ -2664,7 +2664,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_
 /* Generate an EWF header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_ewf( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2698,7 +2698,7 @@ ewf_char_t *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE
 /* Generate an EnCase1 header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase1( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2732,7 +2732,7 @@ ewf_char_t *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_T
 /* Generate an FTK Imager header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_ftk( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2766,7 +2766,7 @@ ewf_char_t *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE
 /* Generate an EnCase2 and EnCase3 header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase2( libewf_values_table_t *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2800,7 +2800,7 @@ ewf_char_t *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_T
 /* Generate an EnCase4 header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase4( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2833,7 +2833,7 @@ ewf_char_t *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_T
 /* Generate an EnCase5 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase5_linen( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2866,7 +2866,7 @@ ewf_char_t *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VA
 /* Generate an EnCase6 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_encase6_linen( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length )
 {
 	ewf_char_t *header                = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2899,7 +2899,7 @@ ewf_char_t *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VA
 /* Generate an EnCase4 header2
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_encase4( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length )
 {
 	ewf_char_t *header2               = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2932,7 +2932,7 @@ ewf_char_t *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_
 /* Generate an EnCase5 header2
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_encase5( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length )
 {
 	ewf_char_t *header2               = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -2965,7 +2965,7 @@ ewf_char_t *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_
 /* Generate an EnCase6 header2
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_encase6( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length )
 {
 	ewf_char_t *header2               = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -3205,19 +3205,19 @@ libewf_char_t *libewf_generate_date_xheader_value( time_t timestamp )
 /* Parse a xml header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( libewf_char_t *header_string_xml, size_t length, uint8_t date_format )
+libewf_values_table_t *libewf_header_values_parse_header_string_xml( libewf_char_t *header_string_xml, size_t length, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values = NULL;
-	libewf_char_t **lines              = NULL;
-	libewf_char_t *open_tag_start      = NULL;
-	libewf_char_t *open_tag_end        = NULL;
-	libewf_char_t *close_tag_start     = NULL;
-	libewf_char_t *close_tag_end       = NULL;
-	libewf_char_t *date_string         = NULL;
-	static char *function              = "libewf_header_values_parse_header_string_xml";
-	size_t string_length               = 0;
-	uint32_t line_count                = 0;
-	uint32_t iterator                  = 0;
+	libewf_values_table_t *header_values = NULL;
+	libewf_char_t **lines                = NULL;
+	libewf_char_t *open_tag_start        = NULL;
+	libewf_char_t *open_tag_end          = NULL;
+	libewf_char_t *close_tag_start       = NULL;
+	libewf_char_t *close_tag_end         = NULL;
+	libewf_char_t *date_string           = NULL;
+	static char *function                = "libewf_header_values_parse_header_string_xml";
+	size_t string_length                 = 0;
+	uint32_t line_count                  = 0;
+	uint32_t iterator                    = 0;
 
 	if( header_string_xml == NULL )
 	{
@@ -3381,7 +3381,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( libewf_char_t
 /* Parse an EWF xheader for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( ewf_char_t *xheader, size_t size, uint8_t date_format )
+libewf_values_table_t *libewf_header_values_parse_xheader( ewf_char_t *xheader, size_t size, uint8_t date_format )
 {
 	libewf_values_table_t *header_values = NULL;
 	libewf_char_t *xml_header_string     = NULL;
@@ -3424,7 +3424,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( ewf_char_t *xheader, si
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_char_t *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *string_length )
+libewf_char_t *libewf_header_values_generate_header_string_xml( libewf_values_table_t *header_values, time_t timestamp, size_t *string_length )
 {
 	libewf_char_t *header_string         = NULL;
 	libewf_char_t *xml_head              = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
@@ -3627,7 +3627,7 @@ libewf_char_t *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TA
 /* Generate an EWFX header
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_header_string_ewfx( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length )
 {
 	ewf_char_t  *header               = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -3660,7 +3660,7 @@ ewf_char_t *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABL
 /* Generate an EWFX header2
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+ewf_char_t *libewf_header_values_generate_header2_string_ewfx( libewf_values_table_t *header_values, time_t timestamp, size_t *header2_length )
 {
 	ewf_char_t  *header2              = NULL;
 	libewf_char_t *header_string      = NULL;
@@ -3693,7 +3693,7 @@ ewf_char_t *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TAB
 /* Generate an EWFX xheader
  * Returns a pointer to the new instance, NULL on error
  */
-ewf_char_t *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+ewf_char_t *libewf_header_values_generate_xheader_string_ewfx( libewf_values_table_t *header_values, time_t timestamp, size_t *header_length )
 {
 	ewf_char_t  *xheader         = NULL;
 	libewf_char_t *header_string = NULL;

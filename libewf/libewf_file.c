@@ -2089,7 +2089,7 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, libewf_char_t *identifier, lib
  */
 int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values      = NULL;
+	libewf_values_table_t *header_values    = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_parse_header_values";
 
@@ -2167,7 +2167,7 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
  */
 int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 {
-	LIBEWF_VALUES_TABLE *hash_values        = NULL;
+	libewf_values_table_t *hash_values      = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_parse_hash_values";
 

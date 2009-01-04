@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define EWF_HASH ewf_hash_t
-#define EWF_HASH_SIZE sizeof( EWF_HASH )
-
 typedef struct ewf_hash ewf_hash_t;
 
 struct ewf_hash

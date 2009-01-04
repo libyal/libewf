@@ -114,11 +114,11 @@ struct libewf_internal_handle
 
 	/* The header values
 	 */
-	LIBEWF_VALUES_TABLE *header_values;
+	libewf_values_table_t *header_values;
 
 	/* The hash values
 	 */
-	LIBEWF_VALUES_TABLE *hash_values;
+	libewf_values_table_t *hash_values;
 
 	/* The sectors with acquiry read errors
 	 */

@@ -70,7 +70,7 @@ ssize_t libewf_segment_file_write_chunks_correction( libewf_segment_file_handle_
 
 ssize_t libewf_segment_file_write_delta_chunk( libewf_segment_file_handle_t *segment_file_handle, uint32_t chunk, ewf_char_t *chunk_data, size_t chunk_size, ewf_crc_t *chunk_crc, uint8_t write_crc );
 
-ssize_t libewf_segment_file_write_close( libewf_segment_file_handle_t *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, ewf_data_t **cached_data_section );
+ssize_t libewf_segment_file_write_close( libewf_segment_file_handle_t *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, libewf_values_table_t *hash_values, LIBEWF_MEDIA_VALUES *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, ewf_data_t **cached_data_section );
 
 #if defined( __cplusplus )
 }

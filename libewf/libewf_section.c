@@ -2856,19 +2856,19 @@ ssize_t libewf_section_data_write( libewf_segment_file_handle_t *segment_file_ha
  */
 ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_handle, libewf_sector_table_t *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
 {
-	EWF_ERROR2 error2;
+	ewf_error2_t error2;
 	uint8_t stored_crc_buffer[ 4 ];
 
-	EWF_ERROR2_SECTOR *error2_sectors = NULL;
-	static char *function             = "libewf_section_error2_read";
-	ewf_crc_t calculated_crc          = 0;
-	ewf_crc_t stored_crc              = 0;
-	ssize_t section_read_count        = 0;
-	ssize_t read_count                = 0;
-	size_t sectors_size               = 0;
-	uint32_t amount_of_errors         = 0;
-	uint32_t iterator                 = 0;
-	uint32_t sector                   = 0;
+	ewf_error2_sector_t *error2_sectors = NULL;
+	static char *function               = "libewf_section_error2_read";
+	ewf_crc_t calculated_crc            = 0;
+	ewf_crc_t stored_crc                = 0;
+	ssize_t section_read_count          = 0;
+	ssize_t read_count                  = 0;
+	size_t sectors_size                 = 0;
+	uint32_t amount_of_errors           = 0;
+	uint32_t iterator                   = 0;
+	uint32_t sector                     = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -2897,16 +2897,16 @@ ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_h
 	section_read_count = libewf_segment_file_handle_read(
 	                      segment_file_handle,
 	                      &error2,
-	                      EWF_ERROR2_SIZE );
+	                      sizeof( ewf_error2_t ) );
 	
-	if( section_read_count != (ssize_t) EWF_ERROR2_SIZE )
+	if( section_read_count != (ssize_t) sizeof( ewf_error2_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read error2.\n",
 		 function );
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &error2, ( EWF_ERROR2_SIZE - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate( &error2, ( sizeof( ewf_error2_t ) - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, error2.crc ) != 1 )
 	{
@@ -2922,7 +2922,7 @@ ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_h
 
 		return( -1 );
 	}
-	sectors_size = EWF_ERROR2_SECTOR_SIZE * amount_of_errors;
+	sectors_size = sizeof( ewf_error2_sector_t ) * amount_of_errors;
 
 	if( stored_crc != calculated_crc )
 	{
@@ -2950,7 +2950,7 @@ ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_h
 	}
 	else
 	{
-		error2_sectors = (EWF_ERROR2_SECTOR *) libewf_common_alloc( sectors_size );
+		error2_sectors = (ewf_error2_sector_t *) libewf_common_alloc( sectors_size );
 
 		if( error2_sectors == NULL )
 		{
@@ -3075,20 +3075,20 @@ ssize_t libewf_section_error2_read( libewf_segment_file_handle_t *segment_file_h
  */
 ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_handle, libewf_sector_table_t *acquiry_errors )
 {
-	EWF_ERROR2 error2;
+	ewf_error2_t error2;
 	uint8_t calculated_crc_buffer[ 4 ];
 
-	EWF_ERROR2_SECTOR *error2_sectors = NULL;
-	ewf_char_t *section_type          = (ewf_char_t *) "error2";
-	static char *function             = "libewf_section_error2_write";
-	ewf_crc_t calculated_crc          = 0;
-	off64_t section_offset            = 0;
-	ssize_t section_write_count       = 0;
-	ssize_t write_count               = 0;
-	size_t section_type_length        = 6;
-	size_t section_size               = 0;
-	size_t sectors_size               = 0;
-	uint32_t iterator                 = 0;
+	ewf_error2_sector_t *error2_sectors = NULL;
+	ewf_char_t *section_type            = (ewf_char_t *) "error2";
+	static char *function               = "libewf_section_error2_write";
+	ewf_crc_t calculated_crc            = 0;
+	off64_t section_offset              = 0;
+	ssize_t section_write_count         = 0;
+	ssize_t write_count                 = 0;
+	size_t section_type_length          = 6;
+	size_t section_size                 = 0;
+	size_t sectors_size                 = 0;
+	uint32_t iterator                   = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -3105,10 +3105,10 @@ ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_
 		return( -1 );
 	}
 	section_offset = segment_file_handle->file_offset;
-	sectors_size   = EWF_ERROR2_SECTOR_SIZE * acquiry_errors->amount;
-	section_size   = EWF_ERROR2_SIZE + sectors_size + sizeof( ewf_crc_t );
+	sectors_size   = sizeof( ewf_error2_sector_t ) * acquiry_errors->amount;
+	section_size   = sizeof( ewf_error2_t ) + sectors_size + sizeof( ewf_crc_t );
 
-	if( libewf_common_memset( &error2, 0, EWF_ERROR2_SIZE ) == NULL )
+	if( libewf_common_memset( &error2, 0, sizeof( ewf_error2_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear error2.\n",
 		 function );
@@ -3122,7 +3122,7 @@ ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &error2, ( EWF_ERROR2_SIZE - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate( &error2, ( sizeof( ewf_error2_t ) - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, error2.crc ) != 1 )
 	{
@@ -3131,7 +3131,7 @@ ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_
 
 		return( -1 );
 	}
-	error2_sectors = (EWF_ERROR2_SECTOR *) libewf_common_alloc( sectors_size );
+	error2_sectors = (ewf_error2_sector_t *) libewf_common_alloc( sectors_size );
 
 	if( error2_sectors == NULL )
 	{
@@ -3185,9 +3185,9 @@ ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_
 	write_count = libewf_segment_file_handle_write(
 	               segment_file_handle,
 	               &error2,
-	               EWF_ERROR2_SIZE );
+	               sizeof( ewf_error2_t ) );
 
-	if( write_count != (ssize_t) EWF_ERROR2_SIZE )
+	if( write_count != (ssize_t) sizeof( ewf_error2_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write error2 to file.\n",
 		 function );
@@ -3255,7 +3255,7 @@ ssize_t libewf_section_error2_write( libewf_segment_file_handle_t *segment_file_
  */
 ssize_t libewf_section_hash_read( libewf_segment_file_handle_t *segment_file_handle, EWF_DIGEST_HASH *md5_hash, uint8_t error_tollerance )
 {
-	EWF_HASH hash;
+	ewf_hash_t hash;
 
 	static char *function    = "libewf_section_hash_read";
 	ewf_crc_t calculated_crc = 0;
@@ -3279,16 +3279,16 @@ ssize_t libewf_section_hash_read( libewf_segment_file_handle_t *segment_file_han
 	read_count = libewf_segment_file_handle_read(
 	              segment_file_handle,
 	              &hash,
-	              EWF_HASH_SIZE );
+	              sizeof( ewf_hash_t ) );
 
-	if( read_count != (ssize_t) EWF_HASH_SIZE )
+	if( read_count != (ssize_t) sizeof( ewf_hash_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to read hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate( &hash, ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, hash.crc ) != 1 )
 	{
@@ -3329,7 +3329,7 @@ ssize_t libewf_section_hash_read( libewf_segment_file_handle_t *segment_file_han
  */
 ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_handle, EWF_DIGEST_HASH *md5_hash )
 {
-	EWF_HASH hash;
+	ewf_hash_t hash;
 
 	ewf_char_t *section_type    = (ewf_char_t *) "hash";
 	static char *function       = "libewf_section_hash_write";
@@ -3348,7 +3348,7 @@ ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_ha
 	}
 	section_offset = segment_file_handle->file_offset;
 
-	if( libewf_common_memset( &hash, 0, EWF_HASH_SIZE ) == NULL )
+	if( libewf_common_memset( &hash, 0, sizeof( ewf_hash_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear hash.\n",
 		 function );
@@ -3362,7 +3362,7 @@ ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_ha
 
 		return( -1 );
 	}
-	calculated_crc = ewf_crc_calculate( &hash, ( EWF_HASH_SIZE - sizeof( ewf_crc_t ) ), 1 );
+	calculated_crc = ewf_crc_calculate( &hash, ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ), 1 );
 
 	if( libewf_endian_revert_32bit( calculated_crc, hash.crc ) != 1 )
 	{
@@ -3375,7 +3375,7 @@ ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_ha
 	                       segment_file_handle,
 	                       section_type,
 	                       section_type_length,
-	                       (size64_t) EWF_HASH_SIZE );
+	                       (size64_t) sizeof( ewf_hash_t ) );
 
 	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
@@ -3387,9 +3387,9 @@ ssize_t libewf_section_hash_write( libewf_segment_file_handle_t *segment_file_ha
 	write_count = libewf_segment_file_handle_write(
 	               segment_file_handle,
 	               &hash,
-	               EWF_HASH_SIZE );
+	               sizeof( ewf_hash_t ) );
 
-	if( write_count != (ssize_t) EWF_HASH_SIZE )
+	if( write_count != (ssize_t) sizeof( ewf_hash_t ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write hash to file.\n",
 		 function );
