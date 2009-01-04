@@ -46,13 +46,15 @@
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 {
 	LIBEWF_SEGMENT_TABLE *segment_table = NULL;
+	static char *function               = "libewf_segment_table_alloc";
 	uint16_t iterator                   = 0;
 
 	segment_table = (LIBEWF_SEGMENT_TABLE *) libewf_common_alloc( LIBEWF_SEGMENT_TABLE_SIZE );
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate segment table.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate segment table.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -64,7 +66,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 	if( segment_table->filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate filename array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate filename array.\n",
+		 function );
 
 		libewf_common_free( segment_table );
 
@@ -74,7 +77,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 	if( segment_table->file_descriptor == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate file descriptor array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate file descriptor array.\n",
+		 function );
 
 		libewf_common_free( segment_table->filename );
 		libewf_common_free( segment_table );
@@ -85,7 +89,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 	if( segment_table->file_offset == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate file offset array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate file offset array.\n",
+		 function );
 
 		libewf_common_free( segment_table->filename );
 		libewf_common_free( segment_table->file_descriptor );
@@ -97,7 +102,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 	if( segment_table->amount_of_chunks == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate amount of chunks array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate amount of chunks array.\n",
+		 function );
 
 		libewf_common_free( segment_table->filename );
 		libewf_common_free( segment_table->file_descriptor );
@@ -110,7 +116,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 	if( segment_table->section_list == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate section list array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate section list array.\n",
+		 function );
 
 		libewf_common_free( segment_table->filename );
 		libewf_common_free( segment_table->file_descriptor );
@@ -128,7 +135,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 			if( segment_table->section_list[ iterator ] == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: unable to allocate section list.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to allocate section list.\n",
+				 function );
 
 				/* The current entry does not need to be freed, because it was never allocated
 				 * but the first entry 0 does, because the iterator is a unsigned integer
@@ -153,7 +161,8 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_segment_table_alloc: section list already created.\n" );
+			LIBEWF_WARNING_PRINT( "%s: section list already created.\n",
+			 function );
 		}
 	}
 	segment_table->amount = amount;

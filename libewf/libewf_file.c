@@ -219,187 +219,8 @@ LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, u
 	EWF_FILE_HEADER file_header;
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	wchar_t *error_string                   = NULL;
 	static char *function                   = "libewf_open";
 	uint32_t iterator                       = 0;
-	uint16_t segment_number                 = 0;
-	int file_descriptor                     = 0;
-
-	if( file_amount < 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	{
-		/* 1 additional entry required because
-		 * entry [ 0 ] is not used for reading
-		 */
-		handle = libewf_internal_handle_alloc( ( file_amount + 1 ), flags );
-
-		if( handle == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
-			 function );
-
-			return( NULL );
-		}
-		if( internal_handle->segment_table == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( handle );
-
-			return( NULL );
-		}
-		for( iterator = 0; iterator < file_amount; iterator++ )
-		{
-			file_descriptor = libewf_common_wide_open( filenames[ iterator ], flags );
-
-			if( file_descriptor == -1 )
-			{
-				error_string = libewf_common_wide_strerror( errno );
-
-				if( error_string == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
-					 function, filenames[ iterator ] );
-				}
-				else
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls with error: %s.\n",
-					 function, filenames[ iterator ], error_string );
-
-					libewf_common_free( error_string );
-				}
-				libewf_internal_handle_free( handle );
-
-				return( NULL );
-			}
-			if( libewf_segment_file_read_file_header( file_descriptor, &segment_number ) <= -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %ls.\n",
-				 function, filenames[ iterator ] );
-
-				libewf_internal_handle_free( internal_handle );
-
-				return( NULL );
-			}
-			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, filenames[ iterator ], file_descriptor, segment_number );
-
-			if( libewf_segment_table_set_wide_filename(
-			     internal_handle->segment_table,
-			     segment_number,
-			     filenames[ iterator ],
-			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-				 function );
-
-				libewf_internal_handle_free( handle );
-
-				return( NULL );
-			}
-			if( libewf_segment_table_set_file_descriptor(
-			     internal_handle->segment_table,
-			     segment_number,
-			     file_descriptor ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
-				 function );
-
-				libewf_internal_handle_free( handle );
-
-				return( NULL );
-			}
-		}
-		if( libewf_read_build_index( handle ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create index.\n",
-			 function );
-
-			libewf_internal_handle_free( handle );
-
-			return( NULL );
-		}
-	}
-	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-	{
-		/* Allocate 2 entries
-		 * entry [ 0 ] is used for the base filename
-		 */
-		handle = libewf_internal_handle_alloc( 1, flags );
-
-		if( handle == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
-			 function );
-
-			return( NULL );
-		}
-		if( internal_handle->segment_table == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( handle );
-
-			return( NULL );
-		}
-		if( libewf_segment_table_set_wide_filename(
-		     internal_handle->segment_table,
-		     0,
-		     filenames[ iterator ],
-		     libewf_common_wide_string_length( filenames[ iterator ] ) ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( handle );
-
-			return( NULL );
-		}
-		if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, 0, -1 ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
-			 function );
-
-			libewf_internal_handle_free( handle );
-
-			return( NULL );
-		}
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
-		 function );
-
-		return( NULL );
-	}
-	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
-	 function );
-
-	return( (LIBEWF_HANDLE *) handle );
-}
-#else
-
-/* Opens EWF file(s)
- * For reading files should contain all filenames that make up an EWF image
- * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
- * Returns a pointer to the new instance of handle, NULL on error
- */
-LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	char *error_string                      = NULL;
-	static char *function                   = "libewf_open";
-	uint32_t iterator                       = 0;
-	uint16_t segment_number                 = 0;
-	int file_descriptor                     = 0;
 
 	if( file_amount < 1 )
 	{
@@ -422,6 +243,43 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
+		if( libewf_segment_file_read_wide_open(
+		     internal_handle, 
+		     filenames, 
+		     file_amount,
+		     flags ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+		if( libewf_read_build_index( internal_handle ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create index.\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
+		}
+	}
+	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	{
+		/* Allocate 2 entries
+		 * entry [ 0 ] is used for the base filename
+		 */
+		internal_handle = libewf_internal_handle_alloc( 1, flags );
+
+		if( internal_handle == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			 function );
+
+			return( NULL );
+		}
 		if( internal_handle->segment_table == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
@@ -431,64 +289,87 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
-		for( iterator = 0; iterator < file_amount; iterator++ )
+		if( libewf_segment_table_set_wide_filename(
+		     internal_handle->segment_table,
+		     0,
+		     filenames[ iterator ],
+		     libewf_common_wide_string_length( filenames[ iterator ] ) ) != 1 )
 		{
-			file_descriptor = libewf_common_open( filenames[ iterator ], flags );
+			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+			 function );
 
-			if( file_descriptor == -1 )
-			{
-				error_string = libewf_common_strerror( errno );
+			libewf_internal_handle_free( internal_handle );
 
-				if( error_string == NULL )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-					 function, filenames[ iterator ] );
-				}
-				else
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s with error: %s.\n",
-					 function, filenames[ iterator ], error_string );
+			return( NULL );
+		}
+		if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, 0, -1 ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
+			 function );
 
-					libewf_common_free( error_string );
-				}
-				libewf_internal_handle_free( internal_handle );
+			libewf_internal_handle_free( internal_handle );
 
-				return( NULL );
-			}
-			if( libewf_segment_file_read_file_header( file_descriptor, &segment_number ) <= -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %s.\n",
-				 function, filenames[ iterator ] );
+			return( NULL );
+		}
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "%s: unsupported flags.\n",
+		 function );
 
-				libewf_internal_handle_free( internal_handle );
+		return( NULL );
+	}
+	LIBEWF_VERBOSE_PRINT( "%s: open successful.\n",
+	 function );
 
-				return( NULL );
-			}
-			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, filenames[ iterator ], file_descriptor, segment_number );
+	return( (LIBEWF_HANDLE *) internal_handle );
+}
+#else
 
-			if( libewf_segment_table_set_filename(
-			     internal_handle->segment_table,
-			     segment_number,
-			     filenames[ iterator ],
-			     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
-				 function );
+/* Opens EWF file(s)
+ * For reading files should contain all filenames that make up an EWF image
+ * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
+ * Returns a pointer to the new instance of handle, NULL on error
+ */
+LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_open";
+	uint32_t iterator                       = 0;
 
-				libewf_internal_handle_free( internal_handle );
+	if( file_amount < 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid file amount at least 1 is required.\n",
+		 function );
 
-				return( NULL );
-			}
-			if( libewf_segment_table_set_file_descriptor( internal_handle->segment_table, segment_number, file_descriptor ) != 1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: unable to set file descriptor in segment table.\n",
-				 function );
+		return( NULL );
+	}
+	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	{
+		/* 1 additional entry required because
+		 * entry [ 0 ] is not used for reading
+		 */
+		internal_handle = libewf_internal_handle_alloc( ( file_amount + 1 ), flags );
 
-				libewf_internal_handle_free( internal_handle );
+		if( internal_handle == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create handle.\n",
+			 function );
 
-				return( NULL );
-			}
+			return( NULL );
+		}
+		if( libewf_segment_file_read_open(
+		     internal_handle, 
+		     filenames, 
+		     file_amount,
+		     flags ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
+			 function );
+
+			libewf_internal_handle_free( internal_handle );
+
+			return( NULL );
 		}
 		if( libewf_read_build_index( internal_handle ) != 1 )
 		{

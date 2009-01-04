@@ -139,18 +139,24 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 /* Opens EWF segment file(s) for reading
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount )
+int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	wchar_t *error_string                   = NULL;
-	static char *function                   = "libewf_segment_file_read_wide_open";
-	uint32_t iterator                       = 0;
-	uint16_t segment_number                 = 0;
-	int file_descriptor                     = 0;
+	wchar_t *error_string   = NULL;
+	static char *function   = "libewf_segment_file_read_wide_open";
+	uint32_t iterator       = 0;
+	uint16_t segment_number = 0;
+	int file_descriptor     = 0;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
 		 function );
 
 		return( -1 );
@@ -172,13 +178,6 @@ int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle,
 	if( internal_handle->segment_table->file_offset == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
 		 function );
 
 		return( -1 );
@@ -235,9 +234,19 @@ int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle,
 
 			return( -1 );
 		}
-		internal_handle->segment_table->filename[ segment_number ]        = filenames[ iterator ];
-		internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor.
-		internal_handle->segment_table->file_offset[ segment_number ]     = file_descriptor.
+		if( libewf_segment_table_set_wide_filename(
+		     internal_handle->segment_table,
+		     0,
+		     filenames[ iterator ],
+		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
+		internal_handle->segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
 
 		LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
 		 function, filenames[ iterator ], file_descriptor, segment_number );
@@ -249,18 +258,24 @@ int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle,
 /* Opens EWF segment file(s) for reading
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount )
+int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount, uint8_t flags )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	char *error_string                      = NULL;
-	static char *function                   = "libewf_segment_file_read_open";
-	uint32_t iterator                       = 0;
-	uint16_t segment_number                 = 0;
-	int file_descriptor                     = 0;
+	char *error_string      = NULL;
+	static char *function   = "libewf_segment_file_read_open";
+	uint32_t iterator       = 0;
+	uint16_t segment_number = 0;
+	int file_descriptor     = 0;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->segment_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
 		 function );
 
 		return( -1 );
@@ -282,13 +297,6 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	if( internal_handle->segment_table->file_offset == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
 		 function );
 
 		return( -1 );
@@ -345,9 +353,19 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 			return( -1 );
 		}
-		internal_handle->segment_table->filename[ segment_number ]        = filenames[ iterator ];
-		internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor.
-		internal_handle->segment_table->file_offset[ segment_number ]     = file_descriptor.
+		if( libewf_segment_table_set_filename(
+		     internal_handle->segment_table,
+		     0,
+		     filenames[ iterator ],
+		     libewf_common_string_length( filenames[ iterator ] ) ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
+			 function );
+
+			return( -1 );
+		}
+		internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
+		internal_handle->segment_table->file_offset[ segment_number ]     = (off_t) EWF_FILE_HEADER_SIZE;
 
 		LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
 		 function, filenames[ iterator ], file_descriptor, segment_number );
@@ -360,18 +378,18 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 /* Opens EWF segment file(s) for writing
  * Returns 1 if successful, 0 if not, or -1 on error
- */
 int libewf_segment_file_write_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount )
 {
 }
+ */
 #else
 
 /* Opens EWF segment file(s) for writing
  * Returns 1 if successful, 0 if not, or -1 on error
- */
 int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount )
 {
 }
+ */
 #endif
 
 /* Reads the segment table from all segment files
