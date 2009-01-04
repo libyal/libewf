@@ -1785,7 +1785,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	{
 		if( offset_table->offset[ offset_table_index + iterator ] > (off_t) INT32_MAX )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset only values below 2^32 are supported..\n",
+			LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
 			 function );
 
 			libewf_common_free( table );
@@ -1875,7 +1875,7 @@ ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -3346,7 +3346,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 	if( next_offset > (uint64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid next_offset only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid next offset value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -3355,12 +3355,16 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 
 	if( section_end_offset > (off_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid section end offset only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid section end offset value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_section_list_append( section_list, section->type, *section_start_offset, section_end_offset ) == NULL )
+	if( libewf_section_list_append(
+	     section_list,
+	     section->type,
+	     *section_start_offset,
+	     section_end_offset ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to append value to section list.\n",
 		 function );
@@ -3377,7 +3381,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descr
 	}
 	if( size > (uint64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );

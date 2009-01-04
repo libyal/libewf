@@ -79,13 +79,15 @@
  */
 EWFGLOB *ewfglob_alloc( void )
 {
-	EWFGLOB *glob = NULL;
+	EWFGLOB *glob         = NULL;
+	static char *function = "ewfglob_alloc";
 
 	glob = (EWFGLOB *) libewf_common_alloc_cleared( EWFGLOB_SIZE, 0 );
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_alloc: unable to allocate glob.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate glob.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -101,18 +103,21 @@ EWFGLOB *ewfglob_alloc( void )
 EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 {
 	CHAR_T **reallocation = NULL;
+	static char *function = "ewfglob_realloc";
 	size_t previous_size  = 0;
 	size_t new_size       = 0;
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_realloc: invalid glob.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid glob.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( glob->amount >= new_amount )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_realloc: new amount less equal than current amount.\n" );
+		LIBEWF_WARNING_PRINT( "%s: new amount less equal than current amount.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -120,7 +125,8 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 
 	if( ( previous_size > (size_t) SSIZE_MAX ) || ( new_size > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_realloc: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -135,7 +141,8 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
 	}
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_realloc: unable to reallocate glob results.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate glob results.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -149,11 +156,13 @@ EWFGLOB *ewfglob_realloc( EWFGLOB *glob, uint16_t new_amount )
  */
 void ewfglob_free( EWFGLOB *glob )
 {
-	uint16_t iterator = 0;
+	static char *function = "ewfglob_free";
+	uint16_t iterator     = 0;
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_free: invalid glob.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid glob.\n",
+		 function );
 
 		return;
 	}
@@ -188,12 +197,14 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 	intptr_t find_handle  = 0;
 #endif
 	EWFGLOB *reallocation = NULL;
+	static char *function = "ewfglob_resolve";
 	int32_t globs_found   = 0;
 	uint32_t iterator     = 0;
 
 	if( glob == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfglob_resolve: invalid glob.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid glob.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -201,14 +212,25 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 	{
 		if( patterns[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewfglob_resolve: invalid pattern.\n" );
+			LIBEWF_WARNING_PRINT( "%s: invalid pattern.\n",
+			 function );
 
 			return( -1 );
 		}
 #ifdef HAVE_WINDOWS_API
-		if( ewfglob_splitpath( patterns[ iterator ], find_drive, _MAX_DRIVE, find_directory, _MAX_DIR, find_name, _MAX_FNAME, find_extension, _MAX_EXT ) != 0 )
+		if( ewfglob_splitpath(
+		     patterns[ iterator ],
+		     find_drive,
+		     _MAX_DRIVE,
+		     find_directory,
+		     _MAX_DIR,
+		     find_name,
+		     _MAX_FNAME,
+		     find_extension,
+		     _MAX_EXT ) != 0 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfglob_resolve: unable to split path.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to split path.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -222,13 +244,21 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 
 				if( reallocation == NULL )
 				{
-					LIBEWF_WARNING_PRINT( "ewfglob_resolve: unable to reallocate glob.\n" );
+					LIBEWF_WARNING_PRINT( "%s: unable to reallocate glob.\n",
+					 function );
 
 					return( -1 );
 				}
-				if( ewfglob_makepath( find_path, _MAX_PATH, find_drive, find_directory, find_data.name, _S_CHAR_T( "" )  ) != 0 )
+				if( ewfglob_makepath(
+				     find_path,
+				     _MAX_PATH,
+				     find_drive,
+				     find_directory,
+				     find_data.name,
+				     _S_CHAR_T( "" )  ) != 0 )
 				{
-					LIBEWF_WARNING_PRINT( "ewfglob_resolve: unable to make path.\n" );
+					LIBEWF_WARNING_PRINT( "%s: unable to make path.\n",
+					 function );
 
 					return( -1 );
 				}
@@ -236,9 +266,10 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 
 				globs_found++;
 
-				if( globs_found > UINT16_MAX )
+				if( globs_found > (int32_t) UINT16_MAX )
 				{
-					LIBEWF_WARNING_PRINT( "ewfglob_resolve: too many globs found.\n" );
+					LIBEWF_WARNING_PRINT( "%s: too many globs found.\n",
+					 function );
 
 					return( -1 );
 				}
@@ -247,20 +278,23 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 
 			if( errno != ENOENT )
 			{
-				LIBEWF_WARNING_PRINT( "ewfglob_resolve: error finding next file entry.\n" );
+				LIBEWF_WARNING_PRINT( "%s: error finding next file entry.\n",
+				 function );
 
 				return( -1 );
 			}
 			if( ewfglob_findclose( find_handle ) != 0 )
 			{
-				LIBEWF_WARNING_PRINT( "ewfglob_resolve: error closing find handle.\n" );
+				LIBEWF_WARNING_PRINT( "%s: error closing find handle.\n",
+				 function );
 
 				return( -1 );
 			}
 		}
 		else if( errno != ENOENT )
 		{
-			LIBEWF_WARNING_PRINT( "ewfglob_resolve: error finding file entry.\n" );
+			LIBEWF_WARNING_PRINT( "%s: error finding file entry.\n",
+			 function );
 
 			return( -1 );
 		}

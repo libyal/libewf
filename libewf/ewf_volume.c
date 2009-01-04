@@ -159,14 +159,14 @@ ssize32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume )
 	}
 	if( sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -175,7 +175,7 @@ ssize32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume )
 
 	if( chunk_size > (size64_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk size only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );

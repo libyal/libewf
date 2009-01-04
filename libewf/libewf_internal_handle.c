@@ -536,7 +536,7 @@ int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HAND
 	}
 	if( internal_handle->media->sectors_per_chunk > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector per chunk only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid sector per chunk value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -566,7 +566,7 @@ int32_t libewf_internal_handle_get_media_bytes_per_sector( LIBEWF_INTERNAL_HANDL
 	}
 	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -596,7 +596,7 @@ int32_t libewf_internal_handle_get_media_amount_of_sectors( LIBEWF_INTERNAL_HAND
 	}
 	if( internal_handle->media->amount_of_sectors > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -656,7 +656,7 @@ int32_t libewf_internal_handle_get_media_error_granularity( LIBEWF_INTERNAL_HAND
 	}
 	if( internal_handle->media->error_granularity > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid error granularity only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid error granularity value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -751,7 +751,7 @@ int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_h
 	}
 	if( internal_handle->media->media_type > (uint8_t) INT8_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media type only values below 2^8 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media type value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -781,7 +781,7 @@ int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_
 	}
 	if( internal_handle->media->media_flags > (uint8_t) INT8_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media flags only values below 2^8 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media flags value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -838,7 +838,7 @@ int8_t libewf_internal_handle_get_format( LIBEWF_INTERNAL_HANDLE *internal_handl
 	}
 	if( internal_handle->format > (uint8_t) INT8_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid format only values below 2^8 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid format value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -2350,14 +2350,14 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	if( internal_handle->media->chunk_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media chunk size only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid media chunk size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media->bytes_per_sector > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -2371,7 +2371,7 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	if( internal_handle->write->segment_file_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file size only values below 2^32 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -2398,7 +2398,7 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	}
 	if( internal_handle->write->input_write_size > (uint64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid input write size only values below 2^64 are supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid input write size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );

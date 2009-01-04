@@ -98,8 +98,6 @@ Next release:
 * use off_t for size values instead of uint64_t
 * check printf %jd and %zu for Cygwin
 
-* refactor function names into static char *
-  grep on 'PRINT( "libewf'
 * refactor some int64 to size64_t and off_t into off64_t
 * add maximum check to set functions in internal handle
 * rewrite #ifdef to #if defined() and #ifndef to #if !defined() ?
@@ -125,6 +123,7 @@ TODO
 * remove internal_handle passing from most functions
   only pass the necessary values
 * segment table should only be updated by functions in segment file/table
+* rewrite ewfglob marcros to function macros (including arguments)
 
 DELTA FILE
 * consists of sections "delta_chunk" with chunk number
@@ -134,6 +133,9 @@ DELTA FILE
 Version: 20070818
 * worked on restructuring to improve internal structure
 * worked on improved rewrite using delta segment files
+* completed refactoring of PRINT( "libewf and PRINT( "ewf
+  function names
+* changed warning strings with 2^ values to value exceeds maximum
 
 Version: 20070816
 * worked on restructuring to improve internal structure

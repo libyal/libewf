@@ -73,13 +73,16 @@ volatile int32_t cancelled;
  */
 int WINAPI ewfsignal_signal_handler( unsigned long signal )
 {
+	static char *function = "ewfsignal_signal_handler";
+
 	switch( signal )
 	{
 		/* use Ctrl+C or Ctrl+Break to simulate SERVICE_CONTROL_STOP in debug mode
 		 */
 		case CTRL_BREAK_EVENT:
 		case CTRL_C_EVENT:
-			LIBEWF_WARNING_PRINT( "ewfsignal_signal_handler: stopping at break signal.\n" );
+			LIBEWF_WARNING_PRINT( "%s: stopping at break signal.\n",
+			 function );
 
 			InterlockedExchange( (long *) &cancelled, 1 );
 

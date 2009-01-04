@@ -630,18 +630,21 @@ uint64_t ewfcommon_get_user_input_size_variable( FILE *stream, LIBEWF_CHAR *requ
 	LIBEWF_CHAR user_input_buffer[ 1024 ];
 
 	LIBEWF_CHAR *user_input_buffer_ptr = &user_input_buffer[ 0 ];
+	static char *function              = "ewfcommon_get_user_input_size_variable";
 	size_t input_length                = 0;
 	uint64_t size_value                = 0;
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_size_variable: invalid output stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		 function );
 
 		return( 0 );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_size_variable: invalid request string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -689,6 +692,7 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 
 	LIBEWF_CHAR *user_input_buffer_ptr = &user_input_buffer[ 0 ];
 	LIBEWF_CHAR *user_input            = NULL;
+	static char *function              = "ewfcommon_get_user_input_fixed_value";
 	size_t input_length                = 0;
 	size_t value_length                = 0;
 	uint8_t iterator                   = 0;
@@ -696,19 +700,22 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: invalid output stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid output stream.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( request_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: invalid request string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid request string.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( default_value >= amount )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: Default value cannot be larger than or equal as amount.\n" );
+		LIBEWF_WARNING_PRINT( "%s: default value exceeds amount.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -779,7 +786,8 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 
 			if( user_input == NULL )
 			{
-				LIBEWF_WARNING_PRINT( "ewfcommon_get_user_input_fixed_value: unable to create string.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to create string.\n",
+				 function );
 
 				return( NULL );
 			}
@@ -799,23 +807,27 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
 int8_t ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size )
 {
 	EWF_DIGEST_HASH *sha1_hash = NULL;
+	static char *function      = "ewfcommon_get_sha1_hash";
 	size_t sha1_hash_size      = EWF_DIGEST_HASH_SIZE_SHA1;
 
 	if( sha1_context == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_sha1_hash: invalid SHA1 digest context.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid SHA1 digest context.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( sha1_hash_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_sha1_hash: invalid SHA1 hash string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid SHA1 hash string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size < LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_sha1_hash: SHA1 hash string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: SHA1 hash string too small.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -823,22 +835,29 @@ int8_t ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1
 
 	if( sha1_hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_sha1_hash: unable to create SHA1 hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create SHA1 hash.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ( ewfsha1_finalize( sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
 	 || ( sha1_hash_size != EWF_DIGEST_HASH_SIZE_SHA1 ) )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_sha1_hash: unable to set SHA1 hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
+		 function );
 
 		libewf_common_free( sha1_hash );
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_digest_hash( sha1_hash_string, size, sha1_hash, EWF_DIGEST_HASH_SIZE_SHA1 ) != 1 )
+	if( libewf_string_copy_from_digest_hash(
+	     sha1_hash_string,
+	     size,
+	     sha1_hash,
+	     EWF_DIGEST_HASH_SIZE_SHA1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_get_sha1_hash: unable to set SHA1 hash string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
+		 function );
 
 		libewf_common_free( sha1_hash );
 
@@ -930,25 +949,33 @@ struct tm *ewfcommon_gmtime( const time_t *timestamp )
  */
 void ewfcommon_version_fprint( FILE *stream, LIBEWF_CHAR *program )
 {
+	static char *function = "ewfcommon_version_fprint";
+
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_version_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( program == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_version_fprint: invalid program name.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid program name.\n",
+		 function );
 
 		return;
 	}
-	fprintf( stream, "%" PRIs_EWF " %" PRIs_EWF " (libewf %" PRIs_EWF ", zlib %s", program, LIBEWF_VERSION, LIBEWF_VERSION, ZLIB_VERSION );
+	fprintf( stream, "%" PRIs_EWF " %" PRIs_EWF " (libewf %" PRIs_EWF ", zlib %s",
+	 program, LIBEWF_VERSION, LIBEWF_VERSION, ZLIB_VERSION );
+
 #if defined( HAVE_LIBCRYPTO )
 	fprintf( stream, ", libcrypto %s", SHLIB_VERSION_NUMBER );
 #endif
+
 #if defined( HAVE_LIBUUID )
 	fprintf( stream, ", libuuid" );
 #endif
+
 	fprintf( stream, ")\n\n" );
 }
 
@@ -956,9 +983,12 @@ void ewfcommon_version_fprint( FILE *stream, LIBEWF_CHAR *program )
  */
 void ewfcommon_copyright_fprint( FILE *stream )
 {
+	static char *function = "ewfcommon_copyright_fprint";
+
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_version_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
@@ -971,9 +1001,12 @@ void ewfcommon_copyright_fprint( FILE *stream )
  */
 void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *description, LIBEWF_CHAR *evidence_number, LIBEWF_CHAR *examiner_name, LIBEWF_CHAR *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, uint64_t acquiry_offset, uint64_t acquiry_size, uint32_t segment_file_size, uint64_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_block_on_read_error )
 {
+	static char *function = "ewfcommon_acquiry_parameters_fprint";
+
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_acquiry_parameters_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
@@ -1158,19 +1191,22 @@ void ewfcommon_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF
 void ewfcommon_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "ewfcommon_acquiry_errors_fprint";
 	uint64_t sector                         = 0;
 	uint32_t amount_of_sectors              = 0;
 	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_acquiry_errors_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_acquiry_errors_fprint: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return;
 	}
@@ -1180,7 +1216,8 @@ void ewfcommon_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	{
 		if( internal_handle->acquiry_error_sectors == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_acquiry_errors_fprint: missing acquiry read error sector list.\n" );
+			LIBEWF_WARNING_PRINT( "%s: missing acquiry read error sector list.\n",
+			 function );
 
 			return;
 		}
@@ -1204,19 +1241,22 @@ void ewfcommon_acquiry_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 void ewfcommon_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "ewfcommon_crc_errors_fprint";
 	uint64_t sector                         = 0;
 	uint32_t amount_of_sectors              = 0;
 	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_crc_errors_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_crc_errors_fprint: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return;
 	}
@@ -1224,7 +1264,8 @@ void ewfcommon_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 	if( internal_handle->read == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_crc_errors_fprint: invalid handle - missing subhandle read.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle read.\n",
+		 function );
 
 		return;
 	}
@@ -1232,7 +1273,8 @@ void ewfcommon_crc_errors_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	{
 		if( internal_handle->read->crc_error_sectors == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_crc_errors_fprint: missing CRC error sector list.\n" );
+			LIBEWF_WARNING_PRINT( "%s: missing CRC error sector list.\n",
+			 function );
 
 			return;
 		}
@@ -1257,18 +1299,21 @@ void ewfcommon_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	LIBEWF_CHAR header_value[ 128 ];
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "ewfcommon_header_values_fprint";
 	uint32_t header_value_length            = 128;
 	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_header_values_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_header_values_fprint: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return;
 	}
@@ -1379,18 +1424,21 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	LIBEWF_CHAR *stored_md5_hash_string     = NULL;
+	static char *function                   = "ewfcommon_hash_values_fprint";
 	uint32_t hash_value_length              = 128;
 	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_hash_values_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_hash_values_fprint: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return;
 	}
@@ -1399,9 +1447,13 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( ( stored_md5_hash_string != NULL )
-	 && ( libewf_get_stored_md5_hash( handle, stored_md5_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
+	 && ( libewf_get_stored_md5_hash(
+	       handle,
+	       stored_md5_hash_string,
+	       LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
 	{
-		fprintf( stream, "\tMD5 hash in file:\t%" PRIs_EWF "\n", stored_md5_hash_string );
+		fprintf( stream, "\tMD5 hash in file:\t%" PRIs_EWF "\n",
+		 stored_md5_hash_string );
 
 		libewf_common_free( stored_md5_hash_string );
 	}
@@ -1416,11 +1468,19 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 		{
 			fprintf( stream, "\n\tAdditional hash values:\n" );
 
-			for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < internal_handle->hash_values->amount; iterator++ )
+			for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT;
+			 iterator < internal_handle->hash_values->amount;
+			 iterator++ )
 			{
-				if( libewf_get_hash_value( handle, internal_handle->hash_values->identifiers[ iterator ], hash_value, hash_value_length ) == 1 )
+				if( libewf_get_hash_value(
+				     handle,
+				     internal_handle->hash_values->identifiers[ iterator ],
+				     hash_value,
+				     hash_value_length ) == 1 )
 				{
-					fprintf( stream, "\t%" PRIs_EWF ": %" PRIs_EWF "\n", internal_handle->hash_values->identifiers[ iterator ], hash_value );
+					fprintf( stream, "\t%" PRIs_EWF ": %" PRIs_EWF "\n",
+					 internal_handle->hash_values->identifiers[ iterator ],
+					 hash_value );
 				}
 			}
 		}
@@ -1692,6 +1752,7 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 #if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
 	CHAR_T *error_string              = NULL;
 #endif
+	static char *function             = "ewfcommon_read_input";
 	off64_t current_read_offset       = 0;
 	off64_t current_calculated_offset = 0;
 	off64_t error2_sector             = 0;
@@ -1713,13 +1774,15 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid read buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid read buffer.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1727,25 +1790,29 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 	if( chunk_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: unable to determine chunk media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (uint64_t) INT64_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid size - size larger than 2^63 not supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( file_descriptor == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid file descriptor.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( total_read_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid total read count.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid total read count.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1753,7 +1820,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 	if( bytes_per_sector == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid amount of bytes per sector.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1761,7 +1829,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 	if( ( chunk_amount <= -1 ) || ( chunk_amount > (int64_t) UINT32_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_input: invalid amount of chunks written.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks written.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1784,7 +1853,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 		{
 			read_count = libewf_common_read( file_descriptor, &buffer[ buffer_offset + read_error_offset ], bytes_to_read );
 
-			LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: read chunk: %" PRIi64 " with size: %zi.\n", ( chunk_amount + 1 ), read_count );
+			LIBEWF_VERBOSE_PRINT( "%s: read chunk: %" PRIi64 " with size: %zi.\n",
+			 function, ( chunk_amount + 1 ), read_count );
 
 			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
 
@@ -1797,7 +1867,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 					if( error_string != NULL )
 					{
-						LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: %s.\n", error_string );
+						LIBEWF_WARNING_PRINT( "%s: error reading data: %s.\n",
+						 function, error_string );
 
 						libewf_common_free( error_string );
 					}
@@ -1806,25 +1877,29 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 #else
 				if( errno == ESPIPE )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: invalid seek.\n" );
+					LIBEWF_WARNING_PRINT( "%s: error reading data: invalid seek.\n",
+					 function );
 
 					return( -1 );
 				}
 				else if( errno == EPERM )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: operation not permitted.\n" );
+					LIBEWF_WARNING_PRINT( "%s: error reading data: operation not permitted.\n",
+					 function );
 
 					return( -1 );
 				}
 				else if( errno == ENXIO )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: no such device or address.\n" );
+					LIBEWF_WARNING_PRINT( "%s: error reading data: no such device or address.\n",
+					 function );
 
 					return( -1 );
 				}
 				else if( errno == ENODEV )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: error reading data: no such device.\n" );
+					LIBEWF_WARNING_PRINT( "%s: error reading data: no such device.\n",
+					 function );
 
 					return( -1 );
 				}
@@ -1835,12 +1910,13 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 					if( current_read_offset != current_calculated_offset )
 					{
-						LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: correcting offset drift current: %jd, calculated: %jd.\n",
-						                      current_read_offset, current_calculated_offset );
+						LIBEWF_VERBOSE_PRINT( "%s: correcting offset drift current: %jd, calculated: %jd.\n",
+						 function, current_read_offset, current_calculated_offset );
 
 						if( current_read_offset < current_calculated_offset )
 						{
-							LIBEWF_WARNING_PRINT( "ewfcommon_read_input: unable to correct offset drift.\n" );
+							LIBEWF_WARNING_PRINT( "%s: unable to correct offset drift.\n",
+							 function );
 
 							return( -1 );
 						}
@@ -1890,8 +1966,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 				{
 					return( 0 );
 				}
-				LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: read error at offset %jd after reading %zi bytes.\n",
-				                      current_calculated_offset, read_count );
+				LIBEWF_VERBOSE_PRINT( "%s: read error at offset %jd after reading %zi bytes.\n",
+				 function, current_calculated_offset, read_count );
 
 				/* There was a read error at a certain offset
 				 */
@@ -1904,7 +1980,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 			{
 				if( seek_on_error == 0 )
 				{
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: unable to handle more input.\n" );
+					LIBEWF_VERBOSE_PRINT( "%s: unable to handle more input.\n",
+					 function );
 
 					return( 0 );
 				}
@@ -1912,7 +1989,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 				/* Check if last chunk is smaller than the chunk size and take corrective measures
 				 */
-				if( ( total_input_size != 0 ) && ( ( current_calculated_offset + chunk_size ) > (int64_t) total_input_size ) )
+				if( ( total_input_size != 0 )
+				 && ( ( current_calculated_offset + chunk_size ) > (int64_t) total_input_size ) )
 				{
 					read_remaining_bytes = (size_t) ( total_input_size - current_calculated_offset );
 				}
@@ -1922,7 +2000,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 				}
 				if( read_remaining_bytes > (size_t) SSIZE_MAX )
 				{
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: invalid remaining bytes value exceeds maximum.\n" );
+					LIBEWF_VERBOSE_PRINT( "%s: invalid remaining bytes value exceeds maximum.\n",
+					 function );
 
 					return( -1 );
 				}
@@ -1934,12 +2013,13 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 				if( wipe_block_on_read_error == 1 )
 				{
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
-					 byte_error_granularity, error_granularity_offset );
+					LIBEWF_VERBOSE_PRINT( "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
+					 function, byte_error_granularity, error_granularity_offset );
 
 					if( libewf_common_memset( &buffer[ error_granularity_offset ], 0, byte_error_granularity ) == NULL )
 					{
-						LIBEWF_WARNING_PRINT( "ewfcommon_read_input: unable to wipe data in chunk on error.\n" );
+						LIBEWF_WARNING_PRINT( "%s: unable to wipe data in chunk on error.\n",
+						 function );
 
 						return( -1 );
 					}
@@ -1956,21 +2036,25 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 				if( libewf_add_acquiry_error( handle, error2_sector, error2_amount_of_sectors ) != 1 )
 				{
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: unable to add acquiry read errror sectors.\n" );
+					LIBEWF_WARNING_PRINT( "%s: unable to add acquiry read errror sectors.\n",
+					 function );
 
 					return( -1 );
 				}
-				LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
-				 ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
+				LIBEWF_VERBOSE_PRINT( "%s: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
+				 function, ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_amount_of_errors,
+				 error2_sector, error2_amount_of_sectors );
 
-				LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: skipping %" PRIu32 " bytes.\n", error_skip_bytes );
+				LIBEWF_VERBOSE_PRINT( "%s: skipping %" PRIu32 " bytes.\n",
+				 function, error_skip_bytes );
 
 				/* At the end of the input
 				 */
 				if( ( total_input_size != 0 )
 				 && ( ( current_calculated_offset + (int64_t) read_remaining_bytes ) >= (int64_t) total_input_size ) )
 				{
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: at end of input no remaining bytes to read from chunk.\n" );
+					LIBEWF_VERBOSE_PRINT( "%s: at end of input no remaining bytes to read from chunk.\n",
+					 function );
 
 					read_count = (ssize_t) read_remaining_bytes;
 
@@ -1983,12 +2067,14 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 					if( error_string != NULL )
 					{
-						LIBEWF_WARNING_PRINT( "ewfcommon_read_input: unable skip %" PRIu32 " bytes after sector with error - %s.\n", error_skip_bytes, error_string );
+						LIBEWF_WARNING_PRINT( "%s: unable skip %" PRIu32 " bytes after sector with error - %s.\n",
+						 function, error_skip_bytes, error_string );
 
 						libewf_common_free( error_string );
 					}
 #else
-					LIBEWF_WARNING_PRINT( "ewfcommon_read_input: unable skip %" PRIu32 " bytes after sector with error.\n", error_skip_bytes );
+					LIBEWF_WARNING_PRINT( "%s: unable skip %" PRIu32 " bytes after sector with error.\n",
+					 function, error_skip_bytes );
 #endif
 					return( -1 );
 				}
@@ -2000,13 +2086,16 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 					read_error_offset     += error_skip_bytes;
 					read_amount_of_errors  = 0;
 
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: remaining to read from chunk %" PRIu32 " bytes.\n", bytes_to_read );
+					LIBEWF_VERBOSE_PRINT( "%s: remaining to read from chunk %" PRIu32 " bytes.\n",
+					 function, bytes_to_read );
 				}
 				else
 				{
 					read_count = (ssize_t) read_remaining_bytes;
 
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: no remaining bytes to read from chunk.\n" );
+					LIBEWF_VERBOSE_PRINT( "%s: no remaining bytes to read from chunk.\n",
+					 function );
+
 					break;
 				}
 			}
@@ -2016,7 +2105,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 		/* At the end of the input
 		 */
-		if( ( total_input_size != 0 ) && ( ( total_read_count + buffer_offset ) >= (int64_t) total_input_size ) )
+		if( ( total_input_size != 0 )
+		 && ( ( total_read_count + buffer_offset ) >= (int64_t) total_input_size ) )
 		{
 			break;
 		}
@@ -2033,6 +2123,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 	EWFSHA1_CONTEXT sha1_context;
 
 	LIBEWF_CHAR *sha1_hash_string       = NULL;
+	static char *function               = "ewfcommon_read";
 	uint8_t *data                       = NULL;
 	off64_t read_offset                 = 0;
 	ssize_t read_count                  = 0;
@@ -2044,7 +2135,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2052,7 +2144,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 	if( media_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to determine media size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2060,13 +2153,15 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 	if( chunk_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to determine chunk size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( chunk_size > (uint32_t) INT32_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read: invalid chunk size only values below 2^32 are supported.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2075,7 +2170,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to allocate data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2083,7 +2179,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 	{
 		if( ewfsha1_initialize( &sha1_context ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to initialize SHA1 digest context.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to initialize SHA1 digest context.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -2100,7 +2197,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: error reading data.\n" );
+			LIBEWF_WARNING_PRINT( "%s: error reading data.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2108,7 +2206,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		}
 		if( read_count == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: unexpected end of data.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2116,7 +2215,8 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 		}
 		if( read_count > (ssize_t) size )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: more bytes read than requested.\n" );
+			LIBEWF_WARNING_PRINT( "%s: more bytes read than requested.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2142,21 +2242,31 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 
 		if( sha1_hash_string == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to create SHA1 hash string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create SHA1 hash string.\n",
+			 function );
 
 			return( -1 );
 		}
-		if( ewfcommon_get_sha1_hash( &sha1_context, sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
+		if( ewfcommon_get_sha1_hash(
+		     &sha1_context,
+		     sha1_hash_string,
+		     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to set SHA1 hash string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
+			 function );
 
 			libewf_common_free( sha1_hash_string );
 
 			return( -1 );
 		}
-		if( libewf_set_hash_value( handle, _S_LIBEWF_CHAR( "ewfcommon_calculated_SHA1" ), sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
+		if( libewf_set_hash_value(
+		     handle,
+		     _S_LIBEWF_CHAR( "ewfcommon_calculated_SHA1" ),
+		     sha1_hash_string,
+		     LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read: unable to set SHA1 hash string in handle.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string in handle.\n",
+			 function );
 
 			libewf_common_free( sha1_hash_string );
 
@@ -2173,6 +2283,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_descriptor, uint64_t read_size, uint64_t read_offset, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	uint8_t *data            = NULL;
+	static char *function    = "ewfcommon_read_to_file_descriptor";
 	ssize_t read_count       = 0;
 	ssize_t write_count      = 0;
 	size_t size              = 0;
@@ -2184,7 +2295,8 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 
 	if( handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2192,7 +2304,8 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 
 	if( media_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: unable to determine media size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine media size.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2200,36 +2313,41 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 
 	if( chunk_size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: unable to determine chunk size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( read_size == 0 ) || ( read_size > media_size ) || ( read_size > (uint64_t) INT64_MAX ) )
+	if( ( read_size == 0 )
+	 || ( read_size > media_size ) || ( read_size > (uint64_t) INT64_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: invalid size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( read_offset >= media_size )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: invalid offset.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid offset.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ( read_size + read_offset ) > media_size )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: unable to export beyond size of media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to export beyond size of media.\n",
+		 function );
 
 		return( -1 );
 	}
-	read_all = (uint8_t) ( ( read_size == media_size ) && ( read_offset == 0 ) );
-
+	read_all    = (uint8_t) ( ( read_size == media_size ) && ( read_offset == 0 ) );
 	buffer_size = EWFCOMMON_BUFFER_SIZE;
 	data        = (uint8_t *) libewf_common_alloc( buffer_size * sizeof( uint8_t ) );
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: unable to allocate data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2245,7 +2363,8 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 
 		if( read_count <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: error reading data.\n" );
+			LIBEWF_WARNING_PRINT( "%s: error reading data.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2253,7 +2372,8 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		}
 		if( read_count == 0 )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: unexpected end of data.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unexpected end of data.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2261,7 +2381,8 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 		}
 		if( read_count > (ssize_t) size )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: more bytes read than requested.\n" );
+			LIBEWF_WARNING_PRINT( "%s: more bytes read than requested.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2273,7 +2394,8 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 
 		if( write_count < read_count )
 		{
-			LIBEWF_WARNING_PRINT( "ewfcommon_read_to_file_descriptor: error writing data.\n" );
+			LIBEWF_WARNING_PRINT( "%s: error writing data.\n",
+			 function );
 
 			libewf_common_free( data );
 

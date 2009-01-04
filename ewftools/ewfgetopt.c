@@ -66,6 +66,7 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 {
 	CHAR_T *option_value   = NULL;
 	CHAR_T *argument_value = NULL;
+	static char *function  = "ewfgetopt";
 
 	if( optind >= argument_count )
 	{
@@ -111,7 +112,8 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 		}
 		if( ( *options_string != (CHAR_T) ':' ) && ( optopt != (INT_T) '?' ) )
 		{
-			LIBEWF_WARNING_PRINT( "ewfgetopt: no such option: %" PRIc ".\n", optopt );
+			LIBEWF_WARNING_PRINT( "%s: no such option: %" PRIc ".\n",
+			 function, optopt );
 		}
 		return( (INT_T) '?' );
 	}
@@ -148,7 +150,8 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 			{
 				return( (INT_T) ':' );
 			}
-			LIBEWF_WARNING_PRINT( "ewfgetopt: option: %" PRIc " requires an argument.\n", optopt );
+			LIBEWF_WARNING_PRINT( "%s: option: %" PRIc " requires an argument.\n",
+			 function, optopt );
 
 			return( (INT_T) '?' );
 		}
