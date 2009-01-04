@@ -222,19 +222,6 @@ void libewf_string_split_values_free(
       libewf_char_t **split_values,
       uint32_t amount );
 
-int libewf_string_copy_utf16_to_ascii(
-     libewf_char_t *utf16_string,
-     size_t size_utf16,
-     libewf_char_t* ascii_string,
-     size_t size_ascii );
-
-int libewf_string_copy_ascii_to_utf16(
-     libewf_char_t *ascii_string,
-     size_t size_ascii,
-     libewf_char_t *utf16_string,
-     size_t size_utf16,
-     uint8_t byte_order );
-
 int libewf_string_copy_from_utf16(
      libewf_char_t* string,
      size_t size_string,

@@ -261,7 +261,7 @@ AS_IF([test "x$ac_libewf_have_libuuid" != xno],
 dnl Check if libewf should be build with wide character type support
 AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
 	[AC_DEFINE([HAVE_WIDE_CHARACTER_TYPE],[1],[Defines if wide character type should be used])
-	AC_CHECK_FUNCS([btowc fgetws mbsinit mbrtowc swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstoll wcstoull])
+	AC_CHECK_FUNCS([btowc fgetws mbsinit mbrtowc swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcrtomb wcstoll wcstoull])
 	AC_CHECK_HEADERS([wchar.h],
 		[AC_DEFINE([HAVE_WCHAR_H],[1],[Define to 1 if you have the <wchar.h> header file.])
 		AC_SUBST([HAVE_WCHAR_H],[1])],

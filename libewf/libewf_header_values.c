@@ -1270,25 +1270,33 @@ ewf_char_t *libewf_header_values_convert_header_string_to_header2(
 		LIBEWF_WARNING_PRINT( "%s: unable to create header2.\n",
 		 function );
 
-		libewf_common_free( header_string );
+		libewf_common_free(
+		 header_string );
 
 		*header2_length = 0;
 
 		return( NULL );
 	}
-	if( libewf_string_copy_to_header2( header_string, string_length, header2, *header2_length ) != 1 )
+	if( libewf_string_copy_to_header2(
+	     header_string,
+	     string_length,
+	     header2,
+	     *header2_length ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set header2.\n",
 		 function );
 
-		libewf_common_free( header2 );
-		libewf_common_free( header_string );
+		libewf_common_free(
+		 header2 );
+		libewf_common_free(
+		 header_string );
 
 		*header2_length = 0;
 
 		return( NULL );
 	}
-	libewf_common_free( header_string );
+	libewf_common_free(
+	 header_string );
 
 	return( header2 );
 }

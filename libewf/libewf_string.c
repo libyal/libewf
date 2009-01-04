@@ -582,93 +582,6 @@ int libewf_string_copy_utf16_to_ascii(
 	return( 1 );
 }
 
-/* Copies a single byte ASCII string to a multi byte UTF16 string
- * Returns 1 if successful, on -1 on error
- */
-int libewf_string_copy_ascii_to_utf16(
-     libewf_char_t *ascii_string,
-     size_t size_ascii,
-     libewf_char_t *utf16_string,
-     size_t size_utf16,
-     uint8_t byte_order )
-{
-	static char *function = "libewf_string_copy_ascii_to_utf16";
-	size_t ascii_iterator = 0;
-	size_t utf16_iterator = 2;
-
-	if( ascii_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid ASCII string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_string == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid UTF16 string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( size_ascii > (size_t) SSIZE_MAX )
-	 || ( size_utf16 > (size_t) SSIZE_MAX ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Two additional bytes required for the byte order indicator
-	 */
-	if( size_utf16 < ( ( size_ascii * 2 ) + 2 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: UTF16 string too small.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Add the endian byte order
-	 */
-	if( byte_order == LIBEWF_STRING_LITTLE_ENDIAN )
-	{
-		utf16_string[ 0 ] = 0xff;
-		utf16_string[ 1 ] = 0xfe;
-	}
-	else if( byte_order == LIBEWF_STRING_BIG_ENDIAN )
-	{
-		utf16_string[ 0 ] = 0xfe;
-		utf16_string[ 1 ] = 0xff;
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: undefined byte order.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* Convert the string
-	 */
-	while( ascii_iterator < size_ascii )
-	{
-		if( byte_order == LIBEWF_STRING_LITTLE_ENDIAN )
-		{
-			utf16_string[ utf16_iterator     ] = ascii_string[ ascii_iterator ];
-			utf16_string[ utf16_iterator + 1 ] = (libewf_char_t) '\0';
-		}
-		else if( byte_order == LIBEWF_STRING_BIG_ENDIAN )
-		{
-			utf16_string[ utf16_iterator     ] = (libewf_char_t) '\0';
-			utf16_string[ utf16_iterator + 1 ] = ascii_string[ ascii_iterator ];
-		}
-		ascii_iterator += 1;
-		utf16_iterator += 2;
-	}
-	utf16_string[ size_utf16 - 2 ] = (libewf_char_t) '\0';
-	utf16_string[ size_utf16 - 1 ] = (libewf_char_t) '\0';
-
-	return( 1 );
-}
-
 /* Copies a multi byte UTF16 string to a single byte string
  * Returns 1 if successful, on -1 on error
  */
@@ -783,7 +696,7 @@ int libewf_string_copy_from_utf16(
 		     &( string[ string_iterator ] ),
 		     (const char *) &( utf16_string[ utf16_iterator ] ),
 		     2,
-		     &conversion_state ) == 0 )
+		     &conversion_state ) >= (size_t) -2 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to convert UTF16 character: %02x %02x.\n",
 			 function, utf16_string[ utf16_iterator ], utf16_string[ utf16_iterator + 1 ] );
@@ -834,6 +747,9 @@ int libewf_string_copy_to_utf16(
      size_t size_utf16,
      uint8_t byte_order )
 {
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+	mbstate_t conversion_state;
+#endif
 	static char *function  = "libewf_string_copy_to_utf16";
 	size_t string_iterator = 0;
 	size_t utf16_iterator  = 2;
@@ -860,6 +776,26 @@ int libewf_string_copy_to_utf16(
 
 		return( -1 );
 	}
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+	if( libewf_common_memset(
+	     &conversion_state,
+	     0,
+	     sizeof( mbstate_t ) ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear converion state.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( mbsinit(
+	     &conversion_state ) == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	/* Two additional bytes required for the byte order indicator
 	 */
 	if( size_utf16 < ( ( size_string * 2 ) + 2 ) )
@@ -892,6 +828,16 @@ int libewf_string_copy_to_utf16(
 	 */
 	while( string_iterator < size_string )
 	{
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+		if( wcrtomb(
+		     (char *) &( utf16_string[ utf16_iterator ] ),
+		     string[ string_iterator ],
+		     &conversion_state ) >= (size_t) -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to convert character: %04x.\n",
+			 function, string[ string_iterator ] );
+		}
+#else
 		if( byte_order == LIBEWF_STRING_LITTLE_ENDIAN )
 		{
 			utf16_string[ utf16_iterator     ] = (ewf_char_t) string[ string_iterator ];
@@ -902,6 +848,7 @@ int libewf_string_copy_to_utf16(
 			utf16_string[ utf16_iterator     ] = (ewf_char_t) '\0';
 			utf16_string[ utf16_iterator + 1 ] = (ewf_char_t) string[ string_iterator ];
 		}
+#endif
 		string_iterator += 1;
 		utf16_iterator  += 2;
 	}
@@ -1091,9 +1038,6 @@ int libewf_string_copy_to_header2(
      ewf_char_t *header2,
      size_t size_header2 )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	mbstate_t conversion_state;
-#endif
 	static char *function = "libewf_string_copy_to_header2";
 
 	if( string == NULL )
@@ -1125,56 +1069,18 @@ int libewf_string_copy_to_header2(
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( libewf_common_memset(
-	     &conversion_state,
-	     0,
-	     sizeof( mbstate_t ) ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to clear converion state.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( mbsinit(
-	     &conversion_state ) == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( wcsrtombs(
-	     (char *) &header2[ 2 ],
-	     (const wchar_t **) &string,
-	     size_header2,
-	     &conversion_state ) != ( size_string - 1 ) )
-#else
-	if( libewf_string_copy_ascii_to_utf16(
+	if( libewf_string_copy_to_utf16(
 	     string,
 	     size_string,
-	     (libewf_char_t *) header2,
+	     header2,
 	     size_header2,
 	     LIBEWF_STRING_LITTLE_ENDIAN ) != 1 )
-#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to copy string to header2.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( header2[ 4 ] == (ewf_char_t) '\0' )
-	{
-		header2[ 0 ] = (ewf_char_t) 0xfe;
-		header2[ 1 ] = (ewf_char_t) 0xff;
-	}
-	else
-	{
-		header2[ 0 ] = (ewf_char_t) 0xff;
-		header2[ 1 ] = (ewf_char_t) 0xfe;
-	}
-#endif
 	return( 1 );
 }
 

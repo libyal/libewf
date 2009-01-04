@@ -86,11 +86,11 @@
 /* Defines if libewf should be build with low memory usage */
 #undef HAVE_LOW_MEMORY_USAGE
 
+/* Define to 1 if you have the `mbrtowc' function. */
+#undef HAVE_MBRTOWC
+
 /* Define to 1 if you have the `mbsinit' function. */
 #undef HAVE_MBSINIT
-
-/* Define to 1 if you have the `mbsrtowcs' function. */
-#undef HAVE_MBSRTOWCS
 
 /* Define to 1 if you have the `memchr' function. */
 #undef HAVE_MEMCHR
@@ -246,6 +246,9 @@
 /* Define to 1 if you have the <wchar.h> header file. */
 #undef HAVE_WCHAR_H
 
+/* Define to 1 if you have the `wcrtomb' function. */
+#undef HAVE_WCRTOMB
+
 /* Define to 1 if you have the `wcschr' function. */
 #undef HAVE_WCSCHR
 
@@ -269,9 +272,6 @@
 
 /* Define to 1 if you have the `wcsrchr' function. */
 #undef HAVE_WCSRCHR
-
-/* Define to 1 if you have the `wcsrtombs' function. */
-#undef HAVE_WCSRTOMBS
 
 /* Define to 1 if you have the `wcstoll' function. */
 #undef HAVE_WCSTOLL
