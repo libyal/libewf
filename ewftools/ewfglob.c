@@ -62,53 +62,96 @@
 
 #define ewfglob_findclose	_findclose
 
-/* Allocates memory for a new glob struct
- * Returns a pointer to the new instance, NULL on error
+/* Initializes a new glob
+ * Returns 1 if successful or -1 on error
  */
-ewfglob_t *ewfglob_alloc(
-            void )
+int ewfglob_initialize(
+     ewfglob_t **glob )
 {
-	ewfglob_t *glob       = NULL;
-	static char *function = "ewfglob_alloc";
-
-	glob = (ewfglob_t *) memory_allocate(
-	                      sizeof( ewfglob_t ) );
+	static char *function = "ewfglob_initialize";
 
 	if( glob == NULL )
 	{
-		notify_warning_printf( "%s: unable to allocate glob.\n",
+		notify_warning_printf( "%s: invalid glob.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( memory_set(
-	     glob,
-	     0,
-	     sizeof( ewfglob_t ) ) == NULL )
+	if( *glob == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear glob.\n",
-		 function );
+		*glob = (ewfglob_t *) memory_allocate(
+		                       sizeof( ewfglob_t ) );
 
-		memory_free(
-		 glob );
+		if( *glob == NULL )
+		{
+			notify_warning_printf( "%s: unable to allocate glob.\n",
+			 function );
 
-		return( NULL );
+			return( -1 );
+		}
+		if( memory_set(
+		     *glob,
+		     0,
+		     sizeof( ewfglob_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear glob.\n",
+			 function );
+
+			memory_free(
+			 *glob );
+
+			*glob = NULL;
+
+			return( -1 );
+		}
+		( *glob )->amount_of_results = 0;
+		( *glob )->result            = NULL;
 	}
-	glob->results = NULL;
-	glob->amount  = 0;
-
-	return( glob );
+	return( 1 );
 }
 
-/* Reallocates memory for a glob
- * Returns a pointer to the instance, NULL on error
+/* Frees memory of a glob
+ * Returns 1 if successful or -1 on error
  */
-ewfglob_t *ewfglob_realloc(
-            ewfglob_t *glob,
-            uint16_t new_amount )
+int ewfglob_free(
+     ewfglob_t *glob )
+{
+	static char *function = "ewfglob_free";
+	int result_iterator   = 0;
+
+	if( glob == NULL )
+	{
+		notify_warning_printf( "%s: invalid glob.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( glob->result != NULL )
+	{
+		for( result_iterator = 0; result_iterator < glob->amount_of_results; result_iterator++ )
+		{
+			if( glob->result[ iterator ] != NULL )
+			{
+				memory_free(
+				 glob->result[ iterator ] );
+			}
+		}
+		memory_free(
+		 glob->result );
+	}
+	memory_free(
+	 glob );
+}
+
+/* Resizes the glob
+ * Returns 1 if successful or -1 on error
+ */
+int ewfglob_resize(
+     ewfglob_t *glob,
+     int new_amount_of_results )
 {
 	void *reallocation    = NULL;
-	static char *function = "ewfglob_realloc";
+	static char *function = "ewfglob_resize";
 	size_t previous_size  = 0;
 	size_t new_size       = 0;
 
@@ -117,16 +160,16 @@ ewfglob_t *ewfglob_realloc(
 		notify_warning_printf( "%s: invalid glob.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( glob->amount >= new_amount )
+	if( glob->amount_of_results >= new_amount_of_results )
 	{
 		notify_warning_printf( "%s: new amount less equal than current amount.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	previous_size = sizeof( system_character_t * ) * glob->amount;
+	previous_size = sizeof( system_character_t * ) * glob->amount_of_results;
 	new_size      = sizeof( system_character_t * ) * new_amount;
 
 	if( ( previous_size > (size_t) SSIZE_MAX )
@@ -135,82 +178,43 @@ ewfglob_t *ewfglob_realloc(
 		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	if( glob->amount == 0 )
-	{
-		reallocation = memory_allocate(
-		                new_size );
-	}
-	else
-	{
-		reallocation = memory_reallocate(
-		                glob->results,
-		                new_size );
-	}
+	reallocation = memory_reallocate(
+	                glob->result,
+	                new_size );
+
 	if( reallocation == NULL )
 	{
 		notify_warning_printf( "%s: unable to reallocate glob results.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	glob->results = (system_character_t **) reallocation;
+	glob->result = (system_character_t **) reallocation;
 
 	if( memory_set(
-	     &( glob->results[ glob->amount ] ),
+	     &( glob->result[ glob->amount_of_results ] ),
 	     0,
 	     ( new_size - previous_size ) ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to clear glob.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	glob->amount  = new_amount;
+	glob->amount_of_results  = new_amount_of_results;
 
-	return( glob );
-}
-
-/* Frees memory of a glob
- */
-void ewfglob_free(
-      ewfglob_t *glob )
-{
-	static char *function = "ewfglob_free";
-	uint16_t iterator     = 0;
-
-	if( glob == NULL )
-	{
-		notify_warning_printf( "%s: invalid glob.\n",
-		 function );
-
-		return;
-	}
-	if( glob->results != NULL )
-	{
-		for( iterator = 0; iterator < glob->amount; iterator++ )
-		{
-			if( glob->results[ iterator ] != NULL )
-			{
-				memory_free(
-				 glob->results[ iterator ] );
-			}
-		}
-		memory_free(
-		 glob->results );
-	}
-	memory_free(
-	 glob );
+	return( 1 );
 }
 
 /* Resolves filenames with wildcards (globs)
- * Returns the amount of result if successful, -1 on error
+ * Returns the amount of results if successful or -1 on error
  */
-int32_t ewfglob_resolve(
-         ewfglob_t *glob,
-         system_character_t * const patterns[],
-         uint32_t amount_of_patterns )
+int ewfglob_resolve(
+     ewfglob_t *glob,
+     system_character_t * const patterns[],
+     int amount_of_patterns )
 {
 #if defined( HAVE_WINDOWS_API )
 	struct ewfglob_finddata_t find_data;
@@ -223,10 +227,9 @@ int32_t ewfglob_resolve(
 
 	intptr_t find_handle  = 0;
 #endif
-	ewfglob_t *reallocation = NULL;
-	static char *function   = "ewfglob_resolve";
-	int32_t globs_found     = 0;
-	uint32_t iterator       = 0;
+	static char *function = "ewfglob_resolve";
+	int32_t globs_found   = 0;
+	uint32_t iterator     = 0;
 
 	if( glob == NULL )
 	{
@@ -269,13 +272,11 @@ int32_t ewfglob_resolve(
 		{
 			do
 			{
-				reallocation = ewfglob_realloc(
-				                glob,
-				                ( glob->amount + 1 ) );
-
-				if( reallocation == NULL )
+				if( ewfglob_resize(
+				     glob,
+				     ( glob->amount_of_results + 1 ) ) != 1 )
 				{
-					notify_warning_printf( "%s: unable to reallocate glob.\n",
+					notify_warning_printf( "%s: unable to resize glob.\n",
 					 function );
 
 					return( -1 );
@@ -293,10 +294,10 @@ int32_t ewfglob_resolve(
 
 					return( -1 );
 				}
-				glob->results[ glob->amount - 1 ] = system_string_duplicate(
-				                                     find_path,
-				                                     system_string_length(
-				                                      find_path ) );
+				glob->result[ glob->amount_of_results - 1 ] = system_string_duplicate(
+				                                               find_path,
+				                                               system_string_length(
+				                                                find_path ) );
 
 				globs_found++;
 

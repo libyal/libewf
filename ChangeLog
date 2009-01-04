@@ -172,6 +172,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080901
+* refactored ewfglob
+
 Version: 20080831
 * added libewf_extern.h
 * Improved configure.ac

@@ -42,27 +42,27 @@ struct ewfglob
 {
 	/* The amount of globs resolved
 	 */
-	uint16_t amount;
+	int amount_of_results;
 
 	/* The resolved globs
 	 */
-	system_character_t **results;
+	system_character_t **result;
 };
 
-ewfglob_t *ewfglob_alloc(
-            void );
+int ewfglob_initialize(
+     ewfglob_t **glob );
 
-ewfglob_t *ewfglob_realloc(
-            ewfglob_t *glob,
-            uint16_t new_amount );
+int ewfglob_free(
+     ewfglob_t **glob );
 
-void ewfglob_free(
-      ewfglob_t *glob );
+int ewfglob_resize(
+     ewfglob_t *glob,
+     int new_amount_of_results );
 
-int32_t ewfglob_resolve(
-         ewfglob_t *glob,
-         system_character_t * const patterns[],
-         uint32_t amount_of_patterns );
+int ewfglob_resolve(
+     ewfglob_t *glob,
+     system_character_t * const patterns[],
+     int amount_of_patterns );
 
 #endif
 

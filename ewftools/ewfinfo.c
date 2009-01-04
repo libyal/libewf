@@ -91,7 +91,6 @@ int main( int argc, char * const argv[] )
 
 #if !defined( HAVE_GLOB_H )
 	ewfglob_t *glob                            = NULL;
-	int32_t glob_count                         = 0;
 #endif
 	char *file_format_string                   = NULL;
 	system_integer_t option                    = 0;
@@ -248,31 +247,29 @@ int main( int argc, char * const argv[] )
 		fprintf( stderr, "Unable to attach signal handler.\n" );
 	}
 #if !defined( HAVE_GLOB_H )
-	glob = ewfglob_alloc();
-
-	if( glob == NULL )
+	if( ewfglob_initialize(
+	     &glob ) != 1 )
 	{
-		fprintf( stderr, "Unable to create glob.\n" );
+		fprintf( stderr, "Unable to initialize glob.\n" );
 
 		return( EXIT_FAILURE );
 	}
-	glob_count = ewfglob_resolve(
-	              glob,
-	              &argv[ optind ],
-	              ( argc - optind ) );
+	amount_of_filenames = ewfglob_resolve(
+	                       glob,
+	                       &argv[ optind ],
+	                       ( argc - optind ) );
 
-	if( ( glob_count <= 0 )
-	 || ( glob_count > (int32_t) UINT16_MAX ) )
+	if( ( amount_of_filenames <= 0 )
+	 || ( amount_of_filenames > (int) UINT16_MAX ) )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
 		ewfglob_free(
-		 glob );
+		 &glob );
 
 		return( EXIT_FAILURE );
 	}
-	amount_of_filenames = (int) glob_count;
-	argv_filenames      = glob->results;
+	argv_filenames = glob->results;
 #else
 	amount_of_filenames = argc - optind;
 	argv_filenames      = &argv[ optind ];
@@ -293,7 +290,7 @@ int main( int argc, char * const argv[] )
 
 #if !defined( HAVE_GLOB_H )
 			ewfglob_free(
-			 glob );
+			 &glob );
 #endif
 
 			return( EXIT_FAILURE );
@@ -306,7 +303,7 @@ int main( int argc, char * const argv[] )
 	                           LIBEWF_OPEN_READ );
 #if !defined( HAVE_GLOB_H )
 	ewfglob_free(
-	 glob );
+	 &glob );
 #endif
 	if( ewf_filenames != NULL )
 	{
