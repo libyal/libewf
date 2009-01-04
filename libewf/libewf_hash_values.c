@@ -331,8 +331,10 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 		return( -1 );
 	}
+	*hash_length = hash_string_length;
+
 	*hash = (ewf_char_t *) memory_allocate(
-	                        sizeof( ewf_char_t ) * hash_string_length );
+	                        sizeof( ewf_char_t ) * *hash_length );
 
 	if( *hash == NULL )
 	{
@@ -359,8 +361,6 @@ int libewf_hash_values_convert_hash_string_to_hash(
 
 		return( -1 );
 	}
-	*hash_length = hash_string_length;
-
 	return( 1 );
 }
 

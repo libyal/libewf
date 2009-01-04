@@ -74,18 +74,6 @@ int libewf_string_copy_to_utf16(
      size_t size_utf16,
      uint8_t byte_order );
 
-int libewf_string_copy_from_header2(
-     character_t *string,
-     size_t size_string,
-     ewf_char_t *header2,
-     size_t size_header2 );
-
-int libewf_string_copy_to_header2(
-     character_t *string,
-     size_t size_string,
-     ewf_char_t *header2,
-     size_t size_header2 );
-
 #if defined( __cplusplus )
 }
 #endif

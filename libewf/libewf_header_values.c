@@ -1266,7 +1266,7 @@ int libewf_header_values_parse_header2(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_from_header2(
+	if( libewf_string_copy_from_utf16(
 	     header_string,
 	     header_size,
 	     header2,
@@ -1337,8 +1337,10 @@ int libewf_header_values_convert_header_string_to_header(
 
 		return( -1 );
 	}
+	*header_length = header_string_length;
+
 	*header = (ewf_char_t *) memory_allocate(
-	                          sizeof( ewf_char_t ) * header_string_length );
+	                          sizeof( ewf_char_t ) * *header_length );
 
 	if( *header == NULL )
 	{
@@ -1365,8 +1367,6 @@ int libewf_header_values_convert_header_string_to_header(
 
 		return( -1 );
 	}
-	*header_length = header_string_length;
-
 	return( 1 );
 }
 
@@ -1426,11 +1426,12 @@ int libewf_header_values_convert_header_string_to_header2(
 
 		return( -1 );
 	}
-	if( libewf_string_copy_to_header2(
+	if( libewf_string_copy_to_utf16(
 	     header_string,
 	     header_string_length,
 	     *header2,
-	     *header2_length ) != 1 )
+	     *header2_length,
+	     LIBEWF_STRING_LITTLE_ENDIAN ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header2.\n",
 		 function );

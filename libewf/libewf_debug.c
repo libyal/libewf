@@ -224,7 +224,7 @@ void libewf_debug_header2_print(
 
 		return;
 	}
-	if( libewf_string_copy_from_header2(
+	if( libewf_string_copy_from_utf16(
 	     header_string,
 	     header_size,
 	     header2,
