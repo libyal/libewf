@@ -292,9 +292,27 @@ AC_CHECK_LIB( crypto, EVP_DigestInit_ex, [ ac_libewf_dummy=yes ], [ ac_libewf_ha
 AC_CHECK_LIB( crypto, EVP_DigestUpdate, [ ac_libewf_dummy=yes ], [ ac_libewf_have_libcrypto_evp=no ] )
 AC_CHECK_LIB( crypto, EVP_DigestFinal_ex, [ ac_libewf_dummy=yes ], [ ac_libewf_have_libcrypto_evp=no ] )
 
-AC_CHECK_LIB( uuid, uuid_generate, [], [ ac_libewf_have_libuuid=no ] )
-AC_CHECK_LIB( uuid, uuid_generate_random, [AC_DEFINE( [HAVE_UUID_GENERATE_RANDOM], [1], [Defines if uuid_generate_random funtion is present in libuuid.] ) ] )
-AC_CHECK_LIB( uuid, uuid_generate_time, [AC_DEFINE( [HAVE_UUID_GENERATE_TIME], [1], [Defines if uuid_generate_time funtion is present in libuuid.] ) ] )
+AC_CHECK_LIB(
+ uuid,
+ uuid_generate,
+ [],
+ [ ac_libewf_have_libuuid=no ])
+
+AC_CHECK_LIB(
+ uuid,
+ uuid_generate_random,
+ [AC_DEFINE(
+  [HAVE_UUID_GENERATE_RANDOM],
+  [1],
+  [Defines if uuid_generate_random funtion is present in libuuid.])])
+
+AC_CHECK_LIB(
+ uuid,
+ uuid_generate_time,
+ [AC_DEFINE(
+  [HAVE_UUID_GENERATE_TIME],
+  [1],
+  [Defines if uuid_generate_time funtion is present in libuuid.])])
 
 dnl Check for headers
 AC_CHECK_HEADER(
