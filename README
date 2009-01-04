@@ -47,6 +47,6 @@ Make sure you use define LIBEWF_DLL_IMPORT before including <libewf.h>,
 i.e. CFLAGS=-DLIBEWF_DLL_IMPORT
 
 When the libewf DLL was build with Microsoft Visual Studio
-you'll need the zlib DLL and the Microsoft Visual Studio redistributable DLLs
-to have the DLL run on other platform than the build platform
+you'll need the zlib DLL. To run the executables on other platforms
+than the build platform, you'll need the Microsoft Visual Studio redistributable DLLs.
 
