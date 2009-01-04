@@ -17,9 +17,9 @@
 .Ft int
 .Fn libewf_check_file_signature "const char *filename"
 .Ft int
-.Fn libewf_glob "const char *first_segment_filename, size_t first_segment_filename_length, char ** filenames[]"
+.Fn libewf_glob "const char *filename, size_t length, uint8_t format, char ** filenames[]"
 .Ft LIBEWF_HANDLE *
-.Fn libewf_open "char * const filenames[], uint16_t file_amount, uint8_t flags"
+.Fn libewf_open "char * const filenames[], uint16_t amount_of_files, uint8_t flags"
 .Ft off64_t
 .Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off64_t offset"
 .Ft ssize_t
@@ -263,9 +263,9 @@ the following functions will replace their narrow character functions.
 .Ft int8_t
 .Fn libewf_check_file_signature "const wchar_t *filename"
 .Ft int
-.Fn libewf_glob "const wchar_t *first_segment_filename, size_t first_segment_filename_length, wchar_t ** filenames[]"
+.Fn libewf_glob "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
 .Ft LIBEWF_HANDLE *
-.Fn libewf_open "wchar_t * const filenames[], uint16_t file_amount, uint8_t flags"
+.Fn libewf_open "wchar_t * const filenames[], uint16_t amount_of_files, uint8_t flags"
 .Sh DESCRIPTION
 The
 .Fn libewf_get_version
@@ -285,8 +285,13 @@ The
 function globs
 .Ar filenames
 using the
-.Ar first_segment_filename
+.Ar filename
+and the
+.Ar format
 according to the EWF segment file naming schema.
+If the
+.Ar format
+is known the filename should contain the base of the filename otherwise the function will try to determine the format based on the extension.
 .Pp
 The
 .Fn libewf_open ,

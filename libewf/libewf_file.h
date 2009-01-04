@@ -72,13 +72,14 @@ LIBEWF_EXTERN int libewf_check_file_signature(
                    const libewf_filename_t *filename );
 
 LIBEWF_EXTERN int libewf_glob(
-                   const libewf_filename_t *first_segment_filename,
-                   size_t length_first_segment_filename,
+                   const libewf_filename_t *filename,
+                   size_t length,
+                   uint8_t format,
                    libewf_filename_t **filenames[] );
 
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               libewf_filename_t * const filenames[],
-                              uint16_t file_amount,
+                              uint16_t amount_of_files,
                               uint8_t flags );
 
 LIBEWF_EXTERN int libewf_close(

@@ -82,18 +82,23 @@ LIBEWF_EXTERN int libewf_check_file_signature(
                    const char *filename );
 #endif
 
-/* Globs the segment files according to the EWF naming schema using the first segment filename
+
+/* Globs the segment files according to the EWF naming schema
+ * if the format is known the filename should contain the base of the filename
+ * otherwise the function will try to determine the format based on the extension
  * Returns the amount of filenames if successful or -1 on error
  */
 #if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 LIBEWF_EXTERN int libewf_glob(
-                   const wchar_t *first_segment_filename,
-                   size_t length_first_segment_filename,
+                   const wchar_t *filename,
+                   size_t length,
+                   uint8_t format,
                    wchar_t **filenames[] );
 #else
 LIBEWF_EXTERN int libewf_glob(
-                   const char *first_segment_filename,
-                   size_t length_first_segment_filename,
+                   const char *filename,
+                   size_t length,
+                   uint8_t format,
                    char **filenames[] );
 #endif
 
@@ -105,12 +110,12 @@ LIBEWF_EXTERN int libewf_glob(
 #if ( @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE ) ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               wchar_t * const filenames[],
-                              uint16_t file_amount,
+                              uint16_t amount_of_files,
                               uint8_t flags );
 #else
 LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open(
                               char * const filenames[],
-                              uint16_t file_amount,
+                              uint16_t amount_of_files,
                               uint8_t flags );
 #endif
 
