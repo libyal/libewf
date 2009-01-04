@@ -1,4 +1,4 @@
-.Dd October 11, 2008
+.Dd October 18, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -8,8 +8,12 @@
 .Lb libewf
 .Sh SYNOPSIS
 .In libewf.h
+.Pp
+Support functions
 .Ft const char *
 .Fn libewf_get_version "void"
+.Ft void
+.Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
 .Ft uint8_t
 .Fn libewf_get_flags_read
 .Ft uint8_t
@@ -17,13 +21,17 @@
 .Ft uint8_t
 .Fn libewf_get_flags_write
 .Ft int
+.Fn libewf_signal_abort "libewf_handle_t *handle"
+.Pp
+File functions
+.Ft int
 .Fn libewf_check_file_signature "const char *filename"
 .Ft int
 .Fn libewf_glob "const char *filename, size_t length, uint8_t format, char ** filenames[]"
-.Ft int
-.Fn libewf_signal_abort "libewf_handle_t *handle"
 .Ft libewf_handle_t *
 .Fn libewf_open "char * const filenames[], int amount_of_files, uint8_t flags"
+.Ft int
+.Fn libewf_close "libewf_handle_t *handle"
 .Ft off64_t
 .Fn libewf_seek_offset "libewf_handle_t *handle, off64_t offset"
 .Ft off64_t
@@ -47,7 +55,35 @@
 .Ft ssize_t
 .Fn libewf_write_finalize "libewf_handle_t *handle"
 .Ft int
-.Fn libewf_close "libewf_handle_t *handle"
+.Fn libewf_get_segment_filename "libewf_handle_t *handle, char *filename, size_t size"
+.Ft int
+.Fn libewf_get_delta_segment_filename "libewf_handle_t *handle, char *filename, size_t size"
+.Ft int
+.Fn libewf_set_segment_file_size "libewf_handle_t *handle, size64_t segment_file_size"
+.Ft int
+.Fn libewf_set_delta_segment_file_size "libewf_handle_t *handle, size64_t delta_segment_file_size"
+.Ft int
+.Fn libewf_set_segment_filename "libewf_handle_t *handle, const char *filename, size_t length"
+.Ft int
+.Fn libewf_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t size"
+.Pp
+Available when compiled with wide character string support:
+.Ft int
+.Fn libewf_check_file_signature_wide "const wchar_t *filename"
+.Ft int
+.Fn libewf_glob_wide "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
+.Ft libewf_handle_t *
+.Fn libewf_open_wide "wchar_t * const filenames[], int amount_of_files, uint8_t flags"
+.Ft int
+.Fn libewf_get_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t size"
+.Ft int
+.Fn libewf_get_delta_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t size"
+.Ft int
+.Fn libewf_set_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t length"
+.Ft int
+.Fn libewf_set_delta_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t length"
+.Pp
+Meta data functions
 .Ft int
 .Fn libewf_get_sectors_per_chunk "libewf_handle_t *handle, uint32_t *sectors_per_chunk"
 .Ft int
@@ -97,54 +133,6 @@
 .Ft int
 .Fn libewf_get_amount_of_hash_values "libewf_handle_t *handle, uint32_t *amount_of_values"
 .Ft int
-.Fn libewf_set_sectors_per_chunk "libewf_handle_t *handle, uint32_t sectors_per_chunk"
-.Ft int
-.Fn libewf_set_bytes_per_sector "libewf_handle_t *handle, uint32_t bytes_per_sector"
-.Ft int
-.Fn libewf_set_error_granularity "libewf_handle_t *handle, uint32_t error_granularity"
-.Ft int
-.Fn libewf_set_compression_values "libewf_handle_t *handle, int8_t compression_level, uint8_t compress_empty_block"
-.Ft int
-.Fn libewf_set_media_size "libewf_handle_t *handle, size64_t media_size"
-.Ft int
-.Fn libewf_set_segment_file_size "libewf_handle_t *handle, size64_t segment_file_size"
-.Ft int
-.Fn libewf_set_delta_segment_file_size "libewf_handle_t *handle, size64_t delta_segment_file_size"
-.Ft int
-.Fn libewf_set_media_type "libewf_handle_t *handle, uint8_t media_type"
-.Ft int
-.Fn libewf_set_volume_type "libewf_handle_t *handle, uint8_t volume_type"
-.Ft int
-.Fn libewf_set_format "libewf_handle_t *handle, uint8_t format"
-.Ft int
-.Fn libewf_set_guid "libewf_handle_t *handle, uint8_t *guid, size_t size"
-.Ft int
-.Fn libewf_set_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size"
-.Ft int
-.Fn libewf_set_read_wipe_chunk_on_error "libewf_handle_t *handle, uint8_t wipe_on_error"
-.Ft int
-.Fn libewf_set_header_codepage "libewf_handle_t *handle, int codepage"
-.Ft int
-.Fn libewf_parse_header_values "libewf_handle_t *handle, uint8_t date_format"
-.Ft int
-.Fn libewf_parse_hash_values "libewf_handle_t *handle"
-.Ft int
-.Fn libewf_add_acquiry_error "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
-.Ft int
-.Fn libewf_add_crc_error "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
-.Ft int
-.Fn libewf_add_session "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
-.Ft int
-.Fn libewf_copy_header_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle"
-.Ft void
-.Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
-.Pp
-Functions available for narrow character string support:
-.Ft int
-.Fn libewf_get_segment_filename "libewf_handle_t *handle, char *filename, size_t size"
-.Ft int
-.Fn libewf_get_delta_segment_filename "libewf_handle_t *handle, char *filename, size_t size"
-.Ft int
 .Fn libewf_get_header_value_identifier "libewf_handle_t *handle, uint32_t index, char *identifier, size_t identifier_length"
 .Ft int
 .Fn libewf_get_header_value "libewf_handle_t *handle, const char *identifier, char *value, size_t value_length"
@@ -179,9 +167,29 @@ Functions available for narrow character string support:
 .Ft int
 .Fn libewf_get_hash_value_sha1 "libewf_handle_t *handle, char *value, size_t length"
 .Ft int
-.Fn libewf_set_segment_filename "libewf_handle_t *handle, const char *filename, size_t length"
+.Fn libewf_set_sectors_per_chunk "libewf_handle_t *handle, uint32_t sectors_per_chunk"
 .Ft int
-.Fn libewf_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t size"
+.Fn libewf_set_bytes_per_sector "libewf_handle_t *handle, uint32_t bytes_per_sector"
+.Ft int
+.Fn libewf_set_error_granularity "libewf_handle_t *handle, uint32_t error_granularity"
+.Ft int
+.Fn libewf_set_compression_values "libewf_handle_t *handle, int8_t compression_level, uint8_t compress_empty_block"
+.Ft int
+.Fn libewf_set_media_size "libewf_handle_t *handle, size64_t media_size"
+.Ft int
+.Fn libewf_set_media_type "libewf_handle_t *handle, uint8_t media_type"
+.Ft int
+.Fn libewf_set_volume_type "libewf_handle_t *handle, uint8_t volume_type"
+.Ft int
+.Fn libewf_set_format "libewf_handle_t *handle, uint8_t format"
+.Ft int
+.Fn libewf_set_guid "libewf_handle_t *handle, uint8_t *guid, size_t size"
+.Ft int
+.Fn libewf_set_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size"
+.Ft int
+.Fn libewf_set_read_wipe_chunk_on_error "libewf_handle_t *handle, uint8_t wipe_on_error"
+.Ft int
+.Fn libewf_set_header_codepage "libewf_handle_t *handle, int codepage"
 .Ft int
 .Fn libewf_set_header_value "libewf_handle_t *handle, const char *identifier, const char *value, size_t value_length"
 .Ft int
@@ -216,22 +224,18 @@ Functions available for narrow character string support:
 .Fn libewf_set_hash_value_md5 "libewf_handle_t *handle, const char *value, size_t length"
 .Ft int
 .Fn libewf_set_hash_value_sha1 "libewf_handle_t *handle, const char *value, size_t length"
-.Pp
-Functions available for wide character string support:
 .Ft int
-.Fn libewf_check_file_signature_wide "const wchar_t *filename"
+.Fn libewf_parse_header_values "libewf_handle_t *handle, uint8_t date_format"
 .Ft int
-.Fn libewf_glob_wide "const wchar_t *filename, size_t length, uint8_t format, wchar_t ** filenames[]"
-.Ft libewf_handle_t *
-.Fn libewf_open_wide "wchar_t * const filenames[], int amount_of_files, uint8_t flags"
+.Fn libewf_parse_hash_values "libewf_handle_t *handle"
 .Ft int
-.Fn libewf_get_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t size"
+.Fn libewf_add_acquiry_error "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
 .Ft int
-.Fn libewf_get_delta_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t size"
+.Fn libewf_add_crc_error "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
 .Ft int
-.Fn libewf_set_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t length"
+.Fn libewf_add_session "libewf_handle_t *handle, off64_t first_sector, uint32_t amount_of_sectors"
 .Ft int
-.Fn libewf_set_delta_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t length"
+.Fn libewf_copy_header_values "libewf_handle_t *destination_handle, libewf_handle_t *source_handle"
 .Pp
 Functions available when system has wide character string support:
 .Sh DESCRIPTION
@@ -354,7 +358,7 @@ None
 .Sh FILES
 None
 .Sh NOTES
-libewf allows to be compiled with either narrow or wide character support.
+libewf allows to be compiled with wide character support.
 To compile libewf with wide character support use
 .Ar ./configure --enable-wide-character-type=yes
 or pass the definition

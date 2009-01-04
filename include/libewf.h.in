@@ -36,6 +36,10 @@
 extern "C" {
 #endif
 
+/* -------------------------------------------------------------------------
+ * Support functions
+ * ------------------------------------------------------------------------- */
+
 /* Returns the library version
  */
 LIBEWF_EXTERN const char *libewf_get_version(
@@ -63,14 +67,8 @@ LIBEWF_EXTERN void libewf_error_backtrace_fprint(
 /* Set the notify values
  */
 LIBEWF_EXTERN void libewf_set_notify_values(
-                   FILE *stream,
-                   uint8_t verbose );
-
-/* Signals the libewf handle to abort its current activity
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_signal_abort(
-                   libewf_handle_t *handle );
+                    FILE *stream,
+                    uint8_t verbose );
 
 /* Returns the flags for reading
  */
@@ -87,6 +85,16 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
 LIBEWF_EXTERN uint8_t libewf_get_flags_write(
                        void );
 
+/* Signals the libewf handle to abort its current activity
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_signal_abort(
+                   libewf_handle_t *handle );
+
+/* -------------------------------------------------------------------------
+ * Library handle functions
+ * ------------------------------------------------------------------------- */
+
 #if @HAVE_V2_API@
 /* Initialize the handle
  * Returns 1 if successful or -1 on error
@@ -102,6 +110,10 @@ LIBEWF_EXTERN int libewf_handle_free(
                    libewf_handle_t **handle,
                    libewf_error_t **error );
 #endif
+
+/* -------------------------------------------------------------------------
+ * File functions
+ * ------------------------------------------------------------------------- */
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not or -1 on error
@@ -444,6 +456,100 @@ LIBEWF_EXTERN ssize_t libewf_write_finalize(
                        libewf_handle_t *handle );
 #endif
 
+/* Retrieves the segment filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_segment_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t size );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Retrieves the segment filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t size );
+#endif
+
+/* Retrieves the delta segment filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_delta_segment_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t size );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Retrieves the delta segment filename
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t size );
+#endif
+
+/* Sets the segment file size
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t segment_file_size );
+
+/* Sets the delta segment file size
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t delta_segment_file_size );
+
+/* Sets the segment filename
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_segment_filename(
+                   libewf_handle_t *handle,
+                   const char *filename,
+                   size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Sets the segment filename
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   const wchar_t *filename,
+                   size_t length );
+#endif
+
+/* Sets the delta segment filename
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_filename(
+                   libewf_handle_t *handle,
+                   const char *filename,
+                   size_t length );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Sets the delta segment filename
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   const wchar_t *filename,
+                   size_t length );
+#endif
+
+/* -------------------------------------------------------------------------
+ * Meta data functions
+ * ------------------------------------------------------------------------- */
+
 /* Retrieves the amount of sectors per chunk from the media information
  * Returns 1 if successful or -1 on error
  */
@@ -537,46 +643,6 @@ LIBEWF_EXTERN int libewf_get_md5_hash(
                    libewf_handle_t *handle,
                    uint8_t *md5_hash,
                    size_t size );
-
-/* Retrieves the segment filename
- * The size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_segment_filename(
-                   libewf_handle_t *handle,
-                   char *filename,
-                   size_t size );
-
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-/* Retrieves the segment filename
- * The size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   wchar_t *filename,
-                   size_t size );
-#endif
-
-/* Retrieves the delta segment filename
- * The size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_delta_segment_filename(
-                   libewf_handle_t *handle,
-                   char *filename,
-                   size_t size );
-
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-/* Retrieves the delta segment filename
- * The size should include the end of string character
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-LIBEWF_EXTERN int libewf_get_delta_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   wchar_t *filename,
-                   size_t size );
-#endif
 
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful, 0 if no acquiry errors are present or -1 on error
@@ -858,20 +924,6 @@ LIBEWF_EXTERN int libewf_set_media_size(
                    libewf_handle_t *handle,
                    size64_t media_size );
 
-/* Sets the segment file size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_segment_file_size(
-                   libewf_handle_t *handle,
-                   size64_t segment_file_size );
-
-/* Sets the delta segment file size
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_file_size(
-                   libewf_handle_t *handle,
-                   size64_t delta_segment_file_size );
-
 /* Sets the media type
  * Returns 1 if successful or -1 on error
  */
@@ -908,42 +960,6 @@ LIBEWF_EXTERN int libewf_set_md5_hash(
                    libewf_handle_t *handle,
                    uint8_t *md5_hash,
                    size_t size );
-
-/* Sets the segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_segment_filename(
-                   libewf_handle_t *handle,
-                   const char *filename,
-                   size_t length );
-
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-/* Sets the segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *filename,
-                   size_t length );
-#endif
-
-/* Sets the delta segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_filename(
-                   libewf_handle_t *handle,
-                   const char *filename,
-                   size_t length );
-
-#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
-/* Sets the delta segment filename
- * Returns 1 if successful or -1 on error
- */
-LIBEWF_EXTERN int libewf_set_delta_segment_filename_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *filename,
-                   size_t length );
-#endif
 
 /* Sets the read wipe chunk on error
  * The chunk is not wiped if read raw is used

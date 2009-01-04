@@ -125,6 +125,11 @@ Other:
 check error tollerance
 check TODO
 
+* Add description of functionality of tools in usage information
+
+* remove HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+* check into compression definition
+
 * move fgets to file stream IO
 
 * use internal format of date/time string convert them in interface
@@ -196,6 +201,10 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20081018
+* Minor adjustments
+* Updated liberror_definitions with encryption error definitions
 
 Version: 20081015
 * Minor adjustments
