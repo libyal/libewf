@@ -87,6 +87,9 @@ int main( int argc, char * const argv[] )
 	EWFGLOB *glob              = NULL;
 	int32_t glob_count         = 0;
 #endif
+
+	LIBEWF_CHAR *program       = _S_LIBEWF_CHAR( "ewfalter" );
+
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
         CHAR_T *error_string       = NULL;
 #endif
@@ -104,7 +107,7 @@ int main( int argc, char * const argv[] )
 
 	fprintf( stderr, "ewfalter is for expirimental usage only.\n" );
 
-	ewfcommon_version_fprint( stderr, _S_LIBEWF_CHAR( "ewfalter" ) );
+	ewfcommon_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "hsqvV" ) ) ) != (INT_T) -1 )
 	{
@@ -254,7 +257,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stdout, "Unable to close EWF file(s).\n" );
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
@@ -264,7 +267,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stdout, "Unable to close EWF file(s).\n" );
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
@@ -278,7 +281,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stdout, "Unable to close EWF file(s).\n" );
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
@@ -286,7 +289,7 @@ int main( int argc, char * const argv[] )
 
 	if( libewf_close( handle ) != 0 )
 	{
-		fprintf( stdout, "Unable to close EWF file(s).\n" );
+		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
 		return( EXIT_FAILURE );
 	}

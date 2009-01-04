@@ -89,6 +89,8 @@ int main( int argc, char * const argv[] )
 {
 	uint8_t guid[ 16 ];
 
+	LIBEWF_CHAR *program       = _S_LIBEWF_CHAR( "ewfinfo" );
+
 #if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob              = NULL;
 	int32_t glob_count         = 0;
@@ -97,6 +99,7 @@ int main( int argc, char * const argv[] )
         CHAR_T *error_string       = NULL;
 #endif
 	LIBEWF_HANDLE *handle      = NULL;
+	char *file_format_string   = NULL;
 	INT_T option               = 0;
 	size64_t media_size        = 0;
 	uint32_t bytes_per_sector  = 0;
@@ -113,7 +116,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stderr, _S_LIBEWF_CHAR( "ewfinfo" ) );
+	ewfcommon_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:himvV" ) ) ) != (INT_T) -1 )
 	{
@@ -275,65 +278,63 @@ int main( int argc, char * const argv[] )
 
 	if( verbose == 1 )
 	{
-		fprintf( stdout, "File format:\t\t\t" );
-
 		switch( format )
 		{
 			case LIBEWF_FORMAT_EWF:
-				fprintf( stdout, "original EWF" );
+				file_format_string = "original EWF";
 				break;
 
 			case LIBEWF_FORMAT_SMART:
-				fprintf( stdout, "SMART" );
+				file_format_string = "SMART";
 				break;
 
 			case LIBEWF_FORMAT_FTK:
-				fprintf( stdout, "FTK Imager" );
+				file_format_string = "FTK Imager";
 				break;
 
 			case LIBEWF_FORMAT_ENCASE1:
-				fprintf( stdout, "EnCase 1" );
+				file_format_string = "EnCase 1";
 				break;
 
 			case LIBEWF_FORMAT_ENCASE2:
-				fprintf( stdout, "EnCase 2" );
+				file_format_string = "EnCase 2";
 				break;
 
 			case LIBEWF_FORMAT_ENCASE3:
-				fprintf( stdout, "EnCase 3" );
+				file_format_string = "EnCase 3";
 				break;
 
 			case LIBEWF_FORMAT_ENCASE4:
-				fprintf( stdout, "EnCase 4" );
+				file_format_string = "EnCase 4";
 				break;
 
 			case LIBEWF_FORMAT_ENCASE5:
-				fprintf( stdout, "EnCase 5" );
+				file_format_string = "EnCase 5";
 				break;
 
 			case LIBEWF_FORMAT_ENCASE6:
-				fprintf( stdout, "EnCase 6" );
+				file_format_string = "EnCase 6";
 				break;
 
 			case LIBEWF_FORMAT_LINEN5:
-				fprintf( stdout, "linen 5" );
+				file_format_string = "linen 5";
 				break;
 
 			case LIBEWF_FORMAT_LINEN6:
-				fprintf( stdout, "linen 6" );
+				file_format_string = "linen 6";
 				break;
 
 			case LIBEWF_FORMAT_EWFX:
-				fprintf( stdout, "extended EWF (libewf)" );
+				file_format_string = "extended EWF (libewf)";
 				break;
 
 			case LIBEWF_FORMAT_UNKNOWN:
 			default:
-				fprintf( stdout, "unknown" );
+				file_format_string = "unknown";
 				break;
 
 		}
-		fprintf( stdout, "\n\n" );
+		fprintf( stdout, "File format:\t\t\t%s\n\n", file_format_string );
 	}
 	if( ( info_option == 'a' ) || ( info_option == 'i' ) )
 	{
@@ -464,7 +465,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( libewf_close( handle ) != 0 )
 	{
-		fprintf( stdout, "Unable to close EWF file(s).\n" );
+		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
 		return( EXIT_FAILURE );
 	}

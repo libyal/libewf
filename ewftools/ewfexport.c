@@ -81,7 +81,7 @@ void usage( void )
 	fprintf( stderr, "\t-o: specify the offset to start the export (default is 0)\n" );
 	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-t: specify the target file to export to (default is export)\n" );
+	fprintf( stderr, "\t-t: specify the target file to export to, use - for stderr (default is export)\n" );
 	fprintf( stderr, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n", (uint32_t) ( 650 * 1024 ) );
 #if defined( SPLIT_EXPORT )
 	fprintf( stderr, "\t    or the limit of the raw file size (default is no limit)" );
@@ -109,6 +109,7 @@ int main( int argc, char * const argv[] )
 	LIBEWF_HANDLE *export_handle = NULL;
 	LIBEWF_CHAR *user_input      = NULL;
 	LIBEWF_CHAR *program         = _S_LIBEWF_CHAR( "ewfexport" );
+
 	CHAR_T *end_of_string        = NULL;
 	CHAR_T *target_filename      = NULL;
 	CHAR_T *time_string          = NULL;
@@ -402,7 +403,7 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_format == 0 )
 			{
-				fprintf( stderr, "ewfexport: unsupported file format.\n" );
+				fprintf( stderr, "Unsupported file format.\n" );
 
 				if( libewf_close( handle ) != 0 )
 				{
@@ -448,7 +449,7 @@ int main( int argc, char * const argv[] )
 
 			if( compression_level <= -1 )
 			{
-				fprintf( stderr, "ewfexport: unsupported compression type.\n" );
+				fprintf( stderr, "Unsupported compression type.\n" );
 
 				if( libewf_close( handle ) != 0 )
 				{
@@ -477,7 +478,7 @@ int main( int argc, char * const argv[] )
 
 				if( compress_empty_block <= -1 )
 				{
-					fprintf( stderr, "ewfexport: unsupported answer.\n" );
+					fprintf( stderr, "Unsupported answer.\n" );
 
 					if( libewf_close( handle ) != 0 )
 					{
@@ -526,7 +527,7 @@ int main( int argc, char * const argv[] )
 			{
 				target_filename = ewfcommon_get_user_input_variable_char_t(
 				                   stderr,
-				                   _S_LIBEWF_CHAR( "Target path and filename without extension or - for stdout" ) );
+				                   _S_LIBEWF_CHAR( "Target path and filename without extension or - for stderr" ) );
 
 				if( target_filename == NULL )
 				{

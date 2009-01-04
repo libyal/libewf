@@ -96,17 +96,17 @@ typedef size_t u64;
  */
 void usage( void )
 {
-	fprintf( stdout, "Usage: ewfacquire [ -d digest_type ] [ -hqsvV ] source\n\n" );
+	fprintf( stderr, "Usage: ewfacquire [ -d digest_type ] [ -hqsvV ] source\n\n" );
 
-	fprintf( stdout, "\tsource: the source file or device\n\n" );
+	fprintf( stderr, "\tsource: the source file or device\n\n" );
 
-	fprintf( stdout, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
-	fprintf( stdout, "\t-h:     shows this help\n" );
-	fprintf( stdout, "\t-q:     quiet shows no status information\n" );
-	fprintf( stdout, "\t-s:     swap byte pairs of the media data (from AB to BA)\n" );
-	fprintf( stdout, "\t        (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stdout, "\t-v:     verbose output to stderr\n" );
-	fprintf( stdout, "\t-V:     print version\n" );
+	fprintf( stderr, "\t-d:     calculate additional digest (hash) types besides md5, options: sha1\n" );
+	fprintf( stderr, "\t-h:     shows this help\n" );
+	fprintf( stderr, "\t-q:     quiet shows no status information\n" );
+	fprintf( stderr, "\t-s:     swap byte pairs of the media data (from AB to BA)\n" );
+	fprintf( stderr, "\t        (use this for big to little endian conversion and vice versa)\n" );
+	fprintf( stderr, "\t-v:     verbose output to stderr\n" );
+	fprintf( stderr, "\t-V:     print version\n" );
 }
 
 /* Prints an overview of the user provided input
@@ -118,10 +118,10 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 	LIBEWF_CHAR *user_input = NULL;
 	int input_confirmed     = -1;
 
-	fprintf( stdout, "The following acquiry parameters were provided:\n" );
+	fprintf( stderr, "The following acquiry parameters were provided:\n" );
 
 	ewfcommon_acquiry_parameters_fprint(
-	 stdout,
+	 stderr,
 	 filename,
 	 case_number,
 	 description,
@@ -146,7 +146,7 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 	while( input_confirmed == -1 )
 	{
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "Continue acquiry with these values" ),
 		              ewfcommon_yes_no,
 		              2,
@@ -158,10 +158,10 @@ int confirm_input( CHAR_T *filename, LIBEWF_CHAR *case_number, LIBEWF_CHAR *desc
 
 		if( input_confirmed <= -1 )	
 		{
-			fprintf( stdout, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
+			fprintf( stderr, "Selected option not supported, please try again or terminate using Ctrl^C.\n" );
 		}
 	}
-	fprintf( stdout, "\n" );
+	fprintf( stderr, "\n" );
 
 	return( input_confirmed );
 }
@@ -287,7 +287,7 @@ int main( int argc, char * const argv[] )
 
 	ewfsignal_initialize();
 
-	ewfcommon_version_fprint( stdout, program );
+	ewfcommon_version_fprint( stderr, program );
 
 	while( ( option = ewfgetopt( argc, argv, _S_CHAR_T( "d:hqsvV" ) ) ) != (INT_T) -1 )
 	{
@@ -333,7 +333,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'V':
-				ewfcommon_copyright_fprint( stdout );
+				ewfcommon_copyright_fprint( stderr );
 
 				return( EXIT_SUCCESS );
 		}
@@ -423,55 +423,55 @@ int main( int argc, char * const argv[] )
 
 		/* Request the necessary case data
 		 */
-		fprintf( stdout, "Acquiry parameters required, please provide the necessary input\n" );
+		fprintf( stderr, "Acquiry parameters required, please provide the necessary input\n" );
 
 		/* Output filename
 		 */
 		while( filename == NULL )
 		{
 			filename = ewfcommon_get_user_input_variable_char_t(
-			            stdout,
+			            stderr,
 			            _S_LIBEWF_CHAR( "Image path and filename without extension" ) );
 
 			if( filename == NULL )
 			{
-				fprintf( stdout, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				fprintf( stderr, "Filename is required, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
 		/* Case number
 		 */
 		case_number = ewfcommon_get_user_input_variable(
-		               stdout,
+		               stderr,
 		               _S_LIBEWF_CHAR( "Case number" ) );
 
 		/* Description
 		 */
 		description = ewfcommon_get_user_input_variable(
-		               stdout,
+		               stderr,
 		               _S_LIBEWF_CHAR( "Description" ) );
 
 		/* Evidence number
 		 */
 		evidence_number = ewfcommon_get_user_input_variable(
-		                   stdout,
+		                   stderr,
 		                   _S_LIBEWF_CHAR( "Evidence number" ) );
 
 		/* Examiner name
 		 */
 		examiner_name = ewfcommon_get_user_input_variable(
-		                 stdout,
+		                 stderr,
 		                 _S_LIBEWF_CHAR( "Examiner name" ) );
 
 		/* Notes
 		 */
 		notes = ewfcommon_get_user_input_variable(
-		         stdout,
+		         stderr,
 		         _S_LIBEWF_CHAR( "Notes" ) );
 
 		/* Media type
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "Media type" ),
 		              ewfcommon_media_types,
 		              EWFCOMMON_MEDIA_TYPES_AMOUNT,
@@ -483,7 +483,7 @@ int main( int argc, char * const argv[] )
 
 		if( media_type <= -1 )
 		{
-			fprintf( stderr, "ewfacquire: unsupported media type.\n" );
+			fprintf( stderr, "Unsupported media type.\n" );
 
 			return( EXIT_FAILURE );
 		}
@@ -491,7 +491,7 @@ int main( int argc, char * const argv[] )
 		/* Volume type
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "Volume type" ),
 		              ewfcommon_volume_types,
 		              EWFCOMMON_VOLUME_TYPES_AMOUNT,
@@ -503,7 +503,7 @@ int main( int argc, char * const argv[] )
 
 		if( volume_type <= -1 )
 		{
-			fprintf( stderr, "ewfacquire: unsupported volume type.\n" );
+			fprintf( stderr, "Unsupported volume type.\n" );
 
 			return( EXIT_FAILURE );
 		}
@@ -511,7 +511,7 @@ int main( int argc, char * const argv[] )
 		/* Compression
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "Use compression" ),
 		              ewfcommon_compression_levels,
 		              EWFCOMMON_COMPRESSION_LEVELS_AMOUNT,
@@ -523,7 +523,7 @@ int main( int argc, char * const argv[] )
 
 		if( compression_level <= -1 )
 		{
-			fprintf( stderr, "ewfacquire: unsupported compression type.\n" );
+			fprintf( stderr, "Unsupported compression type.\n" );
 
 			return( EXIT_FAILURE );
 		}
@@ -533,7 +533,7 @@ int main( int argc, char * const argv[] )
 		if( compression_level == LIBEWF_COMPRESSION_NONE )
 		{
 			user_input = ewfcommon_get_user_input_fixed_value(
-			              stdout,
+			              stderr,
 			              _S_LIBEWF_CHAR( "Compress empty blocks" ),
 			              ewfcommon_yes_no,
 			              2,
@@ -545,7 +545,7 @@ int main( int argc, char * const argv[] )
 
 			if( compress_empty_block <= -1 )
 			{
-				fprintf( stderr, "ewfacquire: unsupported answer.\n" );
+				fprintf( stderr, "Unsupported answer.\n" );
 
 				return( EXIT_FAILURE );
 			}
@@ -554,7 +554,7 @@ int main( int argc, char * const argv[] )
 		/* File format
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "Use EWF file format" ),
 		              ewfcommon_format_types,
 		              EWFCOMMON_FORMAT_TYPES_AMOUNT,
@@ -566,7 +566,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_format == 0 )
 		{
-			fprintf( stderr, "ewfacquire: unsupported EWF file format type.\n" );
+			fprintf( stderr, "Unsupported EWF file format type.\n" );
 
 			exit( EXIT_FAILURE );
 		}
@@ -574,14 +574,14 @@ int main( int argc, char * const argv[] )
 		/* Size and offset of data to acquire
 		 */
 		acquiry_offset = ewfcommon_get_user_input_size_variable(
-		                  stdout,
+		                  stderr,
 		                  _S_LIBEWF_CHAR( "Start to acquire at offset" ),
 		                  0,
 		                  input_size,
 		                  0 );
 
 		acquiry_size = ewfcommon_get_user_input_size_variable(
-		                stdout,
+		                stderr,
 		                _S_LIBEWF_CHAR( "Amount of bytes to acquire" ),
 		                0,
 		                ( input_size - acquiry_offset ),
@@ -599,7 +599,7 @@ int main( int argc, char * const argv[] )
 		}
 
 		segment_file_size = ewfcommon_get_user_input_size_variable(
-		                     stdout,
+		                     stderr,
 		                     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
 		                     1440,
 		                     ( maximum_segment_file_size / 1024 ),
@@ -617,7 +617,7 @@ int main( int argc, char * const argv[] )
 		/* Chunk size (sectors per block)
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "The amount of sectors to read at once" ),
 		              ewfcommon_sector_per_block_sizes,
 		              EWFCOMMON_SECTOR_PER_BLOCK_SIZES_AMOUNT,
@@ -630,7 +630,7 @@ int main( int argc, char * const argv[] )
 		/* Error granularity
 		 */
 		sector_error_granularity = ewfcommon_get_user_input_size_variable(
-		                            stdout,
+		                            stderr,
 		                            _S_LIBEWF_CHAR( "The amount of sectors to be used as error granularity" ),
 		                            1,
 		                            sectors_per_chunk,
@@ -639,7 +639,7 @@ int main( int argc, char * const argv[] )
 		/* The amount of read error retry
 		 */
 		read_error_retry = (uint8_t) ewfcommon_get_user_input_size_variable(
-		                              stdout,
+		                              stderr,
 		                              _S_LIBEWF_CHAR( "The amount of retries when a read error occurs" ),
 		                              0,
 		                              255,
@@ -648,7 +648,7 @@ int main( int argc, char * const argv[] )
 		/* Wipe the sector on error
 		 */
 		user_input = ewfcommon_get_user_input_fixed_value(
-		              stdout,
+		              stderr,
 		              _S_LIBEWF_CHAR( "Wipe sectors on read error (mimic EnCase like behavior)" ),
 		              ewfcommon_yes_no,
 		              2,
@@ -660,11 +660,11 @@ int main( int argc, char * const argv[] )
 
 		if( wipe_block_on_read_error <= -1 )
 		{
-			fprintf( stderr, "ewfacquire: unsupported answer.\n" );
+			fprintf( stderr, "Unsupported answer.\n" );
 
 			return( EXIT_FAILURE );
 		}
-		fprintf( stdout, "\n" );
+		fprintf( stderr, "\n" );
 	}
 	/* Check if user is content with values
 	 */
@@ -1095,19 +1095,19 @@ int main( int argc, char * const argv[] )
 
 	if( time_string != NULL )
 	{
-		fprintf( stdout, "Acquiry started at: %" PRIs "\n", time_string );
+		fprintf( stderr, "Acquiry started at: %" PRIs "\n", time_string );
 
 		libewf_common_free( time_string );
 	}
 	else
 	{
-		fprintf( stdout, "Acquiry started.\n" );
+		fprintf( stderr, "Acquiry started.\n" );
 	}
 	if( callback != NULL )
 	{
-		ewfcommon_process_status_initialize( stdout, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
+		ewfcommon_process_status_initialize( stderr, _S_LIBEWF_CHAR( "acquired" ), timestamp_start );
 	}
-	fprintf( stdout, "This could take a while.\n\n" );
+	fprintf( stderr, "This could take a while.\n\n" );
 
 	write_count = ewfcommon_write_from_file_descriptor(
 	               handle,
@@ -1200,13 +1200,13 @@ int main( int argc, char * const argv[] )
 	{
 		if( time_string != NULL )
 		{
-			fprintf( stdout, "Acquiry failed at: %" PRIs "\n", time_string );
+			fprintf( stderr, "Acquiry failed at: %" PRIs "\n", time_string );
 
 			libewf_common_free( time_string );
 		}
 		else
 		{
-			fprintf( stdout, "Acquiry failed.\n" );
+			fprintf( stderr, "Acquiry failed.\n" );
 		}
 		if( libewf_close( handle ) != 0 )
 		{
@@ -1222,19 +1222,19 @@ int main( int argc, char * const argv[] )
 	}
 	if( time_string != NULL )
 	{
-		fprintf( stdout, "Acquiry completed at: %" PRIs "\n", time_string );
+		fprintf( stderr, "Acquiry completed at: %" PRIs "\n", time_string );
 
 		libewf_common_free( time_string );
 	}
 	else
 	{
-		fprintf( stdout, "Acquiry completed.\n" );
+		fprintf( stderr, "Acquiry completed.\n" );
 	}
-	ewfcommon_process_summary_fprint( stdout, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
+	ewfcommon_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
 
-	fprintf( stdout, "\n" );
+	fprintf( stderr, "\n" );
 
-	ewfcommon_acquiry_errors_fprint( stdout, handle );
+	ewfcommon_acquiry_errors_fprint( stderr, handle );
 
 	if( libewf_close( handle ) != 0 )
 	{
@@ -1262,11 +1262,11 @@ int main( int argc, char * const argv[] )
 	}
 	else if( result_md5_hash == 0 )
 	{
-		fprintf( stdout, "MD5 hash calculated over data:\tN/A\n" );
+		fprintf( stderr, "MD5 hash calculated over data:\tN/A\n" );
 	}
 	else
 	{
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
+		fprintf( stderr, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
 	}
 	libewf_common_free( calculated_md5_hash_string );
 
@@ -1282,11 +1282,11 @@ int main( int argc, char * const argv[] )
 		}
 		else if( result_sha1_hash == 0 )
 		{
-			fprintf( stdout, "SHA1 hash calculated over data:\tN/A\n" );
+			fprintf( stderr, "SHA1 hash calculated over data:\tN/A\n" );
 		}
 		else
 		{
-			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
+			fprintf( stderr, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
 		}
 		libewf_common_free( calculated_sha1_hash_string );
 	}

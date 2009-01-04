@@ -140,11 +140,17 @@ TODO
 
 * remove libewf_set_media_values
 
+* allow to set the delta file path
+
+Version: 20070830
+* changed use of stdout and stderr in ewfacquirestream, ewfinfo
+* removed program: error output in ewfacquire, ewfverify
+
 Version: 20070829
 * worked on read support for > 2Gb segment file for EnCase 6.7
 * worked on write support for > 2Gb segment file for EnCase 6.7
 * worked on session section support
-* corrected use of stdout and stderr in ewfverify
+* changed use of stdout and stderr in ewfverify
 * added errno == 0 check in ewftools after libewf open to prevent
   the following output
   "Unable to open EWF file(s) with failure: Success."
@@ -153,7 +159,7 @@ Version: 20070828
 * worked on read support for > 2Gb segment file for EnCase 6.7
 * changed off_t to off64_t for Windows >2Gb segment file support
 * worked on write support for > 2Gb segment file for EnCase 6.7
-* corrected use of stdout and stderr in ewfacquire
+* changed use of stdout and stderr in ewfacquire
 
 Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy

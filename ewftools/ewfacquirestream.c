@@ -456,10 +456,10 @@ int main( int argc, char * const argv[] )
 	acquiry_operating_system = ewfcommon_determine_operating_system();
 	acquiry_software_version = LIBEWF_VERSION;
 
-	fprintf( stdout, "Using the following acquiry parameters:\n" );
+	fprintf( stderr, "Using the following acquiry parameters:\n" );
 
 	ewfcommon_acquiry_parameters_fprint(
-	 stdout,
+	 stderr,
 	 filenames[ 0 ],
 	 case_number,
 	 description,
@@ -796,7 +796,11 @@ int main( int argc, char * const argv[] )
 				}
 				return( EXIT_FAILURE );
 			}
-			result_sha1_hash = libewf_get_hash_value( handle, _S_LIBEWF_CHAR( "SHA1" ), calculated_sha1_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
+			result_sha1_hash = libewf_get_hash_value(
+			                    handle,
+			                    _S_LIBEWF_CHAR( "SHA1" ),
+			                    calculated_sha1_hash_string,
+			                    LIBEWF_STRING_DIGEST_HASH_LENGTH_SHA1 );
 		}
 	}
 	timestamp_end = time( NULL );
