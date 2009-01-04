@@ -1103,7 +1103,25 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, l
 /* Writes data in EWF format from a file descriptor
  * Returns the amount of bytes written, or -1 on error
  */
-ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_chunk_on_error, uint8_t seek_on_error, uint8_t calculate_md5, libewf_char_t *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, libewf_char_t *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
+ssize64_t ewfcommon_write_from_file_descriptor(
+           LIBEWF_HANDLE *handle,
+           int input_file_descriptor,
+           size64_t write_size,
+           off64_t write_offset,
+           uint32_t sectors_per_chunk,
+           uint32_t bytes_per_sector,
+           uint8_t read_error_retry,
+           uint32_t sector_error_granularity,
+           uint8_t wipe_chunk_on_error,
+           uint8_t seek_on_error,
+           uint8_t calculate_md5,
+           libewf_char_t *md5_hash_string,
+           size_t md5_hash_string_length,
+           uint8_t calculate_sha1,
+           libewf_char_t *sha1_hash_string,
+           size_t sha1_hash_string_length,
+           uint8_t swap_byte_pairs,
+           void (*callback)( uint64_t bytes_read, uint64_t bytes_total ) )
 {
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
@@ -1120,7 +1138,6 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	ssize64_t total_write_count = 0;
 	ssize64_t write_count       = 0;
 	ssize32_t read_count        = 0;
-	uint32_t bytes_per_sector   = 0;
 #if defined( HAVE_RAW_ACCESS )
 	uint8_t *raw_data_buffer    = NULL;
 	size_t raw_data_buffer_size = 0;
@@ -1160,9 +1177,29 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 		return( -1 );
 	}
+	if( libewf_set_sectors_per_chunk(
+	     handle,
+	     sectors_per_chunk ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set sectors per chunk in handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_bytes_per_sector(
+	     handle,
+	     bytes_per_sector ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set bytes per sector in handle.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( write_size > 0 )
 	{
-		if( libewf_set_media_size( handle, write_size ) == -1 )
+		if( libewf_set_media_size(
+		     handle,
+		     write_size ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to set media size in handle.\n",
 			 function );
@@ -1195,42 +1232,12 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		LIBEWF_WARNING_PRINT( "%s: ignoring write offset in a stream mode.\n",
 		 function );
 	}
-	if( libewf_write_initialize(
-	     handle ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize write.\n",
-		 function );
+	chunk_size = sectors_per_chunk * bytes_per_sector;
 
-		return( -1 );
-	}
-	if( libewf_get_chunk_size(
-	     handle,
-	     &chunk_size ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine chunk size.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size == 0 )
+	if( ( chunk_size == 0 )
+	 || ( chunk_size > (size32_t) INT32_MAX ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk size.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_get_bytes_per_sector(
-	     handle,
-	     &bytes_per_sector ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to get bytes per sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( bytes_per_sector == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of bytes per sector.\n",
 		 function );
 
 		return( -1 );

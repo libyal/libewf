@@ -143,8 +143,6 @@ Next release:
 
 TODO
 * create libewf_create_handle and libewf_destroy_handle functions?
-* fix libewf_get_chunk_size to work without initialized write?
-* implement initialize write function
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -161,8 +159,10 @@ CLOSED
   no, strndup is not available on all platforms
 
 Version: 20080114
-* worked on separate initialize write function due to multi threading
-  issues
+* removed initialize write in libewf_raw_write_prepare_buffer
+  messes up multi threaded compression aproach
+* removed write initialize from libewf_get_chunk_size
+  chunk_size is calculated on set of sectors_per_chunk and bytes_per_sector
 
 Version: 20080112
 * removed errno from library

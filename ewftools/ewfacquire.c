@@ -116,7 +116,25 @@ void usage( void )
  * and asks the user for confirmation
  * Return 1 if confirmed by user, 0 otherwise
  */
-int confirm_input( CHAR_T *filename, libewf_char_t *case_number, libewf_char_t *description, libewf_char_t *evidence_number, libewf_char_t *examiner_name, libewf_char_t *notes, uint8_t media_type, uint8_t volume_type, int8_t compression_level, uint8_t compress_empty_block, uint8_t libewf_format, off64_t acquiry_offset, size64_t acquiry_size, size64_t segment_file_size, uint32_t sectors_per_chunk, uint32_t sector_error_granularity, uint8_t read_error_retry, uint8_t wipe_chunk_on_error )
+int confirm_input(
+     CHAR_T *filename,
+     libewf_char_t *case_number,
+     libewf_char_t *description,
+     libewf_char_t *evidence_number,
+     libewf_char_t *examiner_name,
+     libewf_char_t *notes,
+     uint8_t media_type,
+     uint8_t volume_type,
+     int8_t compression_level,
+     uint8_t compress_empty_block,
+     uint8_t libewf_format,
+     off64_t acquiry_offset,
+     size64_t acquiry_size,
+     size64_t segment_file_size,
+     uint32_t sectors_per_chunk,
+     uint32_t sector_error_granularity,
+     uint8_t read_error_retry,
+     uint8_t wipe_chunk_on_error )
 {
 	libewf_char_t *user_input = NULL;
 	int input_confirmed       = -1;
@@ -638,7 +656,9 @@ int main( int argc, char * const argv[] )
 		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT,
 		              EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT );
 
-		sectors_per_chunk = libewf_string_to_int64( user_input, libewf_string_length( user_input ) );
+		sectors_per_chunk = libewf_string_to_int64(
+		                     user_input,
+		                     libewf_string_length( user_input ) );
 
 		libewf_common_free( user_input );
 
@@ -1049,20 +1069,6 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_sectors_per_chunk( handle, (uint32_t) sectors_per_chunk ) != 1 )
-	{
-		fprintf( stderr, "Unable to set sectors per chunk in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		if( libewf_common_close( file_descriptor ) != 0 )
-		{
-			fprintf( stderr, "Unable to close input.\n" );
-		}
-		return( EXIT_FAILURE );
-	}
 	if( libewf_set_segment_file_size( handle, (size64_t) segment_file_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to set segment file size in handle.\n" );
@@ -1247,6 +1253,8 @@ int main( int argc, char * const argv[] )
 	               file_descriptor,
 	               acquiry_size,
 	               acquiry_offset,
+	               (uint32_t) sectors_per_chunk,
+	               512,
 	               read_error_retry,
 	               (uint32_t) sector_error_granularity,
 	               (uint8_t) wipe_chunk_on_error,

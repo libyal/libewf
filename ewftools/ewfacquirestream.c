@@ -520,17 +520,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_sectors_per_chunk( handle, (uint32_t) sectors_per_chunk ) != 1 )
-	{
-		fprintf( stderr, "Unable to set sectors per chunk in handle.\n" );
-
-		if( libewf_close( handle ) != 0 )
-		{
-			fprintf( stderr, "Unable to close EWF file(s).\n" );
-		}
-		return( EXIT_FAILURE );
-	}
-	if( libewf_set_segment_file_size( handle, (size64_t) segment_file_size ) != 1 )
+	if( libewf_set_segment_file_size(
+	     handle,
+	     (size64_t) segment_file_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to set segment file size in handle.\n" );
 
@@ -540,7 +532,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_media_type( handle, media_type ) != 1 )
+	if( libewf_set_media_type(
+	     handle,
+	     media_type ) != 1 )
 	{
 		fprintf( stderr, "Unable to set media type in handle.\n" );
 
@@ -550,7 +544,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_volume_type( handle, volume_type ) != 1 )
+	if( libewf_set_volume_type(
+	     handle,
+	     volume_type ) != 1 )
 	{
 		fprintf( stderr, "Unable to set volume type in handle.\n" );
 
@@ -560,7 +556,10 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_compression_values( handle, compression_level, compress_empty_block ) != 1 )
+	if( libewf_set_compression_values(
+	     handle,
+	     compression_level,
+	     compress_empty_block ) != 1 )
 	{
 		fprintf( stderr, "Unable to set compression values in handle.\n" );
 
@@ -570,7 +569,9 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_format( handle, libewf_format ) != 1 )
+	if( libewf_set_format(
+	     handle,
+	     libewf_format ) != 1 )
 	{
 		fprintf( stderr, "Unable to set format in handle.\n" );
 
@@ -588,7 +589,10 @@ int main( int argc, char * const argv[] )
 	{
 		string_length = libewf_string_length( case_number );
 	}
-	if( libewf_set_header_value_case_number( handle, case_number, string_length ) != 1 )
+	if( libewf_set_header_value_case_number(
+	     handle,
+	     case_number,
+	     string_length ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value case number in handle.\n" );
 
@@ -608,7 +612,10 @@ int main( int argc, char * const argv[] )
 	{
 		string_length = libewf_string_length( description );
 	}
-	if( libewf_set_header_value_description( handle, description, string_length ) != 1 )
+	if( libewf_set_header_value_description(
+	     handle,
+	     description,
+	     string_length ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value description in handle.\n" );
 
@@ -628,7 +635,10 @@ int main( int argc, char * const argv[] )
 	{
 		string_length = libewf_string_length( examiner_name );
 	}
-	if( libewf_set_header_value_examiner_name( handle, examiner_name, string_length ) != 1 )
+	if( libewf_set_header_value_examiner_name(
+	     handle,
+	     examiner_name,
+	     string_length ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value examiner name in handle.\n" );
 
@@ -648,7 +658,10 @@ int main( int argc, char * const argv[] )
 	{
 		string_length = libewf_string_length( evidence_number );
 	}
-	if( libewf_set_header_value_evidence_number( handle, evidence_number, string_length ) != 1 )
+	if( libewf_set_header_value_evidence_number(
+	     handle,
+	     evidence_number,
+	     string_length ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value evidence number in handle.\n" );
 
@@ -668,7 +681,10 @@ int main( int argc, char * const argv[] )
 	{
 		string_length = libewf_string_length( notes );
 	}
-	if( libewf_set_header_value_notes( handle, notes, string_length ) != 1 )
+	if( libewf_set_header_value_notes(
+	     handle,
+	     notes,
+	     string_length ) != 1 )
 	{
 		fprintf( stderr, "Unable to set header value notes in handle.\n" );
 
@@ -684,7 +700,10 @@ int main( int argc, char * const argv[] )
 	 */
 	if( acquiry_operating_system != NULL )
 	{
-		if( libewf_set_header_value_acquiry_operating_system( handle, acquiry_operating_system, libewf_string_length( acquiry_operating_system ) ) != 1 )
+		if( libewf_set_header_value_acquiry_operating_system(
+		     handle,
+		     acquiry_operating_system,
+		     libewf_string_length( acquiry_operating_system ) ) != 1 )
 		{
 			fprintf( stderr, "Unable to set header value acquiry operating system in handle.\n" );
 
@@ -726,7 +745,9 @@ int main( int argc, char * const argv[] )
 #if defined(HAVE_UUID_UUID_H) && defined(HAVE_LIBUUID)
 	/* Add a system GUID if necessary
 	 */
-	if( ewfcommon_determine_guid( guid, libewf_format ) != 1 )
+	if( ewfcommon_determine_guid(
+	     guid,
+	     libewf_format ) != 1 )
 	{
 		fprintf( stderr, "Unable to create GUID.\n" );
 
@@ -736,7 +757,10 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_guid( handle, guid, 16 ) != 1 )
+	if( libewf_set_guid(
+	     handle,
+	     guid,
+	     16 ) != 1 )
 	{
 		fprintf( stderr, "Unable to set GUID in handle.\n" );
 
@@ -807,6 +831,8 @@ int main( int argc, char * const argv[] )
 	               0,
 	               acquiry_size,
 	               acquiry_offset,
+	               (uint32_t) sectors_per_chunk,
+	               512,
 	               read_error_retry,
 	               sector_error_granularity,
 	               wipe_chunk_on_error,

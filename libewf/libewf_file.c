@@ -184,7 +184,8 @@ LIBEWF_HANDLE *libewf_open( libewf_filename_t * const filenames[], uint16_t file
 		}
 		/* Initialize the internal handle for reading
 		 */
-		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
+		if( libewf_internal_handle_read_initialize(
+		     internal_handle ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to initialize read values in handle.\n",
 			 function );
@@ -508,10 +509,11 @@ int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sec
 }
 
 /* Retrieves the chunk size from the media information
- * Will initialize write if necessary
  * Returns 1 if successful, or -1 on error
  */
-int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
+int libewf_get_chunk_size(
+     LIBEWF_HANDLE *handle,
+     size32_t *chunk_size )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_chunk_size";
@@ -542,14 +544,6 @@ int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 	if( internal_handle->media_values->chunk_size > (size32_t) INT32_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->write != NULL )
-	 && ( internal_handle->write->values_initialized == 0 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values are not initialized.\n",
 		 function );
 
 		return( -1 );
@@ -1408,6 +1402,11 @@ int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_ch
 	}
 	internal_handle->media_values->sectors_per_chunk = sectors_per_chunk;
 
+        /* Determine the chunk size
+	 */
+	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
+	                                          * internal_handle->media_values->bytes_per_sector;
+
 	return( 1 );
 }
 
@@ -1452,6 +1451,11 @@ int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_secto
 		return( -1 );
 	}
 	internal_handle->media_values->bytes_per_sector = bytes_per_sector;
+
+        /* Determine the chunk size
+	 */
+	internal_handle->media_values->chunk_size = internal_handle->media_values->sectors_per_chunk
+	                                          * internal_handle->media_values->bytes_per_sector;
 
 	return( 1 );
 }

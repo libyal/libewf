@@ -1,4 +1,4 @@
-.Dd January 14, 2008
+.Dd December 28, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -36,8 +36,6 @@
 .Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
 .Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
-.Ft int
-.Fn libewf_write_initialize "LIBEWF_HANDLE *handle"
 .Ft ssize_t
 .Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
 .Ft int
@@ -289,16 +287,10 @@ The
 functions can be used to open, seek in, read from, write to and close a set of EWF files.
 .Pp
 The
-.Fn libewf_write_initialize
-function needs to be called before writing a set of EWF files.
-.Fn libewf_write_initialize
-will the make the necessary calculations for the set of EWF files.
-.Pp
-The
 .Fn libewf_write_finalize
-function needs to be called after writing a set of EWF files.
+function needs to be called after writing a set of EWF files without knowing the input size upfront, e.g. reading from a pipe.
 .Fn libewf_write_finalize
-will make the necessary corrections to the set of EWF files.
+will the necessary correction to the set of EWF files.
 .Pp
 The
 .Fn libewf_raw_read_prepare_buffer ,
