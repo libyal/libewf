@@ -814,7 +814,7 @@ void ewfoutput_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 				for( iterator = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT; iterator < amount_of_values; iterator++ )
 				{
-					if( libewf_get_header_value_identifier( handle, iterator, hash_identifier, hash_identifier_length ) != 1 )
+					if( libewf_get_hash_value_identifier( handle, iterator, hash_identifier, hash_identifier_length ) != 1 )
 					{
 						LIBEWF_WARNING_PRINT( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
 						 function, iterator );

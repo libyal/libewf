@@ -304,6 +304,16 @@ int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint3
 	}
 	identifier_length = libewf_string_length( values_table->identifiers[ index ] );
 
+	/* Don't bother with empty values
+	 */
+	if( identifier_length == 0 )
+	{
+		return( 0 );
+	}
+	/* Add 1 additional byte required for the end of string character
+	 */
+	identifier_length += 1;
+
 	if( identifier_length > length )
 	{
 		LIBEWF_WARNING_PRINT( "%s: identifier too small.\n",
@@ -349,7 +359,7 @@ int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHA
 
 		return( -1 );
 	}
-	if( (uint32_t) index > values_table->amount )
+	if( (uint32_t) index >= values_table->amount )
 	{
 		return( 0 );
 	}
