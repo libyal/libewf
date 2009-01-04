@@ -2235,7 +2235,7 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE *segment_file, size_t s
 /* Reads a data section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE *segment_file, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_DATA *data             = NULL;
 	static char *function      = "libewf_section_data_read";
@@ -2248,23 +2248,16 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 	uint32_t amount_of_sectors = 0;
 	uint32_t error_granularity = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media values.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid media values.\n",
 		 function );
 
 		return( -1 );
@@ -2344,7 +2337,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 #endif
 	/* TODO add more checks
 	 */
-	if( internal_handle->media_values->media_type != data->media_type )
+	if( media_values->media_type != data->media_type )
 	{
 		LIBEWF_WARNING_PRINT( "%s: media type does not match in data section.\n",
 		 function );
@@ -2365,7 +2358,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->amount_of_chunks != amount_of_chunks )
+	if( media_values->amount_of_chunks != amount_of_chunks )
 	{
 		LIBEWF_WARNING_PRINT( "%s: amount of chunks does not match in data section.\n",
 		 function );
@@ -2386,7 +2379,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->sectors_per_chunk != sectors_per_chunk )
+	if( media_values->sectors_per_chunk != sectors_per_chunk )
 	{
 		LIBEWF_WARNING_PRINT( "%s: sectors per chunk does not match in data section.\n",
 		 function );
@@ -2407,7 +2400,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->bytes_per_sector != bytes_per_sector )
+	if( media_values->bytes_per_sector != bytes_per_sector )
 	{
 		LIBEWF_WARNING_PRINT( "%s: bytes per sector does not match in data section.\n",
 		 function );
@@ -2428,7 +2421,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->amount_of_sectors != amount_of_sectors )
+	if( media_values->amount_of_sectors != amount_of_sectors )
 	{
 		LIBEWF_WARNING_PRINT( "%s: amount of sectors does not match in data section.\n",
 		 function );
@@ -2449,7 +2442,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 
 		return( -1 );
 	}
-	if( internal_handle->media_values->error_granularity != error_granularity )
+	if( media_values->error_granularity != error_granularity )
 	{
 		LIBEWF_WARNING_PRINT( "%s: error granularity does not match in data section.\n",
 		 function );
@@ -2461,7 +2454,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 			return( -1 );
 		}
 	}
-	if( internal_handle->media_values->media_flags != data->media_flags )
+	if( media_values->media_flags != data->media_flags )
 	{
 		LIBEWF_WARNING_PRINT( "%s: media flags do not match in data section.\n",
 		 function );
@@ -2473,7 +2466,7 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEW
 			return( -1 );
 		}
 	}
-	if( libewf_common_memcmp( internal_handle->media_values->guid, data->guid, 16 ) != 0 )
+	if( libewf_common_memcmp( media_values->guid, data->guid, 16 ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: GUID does not match in data section.\n",
 		 function );
@@ -4120,9 +4113,9 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 	else if( ewf_string_compare( section->type, "data", 5 ) == 0 )
 	{
 		read_count = libewf_section_data_read(
-		              internal_handle,
 		              segment_file,
 		              (size_t) size,
+		              internal_handle->media_values,
 		              internal_handle->ewf_format,
  		              internal_handle->error_tollerance );
 	}
