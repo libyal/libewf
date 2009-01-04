@@ -26,72 +26,15 @@
 
 #include "libewf_sector_table.h"
 
-/* Allocates memory for a sector table struct
- * Returns a pointer to the new instance or NULL on error
- */
-libewf_sector_table_t *libewf_sector_table_alloc(
-                        uint32_t amount )
-{
-	libewf_sector_table_t *sector_table = NULL;
-	static char *function               = "libewf_sector_table_alloc";
-
-	sector_table = (libewf_sector_table_t *) memory_allocate(
-	                                          sizeof( libewf_sector_table_t ) );
-
-	if( sector_table == NULL )
-	{
-		notify_warning_printf( "%s: unable to create sector table.\n",
-		 function );
-
-		return( NULL );
-	}
-	sector_table->sector = NULL;
-
-	if( amount > 0 )
-	{
-		sector_table->sector = (libewf_sector_table_entry_t *) memory_allocate(
-		                                                        sizeof( libewf_sector_table_entry_t ) * amount );
-
-		if( sector_table->sector == NULL )
-		{
-			notify_warning_printf( "%s: unable to create dynamic sector array.\n",
-			 function );
-
-			memory_free(
-			 sector_table );
-
-			return( NULL );
-		}
-		if( memory_set(
-		     sector_table->sector,
-		     0, 
-		     ( sizeof( libewf_sector_table_entry_t ) * amount ) ) == NULL )
-		{
-			notify_warning_printf( "%s: unable to clear dynamic sector array.\n",
-			 function );
-
-			memory_free(
-			 sector_table->sector );
-			memory_free(
-			 sector_table );
-
-			return( NULL );
-		} 
-	}
-	sector_table->amount = amount;
-
-	return( sector_table );
-}
-
-/* Reallocates memory for the sector table values
+/* Initialize the sector table
  * Returns 1 if successful or -1 on error
  */
-int libewf_sector_table_realloc(
-     libewf_sector_table_t *sector_table,
+int libewf_sector_table_initialize(
+     libewf_sector_table_t **sector_table,
      uint32_t amount )
 {
-	void *reallocation    = NULL;
-	static char *function = "libewf_sector_table_realloc";
+	static char *function    = "libewf_sector_table_initialize";
+	size_t sector_table_size = 0;
 
 	if( sector_table == NULL )
 	{
@@ -100,45 +43,87 @@ int libewf_sector_table_realloc(
 
 		return( -1 );
 	}
-	if( sector_table->amount >= amount )
+	if( *sector_table == NULL )
 	{
-		notify_warning_printf( "%s: new amount must be greater than previous amount.\n",
-		 function );
+		sector_table_size = sizeof( libewf_sector_table_entry_t ) * amount;
 
-		return( -1 );
+		if( sector_table_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid sector table size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		*sector_table = (libewf_sector_table_t *) memory_allocate(
+		                                           sizeof( libewf_sector_table_t ) );
+
+		if( *sector_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create sector table.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *sector_table,
+		     0,
+		     sizeof( libewf_sector_table_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear sector table.\n",
+			 function );
+
+			memory_free(
+			 *sector_table );
+
+			*sector_table = NULL;
+
+			return( -1 );
+		}
+		if( amount > 0 )
+		{
+			( *sector_table )->sector = (libewf_sector_table_entry_t *) memory_allocate(
+			                                                             sector_table_size );
+
+			if( ( *sector_table )->sector == NULL )
+			{
+				notify_warning_printf( "%s: unable to create sector array.\n",
+				 function );
+
+				memory_free(
+				 *sector_table );
+
+				*sector_table = NULL;
+
+				return( -1 );
+			}
+			if( memory_set(
+			     ( *sector_table )->sector,
+			     0, 
+			     sector_table_size ) == NULL )
+			{
+				notify_warning_printf( "%s: unable to clear sector array.\n",
+				 function );
+
+				memory_free(
+				 ( *sector_table )->sector );
+				memory_free(
+				 *sector_table );
+
+				*sector_table = NULL;
+
+				return( -1 );
+			} 
+		}
+		( *sector_table )->amount = amount;
 	}
-	reallocation = memory_reallocate(
-	                sector_table->sector,
-	                ( sizeof( libewf_sector_table_entry_t ) * amount ) );
-
-	if( reallocation == NULL )
-	{
-		notify_warning_printf( "%s: unable to resize sector array.\n",
-		 function );
-
-		return( -1 );
-	}
-	sector_table->sector = (libewf_sector_table_entry_t *) reallocation;
-
-	if( memory_set(
-	     &( sector_table->sector[ sector_table->amount ] ),
-	     0, 
-	     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to clear sector array.\n",
-		 function );
-
-		return( 1 );
-	} 
-	sector_table->amount = amount;
-
 	return( 1 );
 }
 
-/* Frees memory of a sector table struct including elements
+/* Frees the sector table including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_sector_table_free(
-      libewf_sector_table_t *sector_table )
+int libewf_sector_table_free(
+     libewf_sector_table_t **sector_table )
 {
 	static char *function = "libewf_sector_table_free";
 
@@ -147,15 +132,76 @@ void libewf_sector_table_free(
 		notify_warning_printf( "%s: invalid sector table.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	if( sector_table->sector != NULL )
+	if( *sector_table != NULL )
 	{
+		if( ( *sector_table )->sector != NULL )
+		{
+			memory_free(
+			 ( *sector_table )->sector );
+		}
 		memory_free(
-		 sector_table->sector );
+		 *sector_table );
 	}
-	memory_free(
-	 sector_table );
+	return( 1 );
+}
+
+/* Resizes the sector table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_sector_table_resize(
+     libewf_sector_table_t *sector_table,
+     uint32_t amount )
+{
+	void *reallocation       = NULL;
+	static char *function    = "libewf_sector_table_resize";
+	size_t sector_table_size = 0;
+
+	if( sector_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid sector table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( sector_table->amount < amount )
+	{
+		sector_table_size = sizeof( libewf_sector_table_entry_t ) * amount;
+
+		if( sector_table_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid sector table size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		reallocation = memory_reallocate(
+				sector_table->sector,
+				sector_table_size );
+
+		if( reallocation == NULL )
+		{
+			notify_warning_printf( "%s: unable to resize sector array.\n",
+			 function );
+
+			return( -1 );
+		}
+		sector_table->sector = (libewf_sector_table_entry_t *) reallocation;
+
+		if( memory_set(
+		     &( sector_table->sector[ sector_table->amount ] ),
+		     0, 
+		     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear sector array.\n",
+			 function );
+
+			return( 1 );
+		} 
+		sector_table->amount = amount;
+	}
+	return( 1 );
 }
 
 /* Retrieves the information of a sector

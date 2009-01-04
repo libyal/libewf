@@ -56,15 +56,16 @@ struct libewf_sector_table
 	libewf_sector_table_entry_t *sector;
 };
 
-libewf_sector_table_t *libewf_sector_table_alloc(
-                        uint32_t amount );
-
-int libewf_sector_table_realloc(
-     libewf_sector_table_t *sector_table,
+int libewf_sector_table_initialize(
+     libewf_sector_table_t **sector_table,
      uint32_t amount );
 
-void libewf_sector_table_free(
-      libewf_sector_table_t *sector_table );
+int libewf_sector_table_free(
+     libewf_sector_table_t **sector_table );
+
+int libewf_sector_table_resize(
+     libewf_sector_table_t *sector_table,
+     uint32_t amount );
 
 int libewf_sector_table_get_sector(
      libewf_sector_table_t *sector_table,

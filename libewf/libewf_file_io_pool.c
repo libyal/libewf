@@ -153,15 +153,15 @@ int libewf_file_io_pool_free(
 	return( 1 );
 }
 
-/* Resized the file io pool
+/* Resizes the file io pool
  * Returns 1 if successful or -1 on error
  */
-int libewf_file_io_pool_realloc(
+int libewf_file_io_pool_resize(
      libewf_file_io_pool_t *file_io_pool,
      size_t amount_of_files )
 {
 	void *reallocation       = NULL;
-	static char *function    = "libewf_file_io_pool_realloc";
+	static char *function    = "libewf_file_io_pool_resize";
 	size_t iterator          = 0;
 	size_t file_io_pool_size = 0;
 

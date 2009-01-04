@@ -60,15 +60,16 @@ struct libewf_segment_table
 	size_t basename_length;
 };
 
-libewf_segment_table_t *libewf_segment_table_alloc(
-                         uint16_t amount );
-
-int libewf_segment_table_realloc(
-     libewf_segment_table_t *segment_table,
+int libewf_segment_table_initialize(
+     libewf_segment_table_t **segment_table,
      uint16_t amount );
 
-void libewf_segment_table_free(
-      libewf_segment_table_t *segment_table );
+int libewf_segment_table_free(
+     libewf_segment_table_t **segment_table );
+
+int libewf_segment_table_resize(
+     libewf_segment_table_t *segment_table,
+     uint16_t amount );
 
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,

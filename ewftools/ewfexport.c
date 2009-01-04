@@ -857,6 +857,7 @@ int main( int argc, char * const argv[] )
 		libewf_close(
 		 ewfcommon_libewf_handle );
 
+		return( EXIT_FAILURE );
 	}
 	if( ewfprocess_status_free(
 	     &process_status ) != 1 )

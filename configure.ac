@@ -358,15 +358,7 @@ AC_CHECK_FUNCS(
   [1]) ])
 
 dnl Date and time functions used in common/date_time.h
-AC_CHECK_FUNCS(
- [ctime],
- [],
- [AC_MSG_FAILURE(
-  [Missing function: ctime],
-  [1]) ])
-
-dnl TODO combine with check for ctime ?
-LIBEWF_FUNC_CTIME_R
+LIBEWF_CHECK_FUNC_CTIME
 
 AC_CHECK_FUNCS(
  [gmtime_r],
@@ -519,8 +511,8 @@ AC_CHECK_FUNCS(
 AC_CHECK_FUNCS([uname])
 
 dnl Check for printf conversion specifier support
-LIBEWF_PRINTF_JD
-LIBEWF_PRINTF_ZD
+LIBEWF_CHECK_PRINTF_JD
+LIBEWF_CHECK_PRINTF_ZD
 
 dnl Check for enabling libuca for Unicode string support
 AC_CHECK_HEADERS(
@@ -1106,7 +1098,7 @@ dnl Check if libewf python bindings (pyewf) should be built
 AS_IF(
 	[test "x$ac_libewf_enable_python" != xno],
 	[AM_PATH_PYTHON([2.5])
-	LIBEWF_PYTHON_DEVEL()
+	LIBEWF_CHECK_PYTHON_DEVEL()
 	AC_DEFINE(
 	 [HAVE_PYTHON],
 	 [1],

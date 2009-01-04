@@ -25,6 +25,7 @@
 
 #include <common.h>
 #include <character_string.h>
+#include <date_time.h>
 #include <system_string.h>
 #include <types.h>
 
@@ -47,6 +48,19 @@ void ewfoutput_error_fprint(
       FILE *stream,
       char *format,
       ... );
+
+void ewfoutput_timestamp_fprint(
+      FILE *stream,
+      time_t timestamp );
+
+void ewfoutput_bytes_per_second_fprint(
+      FILE *stream,
+      size64_t bytes,
+      time_t seconds );
+
+void ewfoutput_bytes_fprint(
+      FILE *stream,
+      size64_t bytes );
 
 void ewfoutput_acquiry_parameters_fprint(
       FILE *stream,
@@ -91,19 +105,6 @@ void ewfoutput_header_values_fprint(
 void ewfoutput_hash_values_fprint(
       FILE *stream,
       libewf_handle_t *handle );
-
-void ewfoutput_timestamp_fprint(
-      FILE *stream,
-      time_t timestamp );
-
-void ewfoutput_bytes_per_second_fprint(
-      FILE *stream,
-      size64_t bytes,
-      time_t seconds );
-
-void ewfoutput_bytes_fprint(
-      FILE *stream,
-      size64_t bytes );
 
 #if defined( __cplusplus )
 }

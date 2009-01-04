@@ -33,76 +33,15 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
 
-/* Allocates memory for a segment table struct
- * Returns a pointer to the new instance, NULL on error
- */
-libewf_segment_table_t *libewf_segment_table_alloc(
-                         uint16_t amount )
-{
-	libewf_segment_table_t *segment_table = NULL;
-	static char *function                 = "libewf_segment_table_alloc";
-
-	if( amount == 0 )
-	{
-		notify_warning_printf( "%s: invalid amount value cannot be zero.\n",
-		 function );
-
-		return( NULL );
-	}
-	segment_table = (libewf_segment_table_t *) memory_allocate(
-	                                            sizeof( libewf_segment_table_t ) );
-
-	if( segment_table == NULL )
-	{
-		notify_warning_printf( "%s: unable to create segment table.\n",
-		 function );
-
-		return( NULL );
-	}
-	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) memory_allocate(
-	                                                                        sizeof( libewf_segment_file_handle_t * ) * amount );
-
-	if( segment_table->segment_file_handle == NULL )
-	{
-		notify_warning_printf( "%s: unable to create dynamic segment file array.\n",
-		 function );
-
-		memory_free(
-		 segment_table );
-
-		return( NULL );
-	}
-	if( memory_set(
-	     segment_table->segment_file_handle,
-	     0, 
-	     ( amount * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to clear dynamic segment file array.\n",
-		 function );
-
-		memory_free(
-		 segment_table->segment_file_handle );
-		memory_free(
-		 segment_table );
-
-		return( NULL );
-	} 
-	segment_table->amount          = amount;
-	segment_table->basename        = NULL;
-	segment_table->basename_length = 0;
-
-	return( segment_table );
-}
-
-/* Reallocates memory for the segment table values
+/* Initialize the hash sections
  * Returns 1 if successful or -1 on error
  */
-int libewf_segment_table_realloc(
-     libewf_segment_table_t *segment_table,
+int libewf_segment_table_initialize(
+     libewf_segment_table_t **segment_table,
      uint16_t amount )
 {
-	void *reallocation    = NULL;
-	static char *function = "libewf_segment_table_realloc";
+	static char *function     = "libewf_segment_table_initialize";
+	size_t segment_table_size = 0;
 
 	if( segment_table == NULL )
 	{
@@ -111,45 +50,91 @@ int libewf_segment_table_realloc(
 
 		return( -1 );
 	}
-	if( segment_table->amount >= amount )
+	if( amount == 0 )
 	{
-		notify_warning_printf( "%s: new amount must be greater than previous amount.\n",
+		notify_warning_printf( "%s: invalid amount value cannot be zero.\n",
 		 function );
 
 		return( -1 );
 	}
-	reallocation = memory_reallocate(
-	                segment_table->segment_file_handle,
-	                ( amount * sizeof( libewf_segment_file_handle_t * ) ) );
-
-	if( reallocation == NULL )
+	if( *segment_table == NULL )
 	{
-		notify_warning_printf( "%s: unable to resize file handle array.\n",
-		 function );
+		segment_table_size = sizeof( libewf_segment_file_handle_t * ) * amount;
 
-		return( -1 );
+		if( segment_table_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid segment table size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		*segment_table = (libewf_segment_table_t *) memory_allocate(
+		                                             sizeof( libewf_segment_table_t ) );
+
+		if( *segment_table == NULL )
+		{
+			notify_warning_printf( "%s: unable to create segment table.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_set(
+		     *segment_table,
+		     0,
+		     sizeof( libewf_segment_table_t ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear segment table.\n",
+			 function );
+
+			memory_free(
+			 *segment_table );
+
+			*segment_table = NULL;
+
+			return( -1 );
+		}
+		( *segment_table )->segment_file_handle = (libewf_segment_file_handle_t **) memory_allocate(
+		                                                                             segment_table_size );
+
+		if( ( *segment_table )->segment_file_handle == NULL )
+		{
+			notify_warning_printf( "%s: unable to create segment file array.\n",
+			 function );
+
+			memory_free(
+			 segment_table );
+
+			*segment_table = NULL;
+
+			return( -1 );
+		}
+		if( memory_set(
+		     ( *segment_table )->segment_file_handle,
+		     0, 
+		     segment_table_size ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear segment file array.\n",
+			 function );
+
+			memory_free(
+			 ( *segment_table )->segment_file_handle );
+			memory_free(
+			 *segment_table );
+
+			*segment_table = NULL;
+
+			return( -1 );
+		} 
+		( *segment_table )->amount = amount;
 	}
-	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) reallocation;
-
-	if( memory_set(
-	     &( segment_table->segment_file_handle[ segment_table->amount ] ),
-	     0, 
-	     ( ( amount - segment_table->amount ) * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to clear file handle array.\n",
-		 function );
-
-		return( 1 );
-	} 
-	segment_table->amount = amount;
-
 	return( 1 );
 }
 
-/* Frees memory of a segment table struct including elements
+/* Frees the hash sections including elements
+ * Returns 1 if successful or -1 on error
  */
-void libewf_segment_table_free(
-      libewf_segment_table_t *segment_table )
+int libewf_segment_table_free(
+     libewf_segment_table_t **segment_table )
 {
 	static char *function = "libewf_segment_table_free";
 	uint16_t iterator     = 0;
@@ -159,27 +144,90 @@ void libewf_segment_table_free(
 		notify_warning_printf( "%s: invalid segment table.\n",
 		 function );
 
-		return;
+		return( -1 );
 	}
-	for( iterator = 0; iterator < segment_table->amount; iterator++ )
+	if( *segment_table != NULL )
 	{
-		if( libewf_segment_file_handle_free(
-		     &( segment_table->segment_file_handle[ iterator ] ) ) != 1 )
+		for( iterator = 0; iterator < ( *segment_table )->amount; iterator++ )
 		{
-			notify_warning_printf( "%s: unable to free segment file handle: %" PRIu16 ".\n",
-			 function, ( iterator + 1 ) );
+			if( libewf_segment_file_handle_free(
+			     &( ( *segment_table )->segment_file_handle[ iterator ] ) ) != 1 )
+			{
+				notify_warning_printf( "%s: unable to free segment file handle: %" PRIu16 ".\n",
+				 function, ( iterator + 1 ) );
+			}
 		}
-	}
-	memory_free(
-	 segment_table->segment_file_handle );
-
-	if( segment_table->basename != NULL )
-	{
 		memory_free(
-		 segment_table->basename );
+		 ( *segment_table )->segment_file_handle );
+
+		if( ( *segment_table )->basename != NULL )
+		{
+			memory_free(
+			 ( *segment_table )->basename );
+		}
+		memory_free(
+		 *segment_table );
+
+		*segment_table = NULL;
 	}
-	memory_free(
-	 segment_table );
+	return( 1 );
+}
+
+/* Resizes the segment table
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_segment_table_resize(
+     libewf_segment_table_t *segment_table,
+     uint16_t amount )
+{
+	void *reallocation        = NULL;
+	static char *function     = "libewf_segment_table_resize";
+	size_t segment_table_size = 0;
+
+	if( segment_table == NULL )
+	{
+		notify_warning_printf( "%s: invalid segment table.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->amount < amount )
+	{
+		segment_table_size = sizeof( libewf_segment_file_handle_t * ) * amount;
+
+		if( segment_table_size > (size_t) SSIZE_MAX )
+		{
+			notify_warning_printf( "%s: invalid segment table size value exceeds maximum.\n",
+			 function );
+
+			return( -1 );
+		}
+		reallocation = memory_reallocate(
+				segment_table->segment_file_handle,
+				segment_table_size );
+
+		if( reallocation == NULL )
+		{
+			notify_warning_printf( "%s: unable to resize file handle array.\n",
+			 function );
+
+			return( -1 );
+		}
+		segment_table->segment_file_handle = (libewf_segment_file_handle_t **) reallocation;
+
+		if( memory_set(
+		     &( segment_table->segment_file_handle[ segment_table->amount ] ),
+		     0, 
+		     ( ( amount - segment_table->amount ) * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
+		{
+			notify_warning_printf( "%s: unable to clear file handle array.\n",
+			 function );
+
+			return( 1 );
+		} 
+		segment_table->amount = amount;
+	}
+	return( 1 );
 }
 
 /* Builds the segment table from all segment files
@@ -399,7 +447,6 @@ int libewf_segment_table_read_open(
 	size_t filename_length                            = 0;
 	uint32_t iterator                                 = 0;
 	uint16_t segment_number                           = 0;
-	int result                                        = 0;
 
 	if( segment_table == NULL )
 	{
@@ -562,7 +609,7 @@ int libewf_segment_table_read_open(
 		{
 			if( segment_number >= segment_table->amount )
 			{
-				if( libewf_segment_table_realloc(
+				if( libewf_segment_table_resize(
 				     segment_table,
 				     ( segment_number + 1 ) ) != 1 )
 				{
@@ -598,7 +645,7 @@ int libewf_segment_table_read_open(
 			}
 			if( segment_number >= delta_segment_table->amount )
 			{
-				if( libewf_segment_table_realloc(
+				if( libewf_segment_table_resize(
 				     delta_segment_table,
 				     ( segment_number + 1 ) ) != 1 )
 				{
@@ -824,7 +871,7 @@ int libewf_segment_table_create_segment_file(
 	{
 		/* Add one additional entry because the 0 entry is used for the basename
 		 */
-		if( libewf_segment_table_realloc(
+		if( libewf_segment_table_resize(
 		     segment_table,
 		     ( segment_number + 1 ) ) != 1 )
 		{
