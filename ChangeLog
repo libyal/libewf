@@ -143,6 +143,8 @@ Next release:
   function
 * move libewf_section_read to segment file
 
+* libewf_filename_create set string and length as parameters?
+
 * Try to correct the table
   - add error flag
 

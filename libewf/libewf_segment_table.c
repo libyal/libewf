@@ -84,7 +84,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount )
 
 		return( NULL );
 	} 
-#ifndef REFACTOR
+#ifdef REFACTOR
 	for( iterator = 0; iterator < amount; iterator++ )
 	{
 		segment_table->segment_file[ iterator ] = libewf_segment_file_alloc();
@@ -162,7 +162,7 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 
 		return( 1 );
 	} 
-#ifndef REFACTOR
+#ifdef REFACTOR
 	for( iterator = segment_table->amount; iterator < amount; iterator++ )
 	{
 		segment_table->segment_file[ iterator ] = libewf_segment_file_alloc();
@@ -199,24 +199,27 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 	}
 	for( iterator = 0; iterator < segment_table->amount; iterator++ )
 	{
-		if( segment_table->segment_file[ iterator ]->filename != NULL )
+		if( segment_table->segment_file[ iterator ] != NULL )
 		{
-			libewf_common_free( segment_table->segment_file[ iterator ]->filename );
-		}
-		if( segment_table->segment_file[ iterator ]->section_list != NULL )
-		{
-			section_list_entry = segment_table->segment_file[ iterator ]->section_list->first;
-
-			while( section_list_entry != NULL )
+			if( segment_table->segment_file[ iterator ]->filename != NULL )
 			{
-				current_section_list_entry = section_list_entry;
-				section_list_entry         = section_list_entry->next;
-
-				libewf_common_free( current_section_list_entry );
+				libewf_common_free( segment_table->segment_file[ iterator ]->filename );
 			}
-			libewf_common_free( segment_table->segment_file[ iterator ]->section_list );
+			if( segment_table->segment_file[ iterator ]->section_list != NULL )
+			{
+				section_list_entry = segment_table->segment_file[ iterator ]->section_list->first;
+
+				while( section_list_entry != NULL )
+				{
+					current_section_list_entry = section_list_entry;
+					section_list_entry         = section_list_entry->next;
+
+					libewf_common_free( current_section_list_entry );
+				}
+				libewf_common_free( segment_table->segment_file[ iterator ]->section_list );
+			}
+			libewf_common_free( segment_table->segment_file[ iterator ] );
 		}
-		libewf_common_free( segment_table->segment_file[ iterator ] );
 	}
 	libewf_common_free( segment_table->segment_file );
 	libewf_common_free( segment_table );
