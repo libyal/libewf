@@ -1493,10 +1493,11 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
  * The necessary settings of the write values must have been made
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
+ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t force_write )
 {
 	EWF_CHAR *chunk_data              = NULL;
 	static char *function             = "libewf_write_chunk_data_new";
+	EWF_CRC chunk_crc                 = 0;
 	ssize_t chunk_data_size           = 0;
 	ssize_t write_count               = 0;
 	size_t write_size                 = 0;
@@ -1504,6 +1505,8 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
 	size_t remaining_chunk_size       = 0;
 	size_t compressed_chunk_data_size = 0;
 	int chunk_cache_data_used         = 0;
+	int8_t is_compressed              = 0;
+	int8_t write_crc                  = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1707,15 +1710,17 @@ ssize_t libewf_write_chunk_data_new( LIBEWF_INTERNAL_HANDLE *internal_handle, ui
  * The necessary settings of the write values must have been made
  * Returns the amount of data bytes written, 0 when no longer bytes can be written, or -1 on error
  */
-ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc, int8_t force_write )
+ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, size_t data_size, int8_t force_write )
 {
-	EWF_CHAR *chunk_data    = NULL;
-	static char *function   = "libewf_write_chunk_data_existing";
-	size_t write_size       = 0;
-	size_t chunk_data_size  = 0;
-	ssize_t read_count      = 0;
-	ssize_t write_count     = 0;
-	int8_t read_crc         = 1;
+	EWF_CHAR *chunk_data   = NULL;
+	static char *function  = "libewf_write_chunk_data_existing";
+	EWF_CRC chunk_crc      = 0;
+	size_t write_size      = 0;
+	size_t chunk_data_size = 0;
+	ssize_t read_count     = 0;
+	ssize_t write_count    = 0;
+	int8_t is_compressed   = 0;
+	int8_t write_crc       = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1871,10 +1876,7 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 		              chunk,
 		              0,
 		              internal_handle->chunk_cache->data,
-		              internal_handle->chunk_cache->allocated_size,
-		              &is_compressed,
-		              &chunk_crc,
-		              &read_crc );
+		              internal_handle->chunk_cache->allocated_size );
 
 		if( read_count <= -1 )
 		{
@@ -2247,9 +2249,6 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 			               (void *) &( (uint8_t *) buffer )[ total_write_count ],
 			               size,
 			               size,
-			               0,
-			               0,
-			               0,
 			               0 );
 		}
 		else
@@ -2261,9 +2260,6 @@ ssize_t libewf_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 			               (void *) &( (uint8_t *) buffer )[ total_write_count ],
 			               size,
 			               size,
-			               0,
-			               0,
-			               0,
 			               0 );
 		}
 
@@ -2432,9 +2428,6 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 		               internal_handle->chunk_cache->data,
 		               internal_handle->chunk_cache->amount,
 		               internal_handle->chunk_cache->amount,
-		               0,
-		               0,
-		               0,
 		               1 );
 
 		if( write_count == -1 )
