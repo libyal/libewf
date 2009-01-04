@@ -40,6 +40,9 @@ extern "C" {
 #if defined( HAVE_WCSLEN )
 #define wide_string_length( string ) \
 	wcslen( string )
+
+#define wide_string_size( string ) \
+	( string == NULL ) ? 0 : wcslen( string ) + 1
 #endif
 
 /* String compare

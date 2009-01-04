@@ -37,9 +37,12 @@
 #if defined( HAVE_LIBUCA_H )
 #include <libuca.h>
 #elif defined( HAVE_LOCAL_LIBUCA )
+#include "../libuca/libuca_byte_stream.h"
 #include "../libuca/libuca_unicode_character.h"
 #include "../libuca/libuca_utf8_string.h"
+#include "../libuca/libuca_utf16_stream.h"
 #include "../libuca/libuca_utf16_string.h"
+#include "../libuca/libuca_utf32_stream.h"
 #include "../libuca/libuca_utf32_string.h"
 #endif
 
@@ -67,6 +70,9 @@ typedef wchar_t libewf_character_t;
 
 #define string_length( string ) \
 	wide_string_length( string )
+
+#define string_size( string ) \
+	wide_string_size( string )
 
 #define string_compare( string1, string2, size ) \
 	wide_string_compare( string1, string2, size )
@@ -106,6 +112,9 @@ typedef char libewf_character_t;
 
 #define string_length( string ) \
 	narrow_string_length( string )
+
+#define string_size( string ) \
+	narrow_string_size( string )
 
 #define string_compare( string1, string2, size ) \
 	narrow_string_compare( string1, string2, size )
@@ -248,8 +257,11 @@ character_t *libewf_string_ctime(
 #define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
 	libuca_utf32_string_copy_from_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
 
-#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libuca_utf32_string_copy_to_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+#define utf16_stream_size_from_string( string, size_string ) \
+	libuca_utf16_stream_size_from_utf32( string, size_string, 0 )
+
+#define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
+	libuca_utf16_stream_copy_from_utf32( stream, size_stream, byte_order, (libuca_utf32_character_t *) string, string_size, 0 )
 
 #elif SIZEOF_WCHAR_T == 2
 #define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
@@ -258,8 +270,11 @@ character_t *libewf_string_ctime(
 #define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
 	libuca_utf16_string_copy_from_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
 
-#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libuca_utf16_string_copy_to_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+#define utf16_stream_size_from_string( string, size_string ) \
+	libuca_utf16_stream_size_from_utf16( string, size_string, 0 )
+
+#define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
+	libuca_utf16_stream_copy_from_utf16( stream, size_stream, byte_order, (libuca_utf16_character_t *) string, string_size, 0 )
 
 #else
 #error Unsupported size of wchar_t
@@ -272,8 +287,11 @@ character_t *libewf_string_ctime(
 #define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
 	libuca_utf8_string_copy_from_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
 
-#define string_copy_to_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libuca_utf8_string_copy_to_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+#define utf16_stream_size_from_string( string, size_string ) \
+	libuca_utf16_stream_size_from_utf8( string, size_string, 0 )
+
+#define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
+	libuca_utf16_stream_copy_from_utf8( stream, size_stream, byte_order, (libuca_utf8_character_t *) string, string_size, 0 )
 
 #endif
 

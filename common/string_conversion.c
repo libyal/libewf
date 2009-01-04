@@ -28,8 +28,8 @@
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
 /* Copies the source string (of wchar_t) into the destination string (of char) for a certain size
- * Terminates the destination string with \0 at ( size - 1 )
- * Returns 1 if successful, -1 on error
+ * Terminates the destination string with an end of string character
+ * Returns 1 if successful or -1 on error
  */
 int libewf_string_copy_wchar_to_char(
      char *destination,
@@ -83,8 +83,8 @@ int libewf_string_copy_wchar_to_char(
 }
 
 /* Copies the source string (of char) into the destination string (of wchar_t) for a certain size
- * Terminates the destination string with \0 at ( size - 1 )
- * Returns 1 if successful, -1 on error
+ * Terminates the destination string with an end of string character
+ * Returns 1 if successful or -1 on error
  */
 int libewf_string_copy_char_to_wchar(
      wchar_t *destination,

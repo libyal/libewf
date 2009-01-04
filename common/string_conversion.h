@@ -35,18 +35,18 @@ extern "C" {
 int libewf_string_copy_wchar_to_char(
      char *destination,
      const wchar_t *source,
-     size_t length );
+     size_t size );
 
-#define string_copy_wchar_to_char( destination, source, length ) \
-	libewf_string_copy_wchar_to_char( destination, source, length )
+#define string_copy_wchar_to_char( destination, source, size ) \
+	libewf_string_copy_wchar_to_char( destination, source, size )
 
 int libewf_string_copy_char_to_wchar(
      wchar_t *destination,
      const char *source,
-     size_t length );
+     size_t size );
 
-#define string_copy_char_to_wchar( destination, source, length ) \
-	libewf_string_copy_char_to_wchar( destination, source, length )
+#define string_copy_char_to_wchar( destination, source, size ) \
+	libewf_string_copy_char_to_wchar( destination, source, size )
 
 #endif
 

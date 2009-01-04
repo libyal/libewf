@@ -60,6 +60,9 @@ typedef wint_t system_integer_t;
 #define system_string_length( string ) \
 	wide_string_length( string )
 
+#define system_string_size( string ) \
+	wide_string_size( string )
+
 #define system_string_compare( string1, string2, size ) \
 	wide_string_compare( string1, string2, size )
 
@@ -97,6 +100,9 @@ typedef int system_integer_t;
 
 #define system_string_length( string ) \
 	narrow_string_length( string )
+
+#define system_string_size( string ) \
+	narrow_string_size( string )
 
 #define system_string_compare( string1, string2, size ) \
 	narrow_string_compare( string1, string2, size )
