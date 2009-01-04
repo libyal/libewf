@@ -142,6 +142,7 @@ Next release:
   function
 * remove ewf_compress and ewf_string.c
 * libewf_section_list_append add section_type length parameter
+* pass media values struct to section volume/data functions
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -156,6 +157,10 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071119
+* worked on refactoring to use segment file struct in section
+* changed stored delta segment number to 1 ... x count instead of 0 ... x count
 
 Version: 20071118
 * refactored segment table to a table of segment file **

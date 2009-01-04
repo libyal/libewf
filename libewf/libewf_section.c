@@ -350,10 +350,13 @@ ssize_t libewf_section_compressed_string_read( LIBEWF_SEGMENT_FILE *segment_file
  */
 ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_file, EWF_CHAR *section_type, size_t section_type_length, EWF_CHAR *uncompressed_string, size_t uncompressed_string_size, int8_t compression_level )
 {
-	EWF_CHAR *compressed_string = NULL;
-	static char *function       = "libewf_section_compressed_string_write";
-	ssize_t section_write_count = 0;
-	ssize_t write_count         = 0;
+	EWF_CHAR *compressed_string   = NULL;
+	EWF_CHAR *reallocation        = NULL;
+	static char *function         = "libewf_section_compressed_string_write";
+	size_t compressed_string_size = 0;
+	ssize_t section_write_count   = 0;
+	ssize_t write_count           = 0;
+	int result                    = 0;
 
 	if( segment_file == NULL )
 	{
@@ -376,15 +379,52 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_SEGMENT_FILE *segment_fil
 
 		return( -1 );
 	}
-	compressed_string = ewf_string_compress(
-	                     uncompressed_string,
-	                     &uncompressed_string_size,
-	                     compression_level );
+	compressed_string_size = uncompressed_string_size;
+	compressed_string      = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * compressed_string_size );
 
 	if( compressed_string == NULL )
 	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create compress string.\n",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_compress(
+	          (uint8_t *) compressed_string,
+	          &compressed_string_size,
+	          (uint8_t *) uncompressed_string,
+	          uncompressed_string_size,
+	          compression_level );
+
+	if( ( result == -1 )
+	 && ( compressed_string_size > 0 ) )
+	{
+		reallocation = (EWF_CHAR *) libewf_common_realloc( compressed_string, compressed_string_size );
+
+		if( reallocation == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate compressed string.\n",
+			 function );
+
+			libewf_common_free( compressed_string );
+
+			return( -1 );
+		}
+		compressed_string = reallocation;
+
+		result = libewf_compress(
+		          (uint8_t *) compressed_string,
+		          &compressed_string_size,
+		          (uint8_t *) uncompressed_string,
+		          uncompressed_string_size,
+		          compression_level );
+	}
+	if( result == -1 )
+	{
 		LIBEWF_WARNING_PRINT( "%s: unable to compress string.\n",
 		 function );
+
+		libewf_common_free( compressed_string );
 
 		return( -1 );
 	}
@@ -3824,6 +3864,8 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 
 		return( -1 );
 	}
+	/* The chunk value is stored + 1 count in the file
+	 */
 	if( libewf_endian_convert_32bit( &chunk, delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk value.\n",
@@ -3831,6 +3873,8 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 
 		return( -1 );
 	}
+	chunk -= 1;
+
 	calculated_crc = ewf_crc_calculate( &delta_chunk_header, ( EWFX_DELTA_CHUNK_HEADER_SIZE - EWF_CRC_SIZE ), 1 );
 
 	if( libewf_endian_convert_32bit( &stored_crc, delta_chunk_header.crc ) != 1 )
@@ -3858,6 +3902,13 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_SEGMENT_FILE *segment_file, off6
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 		 function );
+
+		return( -1 );
+	}
+	if( chunk >= offset_table->amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid delta chunk: %" PRIu32 " value outside offset table.\n",
+		 function, chunk );
 
 		return( -1 );
 	}
@@ -3900,7 +3951,9 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( chunk, delta_chunk_header.chunk ) != 1 )
+	/* The chunk value is stored + 1 count in the file
+	 */
+	if( libewf_endian_revert_32bit( ( chunk + 1 ), delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk value.\n" );
 
@@ -3937,7 +3990,7 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 	               section_size,
 	               start_offset );
 
-	if( section_write_count != (ssize_t) EWF_SECTION_SIZE )
+	if( write_count != (ssize_t) EWF_SECTION_SIZE )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
 		 function );
