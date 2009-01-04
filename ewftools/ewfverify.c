@@ -367,7 +367,7 @@ int main( int argc, char * const argv[] )
 
 	if( calculate_md5 == 1 )
 	{
-		stored_md5_hash_result = libewf_get_stored_md5_hash(
+		stored_md5_hash_result = libewf_get_hash_value_md5(
 					  handle,
 					  stored_md5_hash_string,
 					  LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );

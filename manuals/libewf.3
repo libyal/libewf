@@ -1,4 +1,4 @@
-.Dd September 5, 2007
+.Dd September 8, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -20,8 +20,6 @@
 .Fn libewf_open "char * const filenames[], uint16_t file_amount, uint8_t flags"
 .Ft off64_t
 .Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off64_t offset"
-.Ft int
-.Fn libewf_raw_update_md5 "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
 .Fn libewf_raw_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc"
 .Ft ssize_t
@@ -70,8 +68,6 @@
 .Fn libewf_set_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk"
 .Ft int
 .Fn libewf_set_bytes_per_sector "LIBEWF_HANDLE *handle, uint32_t bytes_per_sector"
-.Ft int
-.Fn libewf_set_media_values "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector"
 .Ft int
 .Fn libewf_set_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
 .Ft int
@@ -129,6 +125,10 @@ When the library was compiled with narrow character support (default) the follow
 .Ft int
 .Fn libewf_get_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
+.Fn libewf_get_hash_value_md5 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Ft int
+.Fn libewf_get_hash_value_sha1 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Ft int
 .Fn libewf_set_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
 .Fn libewf_set_header_value_case_number "LIBEWF_HANDLE *handle, char *case_number, size_t length"
@@ -155,9 +155,9 @@ When the library was compiled with narrow character support (default) the follow
 .Ft int
 .Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
-.Fn libewf_get_stored_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
+.Fn libewf_set_hash_value_md5 "LIBEWF_HANDLE *handle, char *value, size_t length"
 .Ft int
-.Fn libewf_get_calculated_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
+.Fn libewf_set_hash_value_sha1 "LIBEWF_HANDLE *handle, char *value, size_t length"
 .Pp
 When the library was compiled with wide character support the following functions are available instead of the narrow character functions
 .Ft const wchar_t *
@@ -189,6 +189,10 @@ When the library was compiled with wide character support the following function
 .Ft int
 .Fn libewf_get_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
 .Ft int
+.Fn libewf_get_hash_value_md5 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_get_hash_value_sha1 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Ft int
 .Fn libewf_set_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
 .Ft int
 .Fn libewf_set_header_value_case_number "LIBEWF_HANDLE *handle, wchar_t *case_number, size_t length"
@@ -215,9 +219,9 @@ When the library was compiled with wide character support the following function
 .Ft int
 .Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
 .Ft int
-.Fn libewf_get_stored_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
+.Fn libewf_set_hash_value_md5 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
 .Ft int
-.Fn libewf_get_calculated_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
+.Fn libewf_set_hash_value_sha1 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
 .Pp
 When wide character support functions like wmain and wopen are present and libewf is compiled with
 .Ar HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
@@ -255,14 +259,6 @@ The
 function needs to be called after writing a set of EWF files without knowing the input size upfront, e.g. reading from a pipe.
 .Fn libewf_write_finalize
 will the necessary correction to the set of EWF files.
-Note that certain information like the calculated MD5 has is not available if
-.Fn libewf_write_finalize
-has not been issued.
-.Pp
-The
-.Fn libewf_raw_update_md5
-function can be used to update the internal MD5 for media data
-when reading from or writing to 'raw' chunks to a set of EWF files.
 .Pp
 The
 .Fn libewf_raw_read_prepare_buffer ,

@@ -1,5 +1,5 @@
 /*
- * libewf MD5 support
+ * crypographic hash for ewftools
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,48 +31,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_MD5_H )
-#define _LIBEWF_MD5_H
+#if !defined( _EWFDIGEST_HASH_H )
+#define _EWFDIGEST_HASH_H
 
-#include "libewf_includes.h"
-
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
-#include <openssl/md5.h>
-#else
-#include "libewf_digest_context.h"
-#endif
+#include "../libewf/libewf_includes.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_MD5_H )
+#define EWFDIGEST_HASH			ewfdigest_hash_t
+#define EWFDIGEST_HASH_SIZE_MD5		(size_t) ( sizeof( EWFDIGEST_HASH ) * 16 )
+#define EWFDIGEST_HASH_SIZE_SHA1	(size_t) ( sizeof( EWFDIGEST_HASH ) * 20 )
 
-#define LIBEWF_MD5_CONTEXT	MD5_CTX
-
-#define libewf_md5_initialize( context ) \
-	MD5_Init( context )
-
-#define libewf_md5_update( context, buffer, size ) \
-	MD5_Update( context, buffer, size )
-
-#define libewf_md5_finalize( context, hash, size ) \
-	MD5_Final( hash, context )
-
-#else
-
-#define LIBEWF_MD5_CONTEXT	LIBEWF_DIGEST_CONTEXT
-
-#define libewf_md5_initialize( context ) \
-	libewf_digest_context_initialize( context, LIBEWF_DIGEST_CONTEXT_TYPE_MD5 )
-
-#define libewf_md5_update( context, buffer, size ) \
-	libewf_digest_context_update( context, buffer, size )
-
-#define libewf_md5_finalize( context, hash, size ) \
-	libewf_digest_context_finalize( context, hash, size )
-
-#endif
+typedef uint8_t ewfdigest_hash_t;
 
 #if defined( __cplusplus )
 }

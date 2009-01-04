@@ -41,8 +41,7 @@ extern "C" {
 #endif
 
 #define EWF_DIGEST_HASH			ewf_digest_hash_t
-#define EWF_DIGEST_HASH_SIZE_MD5	(uint32_t) ( sizeof( EWF_DIGEST_HASH ) * 16 )
-#define EWF_DIGEST_HASH_SIZE_SHA1	(uint32_t) ( sizeof( EWF_DIGEST_HASH ) * 20 )
+#define EWF_DIGEST_HASH_SIZE_MD5	(size_t) ( sizeof( EWF_DIGEST_HASH ) * 16 )
 
 typedef uint8_t ewf_digest_hash_t;
 

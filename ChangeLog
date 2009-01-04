@@ -141,10 +141,6 @@ TODO
 * check usage of stderr and stdout in ewftools
 * fix libewf_debug_read_section to handle a size of size64_t
 
-* remove libewf_set_media_values
-* remove get calculated md5 hash function
-* remove internal handle calculate md5
-
 * allow to set the delta file path
 * change use of stdout and stderr in ewfexport
 * check chunk size for >2Gb table offsets
@@ -152,8 +148,16 @@ TODO
   because the MSB is normally used to mark if the chunk is compressed
 * fix >2Gb segment file write support for chunk offset value overflow
 
-Version: 20070907
+Version: 20070908
 * worked on remove of MD5 calculation from library
+  - implemented MD5 calculation in ewfcommon for ewfacquire and ewfacquirestream
+  - removed libewf_set_media_values, calculated_md5_hash and libewf_raw_update_md5 from API
+  - removed digest context and md5 from library
+  - removed calculated md5 hash and md5 context from internal handle
+  - added macros libewf_get_hash_value_md5 and libewf_get_hash_value_sha1 to API
+  - added macros libewf_set_hash_value_md5 and libewf_set_hash_value_sha1 to API
+  - removed libewf_get_md5_hash from API
+  - removed several libewf_internal_handle_get_ and libewf_internal_handle_set_ functions
 
 Version: 20070905
 * worked on remove of MD5 calculation from library

@@ -83,8 +83,7 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->xhash_size                = 0;
 	internal_handle->header_values             = NULL;
 	internal_handle->hash_values               = NULL;
-	internal_handle->stored_md5_hash           = NULL;
-	internal_handle->calculated_md5_hash       = NULL;
+	internal_handle->md5_hash                  = NULL;
 	internal_handle->acquiry_error_sectors     = NULL;
 	internal_handle->acquiry_amount_of_errors  = 0;
 	internal_handle->current_chunk             = 0;
@@ -144,21 +143,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		LIBEWF_WARNING_PRINT( "%s: unable to create media sub handle.\n",
 		 function );
 
-		libewf_chunk_cache_free( internal_handle->chunk_cache );
-		libewf_segment_table_free( internal_handle->segment_table );
-		libewf_segment_table_free( internal_handle->delta_segment_table );
-		libewf_common_free( internal_handle );
-
-		return( NULL );
-	}
-	/* Initialize the MD5 context
-	 */
-	if( libewf_md5_initialize( &internal_handle->md5_context ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize MD5 context.\n",
-		 function );
-
-		libewf_internal_handle_media_free( internal_handle->media );
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
 		libewf_segment_table_free( internal_handle->segment_table );
 		libewf_segment_table_free( internal_handle->delta_segment_table );
@@ -264,8 +248,7 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	{
 		libewf_hash_values_free( internal_handle->hash_values );
 	}
-	libewf_common_free( internal_handle->stored_md5_hash );
-	libewf_common_free( internal_handle->calculated_md5_hash );
+	libewf_common_free( internal_handle->md5_hash );
 
 	if( internal_handle->chunk_cache != NULL )
 	{
@@ -440,37 +423,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTER
 	return( internal_handle );
 }
 
-/* Updates the internal MD5 for raw access mode
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_raw_update_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, void *buffer, size_t size )
-{
-	static char *function = "libewf_internal_handle_raw_update_md5";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( buffer == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
-		 function );
-
-		return( -1 );
-	}
-        if( libewf_md5_update( &internal_handle->md5_context, buffer, size ) != 1 )
-        {
-                LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
-                 function );
-
-                return( -1 );
-        }
-	return( 1 );
-}
-
 /* Check if the header value is set
  * Returns 0 if not set, 1 if set, or -1 on error
  */
@@ -539,123 +491,6 @@ int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_han
 	return( (uint8_t) ( internal_handle->xhash != NULL ) );
 }
 
-/* Returns the media type value, or -1 on error
- */
-int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_media_type";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media->media_type > (uint8_t) INT8_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media type value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( (int8_t) internal_handle->media->media_type );
-}
-
-/* Returns the media flags value, or -1 on error
- */
-int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_media_flags";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media->media_flags > (uint8_t) INT8_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media flags value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( (int8_t) internal_handle->media->media_flags );
-}
-
-/* Returns the volume type value, or -1 on error
- */
-int8_t libewf_internal_handle_get_volume_type( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_volume_type";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->media->media_flags & 0x02 ) == 0 )
-	{
-		return( (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL );
-	}
-	return( (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL );
-}
-
-/* Returns the format value, or -1 on error
- */
-int8_t libewf_internal_handle_get_format( LIBEWF_INTERNAL_HANDLE *internal_handle )
-{
-	static char *function = "libewf_internal_handle_get_format";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->format > (uint8_t) INT8_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid format value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( (int8_t) internal_handle->format );
-}
-
 /* Returns the maximum amount of supported segment files to write, or -1 on error
  */
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle )
@@ -688,76 +523,6 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 
 		return( -1 );
 	}
-}
-
-/* Retrieves the header value specified by identifier
- * Returns 1 if successful, 0 if value not present, -1 on error
- */
-int libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
-{
-	static char *function = "libewf_internal_handle_get_header_value";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( identifier == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid indentifier.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( value == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->header_values == NULL )
-	{
-		return( 0 );
-	}
-	return( libewf_header_values_get_value( internal_handle->header_values, identifier, value, length ) );
-}
-
-/* Retrieves the hash value specified by identifier
- * Returns 1 if successful, 0 if value not present, -1 on error
- */
-int libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
-{
-	static char *function = "libewf_internal_handle_get_hash_value";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( identifier == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid indentifier.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( value == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->hash_values == NULL )
-	{
-		return( 0 );
-	}
-	return( libewf_hash_values_get_value( internal_handle->hash_values, identifier, value, length ) );
 }
 
 /* Sets the header and its byte size
@@ -843,9 +608,9 @@ int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, E
 /* Sets the MD5 hash value
  * Returns 1 if successful, -1 on error
  */
-int libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash )
+int libewf_internal_handle_set_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash )
 {
-	static char *function = "libewf_internal_handle_set_stored_md5_hash";
+	static char *function = "libewf_internal_handle_set_md5_hash";
 	size_t size           = EWF_DIGEST_HASH_SIZE_MD5;
 
 	if( internal_handle == NULL )
@@ -855,68 +620,23 @@ int libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal
 
 		return( -1 );
 	}
-	internal_handle->stored_md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( size );
+	internal_handle->md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( size );
 
-	if( internal_handle->stored_md5_hash == NULL )
+	if( internal_handle->md5_hash == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create MD5 hash.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy( internal_handle->stored_md5_hash, md5_hash, size ) == NULL )
+	if( libewf_common_memcpy( internal_handle->md5_hash, md5_hash, size ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
 		 function );
 
-		libewf_common_free( internal_handle->stored_md5_hash );
+		libewf_common_free( internal_handle->md5_hash );
 
-		internal_handle->stored_md5_hash = NULL;
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Returns 1 if the GUID is set, or -1 on error
- */
-int libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size )
-{
-	static char *function = "libewf_internal_handle_set_guid";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( guid == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid guid.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size < 16 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: guid too small.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->write != NULL )
-	 && ( internal_handle->write->values_initialized != 0 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized, therefore media values cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_common_memcpy( internal_handle->guid, guid, 16 ) == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set guid.\n",
-		 function );
+		internal_handle->md5_hash = NULL;
 
 		return( -1 );
 	}
@@ -1118,78 +838,6 @@ int libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *i
 	internal_handle->write->input_write_size = input_write_size;
 
 	return( 1 );
-}
-
-/* Sets the header value specified by the identifier
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
-{
-	static char *function = "libewf_internal_handle_set_header_value";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( identifier == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->header_values == NULL )
-	{
-		internal_handle->header_values = libewf_header_values_alloc();
-
-		if( internal_handle->header_values == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( libewf_header_values_set_value( internal_handle->header_values, identifier, value, length ) );
-}
-
-/* Sets the hash value specified by the identifier
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
-{
-	static char *function = "libewf_internal_handle_set_hash_value";
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( identifier == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->hash_values == NULL )
-	{
-		internal_handle->hash_values = libewf_hash_values_alloc();
-
-		if( internal_handle->hash_values == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create hash values.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( libewf_hash_values_set_value( internal_handle->hash_values, identifier, value, length ) );
 }
 
 /* Sets the value to swap byte pairs internally, used by both read and write

@@ -27,7 +27,6 @@ libewf_la_SOURCES = \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
 	libewf_common.c libewf_common.h \
 	libewf_debug.c libewf_debug.h \
-	libewf_digest_context.c libewf_digest_context.h \
 	libewf_endian.c libewf_endian.h \
 	libewf_error_sector.h \
 	libewf_file.c libewf_file.h \
@@ -35,7 +34,6 @@ libewf_la_SOURCES = \
 	libewf_header_values.c libewf_header_values.h \
 	libewf_includes.h \
 	libewf_internal_handle.c libewf_internal_handle.h \
-	libewf_md5.h \
 	libewf_notify.c libewf_notify.h \
 	libewf_offset_table.c libewf_offset_table.h \
 	libewf_read.c libewf_read.h \

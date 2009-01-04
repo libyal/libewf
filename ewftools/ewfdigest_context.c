@@ -201,7 +201,7 @@ int ewfdigest_context_update( EWFDIGEST_CONTEXT* digest_context, uint8_t *buffer
 /* Finalizes the digest context
  * Returns 1 if successful, 0 on failure, -1 on error
  */
-int ewfdigest_context_finalize( EWFDIGEST_CONTEXT* digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size )
+int ewfdigest_context_finalize( EWFDIGEST_CONTEXT* digest_context, EWFDIGEST_HASH *digest_hash, size_t *size )
 {
 	static char *function = "ewfdigest_context_finalize";
 

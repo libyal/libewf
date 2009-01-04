@@ -1080,9 +1080,9 @@ LIBEWF_CHAR *ewfcommon_get_user_input_fixed_value( FILE *stream, LIBEWF_CHAR *re
  */
 int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_string, size_t size )
 {
-	EWF_DIGEST_HASH *md5_hash = NULL;
-	static char *function     = "ewfcommon_get_md5_hash";
-	size_t md5_hash_size      = EWF_DIGEST_HASH_SIZE_MD5;
+	EWFDIGEST_HASH *md5_hash = NULL;
+	static char *function    = "ewfcommon_get_md5_hash";
+	size_t md5_hash_size     = EWFDIGEST_HASH_SIZE_MD5;
 
 	if( md5_context == NULL )
 	{
@@ -1105,7 +1105,7 @@ int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_s
 
 		return( -1 );
 	}
-	md5_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( md5_hash_size );
+	md5_hash = (EWFDIGEST_HASH *) libewf_common_alloc( md5_hash_size );
 
 	if( md5_hash == NULL )
 	{
@@ -1115,7 +1115,7 @@ int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_s
 		return( -1 );
 	}
 	if( ( ewfmd5_finalize( md5_context, md5_hash, &md5_hash_size ) != 1 )
-	 || ( md5_hash_size != EWF_DIGEST_HASH_SIZE_MD5 ) )
+	 || ( md5_hash_size != EWFDIGEST_HASH_SIZE_MD5 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash.\n",
 		 function );
@@ -1128,7 +1128,7 @@ int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_s
 	     md5_hash_string,
 	     size,
 	     md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) != 1 )
+	     EWFDIGEST_HASH_SIZE_MD5 ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
 		 function );
@@ -1147,9 +1147,9 @@ int ewfcommon_get_md5_hash( EWFMD5_CONTEXT *md5_context, LIBEWF_CHAR *md5_hash_s
  */
 int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_hash_string, size_t size )
 {
-	EWF_DIGEST_HASH *sha1_hash = NULL;
-	static char *function      = "ewfcommon_get_sha1_hash";
-	size_t sha1_hash_size      = EWF_DIGEST_HASH_SIZE_SHA1;
+	EWFDIGEST_HASH *sha1_hash = NULL;
+	static char *function     = "ewfcommon_get_sha1_hash";
+	size_t sha1_hash_size     = EWFDIGEST_HASH_SIZE_SHA1;
 
 	if( sha1_context == NULL )
 	{
@@ -1172,7 +1172,7 @@ int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_ha
 
 		return( -1 );
 	}
-	sha1_hash = (EWF_DIGEST_HASH *) libewf_common_alloc( sha1_hash_size );
+	sha1_hash = (EWFDIGEST_HASH *) libewf_common_alloc( sha1_hash_size );
 
 	if( sha1_hash == NULL )
 	{
@@ -1182,7 +1182,7 @@ int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_ha
 		return( -1 );
 	}
 	if( ( ewfsha1_finalize( sha1_context, sha1_hash, &sha1_hash_size ) != 1 )
-	 || ( sha1_hash_size != EWF_DIGEST_HASH_SIZE_SHA1 ) )
+	 || ( sha1_hash_size != EWFDIGEST_HASH_SIZE_SHA1 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash.\n",
 		 function );
@@ -1195,7 +1195,7 @@ int ewfcommon_get_sha1_hash( EWFSHA1_CONTEXT *sha1_context, LIBEWF_CHAR *sha1_ha
 	     sha1_hash_string,
 	     size,
 	     sha1_hash,
-	     EWF_DIGEST_HASH_SIZE_SHA1 ) != 1 )
+	     EWFDIGEST_HASH_SIZE_SHA1 ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set SHA1 hash string.\n",
 		 function );
@@ -1788,7 +1788,7 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
 	if( ( stored_md5_hash_string != NULL )
-	 && ( libewf_get_stored_md5_hash(
+	 && ( libewf_get_hash_value_md5(
 	       handle,
 	       stored_md5_hash_string,
 	       LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
@@ -2856,20 +2856,25 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 			}
 			break;
 		}
-#if defined( HAVE_RAW_ACCESS )
-		if( libewf_raw_update_md5(
-		     handle,
-		     data,
-		     (size_t) read_count ) != 1 )
+		if( calculate_md5 == 1 )
 		{
-			LIBEWF_WARNING_PRINT( "%s: unable to update the internal MD5.\n",
-			 function );
-
-			libewf_common_free( data );
-			libewf_common_free( compressed_data );
-
-			return( -1 );
+/* MSVS C++ does not allow pre compiler macro in macro defintions
+ */
+			ewfmd5_update(
+			 &md5_context,
+			 data,
+			 read_count );
 		}
+		if( calculate_sha1 == 1 )
+		{
+/* MSVS C++ does not allow pre compiler macro in macro defintions
+ */
+			ewfsha1_update(
+			 &sha1_context,
+			 data,
+			 read_count );
+		}
+#if defined( HAVE_RAW_ACCESS )
 		compressed_size = 2 * buffer_size;
 
 		raw_write_count = libewf_raw_write_prepare_buffer(
@@ -2892,28 +2897,6 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 
 			return( -1 );
 		}
-#endif
-
-		if( calculate_md5 == 1 )
-		{
-/* MSVS C++ does not allow pre compiler macro in macro defintions
- */
-			ewfmd5_update(
-			 &md5_context,
-			 data,
-			 read_count );
-		}
-		if( calculate_sha1 == 1 )
-		{
-/* MSVS C++ does not allow pre compiler macro in macro defintions
- */
-			ewfsha1_update(
-			 &sha1_context,
-			 data,
-			 read_count );
-		}
-#if defined( HAVE_RAW_ACCESS )
-
 		if( is_compressed == 1 )
 		{
 			raw_write_data = compressed_data;
@@ -2995,9 +2978,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		{
 			/* The MD5 hash must be set before write finalized is used
 			 */
-			if( libewf_set_hash_value(
+			if( libewf_set_hash_value_md5(
 			     handle,
-			     _S_LIBEWF_CHAR( "MD5" ),
 			     md5_hash_string,
 			     md5_hash_string_length ) != 1 )
 			{
@@ -3011,9 +2993,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 		{
 			/* The SHA1 hash must be set before write finalized is used
 			 */
-			if( libewf_set_hash_value(
+			if( libewf_set_hash_value_sha1(
 			     handle,
-			     _S_LIBEWF_CHAR( "SHA1" ),
 			     sha1_hash_string,
 			     sha1_hash_string_length ) != 1 )
 			{

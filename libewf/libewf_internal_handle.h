@@ -40,7 +40,6 @@
 #include "libewf_error_sector.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
-#include "libewf_md5.h"
 #include "libewf_offset_table.h"
 #include "libewf_segment_table.h"
 
@@ -147,17 +146,9 @@ struct libewf_internal_handle
 	 */
 	LIBEWF_HASH_VALUES *hash_values;
 
-	/* The MD5 digest context
+	/* The MD5 hash of the data
 	 */
-	LIBEWF_MD5_CONTEXT md5_context;
-
-	/* The stored MD5 hash of the data
-	 */
-	EWF_DIGEST_HASH *stored_md5_hash;
-
-	/* The calculated MD5 hash of the data
-	 */
-	EWF_DIGEST_HASH *calculated_md5_hash;
+	EWF_DIGEST_HASH *md5_hash;
 
 	/* The sectors with acquiry read errors
 	 */
@@ -373,31 +364,19 @@ void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_wri
 
 LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_chunk_cache_realloc( LIBEWF_INTERNAL_HANDLE *internal_handle, size_t size );
 
-int libewf_internal_handle_raw_update_md5( LIBEWF_INTERNAL_HANDLE *internal_handle, void *buffer, size_t size );
-
 int8_t libewf_internal_handle_is_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_is_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_is_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int8_t libewf_internal_handle_get_volume_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int8_t libewf_internal_handle_get_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
-int libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-int libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size );
 int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size );
 int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xheader, size_t size );
 int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xhash, size_t size );
 
-int libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash );
-
-int libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
+int libewf_internal_handle_set_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash );
 
 int libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
 int libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );
@@ -405,9 +384,6 @@ int libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *interna
 int libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_flags );
 int libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t format );
 int libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size );
-
-int libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-int libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
 int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );
 

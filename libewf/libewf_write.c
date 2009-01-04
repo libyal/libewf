@@ -1188,21 +1188,6 @@ ssize_t libewf_write_new_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t 
 
 				return( -1 );
 			}
-			/* Check if the MD5 of the chunk needs to be calculated
-			 */
-			if( internal_handle->calculate_md5 != 0 )
-			{
-				if( libewf_md5_update( &internal_handle->md5_context, chunk_data, write_size ) != 1 )
-				{
-					LIBEWF_WARNING_PRINT( "%s: unable to update MD5 context.\n",
-					 function );
-
-					if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-					{
-						return( -1 );
-					}
-				}
-			}
 			chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
 
 			/* The compressed data size contains the maximum allowed buffer size
