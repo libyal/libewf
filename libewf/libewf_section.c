@@ -322,20 +322,10 @@ ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, header, size ); );
 
-	if( libewf_internal_handle_is_set_header( internal_handle ) == 0 )
+	if( internal_handle->header != NULL )
 	{
-		if( libewf_internal_handle_set_header( internal_handle, header, size ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set header in handle.\n",
-			 function );
-
-			libewf_common_free( header );
-
-			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
+		internal_handle->header      = header;
+		internal_handle->header_size = size;
 	}
 	else
 	{
@@ -400,20 +390,10 @@ ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, header2, size ); );
 
-	if( libewf_internal_handle_is_set_header2( internal_handle ) == 0 )
+	if( internal_handle->header2 != NULL )
 	{
-		if( libewf_internal_handle_set_header2( internal_handle, header2, size ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set header2 in handle.\n",
-			 function );
-
-			libewf_common_free( header2 );
-
-			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
+		internal_handle->header2      = header2;
+		internal_handle->header2_size = size;
 	}
 	else
 	{
@@ -3275,20 +3255,10 @@ ssize_t libewf_section_xheader_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, xheader, size ); );
 
-	if( libewf_internal_handle_is_set_xheader( internal_handle ) == 0 )
+	if( internal_handle->xheader != NULL )
 	{
-		if( libewf_internal_handle_set_xheader( internal_handle, xheader, size ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set xheader in handle.\n",
-			 function );
-
-			libewf_common_free( xheader );
-
-			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
+		internal_handle->xheader      = xheader;
+		internal_handle->xheader_size = size;
 	}
 	else
 	{
@@ -3353,20 +3323,10 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, xhash, size ); );
 
-	if( libewf_internal_handle_is_set_xhash( internal_handle ) == 0 )
+	if( internal_handle->xhash != NULL )
 	{
-		if( libewf_internal_handle_set_xhash( internal_handle, xhash, size ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to set xhash in handle.\n",
-			 function );
-
-			libewf_common_free( xhash );
-
-			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
-			{
-				return( -1 );
-			}
-		}
+		internal_handle->xhash      = xhash;
+		internal_handle->xhash_size = size;
 	}
 	else
 	{
