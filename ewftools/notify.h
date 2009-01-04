@@ -37,9 +37,6 @@ void notify_set_values(
       FILE *stream,
       int verbose );
 
-#define notify_set_values \
-	notify_set_values
-
 void notify_printf(
       char *format,
       ... );

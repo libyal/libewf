@@ -21,66 +21,12 @@
  */
 
 #include <common.h>
-#include <date_time.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
 #include "character_string.h"
-
-/* Duplicates a string
- * Size should include the size of the end of string character
- * Returns the pointer to the duplicate string, or NULL on error
- */
-character_t *string_duplicate(
-              character_t *string,
-              size_t size )
-{
-	character_t *duplicate = NULL;
-	static char *function  = "string_duplicate";
-
-	if( string == NULL )
-	{
-		return( NULL );
-	}
-	if( size == 0 )
-	{
-		return( NULL );
-	}
-	if( ( sizeof( character_t ) * size ) > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( NULL );
-	}
-	duplicate = (character_t *) memory_allocate(
-	                             sizeof( character_t ) * size );
-
-	if( duplicate == NULL )
-	{
-		notify_warning_printf( "%s: unable to create duplicate string.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( string_copy(
-	     duplicate,
-	     string,
-	     size ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to set duplicate string.\n",
-		 function );
-
-		memory_free(
-		 duplicate );
-
-		return( NULL );
-	}
-	duplicate[ size - 1 ] = (character_t) '\0';
-
-	return( duplicate );
-}
+#include "date_time.h"
+#include "notify.h"
 
 #if defined( string_to_signed_long_long )
 

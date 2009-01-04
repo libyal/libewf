@@ -22,7 +22,6 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
 #include <errno.h>
@@ -36,6 +35,7 @@
 #endif
 
 #include "glob.h"
+#include "notify.h"
 #include "system_string.h"
 
 #if !defined( HAVE_GLOB_H )
@@ -209,11 +209,12 @@ int glob_resolve(
 	system_character_t find_name[ _MAX_FNAME ];
 	system_character_t find_extension[ _MAX_EXT ];
 
-	intptr_t find_handle  = 0;
+	intptr_t find_handle    = 0;
 #endif
-	static char *function = "glob_resolve";
-	int globs_found       = 0;
-	int iterator          = 0;
+	static char *function   = "glob_resolve";
+	size_t find_path_length = 0;
+	int globs_found         = 0;
+	int iterator            = 0;
 
 	if( glob == NULL )
 	{
@@ -278,10 +279,35 @@ int glob_resolve(
 
 					return( -1 );
 				}
-				glob->result[ glob->amount_of_results - 1 ] = system_string_duplicate(
-				                                               find_path,
-				                                               system_string_length(
-				                                                find_path ) );
+				find_path_length = system_string_length(
+				                    find_path );
+
+				glob->result[ glob->amount_of_results - 1 ] = (system_character_t *) memory_allocate(
+				                                                                      sizeof( system_character_t ) * ( find_path_length + 1 ) );
+
+				if( glob->result[ glob->amount_of_results - 1 ] == NULL )
+				{
+					notify_warning_printf( "%s: unable to create glob result.\n",
+					 function );
+
+					return( -1 );
+				}
+				if( system_string_copy(
+				     glob->result[ glob->amount_of_results - 1 ],
+				     find_path,
+				     find_path_length ) == NULL )
+				{
+					notify_warning_printf( "%s: unable to set glob result.\n",
+					 function );
+
+					memory_free(
+					 glob->result[ glob->amount_of_results - 1 ] );
+
+					glob->result[ glob->amount_of_results - 1 ] = NULL;
+
+					return( -1 );
+				}
+				( glob->result[ glob->amount_of_results - 1 ] )[ find_path_length ] = 0;
 
 				globs_found++;
 

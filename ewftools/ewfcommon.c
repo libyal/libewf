@@ -618,8 +618,11 @@ ssize32_t ewfcommon_read_input(
 			              bytes_to_read );
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf( "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
-			 function, ( chunk_amount + 1 ), read_count );
+			notify_verbose_printf(
+			 "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
+			 function,
+			 chunk_amount + 1,
+			 read_count );
 #endif
 
 			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
@@ -638,7 +641,8 @@ ssize32_t ewfcommon_read_input(
 					if( error_string != NULL )
 					{
 						notify_warning_printf( "%s: error reading data: %s.\n",
-						 function, error_string );
+						 function,
+						 error_string );
 
 						memory_free(
 						 error_string );
@@ -685,8 +689,11 @@ ssize32_t ewfcommon_read_input(
 					if( current_read_offset != current_calculated_offset )
 					{
 #if defined( HAVE_VERBOSE_OUTPUT )
-						notify_verbose_printf( "%s: correcting offset drift current: %" PRIjd ", calculated: %" PRIjd ".\n",
-						 function, current_read_offset, current_calculated_offset );
+						notify_verbose_printf(
+						 "%s: correcting offset drift current: %" PRIjd ", calculated: %" PRIjd ".\n",
+						 function,
+						 current_read_offset,
+						 current_calculated_offset );
 #endif
 
 						if( current_read_offset < current_calculated_offset )
@@ -743,8 +750,11 @@ ssize32_t ewfcommon_read_input(
 					return( 0 );
 				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf( "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
-				 function, current_calculated_offset, read_count );
+				notify_verbose_printf(
+				 "%s: read error at offset %" PRIjd " after reading %" PRIzd " bytes.\n",
+				 function,
+				 current_calculated_offset,
+				 read_count );
 #endif
 
 				/* There was a read error at a certain offset
@@ -794,8 +804,11 @@ ssize32_t ewfcommon_read_input(
 				if( wipe_chunk_on_error == 1 )
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
-					 function, byte_error_granularity, error_granularity_offset );
+					notify_verbose_printf(
+					 "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
+					 function,
+					 byte_error_granularity,
+					 error_granularity_offset );
 #endif
 
 					if( memory_set(
@@ -814,8 +827,10 @@ ssize32_t ewfcommon_read_input(
 				else
 				{
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: wiping remainder of chunk at offset %" PRIu32 ".\n",
-					 function, read_error_offset );
+					notify_verbose_printf(
+					 "%s: wiping remainder of chunk at offset %" PRIu32 ".\n",
+					 function,
+					 read_error_offset );
 #endif
 
 					if( memory_set(
@@ -844,11 +859,17 @@ ssize32_t ewfcommon_read_input(
 				acquiry_amount_of_errors++;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-				notify_verbose_printf( "%s: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
-				 function, acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
+				notify_verbose_printf(
+				 "%s: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
+				 function,
+				 acquiry_amount_of_errors,
+				 error2_sector,
+				 error2_amount_of_sectors );
 
-				notify_verbose_printf( "%s: skipping %" PRIu32 " bytes.\n",
-				 function, error_skip_bytes );
+				notify_verbose_printf(
+				 "%s: skipping %" PRIu32 " bytes.\n",
+				 function,
+				 error_skip_bytes );
 #endif
 
 				/* At the end of the input
@@ -877,14 +898,17 @@ ssize32_t ewfcommon_read_input(
 					if( error_string != NULL )
 					{
 						notify_warning_printf( "%s: unable skip %" PRIu32 " bytes after sector with error - %s.\n",
-						 function, error_skip_bytes, error_string );
+						 function,
+						 error_skip_bytes,
+						 error_string );
 
 						memory_free(
 						 error_string );
 					}
 #else
 					notify_warning_printf( "%s: unable skip %" PRIu32 " bytes after sector with error.\n",
-					 function, error_skip_bytes );
+					 function,
+					 error_skip_bytes );
 #endif
 					return( -1 );
 				}
@@ -897,8 +921,10 @@ ssize32_t ewfcommon_read_input(
 					read_amount_of_errors  = 0;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
-					notify_verbose_printf( "%s: remaining to read from chunk %" PRIzd " bytes.\n",
-					 function, bytes_to_read );
+					notify_verbose_printf(
+					 "%s: remaining to read from chunk %" PRIzd " bytes.\n",
+					 function,
+					 bytes_to_read );
 #endif
 				}
 				else
@@ -2202,7 +2228,8 @@ ssize64_t ewfcommon_export_raw(
 		if( file_descriptor == -1 )
 		{
 			notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
-			 function, target_filename );
+			 function,
+			 target_filename );
 
 			return( -1 );
 		}

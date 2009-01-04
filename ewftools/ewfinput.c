@@ -22,8 +22,6 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -47,6 +45,8 @@
 #include "byte_size_string.h"
 #include "ewfinput.h"
 #include "ewfstring.h"
+#include "notify.h"
+#include "system_string.h"
 
 /* Input selection defintions
  */

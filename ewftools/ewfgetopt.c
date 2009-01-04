@@ -21,14 +21,15 @@
  */
 
 #include <common.h>
-#include <notify.h>
-#include <system_string.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
 #include "ewfgetopt.h"
+#include "notify.h"
+#include "system_string.h"
 
 #if !defined( HAVE_GETOPT )
 
@@ -110,7 +111,8 @@ system_integer_t ewfgetopt(
 		 && ( optopt != (system_integer_t) '?' ) )
 		{
 			notify_warning_printf( "%s: no such option: %" PRIc_SYSTEM ".\n",
-			 function, optopt );
+			 function,
+			 optopt );
 		}
 		return( (system_integer_t) '?' );
 	}
@@ -148,7 +150,8 @@ system_integer_t ewfgetopt(
 				return( (system_integer_t) ':' );
 			}
 			notify_warning_printf( "%s: option: %" PRIc_SYSTEM " requires an argument.\n",
-			 function, optopt );
+			 function,
+			 optopt );
 
 			return( (system_integer_t) '?' );
 		}

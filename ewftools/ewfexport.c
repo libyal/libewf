@@ -595,13 +595,12 @@ int main( int argc, char * const argv[] )
 
 		if( string_length > 0 )
 		{
-			string_length  += 1;
 			target_filename = (system_character_t *) memory_allocate(
-			                                          sizeof( system_character_t ) * string_length );
+			                                          sizeof( system_character_t ) * ( string_length + 1 ) );
 
 			if( target_filename == NULL )
 			{
-				fprintf( stderr, "Unable to create target filename string.\n" );
+				fprintf( stderr, "Unable to create target filename.\n" );
 
 				error_abort = 1;
 			}
@@ -610,10 +609,11 @@ int main( int argc, char * const argv[] )
 				  option_target_filename,
 				  string_length ) == NULL )
 			{
-				fprintf( stderr, "Unable to set target filename string.\n" );
+				fprintf( stderr, "Unable to set target filename.\n" );
 
 				error_abort = 1;
 			}
+			target_filename[ string_length ] = 0;
 		}
 	}
 	else

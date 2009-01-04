@@ -22,10 +22,11 @@
 
 #include <common.h>
 #include <narrow_string.h>
-#include <notify.h>
 #include <wide_string.h>
+#include <types.h>
 
 #include "file_io.h"
+#include "notify.h"
 
 #if defined( HAVE_OPEN ) && defined( HAVE_CLOSE )
 
@@ -142,7 +143,8 @@ int libcommon_file_io_open(
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		notify_warning_printf( "%s: error opening file: %s.\n",
-		 function, filename );
+		 function,
+		 filename );
 #endif
 
 		return( -1 );
@@ -179,7 +181,8 @@ int libcommon_file_io_wopen(
 	{
 #if defined( HAVE_DEBUG_OUTPUT )
 		notify_warning_printf( "%s: error opening file: %s.\n",
-		 function, filename );
+		 function,
+		 filename );
 #endif
 
 		return( -1 );

@@ -22,67 +22,10 @@
 
 #include <common.h>
 #include <memory.h>
-#include <notify.h>
 #include <types.h>
 
+#include "notify.h"
 #include "system_string.h"
-
-/* Duplicates a string
- * Returns the pointer to the duplicate string, or NULL on error
- */
-system_character_t *system_string_duplicate(
-                     system_character_t *string,
-                     size_t size )
-{
-	system_character_t *duplicate = NULL;
-	static char *function         = "system_string_duplicate";
-
-	if( string == NULL )
-	{
-		return( NULL );
-	}
-	if( size == 0 )
-	{
-		return( NULL );
-	}
-	if( size > (size_t) SSIZE_MAX )
-	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* Add an additional character for the end of string
-	 */
-	size += 1;
-
-	duplicate = (system_character_t *) memory_allocate(
-	                                    sizeof( system_character_t ) * size );
-
-	if( duplicate == NULL )
-	{
-		notify_warning_printf( "%s: unable to create duplicate string.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( system_string_copy(
-	     duplicate,
-	     string,
-	     size ) == NULL )
-	{
-		notify_warning_printf( "%s: unable to set duplicate string.\n",
-		 function );
-
-		memory_free(
-		 duplicate );
-
-		return( NULL );
-	}
-	duplicate[ size - 1 ] = (system_character_t) '\0';
-
-	return( duplicate );
-}
 
 #if defined( system_string_to_signed_long_long )
 

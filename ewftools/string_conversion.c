@@ -21,9 +21,9 @@
  */
 
 #include <common.h>
-#include <notify.h>
 #include <types.h>
 
+#include "notify.h"
 #include "string_conversion.h"
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )

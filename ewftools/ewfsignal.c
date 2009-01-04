@@ -21,9 +21,10 @@
  */
 
 #include <common.h>
-#include <notify.h>
+#include <types.h>
 
 #include "ewfsignal.h"
+#include "notify.h"
 
 #if defined( HAVE_SIGNAL_H )
 

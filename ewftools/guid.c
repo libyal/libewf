@@ -21,11 +21,11 @@
  */
 
 #include <common.h>
-#include <notify.h>
 #include <types.h>
 
 #include "character_string.h"
 #include "guid.h"
+#include "notify.h"
 
 /* Converts the GUID into a string
  * Returns 1 if successful or -1 on error

@@ -22,11 +22,7 @@
  */
 
 #include <common.h>
-#include <file_io.h>
-#include <file_stream_io.h>
 #include <memory.h>
-#include <notify.h>
-#include <system_string.h>
 #include <types.h>
 
 #include <stdio.h>
@@ -82,12 +78,16 @@ typedef size_t u64;
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "glob.h"
 #include "ewfinput.h"
 #include "ewfoutput.h"
-#include "process_status.h"
 #include "ewfsignal.h"
 #include "ewfstring.h"
+#include "file_io.h"
+#include "file_stream_io.h"
+#include "glob.h"
+#include "notify.h"
+#include "process_status.h"
+#include "system_string.h"
 
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
 

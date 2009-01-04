@@ -164,10 +164,12 @@ void ewfoutput_copyright_fprint(
 
 		return;
 	}
-	fprintf( stream, "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n",
+	fprintf(
+	 stream,
+	 "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n"
+	 "This is free software; see the source for copying conditions. There is NO\n"
+	 "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	 PACKAGE_BUGREPORT );
-	fprintf( stream, "This is free software; see the source for copying conditions. There is NO\n" );
-	fprintf( stream, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 }
 
 #if defined( HAVE_STDARG_H )
@@ -237,7 +239,9 @@ void VARIABLE_ARGUMENTS_FUNCTION(
 		}
 	}
 #endif
-	fprintf( stream, ".\n" );
+	fprintf(
+	 stream,
+	 ".\n" );
 }
 
 #undef VARIABLE_ARGUMENTS_FUNCTION
@@ -708,7 +712,8 @@ void ewfoutput_acquiry_errors_fprint(
 			     &amount_of_sectors ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
-				 function, iterator );
+				 function,
+				 iterator );
 
 				first_sector      = 0;
 				amount_of_sectors = 0;
@@ -776,7 +781,8 @@ void ewfoutput_crc_errors_fprint(
 			     &amount_of_sectors ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
-				 function, iterator );
+				 function,
+				 iterator );
 
 				first_sector      = 0;
 				amount_of_sectors = 0;
@@ -844,7 +850,8 @@ void ewfoutput_sessions_fprint(
 			     &amount_of_sectors ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
-				 function, iterator );
+				 function,
+				 iterator );
 
 				first_sector      = 0;
 				amount_of_sectors = 0;
@@ -1275,7 +1282,8 @@ void ewfoutput_hash_values_fprint(
 					     hash_identifier_length ) != 1 )
 					{
 						notify_warning_printf( "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
-						 function, iterator );
+						 function,
+						 iterator );
 					}
 					else if( ( ignore_md5 != 0 )
 					      && ( string_compare(
@@ -1300,7 +1308,8 @@ void ewfoutput_hash_values_fprint(
 					          hash_value_length ) != 1 )
 					{
 						notify_warning_printf( "%s: unable to retrieve the hash value for identifier: %" PRIs ".\n",
-						 function, hash_identifier );
+						 function,
+						 hash_identifier );
 					}
 					else
 					{

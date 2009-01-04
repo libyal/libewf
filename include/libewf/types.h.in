@@ -32,7 +32,7 @@
 #error Missing system type definitions (sys/types.h)
 #endif
 
-#if defined( HAVE_WINDOWS_API ) && !defined( HAVE_INTTYPES_H ) && !defined( HAVE_STDINT_H )
+#if defined( WINAPI ) && !defined( HAVE_INTTYPES_H ) && !defined( HAVE_STDINT_H )
 
 /* Define LIBEWF_DEFINITION_INTEGER_TYPES to avoid conflict if types are already defined
  */

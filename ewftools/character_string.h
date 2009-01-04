@@ -24,11 +24,11 @@
 #define _CHARACTER_STRING_H
 
 #include <common.h>
-#include <date_time.h>
 #include <narrow_string.h>
 #include <types.h>
 #include <wide_string.h>
 
+#include "date_time.h"
 #include "string_conversion.h"
 
 #if defined( __cplusplus )
@@ -116,10 +116,6 @@ typedef char character_t;
 	narrow_string_to_unsigned_long_long( string, end_of_string, base )
 
 #endif
-
-character_t *string_duplicate(
-              character_t *string,
-              size_t size );
 
 #if defined( string_to_signed_long_long )
 int string_to_int64(

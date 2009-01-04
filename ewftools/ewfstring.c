@@ -21,11 +21,11 @@
  */
 
 #include <common.h>
-#include <notify.h>
 #include <types.h>
 
 #include "character_string.h"
 #include "ewfstring.h"
+#include "notify.h"
 #include "system_string.h"
 
 /* Copies the source string (of system_character_t) into the destination string for a certain length

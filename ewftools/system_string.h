@@ -126,10 +126,6 @@ typedef int system_integer_t;
 
 #endif
 
-system_character_t *system_string_duplicate(
-                     system_character_t *string,
-                     size_t size );
-
 #if defined( system_string_to_signed_long_long )
 int64_t system_string_to_int64(
          const system_character_t *string,

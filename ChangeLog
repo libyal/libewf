@@ -188,8 +188,6 @@ check TODO
 CLOSED
 * what about read+write and compression?
   solved by delta files
-* change string duplicate function to macro?
-  strndup is not available on all platforms
 * do not finalize on error
   no, does not add any additional value
   if a write error did occur the library should not make any guesses about if
@@ -204,6 +202,7 @@ CLOSED
 
 Version: 20081011
 * changed ewfguid into guid
+* removed string duplicate functions
 
 Version: 20081007
 * small adjustments to support

@@ -21,11 +21,11 @@
  */
 
 #include <common.h>
-#include <notify.h>
 #include <types.h>
 
 #include "byte_size_string.h"
 #include "character_string.h"
+#include "notify.h"
 #include "system_string.h"
 
 /* Determines the factor string of a certain factor value
