@@ -413,7 +413,7 @@ void libewf_string_split_values_free( LIBEWF_CHAR **split_values, uint32_t amoun
 /* Copies a multi byte UTF16 string to a single byte ASCII string
  * Returns 1 if successful, on -1 on error
  */
-int8_t libewf_string_copy_utf16_to_ascii( LIBEWF_CHAR *utf16_string, size_t size_utf16, LIBEWF_CHAR* ascii_string, size_t size_ascii )
+int libewf_string_copy_utf16_to_ascii( LIBEWF_CHAR *utf16_string, size_t size_utf16, LIBEWF_CHAR* ascii_string, size_t size_ascii )
 {
 	static char *function = "libewf_string_copy_utf16_to_ascii";
 	size_t utf16_iterator = 2;
@@ -529,7 +529,7 @@ int8_t libewf_string_copy_utf16_to_ascii( LIBEWF_CHAR *utf16_string, size_t size
 /* Copies a single byte ASCII string to a multi byte UTF16 string
  * Returns 1 if successful, on -1 on error
  */
-int8_t libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size_ascii, LIBEWF_CHAR *utf16_string, size_t size_utf16, uint8_t byte_order )
+int libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size_ascii, LIBEWF_CHAR *utf16_string, size_t size_utf16, uint8_t byte_order )
 {
 	static char *function = "libewf_string_copy_ascii_to_utf16";
 	size_t ascii_iterator = 0;
@@ -611,7 +611,7 @@ int8_t libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size
 /* Converts an EWF character string to a LIBEWF character string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int8_t libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string )
+int libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string )
 {
 	static char *function = "libewf_string_copy_from_ewf_char";
 	size_t iterator       = 0;
@@ -661,7 +661,7 @@ int8_t libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string
 /* Converts a LIBEWF character string to an EWF character string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int8_t libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string )
+int libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string )
 {
 	static char *function = "libewf_string_copy_to_ewf_char";
 	size_t iterator       = 0;
@@ -718,7 +718,7 @@ int8_t libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, 
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful, 0 if hash was not set, or -1 on error
  */
-int8_t libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_string, EWF_DIGEST_HASH *digest_hash, size_t size_digest_hash )
+int libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_string, EWF_DIGEST_HASH *digest_hash, size_t size_digest_hash )
 {
 	static char *function       = "libewf_string_copy_from_digest_hash";
 	size_t string_iterator      = 0;
@@ -786,7 +786,7 @@ int8_t libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_str
 /* Converts an EWF header2 to a string
  * Returns 1 if successful, 0 if string was not set, or -1 on error
  */
-int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
+int libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
@@ -875,7 +875,7 @@ int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string,
 /* Converts a string to an EWF header2
  * Returns 1 if successful, 0 if header2 was not set, or -1 on error
  */
-int8_t libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
+int libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 )
 {
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;

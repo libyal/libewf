@@ -440,7 +440,9 @@ int main( int argc, char * const argv[] )
 			}
 			if( libewf_get_guid( handle, guid, 16 ) == 1 )
 			{
-				fprintf( stdout, "\tGUID:\t\t\t%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
+				fprintf( stdout, "\tGUID:\t\t\t%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
+				                 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8 "%.2" PRIx8 "-%.2" PRIx8
+				                 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "%.2" PRIx8 "\n",
 					guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ], guid[ 4 ], guid[ 5 ], guid[ 6 ], guid[ 7 ],
 					guid[ 8 ], guid[ 9 ], guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ]
 				);

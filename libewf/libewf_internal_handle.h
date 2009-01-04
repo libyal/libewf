@@ -372,16 +372,10 @@ int8_t libewf_internal_handle_is_set_header2( LIBEWF_INTERNAL_HANDLE *internal_h
 int8_t libewf_internal_handle_is_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_is_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int32_t libewf_internal_handle_get_media_sectors_per_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
 int8_t libewf_internal_handle_get_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_volume_type( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_get_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
-int8_t libewf_internal_handle_get_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
-
-int64_t libewf_internal_handle_get_write_amount_of_chunks( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
@@ -394,8 +388,6 @@ int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle,
 int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xhash, size_t size );
 
 int libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash );
-
-int libewf_internal_handle_set_media_values( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
 
 int libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
 

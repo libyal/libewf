@@ -411,6 +411,49 @@ int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	         size ) );
 }
 
+/* Returns the amount of sectors per chunk from the media information
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_sectors_per_chunk";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing media sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( sectors_per_chunk == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media->sectors_per_chunk > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	*sectors_per_chunk = internal_handle->media->sectors_per_chunk;
+
+	return( 1 );
+}
+
 /* Returns the amount of bytes per sector from the media information
  * Returns 1 if successful, -1 on error
  */
@@ -699,22 +742,88 @@ int8_t libewf_get_format( LIBEWF_HANDLE *handle )
 	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
 }
 
-/* Returns 1 if the GUID is set, or -1 on error
+/* Returns the GUID
+ * Returns 1 if successful, -1 on error
  */
-int8_t libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
+int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 {
-	return( libewf_internal_handle_get_guid(
-	         (LIBEWF_INTERNAL_HANDLE *) handle,
-	         guid,
-	         size ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_guid";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->guid == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing GUID.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( guid == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid guid.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( size < 16 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: guid too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_common_memcpy( guid, internal_handle->guid, 16 ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set guid.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
-/* Returns the amount of chunks written, 0 if no chunks have been written, or -1 on error
+/* Returns the amount of chunks written
+ * Returns 1 if successful, -1 on error
  */
-int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle )
+int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks )
 {
-	return( libewf_internal_handle_get_write_amount_of_chunks(
-	         (LIBEWF_INTERNAL_HANDLE *) handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_get_write_amount_of_chunks";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->write == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing write sub handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( amount_of_chunks == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks.\n",
+		 function );
+
+		return( -1 );
+	}
+	*amount_of_chunks = internal_handle->write->amount_of_chunks;
+
+	return( 1 );
 }
 
 /* Retrieves the header value specified by the identifier
@@ -741,15 +850,151 @@ int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 	         length ) );
 }
 
+/* Sets the amount of sectors per chunk in the media information
+ *  * Returns 1 if successful, -1 on error
+ *   */
+int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_sectors_per_chunk";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( sectors_per_chunk == 0 )
+	 || ( sectors_per_chunk > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: sectors per chunk cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media->sectors_per_chunk = sectors_per_chunk;
+
+	return( 1 );
+}
+
+/* Sets the amount of bytes per sector in the media information
+ *  * Returns 1 if successful, -1 on error
+ *   */
+int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector )
+{
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_bytes_per_sector";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( bytes_per_sector == 0 )
+	 || ( bytes_per_sector > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sector.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: bytes per sector cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media->bytes_per_sector = bytes_per_sector;
+
+	return( 1 );
+}
+
+/* TODO remove libewf_set_media_values()
+ */
+
 /* Sets the media values
  * Returns 1 if successful, -1 on error
  */
 int libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector )
 {
-	return( libewf_internal_handle_set_media_values(
-	         (LIBEWF_INTERNAL_HANDLE *) handle,
-	         sectors_per_chunk,
-	         bytes_per_sector ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
+	static char *function                   = "libewf_set_media_values";
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( sectors_per_chunk == 0 )
+	 || ( sectors_per_chunk > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sectors per chunk.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( bytes_per_sector == 0 )
+	 || ( bytes_per_sector > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes per sectors.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( internal_handle->write == NULL )
+	 || ( internal_handle->write->values_initialized != 0 ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: media values cannot be changed.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->media->sectors_per_chunk = sectors_per_chunk;
+	internal_handle->media->bytes_per_sector  = bytes_per_sector;
+
+	return( 1 );
 }
 
 /* Returns 1 if the GUID is set, or -1 on error
@@ -871,7 +1116,7 @@ int libewf_set_calculate_md5( LIBEWF_HANDLE *handle, uint8_t calculate_md5 )
 /* Calculates the MD5 hash and creates a printable string of the calculated md5 hash
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
+int libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	uint8_t *data                           = NULL;
@@ -975,17 +1220,17 @@ int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, si
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash string.\n",
 		 function );
 	}
-	return( (int8_t) result );
+	return( result );
 }
 
 /* Creates a printable string of the stored md5 hash
  * Returns 1 if successful, 0 if no md5 hash is stored, -1 on error
  */
-int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
+int libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_stored_md5_hash";
-	int8_t result                           = 0;
+	int result                              = 0;
 
 	if( handle == NULL )
 	{
@@ -1020,11 +1265,11 @@ int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, s
 /* Creates a printable string of the calculated md5 hash
  * Returns 1 if successful, 0 if no md5 hash is calculated, -1 on error
  */
-int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
+int libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_calculated_md5_hash";
-	int8_t result                           = 0;
+	int result                              = 0;
 
 	if( handle == NULL )
 	{

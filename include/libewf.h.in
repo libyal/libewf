@@ -156,6 +156,11 @@ LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
  */
 LIBEWF_EXTERN int libewf_close( LIBEWF_HANDLE *handle );
 
+/* Returns the amount of sectors per chunk from the media information
+ * Returns 1 if successful, -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk );
+
 /* Returns the amount of bytes per sector from the media information
  * Returns 1 if successful, -1 on error
  */
@@ -202,13 +207,15 @@ LIBEWF_EXTERN int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle );
  */
 LIBEWF_EXTERN int8_t libewf_get_format( LIBEWF_HANDLE *handle );
 
-/* Returns 1 if the GUID is set, or -1 on error
+/* Returns the GUID
+ * Returns 0 if successful, or -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 
-/* Returns the amount of chunks written, 0 if no chunks have been written, or -1 on error
+/* Returns the amount of chunks written
+ * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle );
+LIBEWF_EXTERN int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks );
 
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present, -1 on error
@@ -370,6 +377,17 @@ LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, wchar_t *identif
 #else
 LIBEWF_EXTERN int libewf_get_hash_value( LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length );
 #endif
+
+
+/* Sets the amount of sectors per chunk in the media information
+ * Returns 1 if successful, -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk );
+
+/* Sets the amount of bytes per sector in the media information
+ * Returns 1 if successful, -1 on error
+ */
+LIBEWF_EXTERN int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector );
 
 /* Sets the media values
  * Returns 1 if successful, -1 on error
@@ -585,27 +603,27 @@ LIBEWF_EXTERN int libewf_set_calculate_md5( LIBEWF_HANDLE *handle, uint8_t calcu
  * Returns 1 if successful, -1 on error
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, wchar_t *string, size_t length );
+LIBEWF_EXTERN int libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, wchar_t *string, size_t length );
 #else
-LIBEWF_EXTERN int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, char *string, size_t length );
+LIBEWF_EXTERN int libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, char *string, size_t length );
 #endif
 
 /* Creates a printable string of the stored md5 hash
  * Returns 1 if successful, -1 on error
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, wchar_t *string, size_t length );
+LIBEWF_EXTERN int libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, wchar_t *string, size_t length );
 #else
-LIBEWF_EXTERN int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, char *string, size_t length );
+LIBEWF_EXTERN int libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, char *string, size_t length );
 #endif
 
 /* Creates a printable string of the calculated md5 hash
  * Returns 1 if successful, -1 on error
  */
 #if @HAVE_WIDE_CHARACTER_TYPE@ || defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, wchar_t *string, size_t length );
+LIBEWF_EXTERN int libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, wchar_t *string, size_t length );
 #else
-LIBEWF_EXTERN int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, char *string, size_t length );
+LIBEWF_EXTERN int libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, char *string, size_t length );
 #endif
 
 /* Parses the header values from the xheader, header2 or header section

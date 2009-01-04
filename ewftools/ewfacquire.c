@@ -701,9 +701,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_set_media_values( handle, (uint32_t) sectors_per_chunk, 512 ) != 1 )
+	if( libewf_set_sectors_per_chunk( handle, (uint32_t) sectors_per_chunk ) != 1 )
 	{
-		fprintf( stderr, "Unable to set media values in handle.\n" );
+		fprintf( stderr, "Unable to set sectors per chunk in handle.\n" );
 
 		if( libewf_close( handle ) != 0 )
 		{

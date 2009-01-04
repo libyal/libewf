@@ -41,6 +41,8 @@
 .Ft int
 .Fn libewf_close "LIBEWF_HANDLE *handle"
 .Ft int
+.Fn libewf_get_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk"
+.Ft int
 .Fn libewf_get_bytes_per_sector "LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector"
 .Ft int
 .Fn libewf_get_amount_of_sectors "LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors"
@@ -60,10 +62,14 @@
 .Fn libewf_get_volume_type "LIBEWF_HANDLE *handle"
 .Ft int8_t
 .Fn libewf_get_format "LIBEWF_HANDLE *handle"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
-.Ft int64_t
-.Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle"
+.Ft int
+.Fn libewf_get_write_amount_of_chunks "LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks"
+.Ft int
+.Fn libewf_set_sectors_per_chunk "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk"
+.Ft int
+.Fn libewf_set_bytes_per_sector "LIBEWF_HANDLE *handle, uint32_t bytes_per_sector"
 .Ft int
 .Fn libewf_set_media_values "LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector"
 .Ft int
@@ -150,11 +156,11 @@ When the library was compiled with narrow character support (default) the follow
 .Fn libewf_set_header_value_compression_type "LIBEWF_HANDLE *handle, char *compression_type, size_t length"
 .Ft int
 .Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_calculate_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_stored_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_calculated_md5_hash "LIBEWF_HANDLE *handle, char *string, size_t length"
 .Pp
 When the library was compiled with wide character support the following functions are available instead of the narrow character functions
@@ -212,11 +218,11 @@ When the library was compiled with wide character support the following function
 .Fn libewf_set_header_value_compression_type "LIBEWF_HANDLE *handle, wchar_t *compression_type, size_t length"
 .Ft int
 .Fn libewf_set_hash_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_calculate_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_stored_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
-.Ft int8_t
+.Ft int
 .Fn libewf_get_calculated_md5_hash "LIBEWF_HANDLE *handle, wchar_t *string, size_t length"
 .Pp
 When wide character support functions like wmain and wopen are present and libewf is compiled with

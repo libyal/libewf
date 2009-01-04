@@ -2037,8 +2037,8 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 	size_t bytes_to_read              = 0;
 	size_t read_remaining_bytes       = 0;
 	size_t error_remaining_bytes      = 0;
-	int64_t chunk_amount              = 0;
 	int32_t read_amount_of_errors     = 0;
+	uint32_t chunk_amount             = 0;
 	uint32_t read_error_offset        = 0;
 	uint32_t error_skip_bytes         = 0;
 	uint32_t error_granularity_offset = 0;
@@ -2087,12 +2087,9 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_
 
 		return( -1 );
 	}
-	chunk_amount = libewf_get_write_amount_of_chunks( handle );
-
-	if( ( chunk_amount <= -1 )
-	 || ( chunk_amount > (int64_t) UINT32_MAX ) )
+	if( libewf_get_write_amount_of_chunks( handle, &chunk_amount ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of chunks written.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to determine amount of chunks written.\n",
 		 function );
 
 		return( -1 );

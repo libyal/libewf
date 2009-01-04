@@ -120,11 +120,15 @@ TODO
 * remove libewf_write_finalize and libewf_write_chunk ?
 * check if chunk_cache_offset is still needed in write_new_chunk
   read is now in write_existing_chunk
-* implement raw split support in ewfexport
-* change int8_t return values into int return values
+* implement raw split support in ewfexport and ewfacquire?
 * update ewfexport man page
 * what about header values parsing with preservation of timestamps?
-* change libewf_get functions for api consistency
+
+* change int8_t return values into int return values
+* change libewf_get and libewf_set functions for api consistency
+  move functions from internal handle to file
+
+* remove libewf_set_media_values
 
 Version: 20070827
 * removed libewf_common_string_copy and libewf_common_wide_string_copy
@@ -132,6 +136,8 @@ Version: 20070827
 * changed some int8_t return values into int return values
 * worked on changing libewf_get functions for api consistency
 * removed unused macros from internal handle
+* replaced libewf_set_media_values by libewf_set_sectors_per_chunk
+  and libewf_set_bytes_per_sector
 
 Version: 20070822
 * worked on allowing the internal MD5 calculation to be disabled
