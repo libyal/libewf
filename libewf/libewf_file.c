@@ -51,7 +51,6 @@
 #include "libewf_read.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file.h"
-#include "libewf_segment_table.h"
 #include "libewf_string.h"
 #include "libewf_write.h"
 
@@ -95,11 +94,7 @@ uint8_t libewf_get_flags_write( void )
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_check_file_signature( const wchar_t *filename )
-#else
-int libewf_check_file_signature( const char *filename )
-#endif
+int libewf_check_file_signature( const LIBEWF_FILENAME *filename )
 {
 	static char *function = "libewf_check_file_signature";
 	int file_descriptor   = 0;
@@ -112,46 +107,27 @@ int libewf_check_file_signature( const char *filename )
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	file_descriptor = libewf_common_wide_open( filename, LIBEWF_OPEN_READ );
-#else
-	file_descriptor = libewf_common_open( filename, LIBEWF_OPEN_READ );
-#endif
+	file_descriptor = libewf_filename_open( filename, LIBEWF_OPEN_READ );
 
 	if( file_descriptor < 0 )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 		 function, filename );
-#else
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-		 function, filename );
-#endif
 		return( -1 );
 	}
 	result = libewf_segment_file_check_file_signature( file_descriptor );
 
 	if( libewf_common_close( file_descriptor ) != 0 )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		LIBEWF_WARNING_PRINT( "%s: unable to close file: %ls.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to close file: %" PRIs_EWF_filename ".\n",
 		 function, filename );
-#else
-		LIBEWF_WARNING_PRINT( "%s: unable to close file: %s.\n",
-		 function, filename );
-#endif
 
 		return( -1 );
 	}
 	if( result <= -1 )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %ls.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %" PRIs_EWF_filename ".\n",
 		 function, filename );
-#else
-		LIBEWF_WARNING_PRINT( "%s: unable to read signature from file: %s.\n",
-		 function, filename );
-#endif
 
 		return( -1 );
 	}
@@ -163,11 +139,7 @@ int libewf_check_file_signature( const char *filename )
  * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
  * Returns a pointer to the new instance of handle, NULL on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
-#else
-LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags )
-#endif
+LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_open";
@@ -216,19 +188,11 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 
 			return( NULL );
 		}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		if( libewf_segment_file_read_wide_open(
-		     internal_handle, 
-		     filenames, 
-		     file_amount,
-		     flags ) != 1 )
-#else
 		if( libewf_segment_file_read_open(
 		     internal_handle, 
 		     filenames, 
 		     file_amount,
 		     flags ) != 1 )
-#endif
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
 			 function );
@@ -251,17 +215,10 @@ LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint
 	}
 	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		if( libewf_segment_file_write_wide_open(
-		     internal_handle, 
-		     filenames, 
-		     file_amount ) != 1 )
-#else
 		if( libewf_segment_file_write_open(
 		     internal_handle, 
 		     filenames, 
 		     file_amount ) != 1 )
-#endif
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
 			 function );
@@ -960,11 +917,7 @@ int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 /* Retrieves the delta segment filename
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_t *filename, size_t length )
-#else
-int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length )
-#endif
+int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *filename, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_delta_segment_filename";
@@ -978,24 +931,17 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, si
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->delta_segment_table == NULL )
+	if( internal_handle->delta_segment_filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment filename.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	return( libewf_segment_file_get_wide_filename(
-	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
+	return( libewf_filename_get(
+	         internal_handle->delta_segment_filename,
 	         filename,
 	         length ) );
-#else
-	return( libewf_segment_file_get_filename(
-	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
-	         filename,
-	         length ) );
-#endif
 }
 
 /* Retrieves the amount of acquiry errors
@@ -1614,11 +1560,7 @@ int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 /* Sets the delta segment file
  * Returns 1 if successful, or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_wchar_t *filename, size_t length )
-#else
-int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length )
-#endif
+int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *filename, size_t length )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_set_delta_segment_filename";
@@ -1646,24 +1588,17 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, si
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table == NULL )
+	if( internal_handle->delta_segment_filename == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta_segment_table.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing delta segment filename.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	return( libewf_segment_file_set_wide_filename(
-	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
+	return( libewf_filename_set(
+	         &( internal_handle->delta_segment_filename ),
 	         filename,
 	         length ) );
-#else
-	return( libewf_segment_file_set_filename(
-	         &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
-	         filename,
-	         length ) );
-#endif
 }
 
 /* Sets the read wipe chunk on error

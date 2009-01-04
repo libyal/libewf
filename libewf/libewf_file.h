@@ -49,6 +49,7 @@
 #include <libewf/libewf_handle.h>
 
 #include "libewf_char.h"
+#include "libewf_filename.h"
 #include "libewf_internal_handle.h"
 
 #if defined( __cplusplus )
@@ -61,17 +62,9 @@ LIBEWF_EXTERN uint8_t libewf_get_flags_read( void );
 LIBEWF_EXTERN uint8_t libewf_get_flags_read_write( void );
 LIBEWF_EXTERN uint8_t libewf_get_flags_write( void );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-LIBEWF_EXTERN int libewf_check_file_signature( const wchar_t *filename );
-#else
-LIBEWF_EXTERN int libewf_check_file_signature( const char *filename );
-#endif
+LIBEWF_EXTERN int libewf_check_file_signature( const LIBEWF_FILENAME *filename );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( wchar_t * const filenames[], uint16_t file_amount, uint8_t flags );
-#else
-LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( char * const filenames[], uint16_t file_amount, uint8_t flags );
-#endif
+LIBEWF_EXTERN LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags );
 
 LIBEWF_EXTERN int libewf_close( LIBEWF_HANDLE *handle );
 
@@ -93,11 +86,7 @@ LIBEWF_EXTERN int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format );
 LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_t *filename, size_t length );
-#else
-LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length );
-#endif
+LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *filename, size_t length );
 
 LIBEWF_EXTERN int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors );
 LIBEWF_EXTERN int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors  );
@@ -120,11 +109,7 @@ LIBEWF_EXTERN int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t b
 LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 LIBEWF_EXTERN int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_t *filename, size_t length );
-#else
-LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length );
-#endif
+LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *filename, size_t length );
 
 LIBEWF_EXTERN int libewf_set_read_wipe_chunk_on_error( LIBEWF_HANDLE *handle, uint8_t wipe_on_error );
 

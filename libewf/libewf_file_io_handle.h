@@ -36,6 +36,8 @@
 
 #include "libewf_includes.h"
 
+#include "libewf_filename.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -49,11 +51,7 @@ struct libewf_file_io_handle
 {
 	/* The filename
 	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *filename;
-#else
-	char *filename;
-#endif
+	LIBEWF_FILENAME *filename;
 
 	/* The file descriptor
 	 */
@@ -67,18 +65,6 @@ struct libewf_file_io_handle
 	 */
 	int flags;
 };
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_handle_get_wide_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, wchar_t *filename, size_t length_filename );
-#else
-int libewf_file_io_handle_get_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, char *filename, size_t length_filename );
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_handle_set_wide_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, const wchar_t *filename, size_t length_filename );
-#else
-int libewf_file_io_handle_set_filename( LIBEWF_FILE_IO_HANDLE *file_io_handle, const char *filename, size_t length_filename );
-#endif
 
 #if defined( __cplusplus )
 }

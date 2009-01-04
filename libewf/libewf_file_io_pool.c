@@ -155,11 +155,7 @@ void libewf_file_io_pool_free( LIBEWF_FILE_IO_POOL *file_io_pool )
 	libewf_common_free( file_io_pool );
 }
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_file_io_pool_wide_open( LIBEWF_FILE_IO_POOL *file_io_pool, wchar_t *filename, int flags );
-#else
-int libewf_file_io_pool_open( LIBEWF_FILE_IO_POOL *file_io_pool, char *filename, int flags );
-#endif
+int libewf_file_io_pool_open( LIBEWF_FILE_IO_POOL *file_io_pool, LIBEWF_FILENAME *filename, int flags );
 
 ssize_t libewf_file_io_pool_read( LIBEWF_FILE_IO_POOL *pool, size_t entry, uint8_t *buffer, size_t size );
 ssize_t libewf_file_io_pool_write( LIBEWF_FILE_IO_POOL *pool, size_t entry, uint8_t *buffer, size_t size );

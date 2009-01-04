@@ -1,5 +1,5 @@
 /*
- * libewf segment table
+ * libewf filename
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,66 +31,55 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_SEGMENT_TABLE_H )
-#define _LIBEWF_SEGMENT_TABLE_H
+#if !defined( _LIBEWF_FILENAME_H )
+#define _LIBEWF_FILENAME_H
 
 #include "libewf_includes.h"
-#include "libewf_char.h"
 
-#include "libewf_filename.h"
-#include "libewf_section_list.h"
+#include "libewf_common.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_SEGMENT_FILE		libewf_segment_file_t
-#define LIBEWF_SEGMENT_FILE_SIZE	sizeof( LIBEWF_SEGMENT_FILE )
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#define LIBEWF_FILENAME		wchar_t
+#define LIBEWF_FILENAME_SIZE	sizeof( wchar_t )
+#define PRIs_EWF_filename	"ls"
 
-typedef struct libewf_segment_file libewf_segment_file_t;
+#define libewf_filename_length( filename ) \
+	libewf_common_wide_string_length( filename )
 
-struct libewf_segment_file
-{
-	/* The filename
-	 */
-	LIBEWF_FILENAME *filename;
+#define libewf_filename_copy( destination, source, length ) \
+	libewf_common_wide_memcpy( destination, source, length )
 
-	/* The file descriptor
-	 */
-	int file_descriptor;
+#define libewf_filename_open( filename, flags ) \
+	libewf_common_wide_open( filename, flags )
 
-	/* The file offset
-	 */
-	off64_t file_offset;
+#else
+#define LIBEWF_FILENAME		char
+#define LIBEWF_FILENAME_SIZE	sizeof( char )
+#define PRIs_EWF_filename	"s"
 
-	/* The amount of chunks
-	 */
-	uint32_t amount_of_chunks;
+#define libewf_filename_length( filename ) \
+	libewf_common_string_length( filename )
 
-        /* The list of all the sections
-         */
-        LIBEWF_SECTION_LIST *section_list;
-};
+#define libewf_filename_copy( destination, source, length ) \
+	libewf_common_memcpy( destination, source, length )
 
-#define LIBEWF_SEGMENT_TABLE		libewf_segment_table_t
-#define LIBEWF_SEGMENT_TABLE_SIZE	sizeof( LIBEWF_SEGMENT_TABLE )
+#define libewf_filename_open( filename, flags ) \
+	libewf_common_open( filename, flags )
 
-typedef struct libewf_segment_table libewf_segment_table_t;
+#endif
 
-struct libewf_segment_table
-{
-	/* The amount of segments in the table
-	 */
-	uint16_t amount;
+int libewf_filename_get( LIBEWF_FILENAME *internal_filename, LIBEWF_FILENAME *external_filename, size_t length_external_filename );
 
-	/* A dynamic array containting the segment files
-	 */
-	LIBEWF_SEGMENT_FILE *segment_file;
-};
+int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILENAME *external_filename, size_t length_external_filename );
 
-LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );
-int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t amount );
-void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
+int libewf_filename_create_extension( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, LIBEWF_FILENAME *extension );
+
+LIBEWF_FILENAME *libewf_filename_create( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, LIBEWF_FILENAME *basename );
+
 
 #if defined( __cplusplus )
 }

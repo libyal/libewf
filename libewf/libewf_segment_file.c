@@ -39,6 +39,7 @@
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
+#include "libewf_filename.h"
 #include "libewf_hash_values.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
@@ -174,305 +175,16 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	return( read_count );
 }
 
-/* Determines an extension for a certain segment file
- * For EWF-E01, EWF-S01 segment file extension naming scheme
- * Returns 1 on success, -1 on error
- */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_segment_file_create_wide_extension( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, wchar_t *extension )
-#else
-int libewf_segment_file_create_extension( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, char *extension )
-#endif
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function                   = "libewf_segment_file_create_wide_extension";
-	wchar_t extension_first_character       = (wchar_t) '\0';
-	wchar_t extension_additional_characters = (wchar_t) '\0';
-#else
-	static char *function                   = "libewf_segment_file_create_extension";
-	char extension_first_character          = (char) '\0';
-	char extension_additional_characters    = (char) '\0';
-#endif
-
-	if( extension == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid extension.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment 0.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( maximum_amount_of_segments <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid maximum amount of segment files.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number > (uint16_t) maximum_amount_of_segments )
-	{
-		LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " exceeds the maximum amount of segment files: %" PRIu16 ".\n",
-		 function, segment_number, maximum_amount_of_segments );
-
-		return( -1 );
-	}
-	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
-	{
-		if( ( format == LIBEWF_FORMAT_EWF )
-		 || ( format == LIBEWF_FORMAT_EWFX ) )
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			extension_first_character       = (wchar_t) 'e';
-			extension_additional_characters = (wchar_t) 'a';
-#else
-			extension_first_character       = (char) 'e';
-			extension_additional_characters = (char) 'a';
-#endif
-		}
-		else if( ewf_format == EWF_FORMAT_S01 )
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			extension_first_character       = (wchar_t) 's';
-			extension_additional_characters = (wchar_t) 'a';
-#else
-			extension_first_character       = (char) 's';
-			extension_additional_characters = (char) 'a';
-#endif
-		}
-		else
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			extension_first_character       = (wchar_t) 'E';
-			extension_additional_characters = (wchar_t) 'A';
-#else
-			extension_first_character       = (char) 'E';
-			extension_additional_characters = (char) 'A';
-#endif
-		}
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		extension_first_character       = (wchar_t) 'L';
-		extension_additional_characters = (wchar_t) 'A';
-#else
-		extension_first_character       = (char) 'L';
-		extension_additional_characters = (char) 'A';
-#endif
-	}
-	else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		extension_first_character       = (wchar_t) 'd';
-		extension_additional_characters = (wchar_t) 'a';
-#else
-		extension_first_character       = (char) 'd';
-		extension_additional_characters = (char) 'a';
-#endif
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported segment file type.\n",
-		 function );
-
-		return( -1 );
-	}
-	extension[ 0 ] = extension_first_character;
-
-	if( segment_number <= 99 )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		extension[ 2 ] = (wchar_t) '0' + (wchar_t) ( segment_number % 10 );
-		extension[ 1 ] = (wchar_t) '0' + (wchar_t) ( segment_number / 10 );
-#else
-		extension[ 2 ] = (char) '0' + (char) ( segment_number % 10 );
-		extension[ 1 ] = (char) '0' + (char) ( segment_number / 10 );
-#endif
-	}
-	else if( segment_number >= 100 )
-	{
-		segment_number -= 100;
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		extension[ 2 ]  = extension_additional_characters + (wchar_t) ( segment_number % 26 );
-#else
-		extension[ 2 ]  = extension_additional_characters + (char) ( segment_number % 26 );
-#endif
-		segment_number /= 26;
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		extension[ 1 ]  = extension_additional_characters + (wchar_t) ( segment_number % 26 );
-#else
-		extension[ 1 ]  = extension_additional_characters + (char) ( segment_number % 26 );
-#endif
-		segment_number /= 26;
-
-		if( segment_number >= 26 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to support for more segment files.\n",
-			 function );
-
-			return( -1 );
-		}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		extension[ 0 ] = extension_first_character + (wchar_t) segment_number;
-#else
-		extension[ 0 ] = extension_first_character + (char) segment_number;
-#endif
-	}
-	/* Safety check
-	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( ( extension[ 0 ] > (wchar_t) 'z' )
-	 || ( ( extension[ 0 ] > (wchar_t) 'Z' )
-	  && ( extension[ 0 ] < (wchar_t) 'a' ) ) )
-#else
-	if( ( extension[ 0 ] > (char) 'z' )
-	 || ( ( extension[ 0 ] > (char) 'Z' )
-	  && ( extension[ 0 ] < (char) 'a' ) ) )
-#endif
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to support for more segment files.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	extension[ 3 ] = (wchar_t) '\0';
-#else
-	extension[ 3 ] = (char) '\0';
-#endif
-
-	return( 1 );
-}
-
-/* Creates a filename for a certain segment file
- * Returns the pointer to the filename, NULL on error
- */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_segment_file_create_wide_filename( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, wchar_t *basename )
-#else
-char *libewf_segment_file_create_filename( uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format, char *basename )
-#endif
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function = "libewf_segment_file_create_wide_filename";
-	wchar_t *filename     = NULL;
-#else
-	static char *function = "libewf_segment_file_create_filename";
-	char *filename        = NULL;
-#endif
-	size_t length         = 0;
-
-	if( basename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid basename.\n",
-		 function );
-
-		return( NULL );
-	}
-	if( segment_number == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment 0.\n",
-		 function );
-
-		return( NULL );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	length = libewf_common_wide_string_length( basename );
-#else
-	length = libewf_common_string_length( basename );
-#endif
-
-	if( length == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: basename is empty.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* The actual filename also contain a . 3 character extension and a end of string byte
-	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename = libewf_common_alloc( ( length + 5 ) * sizeof( wchar_t ) );
-#else
-	filename = libewf_common_alloc( ( length + 5 ) * sizeof( char ) );
-#endif
-
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to allocate filename.\n",
-		 function );
-
-		return( NULL );
-	}
-	/* Add one additional character for the end of line
-	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_common_wide_memcpy( filename, basename, ( length + 1 ) ) == NULL )
-#else
-	if( libewf_common_memcpy( filename, basename, ( length + 1 ) ) == NULL )
-#endif
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to copy basename.\n",
-		 function );
-
-		libewf_common_free( filename );
-
-		return( NULL );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename[ length ] = (wchar_t) '.';
-#else
-	filename[ length ] = (char) '.';
-#endif
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_segment_file_create_wide_extension(
-	     segment_number,
-	     maximum_amount_of_segments,
-	     segment_file_type,
-	     ewf_format,
-	     format,
-	     &filename[ length + 1 ] ) != 1 )
-#else
-	if( libewf_segment_file_create_extension(
-	     segment_number,
-	     maximum_amount_of_segments,
-	     segment_file_type,
-	     ewf_format,
-	     format,
-	     &filename[ length + 1 ] ) != 1 )
-#endif
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to determine extension.\n",
-		 function );
-
-		libewf_common_free( filename );
-
-		return( NULL );
-	}
-	return( filename );
-}
-
 /* Creates a new segment file and opens it for writing
  * The necessary sections at the start of the segment file are written
  * Returns 1 if successful, or -1 on error
  */
 int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t *filename      = NULL;
-#else
-	char *filename         = NULL;
-#endif
-	static char *function  = "libewf_segment_file_create";
-	size_t filename_length = 0;
-	int file_descriptor    = -1;
+	LIBEWF_FILENAME *filename = NULL;
+	static char *function     = "libewf_segment_file_create";
+	size_t filename_length    = 0;
+	int file_descriptor       = -1;
 
 	if( segment_table == NULL )
 	{
@@ -526,23 +238,13 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename = libewf_segment_file_create_wide_filename(
+	filename = libewf_filename_create_filename(
 	            segment_number,
 	            maximum_amount_of_segments,
 	            segment_file_type,
 	            ewf_format,
 	            format,
 	            segment_table->segment_file[ 0 ].filename );
-#else
-	filename = libewf_segment_file_create_filename(
-	            segment_number,
-	            maximum_amount_of_segments,
-	            segment_file_type,
-	            ewf_format,
-	            format,
-	            segment_table->segment_file[ 0 ].filename );
-#endif
 
 	if( filename == NULL )
 	{
@@ -551,11 +253,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename_length = libewf_common_wide_string_length( filename );
-#else
-	filename_length = libewf_common_string_length( filename );
-#endif
+	filename_length = libewf_filename_length( filename );
 
 	if( filename_length == 0 )
 	{
@@ -566,29 +264,16 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	LIBEWF_VERBOSE_PRINT( "%s: segment file created: %" PRIu32 " with name: %ls.\n",
+	LIBEWF_VERBOSE_PRINT( "%s: segment file created: %" PRIu32 " with name: %" PRIs_EWF_filename ".\n",
 	 function, segment_number, filename );
-#else
-	LIBEWF_VERBOSE_PRINT( "%s: segment file created: %" PRIu32 " with name: %s.\n",
-	 function, segment_number, filename );
-#endif
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	file_descriptor = libewf_common_wide_open( filename, LIBEWF_OPEN_WRITE );
-#else
-	file_descriptor = libewf_common_open( filename, LIBEWF_OPEN_WRITE );
-#endif
+	file_descriptor = libewf_filename_open( filename, LIBEWF_OPEN_WRITE );
 
 	if( file_descriptor == -1 )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 		 function, filename );
-#else
-		LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-		 function, filename );
-#endif
+
 		libewf_common_free( filename );
 
 		return( -1 );
@@ -2180,189 +1865,14 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 	return( total_write_count );
 }
 
-/* Retrieves a filename of a certain segment
- * Returns 1 if succesful, or -1 on error
- */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_segment_file_get_wide_filename( LIBEWF_SEGMENT_FILE *segment_file, wchar_t *filename, size_t length_filename )
-#else
-int libewf_segment_file_get_filename( LIBEWF_SEGMENT_FILE *segment_file, char *filename, size_t length_filename )
-#endif
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function  = "libewf_segment_file_get_wide_filename";
-#else
-	static char *function  = "libewf_segment_file_get_filename";
-#endif
-	size_t filename_length = 0;
-
-	if( segment_file == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file->filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename_length = libewf_common_wide_string_length( segment_file->filename );
-#else
-	filename_length = libewf_common_string_length( segment_file->filename );
-#endif
-
-	/* Add one additional character for the end of line
-	 */
-	filename_length += 1;
-
-	if( length_filename < filename_length )
-	{
-		LIBEWF_WARNING_PRINT( "%s: filename too small.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_common_wide_memcpy(
-	     filename,
-	     segment_file->filename,
-	     filename_length ) == NULL )
-#else
-	if( libewf_common_memcpy(
-	     filename,
-	     segment_file->filename,
-	     filename_length ) == NULL )
-#endif
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Sets a filename for a specific segment file
- * Creates a duplicate of the string
- * Returns 1 if succesful, or -1 on error
- */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_segment_file_set_wide_filename( LIBEWF_SEGMENT_FILE *segment_file, const wchar_t *filename, size_t length_filename )
-#else
-int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const char *filename, size_t length_filename )
-#endif
-{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function = "libewf_segment_file_set_wide_filename";
-#else
-	static char *function = "libewf_segment_file_set_filename";
-#endif
-
-	if( segment_file == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file->filename != NULL )
-	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		LIBEWF_WARNING_PRINT( "%s: filename already set: %ls.\n",
-		 function, segment_file->filename );
-#else
-		LIBEWF_WARNING_PRINT( "%s: filename already set: %s.\n",
-		 function, segment_file->filename );
-#endif
-
-		return( -1 );
-	}
-	if( length_filename == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length is zero.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( length_filename >= (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid filename length value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	/* One additional byte for the end of string character is needed
-	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	segment_file->filename = (wchar_t *) libewf_common_alloc( sizeof( wchar_t ) * ( length_filename + 1 ) );
-#else
-	segment_file->filename = (char *) libewf_common_alloc( sizeof( char ) * ( length_filename + 1 ) );
-#endif
-
-	if( segment_file->filename == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create filename.\n",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_common_wide_memcpy( segment_file->filename, filename, length_filename ) == NULL )
-#else
-	if( libewf_common_memcpy( segment_file->filename, filename, length_filename ) == NULL )
-#endif
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to set filename.\n",
-		 function );
-
-		libewf_common_free( segment_file->filename );
-
-		segment_file->filename = NULL;
-
-		return( -1 );
-	}
-	/* Make sure the string is terminated
-	 */
-	segment_file->filename[ length_filename ] = '\0';
-
-	return( 1 );
-}
-
 /* Initializes the segment table
  * opens EWF segment files for reading
  * and EWF delta segment files for reading and writing
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_segment_file_read_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount, uint8_t flags )
-#else
-int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount, uint8_t flags )
-#endif
+int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function     = "libewf_segment_file_read_wide_open";
-#else
 	static char *function     = "libewf_segment_file_read_open";
-#endif
 	size_t filename_length    = 0;
 	uint32_t iterator         = 0;
 	uint16_t segment_number   = 0;
@@ -2421,11 +1931,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	/* Get the basename of the first segment file and store it in
 	 * the 0'th entry
 	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename_length = libewf_common_wide_string_length( filenames[ 0 ] );
-#else
-	filename_length = libewf_common_string_length( filenames[ 0 ] );
-#endif
+	filename_length = libewf_filename_length( filenames[ 0 ] );
 
 	if( filename_length <= 4 )
 	{
@@ -2434,34 +1940,20 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_segment_file_set_wide_filename(
-	     &( internal_handle->segment_table->segment_file[ 0 ] ),
-	     filenames[ 0 ],
-	     ( filename_length - 4 ) ) != 1 )
-#else
-	if( libewf_segment_file_set_filename(
-	     &( internal_handle->segment_table->segment_file[ 0 ] ),
+	if( libewf_filename_set(
+	     &( internal_handle->segment_table->segment_file[ 0 ].filename ),
 	     filenames[ iterator ],
 	     ( filename_length - 4 ) ) != 1 )
-#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_segment_file_set_wide_filename(
-	     &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
-	     filenames[ 0 ],
-	     ( filename_length - 4 ) ) != 1 )
-#else
-	if( libewf_segment_file_set_filename(
-	     &( internal_handle->delta_segment_table->segment_file[ 0 ] ),
+	if( libewf_filename_set(
+	     &( internal_handle->delta_segment_table->segment_file[ 0 ].filename ),
 	     filenames[ iterator ],
 	     ( filename_length - 4 ) ) != 1 )
-#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename in delta segment table.\n",
 		 function );
@@ -2473,21 +1965,13 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 	 */
 	for( iterator = 0; iterator < file_amount; iterator++ )
 	{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-		file_descriptor = libewf_common_wide_open( filenames[ iterator ], LIBEWF_FLAG_READ );
-#else
-		file_descriptor = libewf_common_open( filenames[ iterator ], LIBEWF_FLAG_READ );
-#endif
+		file_descriptor = libewf_filename_open( filenames[ iterator ], LIBEWF_FLAG_READ );
 
 		if( file_descriptor == -1 )
 		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 			 function, filenames[ iterator ] );
-#else
-			LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-			 function, filenames[ iterator ] );
-#endif
+
 			return( -1 );
 		}
 		if( libewf_segment_file_read_file_header(
@@ -2495,13 +1979,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 		     &segment_number,
 		     &segment_file_type ) <= -1 )
 		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %ls.\n",
+			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %" PRIs_EWF_filename ".\n",
 			 function, filenames[ iterator ] );
-#else
-			LIBEWF_WARNING_PRINT( "%s: unable to read file header in: %s.\n",
-			 function, filenames[ iterator ] );
-#endif
 
 			return( -1 );
 		}
@@ -2535,11 +2014,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 				}
 			}
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			filename_length = libewf_common_wide_string_length( filenames[ 0 ] );
-#else
-			filename_length = libewf_common_string_length( filenames[ 0 ] );
-#endif
+			filename_length = libewf_filename_length( filenames[ 0 ] );
 
 			if( filename_length == 0 )
 			{
@@ -2549,17 +2024,10 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 				return( -1 );
 			}
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			if( libewf_segment_file_set_wide_filename(
-			     &( internal_handle->segment_table->segment_file[ segment_number ] ),
+			if( libewf_filename_set(
+			     &( internal_handle->segment_table->segment_file[ segment_number ].filename ),
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
-#else
-			if( libewf_segment_file_set_filename(
-			     &( internal_handle->segment_table->segment_file[ segment_number ] ),
-			     filenames[ iterator ],
-			     filename_length ) != 1 )
-#endif
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
 				 function );
@@ -2569,13 +2037,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 			internal_handle->segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
 			internal_handle->segment_table->segment_file[ segment_number ].file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, filenames[ iterator ], file_descriptor, segment_number );
-#else
-			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, filenames[ iterator ], file_descriptor, segment_number );
-#endif
 		}
 		else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 		{
@@ -2586,45 +2049,26 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 			{
 				if( libewf_common_close( file_descriptor ) != 0 )
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_VERBOSE_PRINT( "%s: unable to close delta segment file: %ls.\n",
+					LIBEWF_VERBOSE_PRINT( "%s: unable to close delta segment file: %" PRIs_EWF_filename ".\n",
 					 function, filenames[ iterator ] );
-#else
-					LIBEWF_VERBOSE_PRINT( "%s: unable to close delta segment file: %s.\n",
-					 function, filenames[ iterator ] );
-#endif
 				}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				file_descriptor = libewf_common_wide_open(
+				file_descriptor = libewf_filename_open(
 				                   filenames[ iterator ],
 				                   ( LIBEWF_FLAG_READ & LIBEWF_FLAG_WRITE ) );
-#else
-				file_descriptor = libewf_common_open(
-				                   filenames[ iterator ],
-				                   ( LIBEWF_FLAG_READ & LIBEWF_FLAG_WRITE ) );
-#endif
+
 				if( file_descriptor == -1 )
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 					 function, filenames[ iterator ] );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-					 function, filenames[ iterator ] );
-#endif
 					return( -1 );
 				}
 				/* Seek after file header
 				 */
 				if( libewf_common_lseek( file_descriptor, EWF_FILE_HEADER_SIZE, SEEK_CUR ) == -1 )
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to seek in file: %ls.\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to seek in file: %" PRIs_EWF_filename ".\n",
 					 function, filenames[ iterator ] );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to seek in file: %s.\n",
-					 function, filenames[ iterator ] );
-#endif
+
 					return( -1 );
 				}
 			}
@@ -2640,11 +2084,7 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 					return( -1 );
 				}
 			}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			filename_length = libewf_common_wide_string_length( filenames[ 0 ] );
-#else
-			filename_length = libewf_common_string_length( filenames[ 0 ] );
-#endif
+			filename_length = libewf_filename_length( filenames[ 0 ] );
 
 			if( filename_length == 0 )
 			{
@@ -2653,18 +2093,10 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 				return( -1 );
 			}
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			if( libewf_segment_file_set_wide_filename(
-			     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+			if( libewf_filename_set(
+			     &( internal_handle->delta_segment_table->segment_file[ segment_number ].filename ),
 			     filenames[ iterator ],
 			     filename_length ) != 1 )
-#else
-			if( libewf_segment_file_set_filename(
-			     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
-			     filenames[ iterator ],
-			     filename_length ) != 1 )
-#endif
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to set filename in delta segment table.\n",
 				 function );
@@ -2674,13 +2106,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 			internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
 			internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
+			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %" PRIs_EWF_filename " with file descriptor: %d with segment number: %" PRIu16 ".\n",
 			 function, filenames[ iterator ], file_descriptor, segment_number );
-#else
-			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %s with file descriptor: %d with segment number: %" PRIu16 ".\n",
-			 function, filenames[ iterator ], file_descriptor, segment_number );
-#endif
 		}
 		else
 		{
@@ -2711,17 +2138,9 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 /* Opens EWF segment file(s) for writing
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-int libewf_segment_file_write_wide_open( LIBEWF_INTERNAL_HANDLE *internal_handle, wchar_t * const filenames[], uint16_t file_amount )
-#else
-int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char * const filenames[], uint16_t file_amount )
-#endif
+int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount )
 {
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	static char *function  = "libewf_segment_file_write_wide_open";
-#else
 	static char *function  = "libewf_segment_file_write_open";
-#endif
 	size_t filename_length = 0;
 
 	if( internal_handle == NULL )
@@ -2752,11 +2171,7 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, cha
 
 		return( -1 );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	filename_length = libewf_common_wide_string_length( filenames[ 0 ] );
-#else
-	filename_length = libewf_common_string_length( filenames[ 0 ] );
-#endif
+	filename_length = libewf_filename_length( filenames[ 0 ] );
 
 	if( filename_length == 0 )
 	{
@@ -2766,17 +2181,10 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, cha
 		return( -1 );
 	}
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	if( libewf_segment_file_set_wide_filename(
-	     &( internal_handle->segment_table->segment_file[ 0 ] ),
+	if( libewf_filename_set(
+	     &( internal_handle->segment_table->segment_file[ 0 ].filename ),
 	     filenames[ 0 ],
 	     filename_length ) != 1 )
-#else
-	if( libewf_segment_file_set_filename(
-	     &( internal_handle->segment_table->segment_file[ 0 ] ),
-	     filenames[ 0 ],
-	     filename_length ) != 1 )
-#endif
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set filename in segment table.\n",
 		 function );
@@ -2966,13 +2374,8 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 				}
 				else
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%ls).\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
 					 function, iterator, internal_handle->segment_table->segment_file[ iterator ].filename );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%s).\n",
-					 function, iterator, internal_handle->segment_table->segment_file[ iterator ].filename );
-#endif
 				}
 				result = 0;
 			}
@@ -2991,13 +2394,8 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 				}
 				else
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 " (%ls).\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
 					 function, iterator, internal_handle->delta_segment_table->segment_file[ iterator ].filename );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 " (%s).\n",
-					 function, iterator, internal_handle->delta_segment_table->segment_file[ iterator ].filename );
-#endif
 				}
 				result = 0;
 			}

@@ -42,6 +42,7 @@
 #include "libewf_internal_handle.h"
 #include "libewf_notify.h"
 #include "libewf_string.h"
+#include "libewf_segment_file.h"
 
 #include "ewf_crc.h"
 #include "ewf_compress.h"
@@ -69,16 +70,12 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->media                         = NULL;
 	internal_handle->read                          = NULL;
 	internal_handle->write                         = NULL;
-/* refactor */
 	internal_handle->segment_filename              = NULL;
 	internal_handle->segment_files                 = NULL;
 	internal_handle->amount_of_segment_files       = 0;
 	internal_handle->delta_segment_filename        = NULL;
 	internal_handle->delta_segment_files           = NULL;
 	internal_handle->amount_of_delta_segment_files = 0;
-/* refactor */
-	internal_handle->segment_table                 = NULL;
-	internal_handle->delta_segment_table           = NULL;
 	internal_handle->offset_table                  = NULL;
 	internal_handle->secondary_offset_table        = NULL;
 	internal_handle->chunk_cache                   = NULL;
@@ -103,33 +100,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 	internal_handle->ewf_format                    = EWF_FORMAT_UNKNOWN;
 	internal_handle->error_tollerance              = LIBEWF_ERROR_TOLLERANCE_COMPENSATE;
 
-	/* The segment table is initially filled with a single entry
-	 */
-	internal_handle->segment_table = libewf_segment_table_alloc( 1 );
-
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create segment table.\n",
-		 function );
-
-		libewf_common_free( internal_handle );
-
-		return( NULL );
-	}
-	/* The delta segment table is initially filled with a single entry
-	 */
-	internal_handle->delta_segment_table = libewf_segment_table_alloc( 1 );
-
-	if( internal_handle->delta_segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create delta segment table.\n",
-		 function );
-
-		libewf_segment_table_free( internal_handle->segment_table );
-		libewf_common_free( internal_handle );
-
-		return( NULL );
-	}
 	internal_handle->chunk_cache = libewf_chunk_cache_alloc( EWF_MINIMUM_CHUNK_SIZE + EWF_CRC_SIZE );
 
 	if( internal_handle->chunk_cache == NULL )
@@ -137,8 +107,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache.\n",
 		 function );
 
-		libewf_segment_table_free( internal_handle->segment_table );
-		libewf_segment_table_free( internal_handle->delta_segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -151,8 +119,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 		 function );
 
 		libewf_chunk_cache_free( internal_handle->chunk_cache );
-		libewf_segment_table_free( internal_handle->segment_table );
-		libewf_segment_table_free( internal_handle->delta_segment_table );
 		libewf_common_free( internal_handle );
 
 		return( NULL );
@@ -168,8 +134,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 
 			libewf_internal_handle_media_free( internal_handle->media );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
-			libewf_segment_table_free( internal_handle->segment_table );
-			libewf_segment_table_free( internal_handle->delta_segment_table );
 			libewf_common_free( internal_handle );
 
 			return( NULL );
@@ -190,8 +154,6 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
 			}
 			libewf_internal_handle_media_free( internal_handle->media );
 			libewf_chunk_cache_free( internal_handle->chunk_cache );
-			libewf_segment_table_free( internal_handle->segment_table );
-			libewf_segment_table_free( internal_handle->delta_segment_table );
 			libewf_common_free( internal_handle );
 
 			return( NULL );
@@ -204,7 +166,8 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags )
  */
 void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
-	static char *function = "libewf_internal_handle_free";
+	static char *function           = "libewf_internal_handle_free";
+	uint16_t segment_files_iterator = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -225,13 +188,29 @@ void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	{
 		libewf_internal_handle_write_free( internal_handle->write );
 	}
-	if( internal_handle->segment_table != NULL )
+	if( internal_handle->segment_filename != NULL )
 	{
-		libewf_segment_table_free( internal_handle->segment_table );
+		libewf_common_free( internal_handle->segment_filename );
 	}
-	if( internal_handle->delta_segment_table != NULL )
+	if( internal_handle->segment_files != NULL )
 	{
-		libewf_segment_table_free( internal_handle->delta_segment_table );
+		for( segment_files_iterator = 0; segment_files_iterator < internal_handle->amount_of_segment_files; segment_files_iterator++ )
+		{
+			libewf_segment_file_free_values( &( internal_handle->segment_files[ segment_files_iterator ] ) );
+		}
+		libewf_common_free( internal_handle->segment_files );
+	}
+	if( internal_handle->delta_segment_filename != NULL )
+	{
+		libewf_common_free( internal_handle->delta_segment_filename );
+	}
+	if( internal_handle->delta_segment_files != NULL )
+	{
+		for( segment_files_iterator = 0; segment_files_iterator < internal_handle->amount_of_delta_segment_files; segment_files_iterator++ )
+		{
+			libewf_segment_file_free_values( &( internal_handle->delta_segment_files[ segment_files_iterator ] ) );
+		}
+		libewf_common_free( internal_handle->delta_segment_files );
 	}
 	if( internal_handle->offset_table != NULL )
 	{

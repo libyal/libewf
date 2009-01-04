@@ -2440,34 +2440,19 @@ ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle )
 
 					return( -1 );
 				}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				file_descriptor = libewf_common_wide_open(
+				file_descriptor = libewf_filename_open(
 						   internal_handle->segment_table->segment_file[ segment_table_iterator ].filename,
 						   LIBEWF_OPEN_READ_WRITE );
-#else
-				file_descriptor = libewf_common_open(
-						   internal_handle->segment_table->segment_file[ segment_table_iterator ].filename,
-						   LIBEWF_OPEN_READ_WRITE );
-#endif
 
 				if( file_descriptor == -1 )
 				{
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %ls.\n",
+					LIBEWF_WARNING_PRINT( "%s: unable to open file: %" PRIs_EWF_filename ".\n",
 					 function, internal_handle->segment_table->segment_file[ segment_table_iterator ].filename );
-#else
-					LIBEWF_WARNING_PRINT( "%s: unable to open file: %s.\n",
-					 function, internal_handle->segment_table->segment_file[ segment_table_iterator ].filename );
-#endif
+
 					return( -1 );
 				}
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %ls.\n",
+				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %" PRIs_EWF_filename ".\n",
 				 function, internal_handle->segment_table->segment_file[ segment_table_iterator ].filename );
-#else
-				LIBEWF_VERBOSE_PRINT( "%s: correcting segment file: %s.\n",
-				 function, internal_handle->segment_table->segment_file[ segment_table_iterator ].filename );
-#endif
 			}
 			list_entry_iterator = internal_handle->segment_table->segment_file[ segment_table_iterator ].section_list->first;
 
