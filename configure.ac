@@ -34,28 +34,23 @@ AC_DEFUN([LIBEWF_PRINTF_JD],
 	 AC_LANG_PUSH(C)
 	 AC_MSG_CHECKING(
 	  [if printf supports the conversion specifier "%jd"])
-	 AC_LINK_IFELSE(
-		AC_LANG_PROGRAM(
-		 [[#include <stdio.h>]],
-		 [[printf( "%jd" ); ]]),
-		[AC_MSG_RESULT(
-		 [no])],
-	 	[AC_LINK_IFELSE(
-			AC_LANG_PROGRAM(
-			 [[#include <sys/types.h>
+	 AC_RUN_IFELSE(
+		[AC_LANG_PROGRAM(
+		 [[#include <sys/types.h>
 #include <stdio.h>]],
-		 	 [[printf( "%jd", (off_t) 1024 ); ]]),
-			[AC_MSG_RESULT(
-			 [yes])
-			AC_DEFINE(
-			 [HAVE_PRINTF_JD],
-			 [1],
-			 [Define to 1 if printf supports the conversion specifier "%jd".] )],
-			[AC_MSG_RESULT(
-			 [no])] )] )
+		 [[char string[ 3 ];
+if( snprintf( string, 3, "%jd", (off_t) 10 ) < 0 ) return( 1 );
+if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
+		[AC_MSG_RESULT(
+		 [yes])
+		AC_DEFINE(
+		 [HAVE_PRINTF_JD],
+		 [1],
+		 [Define to 1 if printf supports the conversion specifier "%jd".] )],
+		[AC_MSG_RESULT(
+		 [no])] )
 	AC_LANG_POP(C)
-	CFLAGS="$SAVE_CFLAGS"]
-)
+	CFLAGS="$SAVE_CFLAGS"])
 
 dnl Function to detect if printf conversion specifier "%zd" is available
 AC_DEFUN([LIBEWF_PRINTF_ZD],
@@ -64,28 +59,23 @@ AC_DEFUN([LIBEWF_PRINTF_ZD],
 	 AC_LANG_PUSH(C)
 	 AC_MSG_CHECKING(
 	  [if printf supports the conversion specifier "%zd"])
-	 AC_LINK_IFELSE(
-		AC_LANG_PROGRAM(
-		 [[#include <stdio.h>]],
-		 [[printf( "%zd" ); ]]),
-		[AC_MSG_RESULT(
-		 [no])],
-	 	[AC_LINK_IFELSE(
-			AC_LANG_PROGRAM(
-			 [[#include <sys/types.h>
+	 AC_RUN_IFELSE(
+		[AC_LANG_PROGRAM(
+		 [[#include <sys/types.h>
 #include <stdio.h>]],
-			 [[printf( "%zd", (size_t) 1024 ); ]]),
-			[AC_MSG_RESULT(
-			 [yes])
-			AC_DEFINE(
-			 [HAVE_PRINTF_ZD],
-			 [1],
-			 [Define to 1 if printf supports the conversion specifier "%zd".] )],
-			[AC_MSG_RESULT(
-			 [no])] )] )
+		 [[char string[ 3 ];
+if( snprintf( string, 3, "%zd", (size_t) 10 ) < 0 ) return( 1 );
+if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
+		[AC_MSG_RESULT(
+		 [yes])
+		AC_DEFINE(
+		 [HAVE_PRINTF_ZD],
+		 [1],
+		 [Define to 1 if printf supports the conversion specifier "%zd".] )],
+		[AC_MSG_RESULT(
+		 [no])] )
 	AC_LANG_POP(C)
-	CFLAGS="$SAVE_CFLAGS"]
-)
+	CFLAGS="$SAVE_CFLAGS"])
 
 dnl Function to detect if ctime_r is defined according to the POSIX standard
 AC_DEFUN([LIBEWF_FUNC_CTIME_R],

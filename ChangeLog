@@ -162,6 +162,8 @@ Version: 20080320
 * fix for openssl evp and gcc-2.95 on Debian 3.1
 * fixed sha.h detection error in autoconf/make scripts
 * updated manuals
+* fix for %jd and %zd detection for OpenBSD
+  because gcc throws a warning if %jd has no parameter but fails to print the parameter
 
 Version: 20080319
 * refactored test write functions
