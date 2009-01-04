@@ -89,7 +89,7 @@ int libewf_common_open( const char *filename, uint8_t flags )
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "$s: flags not supported.\n",
+		LIBEWF_WARNING_PRINT( "%s: flags not supported.\n",
 		 function );
 
 		return( -1 );

@@ -146,6 +146,7 @@ TODO
 Version: 20070830
 * changed use of stdout and stderr in ewfacquirestream, ewfinfo, ewfalter
 * removed program: error output in ewfacquire, ewfverify
+* fixed duplicate write of delta chunks
 
 Version: 20070829
 * worked on read support for > 2Gb segment file for EnCase 6.7
