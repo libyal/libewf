@@ -1325,7 +1325,7 @@ int libewf_header_values_parse_header_string(
  */
 int libewf_header_values_parse_header(
      libewf_values_table_t **header_values,
-     ewf_char_t *header,
+     uint8_t *header,
      size_t size,
      uint8_t date_format )
 {
@@ -1385,7 +1385,7 @@ int libewf_header_values_parse_header(
  */
 int libewf_header_values_parse_header2(
      libewf_values_table_t **header_values,
-     ewf_char_t *header2,
+     uint8_t *header2,
      size_t header2_size,
      uint8_t date_format )
 {
@@ -1462,7 +1462,7 @@ int libewf_header_values_parse_header2(
 int libewf_header_values_convert_header_string_to_header(
      character_t *header_string,
      size_t header_string_length,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	static char *function = "libewf_header_values_convert_header_string_to_header";
@@ -1497,8 +1497,8 @@ int libewf_header_values_convert_header_string_to_header(
 	}
 	*header_length = header_string_length;
 
-	*header = (ewf_char_t *) memory_allocate(
-	                          sizeof( ewf_char_t ) * *header_length );
+	*header = (uint8_t *) memory_allocate(
+	                       sizeof( uint8_t ) * *header_length );
 
 	if( *header == NULL )
 	{
@@ -1535,7 +1535,7 @@ int libewf_header_values_convert_header_string_to_header(
 int libewf_header_values_convert_header_string_to_header2(
      character_t *header_string,
      size_t header_string_size,
-     ewf_char_t **header2,
+     uint8_t **header2,
      size_t *header2_size )
 {
 	static char *function     = "libewf_header_values_convert_header_string_to_header2";
@@ -1580,8 +1580,8 @@ int libewf_header_values_convert_header_string_to_header2(
 
 		return( -1 );
 	}
-	*header2 = (ewf_char_t *) memory_allocate(
-	                           sizeof( ewf_char_t ) * (size_t) utf16_stream_size );
+	*header2 = (uint8_t *) memory_allocate(
+	                        sizeof( uint8_t ) * (size_t) utf16_stream_size );
 
 	if( *header2 == NULL )
 	{
@@ -3728,7 +3728,7 @@ int libewf_header_values_generate_header_ewf(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -3776,7 +3776,7 @@ int libewf_header_values_generate_header_encase1(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -3824,7 +3824,7 @@ int libewf_header_values_generate_header_ftk(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -3872,7 +3872,7 @@ int libewf_header_values_generate_header_encase2(
      libewf_values_table_t *header_values,
      time_t timestamp,
      int8_t compression_level,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -3919,7 +3919,7 @@ int libewf_header_values_generate_header_encase2(
 int libewf_header_values_generate_header_encase4(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -3965,7 +3965,7 @@ int libewf_header_values_generate_header_encase4(
 int libewf_header_values_generate_header_linen5(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -4011,7 +4011,7 @@ int libewf_header_values_generate_header_linen5(
 int libewf_header_values_generate_header_linen6(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -4057,7 +4057,7 @@ int libewf_header_values_generate_header_linen6(
 int libewf_header_values_generate_header2_encase4(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header2,
+     uint8_t **header2,
      size_t *header2_length )
 {
 	character_t *header_string      = NULL;
@@ -4103,7 +4103,7 @@ int libewf_header_values_generate_header2_encase4(
 int libewf_header_values_generate_header2_encase5(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header2,
+     uint8_t **header2,
      size_t *header2_length )
 {
 	character_t *header_string      = NULL;
@@ -4149,7 +4149,7 @@ int libewf_header_values_generate_header2_encase5(
 int libewf_header_values_generate_header2_encase6(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header2,
+     uint8_t **header2,
      size_t *header2_length )
 {
 	character_t *header_string      = NULL;
@@ -4764,7 +4764,7 @@ int libewf_header_values_parse_header_string_xml(
  */
 int libewf_header_values_parse_xheader(
      libewf_values_table_t **header_values,
-     ewf_char_t *xheader,
+     uint8_t *xheader,
      size_t size,
      uint8_t date_format )
 {
@@ -5076,7 +5076,7 @@ int libewf_header_values_generate_header_string_xml(
 int libewf_header_values_generate_header_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header,
+     uint8_t **header,
      size_t *header_length )
 {
 	character_t *header_string      = NULL;
@@ -5122,7 +5122,7 @@ int libewf_header_values_generate_header_ewfx(
 int libewf_header_values_generate_header2_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **header2,
+     uint8_t **header2,
      size_t *header2_length )
 {
 	character_t *header_string      = NULL;
@@ -5168,7 +5168,7 @@ int libewf_header_values_generate_header2_ewfx(
 int libewf_header_values_generate_xheader_ewfx(
      libewf_values_table_t *header_values,
      time_t timestamp,
-     ewf_char_t **xheader,
+     uint8_t **xheader,
      size_t *xheader_length )
 {
 	character_t *header_string = NULL;

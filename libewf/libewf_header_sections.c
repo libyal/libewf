@@ -397,18 +397,18 @@ int libewf_header_sections_determine_format(
 		 */
 		else if( header_sections->header2 != NULL )
 		{
-			if( header_sections->header2[ 2 ] == (ewf_char_t) '3' )
+			if( header_sections->header2[ 2 ] == (uint8_t) '3' )
 			{
 				/* The EnCase5 header2 contains av on the 6th position (36 ... 38 ...)
 				 * the header2 is an UTF16 string
 				 */
-				if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'a' )
-				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'v' ) )
+				if( ( header_sections->header2[ 36 ] == (uint8_t) 'a' )
+				 && ( header_sections->header2[ 38 ] == (uint8_t) 'v' ) )
 				{
 					*format = LIBEWF_FORMAT_ENCASE5;
 				}
-				else if( ( header_sections->header2[ 36 ] == (ewf_char_t) 'm' )
-				 && ( header_sections->header2[ 38 ] == (ewf_char_t) 'd' ) )
+				else if( ( header_sections->header2[ 36 ] == (uint8_t) 'm' )
+				 && ( header_sections->header2[ 38 ] == (uint8_t) 'd' ) )
 				{
 					*format = LIBEWF_FORMAT_ENCASE6;
 				}
@@ -421,7 +421,7 @@ int libewf_header_sections_determine_format(
 					return( -1 );
 				}
 			}
-			else if( header_sections->header2[ 2 ] == (ewf_char_t) '1' )
+			else if( header_sections->header2[ 2 ] == (uint8_t) '1' )
 			{
 				*format = LIBEWF_FORMAT_ENCASE4;
 			}
@@ -435,18 +435,18 @@ int libewf_header_sections_determine_format(
 		}
 		else if( header_sections->header != NULL )
 		{
-			if( header_sections->header[ 0 ] == (ewf_char_t) '3' )
+			if( header_sections->header[ 0 ] == (uint8_t) '3' )
 			{
 				/* The linen5 header2 contains av on the 6th position (17 18)
 				 * the header2 is an UTF16 string
 				 */
-				if( ( header_sections->header[ 17 ] == (ewf_char_t) 'a' )
-				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'v' ) )
+				if( ( header_sections->header[ 17 ] == (uint8_t) 'a' )
+				 && ( header_sections->header[ 18 ] == (uint8_t) 'v' ) )
 				{
 					*format = LIBEWF_FORMAT_LINEN5;
 				}
-				else if( ( header_sections->header[ 17 ] == (ewf_char_t) 'm' )
-				 && ( header_sections->header[ 18 ] == (ewf_char_t) 'd' ) )
+				else if( ( header_sections->header[ 17 ] == (uint8_t) 'm' )
+				 && ( header_sections->header[ 18 ] == (uint8_t) 'd' ) )
 				{
 					*format = LIBEWF_FORMAT_LINEN6;
 				}
@@ -459,13 +459,13 @@ int libewf_header_sections_determine_format(
 					return( -1 );
 				}
 			}
-			else if( header_sections->header[ 0 ] == (ewf_char_t) '1' )
+			else if( header_sections->header[ 0 ] == (uint8_t) '1' )
 			{
 				/* EnCase uses \r\n
 				 */
-				if( header_sections->header[ 1 ] == (ewf_char_t) '\r' )
+				if( header_sections->header[ 1 ] == (uint8_t) '\r' )
 				{
-					if( header_sections->header[ 25 ] == (ewf_char_t) 'r' )
+					if( header_sections->header[ 25 ] == (uint8_t) 'r' )
 					{
 						*format = LIBEWF_FORMAT_ENCASE1;
 
@@ -475,7 +475,7 @@ int libewf_header_sections_determine_format(
 							 function );
 						}
 					}
-					else if( header_sections->header[ 31 ] == (ewf_char_t) 'r' )
+					else if( header_sections->header[ 31 ] == (uint8_t) 'r' )
 					{
 						*format = LIBEWF_FORMAT_ENCASE2;
 					}
@@ -489,9 +489,9 @@ int libewf_header_sections_determine_format(
 				}
 				/* FTK Imager uses \n
 				 */
-				else if( header_sections->header[ 1 ] == (ewf_char_t) '\n' )
+				else if( header_sections->header[ 1 ] == (uint8_t) '\n' )
 				{
-					if( header_sections->header[ 29 ] == (ewf_char_t) 'r' )
+					if( header_sections->header[ 29 ] == (uint8_t) 'r' )
 					{
 						*format = LIBEWF_FORMAT_FTK;
 					}

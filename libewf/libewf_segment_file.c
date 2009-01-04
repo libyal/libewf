@@ -254,11 +254,17 @@ int libewf_segment_file_read_sections(
 		}
 		/* The next and done sections point back at themselves
 		 */
-		if( ewf_string_compare( section.type, "next", 5 ) == 0 )
+		if( memory_compare(
+		     section.type,
+		     "next",
+		     5 ) == 0 )
 		{
 			return( 1 );
 		}
-		else if( ewf_string_compare( section.type, "done", 5 ) == 0 )
+		else if( memory_compare(
+		          section.type,
+		          "done",
+		          5 ) == 0 )
 		{
 			*last_segment_file = 1;
 
@@ -535,9 +541,9 @@ ssize_t libewf_segment_file_write_last_section(
          uint8_t format,
          uint8_t ewf_format )
 {
-	ewf_char_t *last_section_type = NULL;
-	static char *function         = "libewf_segment_file_write_last_section";
-	ssize_t write_count           = 0;
+	uint8_t *last_section_type = NULL;
+	static char *function      = "libewf_segment_file_write_last_section";
+	ssize_t write_count        = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -548,11 +554,11 @@ ssize_t libewf_segment_file_write_last_section(
 	}
 	if( last_segment_file == 0 )
 	{
-		last_section_type = (ewf_char_t *) "next";
+		last_section_type = (uint8_t *) "next";
 	}
 	else
 	{
-		last_section_type = (ewf_char_t *) "done";
+		last_section_type = (uint8_t *) "done";
 	}
 	/* Write next or done section
 	 */
@@ -840,7 +846,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               0,
 		               table_offsets,
 		               segment_chunk_amount,
-		               (ewf_char_t *) "table",
+		               (uint8_t *) "table",
 		               5,
 		               0,
 		               format,
@@ -886,7 +892,7 @@ ssize_t libewf_segment_file_write_chunks_data(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
-         ewf_char_t *chunk_data,
+         uint8_t *chunk_data,
          size_t size,
          int8_t is_compressed,
          ewf_crc_t *chunk_crc,
@@ -1034,7 +1040,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
          uint8_t format,
          uint8_t ewf_format )
 {
-	ewf_char_t *table_section_string = NULL;
+	uint8_t *table_section_string    = NULL;
 	static char *function            = "libewf_segment_file_write_chunks_correction";
 	off64_t last_segment_file_offset = 0;
 	off64_t base_offset              = 0;
@@ -1116,7 +1122,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		               0,
 		               table_offsets,
 		               section_amount_of_chunks,
-		               (ewf_char_t *) "table",
+		               (uint8_t *) "table",
 		               5,
 		               (size_t) chunks_section_size,
 		               format,
@@ -1179,7 +1185,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		               base_offset,
 		               table_offsets,
 		               section_amount_of_chunks,
-		               (ewf_char_t *) "table",
+		               (uint8_t *) "table",
 		               5,
 		               0,
 		               format,
@@ -1202,7 +1208,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		               base_offset,
 		               table_offsets,
 		               section_amount_of_chunks,
-		               (ewf_char_t *) "table2",
+		               (uint8_t *) "table2",
 		               6,
 		               0,
 		               format,
@@ -1228,7 +1234,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
-         ewf_char_t *chunk_data,
+         uint8_t *chunk_data,
          size_t chunk_size,
          ewf_crc_t *chunk_crc,
          uint8_t write_crc,

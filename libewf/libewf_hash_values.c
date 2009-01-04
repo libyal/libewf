@@ -55,7 +55,7 @@ int libewf_hash_values_initialize(
 	return( 1 );
 }
 
-/* Parse a xml hash string for the values
+/* Parse a XML hash string for the values
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_parse_hash_string_xml(
@@ -156,7 +156,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		/* Ignore the first part of the xml string
+		/* Ignore the first part of the XML string
 		 */
 		string_length -= (size_t) ( open_tag_end - lines[ line_iterator ] );
 
@@ -188,7 +188,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		/* Ignore the second part of the xml string
+		/* Ignore the second part of the XML string
 		 */
 		string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
 
@@ -225,11 +225,12 @@ int libewf_hash_values_parse_hash_string_xml(
  */
 int libewf_hash_values_parse_xhash(
      libewf_values_table_t **hash_values,
-     ewf_char_t *xhash,
-     size_t size )
+     uint8_t *xhash,
+     size_t xhash_size )
 {
 	character_t *xml_hash_string = NULL;
 	static char *function        = "libewf_hash_values_parse_xhash";
+	ssize_t xml_hash_string_size = 0;
 	int result                   = 0;
 
 	if( xhash == NULL )
@@ -239,8 +240,20 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
+	xml_hash_string_size = string_size_from_byte_stream(
+	                        (uint8_t *) xhash,
+	                        xhash_size,
+	                        LIBUCA_CODEPAGE_ASCII );
+
+	if( xml_hash_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine XML hash string size.\n",
+		 function );
+
+		return( -1 );
+	}
 	xml_hash_string = (character_t *) memory_allocate(
-	                                   sizeof( character_t ) * ( size + 1 ) );
+	                                   sizeof( character_t ) * xml_hash_string_size );
 
 	if( xml_hash_string == NULL )
 	{
@@ -249,12 +262,14 @@ int libewf_hash_values_parse_xhash(
 
 		return( -1 );
 	}
-	if( string_copy_from_char(
+	if( string_copy_from_byte_stream(
 	     xml_hash_string,
-	     (char *) xhash,
-	     size ) != 1 )
+	     xml_hash_string_size,
+	     xhash,
+	     xhash_size,
+	     LIBUCA_CODEPAGE_ASCII ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy xhash to xml hash string.\n",
+		notify_warning_printf( "%s: unable to XML set hash string.\n",
 		 function );
 
 		memory_free(
@@ -265,11 +280,11 @@ int libewf_hash_values_parse_xhash(
 	result = libewf_hash_values_parse_hash_string_xml(
 	          hash_values,
 	          xml_hash_string,
-	          size );
+	          xml_hash_string_size );
 
 	if( result != 1 )
 	{
-		notify_warning_printf( "%s: unable to parse xml hash string.\n",
+		notify_warning_printf( "%s: unable to parse XML hash string.\n",
 		 function );
 	}
 	memory_free(
@@ -285,7 +300,7 @@ int libewf_hash_values_parse_xhash(
 int libewf_hash_values_convert_hash_string_to_hash(
      character_t *hash_string,
      size_t hash_string_length,
-     ewf_char_t **hash,
+     uint8_t **hash,
      size_t *hash_length )
 {
 	static char *function = "libewf_hash_values_convert_hash_string_to_hash";
@@ -328,8 +343,8 @@ int libewf_hash_values_convert_hash_string_to_hash(
 	}
 	*hash_length = hash_string_length;
 
-	*hash = (ewf_char_t *) memory_allocate(
-	                        sizeof( ewf_char_t ) * *hash_length );
+	*hash = (uint8_t *) memory_allocate(
+	                     sizeof( uint8_t ) * *hash_length );
 
 	if( *hash == NULL )
 	{
@@ -404,7 +419,7 @@ int libewf_hash_values_generate_hash_string_xml(
 
 		return( -1 );
 	}
-	/* Add space for the xml data and an end of line
+	/* Add space for the XML data and an end of line
 	 */
 	*hash_string_length = 1 + string_length(
 	                           xml_head );
@@ -544,7 +559,7 @@ int libewf_hash_values_generate_hash_string_xml(
  */
 int libewf_hash_values_generate_xhash_string_ewfx(
      libewf_values_table_t *hash_values,
-     ewf_char_t **hash,
+     uint8_t **hash,
      size_t *hash_length )
 {
 	character_t *hash_string = NULL;

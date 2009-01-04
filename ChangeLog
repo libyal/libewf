@@ -116,8 +116,9 @@ Next release(s):
 * fix ewfinfo
 
 * implement libuca
-  - replace utf16 functions
   - replace string_copy_from_char
+  - xhash and xheader should be stored in UTF-8
+  - handle codepage
 
 * check if libewf_string_split is resistant to empty strings
 
@@ -185,7 +186,8 @@ Version: 20080902
 * implemented ewfguid
 * refactored character string split to return int
 * changed project website
-* worked on integrating libuca
+* worked on integrating libuca and replacing string conversion routines
+* removed ewf_char.h and ewf_string.h
 
 Version: 20080901
 * refactored ewfglob

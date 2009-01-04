@@ -35,7 +35,6 @@
 #include "libewf_sector_table.h"
 #include "libewf_values_table.h"
 
-#include "ewf_char.h"
 #include "ewf_data.h"
 #include "ewf_digest_hash.h"
 #include "ewf_error2.h"

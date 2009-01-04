@@ -46,7 +46,7 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 		return( NULL );
 	}
-	size *= sizeof( ewf_char_t );
+	size *= sizeof( uint8_t );
 
 	if( size > (size_t) SSIZE_MAX )
 	{
@@ -55,8 +55,8 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 		return( NULL );
 	}
-	chunk_cache->compressed = (ewf_char_t *) memory_allocate(
-	                                          size );
+	chunk_cache->compressed = (uint8_t *) memory_allocate(
+	                                       size );
 
 	if( chunk_cache->compressed == NULL )
 	{
@@ -68,8 +68,8 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc(
 
 		return( NULL );
 	}
-	chunk_cache->data = (ewf_char_t *) memory_allocate(
-	                                    size );
+	chunk_cache->data = (uint8_t *) memory_allocate(
+	                                 size );
 
 	if( chunk_cache->data == NULL )
 	{
@@ -99,8 +99,8 @@ int libewf_chunk_cache_realloc(
      libewf_chunk_cache_t *chunk_cache,
      size_t size )
 {
-	ewf_char_t *reallocation = NULL;
-	static char *function    = "libewf_chunk_cache_realloc";
+	uint8_t *reallocation = NULL;
+	static char *function = "libewf_chunk_cache_realloc";
 
 	if( chunk_cache == NULL )
 	{
@@ -109,7 +109,7 @@ int libewf_chunk_cache_realloc(
 
 		return( -1 );
 	}
-	size *= sizeof( ewf_char_t );
+	size *= sizeof( uint8_t );
 
 	if( size > (size_t) SSIZE_MAX )
 	{
@@ -125,9 +125,9 @@ int libewf_chunk_cache_realloc(
 
 		return( -1 );
 	}
-	reallocation = (ewf_char_t *) memory_reallocate(
-	                               (void *) chunk_cache->compressed,
-	                                size );
+	reallocation = (uint8_t *) memory_reallocate(
+	                            chunk_cache->compressed,
+	                            size );
 
 	if( reallocation == NULL )
 	{
@@ -137,8 +137,8 @@ int libewf_chunk_cache_realloc(
 		return( -1 );
 	}
 	chunk_cache->compressed = reallocation;
-	reallocation            = (ewf_char_t *) memory_reallocate(
-	                                          (void *) chunk_cache->data,
+	reallocation            = (uint8_t *) memory_reallocate(
+	                                       chunk_cache->data,
 	                                          size );
 
 	if( reallocation == NULL )

@@ -26,9 +26,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "ewf_char.h"
-#include "ewf_string.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif

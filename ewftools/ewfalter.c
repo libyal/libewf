@@ -230,7 +230,7 @@ int main( int argc, char * const argv[] )
 	ewfcommon_libewf_handle = libewf_open(
 	                           argv_filenames,
 	                           amount_of_filenames,
-	                           LIBEWF_OPEN_READ );
+	                           LIBEWF_OPEN_READ_WRITE );
 #if !defined( HAVE_GLOB_H )
 	ewfglob_free(
 	 &glob );

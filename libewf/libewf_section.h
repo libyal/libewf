@@ -34,7 +34,6 @@
 #include "libewf_sector_table.h"
 #include "libewf_segment_file_handle.h"
 
-#include "ewf_char.h"
 #include "ewf_crc.h"
 #include "ewf_data.h"
 #include "ewf_digest_hash.h"
@@ -52,45 +51,45 @@ ssize_t libewf_section_start_read(
 
 ssize_t libewf_section_start_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *section_type,
+         uint8_t *section_type,
          size_t section_type_length,
          size64_t section_data_size );
 
 ssize_t libewf_section_compressed_string_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t compressed_string_size,
-         ewf_char_t **uncompressed_string,
+         uint8_t **uncompressed_string,
          size_t *uncompressed_string_size );
 
 ssize_t libewf_section_write_compressed_string(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *section_type,
+         uint8_t *section_type,
          size_t section_type_length,
-         ewf_char_t *uncompressed_string,
+         uint8_t *uncompressed_string,
          size_t uncompressed_string_size,
          int8_t compression_level );
 
 ssize_t libewf_section_header_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
-         ewf_char_t **cached_header,
+         uint8_t **cached_header,
          size_t *cached_header_size );
 
 ssize_t libewf_section_header_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *header,
+         uint8_t *header,
          size_t header_size,
          int8_t compression_level );
 
 ssize_t libewf_section_header2_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
-         ewf_char_t **cached_header2,
+         uint8_t **cached_header2,
          size_t *cached_header2_size );
 
 ssize_t libewf_section_header2_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *header2,
+         uint8_t *header2,
          size_t header2_size,
          int8_t compression_level );
 
@@ -142,7 +141,7 @@ ssize_t libewf_section_table_write(
          off64_t base_offset,
          ewf_table_offset_t *offsets,
          uint32_t amount_of_offsets,
-         ewf_char_t *section_type,
+         uint8_t *section_type,
          size_t section_type_length,
          size_t additional_size,
          uint8_t format,
@@ -215,7 +214,7 @@ ssize_t libewf_section_hash_write(
 
 ssize_t libewf_section_last_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *section_type,
+         uint8_t *section_type,
          size_t section_type_length,
          uint8_t format,
          uint8_t ewf_format );
@@ -223,24 +222,24 @@ ssize_t libewf_section_last_write(
 ssize_t libewf_section_xheader_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
-         ewf_char_t **cached_xheader,
+         uint8_t **cached_xheader,
          size_t *cached_xheader_size );
 
 ssize_t libewf_section_xheader_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *xheader,
+         uint8_t *xheader,
          size_t xheader_size,
          int8_t compression_level );
 
 ssize_t libewf_section_xhash_read(
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
-         ewf_char_t **cached_xhash,
+         uint8_t **cached_xhash,
          size_t *cached_xhash_size );
 
 ssize_t libewf_section_xhash_write(
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_char_t *xhash,
+         uint8_t *xhash,
          size_t xhash_size,
          int8_t compression_level );
 
@@ -254,7 +253,7 @@ ssize_t libewf_section_delta_chunk_read(
 ssize_t libewf_section_delta_chunk_write(
          libewf_segment_file_handle_t *segment_file_handle,
          uint32_t chunk,
-         ewf_char_t *chunk_data,
+         uint8_t *chunk_data,
          size_t chunk_size,
          ewf_crc_t *chunk_crc,
          uint8_t write_crc,

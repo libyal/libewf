@@ -28,8 +28,6 @@
 
 #include "libewf_values_table.h"
 
-#include "ewf_char.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -42,7 +40,7 @@ struct libewf_header_sections
 {
 	/* The stored header
 	 */
-	ewf_char_t *header;
+	uint8_t *header;
 
 	/* The size of the stored header
 	 */
@@ -50,7 +48,7 @@ struct libewf_header_sections
 
 	/* The stored header2
 	 */
-	ewf_char_t *header2;
+	uint8_t *header2;
 
 	/* The size of the stored header2
 	 */
@@ -58,7 +56,7 @@ struct libewf_header_sections
 
 	/* The stored xheader
 	 */
-	ewf_char_t *xheader;
+	uint8_t *xheader;
 
 	/* The size of the stored xheader
 	 */

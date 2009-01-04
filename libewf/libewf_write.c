@@ -47,7 +47,6 @@
 #include "libewf_segment_table.h"
 #include "libewf_write.h"
 
-#include "ewf_char.h"
 #include "ewf_crc.h"
 #include "ewf_data.h"
 #include "ewf_definitions.h"
@@ -579,9 +578,9 @@ ssize_t libewf_write_process_chunk_data(
          int8_t compression_level,
          uint8_t compress_empty_block,
          uint8_t ewf_format,
-         ewf_char_t *chunk_data,
+         uint8_t *chunk_data,
          size_t chunk_data_size,
-         ewf_char_t *compressed_chunk_data,
+         uint8_t *compressed_chunk_data,
          size_t *compressed_chunk_data_size,
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
@@ -814,7 +813,7 @@ ssize_t libewf_write_process_chunk_data(
 ssize_t libewf_raw_write_chunk_new(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
-         ewf_char_t *chunk_buffer,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
@@ -1361,7 +1360,7 @@ ssize_t libewf_raw_write_chunk_new(
 ssize_t libewf_raw_write_chunk_existing(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
-         ewf_char_t *chunk_buffer,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
@@ -1690,7 +1689,7 @@ ssize_t libewf_write_chunk_data_new(
          size_t data_size,
          int8_t force_write )
 {
-	ewf_char_t *chunk_data            = NULL;
+	uint8_t *chunk_data               = NULL;
 	static char *function             = "libewf_write_chunk_data_new";
 	ewf_crc_t chunk_crc               = 0;
 	ssize_t chunk_data_size           = 0;
@@ -1782,7 +1781,7 @@ ssize_t libewf_write_chunk_data_new(
 	 || ( ( internal_handle->chunk_cache->offset == 0 )
 	 && ( data_size >= (size_t) internal_handle->media_values->chunk_size ) ) )
 	{
-		chunk_data = (ewf_char_t *) buffer;
+		chunk_data = (uint8_t *) buffer;
 		write_size = read_size;
 	}
 	else
@@ -1917,7 +1916,7 @@ ssize_t libewf_write_chunk_data_existing(
          size_t size,
          size_t data_size )
 {
-	ewf_char_t *chunk_data      = NULL;
+	uint8_t *chunk_data         = NULL;
 	static char *function       = "libewf_write_chunk_data_existing";
 	ewf_crc_t chunk_crc         = 0;
 	size_t remaining_chunk_size = 0;
@@ -2142,9 +2141,9 @@ ssize_t libewf_raw_write_prepare_buffer(
 	                   internal_handle->compression_level,
 	                   internal_handle->compress_empty_block,
 	                   internal_handle->ewf_format,
-	                   (ewf_char_t *) buffer,
+	                   (uint8_t *) buffer,
 	                   buffer_size,
-	                   (ewf_char_t *) compressed_buffer,
+	                   (uint8_t *) compressed_buffer,
 	                   compressed_buffer_size,
 	                   is_compressed,
 	                   (ewf_crc_t *) chunk_crc,

@@ -28,7 +28,6 @@
 
 #include "libewf_values_table.h"
 
-#include "ewf_char.h"
 #include "ewf_digest_hash.h"
 
 #if defined( __cplusplus )
@@ -43,7 +42,7 @@ struct libewf_hash_sections
 {
 	/* The stored xhash
 	 */
-	ewf_char_t *xhash;
+	uint8_t *xhash;
 
 	/* The size of the stored xhash
 	 */

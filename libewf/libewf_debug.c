@@ -127,11 +127,12 @@ void libewf_debug_section_print(
 /* Prints the header data to the notify stream
  */
 void libewf_debug_header_print(
-      ewf_char_t *header,
+      uint8_t *header,
       size_t header_size )
 {
 	character_t *header_string = NULL;
 	static char *function      = "libewf_debug_header_print";
+	ssize_t header_string_size = 0;
 
 	if( header == NULL )
 	{
@@ -140,8 +141,20 @@ void libewf_debug_header_print(
 
 		return;
 	}
+	header_string_size = string_size_from_byte_stream(
+	                      header,
+	                      header_size,
+	                      LIBUCA_CODEPAGE_ASCII );
+
+	if( header_string_size < 0 )
+	{
+		notify_warning_printf( "%s: unable to determine header string size.\n",
+		 function );
+
+		return;
+	}
 	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * ( header_size + 1 ) );
+	                                 sizeof( character_t ) * (size_t) header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -150,12 +163,14 @@ void libewf_debug_header_print(
 
 		return;
 	}
-	if( string_copy_from_char(
+	if( string_copy_from_byte_stream(
 	     header_string,
-	     (char *) header,
-	     header_size ) != 1 )
+	     header_string_size,
+	     (uint8_t *) header,
+	     header_size,
+	     LIBUCA_CODEPAGE_ASCII ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to copy header to header string.\n",
+		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
 		memory_free(
@@ -163,8 +178,6 @@ void libewf_debug_header_print(
 
 		return;
 	}
-	header_string[ header_size ] = (character_t) '\0';
-
 	notify_printf( "%" PRIs "",
 	 header_string );
 
@@ -175,7 +188,7 @@ void libewf_debug_header_print(
 /* Prints the header2 data to the notify stream
  */
 void libewf_debug_header2_print(
-      ewf_char_t *header2,
+      uint8_t *header2,
       size_t header2_size )
 {
 	character_t *header_string = NULL;

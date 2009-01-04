@@ -29,7 +29,6 @@
 
 #include <stdio.h>
 
-#include "ewf_char.h"
 #include "ewf_section.h"
 #include "ewf_ltree.h"
 
@@ -45,11 +44,11 @@ void libewf_debug_section_print(
       ewf_section_t *section );
 
 void libewf_debug_header_print(
-      ewf_char_t *header,
+      uint8_t *header,
       size_t header_size );
 
 void libewf_debug_header2_print(
-      ewf_char_t *header2,
+      uint8_t *header2,
       size_t header2_size );
 
 #if defined( __cplusplus )

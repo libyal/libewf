@@ -37,16 +37,15 @@
 
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
-#include "ewf_string.h"
 
 /* Processes the chunk data, applies decompression if necessary and validates the CRC
  * Returns the amount of bytes of the processed chunk data, or -1 on error
  */
 ssize_t libewf_read_process_chunk_data(
          libewf_internal_handle_t *internal_handle,
-         ewf_char_t *chunk_data,
+         uint8_t *chunk_data,
          size_t chunk_data_size,
-         ewf_char_t *uncompressed_chunk_data,
+         uint8_t *uncompressed_chunk_data,
          size_t *uncompressed_chunk_data_size,
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
@@ -149,7 +148,7 @@ ssize_t libewf_read_process_chunk_data(
 ssize_t libewf_raw_read_chunk(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
-         ewf_char_t *chunk_buffer,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
@@ -375,11 +374,11 @@ ssize_t libewf_read_chunk_data(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
          uint32_t chunk_offset,
-         ewf_char_t *buffer,
+         uint8_t *buffer,
          size_t size )
 {
-	ewf_char_t *chunk_data     = NULL;
-	ewf_char_t *chunk_read     = NULL;
+	uint8_t *chunk_data        = NULL;
+	uint8_t *chunk_read        = NULL;
 	static char *function      = "libewf_read_chunk_data";
 	ewf_crc_t chunk_crc        = 0;
 	off64_t sector             = 0;
@@ -702,9 +701,9 @@ ssize_t libewf_raw_read_prepare_buffer(
 	}
 	chunk_data_size = libewf_read_process_chunk_data(
 	                   internal_handle,
-	                   (ewf_char_t *) buffer,
+	                   (uint8_t *) buffer,
 	                   buffer_size,
-	                   (ewf_char_t *) uncompressed_buffer,
+	                   (uint8_t *) uncompressed_buffer,
 	                   uncompressed_buffer_size,
 	                   is_compressed,
 	                   (ewf_crc_t) chunk_crc,
@@ -872,7 +871,7 @@ ssize_t libewf_read_buffer(
 		                    internal_handle,
 		                    internal_handle->current_chunk,
 		                    internal_handle->current_chunk_offset,
-		                    (ewf_char_t *) &( (uint8_t *) buffer )[ total_read_count ],
+		                    (uint8_t *) &( (uint8_t *) buffer )[ total_read_count ],
 		                    size );
 
 		if( chunk_read_count <= -1 )

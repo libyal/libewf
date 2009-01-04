@@ -31,7 +31,6 @@
 #include "libewf_extern.h"
 #include "libewf_handle.h"
 
-#include "ewf_char.h"
 #include "ewf_crc.h"
 
 #if defined( __cplusplus )
@@ -40,9 +39,9 @@ extern "C" {
 
 ssize_t libewf_read_process_chunk_data(
          libewf_internal_handle_t *internal_handle,
-         ewf_char_t *chunk_data,
+         uint8_t *chunk_data,
          size_t chunk_data_size,
-         ewf_char_t *uncompressed_chunk_data,
+         uint8_t *uncompressed_chunk_data,
          size_t *uncompressed_chunk_data_size,
          int8_t is_compressed,
          ewf_crc_t chunk_crc,
@@ -51,7 +50,7 @@ ssize_t libewf_read_process_chunk_data(
 ssize_t libewf_raw_read_chunk(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
-         ewf_char_t *chunk_buffer,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
          int8_t *is_compressed,
          ewf_crc_t *chunk_crc,
@@ -61,7 +60,7 @@ ssize_t libewf_read_chunk_data(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
          uint32_t chunk_offset,
-         ewf_char_t *buffer,
+         uint8_t *buffer,
          size_t size );
 
 LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
