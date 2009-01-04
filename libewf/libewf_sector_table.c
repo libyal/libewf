@@ -40,7 +40,7 @@
 /* Allocates memory for a sector table struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( size_t amount )
+LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( uint32_t amount )
 {
 	LIBEWF_SECTOR_TABLE *sector_table = NULL;
 	static char *function             = "libewf_sector_table_alloc";
@@ -92,7 +92,7 @@ LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( size_t amount )
 /* Reallocates memory for the sector table values
  * Returns 1 if successful, or -1 on error
  */
-int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, size_t amount )
+int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, uint32_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_sector_table_realloc";
@@ -251,7 +251,7 @@ int libewf_sector_table_add_error_sector( LIBEWF_SECTOR_TABLE *sector_table, off
 
 				if( last_sector > last_range_sector )
 				{
-					sector_table->error_sector[ iterator ].amount_of_sectors += last_sector - last_range_sector;
+					sector_table->error_sector[ iterator ].amount_of_sectors += (uint32_t) ( last_sector - last_range_sector );
 				}
 				return( 1 );
 			}

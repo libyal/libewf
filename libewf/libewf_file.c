@@ -362,7 +362,7 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 
 		return( -1 );
 	}
-	internal_handle->current_chunk = chunk;
+	internal_handle->current_chunk = (uint32_t) chunk;
 
 	/* Determine the offset within the decompressed chunk that is requested
 	 */

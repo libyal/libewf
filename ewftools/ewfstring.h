@@ -114,7 +114,10 @@ extern "C" {
 #error Missing wide character string search function (wmemchr and wcschr)
 #endif
 
-#if defined( HAVE_WCSTOLL )
+#if defined( HAVE_WINDOWS_API )
+#define CHAR_T_TOLONG( string, end_of_string, base ) \
+	(int64_t) _wtoi64( string )
+#elif defined( HAVE_WCSTOLL )
 #define CHAR_T_TOLONG( string, end_of_string, base ) \
 	(int64_t) wcstoll( string, end_of_string, base )
 #else
@@ -195,7 +198,10 @@ extern "C" {
 #error Missing string search function (memchr and strchr)
 #endif
 
-#if defined( HAVE_STRTOLL )
+#if defined( HAVE_WINDOWS_API )
+#define CHAR_T_TOLONG( string, end_of_string, base ) \
+	(int64_t) _atoi64( string )
+#elif defined( HAVE_STRTOLL )
 #define CHAR_T_TOLONG( string, end_of_string, base ) \
 	(int64_t) strtoll( string, end_of_string, base )
 #elif defined( HAVE_ATOLL )

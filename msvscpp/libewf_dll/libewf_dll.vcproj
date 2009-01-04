@@ -211,7 +211,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_hash_sections.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_hash_values.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_header_sections.c"
 				>
 			</File>
 			<File
@@ -247,7 +255,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_sector_table.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_segment_file.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_segment_file_handle.c"
 				>
 			</File>
 			<File
@@ -345,6 +361,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_chunk_offset.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_common.h"
 				>
 			</File>
@@ -389,7 +409,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_hash_sections.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_hash_values.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_header_sections.h"
 				>
 			</File>
 			<File
@@ -429,7 +457,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_sector_table.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_segment_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_segment_file_handle.h"
 				>
 			</File>
 			<File

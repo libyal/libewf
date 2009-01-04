@@ -51,15 +51,15 @@ struct libewf_sector_table
 {
 	/* The amount of error sectors in the table
 	 */
-	size_t amount;
+	uint32_t amount;
 
 	/* A dynamic array containting references to error sectors
 	 */
 	LIBEWF_ERROR_SECTOR *error_sector;
 };
 
-LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( size_t amount );
-int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, size_t amount );
+LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( uint32_t amount );
+int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, uint32_t amount );
 void libewf_sector_table_free( LIBEWF_SECTOR_TABLE *sector_table );
 
 int libewf_sector_table_get_error_sector( LIBEWF_SECTOR_TABLE *sector_table, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors );

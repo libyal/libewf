@@ -95,16 +95,25 @@ LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( HAVE_WCSTOLL )
+#if defined( HAVE_WINDOWS_API )
+#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
+	(int64_t) _wtoi64( string )
+
+#elif defined( HAVE_WCSTOLL )
 #define libewf_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) wcstoll( string, end_of_string, base )
 #endif
 
 #else
 
-#if defined( HAVE_STRTOLL )
+#if defined( HAVE_WINDOWS_API )
+#define libewf_string_to_signed_long_long( string, end_of_string, base ) \
+	(int64_t) _atoi64( string )
+
+#elif defined( HAVE_STRTOLL )
 #define libewf_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) strtoll( string, end_of_string, base )
+
 #elif defined( HAVE_ATOLL )
 #define libewf_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) atoll( string )
@@ -167,16 +176,25 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
-#if defined( HAVE_WCSTOULL )
+#if defined( HAVE_WINDOWS_API )
+#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
+	(uint64_t) _wtoi64( string )
+
+#elif defined( HAVE_WCSTOULL )
 #define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) wcstoull( string, end_of_string, base )
 #endif
 
 #else
 
-#if defined( HAVE_STRTOULL )
+#if defined( HAVE_WINDOWS_API )
+#define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
+	(uint64_t) _atoi64( string )
+
+#elif defined( HAVE_STRTOULL )
 #define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) strtoull( string, end_of_string, base )
+
 #elif defined( HAVE_ATOLL )
 #define libewf_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) atoll( string )

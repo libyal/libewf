@@ -153,7 +153,7 @@ CLOSED
 
 Version: 20071209
 * minor changes to debian package files
-* updated the MS Visual C++ Project files
+* fixes for the MS Visual C++ build
 
 Version: 20071208
 * pkgconfig added to spec file
