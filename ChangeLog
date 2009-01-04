@@ -121,6 +121,8 @@ Known issues:
 
 Next release(s):
 
+* why does libewf_get_segment_filename return basename?
+
 * implement error handling
   - update library (keep error in library due to multi threading)
   - update API later
@@ -194,6 +196,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080911
+* worked on improved error handling
 
 Version: 20080910
 * worked on libuna

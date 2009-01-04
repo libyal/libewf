@@ -27,6 +27,7 @@
 #include <types.h>
 
 #include "libewf_definitions.h"
+#include "libewf_error.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_offset_table.h"
@@ -290,6 +291,7 @@ libewf_handle_t *libewf_open(
                   uint16_t amount_of_files,
                   uint8_t flags )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_handle_t *handle                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_open";
@@ -319,10 +321,16 @@ libewf_handle_t *libewf_open(
 	}
 	if( libewf_handle_initialize(
 	     &handle,
-	     flags ) != 1 )
+	     flags,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to create handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( NULL );
 	}
@@ -352,13 +360,20 @@ libewf_handle_t *libewf_open(
 		     &( internal_handle->ewf_format ),
 		     segment_file_size,
 		     internal_handle->error_tollerance,
-		     &( internal_handle->abort ) ) != 1 )
+		     &( internal_handle->abort ),
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to open segment file(s).\n",
 			 function );
 
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
 			libewf_handle_free(
-			 &handle );
+			 &handle,
+			 NULL );
 
 			return( NULL );
 		}
@@ -382,13 +397,20 @@ libewf_handle_t *libewf_open(
 		if( libewf_segment_table_write_open(
 		     internal_handle->segment_table,
 		     filenames,
-		     amount_of_files ) != 1 )
+		     amount_of_files,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to open segment file(s).\n",
 			 function );
 
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
 			libewf_handle_free(
-			 &handle );
+			 &handle,
+			 NULL );
 
 			return( NULL );
 		}
@@ -396,10 +418,22 @@ libewf_handle_t *libewf_open(
 	/* Make sure format specific values are set
 	 */
 	if( libewf_internal_handle_initialize_format(
-	     internal_handle ) != 1 )
+	     internal_handle,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to initialize format specific values.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+
+		return( NULL );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	notify_verbose_printf( "%s: open successful.\n",
@@ -415,6 +449,7 @@ libewf_handle_t *libewf_open(
 int libewf_close(
      libewf_handle_t *handle )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_close";
 
@@ -445,15 +480,22 @@ int libewf_close(
 		 function );
 
 		libewf_handle_free(
-		 &handle );
+		 &handle,
+		 NULL );
 
 		return( -1 );
 	}
 	if( libewf_handle_free(
-	     &handle ) != 1 )
+	     &handle,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to free handle.\n",
 		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 
 		return( -1 );
 	}

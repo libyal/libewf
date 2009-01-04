@@ -63,14 +63,17 @@ struct libewf_segment_table
 
 int libewf_segment_table_initialize(
      libewf_segment_table_t **segment_table,
-     uint16_t amount );
+     uint16_t amount,
+     libewf_error_t **error );
 
 int libewf_segment_table_free(
-     libewf_segment_table_t **segment_table );
+     libewf_segment_table_t **segment_table,
+     libewf_error_t **error );
 
 int libewf_segment_table_resize(
      libewf_segment_table_t *segment_table,
-     uint16_t amount );
+     uint16_t amount,
+     libewf_error_t **error );
 
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
@@ -86,17 +89,20 @@ int libewf_segment_table_build(
      uint8_t *ewf_format,
      size64_t *segment_file_size,
      uint8_t error_tollerance,
-     int *abort );
+     int *abort,
+     libewf_error_t **error );
 
 int libewf_segment_table_get_basename(
      libewf_segment_table_t *segment_table,
      system_character_t *basename,
-     size_t length );
+     size_t length,
+     libewf_error_t **error );
 
 int libewf_segment_table_set_basename(
      libewf_segment_table_t *segment_table,
      system_character_t *basename,
-     size_t basename_length );
+     size_t basename_length,
+     libewf_error_t **error );
 
 int libewf_segment_table_read_open(
      libewf_segment_table_t *segment_table,
@@ -116,12 +122,14 @@ int libewf_segment_table_read_open(
      uint8_t *ewf_format,
      size64_t *segment_file_size,
      uint8_t error_tollerance,
-     int *abort );
+     int *abort,
+     libewf_error_t **error );
 
 int libewf_segment_table_write_open(
      libewf_segment_table_t *segment_table,
      system_character_t * const filenames[],
-     uint16_t file_amount );
+     uint16_t file_amount,
+     libewf_error_t **error );
 
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
@@ -130,7 +138,8 @@ int libewf_segment_table_create_segment_file(
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
      uint8_t format,
-     uint8_t ewf_format );
+     uint8_t ewf_format,
+     libewf_error_t **error );
 
 #if defined( __cplusplus )
 }

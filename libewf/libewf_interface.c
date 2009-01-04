@@ -695,8 +695,10 @@ int libewf_get_segment_filename(
      system_character_t *filename,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_segment_filename";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -714,10 +716,23 @@ int libewf_get_segment_filename(
 
 		return( -1 );
 	}
-	return( libewf_segment_table_get_basename(
-	         internal_handle->segment_table,
-	         filename,
-	         length ) );
+	result = libewf_segment_table_get_basename(
+	          internal_handle->segment_table,
+	          filename,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to determine segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the delta segment filename
@@ -728,8 +743,10 @@ int libewf_get_delta_segment_filename(
      system_character_t *filename,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_delta_segment_filename";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -747,10 +764,23 @@ int libewf_get_delta_segment_filename(
 
 		return( -1 );
 	}
-	return( libewf_segment_table_get_basename(
-	         internal_handle->delta_segment_table,
-	         filename,
-	         length ) );
+	result = libewf_segment_table_get_basename(
+	          internal_handle->delta_segment_table,
+	          filename,
+	          length,
+	          &error );
+
+	if( result == -1 )
+	{
+		notify_warning_printf( "%s: unable to determine segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Retrieves the amount of acquiry errors
@@ -1305,8 +1335,10 @@ int libewf_set_sectors_per_chunk(
      libewf_handle_t *handle,
      uint32_t sectors_per_chunk )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_sectors_per_chunk";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1332,11 +1364,24 @@ int libewf_set_sectors_per_chunk(
 
 		return( -1 );
 	}
-	return( libewf_internal_handle_initialize_media_values(
-	         internal_handle,
-	         sectors_per_chunk,
-	         internal_handle->media_values->bytes_per_sector,
-	         internal_handle->media_values->media_size ) );
+	result = libewf_internal_handle_initialize_media_values(
+	          internal_handle,
+	          sectors_per_chunk,
+	          internal_handle->media_values->bytes_per_sector,
+	          internal_handle->media_values->media_size,
+	          &error );
+
+	if( result != 1 )
+	{
+		notify_warning_printf( "%s: unable to intialize media values.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Sets the amount of bytes per sector in the media information
@@ -1346,8 +1391,10 @@ int libewf_set_bytes_per_sector(
      libewf_handle_t *handle,
      uint32_t bytes_per_sector )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_bytes_per_sector";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1374,11 +1421,24 @@ int libewf_set_bytes_per_sector(
 
 		return( -1 );
 	}
-	return( libewf_internal_handle_initialize_media_values(
-	         internal_handle,
-	         internal_handle->media_values->sectors_per_chunk,
-	         bytes_per_sector,
-	         internal_handle->media_values->media_size ) );
+	result = libewf_internal_handle_initialize_media_values(
+	          internal_handle,
+	          internal_handle->media_values->sectors_per_chunk,
+	          bytes_per_sector,
+	          internal_handle->media_values->media_size,
+	          &error );
+
+	if( result != 1 )
+	{
+		notify_warning_printf( "%s: unable to intialize media values.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Sets the error granularity
@@ -1476,8 +1536,10 @@ int libewf_set_media_size(
      libewf_handle_t *handle,
      size64_t media_size )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_media_size";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1504,11 +1566,24 @@ int libewf_set_media_size(
 
 		return( -1 );
 	}
-	return( libewf_internal_handle_initialize_media_values(
-	         internal_handle,
-	         internal_handle->media_values->sectors_per_chunk,
-	         internal_handle->media_values->bytes_per_sector,
-	         media_size ) );
+	result = libewf_internal_handle_initialize_media_values(
+	          internal_handle,
+	          internal_handle->media_values->sectors_per_chunk,
+	          internal_handle->media_values->bytes_per_sector,
+	          media_size,
+	          &error );
+
+	if( result != 1 )
+	{
+		notify_warning_printf( "%s: unable to intialize media values.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Sets the segment file size
@@ -1708,8 +1783,10 @@ int libewf_set_format(
      libewf_handle_t *handle,
      uint8_t format )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_format";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1750,15 +1827,21 @@ int libewf_set_format(
 	}
 	internal_handle->format = format;
 
-	if( libewf_internal_handle_initialize_format(
-	     internal_handle ) != 1 )
+	result = libewf_internal_handle_initialize_format(
+	          internal_handle,
+	          &error );
+
+	if( result != 1 )
 	{
 		notify_warning_printf( "%s: unable to initialize format specific values.\n",
 		 function );
 
-		return( -1 );
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Sets the GUID
@@ -1919,8 +2002,10 @@ int libewf_set_segment_filename(
      system_character_t *filename,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_segment_filename";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1945,12 +2030,24 @@ int libewf_set_segment_filename(
 
 		return( -1 );
 	}
-	return( libewf_segment_table_set_basename(
-	         internal_handle->segment_table,
-	         filename,
-	         length ) );
-}
+	result = libewf_segment_table_set_basename(
+	          internal_handle->segment_table,
+	          filename,
+	          length,
+	          &error );
 
+	if( result != 1 )
+	{
+		notify_warning_printf( "%s: unable to set segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
+}
 
 /* Sets the delta segment file
  * Returns 1 if successful or -1 on error
@@ -1960,8 +2057,10 @@ int libewf_set_delta_segment_filename(
      system_character_t *filename,
      size_t length )
 {
+	libewf_error_t *error                     = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_delta_segment_filename";
+	int result                                = 0;
 
 	if( handle == NULL )
 	{
@@ -1986,10 +2085,23 @@ int libewf_set_delta_segment_filename(
 
 		return( -1 );
 	}
-	return( libewf_segment_table_set_basename(
-	         internal_handle->delta_segment_table,
-	         filename,
-	         length ) );
+	result = libewf_segment_table_set_basename(
+	          internal_handle->delta_segment_table,
+	          filename,
+	          length,
+	          &error );
+
+	if( result != 1 )
+	{
+		notify_warning_printf( "%s: unable to set segment table basename.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+	}
+	return( result );
 }
 
 /* Sets the read wipe chunk on error

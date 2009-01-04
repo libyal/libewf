@@ -781,8 +781,8 @@ ssize_t libewf_read_chunk_data(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
 		 "%s: invalid available amount of bytes value exceeds maximum.\n",
 		 function );
 

@@ -1131,7 +1131,8 @@ ssize_t libewf_raw_write_chunk_new(
 #endif
 
 				if( libewf_internal_handle_create_header_values(
-				     internal_handle ) != 1 )
+				     internal_handle,
+				     error ) != 1 )
 				{
 					libewf_error_set(
 					 error,
@@ -1182,7 +1183,8 @@ ssize_t libewf_raw_write_chunk_new(
 		     internal_handle->write->maximum_amount_of_segments,
 		     LIBEWF_SEGMENT_FILE_TYPE_EWF,
 		     internal_handle->format,
-		     internal_handle->ewf_format ) != 1 )
+		     internal_handle->ewf_format,
+		     error ) != 1 )
 		{
 			libewf_error_set(
 			 error,
@@ -2014,7 +2016,8 @@ ssize_t libewf_raw_write_chunk_existing(
 			     internal_handle->write->maximum_amount_of_segments,
 			     LIBEWF_SEGMENT_FILE_TYPE_DWF,
 			     internal_handle->format,
-			     internal_handle->ewf_format ) != 1 )
+			     internal_handle->ewf_format,
+			     error ) != 1 )
 			{
 				libewf_error_set(
 				 error,
@@ -2273,8 +2276,8 @@ ssize_t libewf_write_chunk_data_new(
 	{
 		libewf_error_set(
 		 error,
-		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-		 LIBEWF_ARGUMENT_ERROR_EXCEEDS_MAXIMUM,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_EXCEEDS_MAXIMUM,
 		 "%s: invalid read size value exceeds maximum.\n",
 		 function );
 
@@ -2865,7 +2868,9 @@ ssize_t libewf_raw_write_buffer(
 		return( -1 );
 	}
 	if( ( internal_handle->write->values_initialized == 0 )
-	 && ( libewf_internal_handle_write_initialize( internal_handle ) != 1 ) )
+	 && ( libewf_internal_handle_write_initialize(
+	       internal_handle,
+	       &error ) != 1 ) )
 	{
 		libewf_error_set(
 		 &error,
@@ -3079,7 +3084,8 @@ ssize_t libewf_write_buffer(
 	}
 	if( ( internal_handle->write->values_initialized == 0 )
 	 && ( libewf_internal_handle_write_initialize(
-	       internal_handle ) != 1 ) )
+	       internal_handle,
+	       &error ) != 1 ) )
 	{
 		libewf_error_set(
 		 &error,

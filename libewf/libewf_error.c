@@ -54,7 +54,7 @@
 #endif
 
 /* Set an error initializes the error
- * The error domain and code are set and the error message is appended for backtracing
+ * The error domain and code are set only the first time and the error message is appended for backtracing
  */
 void VARARGS(
       libewf_error_set,
@@ -81,11 +81,9 @@ void VARARGS(
 		}
 		( (libewf_internal_error_t *) *error )->amount_of_messages = 0;
 		( (libewf_internal_error_t *) *error )->message            = NULL;
-
+		( (libewf_internal_error_t *) *error )->domain             = error_domain;
+		( (libewf_internal_error_t *) *error )->code               = error_code;
 	}
-	( (libewf_internal_error_t *) *error )->domain = error_domain;
-	( (libewf_internal_error_t *) *error )->code   = error_code;
-
 	VASTART(
 	 argument_list,
 	 const char *,
