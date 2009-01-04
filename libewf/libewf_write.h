@@ -56,8 +56,8 @@ extern "C" {
 
 int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number );
 uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, int raw_access );
-int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset, int raw_access );
+int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset );
+int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset );
 
 ssize_t libewf_write_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHAR *chunk_data, size_t chunk_data_size, EWF_CHAR *compressed_chunk_data, size_t *compressed_chunk_data_size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *write_crc );
 
