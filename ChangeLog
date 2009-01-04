@@ -158,6 +158,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080821
+* ewfalter now support single segment file as argument
+
 Version: 20080820
 * ewfverify, ewfinfo and ewfexport now support single segment file as argument
 * fixed bug in libewf_glob function in automatic detection of ewf type

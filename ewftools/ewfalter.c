@@ -82,26 +82,29 @@ int main( int argc, char * const argv[] )
 #endif
 {
 #if !defined( HAVE_GLOB_H )
-	ewfglob_t *glob                     = NULL;
-	int32_t glob_count                  = 0;
+	ewfglob_t *glob                            = NULL;
+	int32_t glob_count                         = 0;
 #endif
 
-	character_t *program                = _CHARACTER_T_STRING( "ewfalter" );
+	character_t *program                       = _CHARACTER_T_STRING( "ewfalter" );
 
-	system_character_t *target_filename = NULL;
+	system_character_t * const *argv_filenames = NULL;
+	system_character_t **ewf_filenames         = NULL;
+	system_character_t *target_filename        = NULL;
 
-	uint8_t *buffer                     = NULL;
-	system_integer_t option             = 0;
-	off64_t write_offset                = 0;
-	size64_t media_size                 = 0;
-	ssize_t write_size                  = 0;
-	int64_t alter_count                 = 0;
-	int64_t write_count                 = 0;
-	uint64_t alter_offset               = 0;
-	uint64_t alter_size                 = 0;
-	uint64_t alter_buffer_size          = 0;
-	uint8_t swap_byte_pairs             = 0;
-	uint8_t verbose                     = 0;
+	uint8_t *buffer                            = NULL;
+	system_integer_t option                    = 0;
+	off64_t write_offset                       = 0;
+	size64_t media_size                        = 0;
+	ssize_t write_size                         = 0;
+	int64_t alter_count                        = 0;
+	int64_t write_count                        = 0;
+	uint64_t alter_offset                      = 0;
+	uint64_t alter_size                        = 0;
+	uint64_t alter_buffer_size                 = 0;
+	uint8_t swap_byte_pairs                    = 0;
+	uint8_t verbose                            = 0;
+	int amount_of_filenames                    = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -190,27 +193,63 @@ int main( int argc, char * const argv[] )
 	              &argv[ optind ],
 	              ( argc - optind ) );
 
-	if( glob_count <= 0 )
+	if( ( glob_count <= 0 )
+	 || ( glob_count > (int32_t) UINT16_MAX ) )
 	{
 		fprintf( stderr, "Unable to resolve glob.\n" );
 
-		ewfglob_free( glob );
+		ewfglob_free(
+		 glob );
 
 		return( EXIT_FAILURE );
 	}
-	ewfcommon_libewf_handle = libewf_open(
-	                           glob->results,
-	                           glob->amount,
-	                           LIBEWF_OPEN_READ_WRITE );
-
-	ewfglob_free( glob );
+	amount_of_filenames = (int) glob_count;
+	argv_filenames      = glob->results;
 #else
-	ewfcommon_libewf_handle = libewf_open(
-	                           &argv[ optind ],
-	                           ( argc - optind ),
-	                           LIBEWF_OPEN_READ_WRITE );
+	amount_of_filenames = argc - optind;
+	argv_filenames      = &argv[ optind ];
 #endif
 
+	if( amount_of_filenames == 1 )
+	{
+		amount_of_filenames = libewf_glob(
+		                       argv_filenames[ 0 ],
+		                       system_string_length(
+		                        argv_filenames[ 0 ] ),
+		                       LIBEWF_FORMAT_UNKNOWN,
+		                       &ewf_filenames );
+
+		if( amount_of_filenames <= 0 )
+		{
+			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
+
+#if !defined( HAVE_GLOB_H )
+			ewfglob_free(
+			 glob );
+#endif
+
+			return( EXIT_FAILURE );
+		}
+		argv_filenames = (system_character_t * const *) ewf_filenames;
+	}
+	ewfcommon_libewf_handle = libewf_open(
+	                           argv_filenames,
+	                           amount_of_filenames,
+	                           LIBEWF_OPEN_READ );
+#if !defined( HAVE_GLOB_H )
+	ewfglob_free(
+	 glob );
+#endif
+	if( ewf_filenames != NULL )
+	{
+		for( ; amount_of_filenames > 0; amount_of_filenames-- )
+		{
+			memory_free(
+			 ewf_filenames[ amount_of_filenames - 1 ] );
+		}
+		memory_free(
+		 ewf_filenames );
+	}
 	if( ( ewfcommon_abort == 0 )
 	 && ( ewfcommon_libewf_handle == NULL ) )
 	{
