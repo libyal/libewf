@@ -155,6 +155,7 @@ WORKING
 
 Version: 20071028
 * fixed error in write finalize for ewfacquirestream, due to restrictive check
+* fixed error for handling wide character delta segment filenames
 
 Version: 20071027
 * Worked on cleaning up ewf struct read and write functions

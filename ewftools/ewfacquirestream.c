@@ -179,7 +179,7 @@ int main( int argc, char * const argv[] )
 				return( EXIT_FAILURE );
 
 			case (INT_T) 'b':
-				sectors_per_chunk = ewfinput_determine_sectors_per_chunk( optarg );
+				sectors_per_chunk = ewfinput_determine_sectors_per_chunk_char_t( optarg );
 
 				if( sectors_per_chunk == 0 )
 				{
@@ -196,7 +196,7 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					compression_level = ewfinput_determine_compression_level( optarg );
+					compression_level = ewfinput_determine_compression_level_char_t( optarg );
 				
 					if( compression_level <= -1 )
 					{
@@ -239,7 +239,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (INT_T) 'f':
-				libewf_format = ewfinput_determine_libewf_format( optarg );
+				libewf_format = ewfinput_determine_libewf_format_char_t( optarg );
 
 				if( ( libewf_format == 0 )
 				 || ( libewf_format == LIBEWF_FORMAT_EWF )

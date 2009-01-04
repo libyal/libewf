@@ -5,7 +5,7 @@
 #define HAVE_ATOL 1
 
 /* Define to 1 if you have the `btowc' function. */
-/* #undef HAVE_BTOWC */
+#define HAVE_BTOWC 1
 
 /* Defines if buffer passthrough should be used */
 /* #undef HAVE_BUFFER_PASSTHROUGH */
@@ -49,7 +49,7 @@
 #define HAVE_FGETS 1
 
 /* Define to 1 if you have the `fgetws' function. */
-/* #undef HAVE_FGETWS */
+#define HAVE_FGETWS 1
 
 /* Define to 1 if you have the `getopt' function. */
 #define HAVE_GETOPT 1
@@ -88,10 +88,10 @@
 #define HAVE_LOCALTIME_R 1
 
 /* Define to 1 if you have the `mbsinit' function. */
-/* #undef HAVE_MBSINIT */
+#define HAVE_MBSINIT 1
 
 /* Define to 1 if you have the `mbsrtowcs' function. */
-/* #undef HAVE_MBSRTOWCS */
+#define HAVE_MBSRTOWCS 1
 
 /* Define to 1 if you have the `memchr' function. */
 #define HAVE_MEMCHR 1
@@ -191,7 +191,7 @@
 #define HAVE_STRTOUL 1
 
 /* Define to 1 if you have the `swprintf' function. */
-/* #undef HAVE_SWPRINTF */
+#define HAVE_SWPRINTF 1
 
 /* Define to 1 if you have the <sys/disklabel.h> header file. */
 /* #undef HAVE_SYS_DISKLABEL_H */
@@ -242,58 +242,58 @@
 #define HAVE_VPRINTF 1
 
 /* Define to 1 if you have the <wchar.h> header file. */
-/* #undef HAVE_WCHAR_H */
+#define HAVE_WCHAR_H 1
 
 /* Define to 1 if you have the `wcschr' function. */
-/* #undef HAVE_WCSCHR */
+#define HAVE_WCSCHR 1
 
 /* Define to 1 if you have the `wcscmp' function. */
-/* #undef HAVE_WCSCMP */
+#define HAVE_WCSCMP 1
 
 /* Define to 1 if you have the `wcscpy' function. */
-/* #undef HAVE_WCSCPY */
+#define HAVE_WCSCPY 1
 
 /* Define to 1 if you have the `wcsdup' function. */
-/* #undef HAVE_WCSDUP */
+#define HAVE_WCSDUP 1
 
 /* Define to 1 if you have the `wcslen' function. */
-/* #undef HAVE_WCSLEN */
+#define HAVE_WCSLEN 1
 
 /* Define to 1 if you have the `wcsncmp' function. */
-/* #undef HAVE_WCSNCMP */
+#define HAVE_WCSNCMP 1
 
 /* Define to 1 if you have the `wcsncpy' function. */
-/* #undef HAVE_WCSNCPY */
+#define HAVE_WCSNCPY 1
 
 /* Define to 1 if you have the `wcsrchr' function. */
-/* #undef HAVE_WCSRCHR */
+#define HAVE_WCSRCHR 1
 
 /* Define to 1 if you have the `wcsrtombs' function. */
-/* #undef HAVE_WCSRTOMBS */
+#define HAVE_WCSRTOMBS 1
 
 /* Define to 1 if you have the `wcstol' function. */
-/* #undef HAVE_WCSTOL */
+#define HAVE_WCSTOL 1
 
 /* Define to 1 if you have the `wcstoul' function. */
-/* #undef HAVE_WCSTOUL */
+#define HAVE_WCSTOUL 1
 
 /* Define to 1 if you have the `wctob' function. */
-/* #undef HAVE_WCTOB */
+#define HAVE_WCTOB 1
 
 /* Defines if wide character type should be used */
-/* #undef HAVE_WIDE_CHARACTER_TYPE */
+#define HAVE_WIDE_CHARACTER_TYPE 1
 
 /* Define to 1 if you have the `wmain' function. */
 /* #undef HAVE_WMAIN */
 
 /* Define to 1 if you have the `wmemchr' function. */
-/* #undef HAVE_WMEMCHR */
+#define HAVE_WMEMCHR 1
 
 /* Define to 1 if you have the `wmemcmp' function. */
-/* #undef HAVE_WMEMCMP */
+#define HAVE_WMEMCMP 1
 
 /* Define to 1 if you have the `wmemcpy' function. */
-/* #undef HAVE_WMEMCPY */
+#define HAVE_WMEMCPY 1
 
 /* Define to 1 if you have the `wmemrchr' function. */
 /* #undef HAVE_WMEMRCHR */

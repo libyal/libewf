@@ -1,4 +1,4 @@
-.Dd Oktober 27, 2007
+.Dd Oktober 28, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -67,8 +67,6 @@
 .Ft int
 .Fn libewf_get_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
 .Ft int
-.Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, uint8_t *filename, size_t size"
-.Ft int
 .Fn libewf_get_amount_of_acquiry_errors "LIBEWF_HANDLE *handle, uint32_t *amount_of_errors"
 .Ft int
 .Fn libewf_get_acquiry_error "LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors"
@@ -92,8 +90,6 @@
 .Fn libewf_set_guid "LIBEWF_HANDLE *handle, uint8_t *guid, size_t size"
 .Ft int
 .Fn libewf_set_md5_hash "LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size"
-.Ft int
-.Fn libewf_set_delta_segment_filename "LIBEWF_HANDLE *handle, uint8_t *filename, size_t size"
 .Ft int
 .Fn libewf_set_write_segment_file_size "LIBEWF_HANDLE *handle, size64_t segment_file_size"
 .Ft int
@@ -121,7 +117,7 @@ When the library was compiled with narrow character support (default) the follow
 .Ft const char *
 .Fn libewf_get_version "void"
 .Ft int
-.Fn libewf_is_dll "void"
+.Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, char *filename, size_t size"
 .Ft int
 .Fn libewf_get_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
@@ -152,6 +148,8 @@ When the library was compiled with narrow character support (default) the follow
 .Fn libewf_get_hash_value_md5 "LIBEWF_HANDLE *handle, char *value, size_t length"
 .Ft int
 .Fn libewf_get_hash_value_sha1 "LIBEWF_HANDLE *handle, char *value, size_t length"
+.Ft int
+.Fn libewf_set_delta_segment_filename "LIBEWF_HANDLE *handle, char *filename, size_t size"
 .Ft int
 .Fn libewf_set_header_value "LIBEWF_HANDLE *handle, char *identifier, char *value, size_t length"
 .Ft int
@@ -187,6 +185,8 @@ When the library was compiled with wide character support the following function
 .Ft const wchar_t *
 .Fn libewf_get_version "void"
 .Ft int
+.Fn libewf_get_delta_segment_filename "LIBEWF_HANDLE *handle, wchar_t *filename, size_t size"
+.Ft int
 .Fn libewf_get_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
 .Ft int
 .Fn libewf_get_header_value_case_number "LIBEWF_HANDLE *handle, wchar_t *case_number, size_t length"
@@ -216,6 +216,8 @@ When the library was compiled with wide character support the following function
 .Fn libewf_get_hash_value_md5 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
 .Ft int
 .Fn libewf_get_hash_value_sha1 "LIBEWF_HANDLE *handle, wchar_t *value, size_t length"
+.Ft int
+.Fn libewf_set_delta_segment_filename "LIBEWF_HANDLE *handle, wchar_t *filename, size_t size"
 .Ft int
 .Fn libewf_set_header_value "LIBEWF_HANDLE *handle, wchar_t *identifier, wchar_t *value, size_t length"
 .Ft int

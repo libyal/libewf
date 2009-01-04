@@ -67,12 +67,18 @@ extern LIBEWF_CHAR *ewfinput_yes_no[ 2 ];
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
 
-uint8_t ewfinput_determine_libewf_format( const CHAR_T *argument );
-uint32_t ewfinput_determine_sectors_per_chunk( const CHAR_T *argument );
-int8_t ewfinput_determine_compression_level( const CHAR_T *argument );
-int8_t ewfinput_determine_media_type( const CHAR_T *argument );
-int8_t ewfinput_determine_volume_type( const CHAR_T *argument );
-int8_t ewfinput_determine_yes_no( const CHAR_T *argument );
+uint8_t ewfinput_determine_libewf_format( const LIBEWF_CHAR *argument );
+uint8_t ewfinput_determine_libewf_format_char_t( const CHAR_T *argument );
+
+uint32_t ewfinput_determine_sectors_per_chunk( const LIBEWF_CHAR *argument );
+uint32_t ewfinput_determine_sectors_per_chunk_char_t( const CHAR_T *argument );
+
+int8_t ewfinput_determine_compression_level( const LIBEWF_CHAR *argument );
+int8_t ewfinput_determine_compression_level_char_t( const CHAR_T *argument );
+
+int8_t ewfinput_determine_media_type( const LIBEWF_CHAR *argument );
+int8_t ewfinput_determine_volume_type( const LIBEWF_CHAR *argument );
+int8_t ewfinput_determine_yes_no( const LIBEWF_CHAR *argument );
 
 LIBEWF_CHAR *ewfinput_get_variable( FILE *stream, LIBEWF_CHAR *request_string );
 CHAR_T *ewfinput_get_variable_char_t( FILE *stream, LIBEWF_CHAR *request_string );

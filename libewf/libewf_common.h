@@ -212,7 +212,6 @@ wchar_t *libewf_common_wide_ctime( const time_t *timestamp );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 int libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t length );
-
 int libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t length );
 #endif
 

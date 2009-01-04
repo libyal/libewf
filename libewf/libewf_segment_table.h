@@ -95,9 +95,9 @@ int libewf_segment_table_realloc( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t 
 void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-wchar_t *libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment );
+int libewf_segment_table_get_wide_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, wchar_t *filename, size_t length_filename );
 #else
-char *libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment );
+int libewf_segment_table_get_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, char *filename, size_t length_filename );
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )

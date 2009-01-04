@@ -550,7 +550,7 @@ wchar_t *libewf_common_wide_ctime( const time_t *timestamp )
  * Terminates the destination string with \0 at ( size - 1 )
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t size )
+int libewf_common_copy_wchar_to_char( char *destination, const wchar_t *source, size_t size )
 {
 	static char *function = "libewf_common_copy_wchar_to_char";
 	size_t iterator       = 0;
@@ -596,7 +596,7 @@ int8_t libewf_common_copy_wchar_to_char( char *destination, const wchar_t *sourc
  * Terminates the destination string with \0 at ( size - 1 )
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t size )
+int libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t size )
 {
 	static char *function = "libewf_common_copy_char_to_wchar";
 	size_t iterator       = 0;

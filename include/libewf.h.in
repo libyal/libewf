@@ -220,6 +220,15 @@ LIBEWF_EXTERN int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t 
  */
 LIBEWF_EXTERN int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
 
+/* Retrieves the delta segment filename
+ * Returns 1 if successful, 0 if value not present, or -1 on error
+ */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_t *filename, size_t length );
+#else
+LIBEWF_EXTERN int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length );
+#endif
+
 /* Retrieves the amount of acquiry errors
  * Returns 1 if successful, 0 if no acquiry errors are present, or -1 on error
  */
@@ -475,6 +484,15 @@ LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t 
  * Returns 1 if successful, 0 if value not present, or -1 on error
  */
 LIBEWF_EXTERN int libewf_set_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size );
+
+/* Sets the delta segment file
+ * Returns 1 if successful, or -1 on error
+ */
+#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, wchar_t *filename, size_t length );
+#else
+LIBEWF_EXTERN int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, char *filename, size_t length );
+#endif
 
 /* Sets the write segment file size
  * Returns 1 if successful, or -1 on error
