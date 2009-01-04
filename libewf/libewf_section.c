@@ -53,6 +53,7 @@
 #include "ewf_session.h"
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
+#include "ewfx_delta_chunk.h"
 
 /* Reads a section start from file
  * Returns the amount of bytes read, or -1 on error
@@ -1738,7 +1739,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 			}
 		}
 	}
-	if( write_crc == 1 )
+	if( write_crc != 0 )
 	{
 		calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
 	}
@@ -1789,7 +1790,7 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		return( -1 );
 	}
-	if( write_crc == 1 )
+	if( write_crc != 0 )
 	{
 		if( libewf_endian_revert_32bit( calculated_crc, calculated_crc_buffer ) != 1 )
 		{
@@ -3340,11 +3341,13 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
  */
 ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size, uint16_t segment_number, off64_t start_offset )
 {
-	EWF_CHAR buffer[ 4 ];
+	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 
-	static char *function = "libewf_section_delta_chunk_read";
-	ssize_t read_count    = (ssize_t) size;
-	uint32_t chunk        = 0;
+	static char *function  = "libewf_section_delta_chunk_read";
+	EWF_CRC calculated_crc = 0;
+	EWF_CRC stored_crc     = 0;
+	ssize_t read_count     = (ssize_t) size;
+	uint32_t chunk         = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -3360,25 +3363,47 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	read_count = ewf_string_read_to_buffer( buffer, file_descriptor, sizeof( uint32_t ) );
+	read_count = libewf_common_read(
+	              file_descriptor,
+	              &delta_chunk_header,
+	              EWFX_DELTA_CHUNK_HEADER_SIZE );
 
 	if( read_count <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to read chunk value from file.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to read delta chunk header from file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_endian_convert_32bit( &chunk, buffer ) != 1 )
+	if( libewf_endian_convert_32bit( &chunk, delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to convert chunk value.\n",
 		 function );
 
 		return( -1 );
 	}
+	calculated_crc = ewf_crc_calculate( &delta_chunk_header, ( EWFX_DELTA_CHUNK_HEADER_SIZE - EWF_CRC_SIZE ), 1 );
+
+	if( libewf_endian_convert_32bit( &stored_crc, delta_chunk_header.crc ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( stored_crc != calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
+
+		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
+		{
+			return( -1 );
+		}
+	}
 	/* Skip the chunk data within the section
 	 */
-	if( libewf_common_lseek( file_descriptor, ( size - sizeof( uint32_t ) ), SEEK_CUR ) == -1 )
+	if( libewf_common_lseek( file_descriptor, ( size - EWFX_DELTA_CHUNK_HEADER_SIZE ), SEEK_CUR ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
 		 function );
@@ -3391,9 +3416,9 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 	     internal_handle->offset_table,
 	     chunk,
 	     file_descriptor,
-	     0,
-	     (off64_t) ( start_offset + sizeof( uint32_t ) ),
-	     (size_t) ( size - sizeof( uint32_t ) ),
+	     delta_chunk_header.compressed,
+	     (off64_t) ( start_offset + EWFX_DELTA_CHUNK_HEADER_SIZE ),
+	     ( size - EWFX_DELTA_CHUNK_HEADER_SIZE ),
 	     segment_number,
 	     1 ) == -1 )
 	{
@@ -3411,14 +3436,16 @@ ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Writes a delta chunk section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, uint8_t is_compressed, EWF_CRC *chunk_crc, uint8_t write_crc )
 {
+	EWFX_DELTA_CHUNK_HEADER delta_chunk_header;
 	uint8_t calculated_crc_buffer[ 4 ];
-	EWF_CHAR buffer[ 4 ];
 
 	static char *function       = "libewf_section_delta_chunk_write";
+	EWF_CRC calculated_crc      = 0;
 	ssize_t section_write_count = 0;
 	ssize_t write_count         = 0;
+	size_t section_size         = 0;
 
 	if( chunk_size > (size_t) INT32_MAX )
 	{
@@ -3427,17 +3454,44 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( chunk, buffer ) != 1 )
+	if( libewf_common_memset( &delta_chunk_header, 0, EWFX_DELTA_CHUNK_HEADER_SIZE ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to clear delta chunk header.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_endian_revert_32bit( chunk, delta_chunk_header.chunk ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert chunk value.\n" );
 
 		return( -1 );
 	}
+	delta_chunk_header.compressed = is_compressed;
+
+	calculated_crc = ewf_crc_calculate(
+	                  &delta_chunk_header,
+	                  ( EWFX_DELTA_CHUNK_HEADER_SIZE - EWF_CRC_SIZE ),
+	                  1 );
+
+	if( libewf_endian_revert_32bit( calculated_crc, delta_chunk_header.crc ) != 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+		 function );
+
+		return( -1 );
+	}
+	section_size = EWFX_DELTA_CHUNK_HEADER_SIZE + chunk_size;
+
+	if( write_crc != 0 )
+	{
+		section_size += EWF_CRC_SIZE;
+	}
 	write_count = libewf_section_start_write(
 	               file_descriptor,
 	               (EWF_CHAR *) "delta_chunk",
 	               11,
-	               ( sizeof( uint32_t ) + chunk_size + EWF_CRC_SIZE ),
+	               section_size,
 	               start_offset );
 
 	if( write_count == -1 )
@@ -3449,7 +3503,10 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 	}
 	section_write_count += write_count;
 
-	write_count = ewf_string_write_from_buffer( buffer, file_descriptor, sizeof( uint32_t ) );
+	write_count = libewf_common_write(
+	               file_descriptor,
+	               &delta_chunk_header,
+	               EWFX_DELTA_CHUNK_HEADER_SIZE );
 
 	if( write_count <= -1 )
 	{
@@ -3460,7 +3517,10 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 	}
 	section_write_count += write_count;
 
-	write_count = ewf_string_write_from_buffer( chunk_data, file_descriptor, chunk_size );
+	write_count = ewf_string_write_from_buffer(
+	               chunk_data,
+	               file_descriptor,
+	               chunk_size );
 
 	if( write_count <= -1 )
 	{
@@ -3471,27 +3531,29 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_off
 	}
 	section_write_count += write_count;
 
-	if( libewf_endian_revert_32bit( *chunk_crc, calculated_crc_buffer ) != 1 )
+	if( write_crc != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
-		 function );
+		if( libewf_endian_revert_32bit( *chunk_crc, calculated_crc_buffer ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
+		write_count = libewf_common_write(
+			       file_descriptor,
+			       calculated_crc_buffer,
+			       EWF_CRC_SIZE );
+
+		if( write_count != (size_t) EWF_CRC_SIZE )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to write CRC to file.\n",
+			 function );
+
+			return( -1 );
+		}
+		section_write_count += write_count;
 	}
-	write_count = libewf_common_write(
- 	               file_descriptor,
- 	               calculated_crc_buffer,
- 	               EWF_CRC_SIZE );
-
-	if( write_count != (size_t) EWF_CRC_SIZE )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to write CRC to file.\n",
-		 function );
-
-		return( -1 );
-	}
-	section_write_count += write_count;
-
 	return( section_write_count );
 }
 

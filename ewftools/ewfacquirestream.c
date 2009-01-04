@@ -825,6 +825,20 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
+	if( libewf_close( handle ) != 0 )
+	{
+		fprintf( stderr, "Unable to close EWF file(s).\n" );
+
+		if( calculate_md5 == 1 )
+		{
+			libewf_common_free( calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			libewf_common_free( calculated_sha1_hash_string );
+		}
+		return( EXIT_FAILURE );
+	}
 	if( time_string != NULL )
 	{
 		fprintf( stdout, "Acquiry completed at: %" PRIs "\n", time_string );
@@ -841,20 +855,6 @@ int main( int argc, char * const argv[] )
 
 	ewfoutput_acquiry_errors_fprint( stdout, handle );
 
-	if( libewf_close( handle ) != 0 )
-	{
-		fprintf( stderr, "Unable to close EWF file(s).\n" );
-
-		if( calculate_md5 == 1 )
-		{
-			libewf_common_free( calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			libewf_common_free( calculated_sha1_hash_string );
-		}
-		return( EXIT_FAILURE );
-	}
 	if( calculate_md5 == 1 )
 	{
 		fprintf( stdout, "MD5 hash calculated over data: %" PRIs_EWF "\n", calculated_md5_hash_string );

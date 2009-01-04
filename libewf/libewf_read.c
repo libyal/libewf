@@ -318,7 +318,7 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	{
 		/* Determine if the CRC should be read seperately
 		 */
-		if( *read_crc == 1 )
+		if( *read_crc != 0 )
 		{
 			crc_read_count = libewf_common_read(
 					  internal_handle->offset_table->file_descriptor[ chunk ],

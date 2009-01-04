@@ -96,6 +96,17 @@ Known issues:
   the current assumption is that these chunks only can be uncompressed
   because the MSB is normally used to mark if the chunk is compressed
 
+Code clean up
+* remove internal_handle passing from most functions
+  only pass the necessary values
+* move any access to segment table in file, write and read to segment_file
+  - segment table should only be updated by functions in segment file/table
+* rewrite ewfglob marcros to function macros (including arguments)
+* what about setting errno for API set and get function i.e. for size too small
+* have ewftools only use API ?
+  - most of the internal library code has been removed
+* check unused parameters gcc -Wextra
+
 Next release:
 * full platform test
 * add libewf_convert_date_xheader_value function ?
@@ -103,28 +114,22 @@ Next release:
 * change string duplicate function to macro?
 
 * add maximum check to set functions in file/internal handle
-* move any access to segment table in file, write and read to segment_file
 * move open segment files in file to segment file to read segment table function
 * update ewfexport man page
 
-* move write offset/buffer functionality into write raw common function and call write raw from functions?
-  write raw only checks for the raw access mode like prepare function
-* ewfacquire check if last segment file is closed before telling acquiry was completed
-* remove internal_handle passing from most functions
-  only pass the necessary values
-* segment table should only be updated by functions in segment file/table
-* rewrite ewfglob marcros to function macros (including arguments)
 * what about header values parsing with preservation of timestamps?
 
 * ewfexport: non interactive mode?
 * ewfacquire: account for backspace in user input
 
-* what about setting errno for API set and get function i.e. for size too small
-
-* what about protecting the chunk number in the delta chunks sections
-  using a crc?
-
-* have ewftools only use API ?
+* make buffer passthrough default behavior?
+* work on TODO in write
+* API function get current chunk size?
+* do not finalize on write error?
+* ewfcommon_export_ewf - add raw access write support
+* change default wipe behavior for ewfacquire(stream)
+* automate delta file testing
+* add ewfx_delta_chunk.h to MSVC++ project
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -138,14 +143,13 @@ CLOSED
   - if so remove libewf_string include from ewfacquire
   not needed
 
-WORKING
-* make buffer passthrough default behavior?
-* work on TODO in write
-* check unused parameters gcc -Wextra
-* API function get current chunk size?
-* do not finalize on write error?
-* ewfcommon_export_ewf - add raw access write support
-* change default wipe behavior for ewfacquire(stream)
+Version: 20071106
+* worked on adding compression support to delta file
+  added compression value and CRC to section
+  delta chunk header data is now 'protected' by a CRC
+* ewfacquire(stream) added check if last segment file is closed
+  before telling acquiry was completed, by moving close
+  handle before complete notification
 
 Version: 20071105
 * refactored raw access support in ewfexport

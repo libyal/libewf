@@ -19,6 +19,7 @@ libewf_la_SOURCES = \
 	ewf_table.h \
 	ewf_volume.h \
 	ewf_volume_smart.h \
+	ewfx_delta_chunk.h \
 	libewf.c \
 	libewf_char.h \
 	libewf_chunk_cache.c libewf_chunk_cache.h \
