@@ -198,8 +198,19 @@ int main( int argc, char * const argv[] )
 	 */
 	fprintf( stderr, "Information for alter required, please provide the necessary input\n" );
 
-	alter_offset = ewfcommon_get_user_input_size_variable( stderr, _S_LIBEWF_CHAR( "Start altering at offset" ), 0, size, 0 );
-	alter_size   = ewfcommon_get_user_input_size_variable( stderr, _S_LIBEWF_CHAR( "Amount of bytes to alter" ), 0, size, size );
+	alter_offset = ewfcommon_get_user_input_size_variable(
+	                stderr,
+	                _S_LIBEWF_CHAR( "Start altering at offset" ),
+	                0,
+	                size,
+	                0 );
+
+	alter_size = ewfcommon_get_user_input_size_variable(
+	              stderr,
+	              _S_LIBEWF_CHAR( "Amount of bytes to alter" ),
+	              0,
+	              ( size - alter_offset ),
+	              ( size - alter_offset ) );
 
 	buffer = libewf_common_alloc( alter_size * sizeof( uint8_t ) );
 
@@ -223,6 +234,8 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
+	fprintf( stderr, "\n" );
+
 	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
 
 	if( count <= -1 )

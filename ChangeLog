@@ -127,6 +127,7 @@ TODO
 * "Amount of bytes to alter" correct for offset !!! also in ewfacquire?
 * ewfexport to export EWF format to merge delta file(s) and ewf file(s)
 * implement raw split support in ewfexport
+* change int8_t return values into int return values
 
 Version: 20070819
 * worked on restructuring to improve internal structure
@@ -141,6 +142,7 @@ Version: 20070819
 * worked on ewfexport exporting ewf formatted data for delta merge
   ewfexport no longer exports to stdout
   specify '-t -' to write to stdout only for continuous raw output
+* added libewf_get_flags_ function for use of libewf in Phyton with ctypes
 
 Version: 20070818
 * worked on restructuring to improve internal structure

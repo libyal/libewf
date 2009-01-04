@@ -62,11 +62,32 @@
 #include "ewf_volume.h"
 #include "ewf_table.h"
 
-/* Return the library version
+/* Returns the library version
  */
 const LIBEWF_CHAR *libewf_get_version( void )
 {
 	return( (const LIBEWF_CHAR *) LIBEWF_VERSION );
+}
+
+/* Returns the flags for reading
+ */
+uint8_t libewf_get_flags_read( void )
+{
+	return( (uint8_t) LIBEWF_FLAG_READ );
+}
+
+/* Returns the flags for reading and writing
+ */
+uint8_t libewf_get_flags_read_write( void )
+{
+	return( (uint8_t) ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) );
+}
+
+/* Returns the flags for writing
+ */
+uint8_t libewf_get_flags_write( void )
+{
+	return( (uint8_t) LIBEWF_FLAG_WRITE );
 }
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
@@ -515,7 +536,7 @@ int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LI
 /* Sets the media values
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector )
+int libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector )
 {
 	return( libewf_internal_handle_set_media_values(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -525,7 +546,7 @@ int8_t libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chun
 
 /* Returns 1 if the GUID is set, or -1 on error
  */
-int8_t libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
+int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 {
 	return( libewf_internal_handle_set_guid(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -536,7 +557,7 @@ int8_t libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 /* Sets the write segment file size
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size )
+int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size )
 {
 	return( libewf_internal_handle_set_write_segment_file_size(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -546,7 +567,7 @@ int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segme
 /* Sets the write error granularity
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity )
+int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity )
 {
 	return( libewf_internal_handle_set_write_error_granularity(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -556,7 +577,7 @@ int8_t libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error
 /* Sets the write compression values
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block )
+int libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block )
 {
 	return( libewf_internal_handle_set_write_compression_values(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -567,7 +588,7 @@ int8_t libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compre
 /* Sets the media type
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type )
+int libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type )
 {
 	return( libewf_internal_handle_set_write_media_type(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -578,7 +599,7 @@ int8_t libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, u
 /* Sets the write output format
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format )
+int libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format )
 {
 	return( libewf_internal_handle_set_write_format(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -588,7 +609,7 @@ int8_t libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format )
 /* Sets the write input size
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size )
+int libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size )
 {
 	return( libewf_internal_handle_set_write_input_write_size(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -598,7 +619,7 @@ int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_
 /* Sets the header value specified by the identifier
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	return( libewf_internal_handle_set_header_value(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -610,7 +631,7 @@ int8_t libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, 
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
 	return( libewf_internal_handle_set_hash_value(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,
@@ -622,7 +643,7 @@ int8_t libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LI
 /* Sets the swap byte pairs, used by both read and write
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs )
+int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs )
 {
 	return( libewf_internal_handle_set_swap_byte_pairs(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,

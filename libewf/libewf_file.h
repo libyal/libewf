@@ -57,6 +57,10 @@ extern "C" {
 
 LIBEWF_EXTERN const LIBEWF_CHAR *libewf_get_version( void );
 
+LIBEWF_EXTERN uint8_t libewf_get_flags_read( void );
+LIBEWF_EXTERN uint8_t libewf_get_flags_read_write( void );
+LIBEWF_EXTERN uint8_t libewf_get_flags_write( void );
+
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 LIBEWF_EXTERN int libewf_check_file_signature( const wchar_t *filename );
 #else
@@ -93,21 +97,21 @@ LIBEWF_EXTERN int64_t libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle )
 LIBEWF_EXTERN int8_t libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 LIBEWF_EXTERN int8_t libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
-LIBEWF_EXTERN int8_t libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
+LIBEWF_EXTERN int libewf_set_media_values( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
 
-LIBEWF_EXTERN int8_t libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
+LIBEWF_EXTERN int libewf_set_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size );
 
-LIBEWF_EXTERN int8_t libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size );
-LIBEWF_EXTERN int8_t libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity );
-LIBEWF_EXTERN int8_t libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block );
-LIBEWF_EXTERN int8_t libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type );
-LIBEWF_EXTERN int8_t libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format );
-LIBEWF_EXTERN int8_t libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size );
+LIBEWF_EXTERN int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size32_t segment_file_size );
+LIBEWF_EXTERN int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity );
+LIBEWF_EXTERN int libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block );
+LIBEWF_EXTERN int libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type );
+LIBEWF_EXTERN int libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format );
+LIBEWF_EXTERN int libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size );
 
-LIBEWF_EXTERN int8_t libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-LIBEWF_EXTERN int8_t libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+LIBEWF_EXTERN int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+LIBEWF_EXTERN int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
-LIBEWF_EXTERN int8_t libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs );
+LIBEWF_EXTERN int libewf_set_swap_byte_pairs( LIBEWF_HANDLE *handle, uint8_t swap_byte_pairs );
 
 LIBEWF_EXTERN int8_t libewf_calculate_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );
 LIBEWF_EXTERN int8_t libewf_get_stored_md5_hash( LIBEWF_HANDLE *handle, LIBEWF_CHAR *string, size_t length );

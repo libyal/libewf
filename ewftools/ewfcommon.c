@@ -1574,7 +1574,7 @@ void ewfcommon_header_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "ewfcommon_header_values_fprint";
-	uint32_t header_value_length            = 128;
+	size_t header_value_length              = 128;
 	uint32_t iterator                       = 0;
 
 	if( stream == NULL )
@@ -3099,6 +3099,8 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
  */
 ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t read_size, off64_t read_offset, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
+	LIBEWF_CHAR header_value[ 128 ];
+
 	uint8_t *data              = NULL;
 	static char *function      = "ewfcommon_export_ewf";
 	size32_t chunk_size        = 0;
@@ -3106,6 +3108,7 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	size_t buffer_size         = 0;
 	ssize64_t media_size       = 0;
 	ssize64_t total_read_count = 0;
+	size_t header_value_length = 128;
 	ssize_t read_count         = 0;
 	ssize_t write_count        = 0;
 	uint8_t read_all           = 0;
@@ -3173,6 +3176,15 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
 		 function );
+
+		return( -1 );
+	}
+	if( libewf_set_write_input_size( export_handle, read_size ) == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set write size in export handle.\n",
+		 function );
+
+		libewf_common_free( data );
 
 		return( -1 );
 	}

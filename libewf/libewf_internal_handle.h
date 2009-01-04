@@ -416,26 +416,26 @@ int8_t libewf_internal_handle_get_header_value( LIBEWF_INTERNAL_HANDLE *internal
 
 int8_t libewf_internal_handle_get_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
-int8_t libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size );
-int8_t libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size );
-int8_t libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xheader, size_t size );
-int8_t libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xhash, size_t size );
+int libewf_internal_handle_set_header( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *header, size_t size );
+int libewf_internal_handle_set_header2( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER2 *header2, size_t size );
+int libewf_internal_handle_set_xheader( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xheader, size_t size );
+int libewf_internal_handle_set_xhash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_HEADER *xhash, size_t size );
 
-int8_t libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash );
+int libewf_internal_handle_set_stored_md5_hash( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_DIGEST_HASH *md5_hash );
 
-int8_t libewf_internal_handle_set_media_values( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
+int libewf_internal_handle_set_media_values( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t sectors_per_chunk, uint32_t bytes_per_sector );
 
-int8_t libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
+int libewf_internal_handle_set_guid( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t *guid, size_t size );
 
-int8_t libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size32_t segment_file_size );
-int8_t libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
-int8_t libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );
-int8_t libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_type, uint8_t volume_type );
-int8_t libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_flags );
-int8_t libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t format );
-int8_t libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size );
+int libewf_internal_handle_set_write_segment_file_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size32_t segment_file_size );
+int libewf_internal_handle_set_write_error_granularity( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t error_granularity );
+int libewf_internal_handle_set_write_compression_values( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t compression_level, uint8_t compress_empty_block );
+int libewf_internal_handle_set_write_media_type( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_type, uint8_t volume_type );
+int libewf_internal_handle_set_write_media_flags( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t media_flags );
+int libewf_internal_handle_set_write_format( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t format );
+int libewf_internal_handle_set_write_input_write_size( LIBEWF_INTERNAL_HANDLE *internal_handle, size64_t input_write_size );
 
-int8_t libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+int libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 #define libewf_internal_handle_set_header_value_case_number( handle, value, length ) \
         libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "case_number" ), value, length )
 #define libewf_internal_handle_set_header_value_description( handle, value, length ) \
@@ -463,9 +463,9 @@ int8_t libewf_internal_handle_set_header_value( LIBEWF_INTERNAL_HANDLE *internal
 #define libewf_internal_handle_set_header_value_serial_number( handle, value, length ) \
         libewf_internal_handle_set_header_value( handle, _S_LIBEWF_CHAR( "serial_number" ), value, length )
 
-int8_t libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+int libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
 
-int8_t libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );
+int libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );
 
 int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors );
 int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );
