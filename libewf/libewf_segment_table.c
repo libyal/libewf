@@ -83,7 +83,7 @@ libewf_segment_table_t *libewf_segment_table_alloc(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     segment_table->segment_file_handle,
 	     0, 
 	     ( amount * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )
@@ -140,7 +140,7 @@ int libewf_segment_table_realloc(
 	}
 	segment_table->segment_file_handle = (libewf_segment_file_handle_t **) reallocation;
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &( segment_table->segment_file_handle[ segment_table->amount ] ),
 	     0, 
 	     ( ( amount - segment_table->amount ) * sizeof( libewf_segment_file_handle_t * ) ) ) == NULL )

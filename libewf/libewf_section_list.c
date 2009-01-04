@@ -90,7 +90,7 @@ libewf_section_list_t *libewf_section_list_append(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     section_list_entry,
 	     0,
 	     sizeof( libewf_section_list_entry_t ) ) == NULL )
@@ -103,7 +103,7 @@ libewf_section_list_t *libewf_section_list_append(
 
 		return( NULL );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     section_list_entry->type,
 	     type,
 	     type_length ) == NULL )

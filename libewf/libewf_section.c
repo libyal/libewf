@@ -173,7 +173,7 @@ ssize_t libewf_section_start_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     &section,
 	     0,
 	     sizeof( ewf_section_t ) ) == NULL )
@@ -928,7 +928,7 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	if( libewf_common_memcmp(
+	if( memory_compare(
 	     (void *) volume->signature,
 	     (void *) "SMART",
 	     5 ) == 0 )
@@ -989,7 +989,7 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     volume,
 	     0,
 	     sizeof( ewf_volume_smart_t ) ) == NULL )
@@ -1299,7 +1299,7 @@ ssize_t libewf_section_volume_e01_read(
 	media_values->media_flags = volume->media_flags;
 	*compression_level        = (int8_t) volume->compression_level;
 
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     media_values->guid,
 	     volume->guid,
 	     16 ) == NULL )
@@ -1366,7 +1366,7 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     volume,
 	     0,
 	     sizeof( ewf_volume_t ) ) == NULL )
@@ -1445,7 +1445,7 @@ ssize_t libewf_section_volume_e01_write(
 	{
 		volume->compression_level = (uint8_t) compression_level;
 
-		if( libewf_common_memcpy(
+		if( memory_copy(
 		     volume->guid,
 		     media_values->guid,
 		     16 ) == NULL )
@@ -2015,21 +2015,28 @@ ssize_t libewf_section_table_write(
 		write_crc     = 1;
 		section_size += sizeof( ewf_crc_t );
 	}
-	if( libewf_common_memset( &table, 0, sizeof( ewf_table_t ) ) == NULL )
+	if( memory_set(
+	     &table,
+	     0,
+	     sizeof( ewf_table_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear table.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( amount_of_offsets, table.amount_of_chunks ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     amount_of_offsets,
+	     table.amount_of_chunks ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_64bit( base_offset, table.base_offset ) != 1 )
+	if( libewf_endian_revert_64bit(
+	     base_offset,
+	     table.base_offset ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert base offset value.\n",
 		 function );
@@ -2038,7 +2045,9 @@ ssize_t libewf_section_table_write(
 	}
 	calculated_crc = ewf_crc_calculate( &table, ( sizeof( ewf_table_t ) - sizeof( ewf_crc_t ) ), 1 );
 
-	if( libewf_endian_revert_32bit( calculated_crc, table.crc ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     calculated_crc,
+	     table.crc ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to revert CRC value.\n",
 		 function );
@@ -2091,7 +2100,9 @@ ssize_t libewf_section_table_write(
 				return( -1 );
 			}
 		}
-		if( libewf_endian_revert_32bit( offset32_value, (uint8_t *) offsets[ iterator ].offset ) != 1 )
+		if( libewf_endian_revert_32bit(
+		     offset32_value,
+		     (uint8_t *) offsets[ iterator ].offset ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to revert start offset.\n",
 			 function );
@@ -2129,7 +2140,10 @@ ssize_t libewf_section_table_write(
 	}
 	if( write_crc != 0 )
 	{
-		calculated_crc = ewf_crc_calculate( offsets, offsets_size, 1 );
+		calculated_crc = ewf_crc_calculate(
+		                  offsets,
+		                  offsets_size,
+		                  1 );
 	}
 	section_write_count = libewf_section_start_write(
 	                       segment_file_handle,
@@ -2734,7 +2748,7 @@ ssize_t libewf_section_session_write(
 	ewf_sessions_size = sizeof( ewf_session_entry_t ) * sessions->amount;
 	section_size      = sizeof( ewf_session_t ) + ewf_sessions_size + sizeof( ewf_crc_t );
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &ewf_session,
 	     0,
 	     sizeof( ewf_session_t ) ) == NULL )
@@ -3140,7 +3154,10 @@ ssize_t libewf_section_data_read(
 			return( -1 );
 		}
 	}
-	if( libewf_common_memcmp( media_values->guid, data->guid, 16 ) != 0 )
+	if( memory_compare(
+	     media_values->guid,
+	     data->guid,
+	     16 ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: GUID does not match in data section.\n",
 		 function );
@@ -3215,7 +3232,10 @@ ssize_t libewf_section_data_write(
 
 			return( -1 );
 		}
-		if( libewf_common_memset( *cached_data_section, 0, sizeof( ewf_data_t ) ) == NULL )
+		if( memory_set(
+		     *cached_data_section,
+		     0,
+		     sizeof( ewf_data_t ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to clear data.\n",
 			 function );
@@ -3285,7 +3305,7 @@ ssize_t libewf_section_data_write(
 			}
 			( *cached_data_section )->compression_level = (uint8_t) compression_level;
 
-			if( libewf_common_memcpy(
+			if( memory_copy(
 			     ( *cached_data_section )->guid,
 			     media_values->guid,
 			     16 ) == NULL )
@@ -3651,7 +3671,7 @@ ssize_t libewf_section_error2_write(
 	sectors_size   = sizeof( ewf_error2_sector_t ) * acquiry_errors->amount;
 	section_size   = sizeof( ewf_error2_t ) + sectors_size + sizeof( ewf_crc_t );
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &error2,
 	     0,
 	     sizeof( ewf_error2_t ) ) == NULL )
@@ -3878,7 +3898,10 @@ ssize_t libewf_section_hash_read(
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( hash.unknown1, 16 ); );
 #endif
 
-	if( libewf_common_memcpy( md5_hash, hash.md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	if( memory_copy(
+	     md5_hash,
+	     hash.md5_hash,
+	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
 		 function );
@@ -3917,7 +3940,7 @@ ssize_t libewf_section_hash_write(
 	}
 	section_offset = segment_file_handle->file_offset;
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &hash,
 	     0,
 	     sizeof( ewf_hash_t ) ) == NULL )
@@ -3927,7 +3950,7 @@ ssize_t libewf_section_hash_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     hash.md5_hash,
 	     md5_hash,
 	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
@@ -4040,7 +4063,10 @@ ssize_t libewf_section_last_write(
 
 		return( -1 );
 	}
-	if( libewf_common_memset( &section, 0, sizeof( ewf_section_t ) ) == NULL )
+	if( memory_set(
+	     &section,
+	     0,
+	     sizeof( ewf_section_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear section.\n",
 		 function );
@@ -4546,7 +4572,10 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	section_offset = segment_file_handle->file_offset;
 
-	if( libewf_common_memset( &delta_chunk_header, 0, EWFX_DELTA_CHUNK_HEADER_SIZE ) == NULL )
+	if( memory_set(
+	     &delta_chunk_header,
+	     0,
+	     EWFX_DELTA_CHUNK_HEADER_SIZE ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear delta chunk header.\n",
 		 function );

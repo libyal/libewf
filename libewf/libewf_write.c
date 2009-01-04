@@ -837,7 +837,7 @@ ssize_t libewf_write_process_chunk_data(
 
 		/* Zlib creates its own CRC
 		 */
-		if( libewf_common_memcpy(
+		if( memory_copy(
 		     chunk_crc,
 		     &( chunk_data[ *compressed_chunk_data_size - sizeof( ewf_crc_t ) ] ),
 		     sizeof( ewf_crc_t ) ) == NULL )
@@ -1788,7 +1788,7 @@ ssize_t libewf_write_chunk_data_new(
 		LIBEWF_VERBOSE_PRINT( "%s: reading %" PRIzu_EWF " bytes from buffer.\n",
 		 function, read_size );
 
-		if( libewf_common_memcpy(
+		if( memory_copy(
 		     &internal_handle->chunk_cache->data[ internal_handle->chunk_cache->offset ],
 		     buffer,
 		     read_size ) == NULL )
@@ -2013,7 +2013,7 @@ ssize_t libewf_write_chunk_data_existing(
 
 		/* Update the chunk data
 		 */
-		if( libewf_common_memcpy(
+		if( memory_copy(
 		     &( internal_handle->chunk_cache->data[ chunk_offset ] ),
 		     buffer,
 		     write_size ) == NULL )
@@ -2708,7 +2708,10 @@ ssize_t libewf_write_finalize(
 
 			while( list_entry_iterator != NULL )
 			{
-				if( libewf_common_memcmp( list_entry_iterator->type, "volume", 6 ) == 0 )
+				if( memory_compare(
+				     list_entry_iterator->type,
+				     "volume",
+				     6 ) == 0 )
 				{
 					LIBEWF_VERBOSE_PRINT( "%s: correcting volume section.\n",
 					 function );
@@ -2755,7 +2758,10 @@ ssize_t libewf_write_finalize(
 						return( -1 );
 					}
 				}
-				else if( libewf_common_memcmp( list_entry_iterator->type, "data", 4 ) == 0 )
+				else if( memory_compare(
+				          list_entry_iterator->type,
+				          "data",
+				          4 ) == 0 )
 				{
 					LIBEWF_VERBOSE_PRINT( "%s: correcting data section.\n",
 					 function );

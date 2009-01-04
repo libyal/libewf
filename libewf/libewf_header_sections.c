@@ -65,7 +65,7 @@ libewf_header_sections_t *libewf_header_sections_alloc(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     header_sections,
 	     0,
 	     sizeof( libewf_header_sections_t ) ) == NULL )

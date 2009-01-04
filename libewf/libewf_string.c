@@ -350,7 +350,7 @@ libewf_char_t **libewf_string_split(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     lines,
 	     0,
 	     *amount ) == NULL )
@@ -552,7 +552,7 @@ int libewf_string_copy_from_utf16(
 		utf16_iterator = 0;
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( libewf_common_memset(
+	if( memory_set(
 	     &conversion_state,
 	     0,
 	     sizeof( mbstate_t ) ) == NULL )
@@ -661,7 +661,7 @@ int libewf_string_copy_to_utf16(
 		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( libewf_common_memset(
+	if( memory_set(
 	     &conversion_state,
 	     0,
 	     sizeof( mbstate_t ) ) == NULL )

@@ -303,7 +303,7 @@ struct tm *libewf_common_localtime(
 
 		return( NULL );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     time_elements,
 	     static_time_elements,
 	     sizeof( struct tm ) ) == NULL )

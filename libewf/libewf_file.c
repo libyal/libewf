@@ -267,7 +267,7 @@ int libewf_glob(
 
 			return( -1 );
 		}
-		if( libewf_common_memcpy(
+		if( memory_copy(
 		     segment_filename,
 		     filename,
 		     length ) == NULL )
@@ -1144,7 +1144,7 @@ int libewf_get_guid(
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     guid,
 	     internal_handle->media_values->guid,
 	     16 ) == NULL )
@@ -1202,7 +1202,7 @@ int libewf_get_md5_hash(
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     md5_hash,
 	     internal_handle->hash_sections->md5_hash,
 	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
@@ -2231,7 +2231,7 @@ int libewf_set_guid(
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     internal_handle->media_values->guid,
 	     guid,
 	     16 ) == NULL )
@@ -2299,7 +2299,7 @@ int libewf_set_md5_hash(
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     internal_handle->hash_sections->md5_hash,
 	     md5_hash,
 	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
@@ -2840,7 +2840,7 @@ int libewf_copy_media_values(
 
 		return( -1 );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     internal_destination_handle->media_values,
 	     internal_source_handle->media_values,
 	     sizeof( libewf_media_values_t ) ) == NULL )

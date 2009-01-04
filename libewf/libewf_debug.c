@@ -74,7 +74,7 @@ void libewf_debug_dump_data(
 	 data,
 	 size );
 
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     &stored_crc,
 	     &data[ size - sizeof( ewf_crc_t ) ],
 	     sizeof( ewf_crc_t ) ) == NULL )

@@ -149,7 +149,10 @@ struct tm *ewfoutput_gmtime(
 
 		return( NULL );
 	}
-	if( libewf_common_memcpy( time_elements, static_time_elements, sizeof( struct tm ) ) == NULL )
+	if( memory_copy(
+	     time_elements,
+	     static_time_elements,
+	     sizeof( struct tm ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set time elements.\n",
 		 function );

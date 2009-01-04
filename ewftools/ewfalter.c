@@ -295,7 +295,7 @@ int main( int argc, char * const argv[] )
 			}
 			return( EXIT_FAILURE );
 		}
-		if( libewf_common_memset(
+		if( memory_set(
 		     buffer,
 		     'X',
 		     (size_t) alter_size ) == NULL )

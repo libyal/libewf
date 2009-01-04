@@ -61,7 +61,7 @@ libewf_media_values_t *libewf_media_values_alloc(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     media_values,
 	     0,
 	     sizeof( libewf_media_values_t ) ) == NULL )

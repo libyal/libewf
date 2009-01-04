@@ -570,7 +570,7 @@ ssize_t libewf_read_chunk_data(
 			 */
 			if( internal_handle->read->wipe_on_error != 0 )
 			{
-				if( libewf_common_memset(
+				if( memory_set(
 				     chunk_read,
 				     0,
 				     internal_handle->media_values->chunk_size ) == NULL )
@@ -649,7 +649,7 @@ ssize_t libewf_read_chunk_data(
 		/* Copy the relevant data to buffer
 		 */
 		if( ( bytes_available > 0 )
-		 && ( libewf_common_memcpy(
+		 && ( memory_copy(
 		       buffer,
 		       &chunk_data[ chunk_offset ],
 		       bytes_available ) == NULL ) )

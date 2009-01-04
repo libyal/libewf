@@ -34,6 +34,9 @@
 #if !defined( _LIBEWF_FILENAME_H )
 #define _LIBEWF_FILENAME_H
 
+#include <common.h>
+#include <memory.h>
+
 #include "libewf_includes.h"
 
 #include "libewf_common.h"
@@ -67,7 +70,7 @@ typedef char libewf_filename_t;
 	libewf_common_string_length( filename )
 
 #define libewf_filename_copy( destination, source, length ) \
-	libewf_common_memcpy( destination, source, length )
+	memory_copy( destination, source, length )
 
 #define libewf_filename_open( filename, flags ) \
 	libewf_common_open( filename, flags )

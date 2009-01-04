@@ -96,7 +96,10 @@ ewfglob_t *ewfglob_alloc(
 
 		return( NULL );
 	}
-	if( libewf_common_memset( glob, 0, sizeof( ewfglob_t ) ) == NULL )
+	if( memory_set(
+	     glob,
+	     0,
+	     sizeof( ewfglob_t ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to clear glob.\n",
 		 function );
@@ -169,7 +172,7 @@ ewfglob_t *ewfglob_realloc(
 	}
 	glob->results = reallocation;
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &( glob->results[ glob->amount ] ),
 	     0,
 	     ( new_size - previous_size ) ) == NULL )

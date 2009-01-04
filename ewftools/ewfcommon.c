@@ -770,7 +770,10 @@ ssize32_t ewfcommon_read_input(
 					LIBEWF_VERBOSE_PRINT( "%s: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
 					 function, byte_error_granularity, error_granularity_offset );
 
-					if( libewf_common_memset( &buffer[ error_granularity_offset ], 0, byte_error_granularity ) == NULL )
+					if( memory_set(
+					     &buffer[ error_granularity_offset ],
+					     0,
+					     byte_error_granularity ) == NULL )
 					{
 						LIBEWF_WARNING_PRINT( "%s: unable to wipe data in chunk on error.\n",
 						 function );
@@ -785,7 +788,10 @@ ssize32_t ewfcommon_read_input(
 					LIBEWF_VERBOSE_PRINT( "%s: wiping remainder of chunk at offset %" PRIu32 ".\n",
 					 function, read_error_offset );
 
-					if( libewf_common_memset( &buffer[ read_error_offset ], 0, error_skip_bytes ) == NULL )
+					if( memory_set(
+					     &buffer[ read_error_offset ],
+					     0,
+					     error_skip_bytes ) == NULL )
 					{
 						LIBEWF_WARNING_PRINT( "%s: unable to wipe data in chunk on error.\n",
 						 function );
@@ -989,7 +995,10 @@ ssize_t ewfcommon_raw_read_ewf(
 		 */
 		if( wipe_chunk_on_error != 0 )
 		{
-			if( libewf_common_memset( buffer, 0, read_size ) == NULL )
+			if( memory_set(
+			     buffer,
+			     0,
+			     read_size ) == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to wipe buffer.\n",
 				 function );

@@ -90,7 +90,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     values_table->identifiers,
 	     0,
 	     values_table_size ) == NULL )
@@ -120,7 +120,7 @@ libewf_values_table_t *libewf_values_table_alloc(
 
 		return( NULL );
 	}
-	if( libewf_common_memset(
+	if( memory_set(
 	     values_table->values,
 	     0,
 	     values_table_size ) == NULL )
@@ -198,7 +198,7 @@ int libewf_values_table_realloc(
 	}
 	values_table->identifiers = reallocation;
 
-        if( libewf_common_memset(
+        if( memory_set(
              &( values_table->identifiers[ previous_amount ] ),
              0,
              ( new_size - previous_size ) ) == NULL )
@@ -221,7 +221,7 @@ int libewf_values_table_realloc(
 	}
 	values_table->values = reallocation;
 
-        if( libewf_common_memset(
+        if( memory_set(
              &( values_table->values[ previous_amount ] ),
              0,
              ( new_size - previous_size ) ) == NULL )

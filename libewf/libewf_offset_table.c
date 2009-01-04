@@ -81,7 +81,7 @@ libewf_offset_table_t *libewf_offset_table_alloc(
 
 			return( NULL );
 		}
-		if( libewf_common_memset(
+		if( memory_set(
 		     offset_table->chunk_offset,
 		     0,
 		     ( sizeof( libewf_chunk_offset_t ) * amount ) ) == NULL )
@@ -140,7 +140,7 @@ int libewf_offset_table_realloc(
 	}
 	offset_table->chunk_offset = (libewf_chunk_offset_t *) reallocation;
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &( offset_table->chunk_offset[ offset_table->amount ] ),
 	     0,
 	     ( sizeof( libewf_chunk_offset_t ) * ( amount - offset_table->amount ) ) ) == NULL )

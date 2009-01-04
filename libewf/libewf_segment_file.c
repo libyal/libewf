@@ -90,21 +90,21 @@ int libewf_segment_file_check_file_signature(
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( libewf_common_memcmp(
+	if( memory_compare(
 	     evf_file_signature,
 	     signature,
 	     8 ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( libewf_common_memcmp(
+	else if( memory_compare(
 	          lvf_file_signature,
 	          signature,
 	          8 ) == 0 )
 	{
 		return( 1 );
 	}
-	else if( libewf_common_memcmp(
+	else if( memory_compare(
 	          dvf_file_signature,
 	          signature,
 	          8 ) == 0 )
@@ -154,21 +154,21 @@ ssize_t libewf_segment_file_read_file_header(
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( libewf_common_memcmp(
+	if( memory_compare(
 	     evf_file_signature,
 	     file_header.signature,
 	     8 ) == 0 )
 	{
 		segment_file_handle->file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 	}
-	else if( libewf_common_memcmp(
+	else if( memory_compare(
 	          lvf_file_signature,
 	          file_header.signature,
 	          8 ) == 0 )
 	{
 		segment_file_handle->file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
 	}
-	else if( libewf_common_memcmp(
+	else if( memory_compare(
 	          dvf_file_signature,
 	          file_header.signature,
 	          8 ) == 0 )
@@ -667,7 +667,7 @@ ssize_t libewf_segment_file_write_start(
 	}
 	segment_file_handle->file_type = segment_file_type;
 
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     file_header.signature,
 	     file_signature,
 	     8 ) == NULL )

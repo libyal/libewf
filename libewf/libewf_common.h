@@ -129,27 +129,6 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_MEMCMP )
-#define libewf_common_memcmp( buffer1, buffer2, size ) \
-	memcmp( (const void *) buffer1, (const void *) buffer2, size )
-#else
-#error Missing function memcmp
-#endif
-
-#if defined( HAVE_MEMCPY )
-#define libewf_common_memcpy( destination, source, count ) \
-	memcpy( (void *) destination, (void *) source, count )
-#else
-#error Missing function memcpy
-#endif
-
-#if defined( HAVE_MEMSET )
-#define libewf_common_memset( buffer, value, count ) \
-	memset( (void *) buffer, (int) value, count )
-#else
-#error Missing function memset
-#endif
-
 #if defined( HAVE_STRLEN )
 #define libewf_common_string_length( string ) \
 	strlen( string )

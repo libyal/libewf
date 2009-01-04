@@ -76,7 +76,7 @@ libewf_sector_table_t *libewf_sector_table_alloc(
 
 			return( NULL );
 		}
-		if( libewf_common_memset(
+		if( memory_set(
 		     sector_table->sector,
 		     0, 
 		     ( sizeof( libewf_sector_table_entry_t ) * amount ) ) == NULL )
@@ -134,7 +134,7 @@ int libewf_sector_table_realloc(
 	}
 	sector_table->sector = (libewf_sector_table_entry_t *) reallocation;
 
-	if( libewf_common_memset(
+	if( memory_set(
 	     &( sector_table->sector[ sector_table->amount ] ),
 	     0, 
 	     ( sizeof( libewf_sector_table_entry_t ) * ( amount - sector_table->amount ) ) ) == NULL )

@@ -135,7 +135,7 @@ char *ewfstring_strerror(
 
 		return( NULL );
 	}
-	if( libewf_common_memcpy(
+	if( memory_copy(
 	     error_string,
 	     static_error_string,
 	     error_string_size ) == NULL )
