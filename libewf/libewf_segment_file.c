@@ -39,7 +39,6 @@
 
 #include "libewf_common.h"
 #include "libewf_endian.h"
-#include "libewf_hash_values.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"
@@ -48,10 +47,6 @@
 
 #include "ewf_definitions.h"
 #include "ewf_file_header.h"
-
-const uint8_t dvf_file_signature[] = { 0x64, 0x76, 0x66, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-const uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-const uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
 /* Detects if a file is an EWF file (check for the EWF file signature)
  * Returns 1 if true, 0 if not, or -1 on error
@@ -88,15 +83,15 @@ int libewf_segment_file_check_file_signature( int file_descriptor )
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( libewf_common_memcmp( evf_file_signature, signature, sizeof( evf_file_signature ) ) == 0 )
+	if( ewf_file_header_check_signature( signature ) == 1 )
 	{
 		return( 1 );
 	}
-	else if( libewf_common_memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 )
+	else if( lwf_file_header_check_signature( signature ) == 1 )
 	{
 		return( 1 );
 	}
-	else if( libewf_common_memcmp( dvf_file_signature, signature, sizeof( dvf_file_signature ) ) == 0 )
+	else if( dwf_file_header_check_signature( signature ) == 1 )
 	{
 		return( 1 );
 	}
@@ -145,15 +140,15 @@ ssize_t libewf_segment_file_read_file_header( int file_descriptor, uint16_t *seg
 	}
 	/* The amount of EWF segment files will be the largest
 	 */
-	if( libewf_common_memcmp( evf_file_signature, file_header.signature, sizeof( evf_file_signature ) ) == 0 )
+	if( ewf_file_header_check_signature( file_header.signature ) == 1 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_EWF;
 	}
-	else if( libewf_common_memcmp( lvf_file_signature, file_header.signature, sizeof( lvf_file_signature ) ) == 0 )
+	else if( lwf_file_header_check_signature( file_header.signature ) == 1 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_LWF;
 	}
-	else if( libewf_common_memcmp( dvf_file_signature, file_header.signature, sizeof( dvf_file_signature ) ) == 0 )
+	else if( dwf_file_header_check_signature( file_header.signature ) == 1 )
 	{
 		*segment_file_type = LIBEWF_SEGMENT_FILE_TYPE_DWF;
 	}
@@ -1692,7 +1687,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
  * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc, uint32_t amount_of_chunks )
+ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_handle, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t size, int8_t is_compressed, EWF_CRC *chunk_crc, int8_t write_crc, uint32_t amount_of_chunks )
 {
 	uint8_t calculated_crc_buffer[ 4 ];
 
@@ -1834,7 +1829,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 	/* Write the chunk data to the segment file
 	 */
-	write_count = ewf_string_write_from_buffer(
+	write_count = ewf_chunk_write(
 	               chunk_data,
 	               internal_handle->segment_table->file_descriptor[ segment_number ],
 	               size );
@@ -2126,7 +2121,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 /* Write a delta chunk of data to a segment file and update the offset table
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
+ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment_number, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc )
 {
 	static char *function = "libewf_segment_file_write_delta_chunk";
 	ssize_t write_count   = 0;

@@ -43,19 +43,58 @@
 #include "ewf_compress.h"
 #include "ewf_definitions.h"
 
-/* Initializes the header values
- * Returns 1 if successful, or -1 otherwise
+/* Allocates memory for a new header values struct
+ * Returns a pointer to the new instance, NULL on error
  */
-int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values )
+LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void )
 {
-	static char *function = "libewf_header_values_initialize";
+	LIBEWF_HEADER_VALUES *header_values = NULL;
+	static char *function               = "libewf_header_values_alloc";
+	size_t header_values_size           = 0;
+
+	header_values = (LIBEWF_HEADER_VALUES *) libewf_common_alloc_cleared( LIBEWF_HEADER_VALUES_SIZE, 0 );
 
 	if( header_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate header values.\n",
 		 function );
 
-		return( -1 );
+		return( NULL );
+	}
+	header_values->amount = LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT;
+	header_values_size    = header_values->amount * sizeof( LIBEWF_CHAR* );
+
+	if( header_values_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		libewf_common_free( header_values );
+
+		return( NULL );
+	}
+	header_values->identifiers = (LIBEWF_CHAR **) libewf_common_alloc_cleared( header_values_size, 0 );
+
+	if( header_values->identifiers == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate identifiers.\n",
+		 function );
+
+		libewf_common_free( header_values );
+
+		return( NULL );
+	}
+	header_values->values = (LIBEWF_CHAR **) libewf_common_alloc_cleared( header_values_size, 0 );
+
+	if( header_values->values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate values.\n",
+		 function );
+
+		libewf_common_free( header_values->identifiers );
+		libewf_common_free( header_values );
+
+		return( NULL );
 	}
 	header_values->identifiers[ 0 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "case_number" ), 11 );
 	header_values->identifiers[ 1 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "description" ), 11 );
@@ -72,7 +111,98 @@ int libewf_header_values_initialize( LIBEWF_VALUES_TABLE *header_values )
 	header_values->identifiers[ 12 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "serial_number" ), 13 );
 	header_values->identifiers[ 13 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "unknown_dc" ), 10 );
 
+	return( header_values );
+}
+
+/* Reallocates memory for the header values
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount )
+{
+	LIBEWF_CHAR **reallocation = NULL;
+	static char *function      = "libewf_header_values_realloc";
+	size_t previous_size       = previous_amount * sizeof( LIBEWF_CHAR* );
+	size_t new_size            = new_amount * sizeof( LIBEWF_CHAR* );
+
+	if( header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( previous_amount > (uint32_t) INT32_MAX )
+	 || ( new_amount > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( previous_amount >= new_amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: new amount smaller than previous amount.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( previous_size > (size_t) SSIZE_MAX )
+	 || ( new_size > (size_t) SSIZE_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	reallocation = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( header_values->identifiers, previous_size, new_size, 0 );
+
+	if( reallocation == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate identifiers.\n",
+		 function );
+
+		return( -1 );
+	}
+	header_values->identifiers = reallocation;
+	reallocation               = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( header_values->values, previous_size, new_size, 0 );
+
+	if( reallocation == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate values.\n",
+		 function );
+
+		return( -1 );
+	}
+	header_values->values = reallocation;
+	header_values->amount = new_amount;
+
 	return( 1 );
+}
+
+/* Frees memory of a header values struct including elements
+ */
+void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values )
+{
+	static char *function = "libewf_header_values_free";
+	uint32_t iterator     = 0;
+
+	if( header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		 function );
+
+		return;
+	}
+	if( header_values->values != NULL )
+	{
+		for( iterator = 0; iterator < header_values->amount; iterator++ )
+		{
+			libewf_common_free( header_values->identifiers[ iterator ] );
+			libewf_common_free( header_values->values[ iterator ] );
+		}
+		libewf_common_free( header_values->values );
+	}
+	libewf_common_free( header_values );
 }
 
 /* Sets a 2 digit value for a certain index in the date element at the start of the date string
@@ -650,10 +780,234 @@ LIBEWF_CHAR *libewf_generate_date_header2_value( time_t timestamp )
 	return( date_string );
 }
 
+/* Retrieves the header value index number, or -1 on error
+ * The index number will be larger than the amount when the identifier is not present in the header values
+ */
+int32_t libewf_header_values_get_index( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier )
+{
+	static char *function    = "libewf_header_values_get_index";
+	size_t identifier_length = 0;
+	size_t string_length     = 0;
+	int32_t iterator         = 0;
+
+	if( header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		 function );
+
+		return( -1 );
+	}
+	identifier_length = libewf_string_length( identifier );
+
+	if( identifier_length == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( header_values->amount > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header values amount value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < (int32_t) header_values->amount; iterator++ )
+	{
+		if( header_values->identifiers[ iterator ] == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: missing identifier for index: %" PRIi32 ".\n",
+			 function, iterator );
+
+			continue;
+		}
+		string_length = libewf_string_length( header_values->identifiers[ iterator ] );
+
+		if( string_length == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine length of identifier of index: %" PRIi32 ".\n",
+			 function, iterator );
+
+			continue;
+		}
+		if( string_length != identifier_length )
+		{
+			continue;
+		}
+		if( libewf_string_compare( identifier, header_values->identifiers[ iterator ], identifier_length ) == 0 )
+		{
+			return( iterator );
+		}
+	}
+	return( iterator );
+}
+
+/* Retrieves a header value in value
+ * Length should contain the amount of characters in the string
+ * Returns 1 if successful, 0 if value not present, -1 on error
+ */
+int libewf_header_values_get_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+{
+	static char *function      = "libewf_header_values_get_value";
+	size_t header_value_length = 0;
+	int32_t index              = 0;
+
+	if( value == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
+
+		return( -1 );
+	}
+	index = libewf_header_values_get_index( header_values, identifier );
+
+	if( index <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs_EWF ".\n",
+		 function, identifier );
+
+		return( -1 );
+	}
+	if( (uint32_t) index > header_values->amount )
+	{
+		return( 0 );
+	}
+	if( header_values->values[ index ] == NULL )
+	{
+		return( 0 );
+	}
+	header_value_length = libewf_string_length( header_values->values[ index ] );
+
+	/* Don't bother with empty values
+	 */
+	if( header_value_length == 0 )
+	{
+		return( 0 );
+	}
+	/* Add 1 additional byte required for the end of string character
+	 */
+	header_value_length += 1;
+
+	if( header_value_length > length )
+	{
+		LIBEWF_WARNING_PRINT( "%s: value too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_copy( value, header_values->values[ index ], header_value_length ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set header value.\n",
+		 function );
+
+		return( -1 );
+	}
+	value[ header_value_length - 1 ] = (LIBEWF_CHAR) '\0';
+
+	return( 1 );
+}
+
+/* Set a header value
+ * Length should contain the amount of characters in the string
+ * Frees the previous header value if necessary
+ * Returns 1 if successful, -1 on error
+ */
+int libewf_header_values_set_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+{
+	static char *function = "libewf_header_values_set_value";
+	size_t string_length  = 0;
+	int32_t index         = 0;
+
+	index = libewf_header_values_get_index( header_values, identifier );
+
+	if( index <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs_EWF ".\n",
+		 function, identifier );
+
+		return( -1 );
+	}
+	if( (uint32_t) index >= header_values->amount )
+	{
+		string_length = libewf_string_length( identifier );
+
+		if( string_length == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine length of identifier.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_header_values_realloc(
+		     header_values,
+		     header_values->amount,
+		     ( index + 1 ) ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate header values.\n",
+			 function );
+
+			return( -1 );
+		}
+		header_values->identifiers[ index ] = libewf_string_duplicate( identifier, string_length );
+
+		if( header_values->identifiers[ index ] == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set identifier.\n",
+			 function );
+
+			libewf_common_free( header_values->identifiers[ index ] );
+
+			header_values->identifiers[ index ] = NULL;
+
+			return( -1 );
+		}
+	}
+	/* Clear the buffer of the previous header value
+	 */
+	if( header_values->values[ index ] != NULL )
+	{
+		libewf_common_free( header_values->values[ index ] );
+
+		header_values->values[ index ] = NULL;
+	}
+	/* Don't bother with empty values
+	 */
+	if( value == NULL )
+	{
+		return( 1 );
+	}
+	if( length == 0 )
+	{
+		return( 1 );
+	}
+	header_values->values[ index ] = libewf_string_duplicate( value, length );
+
+	if( header_values->values[ index ] == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set value.\n",
+		 function );
+
+		libewf_common_free( header_values->values[ index ] );
+
+		header_values->values[ index ] = NULL;
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Copies the header values from the source to the destination
  * Returns 1 if successful, -1 on error
  */
-int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, LIBEWF_VALUES_TABLE *source_header_values )
+int libewf_header_values_copy( LIBEWF_HEADER_VALUES *destination_header_values, LIBEWF_HEADER_VALUES *source_header_values )
 {
 	static char *function = "libewf_header_values_copy";
 	size_t string_length  = 0;
@@ -723,7 +1077,7 @@ int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, L
 
 			continue;
 		}
-		if( libewf_values_table_set_value(
+		if( libewf_header_values_set_value(
 		     destination_header_values,
 		     source_header_values->identifiers[ index ],
 		     source_header_values->values[ index ],
@@ -741,19 +1095,19 @@ int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, L
 /* Parse a header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *header_string, size_t length, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string( LIBEWF_CHAR *header_string, size_t length, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values = NULL;
-	LIBEWF_CHAR **lines                = NULL;
-	LIBEWF_CHAR **types                = NULL;
-	LIBEWF_CHAR **values               = NULL;
-	LIBEWF_CHAR *date_string           = NULL;
-	static char *function              = "libewf_header_values_parse_header_string";
-	size_t string_length               = 0;
-	uint32_t line_count                = 0;
-	uint32_t type_count                = 0;
-	uint32_t value_count               = 0;
-	uint32_t iterator                  = 0;
+	LIBEWF_HEADER_VALUES *header_values = NULL;
+	LIBEWF_CHAR **lines                 = NULL;
+	LIBEWF_CHAR **types                 = NULL;
+	LIBEWF_CHAR **values                = NULL;
+	LIBEWF_CHAR *date_string            = NULL;
+	static char *function               = "libewf_header_values_parse_header_string";
+	size_t string_length                = 0;
+	uint32_t line_count                 = 0;
+	uint32_t type_count                 = 0;
+	uint32_t value_count                = 0;
+	uint32_t iterator                   = 0;
 
 	if( header_string == NULL )
 	{
@@ -808,21 +1162,11 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 	}
 	libewf_string_split_values_free( lines, line_count );
 
-	header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+	header_values = libewf_header_values_alloc();
 
 	if( header_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
-		 function );
-
-		libewf_string_split_values_free( types, type_count );
-		libewf_string_split_values_free( values, value_count );
-
-		return( NULL );
-	}
-	if( libewf_header_values_initialize( header_values ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
 		 function );
 
 		libewf_string_split_values_free( types, type_count );
@@ -848,7 +1192,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "av" ), 2 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "acquiry_software_version" ),
 			     values[ iterator ],
@@ -860,7 +1204,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "dc" ), 2 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "unknown_dc" ),
 			     values[ iterator ],
@@ -872,7 +1216,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "md" ), 2 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "model" ),
 			     values[ iterator ],
@@ -884,7 +1228,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "ov" ), 2 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "acquiry_operating_system" ),
 			     values[ iterator ],
@@ -896,7 +1240,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "sn" ), 2 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "serial_number" ),
 			     values[ iterator ],
@@ -936,7 +1280,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 
 				if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "m" ), 1 ) == 0 )
 				{
-					if( libewf_values_table_set_value(
+					if( libewf_header_values_set_value(
 					     header_values,
 					     _S_LIBEWF_CHAR( "acquiry_date" ),
 					     date_string,
@@ -948,7 +1292,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 				}
 				else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "u" ), 1 ) == 0 )
 				{
-					if( libewf_values_table_set_value(
+					if( libewf_header_values_set_value(
 					     header_values,
 					     _S_LIBEWF_CHAR( "system_date" ),
 					     date_string,
@@ -975,7 +1319,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 			}
 			else
 			{
-				if( libewf_values_table_set_value(
+				if( libewf_header_values_set_value(
 				     header_values,
 				     _S_LIBEWF_CHAR( "password" ),
 				     values[ iterator ],
@@ -988,7 +1332,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "a" ), 1 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "description" ),
 			     values[ iterator ],
@@ -1000,7 +1344,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "c" ), 1 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "case_number" ),
 			     values[ iterator ],
@@ -1011,7 +1355,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "n" ), 1 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "evidence_number" ),
 			     values[ iterator ],
@@ -1023,7 +1367,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "e" ), 1 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "examiner_name" ),
 			     values[ iterator ],
@@ -1035,7 +1379,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "t" ), 1 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "notes" ),
 			     values[ iterator ],
@@ -1047,7 +1391,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 		}
 		else if( libewf_string_compare( types[ iterator ], _S_LIBEWF_CHAR( "r" ), 1 ) == 0 )
 		{
-			if( libewf_values_table_set_value(
+			if( libewf_header_values_set_value(
 			     header_values,
 			     _S_LIBEWF_CHAR( "compression_type" ),
 			     values[ iterator ],
@@ -1077,9 +1421,9 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *head
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( EWF_CHAR *header, size_t size, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_HEADER *header, size_t size, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE* header_values = NULL;
+	LIBEWF_HEADER_VALUES* header_values = NULL;
 	LIBEWF_CHAR *header_string          = NULL;
 	static char *function               = "libewf_header_values_parse_header";
 
@@ -1118,9 +1462,9 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( EWF_CHAR *header, size_t
 /* Parse an EWF header for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( EWF_CHAR *header2, size_t size, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_header2( EWF_HEADER2 *header2, size_t size, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE* header_values = NULL;
+	LIBEWF_HEADER_VALUES* header_values = NULL;
 	LIBEWF_CHAR *header_string          = NULL;
 	static char *function               = "libewf_header_values_parse_header2";
 	size_t header_size                  = 0;
@@ -1163,9 +1507,9 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( EWF_CHAR *header2, size
  * Sets header length
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *header_string, size_t string_length, size_t *header_length )
+EWF_HEADER *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *header_string, size_t string_length, size_t *header_length )
 {
-	EWF_CHAR *header      = NULL;
+	EWF_HEADER *header    = NULL;
 	static char *function = "libewf_header_values_convert_header_string_to_header";
 
 	if( header_string == NULL )
@@ -1182,7 +1526,7 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *hea
 
 		return( NULL );
 	}
-	header = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * string_length );
+	header = (EWF_HEADER *) libewf_common_alloc( EWF_HEADER_SIZE * string_length );
 
 	if( header == NULL )
 	{
@@ -1217,9 +1561,9 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *hea
  * Sets header2 length
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *header_string, size_t string_length, size_t *header2_length )
+EWF_HEADER2 *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *header_string, size_t string_length, size_t *header2_length )
 {
-	EWF_CHAR *header2     = NULL;
+	EWF_HEADER2 *header2  = NULL;
 	static char *function = "libewf_header_values_convert_header_string_to_header2";
 
 	if( header_string == NULL )
@@ -1240,7 +1584,7 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *he
 	 */
 	*header2_length = ( string_length + 1 ) * 2;
 
-	header2 = (EWF_CHAR *) libewf_common_alloc( EWF_CHAR_SIZE * *header2_length );
+	header2 = (EWF_HEADER2 *) libewf_common_alloc( EWF_HEADER2_SIZE * *header2_length );
 
 	if( header2 == NULL )
 	{
@@ -1274,7 +1618,7 @@ EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *he
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string    = NULL;
 	LIBEWF_CHAR *case_number      = _S_LIBEWF_CHAR( "" );
@@ -1504,7 +1848,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string            = NULL;
 	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
@@ -1748,7 +2092,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string            = NULL;
 	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
@@ -1961,7 +2305,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string            = NULL;
 	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "" );
@@ -2169,7 +2513,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string            = NULL;
 	LIBEWF_CHAR *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
@@ -2385,7 +2729,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string            = NULL;
 	LIBEWF_CHAR *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
@@ -2614,7 +2958,7 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TA
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string            = NULL;
 	LIBEWF_CHAR *header_string_srce       = _S_LIBEWF_CHAR( "srce\n0\t1\np\tn\tid\tev\ttb\tlo\tpo\tah\tgu\taq\n0\t0\n\t\t\t\t\t-1\t-1\t\t\t\n\n" );
@@ -2823,9 +3167,9 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TA
 /* Generate an EWF header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_ewf( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tm\tu\tp\tr\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -2856,9 +3200,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *
 /* Generate an EnCase1 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_encase1( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tm\tu\tp\tr\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
@@ -2889,9 +3233,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TAB
 /* Generate an FTK Imager header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -2922,9 +3266,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *
 /* Generate an EnCase2 and EnCase3 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_encase2( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\tr\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
@@ -2955,9 +3299,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TAB
 /* Generate an EnCase4 header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\r\nmain\r\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\r\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\r\n\r\n" );
@@ -2987,9 +3331,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TAB
 /* Generate an EnCase5 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3019,9 +3363,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALU
 /* Generate an EnCase6 linen header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR *header                = NULL;
+	EWF_HEADER *header              = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3051,9 +3395,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALU
 /* Generate an EnCase4 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+EWF_HEADER2 *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR *header2               = NULL;
+	EWF_HEADER2 *header2            = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3083,9 +3427,9 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TA
 /* Generate an EnCase5 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+EWF_HEADER2 *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR *header2               = NULL;
+	EWF_HEADER2 *header2            = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\tdc\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3115,9 +3459,9 @@ EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TA
 /* Generate an EnCase6 header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+EWF_HEADER2 *libewf_header_values_generate_header2_string_encase6( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR *header2               = NULL;
+	EWF_HEADER2 *header2            = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "3\nmain\na\tc\tn\te\tt\tmd\tsn\tav\tov\tm\tu\tp\tdc\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3206,18 +3550,18 @@ LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp )
 /* Parse a xml header string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *header_string_xml, size_t length, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *header_string_xml, size_t length, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values = NULL;
-	LIBEWF_CHAR **lines                = NULL;
-	LIBEWF_CHAR *open_tag_start        = NULL;
-	LIBEWF_CHAR *open_tag_end          = NULL;
-	LIBEWF_CHAR *close_tag_start       = NULL;
-	LIBEWF_CHAR *close_tag_end         = NULL;
-	static char *function              = "libewf_header_values_parse_header_string_xml";
-	size_t string_length               = 0;
-	uint32_t line_count                = 0;
-	uint32_t iterator                  = 0;
+	LIBEWF_HEADER_VALUES *header_values = NULL;
+	LIBEWF_CHAR **lines                 = NULL;
+	LIBEWF_CHAR *open_tag_start         = NULL;
+	LIBEWF_CHAR *open_tag_end           = NULL;
+	LIBEWF_CHAR *close_tag_start        = NULL;
+	LIBEWF_CHAR *close_tag_end          = NULL;
+	static char *function               = "libewf_header_values_parse_header_string_xml";
+	size_t string_length                = 0;
+	uint32_t line_count                 = 0;
+	uint32_t iterator                   = 0;
 
 	if( header_string_xml == NULL )
 	{
@@ -3239,20 +3583,11 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 
 		return( NULL );
 	}
-	header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+	header_values = libewf_header_values_alloc();
 
 	if( header_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create header values.\n",
-		 function );
-
-		libewf_string_split_values_free( lines, line_count );
-
-		return( NULL );
-	}
-	if( libewf_header_values_initialize( header_values ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize the header values.\n",
 		 function );
 
 		libewf_string_split_values_free( lines, line_count );
@@ -3336,7 +3671,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 		 */
 		*open_tag_end = (LIBEWF_CHAR) '\0';
 
-		if( libewf_values_table_set_value(
+		if( libewf_header_values_set_value(
 		     header_values,
 		     &open_tag_start[ 1 ],
 		     &open_tag_end[ 1 ],
@@ -3354,11 +3689,11 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *
 /* Parse an EWF xheader for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size_t size, uint8_t date_format )
+LIBEWF_HEADER_VALUES *libewf_header_values_parse_xheader( EWF_HEADER *xheader, size_t size, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values = NULL;
-	LIBEWF_CHAR *xml_header_string     = NULL;
-	static char *function              = "libewf_header_values_parse_xheader";
+	LIBEWF_HEADER_VALUES* header_values = NULL;
+	LIBEWF_CHAR *xml_header_string      = NULL;
+	static char *function               = "libewf_header_values_parse_xheader";
 
 	if( xheader == NULL )
 	{
@@ -3396,7 +3731,7 @@ LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *string_length )
+LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *string_length )
 {
 	LIBEWF_CHAR *header_string         = NULL;
 	LIBEWF_CHAR *xml_head              = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
@@ -3598,9 +3933,9 @@ LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABL
 /* Generate an EWFX header
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_header_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR  *header               = NULL;
+	EWF_HEADER  *header             = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\nc\tn\ta\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3630,9 +3965,9 @@ EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE 
 /* Generate an EWFX header2
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length )
+EWF_HEADER2 *libewf_header_values_generate_header2_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length )
 {
-	EWF_CHAR  *header2              = NULL;
+	EWF_HEADER  *header2            = NULL;
 	LIBEWF_CHAR *header_string      = NULL;
 	LIBEWF_CHAR *header_string_head = _S_LIBEWF_CHAR( "1\nmain\na\tc\tn\te\tt\tav\tov\tm\tu\tp\n" );
 	LIBEWF_CHAR *header_string_tail = _S_LIBEWF_CHAR( "\n\n" );
@@ -3663,9 +3998,9 @@ EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE
 /* Generate an EWFX xheader
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length )
+EWF_HEADER *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length )
 {
-	EWF_CHAR  *xheader         = NULL;
+	EWF_HEADER  *xheader       = NULL;
 	LIBEWF_CHAR *header_string = NULL;
 	static char *function      = "libewf_header_values_generate_xheader_string_ewfx";
 
@@ -3674,10 +4009,10 @@ EWF_CHAR *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_VALUES_TABLE
 	                 timestamp,
 	                 header_length );
 
-	xheader = libewf_header_values_convert_header_string_to_header(
-	           header_string,
-	           *header_length,
-	           header_length );
+	xheader       = libewf_header_values_convert_header_string_to_header(
+	                 header_string,
+	                 *header_length,
+	                 header_length );
 
 	if( xheader == NULL )
 	{

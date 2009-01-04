@@ -45,8 +45,6 @@
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 #include "libewf_file.h"
-#include "libewf_hash_values.h"
-#include "libewf_header_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
 #include "libewf_section_list.h"
@@ -57,9 +55,9 @@
 
 #include "ewf_compress.h"
 #include "ewf_crc.h"
-#include "ewf_definitions.h"
 #include "ewf_digest_hash.h"
 #include "ewf_file_header.h"
+#include "ewf_header.h"
 #include "ewf_section.h"
 #include "ewf_volume.h"
 #include "ewf_table.h"
@@ -401,8 +399,8 @@ off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset )
 	return( offset );
 }
 
-/* Retrieves the amount of sectors per chunk from the media information
- * Returns 1 if successful, or -1 on error
+/* Returns the amount of sectors per chunk from the media information
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_chunk )
 {
@@ -444,8 +442,8 @@ int libewf_get_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t *sectors_per_c
 	return( 1 );
 }
 
-/* Retrieves the amount of bytes per sector from the media information
- * Returns 1 if successful, or -1 on error
+/* Returns the amount of bytes per sector from the media information
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sector )
 {
@@ -487,8 +485,8 @@ int libewf_get_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t *bytes_per_sect
 	return( 1 );
 }
 
-/* Retrieves the amount of sectors from the media information
- * Returns 1 if successful, or -1 on error
+/* Returns the amount of sectors from the media information
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sectors )
 {
@@ -530,8 +528,8 @@ int libewf_get_amount_of_sectors( LIBEWF_HANDLE *handle, uint32_t *amount_of_sec
 	return( 1 );
 }
 
-/* Retrieves the chunk size from the media information
- * Returns 1 if successful, or -1 on error
+/* Returns the chunk size from the media information
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 {
@@ -573,8 +571,8 @@ int libewf_get_chunk_size( LIBEWF_HANDLE *handle, size32_t *chunk_size )
 	return( 1 );
 }
 
-/* Retrieves the error granularity from the media information
- * Returns 1 if successful, or -1 on error
+/* Returns the error granularity from the media information
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granularity )
 {
@@ -616,8 +614,8 @@ int libewf_get_error_granularity( LIBEWF_HANDLE *handle, uint32_t *error_granula
 	return( 1 );
 }
 
-/* Retrieves the compression level value
- * Returns 1 if successful, or -1 on error
+/* Returns the compression level value
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_level )
 {
@@ -652,8 +650,8 @@ int libewf_get_compression_level( LIBEWF_HANDLE *handle, int8_t *compression_lev
 	return( 1 );
 }
 
-/* Retrieves the size of the contained media data
- * Returns 1 if successful, or -1 on error
+/* Returns the size of the contained media data
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size )
 {
@@ -700,10 +698,9 @@ int libewf_get_media_size( LIBEWF_HANDLE *handle, size64_t *media_size )
 	return( 1 );
 }
 
-/* Retrieves the media type value
- * Returns 1 if successful, or -1 on error
+/* Returns the media type value, or -1 on error
  */
-int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type )
+int8_t libewf_get_media_type( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_media_type";
@@ -731,22 +728,12 @@ int libewf_get_media_type( LIBEWF_HANDLE *handle, int8_t *media_type )
 
 		return( -1 );
 	}
-	if( media_type == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media type.\n",
-		 function );
-
-		return( -1 );
-	}
-	*media_type = internal_handle->media->media_type;
-
-	return( 1 );
+	return( (int8_t) internal_handle->media->media_type );
 }
 
-/* Retrieves the media flags
- * Returns 1 if successful, or -1 on error
+/* Returns the media flags value, or -1 on error
  */
-int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags )
+int8_t libewf_get_media_flags( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_media_flags";
@@ -774,22 +761,12 @@ int libewf_get_media_flags( LIBEWF_HANDLE *handle, int8_t *media_flags )
 
 		return( -1 );
 	}
-	if( media_flags == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media flags.\n",
-		 function );
-
-		return( -1 );
-	}
-	*media_flags = internal_handle->media->media_flags;
-
-	return( 1 );
+	return( (int8_t) internal_handle->media->media_flags );
 }
 
-/* Retrieves the volume type value
- * Returns 1 if successful, or -1 on error
+/* Returns the volume type value, or -1 on error
  */
-int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type )
+int8_t libewf_get_volume_type( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_volume_type";
@@ -810,28 +787,16 @@ int libewf_get_volume_type( LIBEWF_HANDLE *handle, int8_t *volume_type )
 
 		return( -1 );
 	}
-	if( volume_type == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid volume type.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( ( internal_handle->media->media_flags & 0x02 ) == 0 )
 	{
-		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL;
+		return( (int8_t) LIBEWF_VOLUME_TYPE_LOGICAL );
 	}
-	else
-	{
-		*volume_type = (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL;
-	}
-	return( 1 );
+	return( (int8_t) LIBEWF_VOLUME_TYPE_PHYSICAL );
 }
 
-/* Retrieves the format type value
- * Returns 1 if successful, or -1 on error
+/* Returns the format value, or -1 on error
  */
-int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format )
+int8_t libewf_get_format( LIBEWF_HANDLE *handle )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_get_volume_type";
@@ -859,20 +824,11 @@ int libewf_get_format( LIBEWF_HANDLE *handle, int8_t *format )
 
 		return( -1 );
 	}
-	if( format == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid format.\n",
-		 function );
-
-		return( -1 );
-	}
-	*format = internal_handle->format;
-
-	return( 1 );
+	return( (int8_t) internal_handle->format );
 }
 
-/* Retrieves the GUID
- * Returns 1 if successful, or -1 on error
+/* Returns the GUID
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 {
@@ -912,8 +868,8 @@ int libewf_get_guid( LIBEWF_HANDLE *handle, uint8_t *guid, size_t size )
 	return( 1 );
 }
 
-/* Retrieves the MD5 hash
- * Returns 1 if successful, 0 if value not present, or -1 on error
+/* Returns the MD5 hash
+ * Returns 1 if successful, 0 if value not present, -1 on error
  */
 int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 {
@@ -958,8 +914,8 @@ int libewf_get_md5_hash( LIBEWF_HANDLE *handle, uint8_t *md5_hash, size_t size )
 }
 
 
-/* Retrieves the delta segment filename
- * Returns 1 if successful, 0 if value not present, or -1 on error
+/* Returns the delta segment filename
+ * Returns 1 if successful, 0 if value not present, -1 on error
  */
 int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filename, size_t length )
 {
@@ -1026,198 +982,8 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filen
 	return( 1 );
 }
 
-/* Retrieves the amount of acquiry errors
- * Returns 1 if successful, 0 if no header values are present, or -1 on error
- */
-int libewf_get_amount_of_acquiry_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_amount_of_acquiry_errors";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( amount_of_errors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		return( 0 );
-	}
-	*amount_of_errors = internal_handle->acquiry_amount_of_errors;
-
-	return( 1 );
-}
-
-/* Retrieves the information of an acquiry error
- * Returns 1 if successful, 0 if no acquiry error could be found, or -1 on error
- */
-int libewf_get_acquiry_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_acquiry_error";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->acquiry_amount_of_errors == 0 )
-	{
-		return( 0 );
-	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing acquiry error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( index >= internal_handle->acquiry_amount_of_errors )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-	*sector            = internal_handle->acquiry_error_sectors[ index ].sector;
-	*amount_of_sectors = internal_handle->acquiry_error_sectors[ index ].amount_of_sectors;
-
-	return( 1 );
-}
-
-/* Retrieves the amount of CRC errors
- * Returns 1 if successful, or -1 on error
- */
-int libewf_get_amount_of_crc_errors( LIBEWF_HANDLE *handle, uint32_t *amount_of_errors )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_amount_of_crc_errors";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->read == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing read sub handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_errors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->read->crc_error_sectors == NULL )
-	{
-		return( 0 );
-	}
-	*amount_of_errors = internal_handle->read->crc_amount_of_errors;
-
-	return( 1 );
-}
-
-/* Retrieves the information of a CRC error
- * Returns 1 if successful, 0 if no CRC error could be found, or -1 on error
- */
-int libewf_get_crc_error( LIBEWF_HANDLE *handle, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_crc_error";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->read == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing read sub handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->read->crc_amount_of_errors == 0 )
-	{
-		return( 0 );
-	}
-	if( internal_handle->read->crc_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid read sub handle - missing CRC error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sector == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( amount_of_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( index >= internal_handle->read->crc_amount_of_errors )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid index out of range.\n",
-		 function );
-
-		return( -1 );
-	}
-	*sector            = internal_handle->read->crc_error_sectors[ index ].sector;
-	*amount_of_sectors = internal_handle->read->crc_error_sectors[ index ].amount_of_sectors;
-
-	return( 1 );
-}
-
-/* Retrieves the amount of chunks written
- * Returns 1 if successful, or -1 on error
+/* Returns the amount of chunks written
+ * Returns 1 if successful, -1 on error
  */
 int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_of_chunks )
 {
@@ -1252,69 +1018,8 @@ int libewf_get_write_amount_of_chunks( LIBEWF_HANDLE *handle, uint32_t *amount_o
 	return( 1 );
 }
 
-/* Retrieves the amount of header values
- * Returns 1 if successful, 0 if no header values are present, or -1 on error
- */
-int libewf_get_amount_of_header_values( LIBEWF_HANDLE *handle, uint32_t *amount_of_values )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_amount_of_header_values";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( amount_of_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->header_values == NULL )
-	{
-		return( 0 );
-	}
-	*amount_of_values = internal_handle->header_values->amount;
-
-	return( 1 );
-}
-
-/* Retrieves the header value identifier specified by its index
- * Returns 1 if successful, 0 if value not present, or -1 on error
- */
-int libewf_get_header_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_header_value_identifier";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->header_values == NULL )
-	{
-		return( 0 );
-	}
-	return( libewf_values_table_get_identifier(
-	         internal_handle->header_values,
-	         index,
-	         value,
-	         length ) );
-}
-
 /* Retrieves the header value specified by the identifier
- * Returns 1 if successful, 0 if value not present, or -1 on error
+ * Returns 1 if successful, 0 if value not present, -1 on error
  */
 int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
@@ -1348,72 +1053,11 @@ int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 	{
 		return( 0 );
 	}
-	return( libewf_values_table_get_value( internal_handle->header_values, identifier, value, length ) );
-}
-
-/* Retrieves the amount of hash values
- * Returns 1 if successful, or -1 on error
- */
-int libewf_get_amount_of_hash_values( LIBEWF_HANDLE *handle, uint32_t *amount_of_values )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_amount_of_hash_values";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( amount_of_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid amount of values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->hash_values == NULL )
-	{
-		return( 0 );
-	}
-	*amount_of_values = internal_handle->hash_values->amount;
-
-	return( 1 );
-}
-
-/* Retrieves the hash value identifier specified by its index
- * Returns 1 if successful, 0 if value not present, or -1 on error
- */
-int libewf_get_hash_value_identifier( LIBEWF_HANDLE *handle, uint32_t index, LIBEWF_CHAR *value, size_t length )
-{
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_get_hash_value_identifier";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->hash_values == NULL )
-	{
-		return( 0 );
-	}
-	return( libewf_values_table_get_identifier(
-	         internal_handle->hash_values,
-	         index,
-	         value,
-	         length ) );
+	return( libewf_header_values_get_value( internal_handle->header_values, identifier, value, length ) );
 }
 
 /* Retrieves the hash value specified by the identifier
- * Returns 1 if successful, 0 if value not present, or -1 on error
+ * Returns 1 if successful, 0 if value not present, -1 on error
  */
 int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
@@ -1447,12 +1091,12 @@ int libewf_get_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 	{
 		return( 0 );
 	}
-	return( libewf_values_table_get_value( internal_handle->hash_values, identifier, value, length ) );
+	return( libewf_hash_values_get_value( internal_handle->hash_values, identifier, value, length ) );
 }
 
 /* Sets the amount of sectors per chunk in the media information
- * Returns 1 if successful, or -1 on error
- */
+ *  * Returns 1 if successful, -1 on error
+ *   */
 int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_chunk )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
@@ -1496,8 +1140,8 @@ int libewf_set_sectors_per_chunk( LIBEWF_HANDLE *handle, uint32_t sectors_per_ch
 }
 
 /* Sets the amount of bytes per sector in the media information
- * Returns 1 if successful, or -1 on error
- */
+ *  * Returns 1 if successful, -1 on error
+ *   */
 int libewf_set_bytes_per_sector( LIBEWF_HANDLE *handle, uint32_t bytes_per_sector )
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
@@ -1708,7 +1352,7 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_CHAR *filen
 }
 
 /* Sets the write segment file size
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_file_size )
 {
@@ -1752,190 +1396,59 @@ int libewf_set_write_segment_file_size( LIBEWF_HANDLE *handle, size64_t segment_
 }
 
 /* Sets the write error granularity
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_write_error_granularity( LIBEWF_HANDLE *handle, uint32_t error_granularity )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_error_granularity";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( ( internal_handle->write != NULL )
-	 && ( internal_handle->write->values_initialized != 0 ) )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized, therefore media values cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->media->error_granularity = error_granularity;
-
-	return( 1 );
+	return( libewf_internal_handle_set_write_error_granularity(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         error_granularity ) );
 }
 
 /* Sets the write compression values
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_write_compression_values( LIBEWF_HANDLE *handle, int8_t compression_level, uint8_t compress_empty_block )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_compression_values";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->compression_level = compression_level;
-
-	/* Compress empty block is only useful when no compression is used
-	 */
-	if( compression_level == EWF_COMPRESSION_NONE )
-	{
-		internal_handle->write->compress_empty_block = compress_empty_block;
-	}
-	return( 1 );
+	return( libewf_internal_handle_set_write_compression_values(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         compression_level,
+	         compress_empty_block ) );
 }
 
 /* Sets the media type
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_write_media_type( LIBEWF_HANDLE *handle, uint8_t media_type, uint8_t volume_type )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_media_type";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->media->media_type = media_type;
-
-	if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
-	{
-		/* Uses 1-complement of EWF_MEDIA_FLAGS_IS_PHYSICAL
-		 */
-		internal_handle->media->media_flags &= ~EWF_MEDIA_FLAGS_IS_PHYSICAL;
-	}
-	else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
-	{
-		internal_handle->media->media_flags |= EWF_MEDIA_FLAGS_IS_PHYSICAL;
-	}
-	else
-	{
-		LIBEWF_WARNING_PRINT( "%s: unsupported volume type.\n",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+	return( libewf_internal_handle_set_write_media_type(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         media_type,
+	         volume_type ) );
 }
 
 /* Sets the write output format
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_write_format( LIBEWF_HANDLE *handle, uint8_t format )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_format";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	internal_handle->format = format;
-
-	return( 1 );
+	return( libewf_internal_handle_set_write_format(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         format ) );
 }
 
 /* Sets the write input size
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_write_input_size( LIBEWF_HANDLE *handle, size64_t input_write_size )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_set_write_input_size";
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->write == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle write.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write->values_initialized != 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: write values were initialized and cannot be changed anymore.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( input_write_size > (size64_t) INT64_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid media size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->write->input_write_size = input_write_size;
-
-	return( 1 );
+	return( libewf_internal_handle_set_write_input_write_size(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         input_write_size ) );
 }
 
 /* Sets the header value specified by the identifier
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
@@ -1960,7 +1473,7 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 	}
 	if( internal_handle->header_values == NULL )
 	{
-		internal_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
+		internal_handle->header_values = libewf_header_values_alloc();
 
 		if( internal_handle->header_values == NULL )
 		{
@@ -1969,19 +1482,12 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 
 			return( -1 );
 		}
-		if( libewf_header_values_initialize( internal_handle->header_values ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize header values.\n",
-			 function );
-
-			return( -1 );
-		}
 	}
-	return( libewf_values_table_set_value( internal_handle->header_values, identifier, value, length ) );
+	return( libewf_header_values_set_value( internal_handle->header_values, identifier, value, length ) );
 }
 
 /* Sets the hash value specified by the identifier
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
 {
@@ -2006,7 +1512,7 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 	}
 	if( internal_handle->hash_values == NULL )
 	{
-		internal_handle->hash_values = libewf_values_table_alloc( LIBEWF_HASH_VALUES_DEFAULT_AMOUNT );
+		internal_handle->hash_values = libewf_hash_values_alloc();
 
 		if( internal_handle->hash_values == NULL )
 		{
@@ -2015,24 +1521,17 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
 
 			return( -1 );
 		}
-		if( libewf_hash_values_initialize( internal_handle->hash_values ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize hash values.\n",
-			 function );
-
-			return( -1 );
-		}
 	}
-	return( libewf_values_table_set_value( internal_handle->hash_values, identifier, value, length ) );
+	return( libewf_hash_values_set_value( internal_handle->hash_values, identifier, value, length ) );
 }
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 {
-	LIBEWF_VALUES_TABLE *header_values      = NULL;
+	LIBEWF_HEADER_VALUES *header_values     = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_parse_header_values";
 
@@ -2080,7 +1579,7 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 		LIBEWF_WARNING_PRINT( "%s: header values already set in handle - cleaning up previous ones.\n",
 		 function );
 
-		libewf_values_table_free( internal_handle->header_values );
+		libewf_header_values_free( internal_handle->header_values );
 	}
 	internal_handle->header_values = header_values;
 
@@ -2097,11 +1596,11 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 }
 
 /* Parses the hash values from the xhash section
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 {
-	LIBEWF_VALUES_TABLE *hash_values        = NULL;
+	LIBEWF_HASH_VALUES *hash_values         = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_parse_hash_values";
 
@@ -2132,7 +1631,7 @@ int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 		LIBEWF_WARNING_PRINT( "%s: hash values already set in handle - cleaning up previous ones.\n",
 		 function );
 
-		libewf_values_table_free( internal_handle->hash_values );
+		libewf_hash_values_free( internal_handle->hash_values );
 	}
 	internal_handle->hash_values = hash_values;
 
@@ -2140,129 +1639,24 @@ int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 }
 
 /* Add an acquiry error
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle    = NULL;
-	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
-	static char *function                      = "libewf_add_acquiry_error";
-	uint32_t iterator                          = 0;
-
-	if( handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sector <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
-	}
-	else
-	{
-		/* Check if acquiry read error sector is already in list
-		 */
-		for( iterator = 0; iterator < internal_handle->acquiry_amount_of_errors; iterator++ )
-		{
-			if( internal_handle->acquiry_error_sectors[ iterator ].sector == sector )
-			{
-				return( 1 );
-			}
-		}
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
-		                         internal_handle->acquiry_error_sectors,
-		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->acquiry_amount_of_errors + 1 ) ) );
-	}
-	if( acquiry_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry read error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->acquiry_error_sectors = acquiry_error_sectors;
-
-	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].sector            = sector;
-	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].amount_of_sectors = amount_of_sectors;
-
-	internal_handle->acquiry_amount_of_errors++;
-
-	return( 1 );
+	return( libewf_internal_handle_add_acquiry_error_sector(
+	         (LIBEWF_INTERNAL_HANDLE *) handle,
+	         sector,
+	         amount_of_sectors ) );
 }
 
 /* Copies the header values from the source to the destination handle
- * Returns 1 if successful, or -1 on error
+ * Returns 1 if successful, -1 on error
  */
 int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_destination_handle = NULL;
-	LIBEWF_INTERNAL_HANDLE *internal_source_handle      = NULL;
-	static char *function                               = "libewf_copy_header_values";
-
-	if( destination_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid destination handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( source_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_destination_handle = (LIBEWF_INTERNAL_HANDLE *) destination_handle;
-	internal_source_handle      = (LIBEWF_INTERNAL_HANDLE *) source_handle;
-
-	if( internal_source_handle->header_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source handle - missing header values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_destination_handle->header_values == NULL )
-	{
-		internal_destination_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
-
-		if( internal_destination_handle->header_values == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create header values in destination handle.\n",
-			 function );
-
-			return( -1 );
-		}
-		if( libewf_header_values_initialize( internal_destination_handle->header_values ) != 1 )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to initialize header values.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( libewf_header_values_copy(
-	         internal_destination_handle->header_values,
-	         internal_source_handle->header_values ) );
+	return( libewf_internal_handle_copy_header_values(
+	         (LIBEWF_INTERNAL_HANDLE *) destination_handle,
+	         (LIBEWF_INTERNAL_HANDLE *) source_handle ) );
 }
 
 /* Set the notify values

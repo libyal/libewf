@@ -43,12 +43,73 @@
 #include "ewf_compress.h"
 #include "ewf_definitions.h"
 
-/* Initializes the hash values
- * Returns 1 if successful, or -1 otherwise
+/* Allocates memory for a new hash values struct
+ * Returns a pointer to the new instance, NULL on error
  */
-int libewf_hash_values_initialize( LIBEWF_VALUES_TABLE *hash_values )
+LIBEWF_HASH_VALUES *libewf_hash_values_alloc( void )
 {
-	static char *function = "libewf_hash_values_initialize";
+	LIBEWF_HASH_VALUES *hash_values = NULL;
+	static char *function           = "libewf_hash_values_alloc";
+	size_t hash_values_size         = 0;
+
+	hash_values = (LIBEWF_HASH_VALUES *) libewf_common_alloc_cleared( LIBEWF_HASH_VALUES_SIZE, 0 );
+
+	if( hash_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate hash values.\n",
+		 function );
+
+		return( NULL );
+	}
+	hash_values->amount = LIBEWF_HASH_VALUES_DEFAULT_AMOUNT;
+	hash_values_size    = hash_values->amount * sizeof( LIBEWF_CHAR* );
+
+	if( hash_values_size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		libewf_common_free( hash_values );
+
+		return( NULL );
+	}
+	hash_values->identifiers = (LIBEWF_CHAR **) libewf_common_alloc_cleared( hash_values_size, 0 );
+
+	if( hash_values->identifiers == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate identifiers.\n",
+		 function );
+
+		libewf_common_free( hash_values );
+
+		return( NULL );
+	}
+	hash_values->values = (LIBEWF_CHAR **) libewf_common_alloc_cleared( hash_values_size, 0 );
+
+	if( hash_values->values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate values.\n",
+		 function );
+
+		libewf_common_free( hash_values->identifiers );
+		libewf_common_free( hash_values );
+
+		return( NULL );
+	}
+	hash_values->identifiers[ 0 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "MD5" ), 3 );
+
+	return( hash_values );
+}
+
+/* Reallocates memory for the hash values
+ * Returns 1 if successful, or -1 on error
+ */
+int libewf_hash_values_realloc( LIBEWF_HASH_VALUES *hash_values, uint32_t previous_amount, uint32_t new_amount )
+{
+	LIBEWF_CHAR **reallocation = NULL;
+	static char *function      = "libewf_hash_values_realloc";
+	size_t previous_size       = previous_amount * sizeof( LIBEWF_CHAR* );
+	size_t new_size            = new_amount * sizeof( LIBEWF_CHAR* );
 
 	if( hash_values == NULL )
 	{
@@ -57,26 +118,316 @@ int libewf_hash_values_initialize( LIBEWF_VALUES_TABLE *hash_values )
 
 		return( -1 );
 	}
-	hash_values->identifiers[ 0 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "MD5" ), 3 );
+	if( ( previous_amount > (uint32_t) INT32_MAX )
+	 || ( new_amount > (uint32_t) INT32_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount value exceeds maximum.\n",
+		 function );
 
+		return( -1 );
+	}
+	if( previous_amount >= new_amount )
+	{
+		LIBEWF_WARNING_PRINT( "%s: new amount smaller than previous amount.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( previous_size > (size_t) SSIZE_MAX )
+	 || ( new_size > (ssize_t) SSIZE_MAX ) )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	reallocation = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( hash_values->identifiers, previous_size, new_size, 0 );
+
+	if( reallocation == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate identifiers.\n",
+		 function );
+
+		return( -1 );
+	}
+	hash_values->identifiers = reallocation;
+	reallocation             = (LIBEWF_CHAR **) libewf_common_realloc_new_cleared( hash_values->values, previous_size, new_size, 0 );
+
+	if( reallocation == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to reallocate values.\n",
+		 function );
+
+		return( -1 );
+	}
+	hash_values->values = reallocation;
+	hash_values->amount = new_amount;
+
+	return( 1 );
+}
+
+/* Frees memory of a hash values struct including elements
+ */
+void libewf_hash_values_free( LIBEWF_HASH_VALUES *hash_values )
+{
+	static char *function = "libewf_hash_values_free";
+	uint32_t iterator     = 0;
+
+	if( hash_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
+		 function );
+
+		return;
+	}
+	if( hash_values->values != NULL )
+	{
+		for( iterator = 0; iterator < hash_values->amount; iterator++ )
+		{
+			libewf_common_free( hash_values->identifiers[ iterator ] );
+			libewf_common_free( hash_values->values[ iterator ] );
+		}
+		libewf_common_free( hash_values->values );
+	}
+	libewf_common_free( hash_values );
+}
+
+/* Retrieves the hash value index number, or -1 on error
+ * The index number will be larger than the amount when the identifier is not present in the hash values
+ */
+int32_t libewf_hash_values_get_index( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier )
+{
+	static char *function    = "libewf_hash_values_get_index";
+	size_t string_length     = 0;
+	size_t identifier_length = 0;
+	int32_t iterator         = 0;
+
+	if( hash_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		 function );
+
+		return( -1 );
+	}
+	identifier_length = libewf_string_length( identifier );
+
+	if( identifier_length == 0 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid identifier.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_values->amount > (uint32_t) INT32_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid hash values amount value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < (int32_t) hash_values->amount; iterator++ )
+	{
+		if( hash_values->identifiers[ iterator ] == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: missing identifier for index: %" PRIi32 ".\n",
+			 function, iterator );
+
+			continue;
+		}
+		string_length = libewf_string_length( hash_values->identifiers[ iterator ] );
+
+		if( string_length == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine length of identifier of index: %" PRIi32 ".\n",
+			 function, iterator );
+
+			continue;
+		}
+		if( string_length != identifier_length )
+		{
+			continue;
+		}
+		if( libewf_string_compare( identifier, hash_values->identifiers[ iterator ], identifier_length ) == 0 )
+		{
+			return( iterator );
+		}
+	}
+	return( iterator );
+}
+
+/* Retrieves a hash value in value
+ * Length should contain the amount of characters in the string
+ * Returns 1 if successful, 0 if value not present, -1 on error
+ */
+int8_t libewf_hash_values_get_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+{
+	static char *function    = "libewf_hash_values_get_value";
+	size_t hash_value_length = 0;
+	int32_t index            = 0;
+
+	if( value == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
+
+		return( -1 );
+	}
+	index = libewf_hash_values_get_index( hash_values, identifier );
+
+	if( index <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs_EWF ".\n",
+		 function, identifier );
+
+		return( -1 );
+	}
+	if( (uint32_t) index > hash_values->amount )
+	{
+		return( 0 );
+	}
+	if( hash_values->values[ index ] == NULL )
+	{
+		return( 0 );
+	}
+	hash_value_length = libewf_string_length( hash_values->values[ index ] );
+
+	/* Don't bother with empty values
+	 */
+	if( hash_value_length == 0 )
+	{
+		return( 0 );
+	}
+	/* Add 1 additional byte required for the end of string character
+	 */
+	hash_value_length += 1;
+
+	if( hash_value_length > length )
+	{
+		LIBEWF_WARNING_PRINT( "%s: value too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_string_copy( value, hash_values->values[ index ], hash_value_length ) == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set hash value.\n",
+		 function );
+
+		return( -1 );
+	}
+	value[ hash_value_length - 1 ] = (LIBEWF_CHAR) '\0';
+
+	return( 1 );
+}
+
+/* Set a hash value
+ * Length should contain the amount of characters in the string
+ * Frees the previous hash value if necessary
+ * Returns 1 if successful, -1 on error
+ */
+int8_t libewf_hash_values_set_value( LIBEWF_HASH_VALUES *hash_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length )
+{
+	static char *function = "libewf_hash_values_set_value";
+	size_t string_length  = 0;
+	int32_t index         = 0;
+
+	index = libewf_hash_values_get_index( hash_values, identifier );
+
+	if( index <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to find index for: %" PRIs_EWF ".\n",
+		 function, identifier );
+
+		return( -1 );
+	}
+	if( (uint32_t) index >= hash_values->amount )
+	{
+		string_length = libewf_string_length( identifier );
+
+		if( string_length == 0 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine length of identifier.\n",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_hash_values_realloc( hash_values, hash_values->amount, ( index + 1 ) ) != 1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to reallocate hash values.\n",
+			 function );
+
+			return( -1 );
+		}
+		hash_values->identifiers[ index ] = libewf_string_duplicate( identifier, string_length );
+
+		if( hash_values->identifiers[ index ] == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to set identifier.\n",
+			 function );
+
+			libewf_common_free( hash_values->identifiers[ index ] );
+
+			hash_values->identifiers[ index ] = NULL;
+
+			return( -1 );
+		}
+	}
+	/* Clear the buffer of the previous hash value
+	 */
+	if( hash_values->values[ index ] != NULL )
+	{
+		libewf_common_free( hash_values->values[ index ] );
+
+		hash_values->values[ index ] = NULL;
+	}
+	/* Don't bother with empty values
+	 */
+	if( value == NULL )
+	{
+		return( 1 );
+	}
+	if( length == 0 )
+	{
+		return( 1 );
+	}
+	hash_values->values[ index ] = libewf_string_duplicate( value, length );
+
+	if( hash_values->values[ index ] == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to set value.\n",
+		 function );
+
+		libewf_common_free( hash_values->values[ index ] );
+
+		hash_values->values[ index ] = NULL;
+
+		return( -1 );
+	}
 	return( 1 );
 }
 
 /* Parse a xml hash string for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash_string_xml, size_t length )
+LIBEWF_HASH_VALUES *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash_string_xml, size_t length )
 {
-	LIBEWF_VALUES_TABLE *hash_values = NULL;
-	LIBEWF_CHAR **lines              = NULL;
-	LIBEWF_CHAR *open_tag_start      = NULL;
-	LIBEWF_CHAR *open_tag_end        = NULL;
-	LIBEWF_CHAR *close_tag_start     = NULL;
-	LIBEWF_CHAR *close_tag_end       = NULL;
-	static char *function            = "libewf_hash_values_parse_hash_string_xml";
-	size_t string_length             = 0;
-	uint32_t line_count              = 0;
-	uint32_t iterator                = 0;
+	LIBEWF_HASH_VALUES *hash_values = NULL;
+	LIBEWF_CHAR **lines             = NULL;
+	LIBEWF_CHAR *open_tag_start     = NULL;
+	LIBEWF_CHAR *open_tag_end       = NULL;
+	LIBEWF_CHAR *close_tag_start    = NULL;
+	LIBEWF_CHAR *close_tag_end      = NULL;
+	static char *function           = "libewf_hash_values_parse_hash_string_xml";
+	size_t string_length            = 0;
+	uint32_t line_count             = 0;
+	uint32_t iterator               = 0;
 
 	if( hash_string_xml == NULL )
 	{
@@ -94,20 +445,11 @@ LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash
 
 		return( NULL );
 	}
-	hash_values = libewf_values_table_alloc( LIBEWF_HASH_VALUES_DEFAULT_AMOUNT );
+	hash_values = libewf_hash_values_alloc();
 
 	if( hash_values == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create hash values.\n",
-		 function );
-
-		libewf_string_split_values_free( lines, line_count );
-
-		return( NULL );
-	}
-	if( libewf_hash_values_initialize( hash_values ) != 1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to initialize the hash values.\n",
 		 function );
 
 		libewf_string_split_values_free( lines, line_count );
@@ -179,7 +521,7 @@ LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash
 		 */
 		*open_tag_end = (LIBEWF_CHAR) '\0';
 
-		if( libewf_values_table_set_value( hash_values, &open_tag_start[ 1 ] , &open_tag_end[ 1 ], string_length ) != 1 )
+		if( libewf_hash_values_set_value( hash_values, &open_tag_start[ 1 ] , &open_tag_end[ 1 ], string_length ) != 1 )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: unable to set value with identifier: %" PRIs_EWF ".\n",
 			 function, &open_tag_start[ 1 ] );
@@ -193,11 +535,11 @@ LIBEWF_VALUES_TABLE *libewf_hash_values_parse_hash_string_xml( LIBEWF_CHAR *hash
 /* Parse an EWF xhash for the values
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_VALUES_TABLE *libewf_hash_values_parse_xhash( EWF_CHAR *xhash, size_t size )
+LIBEWF_HASH_VALUES *libewf_hash_values_parse_xhash( EWF_CHAR *xhash, size_t size )
 {
-	LIBEWF_VALUES_TABLE* hash_values = NULL;
-	LIBEWF_CHAR *xml_hash_string     = NULL;
-	static char *function            = "libewf_hash_values_parse_xhash";
+	LIBEWF_HASH_VALUES* hash_values = NULL;
+	LIBEWF_CHAR *xml_hash_string    = NULL;
+	static char *function           = "libewf_hash_values_parse_xhash";
 
 	if( xhash == NULL )
 	{
@@ -289,7 +631,7 @@ EWF_CHAR *libewf_hash_values_convert_hash_string_to_hash( LIBEWF_CHAR *hash_stri
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_CHAR *libewf_hash_values_generate_hash_string_xml( LIBEWF_VALUES_TABLE *hash_values, size_t *string_length )
+LIBEWF_CHAR *libewf_hash_values_generate_hash_string_xml( LIBEWF_HASH_VALUES *hash_values, size_t *string_length )
 {
 	LIBEWF_CHAR *hash_string         = NULL;
 	LIBEWF_CHAR *xml_head            = _S_LIBEWF_CHAR( "<?xml version=\"1.0\"?>" );
@@ -444,7 +786,7 @@ LIBEWF_CHAR *libewf_hash_values_generate_hash_string_xml( LIBEWF_VALUES_TABLE *h
 /* Generate an EWFX xhash
  * Returns a pointer to the new instance, NULL on error
  */
-EWF_CHAR *libewf_hash_values_generate_xhash_string_ewfx( LIBEWF_VALUES_TABLE *hash_values, size_t *hash_length )
+EWF_CHAR *libewf_hash_values_generate_xhash_string_ewfx( LIBEWF_HASH_VALUES *hash_values, size_t *hash_length )
 {
 	EWF_CHAR *xhash          = NULL;
 	LIBEWF_CHAR *hash_string = NULL;

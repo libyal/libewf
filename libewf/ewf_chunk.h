@@ -1,5 +1,5 @@
 /*
- * libewf values table
+ * The representation of a chunk
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,46 +31,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_VALUES_TABLE_H )
-#define _LIBEWF_VALUES_TABLE_H
+#if !defined( _EWF_CHUNK_H )
+#define _EWF_CHUNK_H
 
 #include "libewf_includes.h"
-#include "libewf_char.h"
 
 #include "ewf_char.h"
+#include "ewf_compress.h"
+#include "ewf_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_VALUES_TABLE libewf_values_table_t
-#define LIBEWF_VALUES_TABLE_SIZE sizeof( LIBEWF_VALUES_TABLE )
+#define EWF_CHUNK EWF_CHAR
+#define EWF_CHUNK_SIZE EWF_CHAR_SIZE
 
-typedef struct libewf_values_table libewf_values_table_t;
+#define ewf_chunk_read( chunk, file_descriptor, length ) \
+	ewf_string_read_to_buffer( chunk, file_descriptor, length )
+#define ewf_chunk_write( chunk, file_descriptor, length ) \
+	ewf_string_write_from_buffer( chunk, file_descriptor, length )
 
-struct libewf_values_table
-{
-	/* The amount of values
-	 */
-	uint32_t amount;
-
-	/* The value identifiers
-	 */
-	LIBEWF_CHAR **identifiers;
-
-	/* The values
-	 */
-	LIBEWF_CHAR **values;
-};
-
-LIBEWF_VALUES_TABLE *libewf_values_table_alloc( uint32_t amount );
-int libewf_values_table_realloc( LIBEWF_VALUES_TABLE *values_table, uint32_t previous_amount, uint32_t new_amount );
-void libewf_values_table_free( LIBEWF_VALUES_TABLE *values_table );
-
-int32_t libewf_values_table_get_index( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier );
-int libewf_values_table_get_identifier( LIBEWF_VALUES_TABLE *values_table, uint32_t index, LIBEWF_CHAR *identifier, size_t length );
-int libewf_values_table_get_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-int libewf_values_table_set_value( LIBEWF_VALUES_TABLE *values_table, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+#define ewf_chunk_compress( compressed_chunk, compressed_size, uncompressed_chunk, uncompressed_size, compression_level ) \
+	ewf_compress( compressed_chunk, compressed_size, uncompressed_chunk, uncompressed_size, compression_level )
+#define ewf_chunk_uncompress( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size ) \
+	ewf_uncompress( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size )
 
 #if defined( __cplusplus )
 }

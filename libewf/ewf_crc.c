@@ -1,5 +1,5 @@
 /*
- * libewf file reading
+ * EWF CRC handling
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,46 +31,51 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_READ_H )
-#define _LIBEWF_READ_H
-
 #include "libewf_includes.h"
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
- * before including libewf_extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBZ )
+#include <zlib.h>
 #endif
 
-#include <libewf/libewf_extern.h>
-#include <libewf/libewf_handle.h>
+#include "libewf_common.h"
+#include "libewf_endian.h"
+#include "libewf_notify.h"
 
-#include "libewf_internal_handle.h"
-
-#include "ewf_chunk.h"
 #include "ewf_crc.h"
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
+/* Calculates the EWF CRC
+ * When calling this function to start a new CRC "previous_key" should be 1
+ * Returns 1 if calculation is successful, or -1 on error
+ *
+ * The original algorithm was taken from the ASR data web site
+ */
+int ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key )
+{
+	static char *function = "ewf_crc_calculate";
 
-ssize_t libewf_read_process_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, EWF_CHUNK *chunk_data, size_t chunk_data_size, EWF_CHUNK *uncompressed_chunk_data, size_t *uncompressed_chunk_data_size, int8_t is_compressed );
+	if( crc == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid CRC.\n",
+		 function );
 
-ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *read_crc );
+		return( -1 );
+	}
+	if( buffer == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
 
-ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, int8_t *is_compressed, EWF_CRC *chunk_crc, int8_t *read_crc );
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
-LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed );
+		return( -1 );
+	}
+	*crc = (EWF_CRC) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
 
-LIBEWF_EXTERN ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc );
-
-LIBEWF_EXTERN ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
-LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
-
-#if defined( __cplusplus )
+	return( 1 );
 }
-#endif
-
-#endif
 

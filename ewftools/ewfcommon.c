@@ -193,7 +193,7 @@ int8_t ewfcommon_determine_guid( uint8_t *guid, uint8_t libewf_format )
 /* Reads data from a file descriptor into the chunk cache
  * Returns the amount of bytes read, 0 if at end of input, or -1 on error
  */
-ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint8_t *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
+ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CHUNK *buffer, size_t buffer_size, size32_t chunk_size, uint32_t bytes_per_sector, ssize64_t total_read_count, size64_t total_input_size, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error )
 {
 #if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
 	CHAR_T *error_string              = NULL;
@@ -214,7 +214,6 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 	uint32_t error_skip_bytes         = 0;
 	uint32_t error_granularity_offset = 0;
 	uint32_t error2_amount_of_sectors = 0;
-	uint32_t acquiry_amount_of_errors = 0;
 	uint32_t byte_error_granularity   = 0;
 
 	if( handle == NULL )
@@ -479,10 +478,9 @@ ssize32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, uint
 
 					return( -1 );
 				}
-				acquiry_amount_of_errors++;
-
 				LIBEWF_VERBOSE_PRINT( "%s: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
-				 function, acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
+				 function, ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_amount_of_errors,
+				 error2_sector, error2_amount_of_sectors );
 
 				LIBEWF_VERBOSE_PRINT( "%s: skipping %" PRIu32 " bytes.\n",
 				 function, error_skip_bytes );
@@ -572,8 +570,8 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 	size32_t chunk_size        = 0;
 	size_t buffer_size         = 0;
 	size_t read_size           = 0;
-	size_t md5_hash_size       = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size      = EWFDIGEST_HASH_SIZE_SHA1;
+	size_t md5_hash_size       = 0;
+	size_t sha1_hash_size      = 0;
 	ssize64_t total_read_count = 0;
 	ssize_t read_count         = 0;
 #if defined( HAVE_RAW_ACCESS )
@@ -892,8 +890,8 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 	static char *function       = "ewfcommon_write_from_file_descriptor";
 	size32_t chunk_size         = 0;
 	size_t buffer_size          = 0;
-	size_t md5_hash_size        = EWFDIGEST_HASH_SIZE_MD5;
-	size_t sha1_hash_size       = EWFDIGEST_HASH_SIZE_SHA1;
+	size_t md5_hash_size       = 0;
+	size_t sha1_hash_size      = 0;
 	ssize64_t total_write_count = 0;
 	ssize64_t write_count       = 0;
 	ssize32_t read_count        = 0;

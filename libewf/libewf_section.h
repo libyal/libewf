@@ -43,6 +43,8 @@
 #include "ewf_char.h"
 #include "ewf_crc.h"
 #include "ewf_digest_hash.h"
+#include "ewf_header.h"
+#include "ewf_header2.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
 
@@ -56,10 +58,10 @@ ssize_t libewf_section_start_write( int file_descriptor, EWF_CHAR *section_type,
 ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *section_type, size_t section_type_length, EWF_CHAR *uncompressed_string, size_t size, int8_t compression_level );
 
 ssize_t libewf_section_header_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
-ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *header, size_t size, int8_t compression_level );
+ssize_t libewf_section_header_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_HEADER *header, size_t size, int8_t compression_level );
 
 ssize_t libewf_section_header2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
-ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_CHAR *header2, size_t size, int8_t compression_level );
+ssize_t libewf_section_header2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset, EWF_HEADER2 *header2, size_t size, int8_t compression_level );
 
 ssize_t libewf_section_volume_s01_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size );
 ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off64_t start_offset );
@@ -99,7 +101,7 @@ ssize_t libewf_section_xhash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	libewf_section_compressed_string_write( internal_handle, file_descriptor, start_offset, (EWF_CHAR *) "xhash", 5, xhash, size, compression_level )
 
 ssize_t libewf_section_delta_chunk_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size, uint16_t segment_number, off64_t start_offset );
-ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc );
+ssize_t libewf_section_delta_chunk_write( int file_descriptor, off64_t start_offset, uint32_t chunk, EWF_CHUNK *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc );
 
 int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off64_t *section_start_offset );
 

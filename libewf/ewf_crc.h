@@ -36,10 +36,6 @@
 
 #include "libewf_includes.h"
 
-#if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBZ )
-#include <zlib.h>
-#endif
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -52,12 +48,7 @@ extern "C" {
 
 typedef uint32_t ewf_crc_t;
 
-/*
 int ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key );
-*/
-
-#define ewf_crc_calculate( buffer, size, previous_key ) \
-	(EWF_CRC) adler32( (uLong) previous_key, (const Bytef *) buffer, (uInt) size );
 
 #if defined( __cplusplus )
 }

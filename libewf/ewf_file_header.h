@@ -40,6 +40,10 @@
 extern "C" {
 #endif
 
+extern const uint8_t dvf_file_signature[];
+extern const uint8_t evf_file_signature[];
+extern const uint8_t lvf_file_signature[];
+
 #define EWF_FILE_HEADER ewf_file_header_t
 #define EWF_FILE_HEADER_SIZE sizeof( EWF_FILE_HEADER )
 
@@ -70,6 +74,10 @@ struct ewf_file_header
 	 */ 
 	uint8_t fields_end[ 2 ];
 };
+
+int dwf_file_header_check_signature( uint8_t *signature );
+int ewf_file_header_check_signature( uint8_t *signature );
+int lwf_file_header_check_signature( uint8_t *signature );
 
 #if defined( __cplusplus )
 }
