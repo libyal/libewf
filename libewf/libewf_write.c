@@ -2747,7 +2747,7 @@ ssize_t libewf_write_finalize(
 				}
 				if( libewf_segment_file_handle_open(
 				     segment_file_handle,
-				     LIBEWF_OPEN_READ_WRITE ) != 1 )
+				     LIBEWF_OPEN_READ | LIBEWF_OPEN_WRITE ) != 1 )
 				{
 					notify_warning_printf( "%s: unable to open file: %" PRIs_SYSTEM ".\n",
 					 function, segment_file_handle->filename );

@@ -140,6 +140,8 @@ Next release(s):
 
 FIX
 * MacOS-X package should install in /usr/
+* unnecessary reopen of delta segement file in libewf_segment_table_create_segment_file
+  add truncate flag?
 
 CLOSED
 * what about read+write and compression?
@@ -158,7 +160,10 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
-Version: 20080324
+Version: 20080330
+* Fixed bug in read write mode - delta files were initiallity opened without read access
+
+Version: 20080329
 * Fixed wrong license in MacOS-X package
 
 Version: 20080323

@@ -514,7 +514,7 @@ int libewf_segment_table_read_open(
 			{
 				if( libewf_segment_file_handle_reopen(
 				     segment_file_handle,
-				     ( LIBEWF_FLAG_READ & LIBEWF_FLAG_WRITE ) ) != 1 )
+				     ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) ) != 1 )
 				{
 					notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
 					 function, filenames[ iterator ] );
@@ -789,7 +789,9 @@ int libewf_segment_table_create_segment_file(
 	{
 		/* Add one additional entry because the 0 entry is used for the basename
 		 */
-		if( libewf_segment_table_realloc( segment_table, ( segment_number + 1 ) ) != 1 )
+		if( libewf_segment_table_realloc(
+		     segment_table,
+		     ( segment_number + 1 ) ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to reallocate segment table.\n",
 			 function );
@@ -845,12 +847,21 @@ int libewf_segment_table_create_segment_file(
 	notify_verbose_printf( "%s: segment file created: %" PRIu32 " with name: %" PRIs_SYSTEM ".\n",
 	 function, segment_number, segment_file_handle->filename );
 #endif
-
 	if( libewf_segment_file_handle_open(
 	     segment_file_handle,
 	     LIBEWF_OPEN_WRITE ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to open segment file: %" PRIs_SYSTEM ".\n",
+		 function, segment_file_handle->filename );
+
+		return( -1 );
+	}
+	if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+	 && ( libewf_segment_file_handle_reopen(
+	       segment_file_handle,
+	       ( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE ) ) != 1 ) )
+	{
+		notify_warning_printf( "%s: unable to reopen segment file: %" PRIs_SYSTEM ".\n",
 		 function, segment_file_handle->filename );
 
 		return( -1 );
