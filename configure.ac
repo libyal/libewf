@@ -165,7 +165,7 @@ AC_CHECK_TYPE([off64_t],[AC_SUBST([HAVE_OFF64_T],[1])],[AC_SUBST([HAVE_OFF64_T],
 AC_CHECK_TYPES([ssize_t, u64])
 
 dnl Check for functions
-AC_CHECK_FUNCS( atol ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset mktime snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtol strtoul uname )
+AC_CHECK_FUNCS([atoll ctime fgets getopt gmtime gmtime_r localtime localtime_r memchr memcmp memcpy memrchr memset mktime snprintf sprintf strchr strcmp strcpy strdup strerror strerror_r strlen strncmp strncpy strrchr strtoll strtoull uname])
 
 AC_FUNC_MEMCMP
 AC_FUNC_STRERROR_R
@@ -190,7 +190,7 @@ AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
 
 AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],
 	[AC_DEFINE([HAVE_WIDE_CHARACTER_TYPE],[1],[Defines if wide character type should be used])
-		AC_CHECK_FUNCS([btowc fgetws mbsinit mbsrtowcs swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstol wcstoul])
+		AC_CHECK_FUNCS([btowc fgetws mbsinit mbsrtowcs swprintf wmain wmemchr wmemcmp wmemcpy wmemrchr wctob wcschr wcscmp wcscpy wcsdup wcslen wcsncmp wcsncpy wcsrchr wcsrtombs wcstoll wcstoull])
 		AC_CHECK_HEADERS([wchar.h],
 			[AC_DEFINE([HAVE_WCHAR_H],[1],[Define to 1 if you have the <wchar.h> header file.])
 			AC_SUBST([HAVE_WCHAR_H],[1])],

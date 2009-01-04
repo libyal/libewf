@@ -1,8 +1,8 @@
 /* libewf/libewf_config.h.  Generated from libewf_config.h.in by configure.  */
 /* libewf/libewf_config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the `atol' function. */
-#define HAVE_ATOL 1
+/* Define to 1 if you have the `atoll' function. */
+#define HAVE_ATOLL 1
 
 /* Define to 1 if you have the `btowc' function. */
 /* #undef HAVE_BTOWC */
@@ -184,11 +184,11 @@
 /* Define to 1 if you have the `strrchr' function. */
 #define HAVE_STRRCHR 1
 
-/* Define to 1 if you have the `strtol' function. */
-#define HAVE_STRTOL 1
+/* Define to 1 if you have the `strtoll' function. */
+#define HAVE_STRTOLL 1
 
-/* Define to 1 if you have the `strtoul' function. */
-#define HAVE_STRTOUL 1
+/* Define to 1 if you have the `strtoull' function. */
+#define HAVE_STRTOULL 1
 
 /* Define to 1 if you have the `swprintf' function. */
 /* #undef HAVE_SWPRINTF */
@@ -271,11 +271,11 @@
 /* Define to 1 if you have the `wcsrtombs' function. */
 /* #undef HAVE_WCSRTOMBS */
 
-/* Define to 1 if you have the `wcstol' function. */
-/* #undef HAVE_WCSTOL */
+/* Define to 1 if you have the `wcstoll' function. */
+/* #undef HAVE_WCSTOLL */
 
-/* Define to 1 if you have the `wcstoul' function. */
-/* #undef HAVE_WCSTOUL */
+/* Define to 1 if you have the `wcstoull' function. */
+/* #undef HAVE_WCSTOULL */
 
 /* Define to 1 if you have the `wctob' function. */
 /* #undef HAVE_WCTOB */

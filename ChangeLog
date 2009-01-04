@@ -116,8 +116,6 @@ Next release:
   - > 2GiB segment file support
 * ewfacquire
   - account for backspace in user input (no issue on Fedora Core 8)
-  - ewfinput_get_size_variable uses strtoul, max is ULONG_MAX
-    change to full 64bit value support? Currently the MAX sufficiently large
 * ewfalter
   - allow to set delta segment file path/basename
     test if no delta files were added before change
@@ -165,6 +163,7 @@ Version: 20071124
 * reduced multiple successive crc error entries to a single
 * reduced multiple successive acquiry error (error2) entries to a single
 * ewfcommon_export_ewf added raw access write support
+* change string to (u)int64 conversion routines to use long long equivalents
 
 Version: 20071123
 * worked on refactoring code

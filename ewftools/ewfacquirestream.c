@@ -98,7 +98,11 @@ void usage( void )
 	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stdout, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
-	 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+	 (uint32_t) ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 ) );
+	fprintf( stdout, "\t    (minimum is %" PRIu32 ", maximum is %" PRIu64 " for encase6 format and %" PRIu32 " for other formats)\n",
+	 (uint32_t) ( EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE / 1024 ),
+	 (uint64_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT / 1024 ),
+	 (uint32_t) ( EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT / 1024 ) );
 	fprintf( stdout, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
 	fprintf( stdout, "\t-V: print version\n" );
@@ -145,7 +149,7 @@ int main( int argc, char * const argv[] )
 	size_t string_length                     = 0;
 	time_t timestamp_start                   = 0;
 	time_t timestamp_end                     = 0;
-	int64_t segment_file_size                = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
+	int64_t segment_file_size                = ( EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE / 1024 );
 	int64_t write_count                      = 0;
 	uint64_t acquiry_offset                  = 0;
 	uint64_t acquiry_size                    = 0;
@@ -334,17 +338,16 @@ int main( int argc, char * const argv[] )
 
 	segment_file_size *= 1024;
 
-	/* Make sure the segment file size is 1 byte smaller than 2 Gb (2 * 1024 * 1024 * 1024)
-	 */
-	if( segment_file_size >= (int64_t) INT32_MAX )
+	if( ( segment_file_size < EWFCOMMON_MINIMUM_SEGMENT_FILE_SIZE )
+	 || ( ( libewf_format == LIBEWF_FORMAT_ENCASE6 )
+	  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_64BIT ) )
+	 || ( ( libewf_format != LIBEWF_FORMAT_ENCASE6 )
+	  && ( segment_file_size >= (int64_t) EWFCOMMON_MAXIMUM_SEGMENT_FILE_SIZE_32BIT ) ) )
 	{
-		segment_file_size = (int64_t) INT32_MAX - 1;
-	}
-	/* And larger than 1440 kb (1440 * 1024)
-	 */
-	else if( segment_file_size < ( 1440 * 1024 ) )
-	{
-		segment_file_size = 1440 * 1024;
+		fprintf( stderr, "Unsupported segment file size defaulting to %" PRIu32 ".\n",
+		 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
+
+		segment_file_size = (int64_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 	}
 	if( option_case_number != NULL )
 	{
