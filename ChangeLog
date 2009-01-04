@@ -127,6 +127,10 @@ DELTA FILE
   chunk data and CRC
 * read dirty chunk from delta segment file
 
+Version: 20070814
+* worked on restructuring to improve internal structure
+* worked on improved rewrite using delta segment files
+
 Version: 20070813
 * worked on restructuring to improve internal structure
 * worked on improved rewrite using delta segment files

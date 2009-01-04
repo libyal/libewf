@@ -645,7 +645,7 @@ ssize_t libewf_section_volume_s01_write( LIBEWF_INTERNAL_HANDLE *internal_handle
 	}
 	if( libewf_common_memset( volume, 0, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_volume_write: unable to clear volume.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear volume.\n" );
 
 		libewf_common_free( volume );
 
@@ -1942,9 +1942,12 @@ ssize_t libewf_section_table2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
  */
 ssize_t libewf_section_sectors_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
+	static char *function = "libewf_section_sectors_read";
+
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_sectors_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1952,7 +1955,8 @@ ssize_t libewf_section_sectors_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	 */
 	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_sectors_read: EWF-S01 format should not contain sectors section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: EWF-S01 format should not contain sectors section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -1963,7 +1967,8 @@ ssize_t libewf_section_sectors_read( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	 */
 	if( libewf_common_lseek( file_descriptor, size, SEEK_CUR ) == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_sectors_read: unable to align with next section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to align with next section.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1977,16 +1982,19 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 {
 	EWF_LTREE *ltree          = NULL;
 	EWF_LTREE_DATA *tree_data = NULL;
+	static char *function     = "libewf_section_ltree_read";
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_ltree_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_sectors_read: EWF-S01 format should not contain ltree section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: EWF-S01 format should not contain ltree section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -1999,13 +2007,15 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	if( ltree == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_ltree_read: unable to allocate ltree.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate ltree.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_ltree_read( ltree, file_descriptor ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_ltree_read: unable to read ltree.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read ltree.\n",
+		 function );
 
 		libewf_common_free( ltree );
 
@@ -2034,6 +2044,7 @@ ssize_t libewf_section_ltree_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
 	EWF_DATA *data             = NULL;
+	static char *function      = "libewf_section_data_read";
 	EWF_CRC calculated_crc     = 0;
 	EWF_CRC stored_crc         = 0;
 	uint32_t amount_of_chunks  = 0;
@@ -2044,19 +2055,22 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_sectors_read: EWF-S01 format should not contain data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: EWF-S01 format should not contain data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2065,7 +2079,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( size != EWF_DATA_SIZE )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: mismatch in section data size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: mismatch in section data size.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2073,13 +2088,15 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to create data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create data.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_data_read( data, file_descriptor ) < -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to read data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read data.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2097,7 +2114,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 #endif
 	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2105,7 +2123,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &stored_crc, data->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to convert stored CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2113,7 +2132,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( stored_crc != calculated_crc )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2126,7 +2146,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	 */
 	if( internal_handle->media->media_type != data->media_type )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: media type does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: media type does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2137,7 +2158,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &amount_of_chunks, data->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to convert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2145,7 +2167,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( internal_handle->media->amount_of_chunks != amount_of_chunks )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: amount of chunks does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: amount of chunks does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2156,7 +2179,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &sectors_per_chunk, data->sectors_per_chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to convert sectors per chunk value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert sectors per chunk value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2164,7 +2188,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( internal_handle->media->sectors_per_chunk != sectors_per_chunk )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: sectors per chunk does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: sectors per chunk does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2175,7 +2200,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &bytes_per_sector, data->bytes_per_sector ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to convert bytes per sector value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert bytes per sector value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2183,7 +2209,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( internal_handle->media->bytes_per_sector != bytes_per_sector )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: bytes per sector does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: bytes per sector does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2194,7 +2221,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &amount_of_sectors, data->amount_of_sectors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to convert amount of sectors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2202,7 +2230,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( internal_handle->media->amount_of_sectors != amount_of_sectors )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: amount of sectors does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: amount of sectors does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2213,7 +2242,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &error_granularity, data->error_granularity ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: unable to convert error granularity value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert error granularity value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2221,7 +2251,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( internal_handle->media->error_granularity != error_granularity )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: error granularity does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error granularity does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2232,7 +2263,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( internal_handle->media->media_flags != data->media_flags )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: media flags do not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: media flags do not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2243,7 +2275,8 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_common_memcmp( internal_handle->guid, data->guid, 16 ) != 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: GUID does not match in data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: GUID does not match in data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2263,19 +2296,22 @@ ssize_t libewf_section_data_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset )
 {
 	EWF_DATA *data              = NULL;
+	static char *function       = "libewf_section_data_write";
 	ssize_t section_write_count = 0;
 	ssize_t data_write_count    = 0;
 	size_t size                 = EWF_DATA_SIZE;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2283,13 +2319,15 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to create data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create data.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memset( data, 0, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to clear data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear data.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2305,33 +2343,45 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	}
 	data->media_flags = internal_handle->media->media_flags;
 
-	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_chunks, data->amount_of_chunks ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media->amount_of_chunks,
+	     data->amount_of_chunks ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to revert amount of chunks value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of chunks value.\n",
+		 function );
 
 		libewf_common_free( data );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->sectors_per_chunk, data->sectors_per_chunk ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media->sectors_per_chunk,
+	     data->sectors_per_chunk ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to revert sectors per chunk value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert sectors per chunk value.\n",
+		 function );
 
 		libewf_common_free( data );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->bytes_per_sector, data->bytes_per_sector ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media->bytes_per_sector,
+	     data->bytes_per_sector ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to revert bytes per sector value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert bytes per sector value.\n",
+		 function );
 
 		libewf_common_free( data );
 
 		return( -1 );
 	}
-	if( libewf_endian_revert_32bit( internal_handle->media->amount_of_sectors, data->amount_of_sectors ) != 1 )
+	if( libewf_endian_revert_32bit(
+	     internal_handle->media->amount_of_sectors,
+	     data->amount_of_sectors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to revert amount of sectors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2347,7 +2397,8 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		if( libewf_common_memcpy( data->guid, internal_handle->guid, 16 ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to set GUID.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set GUID.\n",
+			 function );
 
 			libewf_common_free( data );
 
@@ -2355,18 +2406,25 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 		}
 		if( libewf_endian_revert_32bit( internal_handle->media->error_granularity, data->error_granularity ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to revert error granularity value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to revert error granularity value.\n",
+			 function );
 
 			libewf_common_free( data );
 
 			return( -1 );
 		}
 	}
-	section_write_count = libewf_section_start_write( internal_handle, file_descriptor, (EWF_CHAR *) "data", size, start_offset );
+	section_write_count = libewf_section_start_write(
+	                       internal_handle,
+	                       file_descriptor,
+	                       (EWF_CHAR *) "data",
+	                       size,
+	                       start_offset );
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -2378,7 +2436,8 @@ ssize_t libewf_section_data_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	if( data_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_write: unable to write data to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write data to file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2392,6 +2451,7 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 {
 	EWF_ERROR2 *error2                = NULL;
 	EWF_ERROR2_SECTOR *error2_sectors = NULL;
+	static char *function             = "libewf_section_error2_read";
 	EWF_CRC calculated_crc            = 0;
 	EWF_CRC stored_crc                = 0;
 	uint32_t amount_of_errors         = 0;
@@ -2400,13 +2460,15 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->ewf_format == EWF_FORMAT_S01 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: EWF-S01 format should not contain data section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: EWF-S01 format should not contain data section.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2417,13 +2479,15 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( error2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to allocate error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate error2.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_error2_read( error2, file_descriptor ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to read error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read error2.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2436,7 +2500,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2444,7 +2509,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( libewf_endian_convert_32bit( &stored_crc, error2->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to convert stored CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2452,7 +2518,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( libewf_endian_convert_32bit( &amount_of_errors, error2->amount_of_errors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to convert amount of errors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert amount of errors value.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2462,7 +2529,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 	if( stored_crc != calculated_crc )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2471,7 +2539,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 	}
 	if( amount_of_errors == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: error2 contains no sectors!.\n" );
+		LIBEWF_WARNING_PRINT( "%s: error2 contains no sectors!.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2484,21 +2553,27 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		if( error2_sectors == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to allocate error2 sectors.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate error2 sectors.\n",
+			 function );
 
 			return( -1 );
 		}
 		if( ewf_error2_sectors_read( error2_sectors, file_descriptor, amount_of_errors ) <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to read error2 sectors.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to read error2 sectors.\n",
+			 function );
 
 			libewf_common_free( error2_sectors );
 
 			return( -1 );
 		}
-		if( ewf_crc_calculate( &calculated_crc, (uint8_t *) error2_sectors, ( EWF_ERROR2_SECTOR_SIZE * amount_of_errors ), 1 ) != 1 )
+		if( ewf_crc_calculate(
+		     &calculated_crc,
+		     (uint8_t *) error2_sectors,
+		     ( EWF_ERROR2_SECTOR_SIZE * amount_of_errors ), 1 ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to calculate CRC.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+			 function );
 
 			libewf_common_free( error2_sectors );
 
@@ -2506,7 +2581,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		}
 		if( ewf_crc_read( &stored_crc, file_descriptor ) != EWF_CRC_SIZE )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to read CRC from file descriptor.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to read CRC from file descriptor.\n",
+			 function );
 
 			libewf_common_free( error2_sectors );
 
@@ -2514,7 +2590,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		}
 		if( stored_crc != calculated_crc )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+			LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+			 function, stored_crc, calculated_crc );
 
 			if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 			{
@@ -2525,7 +2602,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		}
 		if( internal_handle->acquiry_error_sectors != NULL )
 		{
-			LIBEWF_VERBOSE_PRINT( "libewf_section_error2_read: acquiry error sectors already set in handle - removing previous one.\n" );
+			LIBEWF_VERBOSE_PRINT( "%s: acquiry error sectors already set in handle - removing previous one.\n",
+			 function );
 
 			libewf_common_free( internal_handle->acquiry_error_sectors );
 		}
@@ -2533,7 +2611,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 
 		if( internal_handle->acquiry_error_sectors == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to create acquiry error sectors.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to create acquiry error sectors.\n",
+			 function );
 
 			libewf_common_free( error2_sectors );
 
@@ -2545,7 +2624,8 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 		{
 			if( libewf_endian_convert_32bit( &sector, error2_sectors[ iterator ].sector ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to convert sector value.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to convert sector value.\n",
+				 function );
 
 				libewf_common_free( error2_sectors );
 
@@ -2553,9 +2633,12 @@ ssize_t libewf_section_error2_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 			}
 			internal_handle->acquiry_error_sectors[ iterator ].sector = (uint64_t) sector;
 
-			if( libewf_endian_convert_32bit( &internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors, error2_sectors[ iterator ].amount_of_sectors ) != 1 )
+			if( libewf_endian_convert_32bit(
+			     &internal_handle->acquiry_error_sectors[ iterator ].amount_of_sectors,
+			     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 			{
-				LIBEWF_WARNING_PRINT( "libewf_section_error2_read: unable to convert amount of sectors value.\n" );
+				LIBEWF_WARNING_PRINT( "%s: unable to convert amount of sectors value.\n",
+				 function );
 
 				libewf_common_free( error2_sectors );
 
@@ -2574,6 +2657,7 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 {
 	EWF_ERROR2 *error2                 = NULL;
 	EWF_ERROR2_SECTOR *error2_sectors  = NULL;
+	static char *function              = "libewf_section_error2_write";
 	ssize_t section_write_count        = 0;
 	ssize_t error2_write_count         = 0;
 	ssize_t error2_sectors_write_count = 0;
@@ -2582,13 +2666,15 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: invalid acquiry read error sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid acquiry read error sectors.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2597,13 +2683,15 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	if( error2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to create error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create error2.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memset( error2, 0, EWF_ERROR2_SIZE ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to clear error2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear error2.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2611,7 +2699,8 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	}
 	if( libewf_endian_revert_32bit( amount_of_errors, error2->amount_of_errors ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to revert amount of errors value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to revert amount of errors value.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2621,7 +2710,8 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	if( error2_sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to create error2 sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create error2 sectors.\n",
+		 function );
 
 		libewf_common_free( error2 );
 
@@ -2629,18 +2719,24 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 	}
 	for( iterator = 0; iterator < amount_of_errors; iterator++ )
 	{
-		if( libewf_endian_revert_32bit( (uint32_t) sectors[ iterator ].sector, error2_sectors[ iterator ].sector ) != 1 )
+		if( libewf_endian_revert_32bit(
+		     (uint32_t) sectors[ iterator ].sector,
+		     error2_sectors[ iterator ].sector ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to revert sector value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to revert sector value.\n",
+			 function );
 
 			libewf_common_free( error2 );
 			libewf_common_free( error2_sectors );
 
 			return( -1 );
 		}
-		if( libewf_endian_revert_32bit( sectors[ iterator ].amount_of_sectors, error2_sectors[ iterator ].amount_of_sectors ) != 1 )
+		if( libewf_endian_revert_32bit(
+		     sectors[ iterator ].amount_of_sectors,
+		     error2_sectors[ iterator ].amount_of_sectors ) != 1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to revert amount of sectors value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to revert amount of sectors value.\n",
+			 function );
 
 			libewf_common_free( error2 );
 			libewf_common_free( error2_sectors );
@@ -2648,11 +2744,17 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 			return( -1 );
 		}
 	}
-	section_write_count = libewf_section_start_write( internal_handle, file_descriptor, (EWF_CHAR *) "error2", size, start_offset );
+	section_write_count = libewf_section_start_write(
+	                       internal_handle,
+	                       file_descriptor,
+	                       (EWF_CHAR *) "error2",
+	                       size,
+	                       start_offset );
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( error2 );
 		libewf_common_free( error2_sectors );
@@ -2667,13 +2769,15 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 	if( error2_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to write error2 to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write error2 to file.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( error2_sectors_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_write: unable to write error2 sectors to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write error2 sectors to file.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2686,18 +2790,21 @@ ssize_t libewf_section_error2_write( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
 	EWF_HASH *hash         = NULL;
+	static char *function  = "libewf_section_hash_read";
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size != EWF_HASH_SIZE )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: mismatch in section data size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: mismatch in section data size.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2705,13 +2812,15 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 
 	if( hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: unable to allocate hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate hash.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_hash_read( hash, file_descriptor ) <= -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: unable to read hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read hash.\n",
+		 function );
 
 		libewf_common_free( hash );
 
@@ -2721,9 +2830,13 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( hash->unknown1, 16 ); );
 #endif
 
-	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
+	if( ewf_crc_calculate(
+	     &calculated_crc,
+	     (uint8_t *) hash,
+	     ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		libewf_common_free( hash );
 
@@ -2731,7 +2844,8 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_endian_convert_32bit( &stored_crc, hash->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: unable to convert stored CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
 
 		libewf_common_free( hash );
 
@@ -2739,7 +2853,8 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( stored_crc != calculated_crc )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+		LIBEWF_WARNING_PRINT( "%s: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2750,7 +2865,8 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 	}
 	if( libewf_internal_handle_set_stored_md5_hash( internal_handle, hash->md5_hash ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: unable to set MD5 hash in handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
+		 function );
 
 		if( internal_handle->error_tollerance < LIBEWF_ERROR_TOLLERANCE_COMPENSATE )
 		{
@@ -2770,13 +2886,15 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_DIGEST_HASH *md5_hash )
 {
 	EWF_HASH *hash              = NULL;
+	static char *function       = "libewf_section_hash_write";
 	ssize_t section_write_count = 0;
 	ssize_t hash_write_count    = 0;
 	size_t size                 = EWF_HASH_SIZE;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -2784,13 +2902,15 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	if( hash == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_write: unable to create hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create hash.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( libewf_common_memset( hash, 0, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_write: unable to clear hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear hash.\n",
+		 function );
 
 		libewf_common_free( hash );
 
@@ -2798,7 +2918,8 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 	}
 	if( libewf_common_memcpy( hash->md5_hash, md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_write: unable to set hash.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set hash.\n",
+		 function );
 
 		libewf_common_free( hash );
 
@@ -2808,7 +2929,8 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( hash );
 
@@ -2820,7 +2942,8 @@ ssize_t libewf_section_hash_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 	if( hash_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_write: unable to write hash to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write hash to file.\n",
+		 function );
 
 		return( -1 );
 	}

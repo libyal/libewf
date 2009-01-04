@@ -49,6 +49,7 @@
 LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 {
 	LIBEWF_CHAR *duplicate = NULL;
+	static char *function  = "libewf_string_duplicate";
 
 	if( string == NULL )
 	{
@@ -60,7 +61,8 @@ LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_duplicate: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -72,13 +74,15 @@ LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 
 	if( duplicate == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_duplicate: unable to create duplicate string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create duplicate string.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( libewf_string_copy( duplicate, string, size ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_duplicate: unable to set duplicate string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set duplicate string.\n",
+		 function );
 
 		libewf_common_free( duplicate );
 
@@ -113,11 +117,13 @@ LIBEWF_CHAR *libewf_string_duplicate( LIBEWF_CHAR *string, size_t size )
 int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 {
 	LIBEWF_CHAR *end_of_string = NULL;
+	static char *function      = "libewf_string_to_int64";
 	int64_t value              = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_int64: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		errno = EINVAL;
 
@@ -125,7 +131,8 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 	}
 	if( size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_int64: string is emtpy.\n" );
+		LIBEWF_WARNING_PRINT( "%s: string is emtpy.\n",
+		 function );
 
 		errno = EINVAL;
 
@@ -133,7 +140,8 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_int64: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		errno = EINVAL;
 
@@ -149,13 +157,13 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 
 	if( value == (int64_t) LONG_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_int64: unable to convert string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert string.\n",
+		 function );
 
 		return( 0 );
 	}
 	return( value );
 }
-
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 
@@ -181,11 +189,13 @@ int64_t libewf_string_to_int64( const LIBEWF_CHAR *string, size_t size )
 uint64_t libewf_string_to_uint64( const LIBEWF_CHAR *string, size_t size )
 {
 	LIBEWF_CHAR *end_of_string = NULL;
+	static char *function      = "libewf_string_to_uint64";
 	uint64_t value             = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_uint64: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		errno = EINVAL;
 
@@ -193,7 +203,8 @@ uint64_t libewf_string_to_uint64( const LIBEWF_CHAR *string, size_t size )
 	}
 	if( size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_uint64: string is emtpy.\n" );
+		LIBEWF_WARNING_PRINT( "%s: string is emtpy.\n",
+		 function );
 
 		errno = EINVAL;
 
@@ -201,7 +212,8 @@ uint64_t libewf_string_to_uint64( const LIBEWF_CHAR *string, size_t size )
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_uint64: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		errno = EINVAL;
 
@@ -217,7 +229,8 @@ uint64_t libewf_string_to_uint64( const LIBEWF_CHAR *string, size_t size )
 
 	if( value == (uint64_t) LONG_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_to_uint64: unable to convert string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert string.\n",
+		 function );
 
 		return( 0 );
 	}
@@ -233,31 +246,36 @@ LIBEWF_CHAR **libewf_string_split( LIBEWF_CHAR *string, size_t size, LIBEWF_CHAR
 	LIBEWF_CHAR *line_start = NULL;
 	LIBEWF_CHAR *line_end   = NULL;
 	LIBEWF_CHAR *string_end = NULL;
+	static char *function   = "libewf_string_split";
 	size_t size_string      = 0;
 	size_t line_size        = 0;
 	uint32_t iterator       = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_split: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( amount == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_split: invalid amount.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid amount.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( size == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_split: string is empty.\n" );
+		LIBEWF_WARNING_PRINT( "%s: string is empty.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_split: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -296,7 +314,8 @@ LIBEWF_CHAR **libewf_string_split( LIBEWF_CHAR *string, size_t size, LIBEWF_CHAR
 
 	if( lines == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_split: unable to allocate dynamic array lines.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate dynamic array lines.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -330,7 +349,8 @@ LIBEWF_CHAR **libewf_string_split( LIBEWF_CHAR *string, size_t size, LIBEWF_CHAR
 
 		if( lines[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_string_split: unable to allocate line string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to allocate line string.\n",
+			 function );
 
 			libewf_string_split_values_free( lines, ( iterator - 1 ) );
 
@@ -338,7 +358,8 @@ LIBEWF_CHAR **libewf_string_split( LIBEWF_CHAR *string, size_t size, LIBEWF_CHAR
 		}
 		if( libewf_string_copy( lines[ iterator ], line_start, line_size ) == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_string_split: unable to set dynamic array lines.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to set dynamic array lines.\n",
+			 function );
 
 			libewf_string_split_values_free( lines, iterator );
 
@@ -364,11 +385,13 @@ LIBEWF_CHAR **libewf_string_split( LIBEWF_CHAR *string, size_t size, LIBEWF_CHAR
  */
 void libewf_string_split_values_free( LIBEWF_CHAR **split_values, uint32_t amount )
 {
-	uint32_t iterator = 0;
+	static char *function = "libewf_string_split_values_free";
+	uint32_t iterator     = 0;
 
 	if( split_values == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_split_values_free: invalid split values array.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid split values array.\n",
+		 function );
 
 		return;
 	}
@@ -376,7 +399,8 @@ void libewf_string_split_values_free( LIBEWF_CHAR **split_values, uint32_t amoun
 	{
 		if( split_values[ iterator ] == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_string_split_values_free: empty value.\n" );
+			LIBEWF_WARNING_PRINT( "%s: empty value.\n",
+			 function );
 		}
 		else
 		{
@@ -391,25 +415,30 @@ void libewf_string_split_values_free( LIBEWF_CHAR **split_values, uint32_t amoun
  */
 int8_t libewf_string_copy_utf16_to_ascii( LIBEWF_CHAR *utf16_string, size_t size_utf16, LIBEWF_CHAR* ascii_string, size_t size_ascii )
 {
+	static char *function = "libewf_string_copy_utf16_to_ascii";
 	size_t utf16_iterator = 2;
 	size_t ascii_iterator = 0;
 	uint8_t byte_order    = 0;
 
 	if( utf16_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_utf16_to_ascii: invalid UTF16 string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid UTF16 string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ascii_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_utf16_to_ascii: invalid ASCII string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid ASCII string.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( size_utf16 > (size_t) SSIZE_MAX ) || ( size_ascii > (size_t) SSIZE_MAX ) )
+	if( ( size_utf16 > (size_t) SSIZE_MAX )
+	 || ( size_ascii > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_utf16_to_ascii: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -418,35 +447,42 @@ int8_t libewf_string_copy_utf16_to_ascii( LIBEWF_CHAR *utf16_string, size_t size
 	 */
 	if( size_ascii < ( ( size_utf16 - 2 ) / 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_utf16_to_ascii: ASCII string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: ASCII string too small.\n",
+		 function );
 
 		return( -1 );
 	}
 	/* Check if UTF16 string is in big or little endian
 	 */
-	if( ( (uint8_t) utf16_string[ 0 ] == 0xff ) && ( (uint8_t) utf16_string[ 1 ] == 0xfe ) )
+	if( ( (uint8_t) utf16_string[ 0 ] == 0xff )
+	 && ( (uint8_t) utf16_string[ 1 ] == 0xfe ) )
 	{
 		byte_order = LIBEWF_STRING_LITTLE_ENDIAN;
 	}
-	else if( ( (uint8_t) utf16_string[ 0 ] == 0xfe ) && ( (uint8_t) utf16_string[ 1 ] == 0xff ) )
+	else if( ( (uint8_t) utf16_string[ 0 ] == 0xfe )
+	 && ( (uint8_t) utf16_string[ 1 ] == 0xff ) )
 	{
 		byte_order = LIBEWF_STRING_BIG_ENDIAN;
 	}
 	else
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_string_copy_utf16_to_ascii: no byte order in UTF16 string.\n" );
+		LIBEWF_VERBOSE_PRINT( "%s: no byte order in UTF16 string.\n",
+		 function );
 
-		if( ( utf16_string[ 0 ] == (LIBEWF_CHAR) '\0' ) && ( utf16_string[ 1 ] != (LIBEWF_CHAR) '\0' ) )
+		if( ( utf16_string[ 0 ] == (LIBEWF_CHAR) '\0' )
+		 && ( utf16_string[ 1 ] != (LIBEWF_CHAR) '\0' ) )
 		{
 			byte_order = LIBEWF_STRING_LITTLE_ENDIAN;
 		}
-		else if( ( utf16_string[ 0 ] != (LIBEWF_CHAR) '\0' ) && ( utf16_string[ 1 ] == (LIBEWF_CHAR) '\0' ) )
+		else if( ( utf16_string[ 0 ] != (LIBEWF_CHAR) '\0' )
+		 && ( utf16_string[ 1 ] == (LIBEWF_CHAR) '\0' ) )
 		{
 			byte_order = LIBEWF_STRING_LITTLE_ENDIAN;
 		}
 		else
 		{
-			LIBEWF_WARNING_PRINT( "libewf_string_copy_utf16_to_ascii: unable to determine byte order in UTF16 string.\n" );
+			LIBEWF_WARNING_PRINT( "%s: unable to determine byte order in UTF16 string.\n",
+			 function );
 
 			return( -1 );
 		}
@@ -495,24 +531,29 @@ int8_t libewf_string_copy_utf16_to_ascii( LIBEWF_CHAR *utf16_string, size_t size
  */
 int8_t libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size_ascii, LIBEWF_CHAR *utf16_string, size_t size_utf16, uint8_t byte_order )
 {
+	static char *function = "libewf_string_copy_ascii_to_utf16";
 	size_t ascii_iterator = 0;
 	size_t utf16_iterator = 2;
 
 	if( ascii_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_ascii_to_utf16: invalid ASCII string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid ASCII string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( utf16_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_ascii_to_utf16: invalid UTF16 string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid UTF16 string.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( size_ascii > (size_t) SSIZE_MAX ) || ( size_utf16 > (size_t) SSIZE_MAX ) )
+	if( ( size_ascii > (size_t) SSIZE_MAX )
+	 || ( size_utf16 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_ascii_to_utf16: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -520,7 +561,8 @@ int8_t libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size
 	 */
 	if( size_utf16 < ( ( size_ascii * 2 ) + 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_ascii_to_utf16: UTF16 string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: UTF16 string too small.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -538,7 +580,8 @@ int8_t libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_ascii_to_utf16: undefined byte order.\n" );
+		LIBEWF_WARNING_PRINT( "%s: undefined byte order.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -570,29 +613,35 @@ int8_t libewf_string_copy_ascii_to_utf16( LIBEWF_CHAR *ascii_string, size_t size
  */
 int8_t libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string )
 {
-	size_t iterator = 0;
+	static char *function = "libewf_string_copy_from_ewf_char";
+	size_t iterator       = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_ewf_char: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_char_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_ewf_char: invalid EWF character string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid EWF character string.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( size_string > (size_t) SSIZE_MAX ) || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
+	if( ( size_string > (size_t) SSIZE_MAX )
+	 || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_ewf_char: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size_string < size_ewf_char_string )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_ewf_char: string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -614,29 +663,35 @@ int8_t libewf_string_copy_from_ewf_char( LIBEWF_CHAR *string, size_t size_string
  */
 int8_t libewf_string_copy_to_ewf_char( LIBEWF_CHAR *string, size_t size_string, EWF_CHAR *ewf_char_string, size_t size_ewf_char_string )
 {
-	size_t iterator = 0;
+	static char *function = "libewf_string_copy_to_ewf_char";
+	size_t iterator       = 0;
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_ewf_char: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( ewf_char_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_ewf_char: invalid EWF character string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid EWF character string.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( size_string > (size_t) SSIZE_MAX ) || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
+	if( ( size_string > (size_t) SSIZE_MAX )
+	 || ( size_ewf_char_string > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_ewf_char: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size_ewf_char_string < size_string )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_ewf_char: EWF character string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: EWF character string too small.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -738,45 +793,57 @@ int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string,
 
 	char *header2_pointer = NULL;
 #endif
+	static char *function = "libewf_string_copy_from_header2";
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( header2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: invalid header2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( size_string > (size_t) SSIZE_MAX ) || ( size_header2 > (size_t) SSIZE_MAX ) )
+	if( ( size_string > (size_t) SSIZE_MAX )
+	 || ( size_header2 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size_string < ( ( size_header2 - 2 ) / 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: string too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: string too small.\n",
+		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( libewf_common_memset( &conversion_state, 0, sizeof( mbstate_t ) ) == NULL )
+	if( libewf_common_memset(
+	     &conversion_state,
+	     0,
+	     sizeof( mbstate_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: unable to clear converion state.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear converion state.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( mbsinit( &conversion_state ) == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: unable to initialize converion state.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( header2[ 0 ] == (EWF_HEADER2) 0xff ) || ( header2[ 0 ] == (EWF_HEADER2) 0xfe ) )
+	if( ( header2[ 0 ] == (EWF_HEADER2) 0xff )
+	 || ( header2[ 0 ] == (EWF_HEADER2) 0xfe ) )
 	{
 		header2_pointer = (char *) &header2[ 2 ];
 	}
@@ -784,12 +851,21 @@ int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string,
 	{
 		header2_pointer = (char *) &header2[ 0 ];
 	}
-	if( mbsrtowcs( string, (const char **) &header2_pointer, size_string, &conversion_state ) != ( size_string - 1 ) )
+	if( mbsrtowcs(
+	     string,
+	     (const char **) &header2_pointer,
+	     size_string,
+	     &conversion_state ) != ( size_string - 1 ) )
 #else
-	if( libewf_string_copy_utf16_to_ascii( (LIBEWF_CHAR *) header2, size_header2, string, size_string ) != 1 )
+	if( libewf_string_copy_utf16_to_ascii(
+	     (LIBEWF_CHAR *) header2,
+	     size_header2,
+	     string,
+	     size_string ) != 1 )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_from_header2: unable to copy header2 to string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to copy header2 to string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -804,50 +880,71 @@ int8_t libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, E
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 	mbstate_t conversion_state;
 #endif
+	static char *function = "libewf_string_copy_to_header2";
 
 	if( string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: invalid string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid string.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( header2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: invalid header2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( ( size_string > (size_t) SSIZE_MAX ) || ( size_header2 > (size_t) SSIZE_MAX ) )
+	if( ( size_string > (size_t) SSIZE_MAX )
+	 || ( size_header2 > (size_t) SSIZE_MAX ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size_header2 < ( ( size_string * 2 ) + 2 ) )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: header2 too small.\n" );
+		LIBEWF_WARNING_PRINT( "%s: header2 too small.\n",
+		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-	if( libewf_common_memset( &conversion_state, 0, sizeof( mbstate_t ) ) == NULL )
+	if( libewf_common_memset(
+	     &conversion_state,
+	     0,
+	     sizeof( mbstate_t ) ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: unable to clear converion state.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to clear converion state.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( mbsinit( &conversion_state ) == 0 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: unable to initialize converion state.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to initialize converion state.\n",
+		 function );
 
 		return( -1 );
 	}
-	if( wcsrtombs( (char *) &header2[ 2 ], (const wchar_t **) &string, size_header2, &conversion_state ) != ( size_string - 1 ) )
+	if( wcsrtombs(
+	     (char *) &header2[ 2 ],
+	     (const wchar_t **) &string,
+	     size_header2,
+	     &conversion_state ) != ( size_string - 1 ) )
 #else
-	if( libewf_string_copy_ascii_to_utf16( string, size_string, (LIBEWF_CHAR *) header2, size_header2, LIBEWF_STRING_LITTLE_ENDIAN ) != 1 )
+	if( libewf_string_copy_ascii_to_utf16(
+	     string,
+	     size_string,
+	     (LIBEWF_CHAR *) header2,
+	     size_header2,
+	     LIBEWF_STRING_LITTLE_ENDIAN ) != 1 )
 #endif
 	{
-		LIBEWF_WARNING_PRINT( "libewf_string_copy_to_header2: unable to copy string to header2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to copy string to header2.\n",
+		 function );
 
 		return( -1 );
 	}

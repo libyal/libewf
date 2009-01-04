@@ -48,18 +48,21 @@
  */
 void libewf_debug_dump_data( uint8_t *data, size_t size )
 {
+	static char *function  = "libewf_debug_dump_data";
 	EWF_CRC stored_crc     = 0;
 	EWF_CRC calculated_crc = 0;
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_dump_data: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return;
 	}
 	if( ewf_crc_calculate( &calculated_crc, data, ( size - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_dump_data: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return;
 	}
@@ -67,11 +70,13 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
 
 	if( libewf_common_memcpy( &stored_crc, &data[ size - EWF_CRC_SIZE ], EWF_CRC_SIZE ) == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_dump_data: unable to set CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to set CRC.\n",
+		 function );
 	}
 	else
 	{
-		fprintf( stderr, "libewf_debug_dump_data: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, calculated_crc );
+		fprintf( stderr, "%s: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n",
+		 function, stored_crc, calculated_crc );
 	}
 }
 
@@ -79,6 +84,7 @@ void libewf_debug_dump_data( uint8_t *data, size_t size )
  */
 void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, size_t size )
 {
+	static char *function      = "libewf_debug_read_section";
 	uint8_t *data              = NULL;
 	uint8_t *uncompressed_data = NULL;
 	ssize_t read_count         = 0;
@@ -87,7 +93,8 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return;
 	}
@@ -95,7 +102,8 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return;
 	}
@@ -103,7 +111,8 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: unable to allocate data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate data.\n",
+		 function );
 
 		return;
 	}
@@ -111,7 +120,8 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( read_count < (ssize_t) size )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: unable to read section data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to read section data.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -121,7 +131,8 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( uncompressed_size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: uncompressed size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: uncompressed size value exceeds maximum.\n",
+		 function );
 
 		return;
 	}
@@ -129,7 +140,8 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( uncompressed_data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: unable to allocate uncompressed data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate uncompressed data.\n",
+		 function );
 
 		libewf_common_free( data );
 
@@ -139,19 +151,22 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
 
 	if( result == 0 )
 	{
-		fprintf( stderr, "libewf_debug_read_section: data is UNCOMPRESSED.\n" );
+		fprintf( stderr, "%s: data is UNCOMPRESSED.\n",
+		 function );
 
 		libewf_debug_dump_data( data, size );
 	}
 	else if( result == 1 )
 	{
-		fprintf( stderr, "libewf_debug_read_section: data is zlib COMPRESSED.\n" );
+		fprintf( stderr, "%s: data is zlib COMPRESSED.\n",
+		 function );
 
 		libewf_debug_dump_data( uncompressed_data, uncompressed_size );
 	}
 	else
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_read_section: unable to uncompress data.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to uncompress data.\n",
+		 function );
 
 		libewf_common_free( data );
 		libewf_common_free( uncompressed_data );
@@ -166,6 +181,7 @@ void libewf_debug_read_section( LIBEWF_INTERNAL_HANDLE *internal_handle, int fil
  */
 void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
 {
+	static char *function  = "libewf_debug_section_fprint";
 	EWF_CRC calculated_crc = 0;
 	EWF_CRC stored_crc     = 0;
 	uint64_t next          = 0;
@@ -173,37 +189,43 @@ void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
 
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_section_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( section == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_section_fprint: invalid section.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid section.\n",
+		 function );
 
 		return;
 	}
 	if( ewf_crc_calculate( &calculated_crc, (uint8_t *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_section_fprint: unable to calculate CRC.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to calculate CRC.\n",
+		 function );
 
 		return;
 	}
 	if( libewf_endian_convert_32bit( &stored_crc, section->crc ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_section_fprint: unable to convert stored CRC value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert stored CRC value.\n",
+		 function );
 
 		return;
 	}
 	if( libewf_endian_convert_64bit( &next, section->next ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_section_fprint: unable to convert next offset value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert next offset value.\n",
+		 function );
 
 		return;
 	}
 	if( libewf_endian_convert_64bit( &size, section->size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_section_fprint: unable to convert size value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to convert size value.\n",
+		 function );
 
 		return;
 	}
@@ -219,15 +241,19 @@ void libewf_debug_section_fprint( FILE *stream, EWF_SECTION *section )
  */
 void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string )
 {
+	static char *function = "libewf_debug_header_string_fprint";
+
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header_string_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header_string_fprint: invalid header string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header string.\n",
+		 function );
 
 		return;
 	}
@@ -239,10 +265,12 @@ void libewf_debug_header_string_fprint( FILE *stream, LIBEWF_CHAR *header_string
 void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
 {
 	LIBEWF_CHAR *header_string = NULL;
+	static char *function      = "libewf_debug_header_fprint";
 
 	if( header == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header_fprint: invalid header.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header.\n",
+		 function );
 
 		return;
 	}
@@ -250,13 +278,15 @@ void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
 
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header_fprint: unable to create header string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header string.\n",
+		 function );
 
 		return;
 	}
 	if( libewf_string_copy_from_header( header_string, size, header, size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header_fprint: unable to copy header to header string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to copy header to header string.\n",
+		 function );
 
 		libewf_common_free( header_string );
 
@@ -272,11 +302,13 @@ void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
 void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t size )
 {
 	LIBEWF_CHAR *header_string = NULL;
+	static char *function      = "libewf_debug_header2_fprint";
 	size_t header_size         = 0;
 
 	if( header2 == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header2_fprint: invalid header2.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
+		 function );
 
 		return;
 	}
@@ -285,13 +317,15 @@ void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t siz
 
 	if( header_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header2_fprint: unable to create header string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create header string.\n",
+		 function );
 
 		return;
 	}
 	if( libewf_string_copy_from_header2( header_string, header_size, header2, size ) != 1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_header2_fprint: unable to copy header2 to header string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to copy header2 to header string.\n",
+		 function );
 
 		libewf_common_free( header_string );
 
@@ -306,15 +340,19 @@ void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t siz
  */
 void libewf_debug_chunk_fprint( FILE *stream, EWF_CHUNK *chunk )
 {
+	static char *function = "libewf_debug_chunk_fprint";
+
 	if( stream == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_chunk_fprint: invalid stream.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid stream.\n",
+		 function );
 
 		return;
 	}
 	if( chunk == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_debug_chunk_fprint: invalid chunk.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk.\n",
+		 function );
 
 		return;
 	}
