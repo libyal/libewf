@@ -36,7 +36,7 @@
 
 /* The libewf version
  */
-#if 1
+#if 0
 #define LIBEWF_VERSION				L"20071112"
 #else
 #define LIBEWF_VERSION				"20071112"
@@ -113,7 +113,7 @@
 
 /* Libewf compression types
  */
-#if 1
+#if 0
 #define LIBEWF_COMPRESSION_TYPE_NONE		L"n"
 #define LIBEWF_COMPRESSION_TYPE_FAST		L"f"
 #define LIBEWF_COMPRESSION_TYPE_BEST		L"b"

@@ -43,19 +43,40 @@
 extern "C" {
 #endif
 
-#define LIBEWF_SEGMENT_TABLE				libewf_segment_table_t
-#define LIBEWF_SEGMENT_TABLE_SIZE			sizeof( LIBEWF_SEGMENT_TABLE )
+#define LIBEWF_SEGMENT_FILE		libewf_segment_file_t
+#define LIBEWF_SEGMENT_FILE_SIZE	sizeof( LIBEWF_SEGMENT_FILE )
 
+typedef struct libewf_segment_file libewf_segment_file_t;
+
+struct libewf_segment_file
+{
+	/* The filename
+	 */
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-#define LIBEWF_SEGMENT_TABLE_FILENAME_SIZE		sizeof( wchar_t* )
+	wchar_t *filename;
 #else
-#define LIBEWF_SEGMENT_TABLE_FILENAME_SIZE		sizeof( char* )
+	char *filename;
 #endif
 
-#define LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE	sizeof( int )
-#define LIBEWF_SEGMENT_TABLE_FILE_OFFSET_SIZE		sizeof( off64_t )
-#define LIBEWF_SEGMENT_TABLE_AMOUNT_OF_CHUNKS_SIZE	sizeof( uint32_t )
-#define LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE		sizeof( LIBEWF_SECTION_LIST )
+	/* The file descriptor
+	 */
+	int file_descriptor;
+
+	/* The file offset
+	 */
+	off64_t file_offset;
+
+	/* The amount of chunks
+	 */
+	uint32_t amount_of_chunks;
+
+        /* The list of all the sections
+         */
+        LIBEWF_SECTION_LIST *section_list;
+};
+
+#define LIBEWF_SEGMENT_TABLE		libewf_segment_table_t
+#define LIBEWF_SEGMENT_TABLE_SIZE	sizeof( LIBEWF_SEGMENT_TABLE )
 
 typedef struct libewf_segment_table libewf_segment_table_t;
 
@@ -65,29 +86,9 @@ struct libewf_segment_table
 	 */
 	uint16_t amount;
 
-	/* A dynamic array containting the filenames
+	/* A dynamic array containting the segment files
 	 */
-#if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
-	wchar_t **filename;
-#else
-	char **filename;
-#endif
-
-	/* A dynamic array containting the file descriptors
-	 */
-	int *file_descriptor;
-
-	/* A dynamic array containting the file offsets
-	 */
-	off64_t *file_offset;
-
-	/* A dynamic array containting the amount of chunks per segment file
-	 */
-	uint32_t *amount_of_chunks;
-
-        /* A list of all the sections within a certain segment file
-         */
-        LIBEWF_SECTION_LIST **section_list;
+	LIBEWF_SEGMENT_FILE *segment_file;
 };
 
 LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint16_t amount );

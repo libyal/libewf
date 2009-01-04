@@ -188,9 +188,9 @@ int libewf_segment_file_exists( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-	if( segment_table->file_descriptor == NULL )
+	if( segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file descriptor.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -202,7 +202,7 @@ int libewf_segment_file_exists( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-	return( segment_table->file_descriptor[ segment_number ] != -1 );
+	return( segment_table->segment_file[ segment_number ].file_descriptor != -1 );
 }
 
 /* Determines an extension for a certain segment file
@@ -512,16 +512,9 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-	if( segment_table->filename == NULL )
+	if( segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -557,7 +550,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	}
 	/* Check if the entry has already been filled
 	 */
-	else if( segment_table->filename[ segment_number ] != NULL )
+	else if( segment_table->segment_file[ segment_number ].filename != NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: segment file has already been created.\n",
 		 function );
@@ -571,7 +564,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	            segment_file_type,
 	            ewf_format,
 	            format,
-	            segment_table->filename[ 0 ] );
+	            segment_table->segment_file[ 0 ].filename );
 #else
 	filename = libewf_segment_file_create_filename(
 	            segment_number,
@@ -579,7 +572,7 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 	            segment_file_type,
 	            ewf_format,
 	            format,
-	            segment_table->filename[ 0 ] );
+	            segment_table->segment_file[ 0 ].filename );
 #endif
 
 	if( filename == NULL )
@@ -631,8 +624,8 @@ int libewf_segment_file_create( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t se
 
 		return( -1 );
 	}
-	segment_table->filename[ segment_number ]        = filename;
-	segment_table->file_descriptor[ segment_number ] = file_descriptor;
+	segment_table->segment_file[ segment_number ].filename        = filename;
+	segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
 
 	return( 1 );
 }
@@ -661,16 +654,9 @@ int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing section lists.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -685,8 +671,8 @@ int libewf_segment_file_build_segment_table( LIBEWF_INTERNAL_HANDLE *internal_ha
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
 		          segment_number,
-		          internal_handle->segment_table->file_descriptor[ segment_number ],
-		          internal_handle->segment_table->section_list[ segment_number ],
+		          internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+		          internal_handle->segment_table->segment_file[ segment_number ].section_list,
 		          &last_segment_file );
 
 		if( result == -1 )
@@ -740,16 +726,9 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->file_descriptor == NULL )
+	if( internal_handle->delta_segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table->section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing section lists.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -764,8 +743,8 @@ int libewf_segment_file_build_delta_segment_table( LIBEWF_INTERNAL_HANDLE *inter
 		result = libewf_segment_file_read_sections(
 		          internal_handle,
 		          segment_number,
-		          internal_handle->delta_segment_table->file_descriptor[ segment_number ],
-		          internal_handle->delta_segment_table->section_list[ segment_number ],
+		          internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor,
+		          internal_handle->delta_segment_table->segment_file[ segment_number ].section_list,
 		          &last_segment_file );
 
 		if( result == -1 )
@@ -810,27 +789,6 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing segment table.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number == 0 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_number > internal_handle->segment_table->amount )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment number, value out of range.\n",
 		 function );
 
 		return( -1 );
@@ -1365,16 +1323,9 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( segment_table->file_descriptor == NULL )
+	if( segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing section lists.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -1393,14 +1344,14 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( segment_table->file_descriptor[ segment_number ] == -1 )
+	if( segment_table->segment_file[ segment_number ].file_descriptor == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( segment_table->section_list[ segment_number ] == NULL )
+	if( segment_table->segment_file[ segment_number ].section_list == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
 		 function );
@@ -1450,7 +1401,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 	/* Write segment file header
 	 */
 	write_count = libewf_common_write(
-	               segment_table->file_descriptor[ segment_number ],
+	               segment_table->segment_file[ segment_number ].file_descriptor,
 	               &file_header,
 	               EWF_FILE_HEADER_SIZE );
 
@@ -1471,8 +1422,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 */
 			write_count = libewf_segment_file_write_headers(
 				       internal_handle,
-				       segment_table->file_descriptor[ segment_number ],
-				       segment_table->section_list[ segment_number ],
+				       segment_table->segment_file[ segment_number ].file_descriptor,
+				       segment_table->segment_file[ segment_number ].section_list,
 				       (off64_t) total_write_count );
 
 			if( write_count == -1 )
@@ -1490,7 +1441,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_section_volume_s01_write(
 					       internal_handle,
-				               segment_table->file_descriptor[ segment_number ],
+				               segment_table->segment_file[ segment_number ].file_descriptor,
 					       (off64_t) total_write_count );
 			}
 			else if( internal_handle->ewf_format == EWF_FORMAT_E01 )
@@ -1499,7 +1450,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_section_volume_e01_write(
 					       internal_handle,
-					       segment_table->file_descriptor[ segment_number ],
+					       segment_table->segment_file[ segment_number ].file_descriptor,
 					       (off64_t) total_write_count );
 			}
 			else
@@ -1516,7 +1467,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			if( libewf_section_list_append(
-			     segment_table->section_list[ segment_number ],
+			     segment_table->segment_file[ segment_number ].section_list,
 			     (EWF_CHAR *) "volume",
 			     (off64_t) total_write_count,
 			     (off64_t) ( total_write_count + write_count ) ) == NULL )
@@ -1534,7 +1485,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 */
 			write_count = libewf_section_data_write(
 				       internal_handle,
-				       segment_table->file_descriptor[ segment_number ],
+				       segment_table->segment_file[ segment_number ].file_descriptor,
 				       (off64_t) total_write_count );
 
 			if( write_count == -1 )
@@ -1545,7 +1496,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			if( libewf_section_list_append(
-			     segment_table->section_list[ segment_number ],
+			     segment_table->segment_file[ segment_number ].section_list,
 			     (EWF_CHAR *) "data",
 			     (off64_t) total_write_count,
 			     (off64_t) ( total_write_count + write_count ) ) == NULL )
@@ -1558,7 +1509,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			total_write_count += write_count;
 		}
 	}
-	segment_table->file_offset[ segment_number ] += total_write_count;
+	segment_table->segment_file[ segment_number ].file_offset += total_write_count;
 
 	return( total_write_count );
 }
@@ -1593,16 +1544,9 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -1643,8 +1587,8 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
-		               internal_handle->segment_table->file_offset[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+		               internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 		               0,
 		               internal_handle->offset_table,
 		               total_chunk_amount,
@@ -1669,11 +1613,11 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		/* Write sectors section start
 		 */
 		write_count = libewf_section_start_write(
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 		               (EWF_CHAR *) "sectors",
 		               7,
 		               section_size,
-		               internal_handle->segment_table->file_offset[ segment_number ] );
+		               internal_handle->segment_table->segment_file[ segment_number ].file_offset );
 
 		if( write_count == -1 )
 		{
@@ -1683,7 +1627,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 			return( -1 );
 		}
 	}
-	internal_handle->segment_table->file_offset[ segment_number ] += write_count;
+	internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
 
 	return( write_count );
 }
@@ -1725,16 +1669,9 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -1774,7 +1711,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_descriptor[ segment_number ] == -1 )
+	if( internal_handle->segment_table->segment_file[ segment_number ].file_descriptor == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid file descriptor.\n",
 		 function );
@@ -1804,9 +1741,9 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	if( libewf_offset_table_set_values(
 	     internal_handle->offset_table,
 	     amount_of_chunks,
-	     internal_handle->segment_table->file_descriptor[ segment_number ],
+	     internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 	     is_compressed,
-	     internal_handle->segment_table->file_offset[ segment_number ],
+	     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 	     chunk_size,
 	     segment_number,
 	     0 ) == -1 )
@@ -1828,7 +1765,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 		chunk_type = "COMPRESSED";
 	}
 	LIBEWF_VERBOSE_PRINT( "%s: writing %s chunk: %" PRIu32 " at offset: %jd with size: %zu, with CRC: %" PRIu32 ".\n",
-	 function, chunk_type, ( chunk + 1 ), internal_handle->segment_table->file_offset[ segment_number ],
+	 function, chunk_type, ( chunk + 1 ), internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 	 chunk_size, *chunk_crc );
 #endif
 
@@ -1836,7 +1773,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 	 */
 	write_count = ewf_string_write_from_buffer(
 	               chunk_data,
-	               internal_handle->segment_table->file_descriptor[ segment_number ],
+	               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 	               size );
 
 	if( write_count != (ssize_t) size )
@@ -1846,8 +1783,8 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-	total_write_count                                             += write_count;
+	internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+	total_write_count                                                          += write_count;
 
 	/* Write the CRC if necessary
 	 */
@@ -1861,7 +1798,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 			return( -1 );
 		}
 		write_count = libewf_common_write(
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 		               calculated_crc_buffer,
 		               EWF_CRC_SIZE );
 
@@ -1872,8 +1809,8 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 			return( -1 );
 		}
-		internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-		total_write_count                                             += write_count;
+		internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+		total_write_count                                                          += write_count;
 	}
 	return( total_write_count );
 }
@@ -1904,23 +1841,9 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing section lists.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -1946,7 +1869,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 	 function, chunks_section_offset );
 
 	if( libewf_common_lseek(
-	     internal_handle->segment_table->file_descriptor[ segment_number ],
+	     internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 	     chunks_section_offset,
 	     SEEK_SET ) == -1 )
 	{
@@ -1965,7 +1888,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 		               chunks_section_offset,
 		               0,
 		               internal_handle->offset_table,
@@ -1983,7 +1906,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 			return( -1 );
 		}
 		if( libewf_section_list_append(
-		     internal_handle->segment_table->section_list[ segment_number ],
+		     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 		     (EWF_CHAR *) "table",
 		     chunks_section_offset,
 		     ( chunks_section_offset + write_count ) ) == NULL )
@@ -2002,7 +1925,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		/* Rewrite sectors section start
 		 */
 		write_count = libewf_section_start_write(
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
 		               (EWF_CHAR *) "sectors",
 		               7,
 		               chunks_section_size,
@@ -2016,7 +1939,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 			return( -1 );
 		}
 		if( libewf_section_list_append(
-		     internal_handle->segment_table->section_list[ segment_number ],
+		     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 		     (EWF_CHAR *) "sectors",
 		     chunks_section_offset,
 		     ( chunks_section_offset + write_count ) ) == NULL )
@@ -2030,11 +1953,11 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 	/* Seek the end of the chunks section
 	*/
 	LIBEWF_VERBOSE_PRINT( "%s: setting file descriptor back to end of data at offset: %" PRIu32 ".\n",
-	 function, internal_handle->segment_table->file_offset[ segment_number ] );
+	 function, internal_handle->segment_table->segment_file[ segment_number ].file_offset );
 
 	if( libewf_common_lseek(
-	     internal_handle->segment_table->file_descriptor[ segment_number ],
-	     internal_handle->segment_table->file_offset[ segment_number ],
+	     internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+	     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 	     SEEK_SET ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to find offset to continue.\n",
@@ -2054,8 +1977,8 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
-		               internal_handle->segment_table->file_offset[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+		               internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 		               base_offset,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
@@ -2072,25 +1995,25 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 			return( -1 );
 		}
 		if( libewf_section_list_append(
-		     internal_handle->segment_table->section_list[ segment_number ],
+		     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 		     (EWF_CHAR *) "table",
-		     internal_handle->segment_table->file_offset[ segment_number ],
-		     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+		     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
+		     ( internal_handle->segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to append table section to section list.\n",
 			 function );
 
 			return( -1 );
 		}
-		internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-		total_write_count                                             += write_count;
+		internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+		total_write_count                                                          += write_count;
 
 		/* Write table2 section start
 		 */
 		write_count = libewf_section_table_write(
 		               internal_handle,
-		               internal_handle->segment_table->file_descriptor[ segment_number ],
-		               internal_handle->segment_table->file_offset[ segment_number ],
+		               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+		               internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 		               base_offset,
 		               internal_handle->offset_table,
 		               ( amount_of_chunks - section_amount_of_chunks ),
@@ -2107,18 +2030,18 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_INTERNAL_HANDLE *int
 			return( -1 );
 		}
 		if( libewf_section_list_append(
-		     internal_handle->segment_table->section_list[ segment_number ],
+		     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 		     (EWF_CHAR *) "table2",
-		     internal_handle->segment_table->file_offset[ segment_number ],
-		     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+		     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
+		     ( internal_handle->segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to append table2 section to section list.\n",
 			 function );
 
 			return( -1 );
 		}
-		internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-		total_write_count                                             += write_count;
+		internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+		total_write_count                                                          += write_count;
 	}
 	return( total_write_count );
 }
@@ -2138,16 +2061,9 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_tab
 
 		return( -1 );
 	}
-	if( segment_table->filename == NULL )
+	if( segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -2184,8 +2100,8 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_tab
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_section_delta_chunk_write(
-		       segment_table->file_descriptor[ segment_number ],
-		       segment_table->file_offset[ segment_number ],
+		       segment_table->segment_file[ segment_number ].file_descriptor,
+		       segment_table->segment_file[ segment_number ].file_offset,
 		       chunk, 
 		       chunk_data, 
 		       chunk_size, 
@@ -2200,17 +2116,17 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_TABLE *segment_tab
 		return( -1 );
 	}
 	if( libewf_section_list_append(
-	     segment_table->section_list[ segment_number ],
+	     segment_table->segment_file[ segment_number ].section_list,
 	     (EWF_CHAR *) "delta_chunk",
-	     segment_table->file_offset[ segment_number ],
-	     ( segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+	     segment_table->segment_file[ segment_number ].file_offset,
+	     ( segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to append delta_chunk section to section list.\n",
 		 function );
 
 		return( -1 );
 	}
-	segment_table->file_offset[ segment_number ] += write_count;
+	segment_table->segment_file[ segment_number ].file_offset += write_count;
 
 	return( write_count );
 }
@@ -2231,23 +2147,16 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->filename == NULL )
+	if( internal_handle->segment_table == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_offset == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->section_list == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing section lists.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -2276,8 +2185,8 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		{
 			write_count = libewf_section_data_write(
 			               internal_handle,
-			               internal_handle->segment_table->file_descriptor[ segment_number ],
-			               internal_handle->segment_table->file_offset[ segment_number ] );
+			               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+			               internal_handle->segment_table->segment_file[ segment_number ].file_offset );
 
 			if( write_count == -1 )
 			{
@@ -2287,18 +2196,18 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			if( libewf_section_list_append(
-			     internal_handle->segment_table->section_list[ segment_number ],
+			     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 			     (EWF_CHAR *) "data",
-			     internal_handle->segment_table->file_offset[ segment_number ],
-			     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+			     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
+			     ( internal_handle->segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to append data section to section list.\n",
 				 function );
 
 				return( -1 );
 			}
-			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-			total_write_count                                             += write_count;
+			internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+			total_write_count                                                          += write_count;
 		}
 		/* Write the error2 section if required 
 		 */
@@ -2313,8 +2222,8 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		{
 			write_count = libewf_section_error2_write(
 			               internal_handle,
-			               internal_handle->segment_table->file_descriptor[ segment_number ],
-			               internal_handle->segment_table->file_offset[ segment_number ],
+			               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+			               internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 			               internal_handle->acquiry_error_sectors,
 			               internal_handle->acquiry_amount_of_errors );
 
@@ -2326,18 +2235,18 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			if( libewf_section_list_append(
-			     internal_handle->segment_table->section_list[ segment_number ],
+			     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 			     (EWF_CHAR *) "error2",
-			     internal_handle->segment_table->file_offset[ segment_number ],
-			     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+			     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
+			     ( internal_handle->segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to append error2 section to section list.\n",
 				 function );
 
 				return( -1 );
 			}
-			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-			total_write_count                                             += write_count;
+			internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+			total_write_count                                                          += write_count;
 		}
 		/* Write the hash section if required
 		 */
@@ -2345,8 +2254,8 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 		{
 			write_count = libewf_section_hash_write(
 			               internal_handle,
-			               internal_handle->segment_table->file_descriptor[ segment_number ],
-			               internal_handle->segment_table->file_offset[ segment_number ],
+			               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+			               internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 			               internal_handle->md5_hash );
 
 			if( write_count == -1 )
@@ -2357,18 +2266,18 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			if( libewf_section_list_append(
-			     internal_handle->segment_table->section_list[ segment_number ],
+			     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 			     (EWF_CHAR *) "hash",
-			     internal_handle->segment_table->file_offset[ segment_number ],
-			     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+			     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
+			     ( internal_handle->segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to append hash section to section list.\n",
 				 function );
 
 				return( -1 );
 			}
-			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-			total_write_count                                             += write_count;
+			internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+			total_write_count                                                          += write_count;
 		}
 
 		/* Write the xhash section
@@ -2395,8 +2304,8 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 			}
 			write_count = libewf_section_xhash_write(
 			               internal_handle,
-			               internal_handle->segment_table->file_descriptor[ segment_number ],
-			               internal_handle->segment_table->file_offset[ segment_number ],
+			               internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+			               internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 			               internal_handle->xhash,
 			               internal_handle->xhash_size,
 			               EWF_COMPRESSION_DEFAULT );
@@ -2409,27 +2318,27 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 				return( -1 );
 			}
 			if( libewf_section_list_append(
-			     internal_handle->segment_table->section_list[ segment_number ],
+			     internal_handle->segment_table->segment_file[ segment_number ].section_list,
 			     (EWF_CHAR *) "xhash",
-			     internal_handle->segment_table->file_offset[ segment_number ],
-			     ( internal_handle->segment_table->file_offset[ segment_number ] + write_count ) ) == NULL )
+			     internal_handle->segment_table->segment_file[ segment_number ].file_offset,
+			     ( internal_handle->segment_table->segment_file[ segment_number ].file_offset + write_count ) ) == NULL )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to append xhash section to section list.\n",
 				 function );
 
 				return( -1 );
 			}
-			internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-			total_write_count                                             += write_count;
+			internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+			total_write_count                                                          += write_count;
 		}
 	}
 	/* Write the done or next section
 	 */
 	write_count = libewf_segment_file_write_last_section(
 	               internal_handle,
-		       internal_handle->segment_table->file_descriptor[ segment_number ],
-		       internal_handle->segment_table->section_list[ segment_number ],
-		       internal_handle->segment_table->file_offset[ segment_number ],
+		       internal_handle->segment_table->segment_file[ segment_number ].file_descriptor,
+		       internal_handle->segment_table->segment_file[ segment_number ].section_list,
+		       internal_handle->segment_table->segment_file[ segment_number ].file_offset,
 	               last_segment_file );
 
 	if( write_count == -1 )
@@ -2439,18 +2348,18 @@ ssize_t libewf_segment_file_write_close( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	internal_handle->segment_table->file_offset[ segment_number ] += write_count;
-	total_write_count                                             += write_count;
+	internal_handle->segment_table->segment_file[ segment_number ].file_offset += write_count;
+	total_write_count                                                          += write_count;
 
-	if( libewf_common_close( internal_handle->segment_table->file_descriptor[ segment_number ] ) != 0 )
+	if( libewf_common_close( internal_handle->segment_table->segment_file[ segment_number ].file_descriptor ) != 0 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to close segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle->segment_table->file_descriptor[ segment_number ]  = -1;
-	internal_handle->segment_table->amount_of_chunks[ segment_number ] = segment_amount_of_chunks;
+	internal_handle->segment_table->segment_file[ segment_number ].file_descriptor  = -1;
+	internal_handle->segment_table->segment_file[ segment_number ].amount_of_chunks = segment_amount_of_chunks;
 
 	return( total_write_count );
 }
@@ -2491,23 +2400,9 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->filename == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -2519,23 +2414,9 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->filename == NULL )
+	if( internal_handle->delta_segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file descriptors.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table->file_offset == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -2708,8 +2589,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 				return( -1 );
 			}
-			internal_handle->segment_table->file_descriptor[ segment_number ] = file_descriptor;
-			internal_handle->segment_table->file_offset[ segment_number ]     = (off64_t) EWF_FILE_HEADER_SIZE;
+			internal_handle->segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
+			internal_handle->segment_table->segment_file[ segment_number ].file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 			LIBEWF_VERBOSE_PRINT( "%s: added segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
@@ -2815,8 +2696,8 @@ int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, char
 
 				return( -1 );
 			}
-			internal_handle->delta_segment_table->file_descriptor[ segment_number ] = file_descriptor;
-			internal_handle->delta_segment_table->file_offset[ segment_number ]     = (off64_t) EWF_FILE_HEADER_SIZE;
+			internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor = file_descriptor;
+			internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset     = (off64_t) EWF_FILE_HEADER_SIZE;
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 			LIBEWF_VERBOSE_PRINT( "%s: added delta segment file: %ls with file descriptor: %d with segment number: %" PRIu16 ".\n",
@@ -2963,9 +2844,9 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->file_offset == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -2977,9 +2858,9 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->file_offset == NULL )
+	if( internal_handle->delta_segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file offsets.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -3039,7 +2920,7 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 	}
 	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
 	{
-		if( internal_handle->segment_table->file_offset[ segment_number ] != offset )
+		if( internal_handle->segment_table->segment_file[ segment_number ].file_offset != offset )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
 			 function, file_descriptor, segment_number, offset );
@@ -3051,12 +2932,12 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 				return( -1 );
 			}
-			internal_handle->segment_table->file_offset[ segment_number ] = offset;
+			internal_handle->segment_table->segment_file[ segment_number ].file_offset = offset;
 		}
 	}
 	else
 	{
-		if( internal_handle->delta_segment_table->file_offset[ segment_number ] != offset )
+		if( internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset != offset )
 		{
 			LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for delta segment: %" PRIu16 " for offset: %jd.\n",
 			 function, file_descriptor, segment_number, offset );
@@ -3068,7 +2949,7 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 				return( -1 );
 			}
-			internal_handle->delta_segment_table->file_offset[ segment_number ] = offset;
+			internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset = offset;
 		}
 	}
 	internal_handle->current_chunk = chunk;
@@ -3099,16 +2980,9 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->filename == NULL )
+	if( internal_handle->segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
@@ -3120,27 +2994,20 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->filename == NULL )
+	if( internal_handle->delta_segment_table->segment_file == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing filenames.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->delta_segment_table->file_descriptor == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing file descriptors.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing segment files.\n",
 		 function );
 
 		return( -1 );
 	}
 	for( iterator = 1; iterator < internal_handle->segment_table->amount; iterator++ )
 	{
-		if( internal_handle->segment_table->file_descriptor[ iterator ] > 0 )
+		if( internal_handle->segment_table->segment_file[ iterator ].file_descriptor > 0 )
 		{
-			if( libewf_common_close( internal_handle->segment_table->file_descriptor[ iterator ] ) != 0 )
+			if( libewf_common_close( internal_handle->segment_table->segment_file[ iterator ].file_descriptor ) != 0 )
 			{
-				if( internal_handle->segment_table->filename[ iterator ] == NULL )
+				if( internal_handle->segment_table->segment_file[ iterator ].filename == NULL )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 ".\n",
 					 function, iterator );
@@ -3149,10 +3016,10 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 				{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%ls).\n",
-					 function, iterator, internal_handle->segment_table->filename[ iterator ] );
+					 function, iterator, internal_handle->segment_table->segment_file[ iterator ].filename );
 #else
 					LIBEWF_WARNING_PRINT( "%s: unable to close segment file: %" PRIu16 " (%s).\n",
-					 function, iterator, internal_handle->segment_table->filename[ iterator ] );
+					 function, iterator, internal_handle->segment_table->segment_file[ iterator ].filename );
 #endif
 				}
 				result = 0;
@@ -3161,11 +3028,11 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 	}
 	for( iterator = 1; iterator < internal_handle->delta_segment_table->amount; iterator++ )
 	{
-		if( internal_handle->delta_segment_table->file_descriptor[ iterator ] > 0 )
+		if( internal_handle->delta_segment_table->segment_file[ iterator ].file_descriptor > 0 )
 		{
-			if( libewf_common_close( internal_handle->delta_segment_table->file_descriptor[ iterator ] ) != 0 )
+			if( libewf_common_close( internal_handle->delta_segment_table->segment_file[ iterator ].file_descriptor ) != 0 )
 			{
-				if( internal_handle->delta_segment_table->filename[ iterator ] == NULL )
+				if( internal_handle->delta_segment_table->segment_file[ iterator ].filename == NULL )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 ".\n",
 					 function, iterator );
@@ -3174,10 +3041,10 @@ int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle )
 				{
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 " (%ls).\n",
-					 function, iterator, internal_handle->delta_segment_table->filename[ iterator ] );
+					 function, iterator, internal_handle->delta_segment_table->segment_file[ iterator ].filename );
 #else
 					LIBEWF_WARNING_PRINT( "%s: unable to close delta segment file: %" PRIu16 " (%s).\n",
-					 function, iterator, internal_handle->delta_segment_table->filename[ iterator ] );
+					 function, iterator, internal_handle->delta_segment_table->segment_file[ iterator ].filename );
 #endif
 				}
 				result = 0;

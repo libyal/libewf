@@ -134,9 +134,11 @@ Next release:
 * API function get current chunk size?
 * do not finalize on write error?
 
-* change segment table to table of segment files
-  this reduced the amount of reallocs
-  and what about the offset/chunk table?
+* refactor segment table to table of segment files
+  this reduces the amount of reallocs
+  - fix allocation problem in segment table
+* refactor the offset/chunk table to a table of chunk offsets?
+  this reduces the amount of reallocs
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -155,6 +157,8 @@ CLOSED
 Version: 20071112
 * change default segment file size to 1500 MB (^10)
   about 1400 MB in (^2), 3x segment files should fit on a DVD
+* worked on refactoring segment table to table of segment files
+* removed segment number in table check from libewf_segment_file_read_sections()
 
 Version: 20071111
 * changed default wipe behavior for ewfacquire(stream)

@@ -1510,6 +1510,13 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
+	if( internal_handle->segment_table->segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment file.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( section_list == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid section list.\n",
@@ -1545,7 +1552,7 @@ ssize_t libewf_section_table_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int 
 
 		return( -1 );
 	}
-	internal_handle->segment_table->amount_of_chunks[ segment_number ] += amount_of_chunks;
+	internal_handle->segment_table->segment_file[ segment_number ].amount_of_chunks += amount_of_chunks;
 
 	return( (ssize_t) size );
 }
