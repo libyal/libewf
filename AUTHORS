@@ -3,7 +3,7 @@ Acknowledgements: libewf
 Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
 Hoffmann Investigations. All rights reserved.
 
-This code is derrived from information and software contributed by:
+This code is derived from information and software contributed by:
 - Expert Witness Compression Format specification by Andrew Rosen
   (http://www.arsdata.com/SMART/whitepaper.html)
 - libevf from PyFlag by Michael Cohen

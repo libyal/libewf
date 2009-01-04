@@ -47,6 +47,7 @@
 
 #include <libewf/extern.h>
 #include <libewf/handle.h>
+#include <libewf/types.h>
 
 #if defined( __cplusplus )
 extern "C" {

@@ -39,8 +39,6 @@
 
 #include <libewf/types.h>
 
-#include "ewf_char.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif

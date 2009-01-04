@@ -42,8 +42,6 @@
 #include "libewf_values_table.h"
 #include "libewf_string.h"
 
-#include "ewf_definitions.h"
-
 /* Allocates memory for a new values table struct
  * Returns a pointer to the new instance, NULL on error
  */
