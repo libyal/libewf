@@ -87,8 +87,10 @@ int libewf_convert_date_header_value(
      libewf_char_t **date_string,
      size_t *date_string_length );
 
-libewf_char_t *libewf_generate_date_header_value(
-                time_t timestamp );
+int libewf_generate_date_header_value(
+     time_t timestamp,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 int libewf_convert_date_header2_value(
      libewf_char_t *header_value,
@@ -97,8 +99,10 @@ int libewf_convert_date_header2_value(
      libewf_char_t **date_string,
      size_t *date_string_length );
 
-libewf_char_t *libewf_generate_date_header2_value(
-                time_t timestamp );
+int libewf_generate_date_header2_value(
+     time_t timestamp,
+     libewf_char_t **date_string,
+     size_t *date_string_length );
 
 int libewf_header_values_copy(
      libewf_values_table_t *destination_header_values,

@@ -76,7 +76,7 @@ int libewf_header_values_initialize(
 }
 
 /* Convert a timestamp into a date string
- * Sets date string and date string lenght
+ * Sets date string and date string length
  * Returns 1 if successful or -1 on error
  */
 int libewf_convert_timestamp(
@@ -395,15 +395,38 @@ int libewf_convert_date_header_value(
 }
 
 /* Generate date string within a header value
- * Returns a pointer to the new instance, NULL on error
+ * Sets date string and date string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_generate_date_header_value(
-                time_t timestamp )
+int libewf_generate_date_header_value(
+     time_t timestamp,
+     libewf_char_t **date_string,
+     size_t *date_string_length )
 {
-	libewf_char_t *date_string = NULL;
-	struct tm *time_elements   = NULL;
-	static char *function      = "libewf_generate_date_header_value";
+	struct tm *time_elements = NULL;
+	static char *function    = "libewf_generate_date_header_value";
 
+	if( date_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *date_string != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: date string already created.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( date_string_length == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid date string length.\n",
+		 function );
+
+		return( -1 );
+	}
 	time_elements = libewf_common_localtime(
 	                 &timestamp );
 
@@ -412,12 +435,14 @@ libewf_char_t *libewf_generate_date_header_value(
 		LIBEWF_WARNING_PRINT( "%s: unable to create time elements.\n",
 		 function );
 
-		return( NULL );
+		return( -1 );
 	}
-	date_string = (libewf_char_t *) libewf_common_alloc(
-	                                 sizeof( libewf_char_t ) * 20 );
+	*date_string_length = 20;
 
-	if( date_string == NULL )
+	*date_string = (libewf_char_t *) libewf_common_alloc(
+	                                  sizeof( libewf_char_t ) * *date_string_length );
+
+	if( *date_string == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
 		 function );
@@ -425,11 +450,13 @@ libewf_char_t *libewf_generate_date_header_value(
 		libewf_common_free(
 		 time_elements );
 
-		return( NULL );
+		*date_string_length = 0;
+
+		return( -1 );
 	}
 	if( libewf_string_snprintf(
-	     date_string,
-	     20,
+	     *date_string,
+	     *date_string_length,
 	     _S_LIBEWF_CHAR( "%4d %d %d %d %d %d" ),
 	     ( time_elements->tm_year + 1900 ),
 	     ( time_elements->tm_mon + 1 ),
@@ -442,20 +469,23 @@ libewf_char_t *libewf_generate_date_header_value(
 		 function );
 
 		libewf_common_free(
-		 date_string );
+		 *date_string );
 		libewf_common_free(
 		 time_elements );
 
-		return( NULL );
+		*date_string        = NULL;
+		*date_string_length = 0;
+
+		return( -1 );
 	}
-	/* Make sure the string is terminated correctly
+	/* Make sure the string is terminated
 	 */
-	date_string[ 19 ] = (libewf_char_t) '\0';
+	( *date_string )[ *date_string_length - 1 ] = (libewf_char_t) '\0';
 
 	libewf_common_free(
 	 time_elements );
 
-	return( date_string );
+	return( 1 );
 }
 
 /* Convert a header2 value into a date string
@@ -500,27 +530,54 @@ int libewf_convert_date_header2_value(
 }
 
 /* Generate date string within a header2 value
- * Returns a pointer to the new instance, NULL on error
+ * Sets date string and date string length
+ * Returns 1 if successful or -1 on error
  */
-libewf_char_t *libewf_generate_date_header2_value(
-                time_t timestamp )
+int libewf_generate_date_header2_value(
+     time_t timestamp,
+     libewf_char_t **date_string,
+     size_t *date_string_length )
 {
-	libewf_char_t *date_string = NULL;
-	static char *function      = "libewf_generate_date_header2_value";
-
-	date_string = (libewf_char_t *) libewf_common_alloc(
-	                                 sizeof( libewf_char_t ) * 11 );
+	static char *function = "libewf_generate_date_header2_value";
 
 	if( date_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid date string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( *date_string != NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: date string already created.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( date_string_length == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid date string length.\n",
+		 function );
+
+		return( -1 );
+	}
+	*date_string_length = 11;
+
+	*date_string = (libewf_char_t *) libewf_common_alloc(
+	                                  sizeof( libewf_char_t ) * *date_string_length );
+
+	if( *date_string == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to create date string.\n",
 		 function );
 
-		return( NULL );
+		*date_string_length = 0;
+
+		return( -1 );
 	}
 	if( libewf_string_snprintf(
-	     date_string,
-	     11,
+	     *date_string,
+	     *date_string_length,
 	     _S_LIBEWF_CHAR( "%" ) _S_LIBEWF_CHAR( PRIu32 ),
 	     (uint32_t) timestamp ) <= -1 )
 	{
@@ -528,15 +585,18 @@ libewf_char_t *libewf_generate_date_header2_value(
 		 function );
 
 		libewf_common_free(
-		 date_string );
+		 *date_string );
 
-		return( NULL );
+		*date_string        = NULL;
+		*date_string_length = 0;
+
+		return( -1 );
 	}
-	/* Make sure the string is terminated correctly
+	/* Make sure the string is terminated
 	 */
-	date_string[ 10 ] = (libewf_char_t) '\0';
+	( *date_string )[ *date_string_length - 1 ] = (libewf_char_t) '\0';
 
-	return( date_string );
+	return( 1 );
 }
 
 /* Copies the header values from the source to the destination
@@ -1362,6 +1422,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type1(
 	libewf_char_t *password_hash    = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *compression_type = _S_LIBEWF_CHAR( "" );
 	static char *function           = "libewf_header_values_generate_header_string_type1";
+	size_t system_date_length       = 0;
+	size_t acquiry_date_length      = 0;
 
 	if( header_values == NULL )
 	{
@@ -1434,9 +1496,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type1(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -1445,7 +1508,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type1(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -1455,9 +1521,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type1(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -1466,7 +1533,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type1(
 		}
 		else
 		{
-			 *string_length += libewf_string_length( system_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			 *string_length += libewf_string_length(
+			                    system_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_PASSWORD ] != NULL )
@@ -1569,7 +1639,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type1(
 	{
 		libewf_common_free( system_date );
 	}
-	/* Make sure the header string is terminated
+	/* Make sure the string is terminated
 	 */
 	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
@@ -1601,6 +1671,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type2(
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *compression_type         = _S_LIBEWF_CHAR( "" );
 	static char *function                   = "libewf_header_values_generate_header_string_type2";
+	size_t system_date_length               = 0;
+	size_t acquiry_date_length              = 0;
 
 	if( header_values == NULL )
 	{
@@ -1673,9 +1745,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type2(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -1684,7 +1757,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type2(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -1694,9 +1770,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type2(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -1705,7 +1782,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type2(
 		}
 		else
 		{
-			*string_length += libewf_string_length( system_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   system_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
@@ -1820,7 +1900,7 @@ libewf_char_t *libewf_header_values_generate_header_string_type2(
 	{
 		libewf_common_free( system_date );
 	}
-	/* Make sure the header string is terminated
+	/* Make sure the string is terminated
 	 */
 	header_string[ *string_length - 1 ] = (libewf_char_t) '\0';
 
@@ -1850,6 +1930,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type3(
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
 	static char *function                   = "libewf_header_values_generate_header_string_type3";
+	size_t system_date_length               = 0;
+	size_t acquiry_date_length              = 0;
 
 	if( header_values == NULL )
 	{
@@ -1913,9 +1995,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type3(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -1924,7 +2007,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type3(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -1934,9 +2020,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type3(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -1945,7 +2032,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type3(
 		}
 		else
 		{
-			*string_length += libewf_string_length( system_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   system_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
@@ -2069,6 +2159,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type4(
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
 	static char *function                   = "libewf_header_values_generate_header_string_type4";
+	size_t system_date_length               = 0;
+	size_t acquiry_date_length              = 0;
 
 	if( header_values == NULL )
 	{
@@ -2132,9 +2224,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type4(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header2_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2143,7 +2236,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type4(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -2153,9 +2249,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type4(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header2_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2164,6 +2261,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type4(
 		}
 		else
 		{
+			/* Make sure to determine the actual length of the date string
+			 */
 			*string_length += libewf_string_length( system_date );
 		}
 	}
@@ -2286,6 +2385,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type5(
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *unknown_dc               = _S_LIBEWF_CHAR( "" );
 	static char *function                   = "libewf_header_values_generate_header_string_type5";
+	size_t system_date_length               = 0;
+	size_t acquiry_date_length              = 0;
 
 	if( header_values == NULL )
 	{
@@ -2351,9 +2452,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type5(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header2_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2362,7 +2464,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type5(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -2372,9 +2477,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type5(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header2_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2383,7 +2489,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type5(
 		}
 		else
 		{
-			*string_length += libewf_string_length( system_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   system_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
@@ -2510,6 +2619,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type6(
 	libewf_char_t *serial_number            = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *unknown_dc               = _S_LIBEWF_CHAR( "" );
 	static char *function                   = "libewf_header_values_generate_header_string_type6";
+	size_t system_date_length               = 0;
+	size_t acquiry_date_length              = 0;
 
 	if( header_values == NULL )
 	{
@@ -2575,9 +2686,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type6(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header2_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2586,7 +2698,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type6(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -2596,9 +2711,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type6(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header2_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2607,7 +2723,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type6(
 		}
 		else
 		{
-			*string_length += libewf_string_length( system_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   system_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
@@ -2716,7 +2835,6 @@ libewf_char_t *libewf_header_values_generate_header_string_type6(
 	return( header_string );
 }
 
-
 /* Generate a header format type 7 (EnCase5 linen header)
  * Sets string length
  * Returns a pointer to the new instance, NULL on error
@@ -2742,6 +2860,8 @@ libewf_char_t *libewf_header_values_generate_header_string_type7(
 	libewf_char_t *acquiry_software_version = _S_LIBEWF_CHAR( "" );
 	libewf_char_t *password_hash            = _S_LIBEWF_CHAR( "" );
 	static char *function                   = "libewf_header_values_generate_header_string_type7";
+	size_t system_date_length               = 0;
+	size_t acquiry_date_length              = 0;
 
 	if( header_values == NULL )
 	{
@@ -2807,9 +2927,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type7(
 	}
 	else
 	{
-		acquiry_date = libewf_generate_date_header2_value( timestamp );
-
-		if( acquiry_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &acquiry_date,
+		     &acquiry_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate acquiry date header value.\n",
 			 function );
@@ -2818,7 +2939,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type7(
 		}
 		else
 		{
-			*string_length += libewf_string_length( acquiry_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   acquiry_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_SYSTEM_DATE ] != NULL )
@@ -2828,9 +2952,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type7(
 	}
 	else
 	{
-		system_date = libewf_generate_date_header2_value( timestamp );
-
-		if( system_date == NULL )
+		if( libewf_generate_date_header2_value(
+		     timestamp,
+		     &system_date,
+		     &system_date_length ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to generate system date header value.\n",
 			 function );
@@ -2839,7 +2964,10 @@ libewf_char_t *libewf_header_values_generate_header_string_type7(
 		}
 		else
 		{
-			*string_length += libewf_string_length( system_date );
+			/* Make sure to determine the actual length of the date string
+			 */
+			*string_length += libewf_string_length(
+			                   system_date );
 		}
 	}
 	if( header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_OPERATING_SYSTEM ] != NULL )
@@ -3840,7 +3968,7 @@ int libewf_header_values_parse_header_string_xml(
 		 */
 		string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
 
-		/* Make sure the identifier string will be terminated
+		/* Make sure the string is terminated
 		 */
 		*open_tag_end = (libewf_char_t) '\0';
 
@@ -3865,7 +3993,7 @@ int libewf_header_values_parse_header_string_xml(
 			}
 			else
 			{
-				/* Make sure to determine the actual lenght of the date string
+				/* Make sure to determine the actual length of the date string
 				 */
 				if( libewf_values_table_set_value(
 				     *header_values,
