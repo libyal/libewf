@@ -417,72 +417,6 @@ int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTE
 	}
 }
 
-/* Add a acquiry read error sector to the list
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors )
-{
-	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
-	static char *function                      = "libewf_internal_handle_add_acquiry_error_sector";
-	uint32_t iterator                          = 0;
-
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sector <= -1 )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->acquiry_error_sectors == NULL )
-	{
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
-	}
-	else
-	{
-		/* Check if acquiry read error sector is already in list
-		 */
-		for( iterator = 0; iterator < internal_handle->acquiry_amount_of_errors; iterator++ )
-		{
-			if( internal_handle->acquiry_error_sectors[ iterator ].sector == sector )
-			{
-				return( 1 );
-			}
-		}
-		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
-		                         internal_handle->acquiry_error_sectors,
-		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->acquiry_amount_of_errors + 1 ) ) );
-	}
-	if( acquiry_error_sectors == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry read error sectors.\n",
-		 function );
-
-		return( -1 );
-	}
-	internal_handle->acquiry_error_sectors = acquiry_error_sectors;
-
-	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].sector            = sector;
-	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].amount_of_sectors = amount_of_sectors;
-
-	internal_handle->acquiry_amount_of_errors++;
-
-	return( 1 );
-}
-
 /* Add a CRC error sector to the list
  * Returns 1 if successful, -1 on error
  */
@@ -555,7 +489,7 @@ int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal
 /* Determines the EWF file format based on known characteristics
  * Returns 1 if the format was determined, -1 on errror
  */
-int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
 	static char *function = "libewf_internal_handle_determine_format";
 
@@ -721,7 +655,7 @@ int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal
 /* Create the default header values
  * Returns 1 on success, -1 on error
  */
-int8_t libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
 	LIBEWF_CHAR *case_number              = _S_LIBEWF_CHAR( "Case Number" );
 	LIBEWF_CHAR *description              = _S_LIBEWF_CHAR( "Description" );
@@ -841,7 +775,7 @@ int8_t libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *inte
 /* Create the header strings from the header values
  * Returns 1 on success, -1 on error
  */
-int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values )
+int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values )
 {
 	static char *function = "libewf_internal_handle_create_headers";
 	time_t timestamp      = time( NULL );
@@ -1089,7 +1023,7 @@ int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_h
 /* Initializes the read values
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
 	static char *function = "libewf_internal_handle_read_initialize";
 
@@ -1113,7 +1047,7 @@ int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_
 /* Initializes the write values
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
+int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle )
 {
 	static char *function               = "libewf_internal_handle_write_initialize";
 	int64_t required_amount_of_segments = 0;
@@ -1429,50 +1363,5 @@ int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal
 	internal_handle->write->values_initialized = 1;
 
 	return( 1 );
-}
-
-/* Copies the header values from the source to the destination handle
- * Returns 1 if successful, -1 on error
- */
-int libewf_internal_handle_copy_header_values( LIBEWF_INTERNAL_HANDLE *destination_handle, LIBEWF_INTERNAL_HANDLE *source_handle )
-{
-	static char *function = "libewf_internal_handle_copy_header_values";
-
-	if( destination_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid destination handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( source_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( source_handle->header_values == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid source handle - missing header values.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( destination_handle->header_values == NULL )
-	{
-		destination_handle->header_values = libewf_header_values_alloc();
-
-		if( destination_handle->header_values == NULL )
-		{
-			LIBEWF_WARNING_PRINT( "%s: unable to create header values in destination handle.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( libewf_header_values_copy(
-	         destination_handle->header_values,
-	         source_handle->header_values ) );
 }
 

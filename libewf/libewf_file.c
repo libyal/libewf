@@ -1774,10 +1774,68 @@ int libewf_parse_hash_values( LIBEWF_HANDLE *handle )
  */
 int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
 {
-	return( libewf_internal_handle_add_acquiry_error_sector(
-	         (LIBEWF_INTERNAL_HANDLE *) handle,
-	         sector,
-	         amount_of_sectors ) );
+	LIBEWF_INTERNAL_HANDLE *internal_handle    = NULL;
+	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
+	static char *function                      = "libewf_add_acquiry_error";
+	uint32_t iterator                          = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
+
+	if( internal_handle->media == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing sub handle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( sector <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->acquiry_error_sectors == NULL )
+	{
+		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_alloc( LIBEWF_ERROR_SECTOR_SIZE );
+	}
+	else
+	{
+		/* Check if acquiry read error sector is already in list
+		 */
+		for( iterator = 0; iterator < internal_handle->acquiry_amount_of_errors; iterator++ )
+		{
+			if( internal_handle->acquiry_error_sectors[ iterator ].sector == sector )
+			{
+				return( 1 );
+			}
+		}
+		acquiry_error_sectors = (LIBEWF_ERROR_SECTOR *) libewf_common_realloc(
+		                         internal_handle->acquiry_error_sectors,
+		                         ( LIBEWF_ERROR_SECTOR_SIZE * ( internal_handle->acquiry_amount_of_errors + 1 ) ) );
+	}
+	if( acquiry_error_sectors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry read error sectors.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle->acquiry_error_sectors = acquiry_error_sectors;
+
+	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].sector            = sector;
+	internal_handle->acquiry_error_sectors[ internal_handle->acquiry_amount_of_errors ].amount_of_sectors = amount_of_sectors;
+
+	internal_handle->acquiry_amount_of_errors++;
+
+	return( 1 );
 }
 
 /* Copies the header values from the source to the destination handle
@@ -1785,9 +1843,49 @@ int libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t am
  */
 int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE *source_handle )
 {
-	return( libewf_internal_handle_copy_header_values(
-	         (LIBEWF_INTERNAL_HANDLE *) destination_handle,
-	         (LIBEWF_INTERNAL_HANDLE *) source_handle ) );
+	LIBEWF_INTERNAL_HANDLE *internal_destination_handle = NULL;
+	LIBEWF_INTERNAL_HANDLE *internal_source_handle      = NULL;
+	static char *function                               = "libewf_copy_header_values";
+
+	if( destination_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid destination handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( source_handle == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source handle.\n",
+		 function );
+
+		return( -1 );
+	}
+	internal_destination_handle = (LIBEWF_INTERNAL_HANDLE *) destination_handle;
+	internal_source_handle      = (LIBEWF_INTERNAL_HANDLE *) source_handle;
+
+	if( internal_source_handle->header_values == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid source handle - missing header values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_destination_handle->header_values == NULL )
+	{
+		internal_destination_handle->header_values = libewf_header_values_alloc();
+
+		if( internal_destination_handle->header_values == NULL )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to create header values in destination handle.\n",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( libewf_header_values_copy(
+	         internal_destination_handle->header_values,
+	         internal_source_handle->header_values ) );
 }
 
 /* Set the notify values

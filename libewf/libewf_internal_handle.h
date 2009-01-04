@@ -347,7 +347,8 @@ LIBEWF_INTERNAL_HANDLE *libewf_internal_handle_alloc( uint8_t flags );
 void libewf_internal_handle_free( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 LIBEWF_INTERNAL_HANDLE_MEDIA *libewf_internal_handle_media_alloc( void );
-#define libewf_internal_handle_media_free( handle_media )	free( handle_media )
+#define libewf_internal_handle_media_free( handle_media ) \
+	free( handle_media )
 
 LIBEWF_INTERNAL_HANDLE_READ *libewf_internal_handle_read_alloc( void );
 void libewf_internal_handle_read_free( LIBEWF_INTERNAL_HANDLE_READ *handle_read );
@@ -357,18 +358,15 @@ void libewf_internal_handle_write_free( LIBEWF_INTERNAL_HANDLE_WRITE *handle_wri
 
 int16_t libewf_internal_handle_get_write_maximum_amount_of_segments( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors );
 int libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );
 
-int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-int8_t libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int8_t libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values );
+int libewf_internal_handle_create_header_values( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int libewf_internal_handle_create_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_HEADER_VALUES *header_values );
 
-int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
-int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
-
-int libewf_internal_handle_copy_header_values( LIBEWF_INTERNAL_HANDLE *destination_handle, LIBEWF_INTERNAL_HANDLE *source_handle );
+int libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
+int libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
 #if defined( __cplusplus )
 }
