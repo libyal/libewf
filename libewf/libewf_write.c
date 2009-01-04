@@ -1558,7 +1558,8 @@ ssize_t libewf_raw_write_chunk_existing(
 				{
 					result = 1;
 				}
-				if( libewf_section_list_remove_last( segment_file_handle->section_list ) != 1 )
+				if( libewf_section_list_remove_last(
+				     segment_file_handle->section_list ) != 1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to remove last section from list.\n",
 					 function );
@@ -1687,7 +1688,6 @@ ssize_t libewf_raw_write_chunk_existing(
 ssize_t libewf_write_chunk_data_new(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
-         uint32_t chunk_offset,
          void *buffer,
          size_t size,
          size_t data_size,
@@ -1914,8 +1914,7 @@ ssize_t libewf_write_chunk_data_existing(
          uint32_t chunk_offset,
          void *buffer,
          size_t size,
-         size_t data_size,
-         int8_t force_write )
+         size_t data_size )
 {
 	ewf_char_t *chunk_data = NULL;
 	static char *function  = "libewf_write_chunk_data_existing";
@@ -1981,34 +1980,29 @@ ssize_t libewf_write_chunk_data_existing(
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %zu with data of size: %zd.\n",
-	 function, size, data_size );
-
-	/* Determine the size of data to write
-	 */
-	if( data_size < (size_t) internal_handle->media_values->chunk_size )
+	if( data_size > (size_t) SSIZE_MAX )
 	{
-		write_size = (size_t) data_size;
-	}
-	else
-	{
-		write_size = internal_handle->media_values->chunk_size;
-	}
-	if( write_size > (size_t) SSIZE_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid read size value exceeds maximum.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid data size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
 	}
-	/* TODO what about chunk data in chunk cache? */
+	LIBEWF_VERBOSE_PRINT( "%s: writing buffer of size: %zu with data of size: %zd.\n",
+	 function, size, data_size );
 
+	/* Check if the data size exceeds the chunk size
+	 */
+	if( data_size > (size_t) internal_handle->media_values->chunk_size )
+	{
+		data_size = (size_t) internal_handle->media_values->chunk_size;
+	}
 	/* Check if the data in the buffer aligns with a chunk
 	 */
 	if( ( chunk_offset == 0 )
-	 && ( write_size == internal_handle->media_values->chunk_size ) )
+	 && ( data_size == internal_handle->media_values->chunk_size ) )
 	{
 		chunk_data = buffer;
+		write_size = (size_t) internal_handle->media_values->chunk_size;
 	}
 	else
 	{
@@ -2028,10 +2022,7 @@ ssize_t libewf_write_chunk_data_existing(
 
 			return( -1 );
 		}
-		if( ( write_size + chunk_offset ) > internal_handle->media_values->chunk_size )
-		{
-			write_size -= chunk_offset;
-		}
+		write_size = internal_handle->media_values->chunk_size - chunk_offset;
 
 		/* Update the chunk data
 		 */
@@ -2050,7 +2041,10 @@ ssize_t libewf_write_chunk_data_existing(
 	}
 	/* Calculate the new CRC
          */
-        chunk_crc = ewf_crc_calculate( chunk_data, write_size, 1 );
+        chunk_crc = ewf_crc_calculate(
+	             chunk_data,
+	             write_size,
+	             1 );
 
 	write_count = libewf_raw_write_chunk_existing(
 	               internal_handle,
@@ -2071,7 +2065,7 @@ ssize_t libewf_write_chunk_data_existing(
 	}
 	/* Report the amount of data written
 	 */
-	return( (ssize_t) write_size );
+	return( (ssize_t) data_size );
 }
 
 /* Prepares a buffer with chunk data before writing according to the handle settings
@@ -2404,21 +2398,18 @@ ssize_t libewf_write_buffer(
 			               internal_handle->current_chunk_offset,
 			               (void *) &( (uint8_t *) buffer )[ total_write_count ],
 			               size,
-			               size,
-			               0 );
+			               size );
 		}
 		else
 		{
 			write_count = libewf_write_chunk_data_new(
 			               internal_handle,
 			               internal_handle->current_chunk,
-			               internal_handle->current_chunk_offset,
 			               (void *) &( (uint8_t *) buffer )[ total_write_count ],
 			               size,
 			               size,
 			               0 );
 		}
-
 		if( write_count <= -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to write data from buffer.\n",
@@ -2442,8 +2433,8 @@ ssize_t libewf_write_buffer(
 		}
 		else if( internal_handle->current_chunk_offset > internal_handle->media_values->chunk_size )
 		{
-			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset.\n",
-			 function );
+			LIBEWF_WARNING_PRINT( "%s: invalid current chunk offset: %" PRIu32 " larger than chunk size: %" PRIu32 ".\n",
+			 function, internal_handle->current_chunk_offset, internal_handle->media_values->chunk_size );
 
 			return( -1 );
 		}
@@ -2580,7 +2571,6 @@ ssize_t libewf_write_finalize(
 		write_count = libewf_write_chunk_data_new(
 		               internal_handle,
 		               internal_handle->current_chunk,
-		               internal_handle->current_chunk_offset,
 		               internal_handle->chunk_cache->data,
 		               internal_handle->chunk_cache->amount,
 		               internal_handle->chunk_cache->amount,

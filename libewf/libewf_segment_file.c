@@ -1262,7 +1262,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               write_crc,
 	               0 );
 
-	/* refactor */
+	/* refactor
+	 * update the offset table?
+	 */
 
 	if( write_count == -1 )
 	{

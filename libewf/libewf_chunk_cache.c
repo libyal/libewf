@@ -39,7 +39,8 @@
 /* Allocates memory for the chunk cache cache
  * Returns a pointer to the new instance, NULL on error
  */
-libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size )
+libewf_chunk_cache_t *libewf_chunk_cache_alloc(
+                       size_t size )
 {
 	libewf_chunk_cache_t *chunk_cache = NULL;
 	static char *function             = "libewf_chunk_cache_alloc";
@@ -63,7 +64,8 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	chunk_cache->compressed = (ewf_char_t *) libewf_common_alloc( size );
+	chunk_cache->compressed = (ewf_char_t *) libewf_common_alloc(
+	                                          size );
 
 	if( chunk_cache->compressed == NULL )
 	{
@@ -74,7 +76,8 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size )
 
 		return( NULL );
 	}
-	chunk_cache->data = (ewf_char_t *) libewf_common_alloc( size );
+	chunk_cache->data = (ewf_char_t *) libewf_common_alloc(
+	                                    size );
 
 	if( chunk_cache->data == NULL )
 	{
@@ -98,7 +101,9 @@ libewf_chunk_cache_t *libewf_chunk_cache_alloc( size_t size )
 /* Reallocates and wipes memory for the chunk cache cache
  * Returns 1 if successful, or -1 on error
  */
-int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size )
+int libewf_chunk_cache_realloc(
+     libewf_chunk_cache_t *chunk_cache,
+     size_t size )
 {
 	ewf_char_t *reallocation = NULL;
 	static char *function    = "libewf_chunk_cache_realloc";
@@ -126,7 +131,9 @@ int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size )
 
 		return( -1 );
 	}
-	reallocation = (ewf_char_t *) libewf_common_realloc( (void *) chunk_cache->compressed, size );
+	reallocation = (ewf_char_t *) libewf_common_realloc(
+	                               (void *) chunk_cache->compressed,
+	                                size );
 
 	if( reallocation == NULL )
 	{
@@ -136,7 +143,9 @@ int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size )
 		return( -1 );
 	}
 	chunk_cache->compressed = reallocation;
-	reallocation            = (ewf_char_t *) libewf_common_realloc( (void *) chunk_cache->data, size );
+	reallocation            = (ewf_char_t *) libewf_common_realloc(
+	                                          (void *) chunk_cache->data,
+	                                          size );
 
 	if( reallocation == NULL )
 	{
@@ -157,7 +166,8 @@ int libewf_chunk_cache_realloc( libewf_chunk_cache_t *chunk_cache, size_t size )
 
 /* Frees memory of a chunk cache struct including elements
  */
-void libewf_chunk_cache_free( libewf_chunk_cache_t *chunk_cache )
+void libewf_chunk_cache_free(
+      libewf_chunk_cache_t *chunk_cache )
 {
 	static char *function = "libewf_chunk_cache_free";
 
@@ -168,8 +178,11 @@ void libewf_chunk_cache_free( libewf_chunk_cache_t *chunk_cache )
 
 		return;
 	}
-	libewf_common_free( chunk_cache->compressed );
-	libewf_common_free( chunk_cache->data );
-	libewf_common_free( chunk_cache );
+	libewf_common_free(
+	 chunk_cache->compressed );
+	libewf_common_free(
+	 chunk_cache->data );
+	libewf_common_free(
+	 chunk_cache );
 }
 

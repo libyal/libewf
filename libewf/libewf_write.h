@@ -137,7 +137,6 @@ ssize_t libewf_raw_write_chunk_existing(
 ssize_t libewf_write_chunk_data_new(
          libewf_internal_handle_t *internal_handle,
          uint32_t chunk,
-         uint32_t chunk_offset,
          void *buffer,
          size_t size,
          size_t chunk_data_size,
@@ -149,8 +148,7 @@ ssize_t libewf_write_chunk_data_existing(
          uint32_t chunk_offset,
          void *buffer,
          size_t size,
-         size_t chunk_data_size,
-         int8_t force_write );
+         size_t chunk_data_size );
 
 LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
                        LIBEWF_HANDLE *handle,

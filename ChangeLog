@@ -106,7 +106,6 @@ Code clean up
 * what about setting errno for API set and get function i.e. for size too small
 * have ewftools only use API ?
   - most of the internal library code has been removed
-* check unused parameters gcc -Wextra
 * seperate common code from libary and tools
 * change ewf_char/string into byte_char/string
 
@@ -135,8 +134,6 @@ Next stable:
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
 
-* work on TODO in write
-
 * merge alloc and realloc blocks
 
 * test abort
@@ -149,7 +146,7 @@ Next stable:
   function
   - functions basically use libewf_section_compressed_string_read
 
-* check TODOs
+* Check refactor
 
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
@@ -174,6 +171,10 @@ Version: 20080228
 * Refactored libewf_header_values_parse_header and libewf_header_values_parse_header2
 * Removed dirty value from offset table entry, reduces memory usage
 * worked on export to EWF
+* worked on handling not empty chunk cache in write existing data
+  data in chunck cache is ignored for now, write existing is not called
+  without a read handle
+* fixed logical error in write existing data
 
 Version: 20080227
 * refactored ewfdigest_hash

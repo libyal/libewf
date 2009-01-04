@@ -215,7 +215,9 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
-	if( libewf_get_media_size( handle, &media_size ) != 1 )
+	if( libewf_get_media_size(
+	     handle,
+	     &media_size ) != 1 )
 	{
 		fprintf( stderr, "Unable to determine media size.\n" );
 
@@ -252,21 +254,27 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to allocate buffer.\n" );
 
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_common_memset( buffer, 'X', (size_t) alter_size ) == NULL )
+	if( libewf_common_memset(
+	     buffer,
+	     'X',
+	     (size_t) alter_size ) == NULL )
 	{
 		fprintf( stderr, "Unable to set buffer.\n" );
 
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
-		libewf_common_free( buffer );
+		libewf_common_free(
+		 buffer );
 
 		return( EXIT_FAILURE );
 	}
@@ -279,11 +287,13 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to set delta segment filename in handle.\n" );
 
-			if( libewf_close( handle ) != 0 )
+			if( libewf_close(
+			     handle ) != 0 )
 			{
 				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
-			libewf_common_free( buffer );
+			libewf_common_free(
+			 buffer );
 
 			return( EXIT_FAILURE );
 		}
@@ -292,37 +302,50 @@ int main( int argc, char * const argv[] )
 
 	/* First alteration run
 	 */
-	count = libewf_write_random( handle, buffer, (size_t) alter_size, alter_offset );
+	count = libewf_write_random(
+	         handle,
+	         buffer,
+	         (size_t) alter_size,
+	         alter_offset );
 
 	if( count <= -1 )
 	{
 		fprintf( stdout, "Alteration failed.\n" );
 
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
-		libewf_common_free( buffer );
+		libewf_common_free(
+		 buffer );
 
 		return( EXIT_FAILURE );
 	}
 	/* Second alteration run
 	 */
-	count = libewf_write_random( handle, buffer, (size_t) alter_size, alter_offset );
+	count = libewf_write_random(
+	         handle,
+	         buffer,
+	         (size_t) alter_size,
+	         alter_offset );
 
-	libewf_common_free( buffer );
+	libewf_common_free(
+	 buffer );
 
 	if( count <= -1 )
 	{
 		fprintf( stdout, "Alteration failed.\n" );
 
-		if( libewf_close( handle ) != 0 )
+		if( libewf_close(
+		     handle ) != 0 )
 		{
 			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_close( handle ) != 0 )
+	if( libewf_close(
+	     handle ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
