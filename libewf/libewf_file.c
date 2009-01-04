@@ -204,7 +204,9 @@ LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_a
 		}
 		/* Determine the EWF file format
 		 */
-		if( libewf_internal_handle_determine_format( internal_handle ) != 1 )
+		if( libewf_internal_handle_determine_format(
+		     internal_handle,
+		     internal_handle->header_sections ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to determine file format.\n",
 			 function );
@@ -2004,27 +2006,34 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 	}
 	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
 
-	if( internal_handle->xheader != NULL )
+	if( internal_handle->header_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing header sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->header_sections->xheader != NULL )
 	{
 		header_values = libewf_header_values_parse_xheader(
-		                 internal_handle->xheader,
-		                 internal_handle->xheader_size,
+		                 internal_handle->header_sections->xheader,
+		                 internal_handle->header_sections->xheader_size,
 		                 date_format );
 	}
 	if( ( header_values == NULL )
-	 && internal_handle->header2 != NULL )
+	 && internal_handle->header_sections->header2 != NULL )
 	{
 		header_values = libewf_header_values_parse_header2(
-		                 internal_handle->header2,
-		                 internal_handle->header2_size,
+		                 internal_handle->header_sections->header2,
+		                 internal_handle->header_sections->header2_size,
 		                 date_format );
 	}
 	if( ( header_values == NULL )
-	 && ( internal_handle->header != NULL ) )
+	 && ( internal_handle->header_sections->header != NULL ) )
 	{
 		header_values = libewf_header_values_parse_header(
-		                 internal_handle->header,
-		                 internal_handle->header_size,
+		                 internal_handle->header_sections->header,
+		                 internal_handle->header_sections->header_size,
 		                 date_format );
 	}
 	if( header_values == NULL )
@@ -2042,6 +2051,8 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 		libewf_values_table_free( internal_handle->header_values );
 	}
 	internal_handle->header_values = header_values;
+
+	/* refactor code below to other loction */
 
 	/* The EnCase2 and EnCase3 format are the same
 	 * only the acquiry software version provides insight in which version of EnCase was used

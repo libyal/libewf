@@ -135,6 +135,9 @@ Next release:
 * Try to correct the table
   - add error flag
 
+* libewf_parse_header_values refactor to check if header values are already
+  set and pass header values reference as parameter
+
 CLOSED
 * use LIBEWF_CHAR internally instead of seperate wide functions?
   only for none wide support functions
@@ -148,6 +151,9 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071130
+* worked on refactoring code
 
 Version: 20071129
 * worked on refactoring code

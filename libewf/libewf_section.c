@@ -4134,6 +4134,13 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 
 		return( -1 );
 	}
+	if( internal_handle->header_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing header sections.\n",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -4261,10 +4268,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_header2_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header2 ),
-		              &( internal_handle->header2_size ) );
+		              &( internal_handle->header_sections->header2 ),
+		              &( internal_handle->header_sections->header2_size ) );
 
-		internal_handle->amount_of_header_sections++;
+		internal_handle->header_sections->amount_of_header_sections++;
 	}
 	/* Read the header section
 	 * The \0 byte is included in the compare
@@ -4274,10 +4281,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_header_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->header ),
-		              &( internal_handle->header_size ) );
+		              &( internal_handle->header_sections->header ),
+		              &( internal_handle->header_sections->header_size ) );
 
-		internal_handle->amount_of_header_sections++;
+		internal_handle->header_sections->amount_of_header_sections++;
 	}
 	/* Read the xheader section
 	 * The \0 byte is included in the compare
@@ -4287,10 +4294,10 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		read_count = libewf_section_xheader_read(
 		              segment_file,
 		              (size_t) size,
-		              &( internal_handle->xheader ),
-		              &( internal_handle->xheader_size ) );
+		              &( internal_handle->header_sections->xheader ),
+		              &( internal_handle->header_sections->xheader_size ) );
 
-		internal_handle->amount_of_header_sections++;
+		internal_handle->header_sections->amount_of_header_sections++;
 	}
 	/* Read the volume or disk section
 	 * The \0 byte is included in the compare
@@ -4312,7 +4319,7 @@ int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT
 		 * output of unexpected additional data in table section
 		 */
 		if( ( internal_handle->ewf_format == EWF_FORMAT_E01 )
-		 && ( internal_handle->amount_of_header_sections == 1 ) )
+		 && ( internal_handle->header_sections->amount_of_header_sections == 1 ) )
 		{
 			internal_handle->format = LIBEWF_FORMAT_ENCASE1;
 		}

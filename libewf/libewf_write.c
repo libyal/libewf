@@ -968,11 +968,11 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		 * like the file header, the header, volume and/or data section, etc.
 		 */
 		write_count = libewf_segment_file_write_start(
-		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
 		               segment_number,
 		               LIBEWF_SEGMENT_FILE_TYPE_EWF,
 		               internal_handle->media_values,
+		               internal_handle->header_sections,
 		               internal_handle->compression_level,
 		               internal_handle->format,
 		               internal_handle->ewf_format,
@@ -1051,6 +1051,7 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
 		write_count = libewf_segment_file_write_chunks_section_start(
 		               internal_handle,
 		               internal_handle->segment_table->segment_file[ segment_number ],
+		               internal_handle->offset_table,
 		               internal_handle->media_values->chunk_size,
 		               internal_handle->write->amount_of_chunks,
 		               internal_handle->write->chunks_per_chunks_section );
@@ -1410,11 +1411,11 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 * like the file header, the header, volume and/or data section, etc.
 			 */
 			write_count = libewf_segment_file_write_start(
-				       internal_handle,
 				       segment_file,
 				       segment_number,
 				       LIBEWF_SEGMENT_FILE_TYPE_DWF,
 				       internal_handle->media_values,
+				       internal_handle->header_sections,
 				       internal_handle->compression_level,
 				       internal_handle->format,
 				       internal_handle->ewf_format,

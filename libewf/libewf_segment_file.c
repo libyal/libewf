@@ -816,19 +816,14 @@ int libewf_segment_file_read_sections( LIBEWF_INTERNAL_HANDLE *internal_handle, 
 /* Write the headers to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file,EWF_CHAR *header, size_t header_size, EWF_CHAR *header2, size_t header2_size, EWF_CHAR *xheader, size_t xheader_size, int8_t compression_level, uint8_t format )
+ssize_t libewf_segment_file_write_headers( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format )
 {
 	static char *function     = "libewf_segment_file_write_headers";
 	ssize_t write_count       = 0;
 	ssize_t total_write_count = 0;
+	size_t header_size        = 0;
+	size_t header2_size       = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -836,8 +831,15 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		return( -1 );
 	}
-	if( ( header == NULL )
-	 || ( header_size == 0 ) )
+	if( header_sections == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid header sections.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( ( header_sections->header == NULL )
+	 || ( header_sections->header_size == 0 ) )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid header.\n",
 		 function );
@@ -846,7 +848,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 	}
 	/* The header size contains the end of string character
 	 */
-	header_size -= 1;
+	header_size = header_sections->header_size - 1;
 
 	if( ( format == LIBEWF_FORMAT_EWF )
 	 || ( format == LIBEWF_FORMAT_SMART )
@@ -857,7 +859,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header_write(
 		               segment_file,
-		               header,
+		               header_sections->header,
 		               header_size,
 		               compression_level );
 
@@ -870,7 +872,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		}
 		total_write_count += write_count;
 
-		internal_handle->amount_of_header_sections += 1;
+		header_sections->amount_of_header_sections += 1;
 	}
 	else if( ( format == LIBEWF_FORMAT_ENCASE2 )
 	 || ( format == LIBEWF_FORMAT_ENCASE3 )
@@ -883,7 +885,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header_write(
 		               segment_file,
-		               header,
+		               header_sections->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -898,7 +900,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		write_count = libewf_section_header_write(
 		               segment_file,
-		               header,
+		               header_sections->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -911,14 +913,14 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		}
 		total_write_count += write_count;
 
-		internal_handle->amount_of_header_sections += 2;
+		header_sections->amount_of_header_sections += 2;
 	}
 	else if( ( format == LIBEWF_FORMAT_ENCASE4 )
 	 || ( format == LIBEWF_FORMAT_ENCASE5 )
 	 || ( format == LIBEWF_FORMAT_ENCASE6 ) )
 	{
-		if( ( header2 == NULL )
-		 && ( header2_size == 0 ) )
+		if( ( header_sections->header2 == NULL )
+		 && ( header_sections->header2_size == 0 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
 			 function );
@@ -927,14 +929,14 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		}
 		/* The header2 size contains two end of string characters
 		 */
-		header2_size -= 2;
+		header2_size = header_sections->header2_size - 2;
 
 		/* The header2 should be written twice
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
 		               segment_file,
-		               header2,
+		               header_sections->header2,
 		               header2_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -949,7 +951,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 
 		write_count = libewf_section_header2_write(
 		               segment_file,
-		               header2,
+		               header_sections->header2,
 		               header2_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -967,7 +969,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header_write(
 		               segment_file,
-		               header,
+		               header_sections->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -980,22 +982,22 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		}
 		total_write_count += write_count;
 
-		internal_handle->amount_of_header_sections += 3;
+		header_sections->amount_of_header_sections += 3;
 	}
 	/* EWFX uses the header and header2 for backwards compatibility
 	 */
 	else if( format == LIBEWF_FORMAT_EWFX )
 	{
-		if( ( xheader == NULL )
-		 && ( xheader_size == 0 ) )
+		if( ( header_sections->xheader == NULL )
+		 && ( header_sections->xheader_size == 0 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid xheader.\n",
 			 function );
 
 			return( -1 );
 		}
-		if( ( header2 == NULL )
-		 && ( header2_size == 0 ) )
+		if( ( header_sections->header2 == NULL )
+		 && ( header_sections->header2_size == 0 ) )
 		{
 			LIBEWF_WARNING_PRINT( "%s: invalid header2.\n",
 			 function );
@@ -1004,15 +1006,15 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		}
 		/* The header2 size contains two end of string characters
 		 */
-		header2_size -= 2;
+		header2_size = header_sections->header2_size - 2;
 
 		/* The xheader should be written once
 		 * the default compression is used
 		 */
 		write_count = libewf_section_xheader_write(
 		               segment_file,
-		               xheader,
-		               xheader_size,
+		               header_sections->xheader,
+		               header_sections->xheader_size,
 		               EWF_COMPRESSION_DEFAULT );
 
 		if( write_count == -1 )
@@ -1029,7 +1031,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header2_write(
 		               segment_file,
-		               header2,
+		               header_sections->header2,
 		               header2_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -1047,7 +1049,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		 */
 		write_count = libewf_section_header_write(
 		               segment_file,
-		               header,
+		               header_sections->header,
 		               header_size,
 		               EWF_COMPRESSION_DEFAULT );
 
@@ -1060,7 +1062,7 @@ ssize_t libewf_segment_file_write_headers( LIBEWF_INTERNAL_HANDLE *internal_hand
 		}
 		total_write_count += write_count;
 
-		internal_handle->amount_of_header_sections += 3;
+		header_sections->amount_of_header_sections += 3;
 	}
 	return( total_write_count );
 }
@@ -1111,7 +1113,7 @@ ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE *segment_fil
 /* Write the necessary sections at the start of the segment file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
+ssize_t libewf_segment_file_write_start( LIBEWF_SEGMENT_FILE *segment_file, uint16_t segment_number, uint8_t segment_file_type, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
 {
 	EWF_FILE_HEADER file_header;
 
@@ -1120,13 +1122,6 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 	ssize_t total_write_count     = 0;
 	ssize_t write_count           = 0;
 
-	if( internal_handle == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -1231,14 +1226,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 			 * The segment file offset is updated by the function
 			 */
 			write_count = libewf_segment_file_write_headers(
-				       internal_handle,
 				       segment_file,
-				       internal_handle->header,
-				       internal_handle->header_size,
-				       internal_handle->header2,
-				       internal_handle->header2_size,
-				       internal_handle->xheader,
-				       internal_handle->xheader_size,
+				       header_sections,
 				       compression_level,
 				       format );
 
@@ -1315,7 +1304,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 /* Write the necessary sections before the actual data chunks to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount )
+ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_OFFSET_TABLE *offset_table, size32_t chunk_size, uint32_t total_chunk_amount, uint32_t segment_chunk_amount )
 {
 	static char *function = "libewf_segment_file_write_chunks_section_start";
 	ssize_t write_count   = 0;
@@ -1328,13 +1317,6 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing offset table.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( segment_file == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
@@ -1342,13 +1324,20 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 
 		return( -1 );
 	}
+	if( offset_table == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset table.\n",
+		 function );
+
+		return( -1 );
+	}
 
 	/* The segment_chunk_amount contains the estimated amount of chunks for this section
 	 */
-	if( internal_handle->offset_table->amount < ( total_chunk_amount + segment_chunk_amount ) )
+	if( offset_table->amount < ( total_chunk_amount + segment_chunk_amount ) )
 	{
 		if( libewf_offset_table_realloc(
-		     internal_handle->offset_table,
+		     offset_table,
 		     ( total_chunk_amount + segment_chunk_amount ) ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to reallocate offset table.\n",
@@ -1365,7 +1354,7 @@ ssize_t libewf_segment_file_write_chunks_section_start( LIBEWF_INTERNAL_HANDLE *
 		write_count = libewf_section_table_write(
 		               segment_file,
 		               0,
-		               internal_handle->offset_table,
+		               offset_table,
 		               total_chunk_amount,
 		               segment_chunk_amount,
 		               (EWF_CHAR *) "table",
