@@ -115,6 +115,7 @@ Next release:
 * move open segment files in file to segment file to read segment table function
 
 * what about header values parsing with preservation of timestamps?
+  store a timestamp string in the header value and convert them in ewfinfo
 
 * ewfexport
   - non interactive mode?
