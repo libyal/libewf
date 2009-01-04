@@ -2210,6 +2210,7 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 			return( -1 );
 		}
 	}
+
 	while( total_read_count < (ssize64_t) media_size )
 	{
 		read_size = buffer_size;

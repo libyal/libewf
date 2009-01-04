@@ -2704,7 +2704,7 @@ ssize_t libewf_section_hash_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int f
 			return( -1 );
 		}
 	}
-	if( libewf_common_memcpy( internal_handle->md5_hash, hash->md5_hash, size ) == NULL )
+	if( libewf_common_memcpy( internal_handle->md5_hash, hash->md5_hash, EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set MD5 hash in handle.\n",
 		 function );
