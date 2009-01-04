@@ -4922,23 +4922,22 @@ int libewf_header_values_convert_header_string_xml_to_xheader(
 		return( -1 );
 	}
 	if( utf8_stream_copy_from_string(
-	     *header,
+	     *xheader,
 	     (size_t) utf8_stream_size,
-	     LIBUCA_CODEPAGE_ASCII,
 	     header_string_xml,
-	     header_string_xml_length ) != 1 )
+	     header_string_xml_size ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set xheader.\n",
 		 function );
 
 		memory_free(
-		 header );
+		 xheader );
 
 		*xheader = NULL;
 
 		return( -1 );
 	}
-	*xheader_length = (size_t) utf8_stream_size;
+	*xheader_size = (size_t) utf8_stream_size;
 
 	return( 1 );
 }
@@ -5312,7 +5311,7 @@ int libewf_header_values_generate_xheader_ewfx(
 
 		return( -1 );
 	}
-	result = libewf_header_values_generate_header_string_xml(
+	result = libewf_header_values_convert_header_string_xml_to_xheader(
 	          header_string_xml,
 	          header_string_xml_size,
 	          xheader,

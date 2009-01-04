@@ -216,29 +216,29 @@ character_t *libewf_string_ctime(
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if SIZEOF_WCHAR_T == 4
 #define string_size_from_byte_stream( stream, size_stream, codepage ) \
-	libuca_utf32_string_size_from_byte_stream( stream, size_stream, codepage, 0 )
+	libuca_utf32_string_size_from_byte_stream( stream, size_stream, codepage )
 
 #define string_copy_from_byte_stream( string, string_size, stream, size_stream, codepage ) \
-	libuca_utf32_string_copy_from_byte_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, codepage, 0 )
+	libuca_utf32_string_copy_from_byte_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, codepage )
 
 #define byte_stream_size_from_string( string, string_size, codepage ) \
-	libuca_byte_stream_size_from_utf32( (libuca_utf32_character_t *) string, string_size, codepage, 0 )
+	libuca_byte_stream_size_from_utf32( (libuca_utf32_character_t *) string, string_size, codepage )
 
 #define byte_stream_copy_from_string( stream, size_stream, codepage, string, string_size ) \
-	libuca_byte_stream_copy_from_utf32( stream, size_stream, codepage, (libuca_utf32_character_t *) string, string_size, 0 )
+	libuca_byte_stream_copy_from_utf32( stream, size_stream, codepage, (libuca_utf32_character_t *) string, string_size )
 
 #elif SIZEOF_WCHAR_T == 2
 #define string_size_from_byte_stream( stream, size_stream, codepage ) \
-	libuca_utf16_string_size_from_byte_stream( stream, size_stream, codepage, 0 )
+	libuca_utf16_string_size_from_byte_stream( stream, size_stream, codepage )
 
 #define string_copy_from_byte_stream( string, string_size, stream, size_stream, codepage ) \
-	libuca_utf16_string_copy_from_byte_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, codepage, 0 )
+	libuca_utf16_string_copy_from_byte_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, codepage )
 
 #define byte_stream_size_from_string( string, string_size, codepage ) \
-	libuca_byte_stream_size_from_utf16( (libuca_utf16_character_t *) string, string_size, codepage, 0 )
+	libuca_byte_stream_size_from_utf16( (libuca_utf16_character_t *) string, string_size, codepage )
 
 #define byte_stream_copy_from_string( stream, size_stream, codepage, string, string_size ) \
-	libuca_byte_stream_copy_from_utf16( stream, size_stream, codepage, (libuca_utf16_character_t *) string, string_size, 0 )
+	libuca_byte_stream_copy_from_utf16( stream, size_stream, codepage, (libuca_utf16_character_t *) string, string_size )
 
 #else
 #error Unsupported size of wchar_t
@@ -246,45 +246,45 @@ character_t *libewf_string_ctime(
 
 #else
 #define string_size_from_byte_stream( stream, size_stream, codepage ) \
-	libuca_utf8_string_size_from_byte_stream( stream, size_stream, codepage, 0 )
+	libuca_utf8_string_size_from_byte_stream( stream, size_stream, codepage )
 
 #define string_copy_from_byte_stream( string, string_size, stream, size_stream, codepage ) \
-	libuca_utf8_string_copy_from_byte_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, codepage, 0 )
+	libuca_utf8_string_copy_from_byte_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, codepage )
 
 #define byte_stream_size_from_string( string, string_size, codepage ) \
-	libuca_byte_stream_size_from_utf8( (libuca_utf8_character_t *) string, string_size, codepage, 0 )
+	libuca_byte_stream_size_from_utf8( (libuca_utf8_character_t *) string, string_size, codepage )
 
 #define byte_stream_copy_from_string( stream, size_stream, codepage, string, string_size ) \
-	libuca_byte_stream_copy_from_utf8( stream, size_stream, codepage, (libuca_utf8_character_t *) string, string_size, 0 )
+	libuca_byte_stream_copy_from_utf8( stream, size_stream, codepage, (libuca_utf8_character_t *) string, string_size )
 
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if SIZEOF_WCHAR_T == 4
 #define string_size_from_utf8_stream( stream, size_stream ) \
-	libuca_utf32_string_size_from_utf8( stream, size_stream, 0 )
+	libuca_utf32_string_size_from_utf8( stream, size_stream )
 
 #define string_copy_from_utf8_stream( string, string_size, stream, size_stream ) \
-	libuca_utf32_string_copy_from_utf8( (libuca_utf32_character_t *) string, string_size, stream, size_stream, 0 )
+	libuca_utf32_string_copy_from_utf8( (libuca_utf32_character_t *) string, string_size, stream, size_stream )
 
 #define utf8_stream_size_from_string( string, size_string ) \
-	libuca_utf8_stream_size_from_utf32( (libuca_utf32_character_t *) string, size_string, 0 )
+	libuca_utf8_stream_size_from_utf32( (libuca_utf32_character_t *) string, size_string )
 
 #define utf8_stream_copy_from_string( stream, size_stream, string, string_size ) \
-	libuca_utf8_stream_copy_from_utf32( stream, size_stream, (libuca_utf32_character_t *) string, string_size, 0 )
+	libuca_utf8_stream_copy_from_utf32( stream, size_stream, (libuca_utf32_character_t *) string, string_size )
 
 #elif SIZEOF_WCHAR_T == 2
 #define string_size_from_utf8_stream( stream, size_stream ) \
-	libuca_utf16_string_size_from_utf8( stream, size_stream, 0 )
+	libuca_utf16_string_size_from_utf8( stream, size_stream )
 
 #define string_copy_from_utf8_stream( string, string_size, stream, size_stream ) \
-	libuca_utf16_string_copy_from_utf8( (libuca_utf16_character_t *) string, string_size, stream, size_stream, 0 )
+	libuca_utf16_string_copy_from_utf8( (libuca_utf16_character_t *) string, string_size, stream, size_stream )
 
 #define utf8_stream_size_from_string( string, size_string ) \
-	libuca_utf8_stream_size_from_utf16( (libuca_utf16_character_t *) string, size_string, 0 )
+	libuca_utf8_stream_size_from_utf16( (libuca_utf16_character_t *) string, size_string )
 
 #define utf8_stream_copy_from_string( stream, size_stream, string, string_size ) \
-	libuca_utf8_stream_copy_from_utf16( stream, size_stream, (libuca_utf16_character_t *) string, string_size, 0 )
+	libuca_utf8_stream_copy_from_utf16( stream, size_stream, (libuca_utf16_character_t *) string, string_size )
 
 #else
 #error Unsupported size of wchar_t
@@ -292,45 +292,45 @@ character_t *libewf_string_ctime(
 
 #else
 #define string_size_from_utf8_stream( stream, size_stream ) \
-	libuca_utf8_string_size_from_utf8( stream, size_stream, 0 )
+	libuca_utf8_string_size_from_utf8_stream( stream, size_stream )
 
 #define string_copy_from_utf8_stream( string, string_size, stream, size_stream ) \
-	libuca_utf8_string_copy_from_utf8( (libuca_utf8_character_t *) string, string_size, stream, size_stream, 0 )
+	libuca_utf8_string_copy_from_utf8_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream )
 
 #define utf8_stream_size_from_string( string, size_string ) \
-	libuca_utf8_stream_size_from_utf8( (libuca_utf8_character_t *) string, size_string, 0 )
+	libuca_utf8_stream_size_from_utf8( (libuca_utf8_character_t *) string, size_string )
 
 #define utf8_stream_copy_from_string( stream, size_stream, string, string_size ) \
-	libuca_utf8_stream_copy_from_utf8( stream, size_stream, (libuca_utf8_character_t *) string, string_size, 0 )
+	libuca_utf8_stream_copy_from_utf8( stream, size_stream, (libuca_utf8_character_t *) string, string_size )
 
 #endif
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if SIZEOF_WCHAR_T == 4
 #define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
-	libuca_utf32_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
+	libuca_utf32_string_size_from_utf16_stream( stream, size_stream, byte_order )
 
 #define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libuca_utf32_string_copy_from_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+	libuca_utf32_string_copy_from_utf16_stream( (libuca_utf32_character_t *) string, string_size, stream, size_stream, byte_order )
 
 #define utf16_stream_size_from_string( string, size_string ) \
-	libuca_utf16_stream_size_from_utf32( (libuca_utf32_character_t *) string, size_string, 0 )
+	libuca_utf16_stream_size_from_utf32( (libuca_utf32_character_t *) string, size_string )
 
 #define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
-	libuca_utf16_stream_copy_from_utf32( stream, size_stream, byte_order, (libuca_utf32_character_t *) string, string_size, 0 )
+	libuca_utf16_stream_copy_from_utf32( stream, size_stream, byte_order, (libuca_utf32_character_t *) string, string_size )
 
 #elif SIZEOF_WCHAR_T == 2
 #define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
-	libuca_utf16_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
+	libuca_utf16_string_size_from_utf16_stream( stream, size_stream, byte_order )
 
 #define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libuca_utf16_string_copy_from_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+	libuca_utf16_string_copy_from_utf16_stream( (libuca_utf16_character_t *) string, string_size, stream, size_stream, byte_order )
 
 #define utf16_stream_size_from_string( string, size_string ) \
-	libuca_utf16_stream_size_from_utf16( (libuca_utf16_character_t *) string, size_string, 0 )
+	libuca_utf16_stream_size_from_utf16( (libuca_utf16_character_t *) string, size_string )
 
 #define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
-	libuca_utf16_stream_copy_from_utf16( stream, size_stream, byte_order, (libuca_utf16_character_t *) string, string_size, 0 )
+	libuca_utf16_stream_copy_from_utf16( stream, size_stream, byte_order, (libuca_utf16_character_t *) string, string_size )
 
 #else
 #error Unsupported size of wchar_t
@@ -338,16 +338,16 @@ character_t *libewf_string_ctime(
 
 #else
 #define string_size_from_utf16_stream( stream, size_stream, byte_order ) \
-	libuca_utf8_string_size_from_utf16_stream( stream, size_stream, byte_order, 0 )
+	libuca_utf8_string_size_from_utf16_stream( stream, size_stream, byte_order )
 
 #define string_copy_from_utf16_stream( string, string_size, stream, size_stream, byte_order ) \
-	libuca_utf8_string_copy_from_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order, 0 )
+	libuca_utf8_string_copy_from_utf16_stream( (libuca_utf8_character_t *) string, string_size, stream, size_stream, byte_order )
 
 #define utf16_stream_size_from_string( string, size_string ) \
-	libuca_utf16_stream_size_from_utf8( (libuca_utf8_character_t *) string, size_string, 0 )
+	libuca_utf16_stream_size_from_utf8( (libuca_utf8_character_t *) string, size_string )
 
 #define utf16_stream_copy_from_string( stream, size_stream, byte_order, string, string_size ) \
-	libuca_utf16_stream_copy_from_utf8( stream, size_stream, byte_order, (libuca_utf8_character_t *) string, string_size, 0 )
+	libuca_utf16_stream_copy_from_utf8( stream, size_stream, byte_order, (libuca_utf8_character_t *) string, string_size )
 
 #endif
 

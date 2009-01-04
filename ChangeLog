@@ -180,6 +180,9 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20080903
+* worked on integrating libuca and replacing string conversion routines
+
 Version: 20080902
 * refactored process status
 * code clean up in ewftools
