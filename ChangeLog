@@ -103,10 +103,12 @@ Python bindings
 API
 * make libewf_handle_initialize and libewf_handle_free available
 * rewrite open and close in correspondence with handle_initialize and handle_free
-* change compress empty blocks into a compression level
-* allow for chunk data and CRC alignment
+* change compress empty-block into a compression level
+* allow for chunk data and CRC alignment (possible performance enhancement)
 * low level API
-* file structure API
+  - file structure API
+* LVF
+  - libewf_add/remove_file for LVF
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -193,6 +195,7 @@ CLOSED
 
 Version: 20080906
 * refactored section list to use list type
+* refactored libewf_values_table
 
 Version: 20080905
 * worked on refactoring code

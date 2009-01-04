@@ -261,9 +261,9 @@ ssize_t libewf_section_compressed_string_read(
          size_t *uncompressed_string_size )
 {
 	uint8_t *compressed_string = NULL;
-	uint8_t *reallocation      = NULL;
 	uint8_t *uncompressed      = NULL;
 	static char *function      = "libewf_section_compressed_string_read";
+	void *reallocation         = NULL;
 	ssize_t read_count         = 0;
 	int result                 = 0;
 
@@ -340,17 +340,17 @@ ssize_t libewf_section_compressed_string_read(
 		return( -1 );
 	}
 	result = libewf_uncompress(
-	          (uint8_t *) uncompressed,
+	          uncompressed,
 	          uncompressed_string_size,
-	          (uint8_t *) compressed_string,
+	          compressed_string,
 	          compressed_string_size );
 
 	while( ( result == -1 )
 	 && ( *uncompressed_string_size > 0 ) )
 	{
-		reallocation = (uint8_t *) memory_reallocate(
-		                            uncompressed,
-		                            sizeof( uint8_t ) * *uncompressed_string_size );
+		reallocation = memory_reallocate(
+		                uncompressed,
+		                sizeof( uint8_t ) * *uncompressed_string_size );
 
 		if( reallocation == NULL )
 		{
@@ -364,12 +364,12 @@ ssize_t libewf_section_compressed_string_read(
 
 			return( -1 );
 		}
-		uncompressed = reallocation;
+		uncompressed = (uint8_t *) reallocation;
 
 		result = libewf_uncompress(
-		          (uint8_t *) uncompressed,
+		          uncompressed,
 		          uncompressed_string_size,
-		          (uint8_t *) compressed_string,
+		          compressed_string,
 		          compressed_string_size );
 	}
 	memory_free(
@@ -403,8 +403,8 @@ ssize_t libewf_section_write_compressed_string(
          int8_t compression_level )
 {
 	uint8_t *compressed_string    = NULL;
-	uint8_t *reallocation         = NULL;
 	static char *function         = "libewf_section_write_compressed_string";
+	void *reallocation            = NULL;
 	off64_t section_offset        = 0;
 	size_t compressed_string_size = 0;
 	ssize_t section_write_count   = 0;
@@ -463,9 +463,9 @@ ssize_t libewf_section_write_compressed_string(
 	if( ( result == -1 )
 	 && ( compressed_string_size > 0 ) )
 	{
-		reallocation = (uint8_t *) memory_reallocate(
-		                            compressed_string,
-		                            ( sizeof( uint8_t ) * compressed_string_size ) );
+		reallocation = memory_reallocate(
+		                compressed_string,
+		                ( sizeof( uint8_t ) * compressed_string_size ) );
 
 		if( reallocation == NULL )
 		{
@@ -477,7 +477,7 @@ ssize_t libewf_section_write_compressed_string(
 
 			return( -1 );
 		}
-		compressed_string = reallocation;
+		compressed_string = (uint8_t *) reallocation;
 
 		result = libewf_compress(
 		          compressed_string,
@@ -5344,7 +5344,6 @@ int libewf_section_read(
  		              error_tollerance );
 
 		hash_sections->md5_hash_set = 1;
-
 	}
 	/* Read the xhash section
 	 * The \0 byte is included in the compare

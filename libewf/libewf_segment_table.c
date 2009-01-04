@@ -408,17 +408,28 @@ int libewf_segment_table_set_basename(
 		segment_table->basename        = NULL;
 		segment_table->basename_length = 0;
 	}
-	segment_table->basename = system_string_duplicate(
-	                           basename,
-	                           basename_length + 1 );
+	segment_table->basename = (system_character_t *) memory_allocate(
+	                                                  sizeof( system_character_t ) * (basename_length + 1 ) );
 
 	if( segment_table->basename == NULL )
+	{
+		notify_warning_printf( "%s: unable to create basename.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( system_string_copy(
+	     segment_table->basename,
+	     basename,
+	     basename_length ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set basename.\n",
 		 function );
 
 		return( -1 );
 	}
+	segment_table->basename[ basename_length ] = 0;
+
 	segment_table->basename_length = basename_length;
 
 	return( 1 );

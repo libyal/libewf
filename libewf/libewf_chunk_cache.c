@@ -156,8 +156,8 @@ int libewf_chunk_cache_resize(
      libewf_chunk_cache_t *chunk_cache,
      size_t size )
 {
-	uint8_t *reallocation = NULL;
 	static char *function = "libewf_chunk_cache_resize";
+	void *reallocation    = NULL;
 
 	if( chunk_cache == NULL )
 	{
@@ -180,9 +180,9 @@ int libewf_chunk_cache_resize(
 
 		return( -1 );
 	}
-	reallocation = (uint8_t *) memory_reallocate(
-	                            chunk_cache->compressed,
-	                            sizeof( uint8_t) * size );
+	reallocation = memory_reallocate(
+	                chunk_cache->compressed,
+	                sizeof( uint8_t) * size );
 
 	if( reallocation == NULL )
 	{
@@ -191,10 +191,10 @@ int libewf_chunk_cache_resize(
 
 		return( -1 );
 	}
-	chunk_cache->compressed = reallocation;
-	reallocation            = (uint8_t *) memory_reallocate(
-	                                       chunk_cache->data,
-	                                       sizeof( uint8_t) * size );
+	chunk_cache->compressed = (uint8_t *) reallocation;
+	reallocation            = memory_reallocate(
+	                           chunk_cache->data,
+	                           sizeof( uint8_t) * size );
 
 	if( reallocation == NULL )
 	{
@@ -203,7 +203,7 @@ int libewf_chunk_cache_resize(
 
 		return( -1 );
 	}
-	chunk_cache->data           = reallocation;
+	chunk_cache->data           = (uint8_t *) reallocation;
 	chunk_cache->allocated_size = size;
 	chunk_cache->chunk          = 0;
 	chunk_cache->amount         = 0;

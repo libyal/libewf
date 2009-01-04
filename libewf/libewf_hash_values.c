@@ -48,10 +48,17 @@ int libewf_hash_values_initialize(
 
 		return( -1 );
 	}
-	hash_values->identifiers[ 0 ] = string_duplicate(
-	                                 _CHARACTER_T_STRING( "MD5" ),
-	                                 3 );
+	if( libewf_values_table_set_identifier(
+	     hash_values,
+	     0,
+	     _CHARACTER_T_STRING( "MD5" ),
+	     4 ) != 1 )
+	{
+		notify_warning_printf( "%s: unable to set MD5 value.\n",
+		 function );
 
+		return( -1 );
+	}
 	return( 1 );
 }
 
@@ -69,9 +76,11 @@ int libewf_hash_values_parse_hash_string_xml(
 	character_t *close_tag_start = NULL;
 	character_t *close_tag_end   = NULL;
 	static char *function        = "libewf_hash_values_parse_hash_string_xml";
-	size_t string_length         = 0;
 	size_t amount_of_lines       = 0;
+	size_t identifier_size       = 0;
 	size_t line_iterator         = 0;
+	size_t string_size           = 0;
+	size_t value_size            = 0;
 
 	if( hash_string_xml == NULL )
 	{
@@ -116,19 +125,19 @@ int libewf_hash_values_parse_hash_string_xml(
 		{
 			continue;
 		}
-		string_length = string_length(
-		                 lines[ line_iterator ] );
+		string_size = string_length(
+		               lines[ line_iterator ] );
 
 		/* Ignore empty lines
 		 */
-		if( string_length == 0 )
+		if( string_size == 0 )
 		{
 			continue;
 		}
 		open_tag_start = string_search(
 		                  lines[ line_iterator ],
 		                  (character_t) '<',
-		                  string_length );
+		                  string_size );
 
 		/* Ignore lines without an open tag
 		 */
@@ -139,7 +148,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		open_tag_end = string_search(
 		                lines[ line_iterator ],
 		                (character_t) '>',
-		                string_length );
+		                string_size );
 
 		/* Ignore lines without an open tag
 		 */
@@ -149,18 +158,18 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		/* Ignore the first part of the XML string
 		 */
-		string_length -= (size_t) ( open_tag_end - lines[ line_iterator ] );
+		string_size -= (size_t) ( open_tag_end - lines[ line_iterator ] );
 
 		/* Ignore lines only containing a single tag
 		 */
-		if( string_length <= 1 )
+		if( string_size <= 1 )
 		{
 			continue;
 		}
 		close_tag_start = string_search_reverse(
 		                   &open_tag_end[ 1 ],
 		                   (character_t) '<',
-		                   string_length );
+		                   string_size );
 
 		/* Ignore lines without a close tag
 		 */
@@ -171,7 +180,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		close_tag_end = string_search_reverse(
 		                 &open_tag_end[ 1 ],
 		                 (character_t) '>',
-		                 string_length );
+		                 string_size );
 
 		/* Ignore lines without a close tag
 		 */
@@ -180,8 +189,14 @@ int libewf_hash_values_parse_hash_string_xml(
 			continue;
 		}
 		/* Ignore the second part of the XML string
+		 * but have room for an end of string character
 		 */
-		string_length = (size_t) ( close_tag_start - open_tag_end ) - 1;
+		identifier_size = (size_t) ( open_tag_end - open_tag_start );
+
+		/* Ignore the second part of the XML string
+		 * but have room for an end of string character
+		 */
+		value_size = (size_t) ( close_tag_start - open_tag_end );
 
 		/* Make sure the identifier string will be terminated
 		 */
@@ -190,8 +205,9 @@ int libewf_hash_values_parse_hash_string_xml(
 		if( libewf_values_table_set_value(
 		     *hash_values,
 		     &open_tag_start[ 1 ],
+		     identifier_size,
 		     &open_tag_end[ 1 ],
-		     string_length ) != 1 )
+		     value_size ) != 1 )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			notify_verbose_printf( "%s: unable to set value with identifier: %" PRIs ".\n",
@@ -386,13 +402,48 @@ int libewf_hash_values_generate_hash_string_xml(
 	character_t *xml_open_tag_xhash  = _CHARACTER_T_STRING( "<xhash>" );
 	character_t *xml_close_tag_xhash = _CHARACTER_T_STRING( "</xhash>" );
 	static char *function            = "libewf_hash_values_generate_hash_string_xml";
-	uint32_t iterator                = 0;
-	int string_offset                = 0;
 	int character_count              = 0;
+	int string_offset                = 0;
+	int values_table_iterator        = 0;
 
 	if( hash_values == NULL )
 	{
 		notify_warning_printf( "%s: invalid hash values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_values->amount_of_values < 0 )
+	{
+		notify_warning_printf( "%s: invalid hash values - amount of value less than zero.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_values->identifier == NULL )
+	{
+		notify_warning_printf( "%s: invalid hash values - missing identifiers.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_values->identifier_size == NULL )
+	{
+		notify_warning_printf( "%s: invalid hash values - missing identifier sizes.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_values->value == NULL )
+	{
+		notify_warning_printf( "%s: invalid hash values - missing values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( hash_values->value_size == NULL )
+	{
+		notify_warning_printf( "%s: invalid hash values - missing value sizes.\n",
 		 function );
 
 		return( -1 );
@@ -429,26 +480,24 @@ int libewf_hash_values_generate_hash_string_xml(
 	*hash_string_size += 1 + string_length(
 	                          xml_close_tag_xhash );
 
-	for( iterator = 0; iterator < hash_values->amount_of_values; iterator++ )
+	for( values_table_iterator = 0; values_table_iterator < hash_values->amount_of_values; values_table_iterator++ )
 	{
-		if( hash_values->identifiers[ iterator ] == NULL )
+		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
+		 || ( hash_values->identifier_size[ values_table_iterator ] <= 1 ) )
 		{
 			notify_warning_printf( "%s: invalid hash value - missing identifier.\n",
 			 function );
 
 			continue;
 		}
-		if( hash_values->values[ iterator ] != NULL )
+		if( ( hash_values->value[ values_table_iterator ] != NULL )
+		 && ( hash_values->value_size[ values_table_iterator ] > 1 ) )
 		{
-			/* Add space for a leading tab, <identifier></identifier> and an end of line
+			/* Add space for a leading tab, <identifier>value</identifier> and an end of line
+			 * do not include the end of string character in the identifier and the value
 			 */
-			*hash_string_size += 7 + ( 2 * string_length(
-			                                hash_values->identifiers[ iterator ] ) );
-
-			/* Add space for the hash value
-			 */
-			*hash_string_size += string_length(
-			                      hash_values->values[ iterator ] );
+			*hash_string_size += ( 2 * ( hash_values->identifier_size[ values_table_iterator ] - 1 ) )
+			                   + hash_values->value_size[ values_table_iterator ] + 6;
 		}
 	}
 	/* allow for an empty line and an end of string
@@ -490,16 +539,18 @@ int libewf_hash_values_generate_hash_string_xml(
 	}
 	string_offset = character_count;
 
-	for( iterator = 0; iterator < hash_values->amount_of_values; iterator++ )
+	for( values_table_iterator = 0; values_table_iterator < hash_values->amount_of_values; values_table_iterator++ )
 	{
-		if( hash_values->identifiers[ iterator ] == NULL )
+		if( ( hash_values->identifier[ values_table_iterator ] == NULL )
+		 || ( hash_values->identifier_size[ values_table_iterator ] == 0 ) )
 		{
 			notify_warning_printf( "%s: invalid hash value - missing identifier.\n",
 			 function );
 
 			continue;
 		}
-		if( hash_values->values[ iterator ] != NULL )
+		if( ( hash_values->value[ values_table_iterator ] != NULL )
+		 && ( hash_values->value_size[ values_table_iterator ] > 1 ) )
 		{
 			character_count = string_snprintf(
 			                   &( ( *hash_string) [ string_offset ] ),
@@ -507,9 +558,9 @@ int libewf_hash_values_generate_hash_string_xml(
 			                   _CHARACTER_T_STRING( "\t<%" ) _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( ">%" )
 			                   _CHARACTER_T_STRING( PRIs ) _CHARACTER_T_STRING( "</%" ) _CHARACTER_T_STRING( PRIs )
 			                   _CHARACTER_T_STRING( ">\n" ),
-			                   hash_values->identifiers[ iterator ],
-			                   hash_values->values[ iterator ],
-			                   hash_values->identifiers[ iterator ] );
+			                   hash_values->identifier[ values_table_iterator ],
+			                   hash_values->value[ values_table_iterator ],
+			                   hash_values->identifier[ values_table_iterator ] );
 
 			if( character_count <= -1 )
 			{

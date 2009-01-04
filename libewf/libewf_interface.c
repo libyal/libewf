@@ -1092,6 +1092,7 @@ int libewf_get_header_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value";
+	size_t identifier_size                    = 0;
 
 	if( handle == NULL )
 	{
@@ -1120,9 +1121,13 @@ int libewf_get_header_value(
 	{
 		return( 0 );
 	}
+	identifier_size = string_size(
+	                   identifier );
+
 	return( libewf_values_table_get_value(
 	         internal_handle->header_values,
 	         identifier,
+	         identifier_size,
 	         value,
 	         length ) );
 }
@@ -1205,6 +1210,7 @@ int libewf_get_hash_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_hash_value";
+	size_t identifier_size                    = 0;
 
 	if( handle == NULL )
 	{
@@ -1233,9 +1239,13 @@ int libewf_get_hash_value(
 	{
 		return( 0 );
 	}
+	identifier_size = string_size(
+	                   identifier );
+
 	return( libewf_values_table_get_value(
                  internal_handle->hash_values,
                  identifier,
+                 identifier_size,
                  value,
                  length ) );
 }
@@ -2005,6 +2015,7 @@ int libewf_set_header_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_header_value";
+	size_t identifier_size                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2051,9 +2062,21 @@ int libewf_set_header_value(
 			return( -1 );
 		}
 	}
+	identifier_size = string_size(
+	                   identifier );
+
+	/* Make sure length contains the end of string character
+	 */
+	if( ( value != NULL )
+	 && ( length > 0 )
+	 && ( value[ length - 1 ] != 0 ) )
+	{
+		length += 1;
+	}
 	return( libewf_values_table_set_value(
 	         internal_handle->header_values,
 	         identifier,
+	         identifier_size,
 	         value,
 	         length ) );
 }
@@ -2069,6 +2092,7 @@ int libewf_set_hash_value(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_hash_value";
+	size_t identifier_size                    = 0;
 
 	if( handle == NULL )
 	{
@@ -2113,9 +2137,21 @@ int libewf_set_hash_value(
 			return( -1 );
 		}
 	}
+	identifier_size = string_size(
+	                   identifier );
+
+	/* Make sure length contains the end of string character
+	 */
+	if( ( value != NULL )
+	 && ( length > 0 )
+	 && ( value[ length - 1 ] != 0 ) )
+	{
+		length += 1;
+	}
 	return( libewf_values_table_set_value(
 	         internal_handle->hash_values,
 	         identifier,
+	         identifier_size,
 	         value,
 	         length ) );
 }
@@ -2195,8 +2231,10 @@ int libewf_parse_header_values(
 	 * only the acquiry software version provides insight in which version of EnCase was used
 	 */
 	if( ( internal_handle->format == LIBEWF_FORMAT_ENCASE2 )
-	 && ( internal_handle->header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
-	 && ( internal_handle->header_values->values[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ][ 0 ] == '3' ) )
+	 && ( internal_handle->header_values->amount_of_values > LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT )
+	 && ( internal_handle->header_values->value != NULL )
+	 && ( internal_handle->header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ] != NULL )
+	 && ( internal_handle->header_values->value[ LIBEWF_HEADER_VALUES_INDEX_ACQUIRY_SOFTWARE_VERSION ][ 0 ] == '3' ) )
  	{
 		internal_handle->format = LIBEWF_FORMAT_ENCASE3;
 	}
