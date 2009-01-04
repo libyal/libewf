@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_DEBUG_H
+#if !defined( _LIBEWF_DEBUG_H )
 #define _LIBEWF_DEBUG_H
 
 #include "libewf_includes.h"
@@ -46,7 +46,7 @@
 #include "ewf_header2.h"
 #include "ewf_ltree.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -59,7 +59,7 @@ void libewf_debug_header_fprint( FILE *stream, EWF_HEADER *header, size_t size )
 void libewf_debug_header2_fprint( FILE *stream, EWF_HEADER2 *header2, size_t size );
 void libewf_debug_chunk_fprint( FILE *stream, EWF_CHUNK *chunk );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

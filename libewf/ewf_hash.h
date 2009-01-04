@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_HASH_H
+#if !defined( _EWF_HASH_H )
 #define _EWF_HASH_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -66,7 +66,7 @@ struct ewf_hash
 ssize_t ewf_hash_read( EWF_HASH *hash, int file_descriptor );
 ssize_t ewf_hash_write( EWF_HASH *hash, int file_descriptor );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

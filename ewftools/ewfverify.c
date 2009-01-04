@@ -164,7 +164,7 @@ int main( int argc, char * const argv[] )
 	}
 	libewf_set_notify_values( stderr, verbose );
 
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 	glob = ewfglob_alloc();
 
 	if( glob == NULL )

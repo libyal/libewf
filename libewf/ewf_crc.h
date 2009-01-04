@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_CRC_H
+#if !defined( _EWF_CRC_H )
 #define _EWF_CRC_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -52,7 +52,7 @@ ssize_t ewf_crc_read( EWF_CRC *crc, int file_descriptor );
 ssize_t ewf_crc_write( EWF_CRC *crc, int file_descriptor );
 int ewf_crc_calculate( EWF_CRC *crc, uint8_t *buffer, size_t size, uint32_t previous_key );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

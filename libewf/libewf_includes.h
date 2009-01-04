@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_INCLUDES_H
+#if !defined( _LIBEWF_INCLUDES_H )
 #define _LIBEWF_INCLUDES_H
 
 #if defined( HAVE_CONFIG_H )

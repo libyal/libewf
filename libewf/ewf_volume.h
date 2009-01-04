@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_VOLUME_H
+#if !defined( _EWF_VOLUME_H )
 #define _EWF_VOLUME_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -158,7 +158,7 @@ ssize_t ewf_volume_read( EWF_VOLUME *volume, int file_descriptor );
 ssize_t ewf_volume_write( EWF_VOLUME *volume, int file_descriptor );
 ssize32_t ewf_volume_calculate_chunk_size( EWF_VOLUME *volume );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

@@ -36,11 +36,11 @@
 
 #include <errno.h>
 
-#ifdef HAVE_STDLIB_H
+#if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
-#if !defined(HAVE_GLOB_H) && defined(HAVE_IO_H)
+#if !defined( HAVE_GLOB_H ) && defined( HAVE_IO_H )
 #include <io.h>
 #endif
 
@@ -52,9 +52,9 @@
 
 #include "ewfglob.h"
 
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 
-#ifdef HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
 #define ewfglob_finddata_t	_wfinddata_t
 #define ewfglob_makepath	_wmakepath_s
@@ -185,7 +185,7 @@ void ewfglob_free( EWFGLOB *glob )
  */
 int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amount_of_patterns )
 {
-#ifdef HAVE_WINDOWS_API
+#if defined( HAVE_WINDOWS_API )
 	struct ewfglob_finddata_t find_data;
 
 	CHAR_T find_path[ _MAX_PATH ];
@@ -217,7 +217,7 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 
 			return( -1 );
 		}
-#ifdef HAVE_WINDOWS_API
+#if defined( HAVE_WINDOWS_API )
 		if( ewfglob_splitpath(
 		     patterns[ iterator ],
 		     find_drive,

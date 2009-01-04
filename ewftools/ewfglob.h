@@ -32,18 +32,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFGLOB_H
+#if !defined( _EWFGLOB_H )
 #define _EWFGLOB_H
 
 #include "../libewf/libewf_includes.h"
 
 #include "ewfcommon.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 
 #define EWFGLOB ewfglob_t
 #define EWFGLOB_SIZE sizeof( EWFGLOB )
@@ -69,7 +69,7 @@ int32_t ewfglob_resolve( EWFGLOB *glob, CHAR_T * const patterns[], uint32_t amou
 
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

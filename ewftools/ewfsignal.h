@@ -31,32 +31,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFSIGNAL_H
+#if !defined( _EWFSIGNAL_H )
 #define _EWFSIGNAL_H
 
 #include "../libewf/libewf_includes.h"
 
-#ifdef HAVE_WINDOWS_API
+#if defined( HAVE_WINDOWS_API )
 #include <windows.h>
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
-#ifdef HAVE_SIGNAL_H
+#if defined( HAVE_SIGNAL_H )
 void ewfsignal_handler( int signal );
 void ewfsignal_initialize( void );
-#elif defined(HAVE_WINDOWS_API)
+
+#elif defined( HAVE_WINDOWS_API )
 int WINAPI ewfsignal_handler( unsigned long signal );
 void ewfsignal_initialize_memory_debug( void );
 void ewfsignal_initialize( void );
 #else
+
 #define ewfsignal_initialize	/* ewfsignal_initialize */
 #endif
 
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

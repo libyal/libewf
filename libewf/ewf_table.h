@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_TABLE_H
+#if !defined( _EWF_TABLE_H )
 #define _EWF_TABLE_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -91,7 +91,7 @@ ssize_t ewf_table_offsets_read( EWF_TABLE_OFFSET *offsets, int file_descriptor, 
 ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor );
 ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount, uint8_t write_crc );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

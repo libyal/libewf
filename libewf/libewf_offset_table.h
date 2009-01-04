@@ -31,14 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_OFFSET_TABLE_H
+#if !defined( _LIBEWF_OFFSET_TABLE_H )
 #define _LIBEWF_OFFSET_TABLE_H
 
 #include "libewf_includes.h"
 
 #include "ewf_table.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -103,7 +103,7 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
 int8_t libewf_offset_table_set_values( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk, int file_descriptor, uint8_t compressed, off_t offset, size_t size, uint16_t segment_number, uint8_t dirty );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

@@ -32,19 +32,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFGETOPT_H
+#if !defined( _EWFGETOPT_H )
 #define _EWFGETOPT_H
 
 #include "../libewf/libewf_includes.h"
 
 #include "ewfcommon.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
-#if defined(HAVE_GETOPT) && !defined(HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS)
-#define ewfgetopt( argument_count, argument_values, options_string )	getopt( argument_count, argument_values, options_string )
+#if defined( HAVE_GETOPT ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#define ewfgetopt( argument_count, argument_values, options_string ) \
+	getopt( argument_count, argument_values, options_string )
 #else
 
 /* The current option argument
@@ -63,7 +64,7 @@ INT_T ewfgetopt( int argument_count, CHAR_T * const argument_values[], const CHA
 
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

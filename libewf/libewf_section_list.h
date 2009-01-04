@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_SECTION_LIST_H
+#if !defined( _LIBEWF_SECTION_LIST_H )
 #define _LIBEWF_SECTION_LIST_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -82,7 +82,7 @@ struct libewf_section_list
 
 LIBEWF_SECTION_LIST *libewf_section_list_append( LIBEWF_SECTION_LIST *section_list, uint8_t *type, off_t start_offset, off_t end_offset );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

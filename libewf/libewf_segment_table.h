@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_SEGMENT_TABLE_H
+#if !defined( _LIBEWF_SEGMENT_TABLE_H )
 #define _LIBEWF_SEGMENT_TABLE_H
 
 #include "libewf_includes.h"
@@ -39,7 +39,7 @@
 
 #include "libewf_section_list.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -106,7 +106,7 @@ int8_t libewf_segment_table_set_wide_filename( LIBEWF_SEGMENT_TABLE *segment_tab
 int8_t libewf_segment_table_set_filename( LIBEWF_SEGMENT_TABLE *segment_table, uint16_t segment, const char *filename, size_t length_filename );
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

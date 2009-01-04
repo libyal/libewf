@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_SECTION_H
+#if !defined( _LIBEWF_SECTION_H )
 #define _LIBEWF_SECTION_H
 
 #include "libewf_includes.h"
@@ -48,7 +48,7 @@
 #include "ewf_section.h"
 #include "ewf_table.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -105,7 +105,7 @@ ssize_t libewf_section_delta_chunk_write( int file_descriptor, off_t start_offse
 
 int libewf_section_read( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, EWF_SECTION *section, LIBEWF_SECTION_LIST *section_list, uint16_t segment_number, off_t *section_start_offset );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

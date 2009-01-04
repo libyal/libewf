@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_DATA_H
+#if !defined( _EWF_DATA_H )
 #define _EWF_DATA_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -157,7 +157,7 @@ struct ewf_data
 ssize_t ewf_data_read( EWF_DATA *data, int file_descriptor );
 ssize_t ewf_data_write( EWF_DATA *data, int file_descriptor );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

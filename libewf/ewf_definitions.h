@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_DEFINIONS_H
+#if !defined( _EWF_DEFINIONS_H )
 #define _EWF_DEFINIONS_H
 
 #include "libewf_includes.h"

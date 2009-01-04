@@ -31,14 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_CHUNK_CACHE_H
+#if !defined( _LIBEWF_CHUNK_CACHE_H )
 #define _LIBEWF_CHUNK_CACHE_H
 
 #include "libewf_includes.h"
 
 #include "ewf_chunk.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -82,7 +82,7 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size );
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size );
 void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

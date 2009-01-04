@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_CONFIG_WINDOWS_H
+#if !defined( _LIBEWF_CONFIG_WINDOWS_H )
 #define _LIBEWF_CONFIG_WINDOWS_H
 
 #include "libewf_config.h"

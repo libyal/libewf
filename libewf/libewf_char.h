@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_CHAR_H
+#if !defined( _LIBEWF_CHAR_H )
 #define _LIBEWF_CHAR_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -68,7 +68,7 @@ typedef char libewf_char_t;
 
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

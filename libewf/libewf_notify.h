@@ -31,14 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_NOTIFY_H
+#if !defined( _LIBEWF_NOTIFY_H )
 #define _LIBEWF_NOTIFY_H
 
 #include "libewf_includes.h"
 
 #include <stdio.h>
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -66,7 +66,7 @@ void libewf_fatal_print( char *, ... );
 
 void libewf_dump_data( uint8_t *data, size_t size );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

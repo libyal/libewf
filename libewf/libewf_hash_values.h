@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_HASHVALUES_H
+#if !defined( _LIBEWF_HASHVALUES_H )
 #define _LIBEWF_HASHVALUES_H
 
 #include "libewf_includes.h"
@@ -39,7 +39,7 @@
 
 #include "ewf_char.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -80,7 +80,7 @@ EWF_CHAR *libewf_hash_values_convert_hash_string_to_hash( LIBEWF_CHAR *hash_stri
 LIBEWF_CHAR *libewf_hash_values_generate_hash_string_xml( LIBEWF_HASH_VALUES *hash_values, size_t *string_length );
 EWF_CHAR *libewf_hash_values_generate_xhash_string_ewfx( LIBEWF_HASH_VALUES *hash_values, size_t *hash_length );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

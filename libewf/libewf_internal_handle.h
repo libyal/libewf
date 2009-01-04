@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_INTERNAL_HANDLE_H
+#if !defined( _LIBEWF_INTERNAL_HANDLE_H )
 #define _LIBEWF_INTERNAL_HANDLE_H
 
 #include "libewf_includes.h"
@@ -51,7 +51,7 @@
 #include "ewf_header2.h"
 #include "ewf_table.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -481,7 +481,7 @@ int8_t libewf_internal_handle_read_initialize( LIBEWF_INTERNAL_HANDLE *internal_
 int8_t libewf_internal_handle_write_is_initialized( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int8_t libewf_internal_handle_write_initialize( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

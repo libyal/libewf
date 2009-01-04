@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_HEADER2_H
+#if !defined( _EWF_HEADER2_H )
 #define _EWF_HEADER2_H
 
 #include "libewf_includes.h"
@@ -39,7 +39,7 @@
 #include "ewf_char.h"
 #include "ewf_string.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -148,7 +148,7 @@ extern "C" {
 #define ewf_header2_write( header2, file_descriptor, length ) \
 	ewf_string_write_from_buffer( header2, file_descriptor, length )
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

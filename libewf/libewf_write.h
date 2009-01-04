@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_WRITE_H
+#if !defined( _LIBEWF_WRITE_H )
 #define _LIBEWF_WRITE_H
 
 #include "libewf_includes.h"
@@ -50,7 +50,7 @@
 #include "libewf_internal_handle.h"
 #include "libewf_section_list.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -76,7 +76,7 @@ LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, 
 
 LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

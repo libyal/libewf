@@ -82,7 +82,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob              = NULL;
 	int32_t glob_count         = 0;
 #endif
@@ -148,7 +148,7 @@ int main( int argc, char * const argv[] )
 	}
 	libewf_set_notify_values( stderr, verbose );
 
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 	glob = ewfglob_alloc();
 
 	if( glob == NULL )

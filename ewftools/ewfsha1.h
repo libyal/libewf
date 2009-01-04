@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFSHA1_H
+#if !defined( _EWFSHA1_H )
 #define _EWFSHA1_H
 
 #include "../libewf/libewf_includes.h"
@@ -43,7 +43,7 @@
 #include "../libewf/libewf_digest_context.h"
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -75,7 +75,7 @@ extern "C" {
 
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

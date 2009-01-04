@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_SEGMENT_FILE_H
+#if !defined( _LIBEWF_SEGMENT_FILE_H )
 #define _LIBEWF_SEGMENT_FILE_H
 
 #include "libewf_includes.h"
@@ -43,7 +43,7 @@
 
 #include "ewf_crc.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -106,7 +106,7 @@ off_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_ha
 
 int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

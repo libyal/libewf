@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_READ_H
+#if !defined( _LIBEWF_READ_H )
 #define _LIBEWF_READ_H
 
 #include "libewf_includes.h"
@@ -51,7 +51,7 @@
 #include "ewf_chunk.h"
 #include "ewf_crc.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -64,7 +64,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffe
 LIBEWF_EXTERN ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

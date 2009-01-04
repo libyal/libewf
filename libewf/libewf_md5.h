@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_MD5_H
+#if !defined( _LIBEWF_MD5_H )
 #define _LIBEWF_MD5_H
 
 #include "libewf_includes.h"
@@ -42,7 +42,7 @@
 #include "libewf_digest_context.h"
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -74,7 +74,7 @@ extern "C" {
 
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

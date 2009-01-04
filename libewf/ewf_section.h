@@ -31,14 +31,14 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_SECTION_H
+#if !defined( _EWF_SECTION_H )
 #define _EWF_SECTION_H
 
 #include "libewf_includes.h"
 
 #include "ewf_char.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -116,7 +116,7 @@ int ewf_section_is_type( EWF_SECTION *section, const EWF_CHAR *type );
 #define ewf_section_is_type_delta_chunk( section ) \
 	ewf_section_is_type( section, (EWF_CHAR *) "delta_chunk" )
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

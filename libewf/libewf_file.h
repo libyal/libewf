@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_FILE_H
+#if !defined( _LIBEWF_FILE_H )
 #define _LIBEWF_FILE_H
 
 #include "libewf_includes.h"
@@ -51,7 +51,7 @@
 #include "libewf_char.h"
 #include "libewf_internal_handle.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -120,7 +120,7 @@ LIBEWF_EXTERN int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t se
 
 LIBEWF_EXTERN void libewf_set_notify_values( FILE *stream, uint8_t verbose );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

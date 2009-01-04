@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_DIGEST_H
+#if !defined( _LIBEWF_DIGEST_H )
 #define _LIBEWF_DIGEST_H
 
 #include "libewf_includes.h"
@@ -47,7 +47,7 @@
 
 #include "ewf_digest_hash.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -80,7 +80,7 @@ int8_t libewf_digest_context_initialize( LIBEWF_DIGEST_CONTEXT *digest_context, 
 int8_t libewf_digest_context_update( LIBEWF_DIGEST_CONTEXT *digest_context, uint8_t *buffer, size_t size );
 int8_t libewf_digest_context_finalize( LIBEWF_DIGEST_CONTEXT *digest_context, EWF_DIGEST_HASH *digest_hash, size_t *size );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

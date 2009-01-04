@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_LTREE_H
+#if !defined( _EWF_LTREE_H )
 #define _EWF_LTREE_H
 
 #include "libewf_includes.h"
@@ -39,7 +39,7 @@
 #include "ewf_char.h"
 #include "ewf_string.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -86,7 +86,7 @@ ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor );
 #define ewf_tree_data_read( file_descriptor, length ) \
 	ewf_string_read( file_descriptor, length )
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

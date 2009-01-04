@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_ENDIAN_H
+#if !defined( _LIBEWF_ENDIAN_H )
 #define _LIBEWF_ENDIAN_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -52,7 +52,7 @@ int8_t libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes );
 
 int8_t libewf_endian_swap_byte_pairs( uint8_t *buffer, size_t size );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

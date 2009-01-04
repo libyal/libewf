@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_CHAR_H
+#if !defined( _EWF_CHAR_H )
 #define _EWF_CHAR_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -45,7 +45,7 @@ extern "C" {
 
 typedef uint8_t ewf_char_t;
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_CHUNK_H
+#if !defined( _EWF_CHUNK_H )
 #define _EWF_CHUNK_H
 
 #include "libewf_includes.h"
@@ -40,7 +40,7 @@
 #include "ewf_compress.h"
 #include "ewf_string.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -57,7 +57,7 @@ extern "C" {
 #define ewf_chunk_uncompress( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size ) \
 	ewf_uncompress( uncompressed_chunk, uncompressed_size, compressed_chunk, compressed_size )
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

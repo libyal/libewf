@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_FILE_HEADER_H
+#if !defined( _EWF_FILE_HEADER_H )
 #define _EWF_FILE_HEADER_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -82,7 +82,7 @@ int lwf_file_header_check_signature( uint8_t *signature );
 ssize_t ewf_file_header_read( EWF_FILE_HEADER *file_header, int file_descriptor );
 ssize_t ewf_file_header_write( EWF_FILE_HEADER *file_header, int file_descriptor );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

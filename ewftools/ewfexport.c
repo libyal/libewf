@@ -94,7 +94,7 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob                = NULL;
 	int32_t glob_count           = 0;
 #endif
@@ -114,10 +114,12 @@ int main( int argc, char * const argv[] )
 	uint64_t sectors_per_chunk   = 64;
 	int64_t segment_file_size    = 0;
 	uint8_t compress_empty_block = 0;
+	uint8_t libewf_format        = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs      = 0;
 	uint8_t verbose              = 0;
 	int8_t compression_level     = LIBEWF_COMPRESSION_NONE;
 	int target_file_descriptor   = 0;
+	int output_raw               = 1;
 
 	ewfsignal_initialize();
 
@@ -169,6 +171,79 @@ int main( int argc, char * const argv[] )
 				}
 				break;
 
+			case (INT_T) 'f':
+				if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "raw" ), 3 ) == 0 )
+				{
+					output_raw = 1;
+				}
+				/* This check must before the check for "ewf"
+				 */
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ewfx" ), 4 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_EWFX;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ewf" ), 3 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_EWF;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "smart" ), 3 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_SMART;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "ftk" ), 3 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_FTK;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase1" ), 7 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_ENCASE1;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase2" ), 7 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_ENCASE2;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase3" ), 7 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_ENCASE3;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase4" ), 7 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_ENCASE4;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase5" ), 7 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_ENCASE5;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "encase6" ), 7 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_ENCASE6;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "linen5" ), 6 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_LINEN5;
+				}
+				else if( CHAR_T_COMPARE( optarg, _S_CHAR_T( "linen6" ), 6 ) == 0 )
+				{
+					output_raw    = 0;
+					libewf_format = LIBEWF_FORMAT_LINEN6;
+				}
+				else
+				{
+					fprintf( stderr, "Unsupported file format type defaulting to raw.\n" );
+				}
+				break;
+
 			case (INT_T) 'h':
 				usage();
 
@@ -215,11 +290,16 @@ int main( int argc, char * const argv[] )
 
 		return( EXIT_FAILURE );
 	}
+	if( ( output_raw == 1 )
+	 && ( CHAR_T_COMPARE( target_filename, _S_CHAR_T( "-" ), 1 ) == 0 ) )
+	{
+		target_file_descriptor = 1;
+	}
 	libewf_set_notify_values( stderr, verbose );
 
 	segment_file_size = ( 650 * 1024 );
 
-#ifndef HAVE_GLOB_H
+#if !defined( HAVE_GLOB_H )
 	glob = ewfglob_alloc();
 
 	if( glob == NULL )

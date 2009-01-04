@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_COMMON_H
+#if !defined( _LIBEWF_COMMON_H )
 #define _LIBEWF_COMMON_H
 
 #include "libewf_includes.h"
@@ -91,7 +91,7 @@
 
 #include "libewf_char.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -242,7 +242,7 @@ int8_t libewf_common_copy_wchar_to_char( char *destination, const wchar_t *sourc
 int8_t libewf_common_copy_char_to_wchar( wchar_t *destination, const char *source, size_t length );
 #endif
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

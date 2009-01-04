@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_VOLUME_SMART_H
+#if !defined( _EWF_VOLUME_SMART_H )
 #define _EWF_VOLUME_SMART_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -103,7 +103,7 @@ ssize_t ewf_volume_smart_read( EWF_VOLUME_SMART *volume, int file_descriptor );
 ssize_t ewf_volume_smart_write( EWF_VOLUME_SMART *volume, int file_descriptor );
 ssize32_t ewf_volume_smart_calculate_chunk_size( EWF_VOLUME_SMART *volume );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

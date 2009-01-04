@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_ERROR2_H
+#if !defined( _EWF_ERROR2_H )
 #define _EWF_ERROR2_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -95,7 +95,7 @@ ssize_t ewf_error2_sectors_read( EWF_ERROR2_SECTOR *sectors, int file_descriptor
 ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor );
 ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

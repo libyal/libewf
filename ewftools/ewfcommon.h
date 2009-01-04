@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFCOMMON_H
+#if !defined( _EWFCOMMON_H )
 #define _EWFCOMMON_H
 
 #include "../libewf/libewf_includes.h"
@@ -48,7 +48,7 @@
 
 #include "../libewf/ewf_chunk.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -272,7 +272,7 @@ ssize64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_f
 
 ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_sha1, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

@@ -34,7 +34,7 @@
 
 #include "../libewf/libewf_includes.h"
 
-#ifdef HAVE_STDLIB_H
+#if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
@@ -42,7 +42,7 @@
 
 #include "ewfgetopt.h"
 
-#ifndef HAVE_GETOPT
+#if !defined( HAVE_GETOPT )
 
 /* The current option argument
  */

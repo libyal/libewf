@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_STRING_H
+#if !defined( _EWF_STRING_H )
 #define _EWF_STRING_H
 
 #include "libewf_includes.h"
@@ -42,7 +42,7 @@
 
 #include "ewf_char.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -92,7 +92,7 @@ EWF_CHAR *ewf_string_read( int file_descriptor, size_t size );
 EWF_CHAR *ewf_string_read_compressed( int file_descriptor, size_t *size );
 ssize_t ewf_string_write_compressed( EWF_CHAR *string, int file_descriptor, size_t *size, int8_t compression_level );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

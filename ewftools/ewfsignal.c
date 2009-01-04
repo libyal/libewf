@@ -37,9 +37,9 @@
 
 #include "ewfsignal.h"
 
-#ifdef HAVE_SIGNAL_H
+#if defined( HAVE_SIGNAL_H )
 
-#ifdef HAVE_SYS_TYPES_H
+#if defined( HAVE_SYS_TYPES_H )
 #include <sys/types.h>
 #endif
 
@@ -125,7 +125,7 @@ void ewfsignal_initialize( void )
 
 	SetErrorMode( SEM_FAILCRITICALERRORS );
 
-#ifdef LOCALE_SUPPORT
+#if defined( LOCALE_SUPPORT )
 	/* Allow subsequent threads to have their own locale.
 	 * The current application is single threaded so this
 	 * call has no practical effect here.

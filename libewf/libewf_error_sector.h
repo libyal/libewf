@@ -31,12 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_ERROR_SECTOR_H
+#if !defined( _LIBEWF_ERROR_SECTOR_H )
 #define _LIBEWF_ERROR_SECTOR_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -56,7 +56,7 @@ struct libewf_error_sector
 	uint32_t amount_of_sectors;
 };
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_STRING_H
+#if !defined( _LIBEWF_STRING_H )
 #define _LIBEWF_STRING_H
 
 #include "libewf_includes.h"
@@ -41,7 +41,7 @@
 #include "ewf_header.h"
 #include "ewf_header2.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -223,7 +223,7 @@ int8_t libewf_string_copy_from_digest_hash( LIBEWF_CHAR *string, size_t size_str
 int8_t libewf_string_copy_from_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 );
 int8_t libewf_string_copy_to_header2( LIBEWF_CHAR *string, size_t size_string, EWF_HEADER2 *header2, size_t size_header2 );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

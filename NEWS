@@ -8,7 +8,7 @@ Library:
 
 EWF tools:
 * ewfexport no longer writes to stdout per default, default is now export.raw
-  specify '-t -' to write to stdout
+  specify '-t -' to write to stdout only for continuous raw output
 
 Platform support:
 * Microsoft Visual Studio 2005 (express) project files have been

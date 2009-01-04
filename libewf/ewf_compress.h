@@ -31,19 +31,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_COMPRESS_H
+#if !defined( _EWF_COMPRESS_H )
 #define _EWF_COMPRESS_H
 
 #include "libewf_includes.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
 int ewf_compress( uint8_t *compressed_data, size_t *compressed_size, uint8_t *uncompressed_data, size_t uncompressed_size, int8_t compression_level );
 int ewf_uncompress( uint8_t *uncompressed_data, size_t *uncompressed_size, uint8_t *compressed_data, size_t compressed_size );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 

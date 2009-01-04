@@ -31,7 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_HEADERVALUES_H
+#if !defined( _LIBEWF_HEADERVALUES_H )
 #define _LIBEWF_HEADERVALUES_H
 
 #include "libewf_includes.h"
@@ -42,7 +42,7 @@
 #include "ewf_header.h"
 #include "ewf_header2.h"
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 extern "C" {
 #endif
 
@@ -150,7 +150,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_ewfx( LIBEWF_HEADER_VALU
 EWF_HEADER *libewf_header_values_generate_header2_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
 EWF_HEADER *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
 
-#ifdef __cplusplus
+#if defined( __cplusplus )
 }
 #endif
 
