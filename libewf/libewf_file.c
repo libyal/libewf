@@ -46,6 +46,7 @@
 #include "libewf_notify.h"
 #include "libewf_file.h"
 #include "libewf_hash_values.h"
+#include "libewf_header_values.h"
 #include "libewf_offset_table.h"
 #include "libewf_read.h"
 #include "libewf_section_list.h"
@@ -1285,7 +1286,7 @@ int libewf_get_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 	{
 		return( 0 );
 	}
-	return( libewf_header_values_get_value( internal_handle->header_values, identifier, value, length ) );
+	return( libewf_values_table_get_value( internal_handle->header_values, identifier, value, length ) );
 }
 
 /* Retrieves the amount of hash values
@@ -1889,7 +1890,7 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 	}
 	if( internal_handle->header_values == NULL )
 	{
-		internal_handle->header_values = libewf_header_values_alloc();
+		internal_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 		if( internal_handle->header_values == NULL )
 		{
@@ -1898,8 +1899,22 @@ int libewf_set_header_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIB
 
 			return( -1 );
 		}
+		internal_handle->header_values->identifiers[ 0 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "case_number" ), 11 );
+		internal_handle->header_values->identifiers[ 1 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "description" ), 11 );
+		internal_handle->header_values->identifiers[ 2 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "examiner_name" ), 13 );
+		internal_handle->header_values->identifiers[ 3 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "evidence_number" ), 15 );
+		internal_handle->header_values->identifiers[ 4 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "notes" ), 5 );
+		internal_handle->header_values->identifiers[ 5 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_date" ), 12 );
+		internal_handle->header_values->identifiers[ 6 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "system_date" ), 11 );
+		internal_handle->header_values->identifiers[ 7 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_operating_system" ), 24 );
+		internal_handle->header_values->identifiers[ 8 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "acquiry_software_version" ), 24 );
+		internal_handle->header_values->identifiers[ 9 ]  = libewf_string_duplicate( _S_LIBEWF_CHAR( "password" ), 8 ); 
+		internal_handle->header_values->identifiers[ 10 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "compression_type" ), 16 );
+		internal_handle->header_values->identifiers[ 11 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "model" ), 5 ); 
+		internal_handle->header_values->identifiers[ 12 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "serial_number" ), 13 );
+		internal_handle->header_values->identifiers[ 13 ] = libewf_string_duplicate( _S_LIBEWF_CHAR( "unknown_dc" ), 10 );
 	}
-	return( libewf_header_values_set_value( internal_handle->header_values, identifier, value, length ) );
+	return( libewf_values_table_set_value( internal_handle->header_values, identifier, value, length ) );
 }
 
 /* Sets the hash value specified by the identifier
@@ -1948,7 +1963,7 @@ int libewf_set_hash_value( LIBEWF_HANDLE *handle, LIBEWF_CHAR *identifier, LIBEW
  */
 int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 {
-	LIBEWF_HEADER_VALUES *header_values     = NULL;
+	LIBEWF_VALUES_TABLE *header_values      = NULL;
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_parse_header_values";
 
@@ -1996,7 +2011,7 @@ int libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format )
 		LIBEWF_WARNING_PRINT( "%s: header values already set in handle - cleaning up previous ones.\n",
 		 function );
 
-		libewf_header_values_free( internal_handle->header_values );
+		libewf_values_table_free( internal_handle->header_values );
 	}
 	internal_handle->header_values = header_values;
 
@@ -2159,7 +2174,7 @@ int libewf_copy_header_values( LIBEWF_HANDLE *destination_handle, LIBEWF_HANDLE 
 	}
 	if( internal_destination_handle->header_values == NULL )
 	{
-		internal_destination_handle->header_values = libewf_header_values_alloc();
+		internal_destination_handle->header_values = libewf_values_table_alloc( LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT );
 
 		if( internal_destination_handle->header_values == NULL )
 		{

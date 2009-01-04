@@ -36,6 +36,7 @@
 
 #include "libewf_includes.h"
 #include "libewf_char.h"
+#include "libewf_values_table.h"
 
 #include <time.h>
 
@@ -62,29 +63,9 @@ extern "C" {
 #define LIBEWF_HEADER_VALUES_INDEX_SERIAL_NUMBER		12
 #define LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC			13
 
-#define LIBEWF_HEADER_VALUES libewf_header_values_t
-#define LIBEWF_HEADER_VALUES_SIZE sizeof( LIBEWF_HEADER_VALUES )
-
-typedef struct libewf_header_values libewf_header_values_t;
-
-struct libewf_header_values
-{
-	/* The amount of header values
-	 */
-	uint32_t amount;
-
-	/* The header value identifiers
-	 */
-	LIBEWF_CHAR **identifiers;
-
-	/* The header values
-	 */
-	LIBEWF_CHAR **values;
-};
-
-LIBEWF_HEADER_VALUES *libewf_header_values_alloc( void );
-int libewf_header_values_realloc( LIBEWF_HEADER_VALUES *header_values, uint32_t previous_amount, uint32_t new_amount );
-void libewf_header_values_free( LIBEWF_HEADER_VALUES *header_values );
+LIBEWF_VALUES_TABLE *libewf_header_values_alloc( void );
+int libewf_header_values_realloc( LIBEWF_VALUES_TABLE *header_values, uint32_t previous_amount, uint32_t new_amount );
+void libewf_header_values_free( LIBEWF_VALUES_TABLE *header_values );
 
 int libewf_date_string_set_2digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index );
 int libewf_date_string_set_4digit_value( LIBEWF_CHAR *date_string, LIBEWF_CHAR **date_elements, uint8_t index );
@@ -107,49 +88,45 @@ LIBEWF_CHAR *libewf_generate_date_header_value( time_t timestamp );
 LIBEWF_CHAR *libewf_convert_date_header2_value( LIBEWF_CHAR *header_value, uint8_t date_format );
 LIBEWF_CHAR *libewf_generate_date_header2_value( time_t timestamp );
 
-int32_t libewf_header_values_get_index( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier );
-int libewf_header_values_get_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
-int libewf_header_values_set_value( LIBEWF_HEADER_VALUES *header_values, LIBEWF_CHAR *identifier, LIBEWF_CHAR *value, size_t length );
+int libewf_header_values_copy( LIBEWF_VALUES_TABLE *destination_header_values, LIBEWF_VALUES_TABLE *source_header_values );
 
-int libewf_header_values_copy( LIBEWF_HEADER_VALUES *destination_header_values, LIBEWF_HEADER_VALUES *source_header_values );
-
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string( LIBEWF_CHAR *header_string, size_t length, uint8_t date_format );
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_CHAR *header, size_t size, uint8_t date_format );
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_header2( EWF_CHAR *header2, size_t size, uint8_t date_format );
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string( LIBEWF_CHAR *header_string, size_t length, uint8_t date_format );
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header( EWF_CHAR *header, size_t size, uint8_t date_format );
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header2( EWF_CHAR *header2, size_t size, uint8_t date_format );
 
 EWF_CHAR *libewf_header_values_convert_header_string_to_header( LIBEWF_CHAR *header_string, size_t string_length, size_t *header_length );
 EWF_CHAR *libewf_header_values_convert_header_string_to_header2( LIBEWF_CHAR *header_string, size_t string_length, size_t *header2_length );
 
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
-LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type3( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_type7( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, LIBEWF_CHAR *header_string_head, LIBEWF_CHAR *header_string_tail, size_t *string_length );
 
-EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_ewf( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_encase1( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_ftk( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_encase2( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, int8_t compression_level, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_encase5_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_encase6_linen( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length );
 
-EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length );
-EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length );
-EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header2_length );
+EWF_CHAR *libewf_header_values_generate_header2_string_encase4( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length );
+EWF_CHAR *libewf_header_values_generate_header2_string_encase5( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length );
+EWF_CHAR *libewf_header_values_generate_header2_string_encase6( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header2_length );
 
 LIBEWF_CHAR *libewf_generate_date_xheader_value( time_t timestamp );
 
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *header_string_xml, size_t length, uint8_t date_format );
-LIBEWF_HEADER_VALUES *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size_t size, uint8_t date_format );
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_header_string_xml( LIBEWF_CHAR *header_string_xml, size_t length, uint8_t date_format );
+LIBEWF_VALUES_TABLE *libewf_header_values_parse_xheader( EWF_CHAR *xheader, size_t size, uint8_t date_format );
 
-LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *string_length );
+LIBEWF_CHAR *libewf_header_values_generate_header_string_xml( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *string_length );
 
-EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
-EWF_CHAR *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_HEADER_VALUES *header_values, time_t timestamp, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_header2_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length );
+EWF_CHAR *libewf_header_values_generate_xheader_string_ewfx( LIBEWF_VALUES_TABLE *header_values, time_t timestamp, size_t *header_length );
 
 #if defined( __cplusplus )
 }

@@ -69,6 +69,7 @@
 
 #include "../libewf/libewf_common.h"
 #include "../libewf/libewf_hash_values.h"
+#include "../libewf/libewf_header_values.h"
 #include "../libewf/libewf_notify.h"
 #include "../libewf/libewf_string.h"
 
