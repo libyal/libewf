@@ -1745,6 +1745,8 @@ ssize_t libewf_section_table_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 			{
 				LIBEWF_WARNING_PRINT( "%s: chunk offset overflow at: %" PRIi64 ".\n",
 				 function, offset64_value );
+fprintf( stderr, "D: %" PRIu64 "\n",
+ offset_table->chunk_offset[ offset_table_index + iterator ].size );
 
 				libewf_common_free( table );
 				libewf_common_free( offsets );

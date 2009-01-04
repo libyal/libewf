@@ -156,6 +156,7 @@ struct tm *ewfoutput_gmtime( const time_t *timestamp )
 }
 
 /* Determines the units strings of a certain factor value
+ * http://nl.wikipedia.org/wiki/Mebibyte
  */
 LIBEWF_CHAR *ewfoutput_determine_units_string( int factor )
 {
@@ -164,23 +165,25 @@ LIBEWF_CHAR *ewfoutput_determine_units_string( int factor )
 		case 0:
 			return( _S_LIBEWF_CHAR( "B" ) );
 		case 1:
-			return( _S_LIBEWF_CHAR( "kB" ) );
+			return( _S_LIBEWF_CHAR( "KiB" ) );
 		case 2:
-			return( _S_LIBEWF_CHAR( "MB" ) );
+			return( _S_LIBEWF_CHAR( "MiB" ) );
 		case 3:
-			return( _S_LIBEWF_CHAR( "GB" ) );
+			return( _S_LIBEWF_CHAR( "GiB" ) );
 		case 4:
-			return( _S_LIBEWF_CHAR( "TB" ) );
+			return( _S_LIBEWF_CHAR( "TiB" ) );
 		case 5:
-			return( _S_LIBEWF_CHAR( "PB" ) );
+			return( _S_LIBEWF_CHAR( "PiB" ) );
 		case 6:
-			return( _S_LIBEWF_CHAR( "EB" ) );
+			return( _S_LIBEWF_CHAR( "EiB" ) );
 		case 7:
-			return( _S_LIBEWF_CHAR( "ZB" ) );
+			return( _S_LIBEWF_CHAR( "ZiB" ) );
+		case 8:
+			return( _S_LIBEWF_CHAR( "YiB" ) );
 		default :
 			break;
 	}
-	return( _S_LIBEWF_CHAR( "?B" ) );
+	return( NULL );
 }
 
 /* Determines the human readable size as a string
@@ -214,9 +217,9 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 
 		return( NULL );
 	}
-	/* The string has a maximum of 7 characters + end of string '\0'
+	/* The string has a maximum of 8 characters + end of string '\0'
 	 */
-	size_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 8 );
+	size_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * 9 );
 
 	if( size_string == NULL )
 	{
@@ -227,6 +230,13 @@ LIBEWF_CHAR *ewfoutput_determine_human_readable_size_string( uint64_t size )
 	}
 	units_string = ewfoutput_determine_units_string( (int) factor );
 
+	if( units_string == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to create uints string.\n",
+		 function );
+
+		return( NULL );
+	}
 	if( remainder > 9 )
 	{
 		remainder = 9;
@@ -477,7 +487,7 @@ void ewfoutput_acquiry_parameters_fprint( FILE *stream, CHAR_T *filename, LIBEWF
 	}
 	fprintf( stream, "\n" );
 
-	fprintf( stream, "Evidence segment file size:\t%" PRIu64 " kbytes\n", ( segment_file_size / 1024 ) );
+	fprintf( stream, "Evidence segment file size:\t%" PRIu64 " kibibytes (KiB)\n", ( segment_file_size / 1024 ) );
 	fprintf( stream, "Block size:\t\t\t%" PRIu32 " sectors\n", sectors_per_chunk );
 	fprintf( stream, "Error granularity:\t\t%" PRIu32 " sectors\n", sector_error_granularity );
 	fprintf( stream, "Retries on read error:\t\t%" PRIu8 "\n", read_error_retry );

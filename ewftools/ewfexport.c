@@ -86,7 +86,7 @@ void usage( void )
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stderr, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
 	fprintf( stderr, "      stdout is only supported for the raw format\n" );
-	fprintf( stderr, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n",
+	fprintf( stderr, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
 	 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 #if defined( SPLIT_EXPORT )
 	fprintf( stderr, "\t    or the limit of the raw file size (default is no limit)" );
@@ -481,7 +481,7 @@ int main( int argc, char * const argv[] )
 			 */
 			segment_file_size = ewfinput_get_size_variable(
 					     stderr,
-					     _S_LIBEWF_CHAR( "Evidence segment file size in kbytes (2^10)" ),
+					     _S_LIBEWF_CHAR( "Evidence segment file size in kibitytes (KiB)" ),
 					     1440,
 					     ( 2 * 1024 * 1024 ),
 					     EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
@@ -529,7 +529,7 @@ int main( int argc, char * const argv[] )
 				 */
 				segment_file_size = ewfinput_get_size_variable(
 						     stderr,
-						     _S_LIBEWF_CHAR( "Maximum export file size in kbytes (2^10) or 0 for no limit" ),
+						     _S_LIBEWF_CHAR( "Maximum export file size in kibibytes (KiB) or 0 for no limit" ),
 						     0,
 						     ( INT64_MAX / 1024 ),
 						     ( 2 * 1024 * 1024 ) );

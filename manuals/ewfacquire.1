@@ -1,4 +1,4 @@
-.Dd November 12, 2007
+.Dd November 17, 2007
 .Dt ewfacquire
 .Os libewf
 .Sh NAME
@@ -79,7 +79,7 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfacquire /dev/fd0
-ewfacquire 20071112 (libewf 20071112, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfacquire 20071117 (libewf 20071117, zlib 1.2.3, libcrypto 0.9.8, libuuid)
 
 Information about acquiry required, please provide the necessary input
 Image path and filename without extension: floppy
@@ -95,7 +95,7 @@ Compress empty blocks (yes, no) [no]:
 Use EWF file format (smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [encase5]:
 Start to acquire at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to acquire (0 >= value >= 1474560) [1474560]:
-Evidence segment file size in kbytes (2^10) (1440 >= value >= 2097152) [1536000]:
+Evidence segment file size in kibibytes (KiB) (1440 >= value >= 2097152) [1536000]:
 The amount of sectors to read at once (64, 128, 256, 512, 1024, 2048, 4096) [64]:
 The amount of sectors to be used as error granularity (1 >= value >= 64) [64]:
 The amount of retries when a read error occurs (0 >= value >= 255) [2]:
@@ -115,7 +115,7 @@ Compress empty blocks:          no
 EWF file format:                Encase 5
 Acquiry start offet:            0
 Amount of bytes to acquire:     1474560
-Evidence segment file size:     1536000 kbytes
+Evidence segment file size:     1536000 kibibytes (KiB)
 Block size:                     64 sectors
 Error granularity:              64 sectors
 Retries on read error:          2
@@ -123,22 +123,22 @@ Wipe sectors on read error:     no
 
 Continue acquiry with these values (yes, no) [yes]:
 
-Acquiry started at: Mon Nov 12 11:32:41 2007
+Acquiry started at: Sat Nov 17 11:32:41 2007
 
 This could take a while.
 
 Status: at 2%.
-        acquired 32 kB (32768 bytes) of total 1.4 MB (1474560 bytes).
+        acquired 32 kB (32768 bytes) of total 1.4 MiB (1474560 bytes).
 
 .Dl ...
 
 Status: at 100%.
-        acquired 1.4 MB (1474560 bytes) of total 1.4 MB (1474560 bytes).
-        completion in 1 second(s) with 1 MB/s (1474560 bytes/second).
+        acquired 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
+        completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Acquiry completed at: Mon Nov 12 11:32:42 2007
+Acquiry completed at: Sat Nov 17 11:32:42 2007
 
-Written: 1.4 MB (1474560 bytes) in 1 second(s) with 1 MB/s (1474560 bytes/second).
+Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
 MD5 hash calculated over data: ae1ce8f5ac079d3ee93f97fe3792bda3
 .Ed

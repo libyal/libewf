@@ -155,6 +155,10 @@ CLOSED
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
 
+Version: 20071117
+* changed MB to MiB, etc.
+* worked on refactoring offset table to table of chunnk offsets
+
 Version: 20071114
 * worked on refactoring segment files functions
 

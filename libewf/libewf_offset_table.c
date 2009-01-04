@@ -76,6 +76,7 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount )
 		offset_table->chunk_offset[ iterator ].segment_number  = 0;
 		offset_table->chunk_offset[ iterator ].file_descriptor = -1;
 		offset_table->chunk_offset[ iterator ].file_offset     = 0;
+		offset_table->chunk_offset[ iterator ].size            = 0;
 		offset_table->chunk_offset[ iterator ].compressed      = 0;
 		offset_table->chunk_offset[ iterator ].dirty           = 0;
 	}
@@ -126,6 +127,7 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 		offset_table->chunk_offset[ iterator ].segment_number  = 0;
 		offset_table->chunk_offset[ iterator ].file_descriptor = -1;
 		offset_table->chunk_offset[ iterator ].file_offset     = 0;
+		offset_table->chunk_offset[ iterator ].size            = 0;
 		offset_table->chunk_offset[ iterator ].compressed      = 0;
 		offset_table->chunk_offset[ iterator ].dirty           = 0;
 	}

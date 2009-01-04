@@ -97,7 +97,7 @@ void usage( void )
 	fprintf( stdout, "\t-N: specify the notes (default is notes).\n" );
 	fprintf( stdout, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stdout, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stdout, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n",
+	fprintf( stdout, "\t-S: specify the segment file size in kibibytes (KiB) (default is %" PRIu32 ")\n",
 	 (uint32_t) EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE );
 	fprintf( stdout, "\t-t: specify the target file (without extension) to write to (default is stream)\n" );
 	fprintf( stdout, "\t-v: verbose output to stderr\n" );
