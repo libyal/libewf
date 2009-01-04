@@ -1,9 +1,9 @@
 AC_PREREQ( 2.59 )
 
-AC_INIT([libewf], [20070713], [forensics@hoffmannbv.nl])
+AC_INIT([libewf], [20070714], [forensics@hoffmannbv.nl])
 AC_CONFIG_SRCDIR([include/libewf.h.in])
 
-AM_INIT_AUTOMAKE([libewf], [20070713])
+AM_INIT_AUTOMAKE([libewf], [20070714])
 
 dnl Function to test if a certain feature was enabled
 AC_DEFUN([LIBEWF_TEST_ENABLE],
@@ -171,17 +171,17 @@ LIBEWF_FUNC_CTIME_R
 
 dnl Check for enabling libcrypto EVP support
 AS_IF([test "x$ac_libewf_have_libcrypto_evp" != xno],
-	[AC_MSG_NOTICE([Support for calculating libcrypto EVP will be build.])
-	AC_CHECK_HEADERS([openssl/evp.h])],
+	[AC_CHECK_HEADERS([openssl/evp.h])
+	AC_MSG_NOTICE([Support for libcrypto EVP will be build.])],
 	[AS_IF([test "x$ac_libewf_have_libcrypto_md5" == xno],
 		[AC_MSG_NOTICE([No support for calculating MD5 hashes, if required install libcrypto with MD5 support.])],
-		[AC_MSG_NOTICE([Support for calculating MD5 hashes will be build.])
-		AC_CHECK_HEADERS([openssl/md5.h])] )
+		[AC_CHECK_HEADERS([openssl/md5.h])
+		AC_MSG_NOTICE([Support for calculating MD5 hashes will be build.])] )
 
 	AS_IF([test "x$ac_libewf_have_libcrypto_sha1" == xno],
 		[AC_MSG_NOTICE([No support for calculating SHA1 hashes, if required install libcrypto with SHA1 support.])],
-		[AC_MSG_NOTICE([Support for calculating SHA1 hashes will be build.])
-		AC_CHECK_HEADERS([openssl/sha.h])] )
+		[AC_CHECK_HEADERS([openssl/sha.h])
+		AC_MSG_NOTICE([Support for calculating SHA1 hashes will be build.])] )
 	])
 
 AS_IF([test "x$ac_libewf_enable_wide_character_type" != xno ],

@@ -1,1 +1,52 @@
-Nothing to read yet.
+Dependencies
+Libewf requires:
+* zlib
+* lybcrypto (OpenSSL)
+  or Windows Crypto API from the Windows Platform SDK
+
+
+Creating a libewf DLL
+Currently 2 methods of creating a libewf DLL are supported:
+* using libtool
+* using Microsoft Visual Studio C++
+
+
+Creating a libewf DLL using libtool
+You'll need Cygwin of MingW with a libtool version that supports
+building DLLs.
+
+By building the library:
+./configure
+make libewf
+
+You should end up with a DLL something like:
+libewf-<version>/libewf/.libs/cygewf-0.dll
+
+
+Creating a libewf DLL using Microsoft Visual Studio C++
+You'll need:
+* Microsoft Visual Studio C++
+  The provided Visual Studio project files were created using
+  the 2005 express version. The express verion is available on the
+  Microsoft website
+* Microsoft Platform API for the Windows Crypto API
+  The platform API verion is available on the Microsoft website
+* The zlib DLL package including the .lib file available from the zlib
+  project site: http://www.gzip.org/zlib/
+
+Extract the contents of the zlib DLL package to:
+libewf-<version>/msvscpp/zlib
+
+You should be able to build the libewf DLL using the provided
+project files. Note that the project files contain a debug and release
+configuration.
+
+
+Using libewf DLL
+Make sure you use define LIBEWF_DLL_IMPORT before including <libewf.h>,
+i.e. CFLAGS=-DLIBEWF_DLL_IMPORT
+
+When the libewf DLL was build with Microsoft Visual Studio
+you'll need the zlib DLL and the Microsoft Visual Studio redistributable DLLs
+to have the DLL run on other platform than the build platform
+

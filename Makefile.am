@@ -6,7 +6,6 @@ SUBDIRS = \
 EXTRA_DIST = \
 	include/libewf.h.in \
 	include/libewf/libewf_definitions.h.in \
-	include/libewf/libewf_extern.h.in \
 	include/libewf/libewf_types.h.in \
 	libewf/libewf_config.h \
 	libewf/libewf_config_windows.h \
@@ -16,6 +15,19 @@ EXTRA_DIST = \
 	manuals/ewfinfo.1 \
 	manuals/ewfverify.1 \
 	manuals/libewf.3 \
+	msvscpp/ewfacquire \
+	msvscpp/ewfacquire/ewfacquire.vcproj \
+	msvscpp/ewfacquirestream \
+	msvscpp/ewfacquirestream/ewfacquirestream.vcproj \
+	msvscpp/ewfexport \
+	msvscpp/ewfexport/ewfexport.vcproj \
+	msvscpp/ewfinfo \
+	msvscpp/ewfinfo/ewfinfo.vcproj \
+	msvscpp/ewfverify \
+	msvscpp/ewfverify/ewfverify.vcproj \
+	msvscpp/libewf_dll \
+	msvscpp/libewf_dll/libewf_dll.vcproj \
+	msvscpp/libewf.sln \
 	TESTS \
 	libewf.spec.in \
 	libewf.spec \
