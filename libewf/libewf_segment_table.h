@@ -55,6 +55,10 @@ struct libewf_segment_file
 	 */
 	LIBEWF_FILENAME *filename;
 
+	/* The filename length
+	 */
+	size_t length_filename;
+
 	/* The file descriptor
 	 */
 	int file_descriptor;

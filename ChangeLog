@@ -131,11 +131,14 @@ Next release:
 
 * make buffer passthrough default behavior?
 * work on TODO in write
-* API function get current chunk size?
+* API function get current chunk size? for raw read?
 * do not finalize on write error?
 
 * offset table dirty still needed?
-* store length segment filename in segment file
+  only needed for write
+  need to determine if a chunks is stored in a delta segment file
+  what about adding the segment file type to the segment file struct?
+
 * move libewf_section_list_append to section write functions?
   - for some sections not useful
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
@@ -170,6 +173,7 @@ Version: 20071123
 * section read count is returned instead of section size when possible
 * fixed win32 support solution file and ewfglob
 * added section type length to section list entry
+* added length filename in segment file struct
 
 Version: 20071121
 * worked on refactoring code

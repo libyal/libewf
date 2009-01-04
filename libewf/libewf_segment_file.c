@@ -131,6 +131,7 @@ LIBEWF_SEGMENT_FILE *libewf_segment_file_alloc( void )
 	}
 	segment_file->file_descriptor     = -1;
 	segment_file->filename            = NULL;
+	segment_file->length_filename     = 0;
 	segment_file->file_offset         = 0;
 	segment_file->amount_of_chunks    = 0;
 	segment_file->section_list->first = NULL;
@@ -177,6 +178,7 @@ LIBEWF_SEGMENT_FILE *libewf_segment_file_open( LIBEWF_FILENAME *filename, size_t
 	}
 	segment_file->file_descriptor     = -1;
 	segment_file->filename            = NULL;
+	segment_file->length_filename     = 0;
 	segment_file->file_offset         = 0;
 	segment_file->amount_of_chunks    = 0;
 	segment_file->section_list->first = NULL;
@@ -1991,7 +1993,7 @@ int libewf_segment_file_get_filename( LIBEWF_SEGMENT_FILE *segment_file, LIBEWF_
 
 		return( -1 );
 	}
-	filename_length = libewf_filename_length( segment_file->filename );
+	filename_length = segment_file->length_filename;
 
 	/* Add one additional character for the end of line
 	 */
@@ -2085,6 +2087,7 @@ int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const L
 	/* Make sure the string is terminated
 	 */
 	segment_file->filename[ length_filename ] = '\0';
+	segment_file->length_filename             = length_filename;
 
 	return( 1 );
 }
