@@ -56,6 +56,8 @@ EXTRA_DIST = \
 	msvscpp/ewfacquire/ewfacquire.vcproj \
 	msvscpp/ewfacquirestream \
 	msvscpp/ewfacquirestream/ewfacquirestream.vcproj \
+	msvscpp/ewfalter \
+	msvscpp/ewfalter/ewfalter.vcproj \
 	msvscpp/ewfexport \
 	msvscpp/ewfexport/ewfexport.vcproj \
 	msvscpp/ewfinfo \

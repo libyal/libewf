@@ -154,6 +154,7 @@ CLOSED
 Version: 20071209
 * minor changes to debian package files
 * fixes for the MS Visual C++ build
+* added ewfalter to MSVCpp build
 
 Version: 20071208
 * pkgconfig added to spec file

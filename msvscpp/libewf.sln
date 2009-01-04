@@ -28,6 +28,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ewfacquirestream", "ewfacqu
 		{B5225323-AC67-411D-8FBA-199E9467FAB5} = {B5225323-AC67-411D-8FBA-199E9467FAB5}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ewfalter", "ewfalter\ewfalter.vcproj", "{DB9753F2-57F5-4C1A-8A40-06D32359562D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5225323-AC67-411D-8FBA-199E9467FAB5} = {B5225323-AC67-411D-8FBA-199E9467FAB5}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -58,6 +63,10 @@ Global
 		{A7DD27F1-73B6-447B-ADF4-424518923A98}.Debug|Win32.Build.0 = Debug|Win32
 		{A7DD27F1-73B6-447B-ADF4-424518923A98}.Release|Win32.ActiveCfg = Release|Win32
 		{A7DD27F1-73B6-447B-ADF4-424518923A98}.Release|Win32.Build.0 = Release|Win32
+		{DB9753F2-57F5-4C1A-8A40-06D32359562D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DB9753F2-57F5-4C1A-8A40-06D32359562D}.Debug|Win32.Build.0 = Debug|Win32
+		{DB9753F2-57F5-4C1A-8A40-06D32359562D}.Release|Win32.ActiveCfg = Release|Win32
+		{DB9753F2-57F5-4C1A-8A40-06D32359562D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

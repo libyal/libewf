@@ -239,8 +239,12 @@ int main( int argc, char * const argv[] )
 	              ( media_size - alter_offset ),
 	              ( media_size - alter_offset ) );
 
-	buffer = libewf_common_alloc( alter_size * sizeof( uint8_t ) );
+	if( alter_size > (size_t) SSIZE_MAX )
+	{
+		fprintf( stderr, "Invalid amount of bytes to alter value exceeds maximum.\n" );
 
+		return( EXIT_FAILURE );
+	}
 	if( buffer == NULL )
 	{
 		fprintf( stderr, "Unable to allocate buffer.\n" );
@@ -251,7 +255,7 @@ int main( int argc, char * const argv[] )
 		}
 		return( EXIT_FAILURE );
 	}
-	if( libewf_common_memset( buffer, 'X', alter_size ) == NULL )
+	if( libewf_common_memset( buffer, 'X', (size_t) alter_size ) == NULL )
 	{
 		fprintf( stderr, "Unable to set buffer.\n" );
 
@@ -285,7 +289,7 @@ int main( int argc, char * const argv[] )
 
 	/* First alteration run
 	 */
-	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
+	count = libewf_write_random( handle, buffer, (size_t) alter_size, alter_offset );
 
 	if( count <= -1 )
 	{
@@ -301,7 +305,7 @@ int main( int argc, char * const argv[] )
 	}
 	/* Second alteration run
 	 */
-	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
+	count = libewf_write_random( handle, buffer, (size_t) alter_size, alter_offset );
 
 	libewf_common_free( buffer );
 
