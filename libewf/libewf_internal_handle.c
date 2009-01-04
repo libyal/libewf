@@ -726,6 +726,18 @@ int libewf_internal_handle_initialize_format(
 			internal_handle->write->maximum_segment_file_size        = INT32_MAX;
 			internal_handle->write->maximum_section_amount_of_chunks = EWF_MAXIMUM_OFFSETS_IN_TABLE;
 		}
+		/* Determine the maximum amount of segments allowed to write
+		 */
+		internal_handle->write->maximum_amount_of_segments = libewf_internal_handle_get_write_maximum_amount_of_segments(
+		                                                      internal_handle );
+
+		if( internal_handle->write->maximum_amount_of_segments <= -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: unable to determine the maximum amount of allowed segment files.\n",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
@@ -1043,7 +1055,6 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
-#endif
 	/* Determine the maximum amount of segments allowed to write
 	 */
 	internal_handle->write->maximum_amount_of_segments = libewf_internal_handle_get_write_maximum_amount_of_segments( internal_handle );
@@ -1055,6 +1066,7 @@ int libewf_internal_handle_write_initialize( libewf_internal_handle_t *internal_
 
 		return( -1 );
 	}
+#endif
 	/* If no input write size was provided check if EWF file format allows for streaming
 	 */
 	if( internal_handle->media_values->media_size == 0 )
