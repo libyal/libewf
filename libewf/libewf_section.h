@@ -1,7 +1,7 @@
 /*
  * libewf section
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -86,8 +86,8 @@ ssize_t libewf_section_session_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_ha
 ssize_t libewf_section_data_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size_t section_size, LIBEWF_MEDIA_VALUES *media_values, uint8_t ewf_format, uint8_t error_tollerance );
 ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_MEDIA_VALUES *media_values, int8_t compression_level, uint8_t format, EWF_DATA **cached_data_section, uint8_t no_section_append );
 
-ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_SECTOR_TABLE *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance );
-ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_SECTOR_TABLE *acquiry_errors );
+ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, libewf_sector_table_t *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance );
+ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, libewf_sector_table_t *acquiry_errors );
 
 ssize_t libewf_section_hash_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_DIGEST_HASH *md5_hash, uint8_t error_tollerance );
 ssize_t libewf_section_hash_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, EWF_DIGEST_HASH *md5_hash );
@@ -107,7 +107,7 @@ ssize_t libewf_section_delta_chunk_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_fi
 ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, size64_t section_size );
 #endif
 
-int libewf_section_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
+int libewf_section_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance );
 
 #if defined( __cplusplus )
 }

@@ -1,7 +1,7 @@
 /*
  * libewf segment file
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -192,7 +192,7 @@ ssize_t libewf_segment_file_read_file_header( LIBEWF_SEGMENT_FILE_HANDLE *segmen
  * for the segment file in the segment table in the handle
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance  )
+int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance  )
 {
 	EWF_SECTION section;
 
@@ -1209,7 +1209,7 @@ ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE_HANDLE *segme
 /* Closes the segment file, necessary sections at the end of the segment file will be written
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_segment_file_write_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
+ssize_t libewf_segment_file_write_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section )
 {
 	static char *function     = "libewf_segment_file_write_close";
 	ssize_t total_write_count = 0;

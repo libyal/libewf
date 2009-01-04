@@ -1,7 +1,7 @@
 /*
  * Definitions for libewf
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -37,9 +37,9 @@
 /* The libewf version
  */
 #if 0
-#define LIBEWF_VERSION				L"20071227"
+#define LIBEWF_VERSION				L"20071228"
 #else
-#define LIBEWF_VERSION				"20071227"
+#define LIBEWF_VERSION				"20071228"
 #endif
 
 /* The libewf file access

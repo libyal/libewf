@@ -2,7 +2,7 @@
  * ewfacquire
  * Reads data from a file and writes it in EWF format
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.

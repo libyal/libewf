@@ -1,7 +1,7 @@
 /*
  * libewf segment table
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -173,7 +173,7 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 /* Builds the segment table from all segment files
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_table_build( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance )
+int libewf_segment_table_build( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance )
 {
 	static char *function   = "libewf_segment_table_build";
 	uint16_t segment_number = 0;
@@ -247,7 +247,7 @@ int libewf_segment_table_build( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_HEAD
  * Opens EWF segment files for reading and EWF delta segment files for reading and writing
  * Returns 1 if successful, 0 if not, or -1 on error
  */
-int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_SEGMENT_TABLE *delta_segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance )
+int libewf_segment_table_read_open( LIBEWF_SEGMENT_TABLE *segment_table, LIBEWF_SEGMENT_TABLE *delta_segment_table, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance )
 {
 	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
 	static char *function                           = "libewf_segment_table_read_open";

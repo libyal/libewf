@@ -1,7 +1,7 @@
 /*
  * libewf section
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -2843,7 +2843,7 @@ ssize_t libewf_section_data_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
 /* Reads a error2 section from file
  * Returns the amount of bytes read, or -1 on error
  */
-ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_SECTOR_TABLE *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
+ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, libewf_sector_table_t *acquiry_errors, uint8_t ewf_format, uint8_t error_tollerance )
 {
 	EWF_ERROR2 error2;
 	uint8_t stored_crc_buffer[ 4 ];
@@ -3061,7 +3061,7 @@ ssize_t libewf_section_error2_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_han
 /* Writes a error2 section to file
  * Returns the amount of bytes written, or -1 on error
  */
-ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_SECTOR_TABLE *acquiry_errors )
+ssize_t libewf_section_error2_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, libewf_sector_table_t *acquiry_errors )
 {
 	EWF_ERROR2 error2;
 	uint8_t calculated_crc_buffer[ 4 ];
@@ -4162,7 +4162,7 @@ ssize_t libewf_section_debug_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_hand
  * The section start offset will be updated
  * Returns 1 if successful, -1 on error
  */
-int libewf_section_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
+int libewf_section_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, EWF_SECTION *section, off64_t *section_start_offset, uint8_t error_tollerance )
 {
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;

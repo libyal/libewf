@@ -2,7 +2,7 @@
  * ewfoutput
  * User output functions for the ewf tools
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -311,7 +311,7 @@ void ewfoutput_copyright_fprint( FILE *stream )
 
 		return;
 	}
-	fprintf( stream, "Copyright (c) 2006-2007, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n", PACKAGE_BUGREPORT );
+	fprintf( stream, "Copyright (c) 2006-2008, Joachim Metz, Hoffmann Investigations <%s> and contributors.\n", PACKAGE_BUGREPORT );
 	fprintf( stream, "This is free software; see the source for copying conditions. There is NO\n" );
 	fprintf( stream, "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n" );
 }

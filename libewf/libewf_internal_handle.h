@@ -1,7 +1,7 @@
 /*
  * libewf handle
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -122,7 +122,7 @@ struct libewf_internal_handle
 
 	/* The sectors with acquiry read errors
 	 */
-	LIBEWF_SECTOR_TABLE *acquiry_errors;
+	libewf_sector_table_t *acquiry_errors;
 
 	/* The current chunk
 	 */
@@ -160,7 +160,7 @@ struct libewf_internal_handle_read
 {
 	/* The sectors with CRC errors
 	 */
-	LIBEWF_SECTOR_TABLE *crc_errors;
+	libewf_sector_table_t *crc_errors;
 
 	/* Value to indicate the write values were initialized
 	 */

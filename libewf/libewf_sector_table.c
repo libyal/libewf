@@ -1,7 +1,7 @@
 /*
  * Error sector table definition for CRC and acquiry read errrors
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -40,12 +40,13 @@
 /* Allocates memory for a sector table struct
  * Returns a pointer to the new instance, NULL on error
  */
-LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( uint32_t amount )
+libewf_sector_table_t *libewf_sector_table_alloc( uint32_t amount )
 {
-	LIBEWF_SECTOR_TABLE *sector_table = NULL;
-	static char *function             = "libewf_sector_table_alloc";
+	libewf_sector_table_t *sector_table = NULL;
+	static char *function               = "libewf_sector_table_alloc";
 
-	sector_table = (LIBEWF_SECTOR_TABLE *) libewf_common_alloc( LIBEWF_SECTOR_TABLE_SIZE );
+	sector_table = (libewf_sector_table_t *) libewf_common_alloc(
+	                                          sizeof( libewf_sector_table_t ) );
 
 	if( sector_table == NULL )
 	{
@@ -92,7 +93,7 @@ LIBEWF_SECTOR_TABLE *libewf_sector_table_alloc( uint32_t amount )
 /* Reallocates memory for the sector table values
  * Returns 1 if successful, or -1 on error
  */
-int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, uint32_t amount )
+int libewf_sector_table_realloc( libewf_sector_table_t *sector_table, uint32_t amount )
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_sector_table_realloc";
@@ -141,7 +142,7 @@ int libewf_sector_table_realloc( LIBEWF_SECTOR_TABLE *sector_table, uint32_t amo
 
 /* Frees memory of a sector table struct including elements
  */
-void libewf_sector_table_free( LIBEWF_SECTOR_TABLE *sector_table )
+void libewf_sector_table_free( libewf_sector_table_t *sector_table )
 {
 	static char *function = "libewf_sector_table_free";
 
@@ -159,7 +160,7 @@ void libewf_sector_table_free( LIBEWF_SECTOR_TABLE *sector_table )
 /* Retrieves the information of an error sector
  * Returns 1 if successful, 0 if no error sector could be found, or -1 on error
  */
-int libewf_sector_table_get_error_sector( LIBEWF_SECTOR_TABLE *sector_table, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
+int libewf_sector_table_get_error_sector( libewf_sector_table_t *sector_table, uint32_t index, off64_t *sector, uint32_t *amount_of_sectors )
 {
 	static char *function = "libewf_sector_table_get_error_sector";
 
@@ -211,7 +212,7 @@ int libewf_sector_table_get_error_sector( LIBEWF_SECTOR_TABLE *sector_table, uin
 /* Add an error sector
  * Returns 1 if successful, or -1 on error
  */
-int libewf_sector_table_add_error_sector( LIBEWF_SECTOR_TABLE *sector_table, off64_t sector, uint32_t amount_of_sectors )
+int libewf_sector_table_add_error_sector( libewf_sector_table_t *sector_table, off64_t sector, uint32_t amount_of_sectors )
 {
 	LIBEWF_ERROR_SECTOR *error_sector = NULL;
 	static char *function             = "libewf_sector_table_add_error_sector";

@@ -1,7 +1,7 @@
 /*
  * libewf segment file
  *
- * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -55,7 +55,7 @@ int libewf_segment_file_check_file_signature( int file_descriptor );
 
 ssize_t libewf_segment_file_read_file_header( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t *segment_number, uint8_t *segment_file_type );
 
-int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance );
+int libewf_segment_file_read_sections( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int *last_segment_file, LIBEWF_HEADER_SECTIONS *header_sections, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_OFFSET_TABLE *secondary_offset_table, libewf_sector_table_t *acquiry_errors, int8_t *compression_level, uint8_t *format, uint8_t *ewf_format, size64_t *segment_file_size, uint8_t error_tollerance );
 
 ssize_t libewf_segment_file_write_headers( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_HEADER_SECTIONS *header_sections, int8_t compression_level, uint8_t format );
 ssize_t libewf_segment_file_write_last_section( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, int last_segment_file, uint8_t format, uint8_t ewf_format );
@@ -70,7 +70,7 @@ ssize_t libewf_segment_file_write_chunks_correction( LIBEWF_SEGMENT_FILE_HANDLE 
 
 ssize_t libewf_segment_file_write_delta_chunk( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint32_t chunk, EWF_CHAR *chunk_data, size_t chunk_size, EWF_CRC *chunk_crc, uint8_t write_crc );
 
-ssize_t libewf_segment_file_write_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, LIBEWF_SECTOR_TABLE *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section );
+ssize_t libewf_segment_file_write_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint16_t segment_number, uint32_t segment_amount_of_chunks, int last_segment_file, LIBEWF_HASH_SECTIONS *hash_sections, LIBEWF_VALUES_TABLE *hash_values, LIBEWF_MEDIA_VALUES *media_values, libewf_sector_table_t *acquiry_errors, int8_t compression_level, uint8_t format, uint8_t ewf_format, EWF_DATA **cached_data_section );
 
 #if defined( __cplusplus )
 }
