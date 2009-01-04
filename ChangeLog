@@ -130,6 +130,10 @@ TODO
 * change int8_t return values into int return values
 * update ewfexport man page
 * what about header values parsing with preservation of timestamps?
+* print detailed error information in ewftools for file errors
+
+Version: 20070821
+* worked on ewfexport exporting ewf formatted data for delta merge
 
 Version: 20070819
 * worked on restructuring to improve internal structure

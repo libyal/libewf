@@ -34,6 +34,7 @@
 
 #include "../libewf/libewf_includes.h"
 
+#include <errno.h>
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
@@ -111,6 +112,9 @@ int main( int argc, char * const argv[] )
 	CHAR_T *end_of_string        = NULL;
 	CHAR_T *target_filename      = NULL;
 	CHAR_T *time_string          = NULL;
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+        CHAR_T *error_string         = NULL;
+#endif
 	void *callback               = &ewfcommon_process_status_fprint;
 	INT_T option                 = 0;
 	size_t string_length         = 0;
@@ -308,7 +312,19 @@ int main( int argc, char * const argv[] )
 
 	if( handle == NULL )
 	{
-		fprintf( stderr, "Unable to open EWF image file(s).\n" );
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+		error_string = ewfcommon_strerror( errno );
+
+		if( error_string != NULL )
+		{
+			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+			 error_string );
+
+			libewf_common_free( error_string );
+		}
+#else
+		fprintf( stderr, "Unable to open EWF file(s).\n" );
+#endif
 
 		libewf_common_free( target_filename );
 
@@ -320,7 +336,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stderr, "Unable to close EWF file handle.\n" );
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		libewf_common_free( target_filename );
 
@@ -334,7 +350,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stderr, "Unable to close EWF file handle.\n" );
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		libewf_common_free( target_filename );
 
@@ -373,7 +389,7 @@ int main( int argc, char * const argv[] )
 
 				if( libewf_close( handle ) != 0 )
 				{
-					fprintf( stderr, "Unable to close EWF file handle.\n" );
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
 				}
 				libewf_common_free( target_filename );
 				libewf_common_free( user_input );
@@ -419,7 +435,7 @@ int main( int argc, char * const argv[] )
 
 				if( libewf_close( handle ) != 0 )
 				{
-					fprintf( stderr, "Unable to close EWF file handle.\n" );
+					fprintf( stderr, "Unable to close EWF file(s).\n" );
 				}
 				libewf_common_free( target_filename );
 
@@ -448,7 +464,7 @@ int main( int argc, char * const argv[] )
 
 					if( libewf_close( handle ) != 0 )
 					{
-						fprintf( stderr, "Unable to close EWF file handle.\n" );
+						fprintf( stderr, "Unable to close EWF file(s).\n" );
 					}
 					libewf_common_free( target_filename );
 
@@ -574,11 +590,23 @@ int main( int argc, char * const argv[] )
 
 		if( export_handle == NULL )
 		{
-			fprintf( stderr, "Unable to open export EWF file handle.\n" );
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+		error_string = ewfcommon_strerror( errno );
+
+		if( error_string != NULL )
+		{
+			fprintf( stderr, "Unable to open export EWF file(s) with failure: %" PRIs ".\n",
+			 error_string );
+
+			libewf_common_free( error_string );
+		}
+#else
+			fprintf( stderr, "Unable to open export EWF file(s).\n" );
+#endif
 
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
@@ -588,11 +616,11 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( export_handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
@@ -602,11 +630,11 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( export_handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
@@ -619,11 +647,11 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( export_handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
@@ -633,11 +661,11 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( export_handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stderr, "Unable to close EWF file handle.\n" );
+				fprintf( stderr, "Unable to close EWF file(s).\n" );
 			}
 			return( EXIT_FAILURE );
 		}
@@ -686,7 +714,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stderr, "Unable to close EWF file handle.\n" );
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
 		}
 		return( EXIT_FAILURE );
 	}
@@ -708,7 +736,7 @@ int main( int argc, char * const argv[] )
 
 	if( libewf_close( handle ) != 0 )
 	{
-		fprintf( stderr, "Unable to close EWF file handle.\n" );
+		fprintf( stderr, "Unable to close EWF file(s).\n" );
 
 		return( EXIT_FAILURE );
 	}

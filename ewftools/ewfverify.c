@@ -34,6 +34,7 @@
 
 #include "../libewf/libewf_includes.h"
 
+#include <errno.h>
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
@@ -92,6 +93,9 @@ int main( int argc, char * const argv[] )
 	LIBEWF_CHAR *stored_sha1_hash_string     = NULL;
 	LIBEWF_CHAR *calculated_sha1_hash_string = NULL;
 	CHAR_T *time_string                      = NULL;
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+        CHAR_T *error_string                     = NULL;
+#endif
 	void *callback                           = &ewfcommon_process_status_fprint;
 	INT_T option                             = 0;
 	time_t timestamp_start                   = 0;
@@ -192,7 +196,19 @@ int main( int argc, char * const argv[] )
 
 	if( handle == NULL )
 	{
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+		error_string = ewfcommon_strerror( errno );
+
+		if( error_string != NULL )
+		{
+			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+			 error_string );
+
+			libewf_common_free( error_string );
+		}
+#else
 		fprintf( stderr, "Unable to open EWF image file(s).\n" );
+#endif
 
 		return( EXIT_FAILURE );
 	}
@@ -287,7 +303,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stdout, "Unable to close EWF file handle.\n" );
+			fprintf( stdout, "Unable to close EWF file(s).\n" );
 		}
 		libewf_common_free( stored_md5_hash_string );
 		libewf_common_free( calculated_md5_hash_string );
@@ -321,7 +337,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stdout, "Unable to close EWF file handle.\n" );
+			fprintf( stdout, "Unable to close EWF file(s).\n" );
 		}
 		libewf_common_free( stored_md5_hash_string );
 		libewf_common_free( calculated_md5_hash_string );
@@ -341,7 +357,7 @@ int main( int argc, char * const argv[] )
 
 		if( libewf_close( handle ) != 0 )
 		{
-			fprintf( stdout, "Unable to close EWF file handle.\n" );
+			fprintf( stdout, "Unable to close EWF file(s).\n" );
 		}
 		libewf_common_free( stored_md5_hash_string );
 		libewf_common_free( calculated_md5_hash_string );
@@ -363,7 +379,7 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stdout, "Unable to close EWF file handle.\n" );
+				fprintf( stdout, "Unable to close EWF file(s).\n" );
 			}
 			libewf_common_free( stored_md5_hash_string );
 			libewf_common_free( calculated_md5_hash_string );
@@ -380,7 +396,7 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stdout, "Unable to close EWF file handle.\n" );
+				fprintf( stdout, "Unable to close EWF file(s).\n" );
 			}
 			libewf_common_free( stored_md5_hash_string );
 			libewf_common_free( calculated_md5_hash_string );
@@ -395,7 +411,7 @@ int main( int argc, char * const argv[] )
 
 			if( libewf_close( handle ) != 0 )
 			{
-				fprintf( stdout, "Unable to close EWF file handle.\n" );
+				fprintf( stdout, "Unable to close EWF file(s).\n" );
 			}
 			libewf_common_free( stored_md5_hash_string );
 			libewf_common_free( calculated_md5_hash_string );
@@ -409,7 +425,7 @@ int main( int argc, char * const argv[] )
 
 	if( libewf_close( handle ) != 0 )
 	{
-		fprintf( stdout, "Unable to close EWF file handle.\n" );
+		fprintf( stdout, "Unable to close EWF file(s).\n" );
 
 		libewf_common_free( stored_md5_hash_string );
 		libewf_common_free( calculated_md5_hash_string );

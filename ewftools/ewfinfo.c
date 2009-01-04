@@ -34,6 +34,7 @@
 
 #include "../libewf/libewf_includes.h"
 
+#include <errno.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -91,6 +92,9 @@ int main( int argc, char * const argv[] )
 #if !defined( HAVE_GLOB_H )
 	EWFGLOB *glob            = NULL;
 	int32_t glob_count       = 0;
+#endif
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+        CHAR_T *error_string     = NULL;
 #endif
 	LIBEWF_HANDLE *handle    = NULL;
 	INT_T option             = 0;
@@ -227,7 +231,19 @@ int main( int argc, char * const argv[] )
 
 	if( handle == NULL )
 	{
-		fprintf( stderr, "Unable to open EWF image file(s).\n" );
+#if defined( HAVE_STRERROR_R ) || defined( HAVE_STRERROR )
+		error_string = ewfcommon_strerror( errno );
+
+		if( error_string != NULL )
+		{
+			fprintf( stderr, "Unable to open EWF file(s) with failure: %" PRIs ".\n",
+			 error_string );
+
+			libewf_common_free( error_string );
+		}
+#else
+		fprintf( stderr, "Unable to open EWF file(s).\n" );
+#endif
 
 		return( EXIT_FAILURE );
 	}
@@ -395,7 +411,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( libewf_close( handle ) != 0 )
 	{
-		fprintf( stdout, "Unable to close EWF file handle.\n" );
+		fprintf( stdout, "Unable to close EWF file(s).\n" );
 
 		return( EXIT_FAILURE );
 	}
