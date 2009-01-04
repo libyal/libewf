@@ -255,10 +255,25 @@ int main( int argc, char * const argv[] )
 	}
 	fprintf( stderr, "\n" );
 
+	/* First alteration run
+	 */
 	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
-/*
+
+	if( count <= -1 )
+	{
+		fprintf( stdout, "Alteration failed.\n" );
+
+		if( libewf_close( handle ) != 0 )
+		{
+			fprintf( stderr, "Unable to close EWF file(s).\n" );
+		}
+		libewf_common_free( buffer );
+
+		return( EXIT_FAILURE );
+	}
+	/* Second alteration run
+	 */
 	count = libewf_write_random( handle, buffer, alter_size, alter_offset );
-*/
 
 	libewf_common_free( buffer );
 

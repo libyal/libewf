@@ -1654,9 +1654,7 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 
 				return( -1 );
 			}
-			internal_handle->offset_table->file_descriptor[ chunk ] = internal_handle->delta_segment_table->file_descriptor[ segment_number ];
-			internal_handle->offset_table->offset[ chunk ]          = internal_handle->delta_segment_table->file_offset[ segment_number ];
-			internal_handle->offset_table->segment_number[ chunk ]  = segment_number;
+			internal_handle->offset_table->offset[ chunk ] = internal_handle->delta_segment_table->file_offset[ segment_number ];
 		}
 	}
 	else
@@ -1718,7 +1716,9 @@ ssize_t libewf_write_existing_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, in
 		}
 		internal_handle->delta_segment_table->file_offset[ segment_number ] += write_count;
 
-		internal_handle->offset_table->dirty[ chunk ] = 1;
+		internal_handle->offset_table->file_descriptor[ chunk ] = internal_handle->delta_segment_table->file_descriptor[ segment_number ];
+		internal_handle->offset_table->segment_number[ chunk ]  = segment_number;
+		internal_handle->offset_table->dirty[ chunk ]           = 1;
 	}
 	/* Report the amount of data written
 	 */
