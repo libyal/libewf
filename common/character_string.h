@@ -265,7 +265,7 @@ typedef char character_t;
 #error Missing snprintf and sprintf
 #endif
 
-#if defined( HAVE_FGETS )
+#if defined( HAVE_WINDOWS_API ) || defined( HAVE_FGETS )
 #define string_get_from_stream( string, size, stream ) \
 	fgets( string, size, stream )
 

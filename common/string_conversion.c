@@ -49,6 +49,7 @@ int libewf_string_copy_wchar_to_char(
 {
 	static char *function = "libewf_string_copy_wchar_to_char";
 	size_t iterator       = 0;
+	int character         = 0;
 
 	if( source == NULL )
 	{
@@ -73,14 +74,18 @@ int libewf_string_copy_wchar_to_char(
 	}
 	for( iterator = 0; iterator < size; iterator++ )
 	{
-		destination[ iterator ] = (char) wctob(
-		                                  (wint_t) source[ iterator ] );
+		character = wctob(
+		             (wint_t) source[ iterator ] );
 
 		/* If character is out of the basic ASCII range use '_' as a place holder
 		 */
-		if( destination[ iterator ] == EOF )
+		if( character == EOF )
 		{
 			destination[ iterator ] = '_';
+		}
+		else
+		{
+			destination[ iterator ] = (char) character;
 		}
 	}
 	destination[ size - 1 ] = (char) '\0';

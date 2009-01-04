@@ -45,11 +45,8 @@ extern "C" {
 #if defined( HAVE_WIDE_CHARACTER_TYPE ) && defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
 
 #if defined( HAVE_WINDOWS_API )
-#define date_time_wctime_r( timestamp, string, size ) \
-	_wctime_s( string, size, timestamp )
-
 #define date_time_wctime( timestamp, string, size ) \
-	_wctime_s( string, size, timestamp )
+	( _wctime_s( string, size, timestamp ) != 0 ? NULL : string )
 
 #else
 #error Missing wide character equivalent of function ctime()

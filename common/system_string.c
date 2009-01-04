@@ -78,7 +78,8 @@ system_character_t *libewf_system_string_duplicate(
 	}
 	if( system_string_copy(
 	     duplicate,
-	     string, size ) == NULL )
+	     string,
+	     size ) == NULL )
 	{
 		notify_warning_printf( "%s: unable to set duplicate string.\n",
 		 function );
