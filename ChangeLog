@@ -159,10 +159,13 @@ WORKING
 * do not finalize on write error?
 * ewfcommon - size write buffer to chunk size for raw write
 * ewfexport - add raw access support
+* write - duplicate tables, due to libewf_write_finalize
 
 Version: 20071104
 * refactored write functions
 * refactored read functions
+* worked on raw access support for ewfexport
+* small fixes in ewfexport
 
 Version: 20071103
 * refactored write functions

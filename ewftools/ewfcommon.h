@@ -63,8 +63,8 @@ ssize64_t ewfcommon_read_verify( LIBEWF_HANDLE *handle, uint8_t calculate_md5, L
 
 ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file_descriptor, size64_t write_size, off64_t write_offset, uint8_t read_error_retry, uint32_t sector_error_granularity, uint8_t wipe_block_on_read_error, uint8_t seek_on_error, uint8_t calculate_md5, LIBEWF_CHAR *md5_hash_string, size_t md5_hash_string_length, uint8_t calculate_sha1, LIBEWF_CHAR *sha1_hash_string, size_t sha1_hash_string_length, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
-ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t read_size, off64_t read_offset, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
-ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t read_size, off64_t read_offset, uint8_t swap_byte_pairs, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t export_size, off64_t read_offset, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
+ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t export_size, off64_t read_offset, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) );
 
 #if defined( __cplusplus )
 }

@@ -8,7 +8,7 @@
 /* #undef HAVE_BTOWC */
 
 /* Defines if buffer passthrough should be used */
-#define HAVE_BUFFER_PASSTHROUGH 1
+/* #undef HAVE_BUFFER_PASSTHROUGH */
 
 /* Defines if compressBound funtion is present in zlib. */
 #define HAVE_COMPRESS_BOUND 1
@@ -125,7 +125,7 @@
 
 /* Defines if libewf's read and write raw functionality should be used in the
    ewf tools */
-/* #undef HAVE_RAW_ACCESS */
+#define HAVE_RAW_ACCESS 1
 
 /* Define to 1 if you have the <signal.h> header file. */
 #define HAVE_SIGNAL_H 1

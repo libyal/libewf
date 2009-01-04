@@ -84,7 +84,8 @@ void usage( void )
 	fprintf( stderr, "\t-o: specify the offset to start the export (default is 0)\n" );
 	fprintf( stderr, "\t-s: swap byte pairs of the media data (from AB to BA)\n" );
 	fprintf( stderr, "\t    (use this for big to little endian conversion and vice versa)\n" );
-	fprintf( stderr, "\t-t: specify the target file to export to, use - for stderr (default is export)\n" );
+	fprintf( stderr, "\t-t: specify the target file to export to, use - for stdout (default is export)\n" );
+	fprintf( stderr, "      stdout is only supported for the raw format\n" );
 	fprintf( stderr, "\t-S: specify the segment file size in kbytes (2^10) (default is %" PRIu32 ")\n", (uint32_t) ( 650 * 1024 ) );
 #if defined( SPLIT_EXPORT )
 	fprintf( stderr, "\t    or the limit of the raw file size (default is no limit)" );
@@ -132,6 +133,7 @@ int main( int argc, char * const argv[] )
 	int64_t segment_file_size    = 0;
 	uint8_t libewf_format        = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs      = 0;
+	uint8_t wipe_chunk_on_error  = 1;
 	uint8_t verbose              = 0;
 	int8_t compression_level     = LIBEWF_COMPRESSION_NONE;
 	int8_t compress_empty_block  = 0;
@@ -506,7 +508,7 @@ int main( int argc, char * const argv[] )
 			{
 				target_filename = ewfinput_get_variable_char_t(
 				                   stderr,
-				                   _S_LIBEWF_CHAR( "Target path and filename without extension or - for stderr" ) );
+				                   _S_LIBEWF_CHAR( "Target path and filename with extension or - for stdout" ) );
 
 				if( target_filename == NULL )
 				{
@@ -680,6 +682,7 @@ int main( int argc, char * const argv[] )
 		         export_size,
 		         export_offset,
 		         swap_byte_pairs,
+		         wipe_chunk_on_error,
 		         callback );
 
 		if( libewf_close( export_handle ) != 0 )
@@ -698,6 +701,7 @@ int main( int argc, char * const argv[] )
 		         export_size,
 		         export_offset,
 		         swap_byte_pairs,
+		         wipe_chunk_on_error,
 		         callback );
 
 		libewf_common_free( target_filename );

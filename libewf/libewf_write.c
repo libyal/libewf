@@ -1286,6 +1286,13 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
+	if( is_compressed == 1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: cannot handle compressed chunk.\n",
+		 function );
+
+		return( -1 );
+	}
 	/* Check if the chunk does not already exists in a delta segment file
 	 */
 	if( internal_handle->offset_table->dirty[ chunk ] == 0 )
