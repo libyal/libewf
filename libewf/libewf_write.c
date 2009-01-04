@@ -1868,7 +1868,6 @@ ssize_t libewf_write_chunk_data_existing( LIBEWF_INTERNAL_HANDLE *internal_handl
 		 */
 		read_count = libewf_read_chunk(
 		              internal_handle,
-		              0,
 		              chunk,
 		              0,
 		              internal_handle->chunk_cache->data,
