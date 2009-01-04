@@ -118,13 +118,13 @@ ewfinfo_SOURCES = \
 	error_string.c error_string.h \
 	ewfcommon.c ewfcommon.h \
 	ewfgetopt.c ewfgetopt.h \
-	ewfguid.c ewfguid.h \
 	ewfinfo.c \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfstring.c ewfstring.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
+	guid.c guid.h \
 	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \

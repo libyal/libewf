@@ -25,17 +25,17 @@
 #include <types.h>
 
 #include "character_string.h"
-#include "ewfguid.h"
+#include "guid.h"
 
 /* Converts the GUID into a string
  * Returns 1 if successful or -1 on error
  */
-int ewfguid_to_string(
-     ewfguid_t *guid,
+int guid_to_string(
+     guid_t *guid,
      character_t *string,
      size_t string_size )
 {
-	static char *function = "ewfguid_to_string";
+	static char *function = "guid_to_string";
 	ssize_t print_count   = 0;
 
 	if( guid == NULL )
@@ -52,7 +52,7 @@ int ewfguid_to_string(
 
 		return( -1 );
 	}
-	if( string_size < EWFGUID_STRING_LENGTH )
+	if( string_size < GUID_STRING_LENGTH )
 	{
 		notify_warning_printf( "%s: string too small.\n",
 		 function );

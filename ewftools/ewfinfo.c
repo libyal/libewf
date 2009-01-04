@@ -49,10 +49,10 @@
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
-#include "glob.h"
-#include "ewfguid.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
+#include "glob.h"
+#include "guid.h"
 
 /* Prints the executable usage information
  */
@@ -86,7 +86,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	character_t media_size_string[ 16 ];
-	character_t guid_string[ EWFGUID_STRING_LENGTH ];
+	character_t guid_string[ GUID_STRING_LENGTH ];
 	uint8_t guid[ 16 ];
 
 	character_t *program                       = _CHARACTER_T_STRING( "ewfinfo" );
@@ -574,10 +574,10 @@ int main( int argc, char * const argv[] )
 			     guid,
 			     16 ) == 1 )
 			{
-				if( ewfguid_to_string(
-				     (ewfguid_t *) guid,
+				if( guid_to_string(
+				     (guid_t *) guid,
 				     guid_string,
-				     EWFGUID_STRING_LENGTH ) == 1 )
+				     GUID_STRING_LENGTH ) == 1 )
 				{
 					fprintf( stdout, "\tGUID:\t\t\t%" PRIs "\n",
 					 guid_string );
