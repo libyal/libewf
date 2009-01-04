@@ -933,6 +933,7 @@ int libewf_internal_handle_add_segment_file(
      int file_io_pool_entry,
      int flags,
      uint16_t *segment_number,
+     uint8_t *segment_file_type,
      libewf_error_t **error )
 {
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
@@ -967,6 +968,17 @@ int libewf_internal_handle_add_segment_file(
 		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
 		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment number.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_type == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file type.\n",
 		 function );
 
 		return( -1 );
@@ -1127,6 +1139,8 @@ int libewf_internal_handle_add_segment_file(
 
 		return( -1 );
 	}
+	*segment_file_type = segment_file_handle->file_type;
+
 	return( 1 );
 }
 

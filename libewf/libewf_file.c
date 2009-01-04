@@ -903,6 +903,8 @@ libewf_handle_t *libewf_open(
 	libewf_error_t *error                     = NULL;
 	libewf_handle_t *handle                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
+	char *first_delta_segment_filename        = NULL;
+	char *first_segment_filename              = NULL;
 	static char *function                     = "libewf_open";
 	size64_t *segment_file_size               = NULL;
 	size_t filename_length                    = 0;
@@ -910,6 +912,7 @@ libewf_handle_t *libewf_open(
 	int filename_iterator                     = 0;
 	int file_io_pool_entry                    = 0;
 	int result                                = 0;
+	uint8_t segment_file_type                 = 0;
 
 	if( filenames == NULL )
 	{
@@ -981,82 +984,24 @@ libewf_handle_t *libewf_open(
 	}
 	internal_handle = (libewf_internal_handle_t *) handle;
 
-	/* Get the basename of the first segment file
-	 * and store it in the segment tables
-	 */
-	filename_length = narrow_string_length(
-	                   filenames[ 0 ] );
-
-        /* Make sure there is more to the filename than the extension
-	 */
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
-		if( filename_length <= 4 )
+		for( filename_iterator = 0; filename_iterator < amount_of_files; filename_iterator++ )
 		{
-			libewf_error_set(
-			 &error,
-			 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
-			 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-			 "%s: filename is too small.\n",
-			 function );
+			filename_length = narrow_string_length(
+					   filenames[ filename_iterator ] );
 
-			libewf_error_backtrace_notify(
-			 error );
-			libewf_error_free(
-			 &error );
-
-			libewf_handle_free(
-			 &handle,
-			 NULL );
-
-			return( NULL );
-		}
-		filename_length -= 4;
-	}
-	/* Set segment table basename
-	 */
-	if( libewf_segment_table_set_basename(
-	     internal_handle->segment_table,
-	     filenames[ 0 ],
-	     filename_length,
-	     &error ) != 1 )
-	{
-		libewf_error_set(
-		 &error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set basename in segment table.\n",
-		 function );
-
-		libewf_error_backtrace_notify(
-		 error );
-		libewf_error_free(
-		 &error );
-
-		libewf_handle_free(
-		 &handle,
-		 NULL );
-
-		return( NULL );
-	}
-	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
-	{
-		if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
-		{
-			/* Set delta segment table basename
+			/* Make sure there is more to the filename than the extension
 			 */
-			if( libewf_segment_table_set_basename(
-			     internal_handle->delta_segment_table,
-			     filenames[ 0 ],
-			     filename_length,
-			     &error ) != 1 )
+			if( filename_length <= 4 )
 			{
 				libewf_error_set(
 				 &error,
-				 LIBEWF_ERROR_DOMAIN_RUNTIME,
-				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set basename in delta segment table.\n",
-				 function );
+				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+				 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 "%s: filename: %s is too small.\n",
+				 function,
+				 filenames[ filename_iterator ] );
 
 				libewf_error_backtrace_notify(
 				 error );
@@ -1069,9 +1014,6 @@ libewf_handle_t *libewf_open(
 
 				return( NULL );
 			}
-		}
-		for( filename_iterator = 0; filename_iterator < amount_of_files; filename_iterator++ )
-		{
 			if( libewf_file_io_pool_add_file(
 			     internal_handle->file_io_pool,
 			     filenames[ filename_iterator ],
@@ -1102,6 +1044,7 @@ libewf_handle_t *libewf_open(
 			          file_io_pool_entry,
 			          flags,
 			          &segment_number,
+			          &segment_file_type,
 			          &error );
 
 			if( result == -1 )
@@ -1166,13 +1109,102 @@ libewf_handle_t *libewf_open(
 
 				return( NULL );
 			}
+			if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+			 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
+			{
+				if( segment_number == 1 )
+				{
+					first_segment_filename = filenames[ filename_iterator ];
+
+					if( first_delta_segment_filename == NULL )
+					{
+						first_delta_segment_filename = filenames[ filename_iterator ];
+					}
+				}
 #if defined( HAVE_VERBOSE_OUTPUT )
-			notify_verbose_printf(
-			 "%s: added segment file: %" PRIu16 " (%s).\n",
-			 function,
-			 segment_number,
-			 filenames[ filename_iterator ] );
+				notify_verbose_printf(
+				 "%s: added segment file: %" PRIu16 " (%s).\n",
+				 function,
+				 segment_number,
+				 filenames[ filename_iterator ] );
 #endif
+			}
+			else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+			{
+				if( segment_number == 1 )
+				{
+					first_delta_segment_filename = filenames[ filename_iterator ];
+				}
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
+				 "%s: added delta segment file: %" PRIu16 " (%s).\n",
+				 function,
+				 segment_number,
+				 filenames[ filename_iterator ] );
+#endif
+			}
+		}
+		/* Get the basename of the first segment file
+		 */
+		filename_length = narrow_string_length(
+				   first_segment_filename );
+
+		/* Set segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->segment_table,
+		     first_segment_filename,
+		     filename_length - 4,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+		/* Get the basename of the first segment file
+		 */
+		filename_length = narrow_string_length(
+				   first_delta_segment_filename );
+
+		/* Set delta segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->delta_segment_table,
+		     first_delta_segment_filename,
+		     filename_length - 4,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in delta segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
 		}
 		if( libewf_segment_table_build(
 		     internal_handle->segment_table,
@@ -1274,6 +1306,40 @@ libewf_handle_t *libewf_open(
 		internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->amount_of_sectors
 		                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
 	}
+	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	{
+		/* Get the basename and store it in the segment tables
+		 */
+		filename_length = narrow_string_length(
+				   filenames[ 0 ] );
+
+		/* Set segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->segment_table,
+		     filenames[ 0 ],
+		     filename_length,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+	}
 	/* Make sure format specific values are set
 	 */
 	if( ( internal_handle->format != 0 )
@@ -1308,6 +1374,493 @@ libewf_handle_t *libewf_open(
 
 	return( handle );
 }
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Opens a set of EWF file(s)
+ * For reading files should contain all filenames that make up an EWF image
+ * For writing files should contain the base of the filename, extentions like .e01 will be automatically added
+ * Returns a pointer to the new instance of handle, NULL on error
+ */
+libewf_handle_t *libewf_open_wide(
+                  wchar_t * const filenames[],
+                  int amount_of_files,
+                  uint8_t flags )
+{
+	libewf_error_t *error                     = NULL;
+	libewf_handle_t *handle                   = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	wchar_t *first_delta_segment_filename     = NULL;
+	wchar_t *first_segment_filename           = NULL;
+	static char *function                     = "libewf_open_wide";
+	size64_t *segment_file_size               = NULL;
+	size_t filename_length                    = 0;
+	uint16_t segment_number                   = 0;
+	int filename_iterator                     = 0;
+	int file_io_pool_entry                    = 0;
+	int result                                = 0;
+	uint8_t segment_file_type                 = 0;
+
+	if( filenames == NULL )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( amount_of_files <= 0 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid amount of files zero or less.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( ( ( flags & LIBEWF_FLAG_READ ) != LIBEWF_FLAG_READ )
+	 && ( ( flags & LIBEWF_FLAG_WRITE ) != LIBEWF_FLAG_WRITE ) )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported flags.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( libewf_handle_initialize(
+	     &handle,
+	     flags,
+	     &error ) != 1 )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create handle.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
+	{
+		for( filename_iterator = 0; filename_iterator < amount_of_files; filename_iterator++ )
+		{
+			filename_length = wide_string_length(
+					   filenames[ filename_iterator ] );
+
+			/* Make sure there is more to the filename than the extension
+			 */
+			if( filename_length <= 4 )
+			{
+				libewf_error_set(
+				 &error,
+				 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+				 LIBEWF_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+				 "%s: filename: %ls is too small.\n",
+				 function,
+				 filenames[ filename_iterator ] );
+
+				libewf_error_backtrace_notify(
+				 error );
+				libewf_error_free(
+				 &error );
+
+				libewf_handle_free(
+				 &handle,
+				 NULL );
+
+				return( NULL );
+			}
+			if( libewf_file_io_pool_add_file_wide(
+			     internal_handle->file_io_pool,
+			     filenames[ filename_iterator ],
+			     LIBEWF_FILE_IO_O_RDONLY,
+			     &file_io_pool_entry,
+			     &error ) != 1 )
+			{
+				libewf_error_set(
+				 &error,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to add file to file io pool.\n",
+				 function );
+
+				libewf_error_backtrace_notify(
+				 error );
+				libewf_error_free(
+				 &error );
+
+				libewf_handle_free(
+				 &handle,
+				 NULL );
+
+				return( NULL );
+			}
+			result = libewf_internal_handle_add_segment_file(
+			          internal_handle,
+			          file_io_pool_entry,
+			          flags,
+			          &segment_number,
+			          &segment_file_type,
+			          &error );
+
+			if( result == -1 )
+			{
+				libewf_error_set(
+				 &error,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_APPEND_FAILED,
+				 "%s: unable to add segment file.\n",
+				 function );
+
+				libewf_error_backtrace_notify(
+				 error );
+				libewf_error_free(
+				 &error );
+
+				libewf_handle_free(
+				 &handle,
+				 NULL );
+
+				return( NULL );
+			}
+			else if( result == 0 )
+			{
+				libewf_error_set(
+				 &error,
+				 LIBEWF_ERROR_DOMAIN_RUNTIME,
+				 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+				 "%s: segment file: %" PRIu16 " already exists.\n",
+				 function,
+				 segment_number );
+
+				libewf_error_backtrace_notify(
+				 error );
+				libewf_error_free(
+				 &error );
+
+				libewf_handle_free(
+				 &handle,
+				 NULL );
+
+				return( NULL );
+			}
+			if( (int) segment_number > amount_of_files )
+			{
+				libewf_error_set(
+				 &error,
+				 LIBEWF_ERROR_DOMAIN_INPUT,
+				 LIBEWF_INPUT_ERROR_INVALID_DATA,
+				 "%s: invalid segment number: %" PRIu16 " - value out of range or missing segment files.\n",
+				 function,
+				 segment_number );
+
+				libewf_error_backtrace_notify(
+				 error );
+				libewf_error_free(
+				 &error );
+
+				libewf_handle_free(
+				 &handle,
+				 NULL );
+
+				return( NULL );
+			}
+			if( ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
+			 || ( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_LWF ) )
+			{
+				if( segment_number == 1 )
+				{
+					first_segment_filename = filenames[ filename_iterator ];
+
+					if( first_delta_segment_filename == NULL )
+					{
+						first_delta_segment_filename = filenames[ filename_iterator ];
+					}
+				}
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
+				 "%s: added segment file: %" PRIu16 " (%ls).\n",
+				 function,
+				 segment_number,
+				 filenames[ filename_iterator ] );
+#endif
+			}
+			else if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
+			{
+				if( segment_number == 1 )
+				{
+					first_delta_segment_filename = filenames[ filename_iterator ];
+				}
+#if defined( HAVE_VERBOSE_OUTPUT )
+				notify_verbose_printf(
+				 "%s: added delta segment file: %" PRIu16 " (%ls).\n",
+				 function,
+				 segment_number,
+				 filenames[ filename_iterator ] );
+#endif
+			}
+		}
+		/* Get the basename of the first segment file
+		 */
+		filename_length = narrow_string_length(
+				   first_segment_filename );
+
+		/* Set segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->segment_table,
+		     first_segment_filename,
+		     filename_length - 4,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+		/* Get the basename of the first segment file
+		 */
+		filename_length = narrow_string_length(
+				   first_delta_segment_filename );
+
+		/* Set delta segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->delta_segment_table,
+		     first_delta_segment_filename,
+		     filename_length - 4,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in delta segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+		if( libewf_segment_table_build(
+		     internal_handle->segment_table,
+		     internal_handle->file_io_pool,
+		     internal_handle->header_sections,
+		     internal_handle->hash_sections,
+		     internal_handle->media_values,
+		     internal_handle->offset_table,
+		     internal_handle->sessions,
+		     internal_handle->acquiry_errors,
+		     &( internal_handle->compression_level ),
+		     &( internal_handle->format ),
+		     &( internal_handle->ewf_format ),
+		     segment_file_size,
+		     &( internal_handle->abort ),
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to build segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+		if( ( internal_handle->delta_segment_table->amount > 1 )
+		 && ( libewf_segment_table_build(
+		       internal_handle->delta_segment_table,
+		       internal_handle->file_io_pool,
+		       internal_handle->header_sections,
+		       internal_handle->hash_sections,
+		       internal_handle->media_values,
+		       internal_handle->offset_table,
+		       internal_handle->sessions,
+		       internal_handle->acquiry_errors,
+		       &( internal_handle->compression_level ),
+		       &( internal_handle->format ),
+		       &( internal_handle->ewf_format ),
+		       segment_file_size,
+		       &( internal_handle->abort ),
+		       &error ) != 1 ) )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to build delta segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL);
+		}
+		/* Determine the EWF format
+		 */
+		if( libewf_header_sections_determine_format(
+		     internal_handle->header_sections,
+		     internal_handle->ewf_format,
+		     &( internal_handle->format ),
+		     &error ) == -1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine format.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+		/* Calculate the media size
+		 */
+		internal_handle->media_values->media_size = (size64_t) internal_handle->media_values->amount_of_sectors
+		                                          * (size64_t) internal_handle->media_values->bytes_per_sector;
+	}
+	else if( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
+	{
+		/* Get the basename and store it in the segment tables
+		 */
+		filename_length = narrow_string_length(
+				   filenames[ 0 ] );
+
+		/* Set segment table basename
+		 */
+		if( libewf_segment_table_set_basename(
+		     internal_handle->segment_table,
+		     filenames[ 0 ],
+		     filename_length,
+		     &error ) != 1 )
+		{
+			libewf_error_set(
+			 &error,
+			 LIBEWF_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set basename in segment table.\n",
+			 function );
+
+			libewf_error_backtrace_notify(
+			 error );
+			libewf_error_free(
+			 &error );
+
+			libewf_handle_free(
+			 &handle,
+			 NULL );
+
+			return( NULL );
+		}
+	}
+	/* Make sure format specific values are set
+	 */
+	if( ( internal_handle->format != 0 )
+	 && ( libewf_internal_handle_set_format(
+	       internal_handle,
+	       internal_handle->format,
+	       &error ) != 1 ) )
+	{
+		libewf_error_set(
+		 &error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set format.\n",
+		 function );
+
+		libewf_error_backtrace_notify(
+		 error );
+		libewf_error_free(
+		 &error );
+
+		libewf_handle_free(
+		 &handle,
+		 NULL );
+
+		return( NULL );
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	notify_verbose_printf(
+	 "%s: open successful.\n",
+	 function );
+#endif
+
+	return( handle );
+}
+#endif
 
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 0 if successful or -1 on error

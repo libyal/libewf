@@ -103,12 +103,6 @@ int libewf_segment_table_set_basename(
      size_t basename_length,
      libewf_error_t **error );
 
-int libewf_segment_table_write_open(
-     libewf_segment_table_t *segment_table,
-     libewf_system_character_t * const filenames[],
-     uint16_t file_amount,
-     libewf_error_t **error );
-
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,

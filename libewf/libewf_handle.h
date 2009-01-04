@@ -281,6 +281,7 @@ int libewf_internal_handle_add_segment_file(
      int file_io_pool_entry,
      int flags,
      uint16_t *segment_number,
+     uint8_t *segment_file_type,
      libewf_error_t **error );
 
 int libewf_internal_handle_get_write_maximum_amount_of_segments(
