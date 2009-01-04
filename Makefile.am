@@ -2,6 +2,7 @@ SUBDIRS = \
 	common \
 	libewf \
 	ewftools \
+	pyewf \
 	manuals
 
 CONFIG_FILES = \

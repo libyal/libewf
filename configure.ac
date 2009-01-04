@@ -12,188 +12,6 @@ AM_INIT_AUTOMAKE(
  [libewf],
  [20080809])
 
-dnl Function to test if a certain feature was enabled
-AC_DEFUN([LIBEWF_TEST_ENABLE],
-	[AC_ARG_ENABLE(
-	 [$1],
-	 [AS_HELP_STRING(
-	  [--enable-$1],
-	  [$3 (default is $4)])],
-	 [ac_libewf_enable_$2=$enableval],
-	 [ac_libewf_enable_$2=$4])dnl
-	 AC_CACHE_CHECK(
-	  [whether to enable $3],
-	  [ac_libewf_enable_$2],
-	  [ac_libewf_enable_$2=$4])dnl
-])
-
-dnl Function to detect if printf conversion specifier "%jd" is available
-AC_DEFUN([LIBEWF_PRINTF_JD],
-	[SAVE_CFLAGS="$CFLAGS"
-	CFLAGS="$CFLAGS -Wall -Werror"
-	AC_LANG_PUSH(C)
-	AC_MSG_CHECKING(
-	 [if printf supports the conversion specifier "%jd"])
-	dnl First try to see if compilation and linkage without a parameter succeeds
-	AC_LINK_IFELSE(
-		[AC_LANG_PROGRAM(
-		 [[#include <stdio.h>]],
-		 [[printf( "%jd" ); ]] )],
-		[AC_MSG_RESULT(
-		 [no])],
-		dnl Second try to see if compilation and linkage with a parameter succeeds
-	 	[AC_LINK_IFELSE(
-			[AC_LANG_PROGRAM(
-			 [[#include <sys/types.h>
-#include <stdio.h>]],
-		 	 [[printf( "%jd", (off_t) 10 ); ]] )],
-			dnl Third try to see if the program runs correctly
-	 		 [AC_RUN_IFELSE(
-				[AC_LANG_PROGRAM(
-				 [[#include <sys/types.h>
-#include <stdio.h>]],
-				 [[char string[ 3 ];
-if( snprintf( string, 3, "%jd", (off_t) 10 ) < 0 ) return( 1 );
-if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
-				[AC_MSG_RESULT(
-				 [yes])
-				AC_DEFINE(
-				 [HAVE_PRINTF_JD],
-				 [1],
-				 [Define to 1 if printf supports the conversion specifier "%jd".] )],
-				[AC_MSG_RESULT(
-				 [no])],
-				[AC_MSG_RESULT(
-				 [undetermined])] )],
-			[AC_MSG_RESULT(
-			 [no])] )] )
-	AC_LANG_POP(C)
-	CFLAGS="$SAVE_CFLAGS"])
-
-dnl Function to detect if printf conversion specifier "%zd" is available
-AC_DEFUN([LIBEWF_PRINTF_ZD],
-	[SAVE_CFLAGS="$CFLAGS"
-	 CFLAGS="$CFLAGS -Wall -Werror"
-	 AC_LANG_PUSH(C)
-	 AC_MSG_CHECKING(
-	  [if printf supports the conversion specifier "%zd"])
-	dnl First try to see if compilation and linkage without a parameter succeeds
-	AC_LINK_IFELSE(
-		[AC_LANG_PROGRAM(
-		 [[#include <stdio.h>]],
-		 [[printf( "%zd" ); ]] )],
-		[AC_MSG_RESULT(
-		 [no])],
-		dnl Second try to see if compilation and linkage with a parameter succeeds
-	 	[AC_LINK_IFELSE(
-			[AC_LANG_PROGRAM(
-			 [[#include <sys/types.h>
-#include <stdio.h>]],
-		 	 [[printf( "%zd", (size_t) 10 ); ]] )],
-			dnl Third try to see if the program runs correctly
-	 		 [AC_RUN_IFELSE(
-				[AC_LANG_PROGRAM(
-				 [[#include <sys/types.h>
-#include <stdio.h>]],
-				 [[char string[ 3 ];
-if( snprintf( string, 3, "%zd", (size_t) 10 ) < 0 ) return( 1 );
-if( ( string[ 0 ] != '1' ) || ( string[ 1 ] != '0' ) ) return( 1 ); ]] )],
-				[AC_MSG_RESULT(
-				 [yes])
-				AC_DEFINE(
-				 [HAVE_PRINTF_ZD],
-				 [1],
-				 [Define to 1 if printf supports the conversion specifier "%zd".] )],
-				[AC_MSG_RESULT(
-				 [no])],
-				[AC_MSG_RESULT(
-				 [undetermined])] )],
-			[AC_MSG_RESULT(
-			 [no])] )] )
-	AC_LANG_POP(C)
-	CFLAGS="$SAVE_CFLAGS"])
-
-dnl Function to detect if ctime_r is defined according to the POSIX standard
-AC_DEFUN([LIBEWF_FUNC_CTIME_R],
-	[AC_CHECK_FUNC(
-	 [ctime_r],
-	 [AC_DEFINE(
-	  [HAVE_CTIME_R],
-	  [1],
-	  [Define to 1 if you have the ctime_r function.] )
-	 AC_LANG_PUSH(C)
-	 AC_MSG_CHECKING(
-	  [if ctime_r is defined according to the POSIX definition])
-	 AC_LINK_IFELSE(
-		AC_LANG_PROGRAM(
-		 [[#include <time.h>]],
-		 [[ctime_r(NULL,NULL,0)]]),
-		[AC_MSG_RESULT(
-		 [ctime_r with additional size argument detected])
-		AC_DEFINE(
-		 [HAVE_CTIME_R_SIZE],
-		 [1],
-		 [Define to 1 if you have the ctime_r function with a third size argument.] )],
-		[AC_LINK_IFELSE(
-			AC_LANG_PROGRAM(
-			 [[#include <time.h>]],
-			 [[ctime_r(NULL,NULL)]]),
-			 [AC_MSG_RESULT(
-			  [yes])],
-			 [CPPFLAGS="$CPPFLAGS -D_POSIX_PTHREAD_SEMANTICS"
-			 AC_LINK_IFELSE(
-				AC_LANG_PROGRAM(
-				 [[#include <time.h>]],
-				 [[ctime_r(NULL,NULL)]] ),
-				[AC_MSG_RESULT(
-				 [ctime_r requires additional compile flags])],
-				[AC_MSG_WARN(
-				 [Unable to determine how to compile ctime_r])] )] )] )
-	AC_LANG_POP(C) ])
-])
-
-dnl Function to determine the operating system
-AC_DEFUN([LIBEWF_DETERMINE_OPERATING_SYSTEM],
-[ac_libewf_target_string="$target";
-if test "x$ac_libewf_target_string" = x;
-then
-	ac_libewf_target_string="$build";
-fi
-case "$ac_libewf_target_string" in
-	*cygwin* )
-		ac_libewf_operating_system="Cygwin";
-		;;
-	*darwin* )
-		ac_libewf_operating_system="Darwin";
-		;;
-	*freebsd* )
-		ac_libewf_operating_system="FreeBSD";
-		;;
-	*netbsd* )
-		ac_libewf_operating_system="NetBSD";
-		;;
-	*openbsd* )
-		ac_libewf_operating_system="OpenBSD";
-		;;
-	*linux* )
-		ac_libewf_operating_system="Linux";
-		;;
-	*mingw* )
-		ac_libewf_operating_system="MingW";
-		;;
-	*solaris* )
-		ac_libewf_operating_system="SunOS";
-		;;
-	* )
-		ac_libewf_operating_system="Unknown";
-		;;
-esac
-AC_DEFINE_UNQUOTED(
- LIBEWF_OPERATING_SYSTEM,
- "$ac_libewf_operating_system",
- [Defines the fallback operating system string.])
-])
-
 dnl Check for host type
 AC_CANONICAL_HOST
 
@@ -225,6 +43,11 @@ LIBEWF_TEST_ENABLE(
  [debug-output],
  [debug_output],
  [enable debug output],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [python],
+ [python],
+ [build python bindings (pyewf)],
  [no])
 
 dnl Check for libtool DLL support
@@ -621,7 +444,7 @@ AS_IF(
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
-	[test "x$ac_libewf_enable_wide_character_type" != xno ],
+	[test "x$ac_libewf_enable_wide_character_type" != xno],
 	[AC_DEFINE(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [1],
@@ -677,7 +500,7 @@ AC_SUBST(
 
 dnl Check if ewftools should be build with raw read and write support
 AS_IF(
-	[test "x$ac_libewf_enable_raw_access" != xno ],
+	[test "x$ac_libewf_enable_raw_access" != xno],
 	[AC_DEFINE(
 	 [HAVE_RAW_ACCESS],
 	 [1],
@@ -686,7 +509,7 @@ AS_IF(
 
 dnl Check if libewf should be build with verbose output
 AS_IF(
-	[test "x$ac_libewf_enable_verbose_output" != xno ],
+	[test "x$ac_libewf_enable_verbose_output" != xno],
 	[AC_DEFINE(
 	 [HAVE_VERBOSE_OUTPUT],
 	 [1],
@@ -695,16 +518,32 @@ AS_IF(
 
 dnl Check if libewf should be build with debug output
 AS_IF(
-	[test "x$ac_libewf_enable_debug_output" != xno ],
+	[test "x$ac_libewf_enable_debug_output" != xno],
 	[AC_DEFINE(
 	 [HAVE_DEBUG_OUTPUT],
 	 [1],
 	 [Defines if debug output should be used] )
 	ac_libewf_enable_debug_output=yes])
 
+dnl Check if libewf python bindings (pyewf) should be built
+AS_IF(
+	[test "x$ac_libewf_enable_python" != xno],
+	[AM_PATH_PYTHON([2.5])
+	LIBEWF_PYTHON_DEVEL()
+	AC_DEFINE(
+	 [HAVE_PYTHON],
+	 [1],
+	 [Have Python bindings])
+	ac_libewf_enable_python=yes])
+
+AM_CONDITIONAL(
+ HAVE_PYTHON,
+ [test "x$ac_libewf_enable_python" != xno])
+
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
+dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall"
 
 dnl Have configure make the Makefiles
@@ -713,6 +552,7 @@ AC_CONFIG_FILES([common/Makefile])
 AC_CONFIG_FILES([libewf/Makefile])
 AC_CONFIG_FILES([ewftools/Makefile])
 AC_CONFIG_FILES([manuals/Makefile])
+AC_CONFIG_FILES([pyewf/Makefile])
 dnl Have configure make the include files
 AC_CONFIG_FILES([include/libewf.h])
 AC_CONFIG_FILES([include/libewf/definitions.h])
@@ -740,6 +580,7 @@ Building:
 Features:
    Wide character type support:             $ac_libewf_enable_wide_character_type
    ewftools use raw read and write support: $ac_libewf_enable_raw_access
+   Python (pyewf) support:                  $ac_libewf_enable_python
    Verbose output:                          $ac_libewf_enable_verbose_output
    Debug output:                            $ac_libewf_enable_debug_output
 ]);
