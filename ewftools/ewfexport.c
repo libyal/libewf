@@ -764,7 +764,6 @@ int main( int argc, char * const argv[] )
 		count = ewfcommon_export_raw(
 		         handle,
 		         target_filename,
-		         segment_file_size,
 		         export_size,
 		         export_offset,
 		         swap_byte_pairs,

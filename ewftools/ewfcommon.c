@@ -1472,7 +1472,7 @@ ssize64_t ewfcommon_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input
 /* Reads the media data and exports it in raw format
  * Returns a -1 on error, the amount of bytes read on success
  */
-ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t maximum_file_size, size64_t export_size, off64_t read_offset, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
+ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, size64_t export_size, off64_t read_offset, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
 	uint8_t *data               = NULL;
 	uint8_t *uncompressed_data  = NULL;
@@ -1737,8 +1737,6 @@ ssize64_t ewfcommon_export_raw( LIBEWF_HANDLE *handle, CHAR_T *target_filename, 
  */
 ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_handle, size64_t export_size, off64_t read_offset, uint8_t calculate_md5, uint8_t calculate_sha1, uint8_t swap_byte_pairs, uint8_t wipe_chunk_on_error, void (*callback)( size64_t bytes_read, size64_t bytes_total ) )
 {
-	LIBEWF_CHAR header_value[ 128 ];
-
 	EWFMD5_CONTEXT md5_context;
 	EWFSHA1_CONTEXT sha1_context;
 
@@ -1756,7 +1754,6 @@ ssize64_t ewfcommon_export_ewf( LIBEWF_HANDLE *handle, LIBEWF_HANDLE *export_han
 	size_t read_size               = 0;
 	size_t buffer_size             = 0;
 	ssize64_t total_read_count     = 0;
-	size_t header_value_length     = 128;
 	size_t md5_hash_size           = EWFDIGEST_HASH_SIZE_MD5;
 	size_t md5_hash_string_length  = LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5;
 	size_t sha1_hash_size          = EWFDIGEST_HASH_SIZE_SHA1;

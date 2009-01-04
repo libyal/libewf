@@ -50,7 +50,7 @@ To do/think about:
 * ewfexport: calculate the md5 hash of exported data and validate this with the stored hash?
 * ewfdebug: create a tool to analyse a single segment file
 * ewfrecover: create a tool recover ewf files
-* ewfverify: show which files are corrupted
+* ewfverify: detect and show which files are corrupted
 * windows port: for ewftools integrate certain functions in the library
 * windows port: build globbing support - basic support in there
 * windows port: some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
@@ -144,6 +144,9 @@ CLOSED
   not needed
 * change string duplicate function to macro?
   no, strndup is not available on all platforms
+
+Version: 20071126
+* minor changes
 
 Version: 20071124
 * worked on refactoring code

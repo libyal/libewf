@@ -66,6 +66,11 @@ struct libewf_file_io_handle
 	int flags;
 };
 
+int libewf_file_io_handle_open( LIBEWF_FILE_IO_HANDLE *file_io_handle, uint8_t flags );
+ssize_t libewf_file_io_handle_read( LIBEWF_FILE_IO_HANDLE *file_io_handle, void *buffer, size_t size );
+ssize_t libewf_file_io_handle_write( LIBEWF_FILE_IO_HANDLE *file_io_handle, void *buffer, size_t size );
+off64_t libewf_file_io_handle_seek_offset( LIBEWF_FILE_IO_HANDLE *file_io_handle, off64_t offset );
+
 #if defined( __cplusplus )
 }
 #endif

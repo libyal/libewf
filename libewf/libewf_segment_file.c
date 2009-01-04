@@ -407,7 +407,6 @@ off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off6
 	return( offset );
 }
 
-
 /* Reads the file header from a segment file
  * Returns the amount of bytes read if successful, or -1 on errror
  */
