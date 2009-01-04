@@ -1185,8 +1185,8 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 	/* Write segment file header
 	 */
-	write_count = libewf_common_write(
-	               segment_file->file_descriptor,
+	write_count = libewf_segment_file_write(
+	               segment_file,
 	               &file_header,
 	               EWF_FILE_HEADER_SIZE );
 
@@ -1197,8 +1197,7 @@ ssize_t libewf_segment_file_write_start( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 		return( -1 );
 	}
-	segment_file->file_offset = write_count;
-	total_write_count         = write_count;
+	total_write_count += write_count;
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_EWF )
 	{
@@ -1515,8 +1514,8 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 			return( -1 );
 		}
-		write_count = libewf_common_write(
-		               segment_file->file_descriptor,
+		write_count = libewf_segment_file_write(
+		               segment_file,
 		               calculated_crc_buffer,
 		               EWF_CRC_SIZE );
 
@@ -1527,8 +1526,7 @@ ssize_t libewf_segment_file_write_chunks_data( LIBEWF_INTERNAL_HANDLE *internal_
 
 			return( -1 );
 		}
-		segment_file->file_offset += write_count;
-		total_write_count         += write_count;
+		total_write_count += write_count;
 	}
 	return( total_write_count );
 }
