@@ -55,7 +55,10 @@
 ssize_t libewf_section_start_read(
          libewf_file_io_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
+         off64_t section_start_offset,
          ewf_section_t *section,
+         uint64_t *section_size,
+         uint64_t *section_next,
          libewf_error_t **error )
 {
 	static char *function    = "libewf_section_start_read";
@@ -85,6 +88,28 @@ ssize_t libewf_section_start_read(
 
 		return( -1 );
 	}
+	if( section_size == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( section_next == NULL )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_ARGUMENTS,
+		 LIBEWF_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid section next.\n",
+		 function );
+
+		return( -1 );
+	}
 	read_count = libewf_file_io_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
@@ -105,7 +130,7 @@ ssize_t libewf_section_start_read(
 	}
 	calculated_crc = ewf_crc_calculate(
 	                  section,
-	                  ( sizeof( ewf_section_t ) - sizeof( ewf_crc_t ) ),
+	                  sizeof( ewf_section_t ) - sizeof( ewf_crc_t ),
 	                  1 );
 
 	endian_little_convert_32bit(
@@ -148,6 +173,37 @@ ssize_t libewf_section_start_read(
 	 section->padding,
 	 40 );
 #endif
+
+	endian_little_convert_64bit(
+	 *section_size,
+	 section->size );
+
+	if( *section_size > (uint64_t) INT64_MAX )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid section size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	endian_little_convert_64bit(
+	 *section_next,
+	 section->next );
+
+	if( *section_next > (uint64_t) INT64_MAX )
+	{
+		libewf_error_set(
+		 error,
+		 LIBEWF_ERROR_DOMAIN_RUNTIME,
+		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid section next value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
 	return( read_count );
 }
 
@@ -6259,8 +6315,8 @@ int libewf_section_read(
 	static char *function      = "libewf_section_read";
 	off64_t section_end_offset = 0;
 	ssize64_t read_count       = 0;
-	uint64_t size              = 0;
-	uint64_t next_offset       = 0;
+	uint64_t section_size      = 0;
+	uint64_t section_next      = 0;
 	size_t section_type_length = 0;
 
 	if( segment_file_handle == NULL )
@@ -6387,7 +6443,10 @@ int libewf_section_read(
 	if( libewf_section_start_read(
 	     file_io_pool,
 	     segment_file_handle,
+	     *section_start_offset,
 	     section,
+	     &section_size,
+	     &section_next,
 	     error ) == -1 )
 	{
 		libewf_error_set(
@@ -6399,37 +6458,7 @@ int libewf_section_read(
 
 		return( -1 );
 	}
-	endian_little_convert_64bit(
-	 size,
-	 section->size );
-
-	if( size > (uint64_t) INT64_MAX )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	endian_little_convert_64bit(
-	 next_offset,
-	 section->next );
-
-	if( next_offset > (uint64_t) INT64_MAX )
-	{
-		libewf_error_set(
-		 error,
-		 LIBEWF_ERROR_DOMAIN_RUNTIME,
-		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid next offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
-	section_end_offset = *section_start_offset + (off64_t) size;
+	section_end_offset = *section_start_offset + (off64_t) section_size;
 
 	if( section_end_offset > (off64_t) INT64_MAX )
 	{
@@ -6466,17 +6495,17 @@ int libewf_section_read(
 
 	/* No need to correct empty sections like done and next
 	 */
-	if( size > 0 )
+	if( section_size > 0 )
 	{
-		size -= sizeof( ewf_section_t );
+		section_size -= sizeof( ewf_section_t );
 	}
-	if( size > (uint64_t) INT64_MAX )
+	if( section_size > (uint64_t) INT64_MAX )
 	{
 		libewf_error_set(
 		 error,
 		 LIBEWF_ERROR_DOMAIN_RUNTIME,
 		 LIBEWF_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid section size value exceeds maximum.\n",
 		 function );
 
 		return( -1 );
@@ -6513,7 +6542,7 @@ int libewf_section_read(
 		read_count = libewf_section_header2_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              &( header_sections->header2 ),
 		              &( header_sections->header2_size ),
 		              error );
@@ -6531,7 +6560,7 @@ int libewf_section_read(
 		read_count = libewf_section_header_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              &( header_sections->header ),
 		              &( header_sections->header_size ),
 		              error );
@@ -6549,7 +6578,7 @@ int libewf_section_read(
 		read_count = libewf_section_xheader_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              &( header_sections->xheader ),
 		              &( header_sections->xheader_size ),
 		              error );
@@ -6571,7 +6600,7 @@ int libewf_section_read(
 		read_count = libewf_section_volume_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              media_values,
 		              compression_level,
 		              format,
@@ -6599,7 +6628,7 @@ int libewf_section_read(
 		read_count = libewf_section_table2_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              media_values->amount_of_chunks,
 		              offset_table,
 		              *format,
@@ -6617,7 +6646,7 @@ int libewf_section_read(
 		read_count = libewf_section_table_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              media_values->amount_of_chunks,
 		              offset_table,
 		              *format,
@@ -6635,7 +6664,7 @@ int libewf_section_read(
 		read_count = libewf_section_sectors_read(
 		              file_io_pool,
 		              segment_file_handle,
- 		              (size64_t) size,
+ 		              (size64_t) section_size,
  		              *ewf_format,
  		              error );
 	}
@@ -6650,7 +6679,7 @@ int libewf_section_read(
 		read_count = libewf_section_delta_chunk_read(
  		              file_io_pool,
  		              segment_file_handle,
- 		              (size_t) size,
+ 		              (size_t) section_size,
  		              offset_table,
  		              error );
 	}
@@ -6665,7 +6694,7 @@ int libewf_section_read(
 		read_count = libewf_section_ltree_read(
 		              file_io_pool,
 		              segment_file_handle,
- 		              (size_t) size,
+ 		              (size_t) section_size,
 		              ewf_format,
  		              error );
 	}
@@ -6682,7 +6711,7 @@ int libewf_section_read(
 		              segment_file_handle,
 		              media_values,
 		              sessions,
-		              (size_t) size,
+		              (size_t) section_size,
 		              *ewf_format,
  		              error );
 	}
@@ -6697,7 +6726,7 @@ int libewf_section_read(
 		read_count = libewf_section_data_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              media_values,
 		              *ewf_format,
  		              error );
@@ -6729,7 +6758,7 @@ int libewf_section_read(
 		read_count = libewf_section_xhash_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              &( hash_sections->xhash ),
 		              &( hash_sections->xhash_size ),
 		              error );
@@ -6746,7 +6775,7 @@ int libewf_section_read(
 		              file_io_pool,
 		              segment_file_handle,
 		              acquiry_errors,
-		              (size_t) size,
+		              (size_t) section_size,
 		              *ewf_format,
  		              error );
 	}
@@ -6758,7 +6787,7 @@ int libewf_section_read(
 		 (char *) section->type );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-		if( size > SSIZE_MAX )
+		if( section_size > SSIZE_MAX )
 		{
 			libewf_error_set(
 			 error,
@@ -6772,7 +6801,7 @@ int libewf_section_read(
 		read_count = libewf_section_debug_read(
 		              file_io_pool,
 		              segment_file_handle,
-		              (size_t) size,
+		              (size_t) section_size,
 		              error );
 #else
 		/* Skip the data within the section
@@ -6793,10 +6822,10 @@ int libewf_section_read(
 
 			return( -1 );
 		}
-		read_count = (ssize64_t) size;
+		read_count = (ssize64_t) section_size;
 #endif
 	}
-	if( read_count != (ssize64_t) size )
+	if( read_count != (ssize64_t) section_size )
 	{
 		libewf_error_set(
 		 error,

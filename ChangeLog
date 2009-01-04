@@ -117,6 +117,9 @@ Code clean up
 * refactor libewf_file_io_pool_get_offset out of libewf_section functions?
 * clean up libewf_write_finalize ?
 
+Testing
+* add export unattended to automated tests
+
 Next release(s):
 
 check for notify_verbose_printf( "
@@ -146,8 +149,6 @@ check TODO
 * ewfexport implement more ewfacquire acquiry parameters?
 
 * have segment file number in libewf_raw_read_chunk for warning output?
-
-* add export unattended to automated tests
 
 * improve offset table correction
   - if not correctable skip chunk while reading and mark as crc error
