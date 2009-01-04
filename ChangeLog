@@ -99,8 +99,6 @@ Known issues:
 Code clean up
 * remove internal_handle passing from most functions
   only pass the necessary values
-* move any access to segment table in file, write and read to segment_file
-  - segment table should only be updated by functions in segment file/table
 * rewrite ewfglob marcros to function macros (including arguments)
 * what about setting errno for API set and get function i.e. for size too small
 * have ewftools only use API ?
@@ -129,8 +127,6 @@ Next release:
 
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
-* move libewf_section_read to segment file
-* move segment table code from segment file to segment table
 
 * Try to correct the table
   - add error flag

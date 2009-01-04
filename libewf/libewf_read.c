@@ -42,8 +42,7 @@
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_read.h"
-#include "libewf_segment_file.h"
-#include "libewf_segment_table.h"
+#include "libewf_segment_file_handle.h"
 
 #include "ewf_crc.h"
 #include "ewf_file_header.h"
@@ -151,15 +150,15 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
-	LIBEWF_SEGMENT_FILE *segment_file = NULL;
+	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle = NULL;
 #if defined( HAVE_VERBOSE_OUTPUT )
-        char *chunk_type                  = NULL;
+        char *chunk_type                                = NULL;
 #endif
-	static char *function             = "libewf_raw_read_chunk";
-	ssize_t chunk_read_count          = 0;
-	ssize_t crc_read_count            = 0;
-	size_t chunk_data_size            = 0;
-	uint16_t segment_number           = 0;
+	static char *function                           = "libewf_raw_read_chunk";
+	ssize_t chunk_read_count                        = 0;
+	ssize_t crc_read_count                          = 0;
+	size_t chunk_data_size                          = 0;
+	uint16_t segment_number                         = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -189,9 +188,9 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	if( internal_handle->segment_table->segment_file == NULL )
+	if( internal_handle->segment_table->segment_file_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment files.\n",
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid segment table - missing segment file handles.\n",
 		 function );
 
 		return( -1 );
@@ -284,16 +283,16 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 
 		return( -1 );
 	}
-	segment_file = internal_handle->offset_table->chunk_offset[ chunk ].segment_file;
+	segment_file_handle = internal_handle->offset_table->chunk_offset[ chunk ].segment_file_handle;
 
-	if( segment_file == NULL )
+	if( segment_file_handle == NULL )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( segment_file->filename == NULL )
+	if( segment_file_handle->filename == NULL )
 	{
 		LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - missing filename.\n",
 		 function );
@@ -302,8 +301,8 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	}
 	/* Make sure the segment file offset is in the right place
 	 */
-	if( libewf_segment_file_seek_offset(
-	     segment_file,
+	if( libewf_segment_file_handle_seek_offset(
+	     segment_file_handle,
 	     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) <= -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to seek chunk.\n",
@@ -313,8 +312,8 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	}
 	/* Read the chunk data
 	 */
-	chunk_read_count = libewf_segment_file_read(
-			    segment_file,
+	chunk_read_count = libewf_segment_file_handle_read(
+			    segment_file_handle,
 			    chunk_buffer,
 			    chunk_data_size );
 
@@ -329,15 +328,15 @@ ssize_t libewf_raw_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t
 	 */
 	if( *read_crc != 0 )
 	{
-		crc_read_count = libewf_segment_file_read(
-				  segment_file,
+		crc_read_count = libewf_segment_file_handle_read(
+				  segment_file_handle,
 				  stored_crc_buffer,
 				  EWF_CRC_SIZE );
 
 		if( crc_read_count != (ssize_t) EWF_CRC_SIZE )
 		{
 			LIBEWF_WARNING_PRINT( "%s: error reading CRC of chunk: %" PRIu32 " from segment file: %" PRIu16 " (%" PRIs_EWF_filename ").\n",
-			 function, chunk, segment_number, segment_file->filename );
+			 function, chunk, segment_number, segment_file_handle->filename );
 
 			return( -1 );
 		}

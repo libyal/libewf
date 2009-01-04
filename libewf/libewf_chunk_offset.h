@@ -36,7 +36,7 @@
 
 #include "libewf_includes.h"
 
-#include "libewf_segment_table.h"
+#include "libewf_segment_file_handle.h"
 
 #include "ewf_table.h"
 
@@ -51,9 +51,9 @@ typedef struct libewf_chunk_offset libewf_chunk_offset_t;
 
 struct libewf_chunk_offset
 {
-	/* A reference to the segment file
+	/* A reference to the segment file handle
 	 */
-	LIBEWF_SEGMENT_FILE *segment_file;
+	LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle;
 
 	/* The file offset of the chunk in the segment file
 	 */

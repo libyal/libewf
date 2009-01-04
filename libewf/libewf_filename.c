@@ -165,7 +165,7 @@ int libewf_filename_set( LIBEWF_FILENAME **internal_filename, const LIBEWF_FILEN
  * For EWF-E01, EWF-S01 segment file extension naming scheme
  * Returns 1 on success, -1 on error
  */
-int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
+int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format )
 {
 	static char *function                           = "libewf_filename_set_extension";
 	LIBEWF_FILENAME extension_first_character       = (LIBEWF_FILENAME) '\0';
@@ -278,7 +278,7 @@ int libewf_filename_set_extension( LIBEWF_FILENAME *extension, uint16_t segment_
 /* Creates a filename for a certain segment file
  * Returns 1 if successful, or -1 on error
  */
-int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename, LIBEWF_FILENAME *basename, size_t length_basename, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t ewf_format, uint8_t format )
+int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename, LIBEWF_FILENAME *basename, size_t length_basename, uint16_t segment_number, int16_t maximum_amount_of_segments, uint8_t segment_file_type, uint8_t format, uint8_t ewf_format )
 {
 	LIBEWF_FILENAME *new_filename = NULL;
 	static char *function         = "libewf_filename_create";
@@ -347,8 +347,8 @@ int libewf_filename_create( LIBEWF_FILENAME **filename, size_t *length_filename,
 	     segment_number,
 	     maximum_amount_of_segments,
 	     segment_file_type,
-	     ewf_format,
-	     format ) != 1 )
+	     format,
+	     ewf_format ) != 1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to set extension.\n",
 		 function );

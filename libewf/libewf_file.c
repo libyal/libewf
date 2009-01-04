@@ -52,6 +52,7 @@
 #include "libewf_read.h"
 #include "libewf_section_list.h"
 #include "libewf_segment_file.h"
+#include "libewf_segment_file_handle.h"
 #include "libewf_segment_table.h"
 #include "libewf_string.h"
 #include "libewf_write.h"
@@ -144,6 +145,7 @@ LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_a
 {
 	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
 	static char *function                   = "libewf_open";
+	size64_t *segment_file_size             = NULL;
 
 	if( filenames == NULL )
 	{
@@ -178,6 +180,10 @@ LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_a
 	}
 	if( ( flags & LIBEWF_FLAG_READ ) == LIBEWF_FLAG_READ )
 	{
+		if( internal_handle->write != NULL )
+		{
+			segment_file_size = &( internal_handle->write->segment_file_size );
+		}
 		/* Initialize the internal handle for reading
 		 */
 		if( libewf_internal_handle_read_initialize( internal_handle ) != 1 )
@@ -190,12 +196,22 @@ LIBEWF_HANDLE *libewf_open( LIBEWF_FILENAME * const filenames[], uint16_t file_a
 			return( NULL );
 		}
 		if( libewf_segment_table_read_open(
-		     internal_handle, 
 		     internal_handle->segment_table, 
 		     internal_handle->delta_segment_table, 
 		     filenames, 
 		     file_amount,
-		     flags ) != 1 )
+		     flags,
+		     internal_handle->header_sections,
+		     internal_handle->hash_sections,
+		     internal_handle->media_values,
+		     internal_handle->offset_table,
+		     internal_handle->secondary_offset_table,
+		     internal_handle->acquiry_errors,
+		     &( internal_handle->compression_level ),
+		     &( internal_handle->format ),
+		     &( internal_handle->ewf_format ),
+		     segment_file_size,
+		     internal_handle->error_tollerance ) != 1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to open segment file(s).\n",
 			 function );
@@ -976,8 +992,8 @@ int libewf_get_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 
 		return( -1 );
 	}
-	return( libewf_segment_file_get_filename(
-	         internal_handle->delta_segment_table->segment_file[ 0 ],
+	return( libewf_segment_file_handle_get_filename(
+	         internal_handle->delta_segment_table->segment_file_handle[ 0 ],
 	         filename,
 	         length ) );
 }
@@ -1601,22 +1617,22 @@ int libewf_set_delta_segment_filename( LIBEWF_HANDLE *handle, LIBEWF_FILENAME *f
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->segment_file[ 0 ] == NULL )
+	if( internal_handle->delta_segment_table->segment_file_handle[ 0 ] == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle - invalid delta segment table - missing first segment file.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->delta_segment_table->segment_file[ 0 ]->filename != NULL )
+	if( internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename != NULL )
 	{
-		libewf_common_free( internal_handle->delta_segment_table->segment_file[ 0 ]->filename );
+		libewf_common_free( internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename );
 
-		internal_handle->delta_segment_table->segment_file[ 0 ]->filename        = NULL;
-		internal_handle->delta_segment_table->segment_file[ 0 ]->length_filename = 0;
+		internal_handle->delta_segment_table->segment_file_handle[ 0 ]->filename        = NULL;
+		internal_handle->delta_segment_table->segment_file_handle[ 0 ]->length_filename = 0;
 	}
-	return( libewf_segment_file_set_filename(
-	         internal_handle->delta_segment_table->segment_file[ 0 ],
+	return( libewf_segment_file_handle_set_filename(
+	         internal_handle->delta_segment_table->segment_file_handle[ 0 ],
 	         filename,
 	         length ) );
 }

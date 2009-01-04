@@ -49,12 +49,13 @@
 #include "libewf_char.h"
 #include "libewf_internal_handle.h"
 #include "libewf_section_list.h"
+#include "libewf_segment_file_handle.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE *segment_file );
+int64_t libewf_write_calculate_chunks_per_segment( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle );
 uint32_t libewf_write_calculate_chunks_per_chunks_section( LIBEWF_INTERNAL_HANDLE *internal_handle );
 int libewf_write_test_segment_file_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset );
 int libewf_write_test_chunks_section_full( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t segment_file_offset );

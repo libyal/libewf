@@ -46,6 +46,7 @@ libewf_la_SOURCES = \
 	libewf_section_list.c libewf_section_list.h \
 	libewf_sector_table.c libewf_sector_table.h \
 	libewf_segment_file.c libewf_segment_file.h \
+	libewf_segment_file_handle.c libewf_segment_file_handle.h \
 	libewf_segment_table.c libewf_segment_table.h \
 	libewf_string.c libewf_string.h \
 	libewf_values_table.c libewf_values_table.h \

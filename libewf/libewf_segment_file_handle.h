@@ -1,5 +1,5 @@
 /*
- * libewf offset table
+ * libewf segment file handle
  *
  * Copyright (c) 2006-2007, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -31,51 +31,62 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined( _LIBEWF_OFFSET_TABLE_H )
-#define _LIBEWF_OFFSET_TABLE_H
+#if !defined( _LIBEWF_SEGMENT_FILE_HANDLE_H )
+#define _LIBEWF_SEGMENT_FILE_HANDLE_H
 
 #include "libewf_includes.h"
 
-#include "libewf_chunk_offset.h"
+#include "libewf_filename.h"
 #include "libewf_section_list.h"
-#include "libewf_segment_file_handle.h"
-
-#include "ewf_table.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define LIBEWF_OFFSET_TABLE libewf_offset_table_t
-#define LIBEWF_OFFSET_TABLE_SIZE sizeof( LIBEWF_OFFSET_TABLE )
+#define LIBEWF_SEGMENT_FILE_HANDLE		libewf_segment_file_handle_t
+#define LIBEWF_SEGMENT_FILE_HANDLE_SIZE		sizeof( LIBEWF_SEGMENT_FILE_HANDLE )
 
-typedef struct libewf_offset_table libewf_offset_table_t;
+typedef struct libewf_segment_file_handle libewf_segment_file_handle_t;
 
-struct libewf_offset_table
+struct libewf_segment_file_handle
 {
-	/* Stores the amount of chunks in the table
-	 * There is an offset per chunk in the table
+	/* The filename
 	 */
-	uint32_t amount;
+	LIBEWF_FILENAME *filename;
 
-	/* The last chunk that was defined
+	/* The filename length
 	 */
-	uint32_t last;
+	size_t length_filename;
 
-	/* Dynamic array of chunk offsets
+	/* The file descriptor
 	 */
-	LIBEWF_CHUNK_OFFSET *chunk_offset;
+	int file_descriptor;
+
+	/* The file offset
+	 */
+	off64_t file_offset;
+
+	/* The amount of chunks
+	 */
+	uint32_t amount_of_chunks;
+
+        /* The list of all the sections
+         */
+        LIBEWF_SECTION_LIST *section_list;
 };
 
-LIBEWF_OFFSET_TABLE *libewf_offset_table_alloc( uint32_t amount );
-int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amount );
-void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table );
+LIBEWF_SEGMENT_FILE_HANDLE *libewf_segment_file_handle_alloc( void );
+void libewf_segment_file_handle_free( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle );
 
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t error_tollerance );
-int libewf_offset_table_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_table, LIBEWF_SECTION_LIST *section_list, uint8_t error_tollerance );
-int libewf_offset_table_compare( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF_OFFSET_TABLE *offset_table2 );
+int libewf_segment_file_handle_get_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, LIBEWF_FILENAME *filename, size_t length_filename );
+int libewf_segment_file_handle_set_filename( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, const LIBEWF_FILENAME *filename, size_t length_filename );
 
-off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table, uint32_t chunk );
+int libewf_segment_file_handle_open( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t flags );
+int libewf_segment_file_handle_reopen( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t flags );
+ssize_t libewf_segment_file_handle_read( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, void *buffer, size_t size );
+ssize_t libewf_segment_file_handle_write( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, void *buffer, size_t size );
+off64_t libewf_segment_file_handle_seek_offset( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, off64_t offset );
+int libewf_segment_file_handle_close( LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle );
 
 #if defined( __cplusplus )
 }

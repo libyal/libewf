@@ -39,7 +39,6 @@
 #include "libewf_endian.h"
 #include "libewf_notify.h"
 #include "libewf_offset_table.h"
-#include "libewf_segment_file.h"
 
 #include "ewf_definitions.h"
 
@@ -102,7 +101,6 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 {
 	void *reallocation    = NULL;
 	static char *function = "libewf_offset_table_realloc";
-	uint32_t iterator     = 0;
 
 	if( offset_table == NULL )
 	{
@@ -120,7 +118,7 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 	}
 	reallocation = libewf_common_realloc(
 	                offset_table->chunk_offset,
-	                ( amount * LIBEWF_CHUNK_OFFSET_SIZE ) );
+	                ( LIBEWF_CHUNK_OFFSET_SIZE * amount ) );
 
 	if( reallocation == NULL )
 	{
@@ -131,13 +129,15 @@ int libewf_offset_table_realloc( LIBEWF_OFFSET_TABLE *offset_table, uint32_t amo
 	}
 	offset_table->chunk_offset = (LIBEWF_CHUNK_OFFSET *) reallocation;
 
-	for( iterator = offset_table->amount; iterator < amount; iterator++ )
+	if( libewf_common_memset(
+	     &( offset_table->chunk_offset[ offset_table->amount ] ),
+	     0,
+	     ( LIBEWF_CHUNK_OFFSET_SIZE * ( amount - offset_table->amount ) ) ) == NULL )
 	{
-		offset_table->chunk_offset[ iterator ].segment_file = NULL;
-		offset_table->chunk_offset[ iterator ].file_offset  = 0;
-		offset_table->chunk_offset[ iterator ].size         = 0;
-		offset_table->chunk_offset[ iterator ].compressed   = 0;
-		offset_table->chunk_offset[ iterator ].dirty        = 0;
+		LIBEWF_WARNING_PRINT( "%s: unable to clear chunk offsets.\n",
+		 function );
+
+		return( -1 );
 	}
 	offset_table->amount = amount;
 
@@ -166,7 +166,7 @@ void libewf_offset_table_free( LIBEWF_OFFSET_TABLE *offset_table )
 /* Fills the offset table
  * Returns 1 if successful, or -1 on error
  */
-int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE *segment_file, uint8_t error_tollerance )
+int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_offset, EWF_TABLE_OFFSET *offsets, uint32_t amount_of_chunks, LIBEWF_SEGMENT_FILE_HANDLE *segment_file_handle, uint8_t error_tollerance )
 {
 #if defined( HAVE_VERBOSE_OUTPUT )
 	char *chunk_type        = NULL;
@@ -194,8 +194,7 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 
 		return( -1 );
 	}
-	/* refactor if pointer is only passed to the offset table */
-	if( segment_file == NULL )
+	if( segment_file_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
 		 function );
@@ -301,10 +300,10 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 
 			return( -1 );
 		}
-		offset_table->chunk_offset[ offset_table->last ].segment_file = segment_file;
-		offset_table->chunk_offset[ offset_table->last ].file_offset  = (off64_t) ( base_offset + current_offset );
-		offset_table->chunk_offset[ offset_table->last ].size         = (size_t) chunk_size;
-		offset_table->chunk_offset[ offset_table->last ].compressed   = compressed;
+		offset_table->chunk_offset[ offset_table->last ].segment_file_handle = segment_file_handle;
+		offset_table->chunk_offset[ offset_table->last ].file_offset         = (off64_t) ( base_offset + current_offset );
+		offset_table->chunk_offset[ offset_table->last ].size                = (size_t) chunk_size;
+		offset_table->chunk_offset[ offset_table->last ].compressed          = compressed;
 
 		offset_table->last++;
 
@@ -350,9 +349,9 @@ int libewf_offset_table_fill( LIBEWF_OFFSET_TABLE *offset_table, off64_t base_of
 	{
 		current_offset = raw_offset;
 	}
-	offset_table->chunk_offset[ offset_table->last ].segment_file = segment_file;
-	offset_table->chunk_offset[ offset_table->last ].file_offset  = (off64_t) ( base_offset + current_offset );
-	offset_table->chunk_offset[ offset_table->last ].compressed   = compressed;
+	offset_table->chunk_offset[ offset_table->last ].segment_file_handle = segment_file_handle;
+	offset_table->chunk_offset[ offset_table->last ].file_offset         = (off64_t) ( base_offset + current_offset );
+	offset_table->chunk_offset[ offset_table->last ].compressed          = compressed;
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	if( compressed == 0 )
@@ -545,8 +544,8 @@ off64_t libewf_offset_table_seek_chunk_offset( LIBEWF_OFFSET_TABLE *offset_table
 
 		return( -1 );
 	}
-	if( libewf_segment_file_seek_offset(
-	     offset_table->chunk_offset[ chunk ].segment_file,
+	if( libewf_segment_file_handle_seek_offset(
+	     offset_table->chunk_offset[ chunk ].segment_file_handle,
 	     offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
