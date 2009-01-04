@@ -540,7 +540,7 @@ int libewf_values_table_resize(
  */
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
-     const char *identifier,
+     const libewf_character_t *identifier,
      size_t identifier_length,
      int *index,
      liberror_error_t **error )
@@ -817,7 +817,7 @@ int libewf_values_table_get_index_wide(
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
-     char *identifier,
+     libewf_character_t *identifier,
      size_t identifier_size,
      liberror_error_t **error )
 {
@@ -964,7 +964,7 @@ int libewf_values_table_get_identifier(
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
-     const char *identifier,
+     const libewf_character_t *identifier,
      size_t identifier_length,
      liberror_error_t **error )
 {
@@ -1448,9 +1448,9 @@ int libewf_values_table_set_identifier_wide(
  */
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     const char *identifier,
+     const libewf_character_t *identifier,
      size_t identifier_length,
-     char *value,
+     libewf_character_t *value,
      size_t value_size,
      liberror_error_t **error )
 {
@@ -1494,9 +1494,9 @@ int libewf_values_table_get_value(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
+		 "%s: unable to find index for: %s.",
 		 function,
-		 identifier );
+		 (char *) identifier );
 
 		return( -1 );
 	}
@@ -1582,9 +1582,9 @@ int libewf_values_table_get_value(
  */
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     const char *identifier,
+     const libewf_character_t *identifier,
      size_t identifier_length,
-     const char *value,
+     const libewf_character_t *value,
      size_t value_length,
      liberror_error_t **error )
 {
@@ -1605,9 +1605,9 @@ int libewf_values_table_set_value(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
+		 "%s: unable to find index for: %s.",
 		 function,
-		 identifier );
+		 (char *) identifier );
 
 		return( -1 );
 	}
@@ -1802,9 +1802,9 @@ int libewf_values_table_get_value_wide(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
+		 "%s: unable to find index for: %s.",
 		 function,
-		 identifier );
+		 (char *) identifier );
 
 		return( -1 );
 	}
@@ -1913,9 +1913,9 @@ int libewf_values_table_set_value_wide(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to find index for: %" PRIs_LIBEWF ".",
+		 "%s: unable to find index for: %s.",
 		 function,
-		 identifier );
+		 (char *) identifier );
 
 		return( -1 );
 	}

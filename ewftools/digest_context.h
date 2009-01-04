@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #if defined( HAVE_LIBCRYPTO ) && defined( HAVE_OPENSSL_EVP_H )
 #include <openssl/evp.h>
 #elif defined( HAVE_WINCPRYPT_H )
@@ -60,17 +62,20 @@ typedef int digest_context_t;
 
 int digest_context_initialize(
      digest_context_t *digest_context,
-     uint8_t type );
+     uint8_t type,
+     liberror_error_t **error );
 
 int digest_context_update(
      digest_context_t *digest_context,
      uint8_t *buffer,
-     size_t size );
+     size_t size,
+     liberror_error_t **error );
 
 int digest_context_finalize(
      digest_context_t *digest_context,
      digest_hash_t *digest_hash,
-     size_t *size );
+     size_t *size,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

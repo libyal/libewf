@@ -26,6 +26,8 @@
 #include <types.h>
 #include <wide_string.h>
 
+#include <liberror.h>
+
 #include <errno.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -1206,6 +1208,7 @@ ssize64_t ewfcommon_read_verify(
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
+	liberror_error_t *error     = NULL;
 	uint8_t *data_buffer        = NULL;
 	uint8_t *uncompressed_data  = NULL;
 	static char *function       = "ewfcommon_read_verify";
@@ -1322,10 +1325,14 @@ ssize64_t ewfcommon_read_verify(
 	if( calculate_md5 == 1 )
 	{
 		if( md5_initialize(
-		     &md5_context ) != 1 )
+		     &md5_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1333,10 +1340,14 @@ ssize64_t ewfcommon_read_verify(
 	if( calculate_sha1 == 1 )
 	{
 		if( sha1_initialize(
-		     &sha1_context ) != 1 )
+		     &sha1_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1457,14 +1468,32 @@ ssize64_t ewfcommon_read_verify(
 			md5_update(
 			 &md5_context,
 			 uncompressed_data,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 		if( calculate_sha1 == 1 )
 		{
 			sha1_update(
 			 &sha1_context,
 			 uncompressed_data,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 		/* Swap byte pairs
 		 */
@@ -1508,10 +1537,17 @@ ssize64_t ewfcommon_read_verify(
 
 	if( calculate_md5 == 1 )
 	{
-		if( md5_finalize( &md5_context, md5_hash, &md5_hash_size ) != 1 )
+		if( md5_finalize(
+		     &md5_context,
+		     md5_hash,
+		     &md5_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1532,10 +1568,14 @@ ssize64_t ewfcommon_read_verify(
 		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
-		     &sha1_hash_size ) != 1 )
+		     &sha1_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1584,6 +1624,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
+	liberror_error_t *error     = NULL;
 	uint8_t *data_buffer         = NULL;
 	static char *function        = "ewfcommon_write_from_file_descriptor";
 	ssize64_t total_write_count  = 0;
@@ -1706,10 +1747,14 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	if( calculate_md5 == 1 )
 	{
 		if( md5_initialize(
-		     &md5_context ) != 1 )
+		     &md5_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1717,10 +1762,14 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	if( calculate_sha1 == 1 )
 	{
 		if( sha1_initialize(
-		     &sha1_context ) != 1 )
+		     &sha1_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1826,14 +1875,32 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 			md5_update(
 			 &md5_context,
 			 data_buffer,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 		if( calculate_sha1 == 1 )
 		{
 			sha1_update(
 			 &sha1_context,
 			 data_buffer,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 #if defined( HAVE_RAW_ACCESS )
 		write_count = ewfcommon_raw_write_ewf(
@@ -1892,10 +1959,14 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		if( md5_finalize(
 		     &md5_context,
 		     md5_hash,
-		     &md5_hash_size ) != 1 )
+		     &md5_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -1944,10 +2015,14 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
-		     &sha1_hash_size ) != 1 )
+		     &sha1_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2027,6 +2102,7 @@ ssize64_t ewfcommon_export_raw(
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
+	liberror_error_t *error     = NULL;
 	uint8_t *data_buffer        = NULL;
 	uint8_t *uncompressed_data  = NULL;
 	static char *function       = "ewfcommon_export_raw";
@@ -2197,10 +2273,14 @@ ssize64_t ewfcommon_export_raw(
 	if( calculate_md5 == 1 )
 	{
 		if( md5_initialize(
-		     &md5_context ) != 1 )
+		     &md5_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2208,10 +2288,14 @@ ssize64_t ewfcommon_export_raw(
 	if( calculate_sha1 == 1 )
 	{
 		if( sha1_initialize(
-		     &sha1_context ) != 1 )
+		     &sha1_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2353,14 +2437,32 @@ ssize64_t ewfcommon_export_raw(
 			md5_update(
 			 &md5_context,
 			 uncompressed_data,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 		if( calculate_sha1 == 1 )
 		{
 			sha1_update(
 			 &sha1_context,
 			 uncompressed_data,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 		write_count = file_io_write(
 		               file_descriptor,
@@ -2407,10 +2509,14 @@ ssize64_t ewfcommon_export_raw(
 		if( md5_finalize(
 		     &md5_context,
 		     md5_hash,
-		     &md5_hash_size ) != 1 )
+		     &md5_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2431,10 +2537,14 @@ ssize64_t ewfcommon_export_raw(
 		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
-		     &sha1_hash_size ) != 1 )
+		     &sha1_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2489,6 +2599,7 @@ ssize64_t ewfcommon_export_ewf(
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
+	liberror_error_t *error        = NULL;
 	uint8_t *data_buffer           = NULL;
 	uint8_t *uncompressed_data     = NULL;
 	static char *function          = "ewfcommon_export_ewf";
@@ -2764,10 +2875,14 @@ ssize64_t ewfcommon_export_ewf(
 	if( calculate_md5 == 1 )
 	{
 		if( md5_initialize(
-		     &md5_context ) != 1 )
+		     &md5_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize MD5 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2775,10 +2890,14 @@ ssize64_t ewfcommon_export_ewf(
 	if( calculate_sha1 == 1 )
 	{
 		if( sha1_initialize(
-		     &sha1_context ) != 1 )
+		     &sha1_context,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to initialize SHA1 digest context.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -2943,14 +3062,32 @@ ssize64_t ewfcommon_export_ewf(
 			md5_update(
 			 &md5_context,
 			 uncompressed_data,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 		if( calculate_sha1 == 1 )
 		{
 			sha1_update(
 			 &sha1_context,
 			 uncompressed_data,
-			 read_count );
+			 read_count,
+			 &error );
+
+			/* TODO improve handling errors
+			 */
+			if( error != NULL )
+			{
+				liberror_error_free(
+				 &error );
+			}
 		}
 #if defined( HAVE_RAW_ACCESS )
 		write_count = ewfcommon_raw_write_ewf(
@@ -3011,10 +3148,14 @@ ssize64_t ewfcommon_export_ewf(
 		if( md5_finalize(
 		     &md5_context,
 		     md5_hash,
-		     &md5_hash_size ) != 1 )
+		     &md5_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set MD5 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}
@@ -3063,10 +3204,14 @@ ssize64_t ewfcommon_export_ewf(
 		if( sha1_finalize(
 		     &sha1_context,
 		     sha1_hash,
-		     &sha1_hash_size ) != 1 )
+		     &sha1_hash_size,
+		     &error ) != 1 )
 		{
 			notify_warning_printf( "%s: unable to set SHA1 hash.\n",
 			 function );
+
+			liberror_error_free(
+			 &error );
 
 			return( -1 );
 		}

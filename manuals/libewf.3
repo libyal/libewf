@@ -1,4 +1,4 @@
-.Dd September 14, 2008
+.Dd September 28, 2008
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -229,77 +229,9 @@ Functions available for wide character string support:
 .Ft int
 .Fn libewf_get_delta_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t size"
 .Ft int
-.Fn libewf_get_header_value_identifier_wide "libewf_handle_t *handle, uint32_t index, wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_get_header_value_wide "libewf_handle_t *handle, const wchar_t *identifier, wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_get_header_value_case_number_wide "libewf_handle_t *handle, wchar_t *case_number, size_t length"
-.Ft int
-.Fn libewf_get_header_value_description_wide "libewf_handle_t *handle, wchar_t *description, size_t length"
-.Ft int
-.Fn libewf_get_header_value_examiner_name_wide "libewf_handle_t *handle, wchar_t *examiner_name, size_t length"
-.Ft int
-.Fn libewf_get_header_value_evidence_number_wide "libewf_handle_t *handle, wchar_t *evidence_number, size_t length"
-.Ft int
-.Fn libewf_get_header_value_notes_wide "libewf_handle_t *handle, wchar_t *notes, size_t length"
-.Ft int
-.Fn libewf_get_header_value_acquiry_date_wide "libewf_handle_t *handle, wchar_t *acquiry_date, size_t length"
-.Ft int
-.Fn libewf_get_header_value_system_date_wide "libewf_handle_t *handle, wchar_t *system_date, size_t length"
-.Ft int
-.Fn libewf_get_header_value_acquiry_operating_system_wide "libewf_handle_t *handle, wchar_t *acquiry_operating_system, size_t length"
-.Ft int
-.Fn libewf_get_header_value_acquiry_software_version_wide "libewf_handle_t *handle, wchar_t *acquiry_software_version, size_t length"
-.Ft int
-.Fn libewf_get_header_value_password_wide "libewf_handle_t *handle, wchar_t *password, size_t length"
-.Ft int
-.Fn libewf_get_header_value_compression_type_wide "libewf_handle_t *handle, wchar_t *compression_type, size_t length"
-.Ft int
-.Fn libewf_get_hash_value_identifier_wide "libewf_handle_t *handle, uint32_t index, wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_get_hash_value_wide "libewf_handle_t *handle, const wchar_t *identifier, wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_get_hash_value_md5_wide "libewf_handle_t *handle, wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_get_hash_value_sha1_wide "libewf_handle_t *handle, wchar_t *value, size_t length"
-.Ft int
 .Fn libewf_set_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t length"
 .Ft int
 .Fn libewf_set_delta_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t length"
-.Ft int
-.Fn libewf_set_header_value_wide "libewf_handle_t *handle, const wchar_t *identifier, const wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_set_header_value_case_number_wide "libewf_handle_t *handle, const wchar_t *case_number, size_t length"
-.Ft int
-.Fn libewf_set_header_value_description_wide "libewf_handle_t *handle, const wchar_t *description, size_t length"
-.Ft int
-.Fn libewf_set_header_value_examiner_name_wide "libewf_handle_t *handle, const wchar_t *examiner_name, size_t length"
-.Ft int
-.Fn libewf_set_header_value_evidence_number_wide "libewf_handle_t *handle, const wchar_t *evidence_number, size_t length"
-.Ft int
-.Fn libewf_set_header_value_notes_wide "libewf_handle_t *handle, const wchar_t *notes, size_t length"
-.Ft int
-.Fn libewf_set_header_value_acquiry_date_wide "libewf_handle_t *handle, const wchar_t *acquiry_date, size_t length"
-.Ft int
-.Fn libewf_set_header_value_system_date_wide "libewf_handle_t *handle, const wchar_t *system_date, size_t length"
-.Ft int
-.Fn libewf_set_header_value_acquiry_operating_system_wide "libewf_handle_t *handle, const wchar_t *acquiry_operating_system, size_t length"
-.Ft int
-.Fn libewf_set_header_value_acquiry_software_version_wide "libewf_handle_t *handle, const wchar_t *acquiry_software_version, size_t length"
-.Ft int
-.Fn libewf_set_header_value_password_wide "libewf_handle_t *handle, const wchar_t *password, size_t length"
-.Ft int
-.Fn libewf_set_header_value_compression_type_wide "libewf_handle_t *handle, const wchar_t *compression_type, size_t length"
-.Ft int
-.Fn libewf_set_header_value_model_wide "libewf_handle_t *handle, const char *model, size_t length"
-.Ft int
-.Fn libewf_set_header_value_serial_number_wide "libewf_handle_t *handle, const char *serial_number, size_t length"
-.Ft int
-.Fn libewf_set_hash_value_wide "libewf_handle_t *handle, const wchar_t *identifier, const wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_set_hash_value_md5_wide "libewf_handle_t *handle, const wchar_t *value, size_t length"
-.Ft int
-.Fn libewf_set_hash_value_sha1_wide "libewf_handle_t *handle, const wchar_t *value, size_t length"
 .Pp
 Functions available when system has wide character string support:
 .Sh DESCRIPTION

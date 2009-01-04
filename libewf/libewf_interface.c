@@ -2081,7 +2081,7 @@ int libewf_get_header_value_identifier(
 	result = libewf_values_table_get_identifier(
 	          internal_handle->header_values,
 	          index,
-	          value,
+	          (libewf_character_t *) value,
 	          length,
 	          &error );
 
@@ -2101,70 +2101,6 @@ int libewf_get_header_value_identifier(
 	}
 	return( result );
 }
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves the header value identifier specified by its index
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_get_header_value_identifier_wide(
-     libewf_handle_t *handle,
-     uint32_t index,
-     wchar_t *value,
-     size_t length )
-{
-	liberror_error_t *error                     = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_get_header_value_identifier_wide";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->header_values == NULL )
-	{
-		return( 0 );
-	}
-	result = libewf_values_table_get_identifier_wide(
-	          internal_handle->header_values,
-	          index,
-	          value,
-	          length,
-	          &error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value identifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	return( result );
-}
-
-#endif
 
 /* Retrieves the header value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2240,9 +2176,9 @@ int libewf_get_header_value(
 
 	result = libewf_values_table_get_value(
 	          internal_handle->header_values,
-	          identifier,
+	          (libewf_character_t *) identifier,
 	          identifier_length,
-	          value,
+	          (libewf_character_t *) value,
 	          length,
 	          &error );
 
@@ -2262,107 +2198,6 @@ int libewf_get_header_value(
 	}
 	return( result );
 }
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves the header value specified by the identifier
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_get_header_value_wide(
-     libewf_handle_t *handle,
-     const wchar_t *identifier,
-     wchar_t *value,
-     size_t length )
-{
-	liberror_error_t *error                     = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_get_header_value_wide";
-	size_t identifier_length                  = 0;
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( identifier == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid indentifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( value == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( internal_handle->header_values == NULL )
-	{
-		return( 0 );
-	}
-	identifier_length = wide_string_length(
-	                     identifier );
-
-	result = libewf_values_table_get_value_wide(
-	          internal_handle->header_values,
-	          identifier,
-	          identifier_length,
-	          value,
-	          length,
-	          &error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve header value.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	return( result );
-}
-
-#endif
 
 /* Retrieves the amount of hash values
  * Returns 1 if successful or -1 on error
@@ -2457,7 +2292,7 @@ int libewf_get_hash_value_identifier(
 	result = libewf_values_table_get_identifier(
 	          internal_handle->hash_values,
 	          index,
-	          value,
+	          (libewf_character_t *) value,
 	          length,
 	          &error );
 
@@ -2477,70 +2312,6 @@ int libewf_get_hash_value_identifier(
 	}
 	return( result );
 }
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves the hash value identifier specified by its index
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_get_hash_value_identifier_wide(
-     libewf_handle_t *handle,
-     uint32_t index,
-     wchar_t *value,
-     size_t length )
-{
-	liberror_error_t *error                     = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_get_hash_value_identifier_wide";
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->hash_values == NULL )
-	{
-		return( 0 );
-	}
-	result = libewf_values_table_get_identifier_wide(
-	          internal_handle->hash_values,
-	          index,
-	          value,
-	          length,
-	          &error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value identifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	return( result );
-}
-
-#endif
 
 /* Retrieves the hash value specified by the identifier
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -2646,9 +2417,9 @@ int libewf_get_hash_value(
 	}
 	result = libewf_values_table_get_value(
                   internal_handle->hash_values,
-	          identifier,
+	          (libewf_character_t *) identifier,
 	          identifier_length,
-	          value,
+	          (libewf_character_t *) value,
 	          length,
 	          &error );
 
@@ -2668,137 +2439,6 @@ int libewf_get_hash_value(
 	}
 	return( result );
 }
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Retrieves the hash value specified by the identifier
- * Returns 1 if successful, 0 if value not present or -1 on error
- */
-int libewf_get_hash_value_wide(
-     libewf_handle_t *handle,
-     const wchar_t *identifier,
-     wchar_t *value,
-     size_t length )
-{
-	liberror_error_t *error                     = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_get_hash_value_wide";
-	size_t identifier_length                  = 0;
-	int result                                = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( identifier == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid indentifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( value == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	identifier_length = wide_string_length(
-	                     identifier );
-
-	if( ( internal_handle->hash_values == NULL )
-	 && ( internal_handle->hash_sections != NULL )
-	 && ( internal_handle->hash_sections->md5_hash_set != 0 )
-	 && ( identifier_length == 3 )
-	 && ( wide_string_compare(
-	       identifier,
-	       L"MD5",
-	       identifier_length ) == 0 ) )
-	{
-		if( libewf_hash_values_parse_md5_hash(
-		     &( internal_handle->hash_values ),
-		     internal_handle->hash_sections->md5_hash,
-		     EWF_DIGEST_HASH_SIZE_MD5,
-		     &error ) != 1 )
-		{
-			liberror_error_set(
-			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse MD5 hash for its value.",
-			 function );
-
-			libewf_notify_error_backtrace(
-			 error);
-			liberror_error_free(
-			 &error );
-
-			return( -1 );
-		}
-	}
-	if( internal_handle->hash_values == NULL )
-	{
-		return( 0 );
-	}
-	result = libewf_values_table_get_value_wide(
-                  internal_handle->hash_values,
-	          identifier,
-	          identifier_length,
-	          value,
-	          length,
-	          &error );
-
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hash value identifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-	}
-	return( result );
-}
-
-#endif
 
 /* Sets the amount of sectors per chunk in the media information
  * Returns 1 if successful or -1 on error
@@ -4457,9 +4097,9 @@ int libewf_set_header_value(
 
 	if( libewf_values_table_set_value(
 	     internal_handle->header_values,
-	     identifier,
+	     (libewf_character_t *) identifier,
 	     identifier_length,
-	     value,
+	     (libewf_character_t *) value,
 	     length,
 	     &error ) != 1 )
 	{
@@ -4479,144 +4119,6 @@ int libewf_set_header_value(
 	}
 	return( 1 );
 }
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Sets the header value specified by the identifier
- * Returns 1 if successful or -1 on error
- */
-int libewf_set_header_value_wide(
-     libewf_handle_t *handle,
-     const wchar_t *identifier,
-     const wchar_t *value,
-     size_t length )
-{
-	liberror_error_t *error                     = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_set_header_value_wide";
-	size_t identifier_length                  = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( ( internal_handle->read != NULL )
-	 || ( internal_handle->write == NULL )
-	 || ( internal_handle->write->values_initialized != 0 ) )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: header value cannot be changed.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( identifier == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid identifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( internal_handle->header_values == NULL )
-	{
-		if( libewf_values_table_initialize(
-		     &( internal_handle->header_values ),
-		     LIBEWF_HEADER_VALUES_DEFAULT_AMOUNT,
-		     &error ) != 1 )
-		{
-			liberror_error_set(
-			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create header values.",
-			 function );
-
-			libewf_notify_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			return( -1 );
-		}
-		if( libewf_header_values_initialize(
-		     internal_handle->header_values,
-		     &error ) != 1 )
-		{
-			liberror_error_set(
-			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize header values.",
-			 function );
-
-			libewf_notify_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			return( -1 );
-		}
-	}
-	identifier_length = wide_string_length(
-	                     identifier );
-
-	if( libewf_values_table_set_value_wide(
-	     internal_handle->header_values,
-	     identifier,
-	     identifier_length,
-	     value,
-	     length,
-	     &error ) != 1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set header value.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		 error );
-		liberror_error_free(
-		 &error );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-#endif
 
 /* Sets the hash value specified by the identifier
  * Returns 1 if successful or -1 on error
@@ -4727,9 +4229,9 @@ int libewf_set_hash_value(
 
 	if( libewf_values_table_set_value(
 	     internal_handle->hash_values,
-	     identifier,
+	     (libewf_character_t *) identifier,
 	     identifier_length,
-	     value,
+	     (libewf_character_t *) value,
 	     length,
 	     &error ) != 1 )
 	{
@@ -4778,171 +4280,6 @@ int libewf_set_hash_value(
 	}
 	return( 1 );
 }
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-
-/* Sets the hash value specified by the identifier
- * Returns 1 if successful or -1 on error
- */
-int libewf_set_hash_value_wide(
-     libewf_handle_t *handle,
-     const wchar_t *identifier,
-     const wchar_t *value,
-     size_t length )
-{
-	liberror_error_t *error                     = NULL;
-	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_set_hash_value_wide";
-	size_t identifier_length                  = 0;
-
-	if( handle == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	internal_handle = (libewf_internal_handle_t *) handle;
-
-	if( internal_handle->read != NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: hash value cannot be changed.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( identifier == NULL )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid identifier.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		error );
-		liberror_error_free(
-		&error );
-
-		return( -1 );
-	}
-	if( internal_handle->hash_values == NULL )
-	{
-		if( libewf_values_table_initialize(
-		     &( internal_handle->hash_values ),
-		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
-		     &error ) != 1 )
-		{
-			liberror_error_set(
-			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hash values.",
-			 function );
-
-			libewf_notify_error_backtrace(
-			 error);
-			liberror_error_free(
-			 &error );
-
-			return( -1 );
-		}
-		if( libewf_hash_values_initialize(
-		     internal_handle->hash_values,
-		     &error ) != 1 )
-		{
-			liberror_error_set(
-			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize hash values.",
-			 function );
-
-			libewf_notify_error_backtrace(
-			 error);
-			liberror_error_free(
-			 &error );
-
-			return( -1 );
-		}
-	}
-	identifier_length = wide_string_length(
-	                     identifier );
-
-	if( libewf_values_table_set_value_wide(
-	     internal_handle->hash_values,
-	     identifier,
-	     identifier_length,
-	     value,
-	     length,
-	     &error ) != 1 )
-	{
-		liberror_error_set(
-		 &error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set hash value.",
-		 function );
-
-		libewf_notify_error_backtrace(
-		 error);
-		liberror_error_free(
-		 &error );
-
-		return( -1 );
-	}
-	if( ( internal_handle->hash_sections != NULL )
-	 && ( identifier_length == 3 )
-	 && ( wide_string_compare(
-	       identifier,
-	       L"MD5",
-	       identifier_length ) == 0 ) )
-	{
-		if( libewf_hash_values_generate_md5_hash(
-		     internal_handle->hash_values,
-		     internal_handle->hash_sections->md5_hash,
-		     EWF_DIGEST_HASH_SIZE_MD5,
-		     &( internal_handle->hash_sections->md5_hash_set ),
-		     &error ) != 1 )
-		{
-			liberror_error_set(
-			 &error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to parse MD5 hash value for its value.",
-			 function );
-
-			libewf_notify_error_backtrace(
-			 error);
-			liberror_error_free(
-			 &error );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
-}
-
-#endif
 
 /* Parses the header values from the xheader, header2 or header section
  * Will parse the first available header in order mentioned above

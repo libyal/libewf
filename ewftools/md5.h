@@ -39,27 +39,27 @@ extern "C" {
 
 #define MD5_CONTEXT	MD5_CTX
 
-#define md5_initialize( context ) \
+#define md5_initialize( context, error ) \
 	MD5_Init( context )
 
-#define md5_update( context, buffer, size ) \
+#define md5_update( context, buffer, size, error ) \
 	MD5_Update( context, buffer, size )
 
-#define md5_finalize( context, hash, size ) \
+#define md5_finalize( context, hash, size, error ) \
 	MD5_Final( hash, context )
 
 #else
 
 #define MD5_CONTEXT	digest_context_t
 
-#define md5_initialize( context ) \
-	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_MD5 )
+#define md5_initialize( context, error ) \
+	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_MD5, error )
 
-#define md5_update( context, buffer, size ) \
-	digest_context_update( context, buffer, size )
+#define md5_update( context, buffer, size, error ) \
+	digest_context_update( context, buffer, size, error )
 
-#define md5_finalize( context, hash, size ) \
-	digest_context_finalize( context, hash, size )
+#define md5_finalize( context, hash, size, error ) \
+	digest_context_finalize( context, hash, size, error )
 
 #endif
 

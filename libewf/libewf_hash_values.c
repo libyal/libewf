@@ -29,7 +29,6 @@
 #include "libewf_definitions.h"
 #include "libewf_hash_values.h"
 #include "libewf_libuna.h"
-#include "libewf_notify.h"
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
@@ -55,7 +54,7 @@ int libewf_hash_values_initialize(
 
 		return( -1 );
 	}
-	if( libewf_values_table_set_identifier_libewf_string(
+	if( libewf_values_table_set_identifier(
 	     hash_values,
 	     LIBEWF_HASH_VALUES_INDEX_MD5,
 	     _LIBEWF_STRING( "MD5" ),
@@ -154,7 +153,7 @@ int libewf_hash_values_parse_md5_hash(
 			return( -1 );
 		}
 	}
-	result = libewf_values_table_get_value_libewf_string(
+	result = libewf_values_table_get_value(
 	          *hash_values,
 	          _LIBEWF_STRING( "MD5" ),
 	          3,
@@ -202,7 +201,7 @@ int libewf_hash_values_parse_md5_hash(
 			md5_hash_string[ md5_hash_string_iterator++ ] = (libewf_character_t) ( (uint8_t) 'a' + ( md5_digit - 10 ) );
 		}
 	}
-	result = libewf_values_table_set_value_libewf_string(
+	result = libewf_values_table_set_value(
 		  *hash_values,
 		  _LIBEWF_STRING( "MD5" ),
 		  3,
@@ -316,7 +315,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		open_tag_start = libewf_string_search(
 		                  lines[ line_iterator ],
-		                  (libewf_character_t) '<',
+		                  '<',
 		                  string_length );
 
 		/* Ignore lines without an open tag
@@ -327,7 +326,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		open_tag_end = libewf_string_search(
 		                lines[ line_iterator ],
-		                (libewf_character_t) '>',
+		                '>',
 		                string_length );
 
 		/* Ignore lines without an open tag
@@ -348,7 +347,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		close_tag_start = libewf_string_search_reverse(
 		                   &open_tag_end[ 1 ],
-		                   (libewf_character_t) '<',
+		                   '<',
 		                   string_length );
 
 		/* Ignore lines without a close tag
@@ -359,7 +358,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		}
 		close_tag_end = libewf_string_search_reverse(
 		                 &open_tag_end[ 1 ],
-		                 (libewf_character_t) '>',
+		                 '>',
 		                 string_length );
 
 		/* Ignore lines without a close tag
@@ -380,7 +379,7 @@ int libewf_hash_values_parse_hash_string_xml(
 		 */
 		*open_tag_end = 0;
 
-		if( libewf_values_table_set_value_libewf_string(
+		if( libewf_values_table_set_value(
 		     *hash_values,
 		     &open_tag_start[ 1 ],
 		     identifier_length,
@@ -392,9 +391,9 @@ int libewf_hash_values_parse_hash_string_xml(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set value with identifier: %" PRIs_LIBEWF ".",
+			 "%s: unable to set value with identifier: %s.",
 			 function,
-			 &open_tag_start[ 1 ] );
+			 (char *) &open_tag_start[ 1 ] );
 
 			libewf_string_split_values_free(
 			 lines,
@@ -814,10 +813,9 @@ int libewf_hash_values_generate_hash_string_xml(
 	print_count = libewf_string_snprintf(
 	               *hash_string,
 	               *hash_string_size,
-	               _LIBEWF_STRING( "%" ) _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "\n%" )
-	               _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "\n" ),
-	               xml_head,
-	               xml_open_tag_xhash );
+	               "%s\n%s\n",
+	               (char *) xml_head,
+	               (char *) xml_open_tag_xhash );
 
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > *hash_string_size ) )
@@ -859,12 +857,10 @@ int libewf_hash_values_generate_hash_string_xml(
 			print_count = libewf_string_snprintf(
 			               &( ( *hash_string) [ string_offset ] ),
 			               ( *hash_string_size - string_offset ),
-			               _LIBEWF_STRING( "\t<%" ) _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( ">%" )
-			               _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "</%" ) _LIBEWF_STRING( PRIs_LIBEWF )
-			               _LIBEWF_STRING( ">\n" ),
-			               hash_values->identifier[ values_table_iterator ],
-			               hash_values->value[ values_table_iterator ],
-			               hash_values->identifier[ values_table_iterator ] );
+			               "\t<%s>%s</%s>\n",
+			               (char *) hash_values->identifier[ values_table_iterator ],
+			               (char *) hash_values->value[ values_table_iterator ],
+			               (char *) hash_values->identifier[ values_table_iterator ] );
 
 			if( ( print_count <= -1 )
 			 || ( (size_t) print_count > ( *hash_string_size - string_offset ) ) )
@@ -890,8 +886,8 @@ int libewf_hash_values_generate_hash_string_xml(
 	print_count = libewf_string_snprintf(
 	               &( ( *hash_string )[ string_offset ] ),
 	               ( *hash_string_size - string_offset ),
-	               _LIBEWF_STRING( "%" ) _LIBEWF_STRING( PRIs_LIBEWF ) _LIBEWF_STRING( "\n\n" ),
-	               xml_close_tag_xhash );
+	               "%s\n\n",
+	               (char *) xml_close_tag_xhash );
 
 	if( ( print_count <= -1 )
 	 || ( (size_t) print_count > ( *hash_string_size - string_offset ) ) )
@@ -976,7 +972,7 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( -1 );
 	}
-	result = libewf_values_table_get_value_libewf_string(
+	result = libewf_values_table_get_value(
 	          hash_values,
 	          _LIBEWF_STRING( "MD5" ),
 	          3,

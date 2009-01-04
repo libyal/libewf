@@ -1,7 +1,7 @@
 if HAVE_LOCAL_LIBUNA
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/libuna
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror -I$(top_srcdir)/libuna
 else
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror
 endif
 
 bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
@@ -30,7 +30,7 @@ ewfacquire_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfacquire_LDADD  = ../libewf/libewf.la
+ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -56,7 +56,7 @@ ewfacquirestream_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfacquirestream_LDADD  = ../libewf/libewf.la
+ewfacquirestream_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 
 ewfalter_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -82,7 +82,7 @@ ewfalter_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfalter_LDADD  = ../libewf/libewf.la
+ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -107,7 +107,7 @@ ewfexport_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfexport_LDADD  = ../libewf/libewf.la
+ewfexport_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 
 ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -132,7 +132,7 @@ ewfinfo_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfinfo_LDADD  = ../libewf/libewf.la
+ewfinfo_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -157,7 +157,7 @@ ewfverify_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfverify_LDADD  = ../libewf/libewf.la
+ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
 
 distclean: clean
 	/bin/rm -f Makefile

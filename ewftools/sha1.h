@@ -39,27 +39,27 @@ extern "C" {
 
 #define SHA1_CONTEXT	SHA_CTX
 
-#define sha1_initialize( context ) \
+#define sha1_initialize( context, error ) \
 	SHA1_Init( context )
 
-#define sha1_update( context, buffer, size ) \
+#define sha1_update( context, buffer, size, error ) \
 	SHA1_Update( context, buffer, size )
 
-#define sha1_finalize( context, hash, size ) \
+#define sha1_finalize( context, hash, size, error ) \
 	SHA1_Final( hash, context )
 
 #else
 
 #define SHA1_CONTEXT	digest_context_t
 
-#define sha1_initialize( context ) \
-	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_SHA1 )
+#define sha1_initialize( context, error ) \
+	digest_context_initialize( context, DIGEST_CONTEXT_TYPE_SHA1, error )
 
-#define sha1_update( context, buffer, size ) \
-	digest_context_update( context, buffer, size )
+#define sha1_update( context, buffer, size, error ) \
+	digest_context_update( context, buffer, size, error )
 
-#define sha1_finalize( context, hash, size ) \
-	digest_context_finalize( context, hash, size )
+#define sha1_finalize( context, hash, size, error ) \
+	digest_context_finalize( context, hash, size, error )
 
 #endif
 

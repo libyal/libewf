@@ -79,7 +79,7 @@ Possible performance improvements:
 
 Error handling
 * what about a function that translates error into an equivalent errno?
-* have wchar error messages?
+* have wchar error messages for WINAPI?
 
 Python bindings
 * rewrite pyewf to match libewf API
@@ -129,6 +129,7 @@ check for funtion,[ ]
 check error tollerance
 check TODO
 
+
 * use internal format of date/time string convert them in interface
 * what about header values parsing with preservation of timestamps?
   store a timestamp string in the header value and convert them in ewfinfo
@@ -138,6 +139,7 @@ check TODO
 * API changes
   - add error parameter
   - remove write_finalize in API v2?
+  - Change char to uint8_t to prevent mis interpretation of UTF-8 string type
 
 * separate narrow and wide character library functions
   - Linux can change wide character into UTF8
@@ -201,7 +203,8 @@ CLOSED
   checks out ok
 
 Version: 20080928
-* made ewftools code more gereneric for use in smiotools
+* worked on making ewftools code more gereneric
+* worked on making UTF-8 strings for internal use (not for filenames)
 
 Version: 20080927
 * small adjustment in makefiles

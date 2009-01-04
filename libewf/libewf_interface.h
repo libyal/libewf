@@ -172,27 +172,11 @@ LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    char *value,
                    size_t length );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_get_header_value_identifier_wide(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   wchar_t *value,
-                   size_t length );
-#endif
-
 LIBEWF_EXTERN int libewf_get_header_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    char *value,
                    size_t length );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_get_header_value_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *identifier,
-                   wchar_t *value,
-                   size_t length );
-#endif
 
 LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
                    libewf_handle_t *handle,
@@ -204,27 +188,11 @@ LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    char *value,
                    size_t length );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_get_hash_value_identifier_wide(
-                   libewf_handle_t *handle,
-                   uint32_t index,
-                   wchar_t *value,
-                   size_t length );
-#endif
-
 LIBEWF_EXTERN int libewf_get_hash_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    char *value,
                    size_t length );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_get_hash_value_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *identifier,
-                   wchar_t *value,
-                   size_t length );
-#endif
 
 LIBEWF_EXTERN int libewf_set_sectors_per_chunk(
                    libewf_handle_t *handle,
@@ -315,27 +283,11 @@ LIBEWF_EXTERN int libewf_set_header_value(
                    const char *value,
                    size_t length );
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_set_header_value_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *identifier,
-                   const wchar_t *value,
-                   size_t length );
-#endif
-
 LIBEWF_EXTERN int libewf_set_hash_value(
                    libewf_handle_t *handle,
                    const char *identifier,
                    const char *value,
                    size_t length );
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-LIBEWF_EXTERN int libewf_set_hash_value_wide(
-                   libewf_handle_t *handle,
-                   const wchar_t *identifier,
-                   const wchar_t *value,
-                   size_t length );
-#endif
 
 LIBEWF_EXTERN int libewf_parse_header_values(
                    libewf_handle_t *handle,
