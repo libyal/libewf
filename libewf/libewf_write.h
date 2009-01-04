@@ -47,6 +47,7 @@
 #include <libewf/libewf_handle.h>
 
 #include "libewf_char.h"
+#include "libewf_chunk_cache.h"
 #include "libewf_internal_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_segment_file_handle.h"
@@ -56,32 +57,46 @@ extern "C" {
 #endif
 
 int64_t libewf_write_calculate_chunks_per_segment_file(
-         libewf_internal_handle_t *internal_handle,
          libewf_segment_file_handle_t *segment_file_handle,
          size64_t segment_file_size,
          size64_t maximum_segment_file_size,
          uint32_t maximum_section_amount_of_chunks,
+         uint32_t segment_amount_of_chunks,
+         uint32_t amount_of_chunks,
          libewf_media_values_t *media_values,
          uint8_t format,
          uint8_t ewf_format,
          uint8_t unrestrict_offset_amount );
 
 uint32_t libewf_write_calculate_chunks_per_chunks_section(
-          libewf_internal_handle_t *internal_handle );
+          size64_t segment_file_size,
+          size64_t maximum_segment_file_size,
+          uint32_t maximum_section_amount_of_chunks,
+          int64_t chunks_per_segment,
+          uint8_t chunks_section_number,
+          uint8_t unrestrict_offset_amount );
 
 int libewf_write_test_segment_file_full(
      libewf_internal_handle_t *internal_handle,
+     size64_t segment_file_size,
+     size64_t maximum_segment_file_size,
+     libewf_media_values_t *media_values,
      off64_t segment_file_offset,
-     uint32_t current_amount_of_chunks,
-     uint32_t total_amount_of_chunks,
-     size32_t chunk_size );
+     uint32_t current_amount_of_chunks );
 
 int libewf_write_test_chunks_section_full(
      libewf_internal_handle_t *internal_handle,
+     size64_t segment_file_size,
+     size64_t maximum_segment_file_size,
+     libewf_media_values_t *media_values,
      off64_t segment_file_offset );
 
 ssize_t libewf_write_process_chunk_data(
-         libewf_internal_handle_t *internal_handle,
+         libewf_chunk_cache_t *chunk_cache,
+         libewf_media_values_t *media_values,
+         int8_t compression_level,
+         uint8_t compress_empty_block,
+         uint8_t ewf_format,
          ewf_char_t *chunk_data,
          size_t chunk_data_size,
          ewf_char_t *compressed_chunk_data,

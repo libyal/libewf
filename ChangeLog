@@ -149,7 +149,6 @@ TODO
   - for write only offset table is not needed etc.
 * what about open read write and set functions?
 * check >16375 chunks offset table in encase 4 and earlier formats?
-* refactor libewf_write_process_chunk_data not to use internal handle
 
 * refactor libewf_section_(x)(header|hash)(1|2)_read functions into a single
   function
@@ -173,6 +172,7 @@ Version: 20080219
 * removed corruption detection test in libewf_segment_file_write_chunks_data
   no longer needed
 * code cleanup
+* refactored use internal handle in libewf_write
 
 Version: 20080217
 * added corruption detection test in libewf_segment_file_write_chunks_data
