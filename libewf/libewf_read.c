@@ -147,7 +147,7 @@ int libewf_read_build_index( LIBEWF_INTERNAL_HANDLE *internal_handle )
  * This function swaps byte pairs if specified
  * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
-ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size )
+ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, uint32_t chunk, uint32_t chunk_offset, void *buffer, size_t size )
 {
 	EWF_CHUNK *chunk_data       = NULL;
 	EWF_CHUNK *chunk_read       = NULL;
@@ -586,28 +586,26 @@ ssize_t libewf_read_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chu
 	return( (ssize_t) bytes_available );
 }
 
-/* Reads media data from the last current into a buffer
+/* Reads certain chunk data from the segment file(s)
+ * Will read until the requested size is filled or the entire chunk is read
  * This function swaps byte pairs if specified
- * Returns the amount of bytes read, or -1 on error
+ * Returns the amount of bytes read, 0 if no bytes can be read, or -1 on error
  */
-ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
+ssize_t libewf_read_chunk_data( LIBEWF_INTERNAL_HANDLE *internal_handle, int8_t raw_access, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc )
 {
-	LIBEWF_INTERNAL_HANDLE *internal_handle = NULL;
-	static char *function                   = "libewf_read_buffer";
-	ssize_t chunk_read_count                = 0;
-	ssize_t total_read_count                = 0;
-	size_t chunk_data_size                  = 0;
-	int chunk_cache_used                    = 0;
+	static char *function    = "libewf_read_chunk_data";
+	ssize_t chunk_read_count = 0;
+	ssize_t total_read_count = 0;
+	size_t chunk_data_size   = 0;
+	int chunk_cache_used     = 0;
 
-	if( handle == NULL )
+	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
 		 function );
 
 		return( -1 );
 	}
-	internal_handle = (LIBEWF_INTERNAL_HANDLE *) handle;
-
 	if( internal_handle->chunk_cache == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
@@ -639,6 +637,27 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	if( size > (size_t) SSIZE_MAX )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( is_compressed == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid is compressed.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_crc == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk crc.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( read_crc == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid read crc.\n",
 		 function );
 
 		return( -1 );
@@ -680,6 +699,7 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 	{
 		chunk_read_count = libewf_read_chunk(
 		                    internal_handle,
+		                    raw_access,
 		                    internal_handle->current_chunk,
 		                    internal_handle->current_chunk_offset,
 		                    (void *) &( (uint8_t *) buffer )[ total_read_count ],
@@ -722,6 +742,63 @@ ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
 		}
 	}
 	return( total_read_count );
+
+	return( 0 );
+}
+
+/* Reads 'raw' data from the curent offset into a buffer
+ * size contains the size of the buffer
+ * Returns the amount of bytes read, or -1 on error
+ */
+ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc )
+{
+	static char *function = "libewf_raw_read_buffer";
+	ssize_t read_count    = 0;
+
+	read_count = libewf_read_chunk_data(
+	              (LIBEWF_INTERNAL_HANDLE *) handle,
+	              1,
+	              buffer,
+	              size,
+	              is_compressed,
+	              (EWF_CRC *) chunk_crc,
+	              read_crc );
+
+	if( read_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read chunk data.\n",
+		 function );
+	}
+	return( read_count );
+}
+
+/* Reads media data from the last current into a buffer
+ * This function swaps byte pairs if specified
+ * Returns the amount of bytes read, or -1 on error
+ */
+ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size )
+{
+	static char *function = "libewf_read_buffer";
+	EWF_CRC chunk_crc     = 0;
+	ssize_t read_count    = 0;
+	int8_t is_compressed  = 0;
+	int8_t read_crc       = 0;
+
+	read_count = libewf_read_chunk_data(
+	              (LIBEWF_INTERNAL_HANDLE *) handle,
+	              0,
+	              buffer,
+	              size,
+	              &is_compressed,
+	              &chunk_crc,
+	              &read_crc );
+
+	if( read_count <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: unable to read chunk data.\n",
+		 function );
+	}
+	return( read_count );
 }
 
 /* Reads media data from an offset into a buffer

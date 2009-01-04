@@ -1351,7 +1351,7 @@ int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle )
 /* Add an acquiry error
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, uint64_t sector, uint32_t amount_of_sectors )
+int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors )
 {
 	return( libewf_internal_handle_add_acquiry_error_sector(
 	         (LIBEWF_INTERNAL_HANDLE *) handle,

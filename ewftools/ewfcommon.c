@@ -1191,7 +1191,8 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 
 	stored_md5_hash_string = (LIBEWF_CHAR *) libewf_common_alloc( LIBEWF_CHAR_SIZE * LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 );
 
-	if( ( stored_md5_hash_string != NULL ) && ( libewf_get_stored_md5_hash( handle, stored_md5_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
+	if( ( stored_md5_hash_string != NULL )
+	 && ( libewf_get_stored_md5_hash( handle, stored_md5_hash_string, LIBEWF_STRING_DIGEST_HASH_LENGTH_MD5 ) == 1 ) )
 	{
 		fprintf( stream, "\tMD5 hash in file:\t%" PRIs_EWF "\n", stored_md5_hash_string );
 
@@ -1201,7 +1202,8 @@ void ewfcommon_hash_values_fprint( FILE *stream, LIBEWF_HANDLE *handle )
 	{
 		fprintf( stream, "\tMD5 hash in file:\tN/A\n" );
 	}
-	if( ( libewf_parse_hash_values( handle ) == 1 ) && ( internal_handle->hash_values != NULL ) )
+	if( ( libewf_parse_hash_values( handle ) == 1 )
+	 && ( internal_handle->hash_values != NULL ) )
 	{
 		if( internal_handle->hash_values->amount > LIBEWF_HASH_VALUES_DEFAULT_AMOUNT )
 		{
@@ -1236,17 +1238,21 @@ void ewfcommon_timestamp_fprint( FILE *stream, time_t timestamp )
 
 		if( time_elements->tm_yday > 0 )
 		{
-			fprintf( stream, " %i day(s), %i hour(s), %i minute(s) and", time_elements->tm_yday, ( time_elements->tm_hour - 1 ), time_elements->tm_min );
+			fprintf( stream, " %i day(s), %i hour(s), %i minute(s) and",
+			 time_elements->tm_yday, ( time_elements->tm_hour - 1 ), time_elements->tm_min );
 		}
 		else if( time_elements->tm_hour > 1 )
 		{
-			fprintf( stream, " %i hour(s), %i minute(s) and", ( time_elements->tm_hour - 1 ), time_elements->tm_min );
+			fprintf( stream, " %i hour(s), %i minute(s) and",
+			 ( time_elements->tm_hour - 1 ), time_elements->tm_min );
 		}
 		else if( time_elements->tm_min > 0 )
 		{
-			fprintf( stream, " %i minute(s) and", time_elements->tm_min );
+			fprintf( stream, " %i minute(s) and",
+			 time_elements->tm_min );
 		}
-		fprintf( stream, " %i second(s)", time_elements->tm_sec );
+		fprintf( stream, " %i second(s)",
+		 time_elements->tm_sec );
 
 		libewf_common_free( time_elements );
 	}
@@ -1272,13 +1278,15 @@ void ewfcommon_bytes_per_second_fprint( FILE *stream, uint64_t bytes, uint64_t s
 
 		if( bytes_per_second_string != NULL )
 		{
-			fprintf( stream, " %" PRIs_EWF "/s (%" PRIu64 " bytes/second)", bytes_per_second_string, bytes_per_second );
+			fprintf( stream, " %" PRIs_EWF "/s (%" PRIu64 " bytes/second)",
+			 bytes_per_second_string, bytes_per_second );
 
 			libewf_common_free( bytes_per_second_string );
 		}
 		else
 		{
-			fprintf( stream, " %" PRIu64 " bytes/second", bytes_per_second );
+			fprintf( stream, " %" PRIu64 " bytes/second",
+			 bytes_per_second );
 		}
 	}
 }
@@ -1476,18 +1484,18 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 #if defined(HAVE_STRERROR_R) || defined(HAVE_STRERROR)
 	CHAR_T *error_string              = NULL;
 #endif
+	off64_t current_read_offset       = 0;
+	off64_t current_calculated_offset = 0;
+	off64_t error2_sector             = 0;
 	ssize_t read_count                = 0;
+	ssize_t buffer_offset             = 0;
+	size32_t chunk_size               = 0;
 	size_t read_size                  = 0;
 	size_t bytes_to_read              = 0;
 	size_t read_remaining_bytes       = 0;
 	size_t error_remaining_bytes      = 0;
-	int64_t current_read_offset       = 0;
-	int64_t current_calculated_offset = 0;
 	int64_t chunk_amount              = 0;
-	int64_t buffer_offset             = 0;
-	uint64_t error2_sector            = 0;
 	int32_t read_amount_of_errors     = 0;
-	uint32_t chunk_size               = 0;
 	uint32_t bytes_per_sector         = 0;
 	uint32_t read_error_offset        = 0;
 	uint32_t error_skip_bytes         = 0;
@@ -1570,7 +1578,7 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 			LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: read chunk: %" PRIi64 " with size: %zi.\n", ( chunk_amount + 1 ), read_count );
 
-			current_calculated_offset = (off_t) ( total_read_count + buffer_offset + read_error_offset );
+			current_calculated_offset = (off64_t) ( total_read_count + buffer_offset + read_error_offset );
 
 			if( read_count <= -1 )
 			{
@@ -1718,7 +1726,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 				if( wipe_block_on_read_error == 1 )
 				{
-					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n", byte_error_granularity, error_granularity_offset );
+					LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: wiping block of %" PRIu32 " bytes at offset %" PRIu32 ".\n",
+					 byte_error_granularity, error_granularity_offset );
 
 					if( libewf_common_memset( &buffer[ error_granularity_offset ], 0, byte_error_granularity ) == NULL )
 					{
@@ -1743,7 +1752,8 @@ int32_t ewfcommon_read_input( LIBEWF_HANDLE *handle, int file_descriptor, EWF_CH
 
 					return( -1 );
 				}
-				LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n", ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
+				LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: adding error2: %" PRIu32 " sector: %" PRIu64 ", count: %" PRIu32 ".\n",
+				 ( (LIBEWF_INTERNAL_HANDLE *) handle )->acquiry_amount_of_errors, error2_sector, error2_amount_of_sectors );
 
 				LIBEWF_VERBOSE_PRINT( "ewfcommon_read_input: skipping %" PRIu32 " bytes.\n", error_skip_bytes );
 
@@ -1818,7 +1828,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 #if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
 	uint8_t *data                       = NULL;
 #endif
-	off_t read_offset                   = 0;
+	off64_t read_offset                 = 0;
 	ssize_t read_count                  = 0;
 	size_t size                         = 0;
 	size_t buffer_size                  = 0;
@@ -1925,7 +1935,7 @@ int64_t ewfcommon_read( LIBEWF_HANDLE *handle, uint8_t calculate_sha1, void (*ca
 			ewfsha1_update( &sha1_context, ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, read_count );
 #endif
 		}
-		read_offset      += (off_t) size;
+		read_offset      += (off64_t) size;
 		total_read_count += (int64_t) read_count;
 
 		if( callback != NULL )
@@ -2049,9 +2059,9 @@ int64_t ewfcommon_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_fil
 			size = (size_t) ( media_size - total_read_count );
 		}
 #if !defined( HAVE_CHUNK_CACHE_PASSTHROUGH )
-		read_count = libewf_read_random( handle, (void *) data, size, (off_t) read_offset );
+		read_count = libewf_read_random( handle, (void *) data, size, read_offset );
 #else
-		read_count = libewf_read_random( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, (off_t) read_offset );
+		read_count = libewf_read_random( handle, (void *) ( (LIBEWF_INTERNAL_HANDLE *) handle )->chunk_cache->data, size, read_offset );
 #endif
 
 		if( read_count <= -1 )

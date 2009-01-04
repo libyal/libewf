@@ -49,7 +49,7 @@ struct libewf_error_sector
 {
 	/* The first sector where the error occurred
 	 */
-	uint64_t sector;
+	off64_t sector;
 
 	/* The amount of sectors
 	 */

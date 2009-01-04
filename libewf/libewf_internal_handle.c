@@ -1435,20 +1435,30 @@ int8_t libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *inter
 /* Add a acquiry read error sector to the list
  * Returns 1 if successful, -1 on error
  */
-int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, uint64_t sector, uint32_t amount_of_sectors )
+int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors )
 {
 	LIBEWF_ERROR_SECTOR *acquiry_error_sectors = NULL;
+	static char *function                      = "libewf_internal_handle_set_acquiry_error_sector";
 	uint32_t iterator                          = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_acquiry_error_sector: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( internal_handle->media == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_acquiry_error_sector: invalid handle - missing subhandle media.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing subhandle media.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( sector <= -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid sector.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1473,7 +1483,8 @@ int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *
 	}
 	if( acquiry_error_sectors == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_internal_handle_set_acquiry_error_sector: unable to create acquiry read error sectors.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create acquiry read error sectors.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -1494,7 +1505,7 @@ int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *inter
 {
 	LIBEWF_ERROR_SECTOR *crc_error_sectors = NULL;
 	static char *function                  = "libewf_internal_handle_add_crc_error_chunk";
-	uint64_t sector                        = 0;
+	off64_t sector                         = 0;
 	uint32_t iterator                      = 0;
 
 	if( internal_handle == NULL )
@@ -1518,7 +1529,7 @@ int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *inter
 
 		return( -1 );
 	}
-	sector = (uint64_t) chunk * (uint64_t) internal_handle->media->sectors_per_chunk;
+	sector = (off64_t) chunk * (off64_t) internal_handle->media->sectors_per_chunk;
 
 	if( internal_handle->read->crc_error_sectors == NULL )
 	{

@@ -216,35 +216,49 @@ ssize_t libewf_section_start_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int
 ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal_handle, int file_descriptor, off_t start_offset, EWF_CHAR *section_type, EWF_CHAR *uncompressed_string, size_t size, int8_t compression_level )
 {
 	EWF_CHAR *compressed_string = NULL;
+	static char *function       = "libewf_section_compressed_string_write";
 	ssize_t section_write_count = 0;
 	ssize_t string_write_count  = 0;
 
 	if( internal_handle == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_compressed_string_write: invalid handle.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( section_type == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_compressed_string_write: invalid section type.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid section type.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( uncompressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_compressed_string_write: invalid uncompressed string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid uncompressed string.\n",
+		 function );
 
 		return( -1 );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_section_compressed_string_write: String:\n" );
-	LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, uncompressed_string, size ); );
+	LIBEWF_VERBOSE_PRINT( "%s: string:\n",
+	 function );
 
+	if( ( uncompressed_string[ 0 ] == 0xff )
+	 || ( uncompressed_string[ 0 ] == 0xfe ) )
+	{
+		LIBEWF_VERBOSE_EXEC( libewf_debug_header2_fprint( stderr, uncompressed_string, size ); );
+	}
+	else
+	{
+		LIBEWF_VERBOSE_EXEC( libewf_debug_header_fprint( stderr, uncompressed_string, size ); );
+	}
 	compressed_string = ewf_string_compress( uncompressed_string, &size, compression_level );
 
 	if( compressed_string == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_compressed_string_write: unable to compress string.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to compress string.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -252,7 +266,8 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal
 
 	if( section_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_compressed_string_write: unable to write section to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write section to file.\n",
+		 function );
 
 		libewf_common_free( compressed_string );
 
@@ -264,7 +279,8 @@ ssize_t libewf_section_compressed_string_write( LIBEWF_INTERNAL_HANDLE *internal
 
 	if( string_write_count == -1 )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_compressed_string_write: unable to write string to file.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to write string to file.\n",
+		 function );
 
 		return( -1 );
 	}

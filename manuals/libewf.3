@@ -1,4 +1,4 @@
-.Dd July 22, 2007
+.Dd July 23, 2007
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -14,20 +14,22 @@
 .Fn libewf_open "char * const filenames[], uint16_t file_amount, uint8_t flags"
 .Ft off64_t
 .Fn libewf_seek_offset "LIBEWF_HANDLE *handle, off64_t offset"
+.Ft int
+.Fn libewf_raw_update_md5 "LIBEWF_HANDLE *handle, void *buffer, size_t size"
+.Ft ssize_t
+.Fn libewf_raw_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc"
 .Ft ssize_t
 .Fn libewf_read_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
 .Ft ssize_t
 .Fn libewf_read_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
 .Ft ssize_t
-.Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
-.Ft ssize_t
-.Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
-.Ft int
-.Fn libewf_raw_update_md5 "LIBEWF_HANDLE *handle, void *buffer, size_t size"
-.Ft ssize_t
 .Fn libewf_raw_write_prepare_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc"
 .Ft ssize_t
 .Fn libewf_raw_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc"
+.Ft ssize_t
+.Fn libewf_write_buffer "LIBEWF_HANDLE *handle, void *buffer, size_t size"
+.Ft ssize_t
+.Fn libewf_write_random "LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset"
 .Ft ssize_t
 .Fn libewf_write_finalize "LIBEWF_HANDLE *handle"
 .Ft int8_t
@@ -77,7 +79,7 @@
 .Ft int8_t
 .Fn libewf_parse_hash_values "LIBEWF_HANDLE *handle"
 .Ft int8_t
-.Fn libewf_add_acquiry_error "LIBEWF_HANDLE *handle, uint64_t sector, uint32_t amount_of_sectors"
+.Fn libewf_add_acquiry_error "LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors"
 .Ft void
 .Fn libewf_set_notify_values "FILE *stream, uint8_t verbose"
 .Pp

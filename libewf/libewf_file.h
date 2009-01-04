@@ -122,7 +122,7 @@ LIBEWF_EXTERN int8_t libewf_get_calculated_md5_hash( LIBEWF_HANDLE *handle, LIBE
 LIBEWF_EXTERN int8_t libewf_parse_header_values( LIBEWF_HANDLE *handle, uint8_t date_format );
 LIBEWF_EXTERN int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle );
 
-LIBEWF_EXTERN int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, uint64_t sector, uint32_t amount_of_sectors );
+LIBEWF_EXTERN int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
 
 LIBEWF_EXTERN void libewf_set_notify_values( FILE *stream, uint8_t verbose );
 

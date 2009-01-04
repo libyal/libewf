@@ -112,6 +112,9 @@ TODO
 * remove raw access value in handle and RAW flag
 * ewfacquire check if last segment file is closed before telling acquiry was completed
 
+Version: 20070723
+* worked on allowing to read raw buffers as chunks
+
 Version: 20070722
 * worked on allowing to write raw buffers as chunks
 

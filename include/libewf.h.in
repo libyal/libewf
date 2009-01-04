@@ -85,6 +85,12 @@ LIBEWF_EXTERN off64_t libewf_seek_offset( LIBEWF_HANDLE *handle, off64_t offset 
  */
 LIBEWF_EXTERN int libewf_raw_update_md5( LIBEWF_HANDLE *handle, void *buffer, size_t size );
 
+/* Reads 'raw' data from the curent offset into a buffer
+ * size contains the size of the buffer
+ * Returns the amount of bytes read, or -1 on error
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_read_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc );
+
 /* Reads data from the curent offset into a buffer
  * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of bytes read, or -1 on error
@@ -97,7 +103,24 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer( LIBEWF_HANDLE *handle, void *buffer, s
  */
 LIBEWF_EXTERN ssize_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, size_t size, off64_t offset );
 
-/* Writes data in EWF format from a buffer, the necessary settings of the write values must have been made
+/* Prepares a buffer with chunk data before writing according to the handle settings
+ * intended for raw write
+ * The buffer size cannot be larger than the chunk size
+ * The function sets the chunk crc, is compressed and write crc values
+ * Returns the resulting chunk size, or -1 on error
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc );
+
+/* Writes 'raw' data in EWF format from a buffer at the current offset
+ * the necessary settings of the write values must have been made
+ * size contains the size of the data within the buffer while
+ * data size contains the size of the actual input data
+ * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
+ */
+LIBEWF_EXTERN ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc );
+
+/* Writes data in EWF format from a buffer at the current offset
+ * the necessary settings of the write values must have been made
  * This function swaps byte pairs if specified and not in raw mode
  * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
  */
@@ -115,21 +138,6 @@ LIBEWF_EXTERN ssize_t libewf_write_random( LIBEWF_HANDLE *handle, void *buffer, 
  * Returns the amount of input bytes written, or -1 on error
  */
 LIBEWF_EXTERN ssize_t libewf_write_finalize( LIBEWF_HANDLE *handle );
-
-/* Prepares a buffer with chunk data before writing according to the handle settings
- * intended for raw write
- * The buffer size cannot be larger than the chunk size
- * The function sets the chunk crc, is compressed and write crc values
- * Returns the resulting chunk size, or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc );
-
-/* Writes data in EWF format from a buffer, the necessary settings of the write values must have been made
- * size contains the size of the data within the buffer while
- * data size contains the size of the actual input data
- * Returns the amount of input bytes written, 0 when no longer bytes can be written, or -1 on error
- */
-LIBEWF_EXTERN ssize_t libewf_raw_write_buffer( LIBEWF_HANDLE *handle, void *buffer, size_t size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc );
 
 /* Closes the EWF handle and frees memory used within the handle
  * Returns 1 if successful, or -1 on error
@@ -591,7 +599,7 @@ LIBEWF_EXTERN int8_t libewf_parse_hash_values( LIBEWF_HANDLE *handle );
 /* Add an acquiry error
  * Returns 1 if successful, -1 on error
  */
-LIBEWF_EXTERN int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, uint64_t sector, uint32_t amount_of_sectors );
+LIBEWF_EXTERN int8_t libewf_add_acquiry_error( LIBEWF_HANDLE *handle, off64_t sector, uint32_t amount_of_sectors );
 
 /* Set the notify values
  */

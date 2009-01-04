@@ -462,7 +462,7 @@ int8_t libewf_internal_handle_set_hash_value( LIBEWF_INTERNAL_HANDLE *internal_h
 
 int8_t libewf_internal_handle_set_swap_byte_pairs( LIBEWF_INTERNAL_HANDLE *internal_handle, uint8_t swap_byte_pairs );
 
-int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, uint64_t sector, uint32_t amount_of_sectors );
+int8_t libewf_internal_handle_add_acquiry_error_sector( LIBEWF_INTERNAL_HANDLE *internal_handle, off64_t sector, uint32_t amount_of_sectors );
 int8_t libewf_internal_handle_add_crc_error_chunk( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );
 
 int8_t libewf_internal_handle_determine_format( LIBEWF_INTERNAL_HANDLE *internal_handle );
