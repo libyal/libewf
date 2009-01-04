@@ -290,6 +290,7 @@ int main( int argc, char * const argv[] )
 	uint64_t acquiry_size                      = 0;
 	uint64_t sectors_per_chunk                 = 0;
 	uint64_t sector_error_granularity          = 0;
+	uint32_t amount_of_acquiry_errors          = 0;
 	int8_t compression_level                   = LIBEWF_COMPRESSION_NONE;
 	int8_t compress_empty_block                = 0;
 	int8_t media_type                          = LIBEWF_MEDIA_TYPE_FIXED;
@@ -1329,11 +1330,19 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stdout, "Acquiry completed.\n" );
 	}
-	ewfoutput_process_summary_fprint( stdout, _S_LIBEWF_CHAR( "Written" ), write_count, timestamp_start, timestamp_end );
+	ewfoutput_process_summary_fprint(
+	 stdout,
+	 _S_LIBEWF_CHAR( "Written" ),
+	 write_count,
+	 timestamp_start,
+	 timestamp_end );
 
 	fprintf( stdout, "\n" );
 
-	ewfoutput_acquiry_errors_fprint( stdout, handle );
+	ewfoutput_acquiry_errors_fprint(
+	 stdout,
+	 handle,
+	 &amount_of_acquiry_errors );
 
 	if( libewf_close( handle ) != 0 )
 	{
@@ -1351,13 +1360,15 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n", calculated_md5_hash_string );
+		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_EWF "\n",
+		 calculated_md5_hash_string );
 
 		libewf_common_free( calculated_md5_hash_string );
 	}
 	if( calculate_sha1 == 1 )
 	{
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n", calculated_sha1_hash_string );
+		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_EWF "\n",
+		 calculated_sha1_hash_string );
 
 		libewf_common_free( calculated_sha1_hash_string );
 	}

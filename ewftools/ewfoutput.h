@@ -88,11 +88,13 @@ void ewfoutput_acquiry_parameters_fprint(
 
 void ewfoutput_acquiry_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle );
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_errors );
 
 void ewfoutput_crc_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle );
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_errors );
 
 void ewfoutput_header_values_fprint(
       FILE *stream,

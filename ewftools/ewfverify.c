@@ -113,6 +113,7 @@ int main( int argc, char * const argv[] )
 	time_t timestamp_start                     = 0;
 	time_t timestamp_end                       = 0;
 	int64_t count                              = 0;
+	uint32_t amount_of_crc_errors              = 0;
 	int8_t stored_md5_hash_result              = 0;
 	int8_t stored_sha1_hash_result             = 0;
 	uint8_t calculate_md5                      = 1;
@@ -464,7 +465,10 @@ int main( int argc, char * const argv[] )
 			return( EXIT_FAILURE );
 		}
 	}
-	ewfoutput_crc_errors_fprint( stdout, handle );
+	ewfoutput_crc_errors_fprint(
+	 stdout,
+	 handle,
+	 &amount_of_crc_errors );
 
 	if( libewf_close( handle ) != 0 )
 	{
@@ -526,9 +530,10 @@ int main( int argc, char * const argv[] )
 		libewf_common_free( stored_sha1_hash_string );
 		libewf_common_free( calculated_sha1_hash_string );
 	}
-	/* The EWF file can be verified without the integrity hash
+	/* The EWF file can be verified without an integrity hash
 	 */
-	if( ( ( calculate_md5 == 0 )
+	if( ( amount_of_crc_errors == 0 )
+	 && ( ( calculate_md5 == 0 )
 	  || ( stored_md5_hash_result == 0 )
 	  || match_md5_hash )
 	 && ( ( calculate_sha1 == 0 )

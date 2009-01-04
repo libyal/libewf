@@ -535,11 +535,11 @@ void ewfoutput_acquiry_parameters_fprint(
  */
 void ewfoutput_acquiry_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle )
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_acquiry_errors_fprint";
 	off64_t sector             = 0;
-	uint32_t amount_of_errors  = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t iterator          = 0;
 
@@ -557,21 +557,35 @@ void ewfoutput_acquiry_errors_fprint(
 
 		return;
 	}
-	if( libewf_get_amount_of_acquiry_errors( handle, &amount_of_errors ) == -1 )
+	if( amount_of_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
+		 function );
+
+		return;
+	}
+	if( libewf_get_amount_of_acquiry_errors(
+	     handle,
+	     amount_of_errors ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
 		 function );
 
 		return;
 	}
-	if( amount_of_errors > 0 )
+	if( *amount_of_errors > 0 )
 	{
 		fprintf( stream, "Read errors during acquiry:\n" );
-		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", amount_of_errors );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n",
+		 *amount_of_errors );
 		
-		for( iterator = 0; iterator < amount_of_errors; iterator++ )
+		for( iterator = 0; iterator < *amount_of_errors; iterator++ )
 		{
-			if( libewf_get_acquiry_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
+			if( libewf_get_acquiry_error(
+			     handle,
+			     iterator,
+			     &sector,
+			     &amount_of_sectors ) != 1 )
 			{
 				LIBEWF_WARNING_PRINT( "%s: unable to retrieve the acquiry error: %" PRIu32 ".\n",
 				 function, iterator );
@@ -590,11 +604,11 @@ void ewfoutput_acquiry_errors_fprint(
  */
 void ewfoutput_crc_errors_fprint(
       FILE *stream,
-      LIBEWF_HANDLE *handle )
+      LIBEWF_HANDLE *handle,
+      uint32_t *amount_of_errors )
 {
 	static char *function      = "ewfoutput_crc_errors_fprint";
 	off64_t sector             = 0;
-	uint32_t amount_of_errors  = 0;
 	uint32_t amount_of_sectors = 0;
 	uint32_t iterator          = 0;
 
@@ -612,19 +626,28 @@ void ewfoutput_crc_errors_fprint(
 
 		return;
 	}
-	if( libewf_get_amount_of_crc_errors( handle, &amount_of_errors ) == -1 )
+	if( amount_of_errors == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid amount of errors.\n",
+		 function );
+
+		return;
+	}
+	if( libewf_get_amount_of_crc_errors(
+	     handle,
+	     amount_of_errors ) == -1 )
 	{
 		LIBEWF_WARNING_PRINT( "%s: unable to retrieve the amount of acquiry errors.\n",
 		 function );
 
 		return;
 	}
-	if( amount_of_errors > 0 )
+	if( *amount_of_errors > 0 )
 	{
 		fprintf( stream, "Sector validation errors:\n" );
-		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", amount_of_errors );
+		fprintf( stream, "\ttotal amount: %" PRIu32 "\n", *amount_of_errors );
 
-		for( iterator = 0; iterator < amount_of_errors; iterator++ )
+		for( iterator = 0; iterator < *amount_of_errors; iterator++ )
 		{
 			if( libewf_get_crc_error( handle, iterator, &sector, &amount_of_sectors ) != 1 )
 			{

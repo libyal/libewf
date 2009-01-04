@@ -170,6 +170,7 @@ Version: 20080212
   as pointed out by David Loveall
 * fixed incorrect default segment file size in ewfacquirestream
   as pointed out by Dennis Schreiber
+* fixed missing ewfinfo -e option
 
 Version: 20080202
 * code cleanup

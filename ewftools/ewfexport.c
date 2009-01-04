@@ -139,6 +139,7 @@ int main( int argc, char * const argv[] )
 	uint64_t export_offset             = 0;
 	uint64_t export_size               = 0;
 	uint64_t sectors_per_chunk         = 64;
+	uint32_t amount_of_crc_errors      = 0;
 	int64_t count                      = 0;
 	uint8_t libewf_format              = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs            = 0;
@@ -800,11 +801,19 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Export completed.\n" );
 	}
-	ewfoutput_process_summary_fprint( stderr, _S_LIBEWF_CHAR( "Written" ), count, timestamp_start, timestamp_end );
+	ewfoutput_process_summary_fprint(
+	 stderr,
+	 _S_LIBEWF_CHAR( "Written" ),
+	 count,
+	 timestamp_start,
+	 timestamp_end );
 
 	fprintf( stderr, "\n" );
 
-	ewfoutput_crc_errors_fprint( stderr, handle );
+	ewfoutput_crc_errors_fprint(
+	 stderr,
+	 handle,
+	 &amount_of_crc_errors );
 
 	if( libewf_close( handle ) != 0 )
 	{
