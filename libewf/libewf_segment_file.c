@@ -2322,26 +2322,75 @@ int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIB
 	return( 1 );
 }
 
+/* Seeks a certain offset within the a segment file
+ * Returns 1 if the seek is successful, or -1 on error
+ */
+off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset )
+{
+	static char *function = "libewf_segment_file_seek_offset";
+
+	if( segment_file == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->file_descriptor == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	if( segment_file->filename == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid segment file - missing filename.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( offset > (off64_t) INT64_MAX )
+	{
+		LIBEWF_WARNING_PRINT( "%s: invalid offset value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file->file_offset != offset )
+	{
+		LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment file: %" PRIs_EWF_filename " for offset: %jd.\n",
+		 function, segment_file->file_descriptor, segment_file->filename, offset );
+
+		if( libewf_common_lseek(
+		     segment_file->file_descriptor,
+		     offset,
+		     SEEK_SET ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
+			 function, offset );
+
+			return( -1 );
+		}
+		segment_file->file_offset = offset;
+	}
+	return( offset );
+}
+
+
 /* Seeks a certain chunk offset within the EWF segment file(s)
  * Returns the segment file offset if seek is successful, or -1 on error
  */
 off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk )
 {
 	static char *function   = "libewf_segment_file_seek_chunk_offset";
-	off64_t offset          = 0;
 	uint16_t segment_number = 0;
-	int file_descriptor     = 0;
 
 	if( internal_handle == NULL )
 	{
 		LIBEWF_WARNING_PRINT( "%s: invalid handle.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid handle - missing chunk cache.\n",
 		 function );
 
 		return( -1 );
@@ -2395,54 +2444,51 @@ off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_
 
 		return( -1 );
 	}
-	file_descriptor = internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor;
-	offset          = internal_handle->offset_table->chunk_offset[ chunk ].file_offset;
-	segment_number  = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
+	segment_number = internal_handle->offset_table->chunk_offset[ chunk ].segment_number;
 
-	if( offset > (off64_t) INT64_MAX )
-	{
-		LIBEWF_WARNING_PRINT( "%s: invalid chunk offset value exceeds maximum.\n",
-		 function );
-
-		return( -1 );
-	}
 	if( internal_handle->offset_table->chunk_offset[ chunk ].dirty == 0 )
 	{
-		if( internal_handle->segment_table->segment_file[ segment_number ].file_offset != offset )
+		if( ( segment_number == 0 )
+		 || ( segment_number >= internal_handle->segment_table->amount ) )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for segment: %" PRIu16 " for offset: %jd.\n",
-			 function, file_descriptor, segment_number, offset );
+			LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " not in segment table.\n",
+			 function, segment_number );
 
-			if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
-				 function, offset );
+			return( -1 );
+		}
+		if( libewf_segment_file_seek_offset(
+		     &( internal_handle->segment_table->segment_file[ segment_number ] ),
+		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
+			 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
 
-				return( -1 );
-			}
-			internal_handle->segment_table->segment_file[ segment_number ].file_offset = offset;
+			return( -1 );
 		}
 	}
 	else
 	{
-		if( internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset != offset )
+		if( ( segment_number == 0 )
+		 || ( segment_number >= internal_handle->delta_segment_table->amount ) )
 		{
-			LIBEWF_VERBOSE_PRINT( "%s: seek file descriptor: %d, for delta segment: %" PRIu16 " for offset: %jd.\n",
-			 function, file_descriptor, segment_number, offset );
+			LIBEWF_WARNING_PRINT( "%s: segment number: %" PRIu16 " not in delta segment table.\n",
+			 function, segment_number );
 
-			if( libewf_common_lseek( file_descriptor, offset, SEEK_SET ) == -1 )
-			{
-				LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
-				 function, offset );
+			return( -1 );
+		}
+		if( libewf_segment_file_seek_offset(
+		     &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+		     internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
+		{
+			LIBEWF_WARNING_PRINT( "%s: cannot find chunk offset: %jd.\n",
+			 function, internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
 
-				return( -1 );
-			}
-			internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset = offset;
+			return( -1 );
 		}
 	}
 	internal_handle->current_chunk = chunk;
 
-	return( offset );
+	return( internal_handle->offset_table->chunk_offset[ chunk ].file_offset );
 }
 
 /* Closes all the EWF segment file(s)

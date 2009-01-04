@@ -1183,11 +1183,12 @@ ssize_t libewf_raw_write_chunk_new( LIBEWF_INTERNAL_HANDLE *internal_handle, uin
  */
 ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk, EWF_CHAR *chunk_buffer, size_t chunk_size, size_t chunk_data_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t write_crc )
 {
-	static char *function     = "libewf_raw_write_chunk_existing";
-	ssize_t total_write_count = 0;
-	ssize_t write_count       = 0;
-	uint16_t segment_number   = 0;
-	int result                = 0;
+	LIBEWF_SEGMENT_FILE *segment_file = NULL;
+	static char *function             = "libewf_raw_write_chunk_existing";
+	ssize_t total_write_count         = 0;
+	ssize_t write_count               = 0;
+	uint16_t segment_number           = 0;
+	int result                        = 0;
 
 	if( internal_handle == NULL )
 	{
@@ -1276,36 +1277,56 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		 */
 		if( segment_number != 0 )
 		{
-			/* Make sure the current file offset points to the start of the last section
-			 */
-			if( internal_handle->delta_segment_table->segment_file[ segment_number ].section_list->last == NULL )
+			segment_file = &( internal_handle->delta_segment_table->segment_file[ segment_number ] );
+
+			if( segment_file == NULL )
 			{
-				LIBEWF_VERBOSE_PRINT( "%s: missing last section.\n",
+				LIBEWF_VERBOSE_PRINT( "%s: invalid segment file .\n",
 				 function );
 
 				return( -1 );
 			}
-			if( internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset !=
-			     internal_handle->delta_segment_table->segment_file[ segment_number ].section_list->last->start_offset )
+			if( segment_file->file_descriptor == -1 )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - invalid file descriptor.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( segment_file->section_list == NULL )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - missing section list.\n",
+				 function );
+
+				return( -1 );
+			}
+			if( segment_file->section_list->last == NULL )
+			{
+				LIBEWF_VERBOSE_PRINT( "%s: invalid segment file - invalid section list - missing last section.\n",
+				 function );
+
+				return( -1 );
+			}
+			/* Make sure the current segment file offset points to the start of the last section
+			 */
+			if( segment_file->file_offset != segment_file->section_list->last->start_offset )
 			{
 				if( libewf_common_lseek(
-				     internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor,
-				     internal_handle->delta_segment_table->segment_file[ segment_number ].section_list->last->start_offset,
+				     segment_file->file_descriptor,
+				     segment_file->section_list->last->start_offset,
 				     SEEK_SET ) == -1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: cannot find offset: %jd.\n",
-					 function, internal_handle->delta_segment_table->segment_file[ segment_number ].section_list->last->start_offset );
+					 function, segment_file->section_list->last->start_offset );
 
 					return( -1 );
 				}
-				internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset =
-				 internal_handle->delta_segment_table->segment_file[ segment_number ].section_list->last->start_offset;
+				segment_file->file_offset = segment_file->section_list->last->start_offset;
 			}
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
-			if( ( internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset
-			    + (off64_t) chunk_size + (off64_t) EWF_CRC_SIZE + (off64_t) EWF_SECTION_SIZE )
+			if( ( segment_file->file_offset + (off64_t) chunk_size + (off64_t) EWF_CRC_SIZE + (off64_t) EWF_SECTION_SIZE )
 			    > (off64_t) internal_handle->write->segment_file_size )
 			{
 				result = 0;
@@ -1315,7 +1336,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				 */
 				write_count = libewf_segment_file_write_last_section(
 					       internal_handle,
-					       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+					       segment_file,
 					       0 );
 
 				if( write_count == -1 )
@@ -1332,7 +1353,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 			else
 			{
 				/* refactor */
-				if( internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor == -1 )
+				if( segment_file->file_descriptor == -1 )
 				{
 					result = 0;
 				}
@@ -1340,7 +1361,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 				{
 					result = 1;
 				}
-				if( libewf_section_list_remove_last( internal_handle->delta_segment_table->segment_file[ segment_number ].section_list ) != 1 )
+				if( libewf_section_list_remove_last( segment_file->section_list ) != 1 )
 				{
 					LIBEWF_WARNING_PRINT( "%s: unable to remove last section from list.\n",
 					 function );
@@ -1373,12 +1394,14 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 				return( -1 );
 			}
+			segment_file = &( internal_handle->delta_segment_table->segment_file[ segment_number ] );
+
 			/* Write the start of the segment file
 			 * like the file header, the header, volume and/or data section, etc.
 			 */
 			write_count = libewf_segment_file_write_start(
 				       internal_handle,
-				       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+				       segment_file,
 				       segment_number,
 				       LIBEWF_SEGMENT_FILE_TYPE_DWF );
 
@@ -1392,9 +1415,12 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 			total_write_count += write_count;
 		}
 		LIBEWF_VERBOSE_PRINT( "%s: writing chunk at offset: %jd.\n",
-		 function, internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset );
+		 function, segment_file->file_offset );
 
-		internal_handle->offset_table->chunk_offset[ chunk ].file_offset = internal_handle->delta_segment_table->segment_file[ segment_number ].file_offset;
+		internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = segment_file->file_descriptor;
+		internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
+		internal_handle->offset_table->chunk_offset[ chunk ].file_offset     = segment_file->file_offset;
+		internal_handle->offset_table->chunk_offset[ chunk ].compressed      = 0;
 	}
 	else
 	{
@@ -1408,7 +1434,11 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 
 			return( -1 );
 		}
-		if( libewf_segment_file_seek_chunk_offset( internal_handle, chunk ) == -1 )
+		segment_file = &( internal_handle->delta_segment_table->segment_file[ segment_number ] );
+
+		if( libewf_segment_file_seek_offset(
+		      segment_file,
+		      internal_handle->offset_table->chunk_offset[ chunk ].file_offset ) == -1 )
 		{
 			LIBEWF_WARNING_PRINT( "%s: unable to seek chunk offset.\n",
 			 function );
@@ -1420,7 +1450,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_segment_file_write_delta_chunk(
-		       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+		       segment_file,
 		       chunk, 
 		       chunk_buffer, 
 		       chunk_size, 
@@ -1443,7 +1473,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		 */
 		write_count = libewf_segment_file_write_last_section(
 			       internal_handle,
-			       &( internal_handle->delta_segment_table->segment_file[ segment_number ] ),
+			       segment_file,
 			       1 );
 
 		if( write_count == -1 )
@@ -1455,10 +1485,7 @@ ssize_t libewf_raw_write_chunk_existing( LIBEWF_INTERNAL_HANDLE *internal_handle
 		}
 		total_write_count += write_count;
 
-		internal_handle->offset_table->chunk_offset[ chunk ].file_descriptor = internal_handle->delta_segment_table->segment_file[ segment_number ].file_descriptor;
-		internal_handle->offset_table->chunk_offset[ chunk ].segment_number  = segment_number;
-		internal_handle->offset_table->chunk_offset[ chunk ].compressed      = 0;
-		internal_handle->offset_table->chunk_offset[ chunk ].dirty           = 1;
+		internal_handle->offset_table->chunk_offset[ chunk ].dirty = 1;
 	}
 	return( total_write_count );
 }

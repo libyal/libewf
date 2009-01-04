@@ -79,6 +79,7 @@ int libewf_segment_file_set_filename( LIBEWF_SEGMENT_FILE *segment_file, const L
 int libewf_segment_file_read_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount, uint8_t flags );
 int libewf_segment_file_write_open( LIBEWF_INTERNAL_HANDLE *internal_handle, LIBEWF_FILENAME * const filenames[], uint16_t file_amount );
 
+off64_t libewf_segment_file_seek_offset( LIBEWF_SEGMENT_FILE *segment_file, off64_t offset );
 off64_t libewf_segment_file_seek_chunk_offset( LIBEWF_INTERNAL_HANDLE *internal_handle, uint32_t chunk );
 
 int libewf_segment_file_close_all( LIBEWF_INTERNAL_HANDLE *internal_handle );
