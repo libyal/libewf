@@ -42,12 +42,14 @@
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 {
 	LIBEWF_CHUNK_CACHE *chunk_cache = NULL;
+	static char *function           = "libewf_chunk_cache_alloc";
 
 	chunk_cache = (LIBEWF_CHUNK_CACHE *) libewf_common_alloc( LIBEWF_CHUNK_CACHE_SIZE );
 
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_alloc: unable to allocate chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to allocate chunk cache.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -55,7 +57,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_alloc: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -63,7 +66,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 	if( chunk_cache->compressed == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_alloc: unable to create chunk (compressed).\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache compressed.\n",
+		 function );
 
 		libewf_common_free( chunk_cache );
 
@@ -73,7 +77,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 
 	if( chunk_cache->data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_alloc: unable to create chunk (data).\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to create chunk cache data.\n",
+		 function );
 
 		libewf_common_free( chunk_cache->compressed );
 		libewf_common_free( chunk_cache );
@@ -95,10 +100,12 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_alloc( size_t size )
 LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache, size_t size )
 {
 	EWF_CHUNK *reallocation = NULL;
+	static char *function   = "libewf_chunk_cache_realloc";
 
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: invalid chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -106,13 +113,15 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( NULL );
 	}
 	if( size <= chunk_cache->allocated_size )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: new size must be greater than previous size.\n" );
+		LIBEWF_WARNING_PRINT( "%s: new size must be greater than previous size.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -120,7 +129,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to realloc chunk (compressed).\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to realloc chunk cache compressed.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -129,7 +139,8 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
 
 	if( reallocation == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_realloc: unable to realloc chunk (data).\n" );
+		LIBEWF_WARNING_PRINT( "%s: unable to realloc chunk cache data.\n",
+		 function );
 
 		return( NULL );
 	}
@@ -147,9 +158,12 @@ LIBEWF_CHUNK_CACHE *libewf_chunk_cache_realloc( LIBEWF_CHUNK_CACHE *chunk_cache,
  */
 void libewf_chunk_cache_free( LIBEWF_CHUNK_CACHE *chunk_cache )
 {
+	static char *function = "libewf_chunk_cache_free";
+
 	if( chunk_cache == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_chunk_cache_free: invalid chunk cache.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid chunk cache.\n",
+		 function );
 
 		return;
 	}

@@ -41,15 +41,19 @@
  */
 int8_t libewf_endian_convert_16bit( uint16_t *value, uint8_t *bytes )
 {
+	static char *function = "libewf_endian_convert_16bit";
+
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_convert_16bit: invalid value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_convert_16bit: invalid bytes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -65,15 +69,19 @@ int8_t libewf_endian_convert_16bit( uint16_t *value, uint8_t *bytes )
  */
 int8_t libewf_endian_convert_32bit( uint32_t *value, uint8_t *bytes )
 {
+	static char *function = "libewf_endian_convert_32bit";
+
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_convert_32bit: invalid value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_convert_32bit: invalid bytes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -93,15 +101,19 @@ int8_t libewf_endian_convert_32bit( uint32_t *value, uint8_t *bytes )
  */
 int8_t libewf_endian_convert_64bit( uint64_t *value, uint8_t *bytes )
 {
+	static char *function = "libewf_endian_convert_64bit";
+
 	if( value == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_convert_64bit: invalid value.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid value.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_convert_64bit: invalid bytes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -129,9 +141,12 @@ int8_t libewf_endian_convert_64bit( uint64_t *value, uint8_t *bytes )
  */
 int8_t libewf_endian_revert_16bit( uint16_t value, uint8_t *bytes )
 {
+	static char *function = "libewf_endian_revert_16bit";
+
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_revert_16bit: invalid bytes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -147,9 +162,12 @@ int8_t libewf_endian_revert_16bit( uint16_t value, uint8_t *bytes )
  */
 int8_t libewf_endian_revert_32bit( uint32_t value, uint8_t *bytes )
 {
+	static char *function = "libewf_endian_revert_32bit";
+
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_revert_32bit: invalid bytes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -169,9 +187,12 @@ int8_t libewf_endian_revert_32bit( uint32_t value, uint8_t *bytes )
  */
 int8_t libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes )
 {
+	static char *function = "libewf_endian_revert_64bit";
+
 	if( bytes == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_revert_64bit: invalid bytes.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid bytes.\n",
+		 function );
 
 		return( -1 );
 	}
@@ -199,18 +220,21 @@ int8_t libewf_endian_revert_64bit( uint64_t value, uint8_t *bytes )
  */
 int8_t libewf_endian_swap_byte_pairs( uint8_t *buffer, size_t size )
 {
-	uint8_t byte    = 0;
-	size_t iterator = 0;
+	static char *function = "libewf_endian_swap_byte_pairs";
+	uint8_t byte          = 0;
+	size_t iterator       = 0;
 
 	if( buffer == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_swap_byte_pairs: invalid buffer.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid buffer.\n",
+		 function );
 
 		return( -1 );
 	}
 	if( size > (size_t) SSIZE_MAX )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_endian_swap_byte_pairs: invalid size value exceeds maximum.\n" );
+		LIBEWF_WARNING_PRINT( "%s: invalid size value exceeds maximum.\n",
+		 function );
 
 		return( -1 );
 	}
