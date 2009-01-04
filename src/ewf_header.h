@@ -1,19 +1,10 @@
 /*
- * EWF header section specification
+ * EWF header section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,8 +33,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFHEADER_H
-#define _EWFHEADER_H
+#ifndef _EWF_HEADER_H
+#define _EWF_HEADER_H
 
 #include <inttypes.h>
 #include <stdio.h>
@@ -145,15 +136,17 @@ extern "C" {
  *
  */
 
-#define EWF_HEADER uint8_t
+#define EWF_HEADER ewf_header_t
 
-EWF_HEADER *ewf_header_alloc( size_t size );
+typedef uint8_t ewf_header_t;
+
+EWF_HEADER *ewf_header_alloc( uint32_t size );
 void ewf_header_free( EWF_HEADER *header );
 EWF_HEADER *ewf_header_uncompress( EWF_HEADER *compressed_header, uint32_t *size );
-EWF_HEADER *ewf_header_compress( EWF_HEADER *header, uint32_t *size, int8_t compression_level );
-EWF_HEADER *ewf_header_read( int file_descriptor, size_t *size );
-ssize_t ewf_header_write( EWF_HEADER *header, int file_descriptor, size_t size );
-void ewf_header_fprint( FILE *stream, EWF_HEADER *header );
+EWF_HEADER *ewf_header_compress( EWF_HEADER *uncompressed_header, uint32_t *size, int8_t compression_level );
+EWF_HEADER *ewf_header_read( int file_descriptor, uint32_t *size );
+int32_t ewf_header_write( EWF_HEADER *header, int file_descriptor, uint32_t size );
+void ewf_header_fprint( FILE *stream, EWF_HEADER *uncompressed_header );
 
 #ifdef __cplusplus
 }

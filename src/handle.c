@@ -46,10 +46,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <zlib.h>
 
-#include "notify.h"
+#include "libewf_notify.h"
 
+#include "ewf_compress.h"
 #include "ewf_crc.h"
 #include "ewf_data.h"
 #include "ewf_file_header.h"
@@ -68,7 +68,7 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to allocate ewf_handle\n" );
+		LIBEWF_FATAL_PRINT( "ewf_handle_alloc: unable to allocate ewf_handle.\n" );
 	}
 	/* 32k is the default chunk size
 	 */
@@ -91,9 +91,10 @@ LIBEWF_HANDLE *libewf_handle_alloc( uint32_t segment_amount )
 	handle->header                    = NULL;
 	handle->header2                   = NULL;
 	handle->md5hash                   = NULL;
+	handle->swap_byte_pairs           = 0;
 	handle->compression_used          = 0;
 	handle->wipe_block_on_read_error  = 0;
-	handle->compression_level         = Z_NO_COMPRESSION;
+	handle->compression_level         = EWF_COMPRESSION_NONE;
 	handle->compress_empty_block      = 0;
 	handle->format                    = LIBEWF_FORMAT_UNKNOWN;
 	handle->ewf_format                = EWF_FORMAT_E01;
@@ -114,7 +115,7 @@ LIBEWF_HANDLE *libewf_handle_cache_alloc( LIBEWF_HANDLE *handle, uint32_t size )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_alloc: invalid handle.\n" );
 	}
 	handle->raw_data                  = ewf_sectors_chunk_alloc( size - EWF_CRC_SIZE );
 	handle->chunk_data                = ewf_sectors_chunk_alloc( size );
@@ -130,7 +131,7 @@ LIBEWF_HANDLE *libewf_handle_cache_realloc( LIBEWF_HANDLE *handle, uint32_t size
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_realloc: invalid handle.\n" );
 	}
 	handle->raw_data                  = ewf_sectors_chunk_realloc( handle->raw_data, ( size - EWF_CRC_SIZE ) );
 	handle->chunk_data                = ewf_sectors_chunk_realloc( handle->chunk_data, size );
@@ -146,7 +147,7 @@ LIBEWF_HANDLE *libewf_handle_cache_wipe( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_cache_wipe: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_cache_wipe: invalid handle.\n" );
 	}
 	handle->raw_data     = ewf_sectors_chunk_wipe( handle->raw_data, ( handle->allocated_chunk_data_size - EWF_CRC_SIZE ) );
 	handle->chunk_data   = ewf_sectors_chunk_wipe( handle->chunk_data, handle->allocated_chunk_data_size );
@@ -161,7 +162,7 @@ void libewf_handle_free( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_free: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_free: invalid handle.\n" );
 	}
 	libewf_segment_table_free( handle->segment_table );
 	libewf_offset_table_free( handle->offset_table );
@@ -196,7 +197,7 @@ uint8_t libewf_handle_is_set_header( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_is_set_header: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_is_set_header: invalid handle.\n" );
 	}
 	return( handle->header != NULL );
 }
@@ -208,7 +209,7 @@ uint8_t libewf_handle_is_set_header2( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_is_set_header2: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_is_set_header2: invalid handle.\n" );
 	}
 	return( handle->header2 != NULL );
 }
@@ -219,7 +220,7 @@ void libewf_handle_set_header( LIBEWF_HANDLE *handle, EWF_HEADER *header )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_header: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_set_header: invalid handle.\n" );
 	}
 	handle->header = header;
 }
@@ -230,7 +231,7 @@ void libewf_handle_set_header2( LIBEWF_HANDLE *handle, EWF_HEADER *header2 )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_header2: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_set_header2: invalid handle.\n" );
 	}
 	handle->header2 = header2;
 }
@@ -241,7 +242,7 @@ void libewf_handle_set_md5hash( LIBEWF_HANDLE *handle, EWF_MD5HASH *md5hash )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: invalid handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_handle_set_md5hash: invalid handle.\n" );
 	}
 	handle->md5hash = ewf_md5hash_alloc();
 

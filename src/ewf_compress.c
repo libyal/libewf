@@ -4,16 +4,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -43,22 +34,39 @@
  */
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <zlib.h>
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 
-/* Compress data
- * wraps zlib uncompress function
+/* Compresses data, wraps zlib uncompress function
+ * Returns a 1 if compression is successful, -1 on error
  */
-int ewf_compress( uint8_t *compressed_data, uint32_t *compressed_size, uint8_t *uncompressed_data, uint32_t uncompressed_size, int8_t compression_level )
+int8_t ewf_compress( uint8_t *compressed_data, uint32_t *compressed_size, uint8_t *uncompressed_data, uint32_t uncompressed_size, int8_t compression_level )
 {
-	uLongf safe_compressed_size = *compressed_size;
-	int zlib_compression_level  = Z_NO_COMPRESSION;
+	uLongf safe_compressed_size = 0;
+	int zlib_compression_level  = 0;
 	int result                  = 0;
 
+	if( compressed_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_compress: invalid compressed data buffer.\n" );
+
+		return( -1 );
+	}
+	if( uncompressed_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_compress: invalid uncompressed data buffer.\n" );
+
+		return( -1 );
+	}
+	if( compressed_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_compress: invalid compressed size.\n" );
+
+		return( -1 );
+	}
 	if( compression_level == EWF_COMPRESSION_DEFAULT )
 	{
 		zlib_compression_level = Z_BEST_SPEED;
@@ -77,50 +85,87 @@ int ewf_compress( uint8_t *compressed_data, uint32_t *compressed_size, uint8_t *
 	}
 	else
 	{
-		LIBEWF_FATAL_PRINT( "ewf_compress: unsupported compression level.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_compress: unsupported compression level.\n" );
+
+		return( -1 );
 	}
+	safe_compressed_size = *compressed_size;
+
 	result = compress2( (Bytef *) compressed_data, &safe_compressed_size, (Bytef *) uncompressed_data, (uLong) uncompressed_size, zlib_compression_level );
 
-	if( result != Z_OK )
+	if( result == Z_OK )
 	{
-		if( result == Z_BUF_ERROR )
-		{
-			LIBEWF_FATAL_PRINT( "ewf_compress: unable to write compressed data: target buffer too small\n" );
-		}
-		else if( result == Z_MEM_ERROR )
-		{
-			LIBEWF_FATAL_PRINT( "ewf_compress: unable to write compressed data: insufficient memory\n" );
-		}
-		LIBEWF_FATAL_PRINT( "ewf_compress: zlib returned undefined error: %d\n", result );
-	}
-	*compressed_size = safe_compressed_size;
+		*compressed_size = safe_compressed_size;
 
-	return( result );
+		return( 1 );
+	}
+	else if( result == Z_BUF_ERROR )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_compress: unable to write compressed data: target buffer too small.\n" );
+	}
+	else if( result == Z_MEM_ERROR )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_compress: unable to write compressed data: insufficient memory.\n" );
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "ewf_compress: zlib returned undefined error: %d.\n", result );
+	}
+	return( -1 );
 }
 
-/* Uncompress data
- * wraps zlib uncompress function
+/* Uncompresses data, wraps zlib uncompress function
+ * Returns a 1 if compression is successful, a 0 if unsuccessful, -1 on error
  */
-int ewf_uncompress( uint8_t *uncompressed_data, uint32_t *uncompressed_size, uint8_t *compressed_data, uint32_t compressed_size )
+int8_t ewf_uncompress( uint8_t *uncompressed_data, uint32_t *uncompressed_size, uint8_t *compressed_data, uint32_t compressed_size )
 {
-	uLongf safe_uncompressed_size = *uncompressed_size;
+	uLongf safe_uncompressed_size = 0;
+	int result                    = 0;
 
-	int result = uncompress( (Bytef *) uncompressed_data, &safe_uncompressed_size, (Bytef *) compressed_data, (uLong) compressed_size );
-
-	if( ( result != Z_OK ) && ( result != Z_DATA_ERROR ) )
+	if( uncompressed_data == NULL )
 	{
-		if( result == Z_BUF_ERROR )
-		{
-			LIBEWF_FATAL_PRINT( "ewf_uncompress: unable to read compressed data: target buffer too small\n" );
-		}
-		else if( result == Z_MEM_ERROR )
-		{
-			LIBEWF_FATAL_PRINT( "ewf_uncompress: unable to read compressed data: insufficient memory\n" );
-		}
-		LIBEWF_FATAL_PRINT( "ewf_uncompress: zlib returned undefined error: %d\n", result );
-	}
-	*uncompressed_size = safe_uncompressed_size;
+		LIBEWF_WARNING_PRINT( "ewf_uncompress: invalid uncompressed data buffer.\n" );
 
-	return( result );
+		return( -1 );
+	}
+	if( compressed_data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_uncompress: invalid compressed data buffer.\n" );
+
+		return( -1 );
+	}
+	if( uncompressed_size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_uncompress: invalid uncompressed size.\n" );
+
+		return( -1 );
+	}
+	safe_uncompressed_size = *uncompressed_size;
+
+	result = uncompress( (Bytef *) uncompressed_data, &safe_uncompressed_size, (Bytef *) compressed_data, (uLong) compressed_size );
+
+	if( result == Z_OK )
+	{
+		*uncompressed_size = safe_uncompressed_size;
+
+		return( 1 );
+	}
+	else if( result == Z_DATA_ERROR )
+	{
+		return( 0 );
+	}
+	else if( result == Z_BUF_ERROR )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_uncompress: unable to read compressed data: target buffer too small.\n" );
+	}
+	else if( result == Z_MEM_ERROR )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_uncompress: unable to read compressed data: insufficient memory.\n" );
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "ewf_uncompress: zlib returned undefined error: %d.\n", result );
+	}
+	return( -1 );
 }
 

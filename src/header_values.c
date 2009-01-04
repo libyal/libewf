@@ -49,7 +49,7 @@
 #include <string.h>
 
 #include "definitions.h"
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 #include "header_values.h"
@@ -160,12 +160,12 @@ char **libewf_split_string( char *string, int delimiter, uint32_t *amount )
 
 	if( string != NULL )
 	{
-		uint32_t iterator = 0;
-		size_t line_size   = 0;
-		size_t string_size = strlen( string );
-		char *line_start   = string;
-		char *line_end     = string;
-		char *string_end   = &string[ string_size ];
+		uint32_t iterator    = 0;
+		uint32_t line_size   = 0;
+		uint32_t string_size = (uint32_t) strlen( string );
+		char *line_start     = string;
+		char *line_end       = string;
+		char *string_end     = &string[ string_size ];
 
 		while( 1 )
 		{
@@ -378,10 +378,11 @@ char *libewf_generate_date_header_value( time_t timestamp )
  */
 char *libewf_convert_date_header2_value( char *header_value, uint8_t date_format )
 {
-	char *date_string;
 	time_t timestamp;
-	struct tm *time_elements;
-	size_t result = 0;
+
+	struct tm *time_elements = NULL;
+	char *date_string        = NULL;
+	uint32_t result          = 0;
 
 	if( header_value == NULL )
 	{
@@ -431,7 +432,7 @@ char *libewf_header_values_set_value( char* header_value, char *value )
 	{
 		free( header_value );
 	}
-	string_size = strlen( value );
+	string_size = (uint32_t) strlen( value );
 
 	/* Don't bother with empty values
 	 */
@@ -524,7 +525,7 @@ LIBEWF_HEADER_VALUES *libewf_header_values_parse_header( EWF_HEADER *header, uin
 		}
 		else if( strncmp( types[ iterator ], "p", 1 ) == 0 )
 		{
-			uint32_t hash_length = strlen( values[ iterator ] );
+			uint32_t hash_length = (uint32_t) strlen( values[ iterator ] );
 
 			if( hash_length <= 0 )
 			{
@@ -686,7 +687,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 	char *password_hash            = "";
 	char *compression_type         = "";
 
-	size_t size = strlen( header_string_head );
+	uint32_t size = (uint32_t) strlen( header_string_head );
 
 	if( header_values == NULL )
 	{
@@ -694,62 +695,62 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 	}
 	if( header_values->case_number != NULL )
 	{
-		size       += strlen( header_values->case_number );
+		size       += (uint32_t) strlen( header_values->case_number );
 		case_number = header_values->case_number;
 	}
 	if( header_values->description != NULL )
 	{
-		size       += strlen( header_values->description );
+		size       += (uint32_t) strlen( header_values->description );
 		description = header_values->description;
 	}
 	if( header_values->examiner_name != NULL )
 	{
-		size         += strlen( header_values->examiner_name );
+		size         += (uint32_t) strlen( header_values->examiner_name );
 		examiner_name = header_values->examiner_name;
 	}
 	if( header_values->evidence_number != NULL )
 	{
-		size           += strlen( header_values->evidence_number );
+		size           += (uint32_t) strlen( header_values->evidence_number );
 		evidence_number = header_values->evidence_number;
 	}
 	if( header_values->notes != NULL )
 	{
-		size += strlen( header_values->notes );
+		size += (uint32_t) strlen( header_values->notes );
 		notes = header_values->notes;
 	}
 	if( header_values->acquiry_date != NULL )
 	{
-		size        += strlen( header_values->acquiry_date );
+		size        += (uint32_t) strlen( header_values->acquiry_date );
 		acquiry_date = header_values->acquiry_date;
 	}
 	else
 	{
 		acquiry_date = libewf_generate_date_header_value( timestamp );
-		size        += strlen( acquiry_date );
+		size        += (uint32_t) strlen( acquiry_date );
 	}
 	if( header_values->system_date != NULL )
 	{
-		size       += strlen( header_values->system_date );
+		size       += (uint32_t) strlen( header_values->system_date );
 		system_date = header_values->system_date;
 	}
 	else
 	{
 		system_date = libewf_generate_date_header_value( timestamp );
-		size       += strlen( system_date );
+		size       += (uint32_t) strlen( system_date );
 	}
 	if( header_values->acquiry_operating_system != NULL )
 	{
-		size                    += strlen( header_values->acquiry_operating_system );
+		size                    += (uint32_t) strlen( header_values->acquiry_operating_system );
 		acquiry_operating_system = header_values->acquiry_operating_system;
 	}
 	if( header_values->acquiry_software_version != NULL )
 	{
-		size                    += strlen( header_values->acquiry_software_version );
+		size                    += (uint32_t) strlen( header_values->acquiry_software_version );
 		acquiry_software_version = header_values->acquiry_software_version;
 	}
 	if( header_values->password != NULL )
 	{
-		size         += strlen( header_values->password );
+		size         += (uint32_t) strlen( header_values->password );
 		password_hash = header_values->password;
 	}
 	else
@@ -759,7 +760,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 	}
 	if( header_values->compression_type != NULL )
 	{
-		size            += strlen( header_values->compression_type );
+		size            += (uint32_t) strlen( header_values->compression_type );
 		compression_type = header_values->compression_type;
 	}
 	else
@@ -780,9 +781,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 		{
 			LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header_string_encase3: compression level not supported.\n" );
 		}
-		size += strlen( compression_type );
+		size += (uint32_t) strlen( compression_type );
 	}
-	size += strlen( header_string_tail );
+	size += (uint32_t) strlen( header_string_tail );
 
 	/* allow for 10x \t and 1x \0
 	 */
@@ -790,6 +791,10 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase3( LIBEWF_HEADER_V
 
 	header = ewf_header_alloc( size );
 
+	if( header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header_string_encase3: unable to create header.\n" );
+	}
 	snprintf( (char *) header, size, "%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s",
 		header_string_head, case_number, evidence_number, description, examiner_name,
 		notes, acquiry_software_version, acquiry_operating_system, acquiry_date,
@@ -828,7 +833,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 	char *acquiry_software_version = "";
 	char *password_hash            = "";
 
-	size_t size = strlen( header_string_head );
+	uint32_t size = (uint32_t) strlen( header_string_head );
 
 	if( header_values == NULL )
 	{
@@ -836,62 +841,62 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 	}
 	if( header_values->case_number != NULL )
 	{
-		size       += strlen( header_values->case_number );
+		size       += (uint32_t) strlen( header_values->case_number );
 		case_number = header_values->case_number;
 	}
 	if( header_values->description != NULL )
 	{
-		size       += strlen( header_values->description );
+		size       += (uint32_t) strlen( header_values->description );
 		description = header_values->description;
 	}
 	if( header_values->examiner_name != NULL )
 	{
-		size         += strlen( header_values->examiner_name );
+		size         += (uint32_t) strlen( header_values->examiner_name );
 		examiner_name = header_values->examiner_name;
 	}
 	if( header_values->evidence_number != NULL )
 	{
-		size           += strlen( header_values->evidence_number );
+		size           += (uint32_t) strlen( header_values->evidence_number );
 		evidence_number = header_values->evidence_number;
 	}
 	if( header_values->notes != NULL )
 	{
-		size += strlen( header_values->notes );
+		size += (uint32_t) strlen( header_values->notes );
 		notes = header_values->notes;
 	}
 	if( header_values->acquiry_date != NULL )
 	{
-		size        += strlen( header_values->acquiry_date );
+		size        += (uint32_t) strlen( header_values->acquiry_date );
 		acquiry_date = header_values->acquiry_date;
 	}
 	else
 	{
 		acquiry_date = libewf_generate_date_header_value( timestamp );
-		size        += strlen( acquiry_date );
+		size        += (uint32_t) strlen( acquiry_date );
 	}
 	if( header_values->system_date != NULL )
 	{
-		size       += strlen( header_values->system_date );
+		size       += (uint32_t) strlen( header_values->system_date );
 		system_date = header_values->system_date;
 	}
 	else
 	{
 		system_date = libewf_generate_date_header_value( timestamp );
-		size       += strlen( system_date );
+		size       += (uint32_t) strlen( system_date );
 	}
 	if( header_values->acquiry_operating_system != NULL )
 	{
-		size                    += strlen( header_values->acquiry_operating_system );
+		size                    += (uint32_t) strlen( header_values->acquiry_operating_system );
 		acquiry_operating_system = header_values->acquiry_operating_system;
 	}
 	if( header_values->acquiry_software_version != NULL )
 	{
-		size                    += strlen( header_values->acquiry_software_version );
+		size                    += (uint32_t) strlen( header_values->acquiry_software_version );
 		acquiry_software_version = header_values->acquiry_software_version;
 	}
 	if( header_values->password != NULL )
 	{
-		size         += strlen( header_values->password );
+		size         += (uint32_t) strlen( header_values->password );
 		password_hash = header_values->password;
 	}
 	else
@@ -899,7 +904,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 		size         += 1;
 		password_hash = "0";
 	}
-	size += strlen( header_string_tail );
+	size += (uint32_t) strlen( header_string_tail );
 
 	/* allow for 9x \t and 1x \0
 	 */
@@ -907,6 +912,10 @@ EWF_HEADER *libewf_header_values_generate_header_string_encase4( LIBEWF_HEADER_V
 
 	header = ewf_header_alloc( size );
 
+	if( header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header_string_encase4: unable to create header.\n" );
+	}
 	snprintf( (char *) header, size, "%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s",
 		header_string_head, case_number, evidence_number, description, examiner_name,
 		notes, acquiry_software_version, acquiry_operating_system, acquiry_date,
@@ -945,7 +954,7 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_
 	char *acquiry_software_version = "";
 	char *password_hash            = "";
 
-	size_t size = strlen( header_string_head );
+	uint32_t size = (uint32_t) strlen( header_string_head );
 
 	if( header_values == NULL )
 	{
@@ -953,65 +962,65 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_
 	}
 	if( header_values->case_number != NULL )
 	{
-		size       += strlen( header_values->case_number );
+		size       += (uint32_t) strlen( header_values->case_number );
 		case_number = header_values->case_number;
 	}
 	if( header_values->description != NULL )
 	{
-		size       += strlen( header_values->description );
+		size       += (uint32_t) strlen( header_values->description );
 		description = header_values->description;
 	}
 	if( header_values->examiner_name != NULL )
 	{
-		size         += strlen( header_values->examiner_name );
+		size         += (uint32_t) strlen( header_values->examiner_name );
 		examiner_name = header_values->examiner_name;
 	}
 	if( header_values->evidence_number != NULL )
 	{
-		size           += strlen( header_values->evidence_number );
+		size           += (uint32_t) strlen( header_values->evidence_number );
 		evidence_number = header_values->evidence_number;
 	}
 	if( header_values->notes != NULL )
 	{
-		size += strlen( header_values->notes );
+		size += (uint32_t) strlen( header_values->notes );
 		notes = header_values->notes;
 	}
 	if( header_values->acquiry_date != NULL )
 	{
-		size        += strlen( header_values->acquiry_date );
+		size        += (uint32_t) strlen( header_values->acquiry_date );
 		acquiry_date = header_values->acquiry_date;
 	}
 	else
 	{
 		acquiry_date = libewf_generate_date_header2_value( timestamp );
-		size        += strlen( acquiry_date );
+		size        += (uint32_t) strlen( acquiry_date );
 	}
 	if( header_values->system_date != NULL )
 	{
-		size       += strlen( header_values->system_date );
+		size       += (uint32_t) strlen( header_values->system_date );
 		system_date = header_values->system_date;
 	}
 	else
 	{
 		system_date = libewf_generate_date_header2_value( timestamp );
-		size       += strlen( system_date );
+		size       += (uint32_t) strlen( system_date );
 	}
 	if( header_values->acquiry_operating_system != NULL )
 	{
-		size                    += strlen( header_values->acquiry_operating_system );
+		size                    += (uint32_t) strlen( header_values->acquiry_operating_system );
 		acquiry_operating_system = header_values->acquiry_operating_system;
 	}
 	if( header_values->acquiry_software_version != NULL )
 	{
-		size                    += strlen( header_values->acquiry_software_version );
+		size                    += (uint32_t) strlen( header_values->acquiry_software_version );
 		acquiry_software_version = header_values->acquiry_software_version;
 	}
 	if( header_values->password != NULL )
 	{
-		size         += strlen( header_values->password );
+		size         += (uint32_t) strlen( header_values->password );
 		password_hash = header_values->password;
 	}
-	size += strlen( header_string_tail );
+	size += (uint32_t) strlen( header_string_tail );
 
 	/* allow for 9x \t and 1x \0
 	 */
@@ -1019,6 +1028,10 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase4( LIBEWF_HEADER_
 
 	header = ewf_header_alloc( size );
 
+	if( header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header2_string_encase4: unable to create header.\n" );
+	}
 	snprintf( (char *) header, size, "%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s",
 		header_string_head, description, case_number, evidence_number, examiner_name,
 		notes, acquiry_software_version, acquiry_operating_system, acquiry_date,
@@ -1060,9 +1073,9 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_
 	char *password_hash            = "";
 	char *unknown_dc               = "";
 
-	size_t size  = strlen( header_string_main );
-	size        += strlen( header_string_srce );
-	size        += strlen( header_string_sub );
+	uint32_t size = (uint32_t) strlen( header_string_main );
+	size         += (uint32_t) strlen( header_string_srce );
+	size         += (uint32_t) strlen( header_string_sub );
 
 	if( header_values == NULL )
 	{
@@ -1070,70 +1083,70 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_
 	}
 	if( header_values->case_number != NULL )
 	{
-		size       += strlen( header_values->case_number );
+		size       += (uint32_t) strlen( header_values->case_number );
 		case_number = header_values->case_number;
 	}
 	if( header_values->description != NULL )
 	{
-		size       += strlen( header_values->description );
+		size       += (uint32_t) strlen( header_values->description );
 		description = header_values->description;
 	}
 	if( header_values->examiner_name != NULL )
 	{
-		size         += strlen( header_values->examiner_name );
+		size         += (uint32_t) strlen( header_values->examiner_name );
 		examiner_name = header_values->examiner_name;
 	}
 	if( header_values->evidence_number != NULL )
 	{
-		size           += strlen( header_values->evidence_number );
+		size           += (uint32_t) strlen( header_values->evidence_number );
 		evidence_number = header_values->evidence_number;
 	}
 	if( header_values->notes != NULL )
 	{
-		size += strlen( header_values->notes );
+		size += (uint32_t) strlen( header_values->notes );
 		notes = header_values->notes;
 	}
 	if( header_values->acquiry_date != NULL )
 	{
-		size        += strlen( header_values->acquiry_date );
+		size        += (uint32_t) strlen( header_values->acquiry_date );
 		acquiry_date = header_values->acquiry_date;
 	}
 	else
 	{
 		acquiry_date = libewf_generate_date_header2_value( timestamp );
-		size        += strlen( acquiry_date );
+		size        += (uint32_t) strlen( acquiry_date );
 	}
 	if( header_values->system_date != NULL )
 	{
-		size       += strlen( header_values->system_date );
+		size       += (uint32_t) strlen( header_values->system_date );
 		system_date = header_values->system_date;
 	}
 	else
 	{
 		system_date = libewf_generate_date_header2_value( timestamp );
-		size       += strlen( system_date );
+		size       += (uint32_t) strlen( system_date );
 	}
 	if( header_values->acquiry_operating_system != NULL )
 	{
-		size                    += strlen( header_values->acquiry_operating_system );
+		size                    += (uint32_t) strlen( header_values->acquiry_operating_system );
 		acquiry_operating_system = header_values->acquiry_operating_system;
 	}
 	if( header_values->acquiry_software_version != NULL )
 	{
-		size                    += strlen( header_values->acquiry_software_version );
+		size                    += (uint32_t) strlen( header_values->acquiry_software_version );
 		acquiry_software_version = header_values->acquiry_software_version;
 	}
 	if( header_values->password != NULL )
 	{
-		size         += strlen( header_values->password );
+		size         += (uint32_t) strlen( header_values->password );
 		password_hash = header_values->password;
 	}
 	if( header_values->unknown_dc != NULL )
 	{
-		size      += strlen( header_values->unknown_dc );
+		size      += (uint32_t) strlen( header_values->unknown_dc );
 		unknown_dc = header_values->unknown_dc;
 	}
-	size += strlen( header_string_tail );
+	size += (uint32_t) strlen( header_string_tail );
 
 	/* allow for 10x \t and 1x \0
 	 */
@@ -1141,6 +1154,10 @@ EWF_HEADER *libewf_header_values_generate_header2_string_encase5( LIBEWF_HEADER_
 
 	header = ewf_header_alloc( size );
 
+	if( header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header2_string_encase5: unable to create header.\n" );
+	}
 	snprintf( (char *) header, size, "%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s%s%s",
 		header_string_main, description, case_number, evidence_number, examiner_name,
 		notes, acquiry_software_version, acquiry_operating_system, acquiry_date,
@@ -1181,7 +1198,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 	char *password_hash            = "";
 	char *compression_type         = "";
 
-	size_t size = strlen( header_string_head );
+	uint32_t size = (uint32_t) strlen( header_string_head );
 
 	if( header_values == NULL )
 	{
@@ -1189,62 +1206,62 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 	}
 	if( header_values->case_number != NULL )
 	{
-		size       += strlen( header_values->case_number );
+		size       += (uint32_t) strlen( header_values->case_number );
 		case_number = header_values->case_number;
 	}
 	if( header_values->description != NULL )
 	{
-		size       += strlen( header_values->description );
+		size       += (uint32_t) strlen( header_values->description );
 		description = header_values->description;
 	}
 	if( header_values->examiner_name != NULL )
 	{
-		size         += strlen( header_values->examiner_name );
+		size         += (uint32_t) strlen( header_values->examiner_name );
 		examiner_name = header_values->examiner_name;
 	}
 	if( header_values->evidence_number != NULL )
 	{
-		size           += strlen( header_values->evidence_number );
+		size           += (uint32_t) strlen( header_values->evidence_number );
 		evidence_number = header_values->evidence_number;
 	}
 	if( header_values->notes != NULL )
 	{
-		size += strlen( header_values->notes );
+		size += (uint32_t) strlen( header_values->notes );
 		notes = header_values->notes;
 	}
 	if( header_values->acquiry_date != NULL )
 	{
-		size        += strlen( header_values->acquiry_date );
+		size        += (uint32_t) strlen( header_values->acquiry_date );
 		acquiry_date = header_values->acquiry_date;
 	}
 	else
 	{
 		acquiry_date = libewf_generate_date_header_value( timestamp );
-		size        += strlen( acquiry_date );
+		size        += (uint32_t) strlen( acquiry_date );
 	}
 	if( header_values->system_date != NULL )
 	{
-		size       += strlen( header_values->system_date );
+		size       += (uint32_t) strlen( header_values->system_date );
 		system_date = header_values->system_date;
 	}
 	else
 	{
 		system_date = libewf_generate_date_header_value( timestamp );
-		size       += strlen( system_date );
+		size       += (uint32_t) strlen( system_date );
 	}
 	if( header_values->acquiry_operating_system != NULL )
 	{
-		size                    += strlen( header_values->acquiry_operating_system );
+		size                    += (uint32_t) strlen( header_values->acquiry_operating_system );
 		acquiry_operating_system = header_values->acquiry_operating_system;
 	}
 	if( header_values->acquiry_software_version != NULL )
 	{
-		size                    += strlen( header_values->acquiry_software_version );
+		size                    += (uint32_t) strlen( header_values->acquiry_software_version );
 		acquiry_software_version = header_values->acquiry_software_version;
 	}
 	if( header_values->password != NULL )
 	{
-		size         += strlen( header_values->password );
+		size         += (uint32_t) strlen( header_values->password );
 		password_hash = header_values->password;
 	}
 	else
@@ -1254,7 +1271,7 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 	}
 	if( header_values->compression_type != NULL )
 	{
-		size            += strlen( header_values->compression_type );
+		size            += (uint32_t) strlen( header_values->compression_type );
 		compression_type = header_values->compression_type;
 	}
 	else
@@ -1275,9 +1292,9 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 		{
 			LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header_string_ftk: compression level not supported.\n" );
 		}
-		size += strlen( compression_type );
+		size += (uint32_t) strlen( compression_type );
 	}
-	size += strlen( header_string_tail );
+	size += (uint32_t) strlen( header_string_tail );
 
 	/* allow for 10x \t and 1x \0
 	 */
@@ -1285,6 +1302,10 @@ EWF_HEADER *libewf_header_values_generate_header_string_ftk( LIBEWF_HEADER_VALUE
 
 	header = ewf_header_alloc( size );
 
+	if( header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_header_values_generate_header_string_ftk: unable to create header.\n" );
+	}
 	snprintf( (char *) header, size, "%s%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s%s",
 		header_string_head, case_number, evidence_number, description, examiner_name,
 		notes, acquiry_software_version, acquiry_operating_system, acquiry_date,

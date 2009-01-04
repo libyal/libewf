@@ -49,10 +49,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <zlib.h>
 
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 #include "md5.h"
 
 #include "ewf_compress.h"
@@ -64,6 +63,7 @@
 #include "ewf_hash.h"
 #include "ewf_header.h"
 #include "ewf_header2.h"
+#include "ewf_ltree.h"
 #include "ewf_section.h"
 #include "ewf_sectors.h"
 #include "ewf_volume.h"
@@ -79,14 +79,22 @@
  */
 void libewf_dump_section_data( uint8_t *data, size_t size )
 {
-	EWF_CRC calculated_crc = ewf_crc( (void *) data, ( size - EWF_CRC_SIZE ), 1 );
-	EWF_CRC stored_crc     = 0;
+	EWF_CRC *calculated_crc = NULL;
+	EWF_CRC stored_crc      = 0;
 
+	calculated_crc = ewf_crc_calculate( (void *) data, ( size - EWF_CRC_SIZE ), 1 );
+
+	if( calculated_crc == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_dump_section_data: unable to calculate CRC.\n" );
+	}
 	libewf_dump_data( data, size );
 
 	memcpy( (uint8_t *) &stored_crc, (uint8_t *) ( data + size - EWF_CRC_SIZE ), EWF_CRC_SIZE );
 
-	fprintf( stderr, "libewf_dump_section_data: possible crc (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+	fprintf( stderr, "libewf_dump_section_data: possible CRC (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
+
+	ewf_crc_free( calculated_crc );
 }
 
 /* Reads section data
@@ -97,6 +105,7 @@ void libewf_section_read_data( LIBEWF_HANDLE *handle, int file_descriptor, size_
 	uint8_t *uncompressed_data = NULL;
 	uint32_t uncompressed_size = 0;
 	ssize_t read_count         = 0;
+	int result                 = 0;
 
 	if( handle == NULL )
 	{
@@ -112,17 +121,23 @@ void libewf_section_read_data( LIBEWF_HANDLE *handle, int file_descriptor, size_
 	uncompressed_size = size + 1024;
 	uncompressed_data = (uint8_t *) malloc( sizeof( uint8_t ) * uncompressed_size );
 
-	if( ewf_uncompress( uncompressed_data, &uncompressed_size, data, size ) != Z_OK )
+	result = ewf_uncompress( uncompressed_data, &uncompressed_size, data, size );
+
+	if( result == 0 )
 	{
 		fprintf( stderr, "libewf_section_read_data: data is not zlib compressed.\n" );
 
 		libewf_dump_section_data( data, size );
 	}
-	else
+	else if( result == 1 )
 	{
-		fprintf( stderr, "libewf_section_read_data: zlib uncompressed data:\n\n" );
+		fprintf( stderr, "libewf_section_read_data: zlib uncompressed data:.\n\n" );
 
 		libewf_dump_section_data( uncompressed_data, uncompressed_size );
+	}
+	else
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_read_data: unable to uncompress data.\n" );
 	}
 	free( data );
 	free( uncompressed_data );
@@ -140,7 +155,11 @@ void libewf_section_header_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	}
 	header = ewf_header_read( file_descriptor, &size );
 
-	LIBEWF_VERBOSE_PRINT( "libewf_section_header_read: Header:\n" );
+	if( header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header_read: unable to read header.\n" );
+	}
+	LIBEWF_VERBOSE_PRINT( "libewf_section_header_read: Header:.\n" );
 	LIBEWF_VERBOSE_EXEC( ewf_header_fprint( stderr, header ); );
 
 	if( libewf_handle_is_set_header( handle ) == 0 )
@@ -165,7 +184,11 @@ void libewf_section_header2_read( LIBEWF_HANDLE *handle, int file_descriptor, si
 	}
 	header2 = ewf_header2_read( file_descriptor, size );
 
-	LIBEWF_VERBOSE_PRINT( "libewf_section_header2_read: Header2:\n" );
+	if( header2 == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header2_read: unable to read header2.\n" );
+	}
+	LIBEWF_VERBOSE_PRINT( "libewf_section_header2_read: Header2:.\n" );
 	LIBEWF_VERBOSE_EXEC( ewf_header_fprint( stderr, header2 ); );
 
 	if( libewf_handle_is_set_header2( handle ) == 0 )
@@ -184,9 +207,9 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 {
 	EWF_VOLUME *volume             = NULL;
 	EWF_VOLUME_SMART *volume_smart = NULL;
-	EWF_CRC calculated_crc         = 0;
+	EWF_CRC *calculated_crc        = NULL;
 	EWF_CRC stored_crc             = 0;
-	uint32_t bytes_per_chunk       = 0;
+	int32_t bytes_per_chunk        = 0;
 	uint32_t volume_chunk_count    = 0;
 
 	if( handle == NULL )
@@ -197,6 +220,10 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	{
 		volume = ewf_volume_read( file_descriptor );
 
+		if( volume == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_section_volume_read: unable to read volume.\n" );
+		}
 #ifdef _LIBEWF_DEBUG_
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown1, 4 ); );
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->unknown2, 16 ); );
@@ -208,13 +235,22 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume->signature, 5 ); );
 #endif
 
-		calculated_crc  = ewf_crc( (void *) volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 );
+		calculated_crc = ewf_crc_calculate( (void *) volume, ( EWF_VOLUME_SIZE - EWF_CRC_SIZE ), 1 );
+
+		if( calculated_crc == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_section_volume_read: unable to calculate CRC.\n" );
+		}
 		stored_crc      = convert_32bit( volume->crc );
 		bytes_per_chunk = ewf_volume_calculate_chunk_size( volume );
 
-		if( stored_crc != calculated_crc )
+		if( bytes_per_chunk <= -1 )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_volume_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+			LIBEWF_WARNING_PRINT( "libewf_section_volume_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
+		}
+		if( stored_crc != *calculated_crc )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_section_volume_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
 		}
 		volume_chunk_count        = convert_32bit( volume->chunk_count );
 		handle->chunk_count       = convert_32bit( volume->chunk_count );
@@ -225,29 +261,39 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	        handle->compression_level = volume->compression_level;
 		handle->ewf_format        = EWF_FORMAT_E01;
 
-		LIBEWF_VERBOSE_PRINT( "libewf_section_volume_read: This volume has %" PRIu32 " chunks of %" PRIu32 " bytes each, crc %" PRIu32 " (%" PRIu32 ")\n", volume_chunk_count, bytes_per_chunk, stored_crc, calculated_crc );
+		LIBEWF_VERBOSE_PRINT( "libewf_section_volume_read: this volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n", volume_chunk_count, bytes_per_chunk, stored_crc, *calculated_crc );
 
 		memcpy( (uint8_t *) handle->guid, (uint8_t *) volume->guid, 16 );
 
 		ewf_volume_free( volume );
+		ewf_crc_free( calculated_crc );
 	}
 	else if( size == EWF_VOLUME_SMART_SIZE )
 	{
 		volume_smart = ewf_volume_smart_read( file_descriptor );
 
+		if( volume_smart == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_section_volume_read: unable to read volume smart.\n" );
+		}
 #ifdef _LIBEWF_DEBUG_
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume_smart->unknown1, 4 ); );
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume_smart->unknown2, 20 ); );
 		LIBEWF_VERBOSE_EXEC( libewf_dump_data( volume_smart->unknown3, 45 ); );
 #endif
 
-		calculated_crc  = ewf_crc( (void *) volume_smart, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 );
+		calculated_crc = ewf_crc_calculate( (void *) volume_smart, ( EWF_VOLUME_SMART_SIZE - EWF_CRC_SIZE ), 1 );
+
+		if( calculated_crc == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_section_volume_read: unable to calculate CRC.\n" );
+		}
 		stored_crc      = convert_32bit( volume_smart->crc );
 		bytes_per_chunk = ewf_volume_smart_calculate_chunk_size( volume_smart );
 
-		if( stored_crc != calculated_crc )
+		if( stored_crc != *calculated_crc )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_section_volume_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+			LIBEWF_WARNING_PRINT( "libewf_section_volume_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
 		}
 		volume_chunk_count        = convert_32bit( volume_smart->chunk_count );
 		handle->chunk_count       = convert_32bit( volume_smart->chunk_count );
@@ -257,9 +303,10 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	        handle->media_type        = convert_32bit( volume_smart->unknown3 );
 		handle->ewf_format        = EWF_FORMAT_S01;
 
-		LIBEWF_VERBOSE_PRINT( "libewf_section_volume_read: This volume has %" PRIu32 " chunks of %" PRIu32 " bytes each, crc %" PRIu32 " (%" PRIu32 ")\n", volume_chunk_count, bytes_per_chunk, stored_crc, calculated_crc );
+		LIBEWF_VERBOSE_PRINT( "libewf_section_volume_read: This volume has %" PRIu32 " chunks of %" PRIi32 " bytes each, CRC %" PRIu32 " (%" PRIu32 ").\n", volume_chunk_count, bytes_per_chunk, stored_crc, *calculated_crc );
 
 		ewf_volume_smart_free( volume_smart );
+		ewf_crc_free( calculated_crc );
 	}
 	else
 	{
@@ -267,9 +314,9 @@ void libewf_section_volume_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	}
 	if( ( bytes_per_chunk + EWF_CRC_SIZE ) > handle->chunk_size )
 	{
-		handle = libewf_handle_cache_realloc( handle, ( bytes_per_chunk + EWF_CRC_SIZE ) );
+		handle = libewf_handle_cache_realloc( handle, (uint32_t) ( bytes_per_chunk + EWF_CRC_SIZE ) );
 
-		handle->chunk_size = bytes_per_chunk;
+		handle->chunk_size = (uint32_t) bytes_per_chunk;
 	}
 	if( volume_chunk_count == 0 )
 	{
@@ -289,9 +336,9 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 	uint32_t raw_offset     = 0;
 	uint64_t chunk_size     = 0;
 	uint64_t iterator       = 0;
-	uint8_t compressed      = 0;
 	uint64_t current_offset = 0;
 	uint64_t next_offset    = 0;
+	uint8_t compressed      = 0;
 
 	if( offset_table == NULL )
 	{
@@ -333,11 +380,11 @@ LIBEWF_OFFSET_TABLE *libewf_fill_offset_table( LIBEWF_OFFSET_TABLE *offset_table
 
 		if( compressed == 0 )
 		{
-			LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: uncompressed chunk %" PRIu64 " read with offset %" PRIu64 " and size %" PRIu64 "\n", offset_table->last, current_offset, chunk_size );
+			LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: uncompressed chunk %" PRIu64 " read with offset %" PRIu64 " and size %" PRIu64 ".\n", offset_table->last, current_offset, chunk_size );
 		}
 		else
 		{
-			LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: compressed chunk %" PRIu64 " read with offset %" PRIu64 " and size %" PRIu64 "\n", offset_table->last, current_offset, chunk_size );
+			LIBEWF_VERBOSE_PRINT( "libewf_fill_offset_table: compressed chunk %" PRIu64 " read with offset %" PRIu64 " and size %" PRIu64 ".\n", offset_table->last, current_offset, chunk_size );
 
 		}
 		current_offset = next_offset;
@@ -373,7 +420,7 @@ LIBEWF_OFFSET_TABLE *libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_t
 
 	while( section_list_entry != NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: start offset: %" PRIu64 " last offset: %" PRIu64 "\n", section_list_entry->start_offset, last_offset );
+		LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: start offset: %" PRIu64 " last offset: %" PRIu64 ".\n", section_list_entry->start_offset, last_offset );
 
 		if( ( section_list_entry->file_descriptor == file_descriptor ) && ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
 		{
@@ -381,7 +428,7 @@ LIBEWF_OFFSET_TABLE *libewf_calculate_last_offset( LIBEWF_OFFSET_TABLE *offset_t
 
 			offset_table = libewf_offset_table_set_values( offset_table, offset_table->last, file_descriptor, offset_table->compressed[ offset_table->last ], last_offset, chunk_size );
 
-			LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: last chunk %" PRIu64 " calculated with offset %" PRIu64 " and size %" PRIu64 "\n", ( offset_table->last + 1 ), last_offset, chunk_size );
+			LIBEWF_VERBOSE_PRINT( "libewf_calculate_last_offset: last chunk %" PRIu64 " calculated with offset %" PRIu64 " and size %" PRIu64 ".\n", ( offset_table->last + 1 ), last_offset, chunk_size );
 
 			break;
 		}
@@ -396,7 +443,8 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 {
 	EWF_TABLE *table          = NULL;
 	EWF_TABLE_OFFSET *offsets = NULL;
-	EWF_CRC calculated_crc    = 0;
+	EWF_CRC *calculated_crc   = NULL;
+	EWF_CRC *stored_crc_read  = NULL;
 	EWF_CRC stored_crc        = 0;
 	uint32_t chunk_count      = 0;
 
@@ -410,34 +458,52 @@ LIBEWF_OFFSET_TABLE *libewf_offset_table_read( LIBEWF_OFFSET_TABLE *offset_table
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( table->padding, 16 ); );
 #endif
 
-	/* table size contains both the size of the crc (4 bytes)
+	/* table size contains both the size of the CRC (4 bytes)
 	 */
-	calculated_crc = ewf_crc( (void *) table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
-	stored_crc     = convert_32bit( table->crc );
+	calculated_crc = ewf_crc_calculate( (void *) table, ( EWF_TABLE_SIZE - EWF_CRC_SIZE ), 1 );
 
-	if( stored_crc != calculated_crc )
+	if( calculated_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+		LIBEWF_FATAL_PRINT( "libewf_section_table_read: unable to calculate CRC.\n" );
+	}
+	stored_crc = convert_32bit( table->crc );
+
+	if( stored_crc != *calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_offset_table_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
 	}
 	chunk_count = convert_32bit( table->chunk_count );
 
-	LIBEWF_VERBOSE_PRINT( "libewf_offset_table_read: Table is of size %" PRIu32 " chunks crc %" PRIu32 " (%" PRIu32 ")\n", chunk_count, stored_crc, calculated_crc );
+	LIBEWF_VERBOSE_PRINT( "libewf_offset_table_read: Table is of size %" PRIu32 " chunks CRC %" PRIu32 " (%" PRIu32 ").\n", chunk_count, stored_crc, *calculated_crc );
+
+	ewf_crc_free( calculated_crc );
 
 	if( chunk_count <= 0 )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_offset_table_read: table contains no offsets!\n" );
+		LIBEWF_FATAL_PRINT( "libewf_offset_table_read: table contains no offsets!.\n" );
 	}
 	offsets = ewf_table_offsets_read( file_descriptor, chunk_count );
 
 	if( ewf_format == EWF_FORMAT_E01 )
 	{
-		calculated_crc = ewf_crc( offsets, ( EWF_TABLE_OFFSET_SIZE * chunk_count ), 1 );
-		stored_crc     = ewf_crc_read( file_descriptor );
+		calculated_crc = ewf_crc_calculate( offsets, ( EWF_TABLE_OFFSET_SIZE * chunk_count ), 1 );
 
-		if( stored_crc != calculated_crc )
+		if( calculated_crc == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+			LIBEWF_FATAL_PRINT( "libewf_section_table_read: unable to calculate CRC.\n" );
 		}
+		stored_crc_read = ewf_crc_read( file_descriptor );
+
+		if( stored_crc_read == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_section_table_read: unable to read CRC from file descriptor.\n" );
+		}
+		if( *stored_crc_read != *calculated_crc )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_offset_table_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", *stored_crc_read, *calculated_crc );
+		}
+		ewf_crc_free( calculated_crc );
+		ewf_crc_free( stored_crc_read );
 	}
 	offset_table = libewf_fill_offset_table( offset_table, offsets, chunk_count, file_descriptor );
 	offset_table = libewf_calculate_last_offset( offset_table, section_list, file_descriptor );
@@ -530,13 +596,52 @@ void libewf_section_sectors_read( LIBEWF_HANDLE *handle, int file_descriptor, si
 	 */
 }
 
+/* Reads a ltree section
+ */
+void libewf_section_ltree_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size )
+{
+	EWF_LTREE *ltree       = NULL;
+	EWF_HEADER *tree_data  = NULL;
+	EWF_CRC calculated_crc = 0;
+	EWF_CRC stored_crc     = 0;
+
+	if( handle == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_ltree_read: incorrect handle.\n" );
+	}
+/*
+	if( size != EWF_LTREE_SIZE )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_ltree_read: mismatch in section data size.\n" );
+	}
+*/
+	ltree = ewf_ltree_read( file_descriptor );
+
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->unknown1, 16 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->tree_size, 4 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->unknown2, 4 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->unknown3, 4 ); );
+	LIBEWF_VERBOSE_EXEC( libewf_dump_data( ltree->unknown4, 20 ); );
+
+	fprintf( stderr, "remaining lree size: %d (0x%x).\n", ( size - EWF_LTREE_SIZE ), ( size - EWF_LTREE_SIZE ) );
+
+/*
+	LIBEWF_VERBOSE_EXEC( libewf_section_read_data( handle, file_descriptor, ( size - EWF_LTREE_SIZE ) ); );
+*/
+	tree_data = ewf_tree_data_read( file_descriptor, ( size - EWF_LTREE_SIZE ) );
+
+	LIBEWF_VERBOSE_EXEC( ewf_header_fprint( stderr, tree_data ); );
+
+	ewf_header_free( tree_data );
+}
+
 /* Reads a data section
  */
 void libewf_section_data_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size )
 {
-	EWF_DATA *data         = NULL;
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
+	EWF_DATA *data          = NULL;
+	EWF_CRC *calculated_crc = NULL;
+	EWF_CRC stored_crc      = 0;
 
 	if( handle == NULL )
 	{
@@ -546,13 +651,23 @@ void libewf_section_data_read( LIBEWF_HANDLE *handle, int file_descriptor, size_
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_data_read: mismatch in section data size.\n" );
 	}
-	data           = ewf_data_read( file_descriptor );
-	calculated_crc = ewf_crc( (void *) data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
-	stored_crc     = convert_32bit( data->crc );
+	data = ewf_data_read( file_descriptor );
 
-	if( stored_crc != calculated_crc )
+	if( data == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_data_read: crc does not match (in file: %" PRIu32 " calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+		LIBEWF_FATAL_PRINT( "libewf_section_data_read: unable to read data.\n" );
+	}
+	calculated_crc = ewf_crc_calculate( (void *) data, ( EWF_DATA_SIZE - EWF_CRC_SIZE ), 1 );
+
+	if( calculated_crc == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_data_read: unable to calculate CRC.\n" );
+	}
+	stored_crc = convert_32bit( data->crc );
+
+	if( stored_crc != *calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_section_data_read: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
 	}
 #ifdef _LIBEWF_DEBUG_
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( data->unknown1, 4 ); );
@@ -566,6 +681,7 @@ void libewf_section_data_read( LIBEWF_HANDLE *handle, int file_descriptor, size_
 #endif
 
 	ewf_data_free( data );
+	ewf_crc_free( calculated_crc );
 }
 
 /* Reads a error2 section
@@ -574,7 +690,8 @@ void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 {
 	EWF_ERROR2 *error2         = NULL;
 	EWF_ERROR2_SECTOR *sectors = NULL;
-	EWF_CRC calculated_crc     = 0;
+	EWF_CRC *calculated_crc    = NULL;
+	EWF_CRC *stored_crc_read   = NULL;
 	EWF_CRC stored_crc         = 0;
 	uint32_t error_count       = 0;
 
@@ -583,17 +700,24 @@ void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: incorrect handle.\n" );
 	}
 	error2         = ewf_error2_read( file_descriptor );
-	calculated_crc = ewf_crc( (void *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
-	stored_crc     = convert_32bit( error2->crc );
-	error_count    = convert_32bit( error2->error_count );
+	calculated_crc = ewf_crc_calculate( (void *) error2, ( EWF_ERROR2_SIZE - EWF_CRC_SIZE ), 1 );
 
-	if( stored_crc != calculated_crc )
+	if( calculated_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: unable to calculate CRC.\n" );
 	}
+	stored_crc  = convert_32bit( error2->crc );
+	error_count = convert_32bit( error2->error_count );
+
+	if( stored_crc != *calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
+	}
+	ewf_crc_free( calculated_crc );
+
 	if( error_count <= 0 )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: error2 contains no sectors!\n" );
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: error2 contains no sectors!.\n" );
 	}
 	sectors = ewf_error2_sectors_read( file_descriptor, error_count );
 
@@ -602,26 +726,37 @@ void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, siz
 	LIBEWF_VERBOSE_EXEC( libewf_dump_data( (uint8_t *) sectors, ( EWF_ERROR2_SECTOR_SIZE * error_count ) ); );
 #endif
 
-	stored_crc     = ewf_crc_read( file_descriptor );
-	calculated_crc = ewf_crc( (void *) sectors, ( EWF_ERROR2_SECTOR_SIZE * error_count ), 1 );
+	calculated_crc = ewf_crc_calculate( (void *) sectors, ( EWF_ERROR2_SECTOR_SIZE * error_count ), 1 );
 
-	if( stored_crc != calculated_crc )
+	if( calculated_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: unable to calculate CRC.\n" );
+	}
+	stored_crc_read = ewf_crc_read( file_descriptor );
+
+	if( stored_crc_read == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_read: unable to read CRC from file descriptor.\n" );
+	}
+	if( *stored_crc_read != *calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_section_error2_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", *stored_crc_read, *calculated_crc );
 	}
 	handle->error2_error_count = error_count;
 	handle->error2_sectors     = sectors;
 
 	ewf_error2_free( error2 );
+	ewf_crc_free( calculated_crc );
+	ewf_crc_free( stored_crc_read );
 }
 
 /* Reads a hash section
  */
 void libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size )
 {
-	EWF_HASH *hash         = NULL;
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
+	EWF_HASH *hash          = NULL;
+	EWF_CRC *calculated_crc = NULL;
+	EWF_CRC stored_crc      = 0;
 
 	if( handle == NULL )
 	{
@@ -632,12 +767,17 @@ void libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, size_
 		LIBEWF_FATAL_PRINT( "libewf_section_hash_read: mismatch in section data size.\n" );
 	}
 	hash           = ewf_hash_read( file_descriptor );
-	calculated_crc = ewf_crc( (void *) hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
-	stored_crc     = convert_32bit( hash->crc );
+	calculated_crc = ewf_crc_calculate( (void *) hash, ( EWF_HASH_SIZE - EWF_CRC_SIZE ), 1 );
 
-	if( stored_crc != calculated_crc )
+	if( calculated_crc == NULL )
 	{
-		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+		LIBEWF_FATAL_PRINT( "libewf_section_hash_read: unable to calculate CRC.\n" );
+	}
+	stored_crc = convert_32bit( hash->crc );
+
+	if( stored_crc != *calculated_crc )
+	{
+		LIBEWF_WARNING_PRINT( "libewf_section_hash_read: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
 	}
 	libewf_handle_set_md5hash( handle, hash->md5hash );
 
@@ -648,6 +788,7 @@ void libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, size_
 #endif
 
 	ewf_hash_free( hash );
+	ewf_crc_free( calculated_crc );
 }
 
 /* Reads and processes a section's data from a segment
@@ -704,6 +845,12 @@ void libewf_section_data_read_segment( LIBEWF_HANDLE *handle, uint32_t segment, 
 	{
 		libewf_section_sectors_read( handle, file_descriptor, size );
 	}
+	/* Read the ltree section
+	 */
+	else if( ewf_section_is_type_ltree( section ) )
+	{
+		libewf_section_ltree_read( handle, file_descriptor, size );
+	}
 	/* Read the data section
 	 */
 	else if( ewf_section_is_type_data( section ) )
@@ -724,7 +871,7 @@ void libewf_section_data_read_segment( LIBEWF_HANDLE *handle, uint32_t segment, 
 	}
 	else
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_section_data_read_segment: Unknown section type: %s\n", section->type );
+		LIBEWF_VERBOSE_PRINT( "libewf_section_data_read_segment: Unknown section type: %s.\n", section->type );
 		LIBEWF_VERBOSE_EXEC( libewf_section_read_data( handle, file_descriptor, size ); );
 	}
 }
@@ -734,16 +881,16 @@ void libewf_section_data_read_segment( LIBEWF_HANDLE *handle, uint32_t segment, 
  */
 EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segment )
 {
-	char *filename         = NULL;
-	EWF_SECTION *section   = NULL;
-	int file_descriptor    = 0;
-	uint64_t offset_end    = 0;
-	EWF_CRC calculated_crc = 0;
-	EWF_CRC stored_crc     = 0;
+	EWF_SECTION *section    = NULL;
+	EWF_CRC *calculated_crc = NULL;
+	char *filename          = NULL;
+	EWF_CRC stored_crc      = 0;
+	uint64_t offset_end     = 0;
+	int file_descriptor     = 0;
 
-	/* The first offset is after the 13 byte file header
+	/* The first offset is directly after the file header (13 byte)
 	 */
-	uint64_t previous_offset = 13;
+	uint64_t previous_offset = EWF_FILE_HEADER_SIZE;
 	uint64_t next_offset     = 0;
 
 	if( handle == NULL )
@@ -752,20 +899,32 @@ EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segme
 	}
 	if( libewf_segment_table_values_is_set( handle->segment_table, segment ) == 0 )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: missing a segment file for segment %" PRIu32 "\n", segment );
+		LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: missing a segment file for segment %" PRIu32 ".\n", segment );
 	}
 	file_descriptor = libewf_segment_table_get_file_descriptor( handle->segment_table, segment );
 
 	while( 1 )
 	{
-		section        = ewf_section_read( file_descriptor );
-		calculated_crc = ewf_crc( (void *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
-		stored_crc     = convert_32bit( section->crc );
+		section = ewf_section_read( file_descriptor );
 
-		if( stored_crc != calculated_crc )
+		if( section == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_sections_read_segment: crc does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", stored_crc, calculated_crc );
+			LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: unable to read section start.\n" );
 		}
+		calculated_crc = ewf_crc_calculate( (void *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+
+		if( calculated_crc == NULL )
+		{
+			LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: unable to calculate CRC.\n" );
+		}
+		stored_crc = convert_32bit( section->crc );
+
+		if( stored_crc != *calculated_crc )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_sections_read_segment: CRC does not match (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", stored_crc, *calculated_crc );
+		}
+		ewf_crc_free( calculated_crc );
+
 		next_offset = convert_64bit( section->next );
 
 		LIBEWF_VERBOSE_EXEC( ewf_section_fprint( stderr, section ); );
@@ -803,7 +962,7 @@ EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segme
 		}
 		else
 		{
-			LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: section skip for section type: %s not allowed\n", section->type );
+			LIBEWF_FATAL_PRINT( "libewf_sections_read_segment: section skip for section type: %s not allowed.\n", section->type );
 		}
 		ewf_section_free( section );
 	}
@@ -814,12 +973,12 @@ EWF_SECTION *libewf_sections_read_segment( LIBEWF_HANDLE *handle, uint32_t segme
  */
 int64_t libewf_read_chunk( LIBEWF_HANDLE *handle, uint32_t chunk, void *buffer, uint64_t buffer_size )
 {
-	EWF_CRC stored_crc     = 0;
-	EWF_CRC calculated_crc = 0;
-	int file_descriptor    = 0;
-	uint64_t size          = 0;
-	uint64_t offset        = 0;
-	ssize_t count          = 0;
+	EWF_CRC *calculated_crc = NULL;
+	EWF_CRC stored_crc      = 0;
+	uint64_t size           = 0;
+	uint64_t offset         = 0;
+	ssize_t count           = 0;
+	int file_descriptor     = 0;
 
 	if( handle == NULL )
 	{
@@ -837,7 +996,7 @@ int64_t libewf_read_chunk( LIBEWF_HANDLE *handle, uint32_t chunk, void *buffer, 
 	size            = handle->offset_table->size[ chunk ];
 	offset          = handle->offset_table->offset[ chunk ];
 
-	LIBEWF_VERBOSE_PRINT( "libewf_read_chunk: read file descriptor: %d, for offset: %" PRIu64 ", for size: %" PRIu64 "\n", file_descriptor, offset, size );
+	LIBEWF_VERBOSE_PRINT( "libewf_read_chunk: read file descriptor: %d, for offset: %" PRIu64 ", for size: %" PRIu64 ".\n", file_descriptor, offset, size );
 
 	if( size == 0 )
 	{
@@ -857,15 +1016,21 @@ int64_t libewf_read_chunk( LIBEWF_HANDLE *handle, uint32_t chunk, void *buffer, 
 	 */
 	if( handle->offset_table->compressed[ chunk ] == 0 )
 	{
-		stored_crc     = convert_32bit( (uint8_t *) ( buffer + count - EWF_CRC_SIZE ) );
-		calculated_crc = ewf_crc( buffer, ( count - EWF_CRC_SIZE ), 1 );
+		calculated_crc = ewf_crc_calculate( buffer, ( count - EWF_CRC_SIZE ), 1 );
 
-		LIBEWF_VERBOSE_PRINT( "libewf_read_chunk: crc for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", chunk, stored_crc, calculated_crc );
-
-		if( stored_crc != calculated_crc )
+		if( calculated_crc == NULL )
 		{
-			LIBEWF_WARNING_PRINT( "libewf_read_chunk: crc does not match for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ")\n", chunk, stored_crc, calculated_crc );
+			LIBEWF_FATAL_PRINT( "libewf_read_chunk: unable to calculate CRC.\n" );
 		}
+		stored_crc = convert_32bit( (uint8_t *) ( buffer + count - EWF_CRC_SIZE ) );
+
+		LIBEWF_VERBOSE_PRINT( "libewf_read_chunk: CRC for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", chunk, stored_crc, calculated_crc );
+
+		if( stored_crc != *calculated_crc )
+		{
+			LIBEWF_WARNING_PRINT( "libewf_read_chunk: CRC does not match for chunk: %" PRIu32 " (in file: %" PRIu32 ", calculated: %" PRIu32 ").\n", chunk, stored_crc, *calculated_crc );
+		}
+		ewf_crc_free( calculated_crc );
 	}
 	return( count );
 }
@@ -885,7 +1050,7 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_read_random: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_read_random: incorrect handle.\n" );
 	}
 	if( handle->index_build == 0 )
 	{
@@ -948,11 +1113,11 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 				 */
 				result = ewf_sectors_chunk_uncompress( handle->raw_data, &raw_data_size, handle->chunk_data, chunk_read_count );
 
-				LIBEWF_VERBOSE_PRINT( "libewf_read_random: chunk %" PRIu32 " of %" PRIu32 " (%i%%) is COMPRESSED\n",
+				LIBEWF_VERBOSE_PRINT( "libewf_read_random: chunk %" PRIu32 " of %" PRIu32 " (%i%%) is COMPRESSED.\n",
 				( chunk + 1 ), handle->offset_table->amount,
 				(int) ( ( handle->offset_table->last > 0 ) ? ( ( chunk * 100 ) / handle->offset_table->last ) : 1 ) ) ;
 
-				if( result != Z_OK )
+				if( result != 1 )
 				{
 					LIBEWF_FATAL_PRINT( "libewf_read_random: unable to uncompress chunk.\n" );
 				}
@@ -961,7 +1126,7 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 			}
 			else
 			{
-				LIBEWF_VERBOSE_PRINT( "libewf_read_random: chunk %" PRIu32 " of %" PRIu32 " (%i%%) is UNCOMPRESSED\n",
+				LIBEWF_VERBOSE_PRINT( "libewf_read_random: chunk %" PRIu32 " of %" PRIu32 " (%i%%) is UNCOMPRESSED.\n",
 				( chunk + 1 ), handle->offset_table->amount,
 				(int) ( ( handle->offset_table->last > 0 ) ? ( ( chunk * 100 ) / handle->offset_table->last ) : 1 ) ) ;
 
@@ -993,6 +1158,10 @@ int64_t libewf_read_random( LIBEWF_HANDLE *handle, void *buffer, uint64_t size, 
 
 		chunk++;
 	}
+	if( handle->swap_byte_pairs == 1 )
+	{
+		swap_byte_pairs( buffer, count_read );
+	}
 	return( count_read );
 }
 
@@ -1015,7 +1184,7 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: incorrect handle.\n" );
 	}
 	if( handle->index_build == 0 )
 	{
@@ -1027,7 +1196,7 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 
 	if( data == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: unable to allocate data\n" );
+		LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: unable to allocate data.\n" );
 	}
 	for( iterator = 0; iterator < handle->offset_table->amount; iterator++ )
 	{
@@ -1040,7 +1209,7 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 		{
 			free( data );
 
-			LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: error writing data\n" );
+			LIBEWF_FATAL_PRINT( "libewf_read_to_file_descriptor: error writing data.\n" );
 		}
 		total_count += count;
 
@@ -1063,7 +1232,7 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 	{
 		stored_md5hash_string = ewf_md5hash_to_string( handle->md5hash );
 
-		LIBEWF_VERBOSE_PRINT( "libewf_read_to_file_descriptor: MD5 hash stored: %s, calculated: %s\n", stored_md5hash_string, calculated_md5hash_string );
+		LIBEWF_VERBOSE_PRINT( "libewf_read_to_file_descriptor: MD5 hash stored: %s, calculated: %s.\n", stored_md5hash_string, calculated_md5hash_string );
 
 		if( memcmp( calculated_md5hash, handle->md5hash, 16 ) != 0 )
 		{
@@ -1073,7 +1242,7 @@ int64_t libewf_read_to_file_descriptor( LIBEWF_HANDLE *handle, int output_file_d
 	}
 	else
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_read_to_file_descriptor: MD5 hash stored: NONE, calculated: %s\n", calculated_md5hash_string );
+		LIBEWF_VERBOSE_PRINT( "libewf_read_to_file_descriptor: MD5 hash stored: NONE, calculated: %s.\n", calculated_md5hash_string );
 	}
 	ewf_md5hash_free( calculated_md5hash );
 

@@ -45,14 +45,14 @@
 #ifndef _EWFFILEHEADER_H
 #define _EWFFILEHEADER_H
 
-#include <sys/types.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern uint8_t ewf_file_signature[];
-extern uint8_t lwf_file_signature[];
+extern uint8_t evf_file_signature[];
+extern uint8_t lvf_file_signature[];
 
 typedef struct ewf_file_header EWF_FILE_HEADER;
 

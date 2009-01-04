@@ -45,13 +45,16 @@
 #ifndef _EWFHASH_H
 #define _EWFHASH_H
 
-#include <sys/types.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct ewf_hash EWF_HASH;
+#define EWF_HASH ewf_hash_t
+#define EWF_HASH_SIZE sizeof( EWF_HASH )
+
+typedef struct ewf_hash ewf_hash_t;
 
 struct ewf_hash
 {
@@ -88,8 +91,6 @@ struct ewf_hash
 	uint8_t crc[4];
 
 } __attribute__((packed));
-
-#define EWF_HASH_SIZE sizeof( EWF_HASH )
 
 EWF_HASH *ewf_hash_alloc( void );
 void ewf_hash_free( EWF_HASH *hash );

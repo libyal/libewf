@@ -1,20 +1,10 @@
 /*
- * EWF volume section specification for the SMART format and the
- * original EWF format
+ * EWF SMART volume section (EWF-S01)
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -28,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -43,16 +33,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFVOLUME_SMART_H
-#define _EWFVOLUME_SMART_H
+#ifndef _EWF_VOLUME_SMART_H
+#define _EWF_VOLUME_SMART_H
 
-#include <sys/types.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-typedef struct ewf_volume_smart EWF_VOLUME_SMART;
+#define EWF_VOLUME_SMART ewf_volume_smart_t
+#define EWF_VOLUME_SMART_SIZE sizeof( EWF_VOLUME_SMART )
+
+typedef struct ewf_volume_smart ewf_volume_smart_t;
 
 struct ewf_volume_smart
 {
@@ -109,13 +102,11 @@ struct ewf_volume_smart
 
 } __attribute__((packed));
 
-#define EWF_VOLUME_SMART_SIZE sizeof( EWF_VOLUME_SMART )
-
 EWF_VOLUME_SMART *ewf_volume_smart_alloc( void );
 void ewf_volume_smart_free( EWF_VOLUME_SMART *volume );
 EWF_VOLUME_SMART *ewf_volume_smart_read( int file_descriptor );
-ssize_t ewf_volume_smart_write( EWF_VOLUME_SMART *volume, int file_descriptor );
-uint32_t ewf_volume_smart_calculate_chunk_size( EWF_VOLUME_SMART *volume );
+int32_t ewf_volume_smart_write( EWF_VOLUME_SMART *volume, int file_descriptor );
+int32_t ewf_volume_smart_calculate_chunk_size( EWF_VOLUME_SMART *volume );
 
 #ifdef __cplusplus
 }

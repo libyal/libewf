@@ -1,19 +1,10 @@
 /*
- * EWF section start (header) specification
+ * EWF section start
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,31 +33,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <inttypes.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "definitions.h"
+#include "libewf_common.h"
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_section.h"
 #include "ewf_crc.h"
 
-/* Allocates memory for a new efw section struct
+/* Allocates memory for a new ewf section struct
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_SECTION *ewf_section_alloc( void )
 {
-	EWF_SECTION *section = (EWF_SECTION *) malloc( EWF_SECTION_SIZE );
+	EWF_SECTION *section = NULL;
+
+	section = (EWF_SECTION *) libewf_alloc_cleared( EWF_SECTION_SIZE );
 
 	if( section == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_section_alloc: unable to allocate ewf_section\n" );
-	}
-	memset( section, 0, EWF_SECTION_SIZE );
+		LIBEWF_WARNING_PRINT( "ewf_section_alloc: unable to allocate ewf_section.\n" );
 
+		return( NULL );
+	}
 	return( section );
 }
 
@@ -76,24 +67,39 @@ void ewf_section_free( EWF_SECTION *section )
 {
 	if( section == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_section_free: invalid section.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_section_free: invalid section.\n" );
+
+		return;
 	}
-	free( section );
+	libewf_free( section );
 }
 
 /* Reads the section from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_SECTION *ewf_section_read( int file_descriptor )
 {
-	EWF_SECTION *section = ewf_section_alloc();
+	EWF_SECTION *section = NULL;
+	uint32_t size        = EWF_SECTION_SIZE;
+	int32_t count        = 0;
 
-	ssize_t count = read( file_descriptor, section, EWF_SECTION_SIZE );
+	section = ewf_section_alloc();
 
-	if( count < EWF_SECTION_SIZE )
+	if( section == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_section_read: unable to create section.\n" );
+
+		return( NULL );
+	}
+	count = read( file_descriptor, section, size );
+
+	if( count < size )
 	{
 		ewf_section_free( section );
 
-		LIBEWF_FATAL_PRINT( "ewf_section_read: unable to read ewf_section\n" );
+		LIBEWF_WARNING_PRINT( "ewf_section_read: unable to read section.\n" );
+
+		return( NULL );
 	}
 	return( section );
 }
@@ -101,11 +107,11 @@ EWF_SECTION *ewf_section_read( int file_descriptor )
 /* Writes a section to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
+int32_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 {
-	EWF_CRC crc;
-	ssize_t count;
-	size_t size = EWF_SECTION_SIZE;
+	EWF_CRC *crc  = NULL;
+	uint32_t size = EWF_SECTION_SIZE;
+	int32_t count = 0;
 
 	if( section == NULL )
 	{
@@ -113,9 +119,17 @@ ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
 
 		return( -1 );
 	}
-	crc = ewf_crc( (void *) section, ( size - EWF_CRC_SIZE ), 1 );
+	crc = ewf_crc_calculate( (void *) section, ( size - EWF_CRC_SIZE ), 1 );
 
-	revert_32bit( crc, section->crc );
+	if( crc == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_section_write: unable to calculate CRC.\n" );
+
+		return( -1 );
+	}
+	revert_32bit( *crc, section->crc );
+
+	ewf_crc_free( crc );
 
 	count = write( file_descriptor, section, size );
 
@@ -130,7 +144,7 @@ ssize_t ewf_section_write( EWF_SECTION *section, int file_descriptor )
  */
 uint8_t ewf_section_is_type( EWF_SECTION *section, const char *type )
 {
-	return( memcmp( section->type, type, strlen( type ) ) == 0 );
+	return( libewf_memcmp( section->type, type, libewf_strlen( type ) ) == 0 );
 }
 
 /* Test if section is of type header
@@ -217,24 +231,53 @@ uint8_t ewf_section_is_type_error2( EWF_SECTION *section )
 	return( ewf_section_is_type( section, "error2" ) );
 }
 
+/* Test if section is of type ltree
+ */
+uint8_t ewf_section_is_type_ltree( EWF_SECTION *section )
+{
+	return( ewf_section_is_type( section, "ltree" ) );
+}
+
 /* Print the section data to a stream
  */
 void ewf_section_fprint( FILE *stream, EWF_SECTION *section )
 {
-	if ( ( stream != NULL ) && ( section != NULL ) )
+	EWF_CRC *calculated_crc = NULL;
+	EWF_CRC stored_crc      = 0;
+	uint64_t next           = 0;
+	uint64_t size           = 0;
+
+	if( stream == NULL )
 	{
-		EWF_CRC calculated_crc = ewf_crc( (void *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
-		EWF_CRC stored_crc     = convert_32bit( section->crc );
+		LIBEWF_WARNING_PRINT( "ewf_section_fprint: invalid stream.\n" );
 
-		uint64_t next = convert_64bit( section->next );
-		uint64_t size = convert_64bit( section->size );
-
-		fprintf( stream, "Section:\n" );
-		fprintf( stream, "type: %s\n", section->type );
-		fprintf( stream, "next: %" PRIu64 "\n", next );
-		fprintf( stream, "size: %" PRIu64 "\n", size );
-		fprintf( stream, "crc: %" PRIu32 " ( %" PRIu32 " )\n", stored_crc, calculated_crc );
-		fprintf( stream, "\n" );
+		return;
 	}
+	if( section == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_section_fprint: invalid section.\n" );
+
+		return;
+	}
+	calculated_crc = ewf_crc_calculate( (void *) section, ( EWF_SECTION_SIZE - EWF_CRC_SIZE ), 1 );
+
+	if( calculated_crc == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_section_fprint: unable to calculate CRC.\n" );
+
+		return;
+	}
+	stored_crc = convert_32bit( section->crc );
+	next       = convert_64bit( section->next );
+	size       = convert_64bit( section->size );
+
+	fprintf( stream, "Section:\n" );
+	fprintf( stream, "type: %s\n", section->type );
+	fprintf( stream, "next: %" PRIu64 "\n", next );
+	fprintf( stream, "size: %" PRIu64 "\n", size );
+	fprintf( stream, "crc: %" PRIu32 " ( %" PRIu32 " )\n", stored_crc, *calculated_crc );
+	fprintf( stream, "\n" );
+
+	ewf_crc_free( calculated_crc );
 }
 

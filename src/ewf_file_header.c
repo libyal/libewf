@@ -42,20 +42,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_file_header.h"
 
-uint8_t ewf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
-uint8_t lwf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+uint8_t evf_file_signature[] = { 0x45, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
+uint8_t lvf_file_signature[] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0xFF, 0x00 };
 
-/* Allocates memory for a new efw file header struct
+/* Allocates memory for a new ewf file header struct
  */
 EWF_FILE_HEADER *ewf_file_header_alloc( void )
 {
@@ -67,7 +66,7 @@ EWF_FILE_HEADER *ewf_file_header_alloc( void )
 	}
 	memset( file_header, 0, EWF_FILE_HEADER_SIZE );
 
-	memcpy( (uint8_t *) file_header, (uint8_t *) ewf_file_signature, 8 );
+	memcpy( (uint8_t *) file_header, (uint8_t *) evf_file_signature, 8 );
 
 	file_header->fields_start = 1;
 
@@ -94,7 +93,8 @@ uint8_t ewf_file_header_check_signature( uint8_t *signature )
 	{
 		return( 0 );
 	}
-	return( memcmp( ewf_file_signature, signature, sizeof( ewf_file_signature ) ) == 0 );
+	return( ( memcmp( evf_file_signature, signature, sizeof( evf_file_signature ) ) == 0 )
+	|| ( memcmp( lvf_file_signature, signature, sizeof( lvf_file_signature ) ) == 0 ) );
 }
 
 /* Reads the file header from a file descriptor

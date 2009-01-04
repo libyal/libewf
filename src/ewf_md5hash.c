@@ -47,13 +47,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <sys/types.h>
-
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_md5hash.h"
 
-/* Allocates memory for a new efw md5 hash
+/* Allocates memory for a new ewf md5 hash
  */
 EWF_MD5HASH *ewf_md5hash_alloc( void )
 {
@@ -61,7 +59,7 @@ EWF_MD5HASH *ewf_md5hash_alloc( void )
 
 	if( md5hash == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_md5hash_alloc: unable to allocate ewf_md5hash\n" );
+		LIBEWF_FATAL_PRINT( "ewf_md5hash_alloc: unable to allocate ewf_md5hash.\n" );
 	}
 	memset( md5hash, 0, EWF_MD5HASH_SIZE );
 
@@ -111,7 +109,7 @@ char *ewf_md5hash_to_string( EWF_MD5HASH *md5hash )
 
 	if( string == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "evf_md5hash_to_string: unable to allocate string\n" );
+		LIBEWF_FATAL_PRINT( "evf_md5hash_to_string: unable to allocate string.\n" );
 	}
 	for( iterator = 0; iterator < 16; iterator++ )
 	{

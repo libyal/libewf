@@ -45,7 +45,7 @@
 #ifndef _EWFTABLE_H
 #define _EWFTABLE_H
 
-#include <sys/types.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,8 +54,14 @@ extern "C" {
 #define EWF_OFFSET_COMPRESSED_READ_MASK  0x7fffffff
 #define EWF_OFFSET_COMPRESSED_WRITE_MASK 0x80000000
 
-typedef struct ewf_table EWF_TABLE;
-typedef struct ewf_table_offset EWF_TABLE_OFFSET;
+#define EWF_TABLE ewf_table_t
+#define EWF_TABLE_SIZE sizeof( EWF_TABLE )
+
+#define EWF_TABLE_OFFSET ewf_table_offset_t
+#define EWF_TABLE_OFFSET_SIZE sizeof( EWF_TABLE_OFFSET )
+
+typedef struct ewf_table ewf_table_t;
+typedef struct ewf_table_offset ewf_table_offset_t;
 
 struct ewf_table
 {
@@ -95,9 +101,6 @@ struct ewf_table_offset
 	uint8_t offset[4];
 
 } __attribute__((packed));
-
-#define EWF_TABLE_SIZE sizeof( EWF_TABLE )
-#define EWF_TABLE_OFFSET_SIZE sizeof( EWF_TABLE_OFFSET )
 
 EWF_TABLE *ewf_table_alloc( void );
 EWF_TABLE_OFFSET *ewf_table_offsets_alloc( uint32_t amount );

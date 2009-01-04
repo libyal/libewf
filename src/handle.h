@@ -138,6 +138,12 @@ struct libewf_handle
 	 */
 	EWF_MD5HASH *md5hash;
 
+	/* value to indicate if a pair of bytes should be swapped
+	 * this allows to convert little endian into big endian data and vice versa
+	 * this is only applicable to the actual media data within the EWF file
+	 */
+	uint8_t swap_byte_pairs;
+
 	/* value to indicate if compression is used
 	 */
 	uint8_t compression_used;

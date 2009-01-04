@@ -46,14 +46,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <zlib.h>
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 #include "ewf_sectors.h"
 
-/* Allocates memory for a new efw sectors_chunk 
+/* Allocates memory for a new ewf sectors_chunk 
  */
 EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( size_t size )
 {
@@ -69,7 +68,7 @@ EWF_SECTORS_CHUNK *ewf_sectors_chunk_alloc( size_t size )
 	return( sectors_chunk );
 }
 
-/* Reallocates memory for a efw sectors_chunk
+/* Reallocates memory for a ewf sectors_chunk
  */
 EWF_SECTORS_CHUNK *ewf_sectors_chunk_realloc( EWF_SECTORS_CHUNK *sectors_chunk, size_t size )
 {
@@ -120,14 +119,26 @@ void ewf_sectors_chunk_free( EWF_SECTORS_CHUNK *sectors_chunk )
  */
 int ewf_sectors_chunk_uncompress( EWF_SECTORS_CHUNK *sectors_chunk, uint32_t *size, EWF_SECTORS_CHUNK *compressed_sectors_chunk, uint32_t compressed_size )
 {
-	return( ewf_uncompress( sectors_chunk, size, compressed_sectors_chunk, compressed_size ) );
+	int result = ewf_uncompress( sectors_chunk, size, compressed_sectors_chunk, compressed_size );
+
+	if( result == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "ewf_sectors_chunk_uncompress: unable to uncompress chunk.\n" );
+	}
+	return( result );
 }
 
 /* Compresses the sectors_chunk
  */
 int ewf_sectors_chunk_compress( EWF_SECTORS_CHUNK *compressed_sectors_chunk, uint32_t *compressed_size, EWF_SECTORS_CHUNK *sectors_chunk, uint32_t size, int8_t compression_level )
 {
-	return( ewf_compress( compressed_sectors_chunk, compressed_size, sectors_chunk, size, compression_level ) );
+	int result = ewf_compress( compressed_sectors_chunk, compressed_size, sectors_chunk, size, compression_level );
+
+	if( result == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "ewf_sectors_chunk_compress: unable to uncompress chunk.\n" );
+	}
+	return( result );
 }
 
 /* Reads the sectors_chunk from a file descriptor into a buffer

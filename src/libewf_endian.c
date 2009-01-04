@@ -142,3 +142,18 @@ void revert_64bit( uint64_t value,  uint8_t *bytes )
 	bytes[ 7 ] = ( uint8_t ) ( value & 0x0ff );
 }
 
+/* Swaps the byte order of byte pairs within a buffer of a certain size
+ */
+void swap_byte_pairs( uint8_t *buffer, uint64_t size )
+{
+	uint8_t byte      = 0;
+	uint64_t iterator = 0;
+
+	for( iterator = 0; iterator < size; iterator += 2 )
+	{
+		byte                   = buffer[ iterator ];
+		buffer[ iterator ]     = buffer[ iterator + 1 ];
+		buffer[ iterator + 1 ] = byte;
+	}
+}
+

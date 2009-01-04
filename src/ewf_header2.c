@@ -1,19 +1,10 @@
 /*
- * EWF header2 section specification
+ * EWF header2 section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,49 +33,66 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <errno.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 #include "ewf_header2.h"
 
 /* Convert the UTF16 ewf header2 into an ASCII ewf header format
+ * Return a pointer to the new instance, NULL on error
  */
-EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, size_t size_utf16 )
+EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, uint32_t size_utf16 )
 {
-	/* The UTF16 header contains twice as much bytes
-	 * needed for the ASCII header
-	 * an additional byte required for end of string
-	 * the UTF16 string should contain two bytes representing byte order
-	 */
-	size_t size_ascii        = ( size_utf16 / 2 ) + 1;
-	EWF_HEADER *ascii_header = ewf_header_alloc( size_ascii );
-	uint8_t byte_order       = 0;
+	EWF_HEADER *ascii_header = NULL;
+	uint32_t size_ascii      = 0;
 	uint32_t utf16_iterator  = 2;
 	uint32_t ascii_iterator  = 0;
+	uint8_t byte_order       = 0;
 
+	if( utf16_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header2_convert_utf16_to_ascii: invalid UTF16 header.\n" );
+
+		return( NULL );
+	}
+	/* The UTF16 header contains twice as much bytes needed for the ASCII header
+	 * an additional byte required for end of string the UTF16 string
+	 * should contain two bytes representing byte order
+	 */
+	size_ascii   = ( size_utf16 / 2 ) + 1;
+	ascii_header = ewf_header_alloc( size_ascii );
+
+	if( ascii_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header2_convert_utf16_to_ascii: unable to create ASCII header.\n" );
+
+		return( NULL );
+	}
 	/* Check if UTF16 string is in big or little endian
 	 */
 	if( utf16_header[ 0 ] == 0xff && utf16_header[ 1 ] == 0xfe )
 	{
-		byte_order = 'l';
+		byte_order = EWF_HEADER2_LITTLE_ENDIAN;
 	}
 	else if( utf16_header[ 0 ] == 0xfe && utf16_header[ 1 ] == 0xff )
 	{
-		byte_order = 'b';
+		byte_order = EWF_HEADER2_BIG_ENDIAN;
 	}
 	else
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header2_convert_utf16_to_ascii: no byte order in UTF16 string.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_header2_convert_utf16_to_ascii: no byte order in UTF16 string.\n" );
+
+		ewf_header_free( ascii_header );
+
+		return( NULL );
 	}
+	/* Convert string
+	 */
 	while( utf16_iterator < size_utf16 )
 	{
-		if( byte_order == 'b' )
+		if( byte_order == EWF_HEADER2_BIG_ENDIAN )
 		{
 			if( utf16_header[ utf16_iterator ] == 0 )
 			{
@@ -97,7 +105,7 @@ EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, size_t
 				ascii_header[ ascii_iterator ] = '_';
 			}
 		}
-		else if( byte_order == 'l' )
+		else if( byte_order == EWF_HEADER2_LITTLE_ENDIAN )
 		{
 			if( utf16_header[ utf16_iterator + 1 ] == 0 )
 			{
@@ -119,26 +127,66 @@ EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, size_t
 }
 
 /* Convert the ASCII ewf header into an UTF16 ewf header format
+ * Return a pointer to the new instance, NULL on error
  */
-EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, size_t size_ascii )
+EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, uint32_t size_ascii, uint8_t byte_order )
 {
-	/* Two additional bytes required for end of string and 2 for the byte order indicator
-	 */
-	size_t size_utf16        = ( size_ascii * 2 ) + 4;
-	EWF_HEADER *utf16_header = ewf_header_alloc( size_utf16 );
+	EWF_HEADER *utf16_header = NULL;
+	uint32_t size_utf16      = 0;
 	uint32_t ascii_iterator  = 0;
 	uint32_t utf16_iterator  = 2;
 
-	/* Add the little endian byte order
-	 */
-	utf16_header[ 0 ] = 0xff;
-	utf16_header[ 1 ] = 0xfe;
+	if( ascii_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header2_convert_utf16_to_ascii: invalid ASCII header.\n" );
 
+		return( NULL );
+	}
+	/* Two additional bytes required for end of string and 2 for the byte order indicator
+	 */
+	size_utf16   = ( size_ascii * 2 ) + 4;
+	utf16_header = ewf_header_alloc( size_utf16 );
+
+	if( utf16_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header2_convert_ascii_to_utf16: unable to create UTF16 header.\n" );
+
+		return( NULL );
+	}
+	/* Add the endian byte order
+	 */
+	if( byte_order == EWF_HEADER2_LITTLE_ENDIAN )
+	{
+		utf16_header[ 0 ] = 0xff;
+		utf16_header[ 1 ] = 0xfe;
+	}
+	else if( byte_order == EWF_HEADER2_BIG_ENDIAN )
+	{
+		utf16_header[ 0 ] = 0xfe;
+		utf16_header[ 1 ] = 0xff;
+	}
+	else
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header2_convert_ascii_to_utf16: undefined byte order.\n" );
+
+		ewf_header_free( utf16_header );
+
+		return( NULL );
+	}
+	/* Convert the string
+	 */
 	while( ascii_iterator < size_ascii )
 	{
-		utf16_header[ utf16_iterator + 1 ] = 0;
-		utf16_header[ utf16_iterator     ] = ascii_header[ ascii_iterator ];
-
+		if( byte_order == EWF_HEADER2_LITTLE_ENDIAN )
+		{
+			utf16_header[ utf16_iterator     ] = ascii_header[ ascii_iterator ];
+			utf16_header[ utf16_iterator + 1 ] = 0;
+		}
+		else if( byte_order == EWF_HEADER2_BIG_ENDIAN )
+		{
+			utf16_header[ utf16_iterator     ] = 0;
+			utf16_header[ utf16_iterator + 1 ] = ascii_header[ ascii_iterator ];
+		}
 		ascii_iterator += 1;
 		utf16_iterator += 2;
 	}
@@ -149,11 +197,20 @@ EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, size_t
 }
 
 /* Reads the header2 from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
-EWF_HEADER *ewf_header2_read( int file_descriptor, size_t size )
+EWF_HEADER *ewf_header2_read( int file_descriptor, uint32_t size )
 {
-	EWF_HEADER *uncompressed_header = ewf_header_read( file_descriptor, &size );
-	EWF_HEADER *ascii_header        = ewf_header2_convert_utf16_to_ascii( uncompressed_header, size );
+	EWF_HEADER *uncompressed_header = NULL;
+	EWF_HEADER *ascii_header        = NULL;
+
+	uncompressed_header = ewf_header_read( file_descriptor, &size );
+
+	if( uncompressed_header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "ewf_header2_read: unable to read uncompressed header.\n" );
+	}
+	ascii_header = ewf_header2_convert_utf16_to_ascii( uncompressed_header, size );
 
 	ewf_header_free( uncompressed_header );
 

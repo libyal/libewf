@@ -1,19 +1,10 @@
 /*
- * EWF header section specification
+ * EWF header section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,30 +33,31 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <zlib.h>
 
-#include "notify.h"
+#include "libewf_common.h"
+#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 #include "ewf_header.h"
 
-/* Allocates memory for a new efw header struct
+/* Allocates memory for a new ewf header struct
+ * Return a pointer to the new instance, NULL on error
  */
-EWF_HEADER *ewf_header_alloc( size_t size )
+EWF_HEADER *ewf_header_alloc( uint32_t size )
 {
-	size_t header_size = sizeof( EWF_HEADER ) * size;
-	EWF_HEADER *header = (EWF_HEADER *) malloc( header_size );
+	EWF_HEADER *header   = NULL;
+	uint32_t header_size = 0;
+
+	header_size = size * sizeof( EWF_HEADER );
+	header      = (EWF_HEADER *) libewf_alloc_cleared( header_size );
 
 	if( header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header_alloc: unable to allocate ewf_header\n" );
-	}
-	memset( header, 0, header_size );
+		LIBEWF_WARNING_PRINT( "ewf_header_alloc: unable to allocate ewf_header.\n" );
 
+		return( NULL );
+	}
 	return( header );
 }
 
@@ -75,97 +67,169 @@ void ewf_header_free( EWF_HEADER *header )
 {
 	if( header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header_free: invalid header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_header_free: invalid header.\n" );
+
+		return;
 	}
-	free( header );
+	libewf_free( header );
 }
 
 /* Uncompresses the header
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_HEADER *ewf_header_uncompress( EWF_HEADER *compressed_header, uint32_t *size )
 {
-	EWF_HEADER *header;
-	int result;
-	uint32_t compressed_size = *size;
-
-	/* Make sure the target buffer for the uncompressed data is large enough
-	 */
-	*size *= 16;
+	EWF_HEADER *uncompressed_header = NULL;
+	uint32_t compressed_size        = 0;
+	int8_t result                   = 0;
 
 	if( compressed_header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header_uncompress: invalid compressed_header.\n" );
-	}
-	header = ewf_header_alloc( (size_t) *size );
-	result = ewf_uncompress( (uint8_t *) header, size, (uint8_t *) compressed_header, compressed_size );
+		LIBEWF_WARNING_PRINT( "ewf_header_uncompress: invalid compressed header.\n" );
 
-	if( result != Z_OK )
+		return( NULL );
+	}
+	if( size == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header_uncompress: unable to uncompress header.\n" );
-	}
-	return( header );
-}
+		LIBEWF_WARNING_PRINT( "ewf_header_uncompress: invalid size.\n" );
 
-/* Compresses the header
- */
-EWF_HEADER *ewf_header_compress( EWF_HEADER *header, uint32_t *size, int8_t compression_level )
-{
-	EWF_HEADER *compressed_header;
-	int result;
-	uint32_t uncompressed_size = *size;
+		return( NULL );
+	}
+	compressed_size = *size;
 
 	/* Make sure the target buffer for the uncompressed data is large enough
 	 */
 	*size *= 16;
 
-	if( header == NULL )
-	{
-		LIBEWF_FATAL_PRINT( "ewf_header_compress: invalid header.\n" );
-	}
-	compressed_header = ewf_header_alloc( (size_t) *size );
-	result            = ewf_compress( (uint8_t *) compressed_header, size, (uint8_t *) header, uncompressed_size, compression_level );
+	uncompressed_header = ewf_header_alloc( *size );
 
-	if( result != Z_OK )
+	if( uncompressed_header == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_header_compress: unable to compress header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_header_uncompress: unable to allocate uncompressed header.\n" );
+
+		return( NULL );
+	}
+	result = ewf_uncompress( (uint8_t *) uncompressed_header, size, (uint8_t *) compressed_header, compressed_size );
+
+	if( result == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_uncompress: unable to uncompress header.\n" );
+
+		ewf_header_free( uncompressed_header );
+
+		return( NULL );
+	}
+	return( uncompressed_header );
+}
+
+/* Compresses the header
+ * Return a pointer to the new instance, NULL on error
+ */
+EWF_HEADER *ewf_header_compress( EWF_HEADER *uncompressed_header, uint32_t *size, int8_t compression_level )
+{
+	EWF_HEADER *compressed_header = NULL;
+	uint32_t uncompressed_size    = 0;
+	int8_t result                 = 0;
+
+	if( uncompressed_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_compress: invalid uncompressed header.\n" );
+
+		return( NULL );
+	}
+	if( size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_compress: invalid size.\n" );
+
+		return( NULL );
+	}
+	uncompressed_size = *size;
+
+	/* Make sure the target buffer for the uncompressed data is large enough
+	 */
+	*size *= 16;
+
+	compressed_header = ewf_header_alloc( *size );
+
+	if( compressed_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_compress: unable to allocate compressed header.\n" );
+
+		return( NULL );
+	}
+	result = ewf_compress( (uint8_t *) compressed_header, size, (uint8_t *) uncompressed_header, uncompressed_size, compression_level );
+
+	if( result == -1 )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_compress: unable to compress header.\n" );
+
+		ewf_header_free( compressed_header );
+
+		return( NULL );
 	}
 	return( compressed_header );
 }
 
 /* Reads the header from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
-EWF_HEADER *ewf_header_read( int file_descriptor, size_t *size )
+EWF_HEADER *ewf_header_read( int file_descriptor, uint32_t *size )
 {
-	EWF_HEADER *header;
-	EWF_HEADER *compressed_header = ewf_header_alloc( *size );
+	EWF_HEADER *uncompressed_header = NULL;
+	EWF_HEADER *compressed_header   = NULL;
+	int32_t count                   = 0;
 
-	ssize_t count = read( file_descriptor, compressed_header, *size );
+	if( size == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_read: invalid size.\n" );
+
+		return( NULL );
+	}
+	compressed_header = ewf_header_alloc( *size );
+
+	if( compressed_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_read: unable to allocate compressed header.\n" );
+
+		return( NULL );
+	}
+	count = libewf_read( file_descriptor, compressed_header, *size );
 
 	if( count < *size )
 	{
-		free( compressed_header );
+		LIBEWF_WARNING_PRINT( "ewf_header_read: unable to read EWF header.\n" );
 
-		LIBEWF_FATAL_PRINT( "ewf_header_read: unable to read ewf_header\n" );
+		ewf_header_free( compressed_header );
+
+		return( NULL );
 	}
-	header = ewf_header_uncompress( compressed_header, (uint32_t *) size );
+	uncompressed_header = ewf_header_uncompress( compressed_header, size );
 
-	return( header );
+	if( uncompressed_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_read: unable to uncompress EWF header.\n" );
+
+		ewf_header_free( compressed_header );
+
+		return( NULL );
+	}
+	return( uncompressed_header );
 }
 
 /* Writes the header to a file descriptor
- * Returns a -1 on error, the amount of bytes written on success
+ * Returns the amount of bytes written on success, -1 on error
  */
-ssize_t ewf_header_write( EWF_HEADER *header, int file_descriptor, size_t size )
+int32_t ewf_header_write( EWF_HEADER *header, int file_descriptor, uint32_t size )
 {
-	ssize_t count;
+	int32_t count = 0;
 
 	if( header == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_header_write: invalid header.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_header_write: invalid header.\n" );
 
 		return( -1 );
 	}
-	count = write( file_descriptor, header, size );
+	count = libewf_write( file_descriptor, header, size );
 
 	if( count < size )
 	{
@@ -176,11 +240,20 @@ ssize_t ewf_header_write( EWF_HEADER *header, int file_descriptor, size_t size )
 
 /* Print the header data to a stream
  */
-void ewf_header_fprint( FILE *stream, EWF_HEADER *header )
+void ewf_header_fprint( FILE *stream, EWF_HEADER *uncompressed_header )
 {
-	if ( ( stream != NULL ) && ( header != NULL ) )
+	if( stream == NULL )
 	{
-		fprintf( stream, "%s", (char *) header );
+		LIBEWF_WARNING_PRINT( "ewf_header_fprint: invalid stream.\n" );
+
+		return;
 	}
+	if( uncompressed_header == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_header_fprint: invalid uncompressed header.\n" );
+
+		return;
+	}
+	fprintf( stream, "%s", (char *) uncompressed_header );
 }
 

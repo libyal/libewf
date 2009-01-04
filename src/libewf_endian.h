@@ -53,6 +53,7 @@ uint64_t convert_64bit( uint8_t *bytes );
 void revert_16bit( uint16_t value, uint8_t *bytes );
 void revert_32bit( uint32_t value, uint8_t *bytes );
 void revert_64bit( uint64_t value, uint8_t *bytes );
+void swap_byte_pairs( uint8_t *buffer, uint64_t size );
 
 #endif
 

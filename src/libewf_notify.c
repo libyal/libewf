@@ -4,16 +4,7 @@
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -46,37 +37,38 @@
 #include <stdlib.h>
 
 #include "definitions.h"
-#include "notify.h"
+#include "libewf_notify.h"
 
 #ifdef __STDC__
 
 #include <stdarg.h>
 
-#define VARARGS( function, type, argument )	function( type argument, ... )
-#define VASTART( argument_list, type, name )	va_start( argument_list, name )
-#define VAEND( argument_list )			va_end( argument_list )
+#define VARARGS( function, type, argument )		function( type argument, ... )
+#define VARARGS_EXCEPTION( function, type, argument )	function( void *exception, type argument, ... )
+#define VASTART( argument_list, type, name )		va_start( argument_list, name )
+#define VAEND( argument_list )				va_end( argument_list )
 
 #else
 
 #include <varargs.h>
 
-#define VARARGS( function, type, argument )	function( va_alist ) va_dcl
-#define VASTART( argument_list, type, name )	{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
-#define VAEND( argument_list )			va_end( argument_list ); }
+#define VARARGS( function, type, argument )		function( va_alist ) va_dcl
+#define VARARGS_EXCEPTION( function, type, argument )	function( void *exception, va_alist ) va_dcl
+#define VASTART( argument_list, type, name )		{ type name; va_start( argument_list ); name = va_arg( argument_list, type )
+#define VAEND( argument_list )				va_end( argument_list ); }
 
 #endif
 
-uint8_t libewf_verbose           = 0;
-uint8_t libewf_warning_non_fatal = 0;
+uint8_t libewf_verbose = 0;
 
 /* Print a remark on stderr and continue
  */
 void VARARGS( libewf_verbose_print, char *, format )
 {
+	va_list argument_list;
+
 	if( libewf_verbose != 0 )
 	{
-		va_list argument_list;
-
 		VASTART( argument_list, char *, format );
 
 		vfprintf( stderr, format, argument_list );
@@ -96,11 +88,6 @@ void VARARGS( libewf_warning_print, char *, format )
 	vfprintf( stderr, format, argument_list );
 
 	VAEND( argument_list );
-
-	if( libewf_warning_non_fatal != 0 )
-	{
-		exit( EXIT_FAILURE );
-	}
 }
 
 /* Print a fatal error on stderr, and terminate
@@ -116,6 +103,22 @@ void VARARGS( libewf_fatal_print, char *, format )
 	VAEND( argument_list );
 
 	exit( EXIT_FAILURE );
+}
+
+/* Throws an exception
+ */
+void VARARGS_EXCEPTION( libewf_throw_exception, char *, format )
+{
+	va_list argument_list;
+
+	if( libewf_verbose != 0 )
+	{
+		VASTART( argument_list, char *, format );
+
+		vfprintf( stderr, format, argument_list );
+
+		VAEND( argument_list );
+	}
 }
 
 /* Prints a dump of data

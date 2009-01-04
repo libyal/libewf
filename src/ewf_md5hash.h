@@ -45,15 +45,16 @@
 #ifndef _EWFMD5HASH_H
 #define _EWFMD5HASH_H
 
-#include <sys/types.h>
+#include <inttypes.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define EWF_MD5HASH uint8_t
-
+#define EWF_MD5HASH ewf_md5hash_t
 #define EWF_MD5HASH_SIZE ( sizeof( EWF_MD5HASH ) * 16 )
+
+typedef uint8_t ewf_md5hash_t;
 
 EWF_MD5HASH *ewf_md5hash_alloc( void );
 void ewf_md5hash_free( EWF_MD5HASH *md5hash );

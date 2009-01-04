@@ -45,7 +45,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "section_list.h"
 
@@ -57,7 +57,7 @@ LIBEWF_SECTION_LIST_ENTRY *libewf_section_list_entry_alloc( void )
 
 	if( section_list_entry == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_list_entry_alloc: unable to allocate section_list_entry\n" );
+		LIBEWF_FATAL_PRINT( "libewf_section_list_entry_alloc: unable to allocate section_list_entry.\n" );
 	}
 	section_list_entry->file_descriptor = -1;
 	section_list_entry->start_offset    = 0;
@@ -75,7 +75,7 @@ LIBEWF_SECTION_LIST *libewf_section_list_alloc( void )
 
 	if( section_list == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_section_list_alloc: unable to allocate section_list\n" );
+		LIBEWF_FATAL_PRINT( "libewf_section_list_alloc: unable to allocate section_list.\n" );
 	}
 	section_list->first = NULL;
 	section_list->last = NULL;

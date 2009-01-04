@@ -52,7 +52,7 @@
 
 #include "definitions.h"
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_compress.h"
 #include "file.h"

@@ -1,19 +1,10 @@
 /*
- * libewf notification
+ * Common code for libewf - wraps external function calls
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,33 +33,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LIBEWF_NOTIFY_H
-#define _LIBEWF_NOTIFY_H
+#ifndef _LIBEWF_COMMON_H
+#define _LIBEWF_COMMON_H
 
 #include <inttypes.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#define LIBEWF_VERBOSE_EXEC( code ) if( libewf_verbose != 0 ) { code };
-
-#define LIBEWF_VERBOSE_PRINT libewf_verbose_print
-#define LIBEWF_WARNING_PRINT libewf_warning_print
-#define LIBEWF_FATAL_PRINT libewf_fatal_print
-
-extern uint8_t libewf_verbose;
-extern uint8_t libewf_warning_non_fatal;
-
-extern void libewf_verbose_print( char *, ... );
-extern void libewf_warning_print( char *, ... );
-extern void libewf_fatal_print( char *, ... );
-
-void libewf_dump_data( uint8_t *data, size_t size );
-
-#ifdef __cplusplus
-}
-#endif
+void *libewf_alloc( uint32_t size );
+void libewf_free( void *buffer );
+void *libewf_memset( void *buffer, uint8_t value, uint32_t count );
+int32_t libewf_memcmp( const void *buffer1, const void *buffer2, uint32_t size );
+uint32_t libewf_strlen( const char *string );
+int32_t libewf_read( int file_descriptor, void *buffer, uint32_t count );
+int32_t libewf_write( int file_descriptor, const void *buffer, uint32_t count );
+void *libewf_alloc_cleared( uint32_t size );
 
 #endif
 

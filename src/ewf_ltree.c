@@ -1,5 +1,5 @@
 /*
- * EWF hash section specification
+ * EWF ltree section specification
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -51,87 +51,116 @@
 #include "libewf_notify.h"
 
 #include "ewf_crc.h"
-#include "ewf_file_header.h"
-#include "ewf_hash.h"
+#include "ewf_header2.h"
+#include "ewf_ltree.h"
 
-/* Allocates memory for a new ewf hash struct
+/* Allocates memory for a new ewf ltree struct
  */
-EWF_HASH *ewf_hash_alloc( void )
+EWF_LTREE *ewf_ltree_alloc( void )
 {
-	EWF_HASH *hash = (EWF_HASH *) malloc( EWF_HASH_SIZE );
+	EWF_LTREE *ltree = (EWF_LTREE *) malloc( EWF_LTREE_SIZE );
 
-	if( hash == NULL )
+	if( ltree == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_hash_alloc: unable to allocate ewf_hash.\n" );
+		LIBEWF_FATAL_PRINT( "ewf_ltree_alloc: unable to allocate ewf_ltree.\n" );
 	}
-	memset( hash, 0, EWF_HASH_SIZE );
+	memset( ltree, 0, EWF_LTREE_SIZE );
 
-	memcpy( (uint8_t *) hash->signature, (uint8_t *) evf_file_signature, 8 );
-
-	return( hash );
+	return( ltree );
 }
 
-/* Frees memory of a hash
+/* Frees memory of a ltree
  */
-void ewf_hash_free( EWF_HASH *hash )
+void ewf_ltree_free( EWF_LTREE *ltree )
 {
-	if( hash == NULL )
+	if( ltree == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_hash_free: invalid hash.\n" );
+		LIBEWF_FATAL_PRINT( "ewf_ltree_free: invalid ltree.\n" );
 	}
-	free( hash );
+	free( ltree );
 }
 
-/* Reads the hash from a file descriptor
+/* Reads the ltree from a file descriptor
  */
-EWF_HASH *ewf_hash_read( int file_descriptor )
+EWF_LTREE *ewf_ltree_read( int file_descriptor )
 {
-	EWF_HASH *hash = ewf_hash_alloc();
+	EWF_LTREE *ltree = ewf_ltree_alloc();
+	ssize_t count    = read( file_descriptor, ltree, EWF_LTREE_SIZE );
 
-	ssize_t count = read( file_descriptor, hash, EWF_HASH_SIZE );
-
-	if( count < EWF_HASH_SIZE )
+	if( count < EWF_LTREE_SIZE )
 	{
-		ewf_hash_free( hash );
+		ewf_ltree_free( ltree );
 
-		LIBEWF_FATAL_PRINT( "ewf_hash_read: unable to read ewf_hash.\n" );
+		LIBEWF_FATAL_PRINT( "ewf_ltree_read: unable to read ewf_ltree.\n" );
 	}
-	return( hash );
+	return( ltree );
 }
 
-/* Writes the hash to a file descriptor
+/* Writes the ltree to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_hash_write( EWF_HASH *hash, int file_descriptor )
+ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor )
 {
 	EWF_CRC *crc  = NULL;
 	ssize_t count = 0;
-	size_t size   = EWF_HASH_SIZE;
+	size_t size   = EWF_LTREE_SIZE;
 
-	if( hash == NULL )
+	if( ltree == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_hash_write: invalid hash.\n" );
+		LIBEWF_VERBOSE_PRINT( "ewf_ltree_write: invalid ltree.\n" );
 
 		return( -1 );
 	}
-	crc = ewf_crc_calculate( (void *) hash, ( size - EWF_CRC_SIZE ), 1 );
+/*
+	crc = ewf_crc_calculate( (void *) ltree, ( size - EWF_CRC_SIZE ), 1 );
 
-	if( crc == NULL )
+	if( ltree == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_hash_write: unable to calculate CRC.\n" );
+		LIBEWF_VERBOSE_PRINT( "ewf_ltree_write: unable to calculate CRC.\n" );
 
 		return( -1 );
 	}
-	revert_32bit( *crc, hash->crc );
+	revert_32bit( *crc, ltree->crc );
 
 	ewf_crc_free( crc );
+*/
 
-	count = write( file_descriptor, hash, size );
+	count = write( file_descriptor, ltree, size );
 
 	if( count < size )
 	{
 		return( -1 );
 	}
 	return( count );
+}
+
+/* Reads the tree data from a file descriptor
+ * Test function
+ */
+EWF_HEADER *ewf_tree_data_read( int file_descriptor, size_t size )
+{
+	EWF_HEADER *ascii_header        = NULL;
+	EWF_HEADER *uncompressed_header = NULL;
+	ssize_t count                   = 0;
+
+	uncompressed_header = ewf_header_alloc( size );
+
+	if( uncompressed_header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "ewf_ltree_data_read: invalid uncompressed header.\n" );
+	}
+	count = read( file_descriptor, uncompressed_header, size );
+
+	if( count < size )
+	{
+		free( uncompressed_header );
+
+		LIBEWF_FATAL_PRINT( "ewf_tree_data_read: unable to read tree_data.\n" );
+	}
+	ascii_header = ewf_header2_convert_utf16_to_ascii( uncompressed_header, size );
+
+	ewf_header_free( uncompressed_header );
+
+	return( ascii_header );
 }
 

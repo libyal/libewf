@@ -55,7 +55,7 @@
 #include <errno.h>
 
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 #include "md5.h"
 
 #include "ewf_compress.h"
@@ -103,18 +103,23 @@ int test_empty_block( uint8_t *block_buffer, uint64_t block_size )
  */
 int64_t libewf_section_write( LIBEWF_HANDLE *handle, int file_descriptor, char *section_type, uint64_t section_data_size, uint64_t start_offset )
 {
-	EWF_SECTION *section     = NULL;
-	size_t section_type_size = 0;
-	uint64_t section_size    = 0;
-	uint64_t section_offset  = 0;
-	ssize_t write_count      = 0;
+	EWF_SECTION *section       = NULL;
+	uint32_t section_type_size = 0;
+	uint64_t section_size      = 0;
+	uint64_t section_offset    = 0;
+	ssize_t write_count        = 0;
 
 	if( handle == NULL )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_write: incorrect handle.\n" );
 	}
-	section           = ewf_section_alloc();
-	section_type_size = strlen( section_type );
+	section = ewf_section_alloc();
+
+	if( section == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_write: unable to create section.\n" );
+	}
+	section_type_size = libewf_strlen( section_type );
 	section_size      = EWF_SECTION_SIZE + section_data_size;
 	section_offset    = start_offset + section_size;
 
@@ -143,18 +148,23 @@ int64_t libewf_section_write( LIBEWF_HANDLE *handle, int file_descriptor, char *
  */
 int64_t libewf_last_section_write( LIBEWF_HANDLE *handle, int file_descriptor, char *section_type, uint64_t start_offset )
 {
-	EWF_SECTION *section     = NULL;
-	size_t section_type_size = 0;
-	uint64_t section_size    = 0;
-	uint64_t section_offset  = 0;
-	ssize_t write_count      = 0;
+	EWF_SECTION *section       = NULL;
+	uint64_t section_size      = 0;
+	uint64_t section_offset    = 0;
+	uint32_t section_type_size = 0;
+	int32_t write_count        = 0;
 
 	if( handle == NULL )
 	{
 		LIBEWF_FATAL_PRINT( "libewf_last_section_write: incorrect handle.\n" );
 	}
-	section           = ewf_section_alloc();
-	section_type_size = strlen( section_type );
+	section = ewf_section_alloc();
+
+	if( section == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_last_section_write: unable to create section.\n" );
+	}
+	section_type_size = libewf_strlen( section_type );
 	section_size      = EWF_SECTION_SIZE;
 	section_offset    = start_offset;
 
@@ -194,12 +204,22 @@ int64_t libewf_section_header_write( LIBEWF_HANDLE *handle, int file_descriptor,
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_header_write: incorrect header.\n" );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_section_header_write: Header:\n" );
+	LIBEWF_VERBOSE_PRINT( "libewf_section_header_write: Header:.\n" );
 	LIBEWF_VERBOSE_EXEC( ewf_header_fprint( stderr, header ); );
 
-	compressed_header   = ewf_header_compress( header, &size, compression_level );
+	compressed_header = ewf_header_compress( header, &size, compression_level );
+
+	if( compressed_header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header_write: unable to compress header.\n" );
+	}
 	section_write_count = libewf_section_write( handle, file_descriptor, "header", size, start_offset );
-	header_write_count  = ewf_header_write( compressed_header, file_descriptor, size );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header_write: unable to write section to file.\n" );
+	}
+	header_write_count = ewf_header_write( compressed_header, file_descriptor, size );
 
 	ewf_header_free( compressed_header );
 
@@ -228,14 +248,29 @@ int64_t libewf_section_header2_write( LIBEWF_HANDLE *handle, int file_descriptor
 	{
 		LIBEWF_FATAL_PRINT( "libewf_section_header2_write: incorrect header.\n" );
 	}
-	LIBEWF_VERBOSE_PRINT( "libewf_section_header2_write: Header:\n" );
+	LIBEWF_VERBOSE_PRINT( "libewf_section_header2_write: Header:.\n" );
 	LIBEWF_VERBOSE_EXEC( ewf_header_fprint( stderr, header ); );
 
-	size_utf16          = ( size * 2 ) + 4;
-	utf16_header        = ewf_header2_convert_ascii_to_utf16( header, size );
-	compressed_header   = ewf_header_compress( utf16_header, &size_utf16, compression_level );
+	size_utf16   = ( size * 2 ) + 4;
+	utf16_header = ewf_header2_convert_ascii_to_utf16( header, size, EWF_HEADER2_LITTLE_ENDIAN );
+
+	if( utf16_header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header2_write: unable to convert header to UTF16.\n" );
+	}
+	compressed_header = ewf_header_compress( utf16_header, &size_utf16, compression_level );
+
+	if( compressed_header == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header2_write: unable to compress header.\n" );
+	}
 	section_write_count = libewf_section_write( handle, file_descriptor, "header2", size_utf16, start_offset );
-	header_write_count  = ewf_header_write( compressed_header, file_descriptor, size_utf16 );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_header2_write: unable to write section to file.\n" );
+	}
+	header_write_count = ewf_header_write( compressed_header, file_descriptor, size_utf16 );
 
 	ewf_header_free( utf16_header );
 	ewf_header_free( compressed_header );
@@ -262,6 +297,10 @@ int64_t libewf_section_volume_write( LIBEWF_HANDLE *handle, int file_descriptor,
 	}
 	volume = ewf_volume_alloc();
 
+	if( volume == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_volume_write: unable to create volume.\n" );
+	}
 	revert_32bit( handle->chunk_count, volume->chunk_count );
 	revert_32bit( handle->sectors_per_chunk, volume->sectors_per_chunk );
 	revert_32bit( handle->bytes_per_sector, volume->bytes_per_sector );
@@ -274,6 +313,11 @@ int64_t libewf_section_volume_write( LIBEWF_HANDLE *handle, int file_descriptor,
 		volume->compression_level = handle->compression_level;
 	}
 	section_write_count = libewf_section_write( handle, file_descriptor, "volume", size, start_offset );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_volume_write: unable to write section to file.\n" );
+	}
 	volume_write_count  = ewf_volume_write( volume, file_descriptor );
 
 	ewf_volume_free( volume );
@@ -300,6 +344,10 @@ int64_t libewf_section_volume_smart_write( LIBEWF_HANDLE *handle, int file_descr
 	}
 	volume = ewf_volume_smart_alloc();
 
+	if( volume == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_volume_smart_write: unable to create volume.\n" );
+	}
 	revert_32bit( handle->chunk_count, volume->chunk_count );
 	revert_32bit( handle->sectors_per_chunk, volume->sectors_per_chunk );
 	revert_32bit( handle->bytes_per_sector, volume->bytes_per_sector );
@@ -316,7 +364,12 @@ int64_t libewf_section_volume_smart_write( LIBEWF_HANDLE *handle, int file_descr
 		volume->signature[ 4 ] = 'T';
 	}
 	section_write_count = libewf_section_write( handle, file_descriptor, "volume", size, start_offset );
-	volume_write_count  = ewf_volume_smart_write( volume, file_descriptor );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_volume_smart_write: unable to write section to file.\n" );
+	}
+	volume_write_count = ewf_volume_smart_write( volume, file_descriptor );
 
 	ewf_volume_smart_free( volume );
 
@@ -345,7 +398,12 @@ int64_t libewf_section_table_write( LIBEWF_HANDLE *handle, int file_descriptor, 
 
 	revert_32bit( offsets_amount, table->chunk_count );
 
-	section_write_count       = libewf_section_write( handle, file_descriptor, section_header, size, start_offset );
+	section_write_count = libewf_section_write( handle, file_descriptor, section_header, size, start_offset );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_table_write: unable to write section to file.\n" );
+	}
 	table_write_count         = ewf_table_write( table, file_descriptor );
 	table_offsets_write_count = ewf_table_offsets_write( offsets, file_descriptor, offsets_amount );
 
@@ -377,6 +435,10 @@ int64_t libewf_section_data_write( LIBEWF_HANDLE *handle, int file_descriptor, u
 	}
 	data = ewf_data_alloc();
 
+	if( data == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_data_write: unable to create data.\n" );
+	}
 	revert_32bit( handle->chunk_count, data->chunk_count );
 	revert_32bit( handle->sectors_per_chunk, data->sectors_per_chunk );
 	revert_32bit( handle->bytes_per_sector, data->bytes_per_sector );
@@ -387,7 +449,12 @@ int64_t libewf_section_data_write( LIBEWF_HANDLE *handle, int file_descriptor, u
 		data->compression_level = handle->compression_level;
 	}
 	section_write_count = libewf_section_write( handle, file_descriptor, "data", size, start_offset );
-	data_write_count    = ewf_data_write( data, file_descriptor );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_data_write: unable to write section to file.\n" );
+	}
+	data_write_count = ewf_data_write( data, file_descriptor );
 
 	ewf_data_free( data );
 
@@ -416,7 +483,12 @@ int64_t libewf_section_error2_write( LIBEWF_HANDLE *handle, int file_descriptor,
 
 	revert_32bit( sectors_amount, error2->error_count );
 
-	section_write_count        = libewf_section_write( handle, file_descriptor, "error2", size, start_offset );
+	section_write_count = libewf_section_write( handle, file_descriptor, "error2", size, start_offset );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_error2_write: unable to write section to file.\n" );
+	}
 	error2_write_count         = ewf_error2_write( error2, file_descriptor );
 	error2_sectors_write_count = ewf_error2_sectors_write( sectors, file_descriptor, sectors_amount );
 
@@ -451,7 +523,12 @@ int64_t libewf_section_hash_write( LIBEWF_HANDLE *handle, int file_descriptor, u
 	memcpy( (uint8_t *) hash->md5hash, (uint8_t *) md5hash, EWF_MD5HASH_SIZE );
 
 	section_write_count = libewf_section_write( handle, file_descriptor, "hash", size, start_offset );
-	hash_write_count    = ewf_hash_write( hash, file_descriptor );
+
+	if( section_write_count == -1 )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_section_hash_write: unable to write section to file.\n" );
+	}
+	hash_write_count = ewf_hash_write( hash, file_descriptor );
 
 	ewf_hash_free( hash );
 
@@ -640,19 +717,19 @@ int64_t libewf_read_chunk_data( int input_file_descriptor, uint8_t *buffer, uint
 	{
 		if( errno == ESPIPE )
 		{
-			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: Invalid seek\n" );
+			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: Invalid seek.\n" );
 		}
 		else if( errno == EPERM )
 		{
-			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: Operation not permitted\n" );
+			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: Operation not permitted.\n" );
 		}
 		else if( errno == ENXIO )
 		{
-			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: No such device or address\n" );
+			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: No such device or address.\n" );
 		}
 		else if( errno == ENODEV )
 		{
-			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: No such device\n" );
+			LIBEWF_FATAL_PRINT( "libewf_read_chunk: error reading data: No such device.\n" );
 		}
 	}
 	return( read_count );
@@ -664,13 +741,14 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 {
 	LIBEWF_MD5_CTX md5;
 
-	char *filename                         = NULL;
-	char *extension                        = NULL;
-	char *calculated_md5hash_string        = NULL;
-	char *table_section_string             = NULL;
-	EWF_FILE_HEADER *file_header           = NULL;
-	EWF_TABLE_OFFSET *offsets              = NULL;
-	EWF_MD5HASH *calculated_md5hash        = NULL;
+	char *filename                          = NULL;
+	char *extension                         = NULL;
+	char *calculated_md5hash_string         = NULL;
+	char *table_section_string              = NULL;
+	EWF_FILE_HEADER *file_header            = NULL;
+	EWF_TABLE_OFFSET *offsets               = NULL;
+	EWF_MD5HASH *calculated_md5hash         = NULL;
+	EWF_CRC *crc                            = NULL;
 
 	int64_t total_write_count               = 0;
 	int64_t total_read_count                = 0;
@@ -706,7 +784,6 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 	uint8_t maximum_chunk_write_iterations  = 1;
 	uint8_t chunk_write_iterator            = 0;
 	int result                              = 0;
-	EWF_CRC crc                             = 0;
 
 	if( handle == NULL )
 	{
@@ -733,7 +810,12 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 		LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to allocate filename.\n" );
 	}
 	file_header = ewf_file_header_alloc();
+	crc         = ewf_crc_alloc();
 
+	if( crc == NULL )
+	{
+		LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to create CRC.\n" );
+	}
 	/* Make sure the compressed data size buffer is large enough
 	 * zlib compression can enlarge the data
 	 * about 1024 bytes should be enough
@@ -763,7 +845,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 		}
 		handle->segment_table = libewf_segment_table_set_values( handle->segment_table, segment, filename, -1 );
 
-		LIBEWF_VERBOSE_PRINT( "\nlibewf_write_from_file_descriptor: segment file to write: %" PRIu32 " with name: %s\n", segment, filename );
+		LIBEWF_VERBOSE_PRINT( ".\nlibewf_write_from_file_descriptor: segment file to write: %" PRIu32 " with name: %s.\n", segment, filename );
 
 		if( segment != 1 )
 		{
@@ -834,7 +916,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 		sectors_chunk_amount   = sectors_size / ( handle->chunk_size + EWF_CRC_SIZE );
 		remaining_chunk_amount = handle->chunk_count - total_chunk_write_count;
 
-		LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: calculated amount of chunks: %d\n", sectors_chunk_amount );
+		LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: calculated amount of chunks: %d.\n", sectors_chunk_amount );
 
 		if( remaining_chunk_amount < handle->chunks_per_file )
 		{
@@ -879,7 +961,12 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 				}
 				/* Write sectors section start
 				 */
-				write_count          = libewf_section_write( handle, handle->segment_table->file_descriptor[ segment ], "sectors", sectors_size, segment_file_offset );
+				write_count = libewf_section_write( handle, handle->segment_table->file_descriptor[ segment ], "sectors", sectors_size, segment_file_offset );
+
+				if( write_count == -1 )
+				{
+					LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to write section to file.\n" );
+				}
 				segment_file_offset += write_count;
 				total_write_count   += write_count;
 			}
@@ -950,7 +1037,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 				 */
 				handle = libewf_handle_cache_wipe( handle );
 
-				LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: reading chunk: %d with size: %" PRIu32 "\n", chunk_amount, handle->chunk_size );
+				LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: reading chunk: %d with size: %" PRIu32 ".\n", chunk_amount, handle->chunk_size );
 
 				bytes_to_read     = handle->chunk_size;
 				read_error_offset = 0;
@@ -960,7 +1047,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 				{
 					read_count = libewf_read_chunk_data( input_file_descriptor, &handle->raw_data[ read_error_offset ], bytes_to_read );
 
-					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: read chunk: %d with size: %" PRIi64 "\n", chunk_amount, read_count );
+					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: read chunk: %d with size: %" PRIi64 ".\n", chunk_amount, read_count );
 
 					/* The last read is OK, correct read_count
 					 */
@@ -992,7 +1079,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 					{
 						read_error_offset += read_count;
 					}
-					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: read error: %d at offset %" PRIu64 "\n", errno, ( total_read_count + read_error_offset ) );
+					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: read error: %d at offset %" PRIu64 ".\n", errno, ( total_read_count + read_error_offset ) );
 
 					if( read_error_count >= handle->read_error_retry )
 					{
@@ -1038,7 +1125,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 						error2_sector       /= handle->bytes_per_sector;
 						error2_sector_count /= handle->bytes_per_sector;
 
-						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: adding error2: %" PRIi32 " sector: %" PRIu32 ", count: %" PRIu32 "\n", total_read_error_count, error2_sector, error2_sector_count );
+						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: adding error2: %" PRIi32 " sector: %" PRIu32 ", count: %" PRIu32 ".\n", total_read_error_count, error2_sector, error2_sector_count );
 						revert_32bit( error2_sector, handle->error2_sectors[ total_read_error_count - 1 ].sector );
 						revert_32bit( error2_sector_count, handle->error2_sectors[ total_read_error_count - 1 ].sector_count );
 
@@ -1064,6 +1151,10 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 				}
 				total_read_count += read_count;
 
+				if( handle->swap_byte_pairs == 1 )
+				{
+					swap_byte_pairs( handle->raw_data, read_count );
+				}
 				/* Callback for status update
 				 */
 				if( callback != NULL )
@@ -1080,18 +1171,18 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 				{
 					result = ewf_sectors_chunk_compress( handle->chunk_data, &compressed_data_size, handle->raw_data, read_count, handle->compression_level );
 
-					if( result != Z_OK )
+					if( result != 1 )
 					{
-						LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to compress chunk: %d\n", chunk_amount );
+						LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to compress chunk: %d.\n", chunk_amount );
 					}
 				}
 				else if( ( handle->compress_empty_block == 1 ) && ( test_empty_block( handle->raw_data, read_count ) == 1 ) )
 				{
 					result = ewf_sectors_chunk_compress( handle->chunk_data, &compressed_data_size, handle->raw_data, read_count, EWF_COMPRESSION_DEFAULT );
 
-					if( result != Z_OK )
+					if( result != 1 )
 					{
-						LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to compress empty chunk: %d\n", chunk_amount );
+						LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to compress empty chunk: %d.\n", chunk_amount );
 					}
 				}
 				if( ( handle->ewf_format == EWF_FORMAT_S01 ) || ( compressed_data_size < handle->chunk_size ) )
@@ -1103,11 +1194,11 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 					memcpy( (uint8_t *) &crc, (uint8_t *) &handle->chunk_data[ compressed_data_size - EWF_CRC_SIZE ], EWF_CRC_SIZE );
 
-					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: writing COMPRESSED chunk: %d at offset: %" PRIu64 " with size: %" PRIu64 ", with crc: %" PRIu32 "\n", chunk_amount, segment_file_offset, write_size, crc );
+					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: writing COMPRESSED chunk: %d at offset: %" PRIu64 " with size: %" PRIu64 ", with CRC: %" PRIu32 ".\n", chunk_amount, segment_file_offset, write_size, crc );
 
 					if( sectors_chunk_amount <= chunk_amount )
 					{
-						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: enlarging offsets size: %" PRIu32 ", required: %" PRIu32 "\n", sectors_chunk_amount, chunk_amount );
+						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: enlarging offsets size: %" PRIu32 ", required: %" PRIu32 ".\n", sectors_chunk_amount, chunk_amount );
 
 						offsets = ewf_table_offsets_realloc( offsets, ( chunk_amount + 1 ) );
 
@@ -1119,17 +1210,21 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 				{
 					write_size = read_count + EWF_CRC_SIZE;
 
-					crc = ewf_crc( (void *) handle->raw_data, read_count, 1 );
+					crc = ewf_crc_calculate( (void *) handle->raw_data, read_count, 1 );
 
-					revert_32bit( crc, &handle->raw_data[ read_count ] );
+					if( crc == NULL )
+					{
+						LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to calculate CRC.\n" );
+					}
+					revert_32bit( *crc, &handle->raw_data[ read_count ] );
 
-					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: writing UNCOMPRESSED chunk: %d at offset: %" PRIu64 " with size: %" PRIu64 ", with crc: %" PRIu32 "\n", chunk_amount, segment_file_offset, write_size, crc );
+					LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: writing UNCOMPRESSED chunk: %d at offset: %" PRIu64 " with size: %" PRIu64 ", with CRC: %" PRIu32 ".\n", chunk_amount, segment_file_offset, write_size, *crc );
 
 					write_count = ewf_sectors_chunk_write( handle->raw_data, handle->segment_table->file_descriptor[ segment ], write_size );
 
 					if( sectors_chunk_amount <= chunk_amount )
 					{
-						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: enlarging offsets size: %" PRIu32 ", required: %" PRIu32 "\n", sectors_chunk_amount, chunk_amount );
+						LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: enlarging offsets size: %" PRIu32 ", required: %" PRIu32 ".\n", sectors_chunk_amount, chunk_amount );
 
 						offsets = ewf_table_offsets_realloc( offsets, ( chunk_amount + 1 ) );
 
@@ -1140,7 +1235,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 				if( write_count != write_size )
 				{
-					LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to write data\n" );
+					LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to write data.\n" );
 				}
 				segment_file_offset += write_count;
 				total_write_count   += write_count;
@@ -1155,27 +1250,32 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 			if( lseek( handle->segment_table->file_descriptor[ segment ], (off_t) data_chunks_offset, SEEK_SET ) == -1 )
 			{
-				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to find offset to correct sectors size\n" );
+				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to find offset to correct sectors size.\n" );
 			}
 			if( handle->ewf_format == EWF_FORMAT_E01 )
 			{
 				/* Rewrite sectors section start
 				 */
-				libewf_section_write( handle, handle->segment_table->file_descriptor[ segment ], "sectors", sectors_write_count, data_chunks_offset );
-				LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: correcting sectors section size: %" PRIu64 " offset: %" PRIu64 "\n", sectors_write_count, data_chunks_offset );
+				write_count = libewf_section_write( handle, handle->segment_table->file_descriptor[ segment ], "sectors", sectors_write_count, data_chunks_offset );
+
+				if( write_count == -1 )
+				{
+					LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to rewrite sectors section to file.\n" );
+				}
+				LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: correcting sectors section size: %" PRIu64 " offset: %" PRIu64 ".\n", sectors_write_count, data_chunks_offset );
 			}
 			else if( handle->ewf_format == EWF_FORMAT_S01 )
 			{
 				/* Rewrite table section start
 				 */
 				libewf_section_table_write( handle, handle->segment_table->file_descriptor[ segment ], data_chunks_offset, offsets, sectors_chunk_amount, table_section_string, sectors_write_count );
-				LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: correcting table section size: %" PRIu64 " offset: %" PRIu64 "\n", sectors_write_count, data_chunks_offset );
+				LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: correcting table section size: %" PRIu64 " offset: %" PRIu64 ".\n", sectors_write_count, data_chunks_offset );
 			}
-			LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: back to end of data at offset: %" PRIu64 "\n", segment_file_offset );
+			LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: back to end of data at offset: %" PRIu64 ".\n", segment_file_offset );
 
 			if( lseek( handle->segment_table->file_descriptor[ segment ], (off_t) segment_file_offset, SEEK_SET ) == -1 )
 			{
-				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to find offset to continue\n" );
+				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to find offset to continue.\n" );
 			}
 			if( handle->ewf_format == EWF_FORMAT_E01 )
 			{
@@ -1236,13 +1336,14 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 			}
 			if( ( extension[ 0 ] == '{' ) || ( extension[ 0 ] == '[' ) )
 			{
-				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to support for more segment files\n" );
+				LIBEWF_FATAL_PRINT( "libewf_write_from_file_descriptor: unable to support for more segment files.\n" );
 			}
 		}
 	}
 	free( filename );
 	free( extension );
 	ewf_file_header_free( file_header );
+	ewf_crc_free( crc );
 
 	/* Write the data section for a single segment file
 	 * only for EWF-E01 and the segment count must be 2 (one segment file)
@@ -1273,7 +1374,7 @@ int64_t libewf_write_from_file_descriptor( LIBEWF_HANDLE *handle, int input_file
 
 	calculated_md5hash_string = ewf_md5hash_to_string( calculated_md5hash );
 
-	LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: MD5 calculated: %s\n", calculated_md5hash_string );
+	LIBEWF_VERBOSE_PRINT( "libewf_write_from_file_descriptor: MD5 calculated: %s.\n", calculated_md5hash_string );
 
 	ewf_md5hash_free( calculated_md5hash );
 

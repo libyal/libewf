@@ -48,12 +48,12 @@
 #include <string.h>
 
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_crc.h"
 #include "ewf_table.h"
 
-/* Allocates memory for a new efw table struct
+/* Allocates memory for a new ewf table struct
  */
 EWF_TABLE *ewf_table_alloc( void )
 {
@@ -172,9 +172,9 @@ EWF_TABLE_OFFSET *ewf_table_offsets_read( int file_descriptor, uint32_t amount )
  */
 ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
 {
-	EWF_CRC crc;
-	ssize_t count;
-	size_t size = EWF_TABLE_SIZE;
+	EWF_CRC *crc  = NULL;
+	ssize_t count = 0;
+	size_t size   = EWF_TABLE_SIZE;
 
 	if( table == NULL )
 	{
@@ -182,9 +182,17 @@ ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
 
 		return( -1 );
 	}
-	crc = ewf_crc( (void *) table, ( size - EWF_CRC_SIZE ), 1 );
+	crc = ewf_crc_calculate( (void *) table, ( size - EWF_CRC_SIZE ), 1 );
 
-	revert_32bit( crc, table->crc );
+	if( crc == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_table_write: unable to calculate CRC.\n" );
+
+		return( -1 );
+	}
+	revert_32bit( *crc, table->crc );
+
+	ewf_crc_free( crc );
 
 	count = write( file_descriptor, table, size );
 
@@ -200,7 +208,7 @@ ssize_t ewf_table_write( EWF_TABLE *table, int file_descriptor )
  */
 ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor, uint32_t amount )
 {
-	EWF_CRC crc       = 0;
+	EWF_CRC *crc      = NULL;
 	ssize_t count     = 0;
 	ssize_t crc_count = 0;
 	size_t size       = EWF_TABLE_OFFSET_SIZE * amount;
@@ -217,9 +225,24 @@ ssize_t ewf_table_offsets_write( EWF_TABLE_OFFSET *offsets, int file_descriptor,
 	{
 		return( -1 );
 	}
-	crc       = ewf_crc( offsets, size, 1 );
+	crc = ewf_crc_calculate( offsets, size, 1 );
+
+	if( crc == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_table_offsets_write: unable to calculate CRC.\n" );
+
+		return( -1 );
+	}
 	crc_count = ewf_crc_write( crc, file_descriptor );
 
+	ewf_crc_free( crc );
+
+	if( crc_count == -1 )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_table_offsets_write: unable to write CRC.\n" );
+
+		return( -1 );
+	}
 	return( count + crc_count );
 }
 

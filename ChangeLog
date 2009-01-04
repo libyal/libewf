@@ -1,30 +1,89 @@
 To do/think about:
 * ewfinfo: add date format in ewfinfo to month in text - no interpretation differences possible
+* ewfinfo: generate CRC list
 * header2: enhance UTF16 conversion code
 * header2: enhance utf conversion routine
 * read: always compare a data section with the volume/disk section for EWF-E01
 * read: build in additional constraints
-* read: remove file descriptor check in last_offset calculation?
-  if( ( section_list_entry->file_descriptor == file_descriptor ) && ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
 * read: correct for errors in the table or table2 section for EWF-E01
-* read: add functionality for byte swap in data for endian fix of data
-* all: Enhance error handling - no program exit but a nice return - nicer prints - return error in sector message
-* all: due to 20060505 fix give all value definitions a default value - looks nicer
-* all: add LVF support - vtree section
+* read: add functionality for byte swap in data for endian fix of data - test this
+* read: warn when maximum offsets in table of S01 format is exceeded
+* all: add LVF support - ltree section
+* all: make a more generic libewf_string (use this in ewf_header, ewf_ltree) also move ASCII and UTF code here
 * write: reduce multiple successive error2 entries to a single
 * write: add additional data to file for different EWF formats
 * ewfacquire: make size input and output human friendly (support kM notation etc)
+* ewfacquire: warn before hand if segment file amount exceeds limit
+* ewf_header_compress: is there a better way to determine the size of the uncompressed buffer
+* ewf_header_compress: ask for media type
 
 * more integration with autoconf/automake config.h
 
 Further analysis of the EWF format:
 * media type
 * password hash
-* 16 bytes in hash section
+* 16 bytes in hash section (EWF-E01)
+* ltree (EWF-L01 LVF)
 
 Possible performance improvements:
 * create a offset table per segment file - create it on demand - section list per segment table is done
 * build offset table while reading ?
+
+Code clean up:
+* all: Enhance error handling - no program exit but a nice return - nicer prints - return error in sector message
+* all: use typedefs instead of defines
+* all: due to 20060505 fix give all value definitions a default value - looks nicer
+* read: remove file descriptor check in last_offset calculation?
+  if( ( section_list_entry->file_descriptor == file_descriptor ) && ( section_list_entry->start_offset < last_offset ) && ( last_offset < section_list_entry->end_offset ) )
+* all: wrap basic library calls in preperation of thread safety of library calls
+* all: remove unrequired includes
+
+Finished:
+  - libewf_notify (c/h)
+  - libewf_common (c/h)
+  - ewf_compress (c/h)
+  - ewf_crc (c/h)
+  - ewf_data (c/h)
+  - ewf_header (c/h)
+  - ewf_header2 (c/h)
+  - ewf_section (c/h)
+  - ewf_volume (c/h)
+  - ewf_volume_smart (c/h)
+
+To do:
+  - ewf_table (c/h)
+  - ewf_file_header (c/h)
+  - ewf_sectors (c/h)
+  - ewf_md5hash (c/h)
+  - ewf_hash (c/h)
+  - ewf_error2 (c/h)
+
+Version: 20060824
+* worked on code clean up and improved error handling
+* move crc check from file_read into different EWF read methods?
+  no embedding this check in the segment types makes it more difficult
+  to generate an CRC error list for ewfinfo
+
+Version: 20060823
+* no need for fatal warnings if code becomes re-entrant after error
+* added a wrapper of basic library calls
+* worked on code clean up and improved error handling
+* renamed notify.* to libewf_notify.* prevents name clashes
+* ewf_crc function now use a dynamic allocated CRC - this helps with error propagation
+* added big endian support to ascii to utf16 routine
+
+Version: 20060822
+* added byte swap (equivalent of dd conv=swab) functionality in both read and write
+* changed sys/types.h to inttypes.h
+  all: check if sys/types definitions still needed in ewf_*.h files ? - not under linux will do a cross platform test anyway
+* started with implementing improved error handling and re-entry after error,
+  combined with code clean up, better error control, revision of header to allow for one place to maintain acknowledgements
+
+Version: 20060821
+* read: added basic support for L01 files, which are basically EWF files
+* renamed ewf_file_signature to evf_file_signature - closer to the truth
+* ewfacquire: compensate for maximum S01 file size in ewf file size question - determine maximum
+  - not relevant because there is a maximum of chunks within the file but the other data could grow to the 2 Gb
 
 Version: 20060820
 * ewfacquire: small change to confirmation

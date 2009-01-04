@@ -69,6 +69,7 @@ uint8_t libewf_compare_offset_tables( LIBEWF_OFFSET_TABLE *offset_table1, LIBEWF
 void libewf_section_table_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size, LIBEWF_SECTION_LIST *section_list );
 void libewf_section_table2_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size, LIBEWF_SECTION_LIST *section_list );
 void libewf_section_sectors_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
+void libewf_section_ltree_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
 void libewf_section_data_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
 void libewf_section_error2_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );
 void libewf_section_hash_read( LIBEWF_HANDLE *handle, int file_descriptor, size_t size );

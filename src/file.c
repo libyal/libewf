@@ -52,7 +52,7 @@
 #include <zlib.h>
 
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 #include "md5.h"
 
 #include "ewf_compress.h"
@@ -153,7 +153,7 @@ LIBEWF_HANDLE *libewf_open_read( LIBEWF_HANDLE *handle, const char *filename )
 
 	if( file_descriptor == -1 )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_open: unable to open file: %s\n", filename );
+		LIBEWF_FATAL_PRINT( "libewf_open: unable to open file: %s.\n", filename );
 	}
 	file_header = ewf_file_header_read( file_descriptor );
 
@@ -198,22 +198,22 @@ LIBEWF_HANDLE *libewf_build_index( LIBEWF_HANDLE *handle )
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_build_index: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_build_index: incorrect handle.\n" );
 	}
 	if( handle->index_build != 0 )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_build_index: index has already been build\n" );
+		LIBEWF_FATAL_PRINT( "libewf_build_index: index has already been build.\n" );
 	}
 	for( segment = 1; segment < handle->segment_table->amount; segment++ )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_build_index: building index for segment: %" PRIu32 "\n", segment );
+		LIBEWF_VERBOSE_PRINT( "libewf_build_index: building index for segment: %" PRIu32 ".\n", segment );
 
 		last_section = libewf_sections_read_segment( handle, segment );
 	}
 	/* Check to see if we are done */
 	if( ( last_section == NULL ) || ( !ewf_section_is_type_done( last_section ) ) )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_build_index: no ending section, cannot find the last segment file\n" );
+		LIBEWF_FATAL_PRINT( "libewf_build_index: no ending section, cannot find the last segment file.\n" );
 	}
 	ewf_section_free( last_section );
 
@@ -232,7 +232,7 @@ void libewf_close( LIBEWF_HANDLE *handle )
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_close: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_close: incorrect handle.\n" );
 	}
 	for( iterator = 0; iterator < handle->segment_table->amount; iterator++ )
 	{
@@ -250,7 +250,7 @@ uint64_t libewf_data_size( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_data_size: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_data_size: incorrect handle.\n" );
 	}
 	if( handle->index_build == 0 )
 	{
@@ -266,7 +266,7 @@ char *libewf_data_md5hash( LIBEWF_HANDLE *handle )
 {
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_data_md5hash: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_data_md5hash: incorrect handle.\n" );
 	}
 	if( handle->index_build == 0 )
 	{
@@ -291,7 +291,7 @@ char *libewf_calculate_md5hash( LIBEWF_HANDLE *handle )
 
 	if( handle == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_check_md5hash: incorrect handle\n" );
+		LIBEWF_FATAL_PRINT( "libewf_check_md5hash: incorrect handle.\n" );
 	}
 	if( handle->index_build == 0 )
 	{
@@ -301,7 +301,7 @@ char *libewf_calculate_md5hash( LIBEWF_HANDLE *handle )
 
 	if( data == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_check_md5hash: unable to allocate data\n" );
+		LIBEWF_FATAL_PRINT( "libewf_check_md5hash: unable to allocate data.\n" );
 	}
 	LIBEWF_MD5_INIT( &md5 );
 

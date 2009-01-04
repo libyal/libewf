@@ -1,10 +1,19 @@
 /*
- * EWF data section
+ * EWF ltree section specification
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * Refer to AUTHORS for acknowledgements.
+ * This code is derrived from information and software contributed by
+ * - Expert Witness Compression Format specification by Andrew Rosen
+ *   (http://www.arsdata.com/SMART/whitepaper.html)
+ * - libevf from PyFlag by Michael Cohen
+ *   (http://pyflag.sourceforge.net/)
+ * - Open SSL for the implementation of the MD5 hash algorithm
+ * - Wietse Venema for error handling code
+ *
+ * Additional credits go to
+ * - Robert Jan Mora for testing and other contribution
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -18,7 +27,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated in the acknowledgements.
+ *   must acknowledge the contribution by people stated above.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -33,119 +42,58 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_DATA_H
-#define _EWF_DATA_H
+#ifndef _EWFLTREE_H
+#define _EWFLTREE_H
 
 #include <inttypes.h>
+
+#include "ewf_header.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define EWF_DATA ewf_data_t
-#define EWF_DATA_SIZE sizeof( EWF_DATA )
+typedef struct ewf_ltree EWF_LTREE;
 
-typedef struct ewf_data ewf_data_t;
-
-struct ewf_data
+struct ewf_ltree
 {
 	/* Unknown
-	 * consists of 4 bytes (32 bits)
-	 * value should be 0x00
-	 */
-	uint8_t unknown1[4];
-
-	/* The amount of chunks
-	 * consists of 4 bytes (32 bits)
-	 */
-	uint8_t chunk_count[4];
-
-	/* The amount of sectors per chunks
-	 * consists of 4 bytes (32 bits)
-	 * value should be 64
-	 */
-	uint8_t sectors_per_chunk[4];
-
-	/* The amount of bytes per chunks
-	 * consists of 4 bytes (32 bits)
-	 * value should be 512
-	 */
-	uint8_t bytes_per_sector[4];
-
-	/* The amount of sectors
-	 * consists of 4 bytes (32 bits)
-	 */
-	uint8_t sector_count[4];
-
-	/* Unknown
 	 * consists of 16 bytes
-	 * contains 0x00
 	 */
-	uint8_t unknown2[16];
+	uint8_t unknown1[16];
+
+	/* The size of the tree in bytes
+	 * consists of 4 bytes (32 bits)
+	 */
+	uint8_t tree_size[4];
 
 	/* Unknown
 	 * consists of 4 bytes
-	 * varies in data
+	 * contains 0x00
+	 */
+	uint8_t unknown2[4];
+
+	/* Unknown
+	 * consists of 4 bytes
 	 */
 	uint8_t unknown3[4];
 
 	/* Unknown
-	 * consists of 12 bytes
+	 * consists of 20 bytes
 	 * contains 0x00
 	 */
-	uint8_t unknown4[12];
-
-	/* Compression level (Encase 5 only)
-	 * consists of 1 byte
-	 * value is 0x00 for no compression, 0x01 for good compression, 0x02 for best compression
-	 */
-	uint8_t compression_level;
-
-	/* Unknown
-	 * consists of 3 bytes
-	 * contains 0x00
-	 */
-	uint8_t unknown5[3];
-
-	/* The error block size
-	 * consists of 4 bytes (32 bits)
-	 */
-	uint8_t error_block_size[4];
-
-	/* Unknown
-	 * consists of 4 bytes
-	 * contains 0x00
-	 */
-	uint8_t unknown6[4];
-
-	/* The GUID (Encase 5 only)
-	 * consists of 16 bytes
-	 */
-	uint8_t guid[16];
-
-	/* Unknown
-	 * consists of 963 bytes
-	 * contains 0x00
-	 */
-	uint8_t unknown7[963];
-
-	/* Reserved (signature)
-	 * consists of 5 bytes
-	 */
-	uint8_t signature[5];
-
-	/* The section crc of all (previous) data section data
-	 * consits of 4 bytes (32 bits)
-	 * starts with offset 76
-	 */
-	uint8_t crc[4];
+	uint8_t unknown4[20];
 
 } __attribute__((packed));
 
-EWF_DATA *ewf_data_alloc( void );
-void ewf_data_free( EWF_DATA *data );
-EWF_DATA *ewf_data_read( int file_descriptor );
-int32_t ewf_data_write( EWF_DATA *data, int file_descriptor );
+#define EWF_LTREE_SIZE sizeof( EWF_LTREE )
+
+EWF_LTREE *ewf_ltree_alloc( void );
+void ewf_ltree_free( EWF_LTREE *ltree );
+EWF_LTREE *ewf_ltree_read( int file_descriptor );
+ssize_t ewf_ltree_write( EWF_LTREE *ltree, int file_descriptor );
+
+EWF_HEADER *ewf_tree_data_read( int file_descriptor, size_t size );
 
 #ifdef __cplusplus
 }

@@ -48,12 +48,12 @@
 #include <string.h>
 
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_crc.h"
 #include "ewf_error2.h"
 
-/* Allocates memory for a new efw error2 struct
+/* Allocates memory for a new ewf error2 struct
  */
 EWF_ERROR2 *ewf_error2_alloc( void )
 {
@@ -166,9 +166,9 @@ EWF_ERROR2_SECTOR *ewf_error2_sectors_read( int file_descriptor, uint32_t amount
  */
 ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 {
-	EWF_CRC crc;
-	ssize_t count;
-	size_t size = EWF_ERROR2_SIZE;
+	EWF_CRC *crc  = NULL;
+	ssize_t count = 0;
+	size_t size   = EWF_ERROR2_SIZE;
 
 	if( error2 == NULL )
 	{
@@ -176,9 +176,17 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
 
 		return( -1 );
 	}
-	crc = ewf_crc( (void *) error2, ( size - EWF_CRC_SIZE ), 1 );
+	crc = ewf_crc_calculate( (void *) error2, ( size - EWF_CRC_SIZE ), 1 );
 
-	revert_32bit( crc, error2->crc );
+	if( crc == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_error2_write: unable to calculate CRC.\n" );
+
+		return( -1 );
+	}
+	revert_32bit( *crc, error2->crc );
+
+	ewf_crc_free( crc );
 
 	count = write( file_descriptor, error2, size );
 
@@ -194,7 +202,7 @@ ssize_t ewf_error2_write( EWF_ERROR2 *error2, int file_descriptor )
  */
 ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descriptor, uint32_t amount )
 {
-	EWF_CRC crc       = 0;
+	EWF_CRC *crc      = NULL;
 	ssize_t count     = 0;
 	ssize_t crc_count = 0;
 	size_t size       = EWF_ERROR2_SECTOR_SIZE * amount;
@@ -211,9 +219,24 @@ ssize_t ewf_error2_sectors_write( EWF_ERROR2_SECTOR *sectors, int file_descripto
 	{
 		return( -1 );
 	}
-	crc       = ewf_crc( sectors, size, 1 );
+	crc = ewf_crc_calculate( sectors, size, 1 );
+
+	if( crc == NULL )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_error2_sectors_write: unable to calculate CRC.\n" );
+
+		return( -1 );
+	}
 	crc_count = ewf_crc_write( crc, file_descriptor );
 
+	ewf_crc_free( crc );
+
+	if( crc_count == -1 )
+	{
+		LIBEWF_VERBOSE_PRINT( "ewf_error2_sectors_write: unable to write CRC.\n" );
+
+		return( -1 );
+	}
 	return( count + crc_count );
 }
 

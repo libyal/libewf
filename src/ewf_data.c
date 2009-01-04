@@ -1,19 +1,10 @@
 /*
- * EWF data section specification
+ * EWF data section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,29 +33,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
+#include "libewf_common.h"
 #include "libewf_endian.h"
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "ewf_crc.h"
 #include "ewf_data.h"
 
-/* Allocates memory for a new efw data struct
+/* Allocates memory for a new ewf data struct
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_DATA *ewf_data_alloc( void )
 {
-	EWF_DATA *data = (EWF_DATA *) malloc( EWF_DATA_SIZE );
+	EWF_DATA *data = NULL;
+
+	data = (EWF_DATA *) libewf_alloc_cleared( EWF_DATA_SIZE );
 
 	if( data == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_data_alloc: unable to allocate ewf_data\n" );
-	}
-	memset( data, 0, EWF_DATA_SIZE );
+		LIBEWF_WARNING_PRINT( "ewf_data_alloc: unable to allocate ewf_data.\n" );
 
+		return( NULL );
+	}
 	data->unknown3[0]          = 1;
 	data->sectors_per_chunk[0] = 64;
 
@@ -82,24 +74,39 @@ void ewf_data_free( EWF_DATA *data )
 {
 	if( data == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "ewf_data_free: invalid data.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_data_free: invalid data.\n" );
+
+		return;
 	}
-	free( data );
+	libewf_free( data );
 }
 
 /* Reads the data from a file descriptor
+ * Return a pointer to the new instance, NULL on error
  */
 EWF_DATA *ewf_data_read( int file_descriptor )
 {
-	EWF_DATA *data = ewf_data_alloc();
+	EWF_DATA *data = NULL;
+	uint32_t size  = EWF_DATA_SIZE;
+	int32_t count  = 0;
 
-	ssize_t count = read( file_descriptor, data, EWF_DATA_SIZE );
+	data = ewf_data_alloc();
 
-	if( count < EWF_DATA_SIZE )
+	if( data == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_data_read: unable to create data.\n" );
+
+		return( NULL );
+	}
+	count = libewf_read( file_descriptor, data, size );
+
+	if( count < size )
 	{
 		ewf_data_free( data );
 
-		LIBEWF_FATAL_PRINT( "ewf_data_read: unable to read ewf_data\n" );
+		LIBEWF_WARNING_PRINT( "ewf_data_read: unable to read ewf_data.\n" );
+
+		return( NULL );
 	}
 	return( data );
 }
@@ -107,23 +114,31 @@ EWF_DATA *ewf_data_read( int file_descriptor )
 /* Writes the data to a file descriptor
  * Returns a -1 on error, the amount of bytes written on success
  */
-ssize_t ewf_data_write( EWF_DATA *data, int file_descriptor )
+int32_t ewf_data_write( EWF_DATA *data, int file_descriptor )
 {
-	EWF_CRC crc;
-	ssize_t count;
-	size_t size = EWF_DATA_SIZE;
+	EWF_CRC *crc  = NULL;
+	uint32_t size = EWF_DATA_SIZE;
+	int32_t count = 0;
 
 	if( data == NULL )
 	{
-		LIBEWF_VERBOSE_PRINT( "ewf_data_write: invalid data.\n" );
+		LIBEWF_WARNING_PRINT( "ewf_data_write: invalid data.\n" );
 
 		return( -1 );
 	}
-	crc = ewf_crc( (void *) data, ( size - EWF_CRC_SIZE ), 1 );
+	crc = ewf_crc_calculate( (void *) data, ( size - EWF_CRC_SIZE ), 1 );
 
-	revert_32bit( crc, data->crc );
+	if( crc == NULL )
+	{
+		LIBEWF_WARNING_PRINT( "ewf_data_write: unable to calculate CRC.\n" );
+
+		return( -1 );
+	}
+	revert_32bit( *crc, data->crc );
+
+	ewf_crc_free( crc );
 	
-	count = write( file_descriptor, data, size );
+	count = libewf_write( file_descriptor, data, size );
 
 	if( count < size )
 	{

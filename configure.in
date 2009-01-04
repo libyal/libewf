@@ -1,11 +1,11 @@
 AC_PREREQ( 2.59 )
-AC_INIT( libewf, 20060820-1, forensics@hoffmannbv.nl )
-AM_INIT_AUTOMAKE( libewf, 20060820-1 )
+AC_INIT( libewf, 20060824-1, forensics@hoffmannbv.nl )
+AM_INIT_AUTOMAKE( libewf, 20060824-1 )
 AM_CONFIG_HEADER( config.h )
 
 AC_CANONICAL_HOST
 
-AC_CHECK_FUNCS( memchr memset strchr strtoul uname )
+AC_CHECK_FUNCS( memchr memset strchr strdup strtoul uname )
 
 AC_CHECK_HEADERS( fcntl.h inttypes.h stdlib.h string.h sys/ioctl.h unistd.h )
 

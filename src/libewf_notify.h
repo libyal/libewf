@@ -1,5 +1,5 @@
 /*
- * EWF section start
+ * libewf notification
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -33,70 +33,37 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWF_SECTION_H
-#define _EWF_SECTION_H
+#ifndef _LIBEWF_NOTIFY_H
+#define _LIBEWF_NOTIFY_H
 
 #include <inttypes.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define EWF_SECTION ewf_section_t
-#define EWF_SECTION_SIZE sizeof( EWF_SECTION )
+#define LIBEWF_VERBOSE_EXEC( code ) if( libewf_verbose != 0 ) { code };
 
-typedef struct ewf_section ewf_section_t;
+#define LIBEWF_VERBOSE_PRINT libewf_verbose_print
+#define LIBEWF_WARNING_PRINT libewf_warning_print
+#define LIBEWF_FATAL_PRINT libewf_fatal_print
+#define LIBEWF_THROW_EXCEPTION libewf_throw_exception
 
-struct ewf_section
-{
-	/* The section type string
-	 * consists of 16 bytes
-	 */
-	uint8_t type[16];
+#define LIBEWF_EXCEPTION_GENERIC	(void *) -1
+#define LIBEWF_EXCEPTION_MEMORY		(void *) -2
+#define LIBEWF_EXCEPTION_IO		(void *) -3
+#define LIBEWF_EXCEPTION_PARAMETER	(void *) -4
 
-	/* The section offset to the next section
-	 * consists of 8 bytes (64 bits)
-	 */
-	uint8_t next[8];
+extern uint8_t libewf_verbose;
+extern uint8_t libewf_warning_non_fatal;
 
-	/* The section size
-	 * consists of 8 bytes (64 bits)
-	 */
-	uint8_t size[8];
+extern void libewf_verbose_print( char *, ... );
+extern void libewf_warning_print( char *, ... );
+extern void libewf_fatal_print( char *, ... );
+extern void libewf_throw_exception( void *exception, char *, ... );
 
-	/* The section padding
-	 * consists of 40 bytes
-	 */
-	uint8_t padding[40];
-
-	/* The section crc of all (previous) section data
-	 * consists of 4 bytes
-	 */
-	uint8_t crc[4];
-
-} __attribute__((packed));
-
-EWF_SECTION *ewf_section_alloc( void );
-void ewf_section_free( EWF_SECTION *section );
-EWF_SECTION *ewf_section_read( int file_descriptor );
-int32_t ewf_section_write( EWF_SECTION *section, int file_descriptor );
-
-uint8_t ewf_section_is_type( EWF_SECTION *section, const char *type );
-uint8_t ewf_section_is_type_header( EWF_SECTION *section );
-uint8_t ewf_section_is_type_header2( EWF_SECTION *section );
-uint8_t ewf_section_is_type_volume( EWF_SECTION *section );
-uint8_t ewf_section_is_type_disk( EWF_SECTION *section );
-uint8_t ewf_section_is_type_table( EWF_SECTION *section );
-uint8_t ewf_section_is_type_table2( EWF_SECTION *section );
-uint8_t ewf_section_is_type_sectors( EWF_SECTION *section );
-uint8_t ewf_section_is_type_hash( EWF_SECTION *section );
-uint8_t ewf_section_is_type_done( EWF_SECTION *section );
-uint8_t ewf_section_is_type_next( EWF_SECTION *section );
-uint8_t ewf_section_is_type_data( EWF_SECTION *section );
-uint8_t ewf_section_is_type_error2( EWF_SECTION *section );
-uint8_t ewf_section_is_type_ltree( EWF_SECTION *section );
-
-void ewf_section_fprint( FILE *stream, EWF_SECTION *section );
+void libewf_dump_data( uint8_t *data, size_t size );
 
 #ifdef __cplusplus
 }

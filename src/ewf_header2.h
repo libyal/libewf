@@ -1,19 +1,10 @@
 /*
- * EWF header2 section specification
+ * EWF header2 section
  *
  * Copyright (c) 2006, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
- * This code is derrived from information and software contributed by
- * - Expert Witness Compression Format specification by Andrew Rosen
- *   (http://www.arsdata.com/SMART/whitepaper.html)
- * - libevf from PyFlag by Michael Cohen
- *   (http://pyflag.sourceforge.net/)
- * - Open SSL for the implementation of the MD5 hash algorithm
- * - Wietse Venema for error handling code
- *
- * Additional credits go to
- * - Robert Jan Mora for testing and other contribution
+ * Refer to AUTHORS for acknowledgements.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -27,7 +18,7 @@
  *   its contributors may be used to endorse or promote products derived from
  *   this software without specific prior written permission.
  * - All advertising materials mentioning features or use of this software
- *   must acknowledge the contribution by people stated above.
+ *   must acknowledge the contribution by people stated in the acknowledgements.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -42,11 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _EWFHEADER2_H
-#define _EWFHEADER2_H
+#ifndef _EWF_HEADER2_H
+#define _EWF_HEADER2_H
 
-#include <sys/types.h>
-#include <stdio.h>
+#include <inttypes.h>
 
 #include "ewf_header.h"
 
@@ -113,9 +103,12 @@ extern "C" {
  * TODO the remaining values are currently unknown
  */
 
-EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, size_t size_utf16 );
-EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, size_t size_ascii );
-EWF_HEADER *ewf_header2_read( int file_descriptor, size_t size );
+#define EWF_HEADER2_LITTLE_ENDIAN	'l'
+#define EWF_HEADER2_BIG_ENDIAN		'b'
+
+EWF_HEADER *ewf_header2_convert_utf16_to_ascii( EWF_HEADER *utf16_header, uint32_t size_utf16 );
+EWF_HEADER *ewf_header2_convert_ascii_to_utf16( EWF_HEADER *ascii_header, uint32_t size_ascii, uint8_t byte_order );
+EWF_HEADER *ewf_header2_read( int file_descriptor, uint32_t size );
 
 #ifdef __cplusplus
 }

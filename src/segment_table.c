@@ -42,7 +42,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -52,7 +51,7 @@
 
 #include "definitions.h"
 
-#include "notify.h"
+#include "libewf_notify.h"
 
 #include "section_list.h"
 #include "segment_table.h"
@@ -65,7 +64,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_alloc( uint32_t initial_table_size )
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_alloc: unable to allocate segment_table\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_alloc: unable to allocate segment_table.\n" );
 	}
 	/* Segment has an offset of 1 so an additional values entry is needed
 	 */
@@ -82,13 +81,13 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_alloc( LIBEWF_SEGMENT_TABLE *s
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: invalid segment_table\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: invalid segment_table.\n" );
 	}
 	segment_table->filename = (char **) malloc( size * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE );
 
 	if( segment_table->filename == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: unable to allocate dynamic filename array\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: unable to allocate dynamic filename array.\n" );
 	}
 	memset( segment_table->filename, (intptr_t) NULL, ( size * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ) );
 
@@ -96,7 +95,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_alloc( LIBEWF_SEGMENT_TABLE *s
 
 	if( segment_table->file_descriptor == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: unable to allocate dynamic file descriptor array\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: unable to allocate dynamic file descriptor array.\n" );
 	}
 	memset( segment_table->file_descriptor, -1, ( size * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ) );
 
@@ -104,7 +103,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_alloc( LIBEWF_SEGMENT_TABLE *s
 
 	if( segment_table->section_list == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: unable to allocate dynamic section list array\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_alloc: unable to allocate dynamic section list array.\n" );
 	}
 	memset( segment_table->section_list, (intptr_t) NULL, ( size * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ) );
 
@@ -129,7 +128,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_realloc( LIBEWF_SEGMENT_TABLE 
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_realloc: invalid segment_table\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_values_realloc: invalid segment_table.\n" );
 	}
 	offset = segment_table->amount;
 
@@ -137,7 +136,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_realloc( LIBEWF_SEGMENT_TABLE 
 
 	if( segment_table->filename == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "segment_table_values_alloc: unable to allocate dynamic filename array\n" );
+		LIBEWF_FATAL_PRINT( "segment_table_values_alloc: unable to allocate dynamic filename array.\n" );
 	}
 	memset( ( segment_table->filename + offset ), (intptr_t) NULL, ( ( size - offset ) * LIBEWF_SEGMENT_TABLE_FILENAME_SIZE ) );
 
@@ -145,7 +144,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_realloc( LIBEWF_SEGMENT_TABLE 
 
 	if( segment_table->file_descriptor == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "segment_table_file_descriptor_alloc: unable to allocate dynamic file descriptor array\n" );
+		LIBEWF_FATAL_PRINT( "segment_table_file_descriptor_alloc: unable to allocate dynamic file descriptor array.\n" );
 	}
 	memset( ( segment_table->file_descriptor + offset ), -1, ( ( size - offset ) * LIBEWF_SEGMENT_TABLE_FILE_DESCRIPTOR_SIZE ) );
 
@@ -153,7 +152,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_values_realloc( LIBEWF_SEGMENT_TABLE 
 
 	if( segment_table->section_list == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "segment_table_file_descriptor_alloc: unable to allocate dynamic section list array\n" );
+		LIBEWF_FATAL_PRINT( "segment_table_file_descriptor_alloc: unable to allocate dynamic section list array.\n" );
 	}
 	memset( ( segment_table->section_list + offset ), (intptr_t) NULL, ( ( size - offset ) * LIBEWF_SEGMENT_TABLE_SECTION_LIST_SIZE ) );
 
@@ -177,7 +176,7 @@ void libewf_segment_table_free( LIBEWF_SEGMENT_TABLE *segment_table )
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_free: invalid segment_table\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_free: invalid segment_table.\n" );
 	}
 	for( iterator = 0; iterator < segment_table->amount; iterator++ )
 	{
@@ -203,13 +202,13 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_set_values( LIBEWF_SEGMENT_TABLE *seg
 
 	if( segment_table == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_set_values: invalid segment_table\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_set_values: invalid segment_table.\n" );
 	}
 	/* Check if additional entries should be allocated
 	 */
 	if( segment > segment_table->amount )
 	{
-		LIBEWF_VERBOSE_PRINT( "libewf_segment_table_set_values: allocating additional segment_table entries\n" );
+		LIBEWF_VERBOSE_PRINT( "libewf_segment_table_set_values: allocating additional segment_table entries.\n" );
 
 		/* Segment has an offset of 1 so an additional values entry is needed
 		 */
@@ -227,7 +226,7 @@ LIBEWF_SEGMENT_TABLE *libewf_segment_table_set_values( LIBEWF_SEGMENT_TABLE *seg
 
 	if( segment_table->filename[ segment ] == NULL )
 	{
-		LIBEWF_FATAL_PRINT( "libewf_segment_table_set_values: unable to allocate filename\n" );
+		LIBEWF_FATAL_PRINT( "libewf_segment_table_set_values: unable to allocate filename.\n" );
 	}
 	memcpy( segment_table->filename[ segment ], filename, filename_size );
 

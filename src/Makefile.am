@@ -3,6 +3,8 @@ bin_PROGRAMS = ewfacquire ewfexport ewfinfo ewfverify
 
 libewf_a_SOURCES = \
 	definitions.h \
+	libewf_common.c libewf_common.h \
+	libewf_notify.c libewf_notify.h \
 	libewf_endian.c libewf_endian.h \
 	ewf_compress.c ewf_compress.h \
 	ewf_crc.c ewf_crc.h \
@@ -12,6 +14,7 @@ libewf_a_SOURCES = \
 	ewf_hash.c ewf_hash.h \
 	ewf_header.c ewf_header.h \
 	ewf_header2.c ewf_header2.h \
+	ewf_ltree.c ewf_ltree.h \
 	ewf_md5hash.c ewf_md5hash.h \
 	ewf_section.c ewf_section.h \
 	ewf_sectors.c ewf_sectors.h \
@@ -24,7 +27,6 @@ libewf_a_SOURCES = \
 	file_read.c file_read.h \
 	file_write.c file_write.h \
 	md5.h \
-	notify.c notify.h \
 	offset_table.c offset_table.h \
 	section_list.c section_list.h \
 	segment_table.c segment_table.h
