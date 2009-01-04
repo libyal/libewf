@@ -27,8 +27,7 @@
 #include <notify.h>
 #include <types.h>
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_file.h"
 #include "libewf_filename.h"
 #include "libewf_offset_table.h"

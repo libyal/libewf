@@ -24,8 +24,7 @@
 #include <memory.h>
 #include <notify.h>
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_header_sections.h"
 #include "libewf_header_values.h"
 #include "libewf_string.h"

@@ -32,8 +32,7 @@
 #include <string.h>
 #endif
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_chunk_cache.h"
 #include "libewf_compression.h"
 #include "libewf_file.h"

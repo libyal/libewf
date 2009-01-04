@@ -24,8 +24,7 @@
 #include <character_string.h>
 #include <notify.h>
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_handle.h"
 #include "libewf_support.h"
 

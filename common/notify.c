@@ -35,7 +35,7 @@
 #elif defined( HAVE_VARARGS_H )
 #include <varargs.h>
 #else
-#error No variable argument support available
+#error Missing headers stdarg.h and varargs.h
 #endif
 
 FILE *libewf_notify_stream = NULL;
@@ -105,70 +105,99 @@ void libewf_notify_dump_data(
       void *data,
       size_t size )
 {
-	size_t iterator = 0;
+	size_t byte_iterator = 0;
+	size_t size_iterator = 0;
 
 	if( libewf_notify_stream == NULL )
 	{
 		return;
 	}
-	while( iterator < size )
+	while( size_iterator < size )
 	{
-		if( iterator % 16 == 0 )
+		while( byte_iterator < size )
 		{
-			fprintf( libewf_notify_stream, "%.8" PRIzx ": ",
-			 iterator );
-		}
-		fprintf( libewf_notify_stream, "%.2" PRIx8 " ",
-		 ( (unsigned char *) data )[ iterator++ ] );
+			if( byte_iterator % 16 == 0 )
+			{
+				fprintf(
+				 libewf_notify_stream,
+				 "%.8" PRIzx ": ",
+				 byte_iterator );
+			}
+			fprintf(
+			 libewf_notify_stream,
+			 "%.2" PRIx8 " ",
+			 ( (unsigned char *) data )[ byte_iterator++ ] );
 
-		if( iterator % 16 == 0 )
-		{
-			fprintf( libewf_notify_stream, "\n" );
+			if( byte_iterator % 16 == 0 )
+			{
+				break;
+			}
+			else if( byte_iterator % 8 == 0 )
+			{
+				fprintf(
+				 libewf_notify_stream,
+				 " " );
+			}
 		}
-		else if( iterator % 8 == 0 )
+		while( byte_iterator % 16 != 0 )
 		{
-			fprintf( libewf_notify_stream, "  " );
-		}
-	}
-	if( iterator % 16 != 0 )
-	{
-		fprintf( libewf_notify_stream, "\n" );
-	}
-	fprintf( libewf_notify_stream, "\n" );
+			byte_iterator++;
 
-	iterator = 0;
+			fprintf(
+			 libewf_notify_stream,
+			 "   " );
 
-	while( iterator < size )
-	{
-		if( iterator % 32 == 0 )
-		{
-			fprintf( libewf_notify_stream, "%.8" PRIzx ": ",
-			 iterator );
+			if( ( byte_iterator % 8 == 0 )
+			 && ( byte_iterator % 16 != 0 ) )
+			{
+				fprintf(
+				 libewf_notify_stream,
+				 " " );
+			}
 		}
-		if( ( ( (char *) data )[ iterator ] >= 0x20 )
-		 && ( ( (char *) data )[ iterator ] <= 0x7e ) )
-		{
-			fprintf( libewf_notify_stream, "%c ",
-			 ( (char *) data )[ iterator ] );
-		}
-		else
-		{
-			fprintf( libewf_notify_stream, ". " );
-		}
-		iterator++;
+		fprintf(
+		 libewf_notify_stream,
+		 "  " );
 
-		if( iterator % 32 == 0 )
+		byte_iterator = size_iterator;
+
+		while( byte_iterator < size )
 		{
-			fprintf( libewf_notify_stream, "\n" );
+			if( ( ( (char *) data )[ byte_iterator ] >= 0x20 )
+			 && ( ( (char *) data )[ byte_iterator ] <= 0x7e ) )
+			{
+				fprintf(
+				 libewf_notify_stream,
+				 "%c",
+				 ( (char *) data )[ byte_iterator ] );
+			}
+			else
+			{
+				fprintf(
+				 libewf_notify_stream,
+				 "." );
+			}
+			byte_iterator++;
+
+			if( byte_iterator % 16 == 0 )
+			{
+				break;
+			}
+			else if( byte_iterator % 8 == 0 )
+			{
+				fprintf(
+				 libewf_notify_stream,
+				 " " );
+			}
 		}
-		else if( iterator % 8 == 0 )
-		{
-			fprintf( libewf_notify_stream, "  " );
-		}
+		fprintf(
+		 libewf_notify_stream,
+		 "\n" );
+
+		size_iterator = byte_iterator;
 	}
-	if( iterator % 32 != 0 )
-	{
-		fprintf( libewf_notify_stream, "\n" );
-	}
-	fprintf( libewf_notify_stream, "\n" );
+	fprintf(
+	 libewf_notify_stream,
+	 "\n" );
 }
+

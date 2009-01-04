@@ -27,8 +27,7 @@
 #include <system_string.h>
 #include <types.h>
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_filename.h"
 #include "libewf_file_io_handle.h"
 #include "libewf_file_io_pool.h"

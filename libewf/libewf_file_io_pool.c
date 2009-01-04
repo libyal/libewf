@@ -25,8 +25,7 @@
 #include <notify.h>
 #include <system_string.h>
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_file_io_pool.h"
 
 /* Initialize the file io pool

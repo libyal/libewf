@@ -119,9 +119,12 @@ Known issues:
 
 Next release(s):
 
-* update libuca
 * implement error handling
-* separate narrow and wide character fucntions
+  - update library (keep error in library due to multi threading)
+  - update API later
+
+* separate narrow and wide character library functions
+  - Linux can change wide character into UTF8, but what about Windows ASCII with codepage?
 
 * ewfinput have ewfinput_get_string_variable_system_character get its own
   input without the conversion function?
@@ -187,6 +190,15 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20080910
+* worked on libuna
+* worked on improved error handling
+* implemted new version of notify dump data
+
+Version: 20080909
+* replaced libuca with libuna
+* worked on improved error handling based on libuna version
 
 Version: 20080908
 * minor changes to configure.ac

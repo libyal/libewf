@@ -33,6 +33,9 @@ enum LIBEWF_ERROR_DOMAINS
 {
 	LIBEWF_ERROR_DOMAIN_ARGUMENTS           = (int) 'a',
 	LIBEWF_ERROR_DOMAIN_CONVERSION          = (int) 'c',
+	LIBEWF_ERROR_DOMAIN_INPUT               = (int) 'i',
+	LIBEWF_ERROR_DOMAIN_MEMORY              = (int) 'm',
+	LIBEWF_ERROR_DOMAIN_OUTPUT              = (int) 'o',
 };
 
 /* The argument error codes
@@ -51,6 +54,14 @@ enum LIBEWF_CONVERSION_ERROR
 {
 	LIBEWF_CONVERSION_ERROR_INVALID_INPUT   = 0,
 	LIBEWF_CONVERSION_ERROR_INVALID_OUTPUT  = 1
+};
+
+/* The memory error codes
+ */
+enum LIBEWF_MEMORY_ERROR
+{
+	LIBEWF_MEMORY_ERROR_INSUFFICIENT        = 0,
+	LIBEWF_MEMORY_ERROR_SET_UNABLE          = 1
 };
 
 #endif

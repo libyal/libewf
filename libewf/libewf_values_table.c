@@ -26,10 +26,9 @@
 #include <notify.h>
 #include <types.h>
 
-#include <libewf/definitions.h>
-
-#include "libewf_values_table.h"
+#include "libewf_definitions.h"
 #include "libewf_string.h"
+#include "libewf_values_table.h"
 
 /* Initializes the values table
  * Returns 1 if successful or -1 on error

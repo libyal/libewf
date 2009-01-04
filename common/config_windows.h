@@ -101,6 +101,12 @@
 #define HAVE_WCHAR_H            1
 #endif
 
+#if defined( SIZEOF_WCHAR_T )
+#undef SIZEOF_WCHAR_T
+#endif
+
+#define SIZEOF_WCHAR_T		2
+
 #define HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS	1
 #endif 
     

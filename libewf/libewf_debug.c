@@ -21,17 +21,13 @@
  */
 
 #include <common.h>
-#include <character_string.h>
 #include <endian.h>
 #include <memory.h>
 #include <notify.h>
 #include <types.h>
 
-#include <libewf/definitions.h>
-
-#include "libewf_compression.h"
 #include "libewf_debug.h"
-#include "libewf_segment_file.h"
+#include "libewf_libuna.h"
 #include "libewf_string.h"
 
 #include "ewf_crc.h"
@@ -130,9 +126,10 @@ void libewf_debug_header_print(
       uint8_t *header,
       size_t header_size )
 {
-	character_t *header_string = NULL;
-	static char *function      = "libewf_debug_header_print";
-	ssize_t header_string_size = 0;
+	libewf_character_t *header_string = NULL;
+	libuna_error_t *error             = NULL;
+	static char *function             = "libewf_debug_header_print";
+	size_t header_string_size         = 0;
 
 	if( header == NULL )
 	{
@@ -141,20 +138,23 @@ void libewf_debug_header_print(
 
 		return;
 	}
-	header_string_size = string_size_from_byte_stream(
-	                      header,
-	                      header_size,
-	                      LIBUNA_CODEPAGE_ASCII );
-
-	if( header_string_size < 0 )
+	if( libewf_string_size_from_byte_stream(
+	     header,
+	     header_size,
+	     LIBUNA_CODEPAGE_ASCII,
+	     &header_string_size,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to determine header string size.\n",
 		 function );
 
+		libuna_error_free(
+		 &error );
+
 		return;
 	}
-	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * (size_t) header_string_size );
+	header_string = (libewf_character_t *) memory_allocate(
+	                                        sizeof( libewf_character_t ) * header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -163,22 +163,25 @@ void libewf_debug_header_print(
 
 		return;
 	}
-	if( string_copy_from_byte_stream(
+	if( libewf_string_copy_from_byte_stream(
 	     header_string,
 	     header_string_size,
-	     (uint8_t *) header,
+	     header,
 	     header_size,
-	     LIBUNA_CODEPAGE_ASCII ) != 1 )
+	     LIBUNA_CODEPAGE_ASCII,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
+		libuna_error_free(
+		 &error );
 		memory_free(
 		 header_string );
 
 		return;
 	}
-	notify_printf( "%" PRIs "",
+	notify_printf( "%" PRIs_LIBEWF "",
 	 header_string );
 
 	memory_free(
@@ -191,9 +194,10 @@ void libewf_debug_header2_print(
       uint8_t *header2,
       size_t header2_size )
 {
-	character_t *header_string = NULL;
-	static char *function      = "libewf_debug_header2_print";
-	ssize_t header_string_size = 0;
+	libewf_character_t *header_string = NULL;
+	libuna_error_t *error             = NULL;
+	static char *function             = "libewf_debug_header2_print";
+	size_t header_string_size         = 0;
 
 	if( header2 == NULL )
 	{
@@ -202,20 +206,23 @@ void libewf_debug_header2_print(
 
 		return;
 	}
-	header_string_size = string_size_from_utf16_stream(
-	                      header2,
-	                      header2_size,
-	                      LIBUNA_ENDIAN_LITTLE );
-
-	if( header_string_size < 0 )
+	if( libewf_string_size_from_utf16_stream(
+	     header2,
+	     header2_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     &header_string_size,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to determine header string size.\n",
 		 function );
 
+		libuna_error_free(
+		 &error );
+
 		return;
 	}
-	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * (size_t) header_string_size );
+	header_string = (libewf_character_t *) memory_allocate(
+	                                        sizeof( libewf_character_t ) * header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -224,22 +231,25 @@ void libewf_debug_header2_print(
 
 		return;
 	}
-	if( string_copy_from_utf16_stream(
+	if( libewf_string_copy_from_utf16_stream(
 	     header_string,
-	     (size_t) header_string_size,
+	     header_string_size,
 	     header2,
 	     header2_size,
-	     LIBUNA_ENDIAN_LITTLE ) != 1 )
+	     LIBUNA_ENDIAN_LITTLE,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
+		libuna_error_free(
+		 &error );
 		memory_free(
 		 header_string );
 
 		return;
 	}
-	notify_printf( "%" PRIs "",
+	notify_printf( "%" PRIs_LIBEWF "",
 	 header_string );
 
 	memory_free(
@@ -252,9 +262,10 @@ void libewf_debug_xheader_print(
       uint8_t *xheader,
       size_t xheader_size )
 {
-	character_t *header_string = NULL;
-	static char *function      = "libewf_debug_xheader_print";
-	ssize_t header_string_size = 0;
+	libewf_character_t *header_string = NULL;
+	libuna_error_t *error             = NULL;
+	static char *function             = "libewf_debug_xheader_print";
+	size_t header_string_size         = 0;
 
 	if( xheader == NULL )
 	{
@@ -263,19 +274,22 @@ void libewf_debug_xheader_print(
 
 		return;
 	}
-	header_string_size = string_size_from_utf8_stream(
-	                      xheader,
-	                      xheader_size );
-
-	if( header_string_size < 0 )
+	if( libewf_string_size_from_utf8_stream(
+	     xheader,
+	     xheader_size,
+	     &header_string_size,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to determine header string size.\n",
 		 function );
 
+		libuna_error_free(
+		 &error );
+
 		return;
 	}
-	header_string = (character_t *) memory_allocate(
-	                                 sizeof( character_t ) * (size_t) header_string_size );
+	header_string = (libewf_character_t *) memory_allocate(
+	                                        sizeof( libewf_character_t ) * header_string_size );
 
 	if( header_string == NULL )
 	{
@@ -284,21 +298,24 @@ void libewf_debug_xheader_print(
 
 		return;
 	}
-	if( string_copy_from_utf8_stream(
+	if( libewf_string_copy_from_utf8_stream(
 	     header_string,
-	     (size_t) header_string_size,
+	     header_string_size,
 	     xheader,
-	     xheader_size ) != 1 )
+	     xheader_size,
+	     &error ) != 1 )
 	{
 		notify_warning_printf( "%s: unable to set header string.\n",
 		 function );
 
+		libuna_error_free(
+		 &error );
 		memory_free(
 		 header_string );
 
 		return;
 	}
-	notify_printf( "%" PRIs "",
+	notify_printf( "%" PRIs_LIBEWF "",
 	 header_string );
 
 	memory_free(

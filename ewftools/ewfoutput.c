@@ -53,10 +53,10 @@
 
 #include <libewf/features.h>
 
-#if defined( HAVE_LIBUCA_H )
-#include <libuca.h>
-#elif defined( HAVE_LOCAL_LIBUCA )
-#include "../libuca/libuca_definitions.h"
+#if defined( HAVE_LIBUNA_H )
+#include <libuna.h>
+#elif defined( HAVE_LOCAL_LIBUNA )
+#include <libuna_definitions.h>
 #endif
 
 #if defined( HAVE_ZLIB_H )
@@ -115,13 +115,8 @@ void ewfoutput_version_fprint(
 	fprintf( stream, "%" PRIs " %" PRIs " (libewf %" PRIs "",
 	 program, LIBEWF_VERSION_STRING, LIBEWF_VERSION_STRING );
 
-#if defined( LIBUCA_WIDE_CHARACTER_TYPE )
-	fprintf( stream, ", libuca %ls",
-	 LIBUCA_VERSION_STRING );
-#else
-	fprintf( stream, ", libuca %s",
-	 LIBUCA_VERSION_STRING );
-#endif
+	fprintf( stream, ", libuna %s",
+	 LIBUNA_VERSION_STRING );
 
 #if defined( HAVE_LIBZ )
 	fprintf( stream, ", zlib %s", ZLIB_VERSION );

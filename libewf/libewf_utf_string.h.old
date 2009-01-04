@@ -1,0 +1,200 @@
+/*
+ * UTF character string functions
+ *
+ * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Hoffmann Investigations. All rights reserved.
+ *
+ * Refer to AUTHORS for acknowledgements.
+ *
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#if !defined( _UTF_STRING_H )
+#define _UTF_STRING_H
+
+#include <common.h>
+#include <narrow_string.h>
+#include <types.h>
+#include <wide_string.h>
+
+/* libuna is needed to do the UTF string conversions
+ */
+#include "libewf_libuna.h"
+
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+typedef wchar_t libewf_utf_character_t;
+
+#define PRIc_UTF	"lc"
+#define PRIs_UTF	"ls"
+
+/* The internal character type contains UTF-32
+ */
+#if SIZEOF_WCHAR_T == 4
+
+/* Byte stream functions
+ */
+#define libewf_utf_string_size_from_byte_stream( stream, size_stream, codepage, libewf_utf_string_size, error ) \
+	libuna_utf32_string_size_from_byte_stream( stream, size_stream, codepage, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_byte_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, codepage, error ) \
+	libuna_utf32_string_copy_from_byte_stream( (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, codepage, error )
+
+#define byte_stream_size_from_string( libewf_utf_string, libewf_utf_string_size, codepage, error ) \
+	libuna_byte_stream_size_from_utf32( (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, codepage, error )
+
+#define byte_stream_copy_from_string( stream, size_stream, codepage, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_byte_stream_copy_from_utf32( stream, size_stream, codepage, (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* UTF-8 stream functions
+ */
+#define libewf_utf_string_size_from_utf8_stream( stream, size_stream, libewf_utf_string_size, error ) \
+	libuna_utf32_string_size_from_utf8( stream, size_stream, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_utf8_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, error ) \
+	libuna_utf32_string_copy_from_utf8( (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, error )
+
+#define utf8_stream_size_from_string( libewf_utf_string, size_string, error ) \
+	libuna_utf8_stream_size_from_utf32( (libuna_utf32_character_t *) libewf_utf_string, size_string, error )
+
+#define utf8_stream_copy_from_string( stream, size_stream, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_utf8_stream_copy_from_utf32( stream, size_stream, (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* UTF-16 stream functions
+ */
+#define libewf_utf_string_size_from_utf16_stream( stream, size_stream, byte_order, libewf_utf_string_size, error ) \
+	libuna_utf32_string_size_from_utf16_stream( stream, size_stream, byte_order, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_utf16_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, byte_order, error ) \
+	libuna_utf32_string_copy_from_utf16_stream( (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, byte_order, error )
+
+#define utf16_stream_size_from_string( libewf_utf_string, size_string, error ) \
+	libuna_utf16_stream_size_from_utf32( (libuna_utf32_character_t *) libewf_utf_string, size_string, error )
+
+#define utf16_stream_copy_from_string( stream, size_stream, byte_order, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_utf16_stream_copy_from_utf32( stream, size_stream, byte_order, (libuna_utf32_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* The internal character type contains UTF-16
+ */
+#elif SIZEOF_WCHAR_T == 2
+
+/* Byte stream functions
+ */
+#define libewf_utf_string_size_from_byte_stream( stream, size_stream, codepage, libewf_utf_string_size, error ) \
+	libuna_utf16_string_size_from_byte_stream( stream, size_stream, codepage, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_byte_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, codepage, error ) \
+	libuna_utf16_string_copy_from_byte_stream( (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, codepage, error )
+
+#define byte_stream_size_from_string( libewf_utf_string, libewf_utf_string_size, codepage, error ) \
+	libuna_byte_stream_size_from_utf16( (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, codepage, error )
+
+#define byte_stream_copy_from_string( stream, size_stream, codepage, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_byte_stream_copy_from_utf16( stream, size_stream, codepage, (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* UTF-8 stream functions
+ */
+#define libewf_utf_string_size_from_utf8_stream( stream, size_stream, libewf_utf_string_size, error ) \
+	libuna_utf16_string_size_from_utf8( stream, size_stream, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_utf8_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, error ) \
+	libuna_utf16_string_copy_from_utf8( (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, error )
+
+#define utf8_stream_size_from_string( libewf_utf_string, size_string, error ) \
+	libuna_utf8_stream_size_from_utf16( (libuna_utf16_character_t *) libewf_utf_string, size_string, error )
+
+#define utf8_stream_copy_from_string( stream, size_stream, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_utf8_stream_copy_from_utf16( stream, size_stream, (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* UTF-16 stream functions
+ */
+#define libewf_utf_string_size_from_utf16_stream( stream, size_stream, byte_order, libewf_utf_string_size, error ) \
+	libuna_utf16_string_size_from_utf16_stream( stream, size_stream, byte_order, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_utf16_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, byte_order, error ) \
+	libuna_utf16_string_copy_from_utf16_stream( (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, byte_order, error )
+
+#define utf16_stream_size_from_string( libewf_utf_string, size_string, error ) \
+	libuna_utf16_stream_size_from_utf16( (libuna_utf16_character_t *) libewf_utf_string, size_string, error )
+
+#define utf16_stream_copy_from_string( stream, size_stream, byte_order, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_utf16_stream_copy_from_utf16( stream, size_stream, byte_order, (libuna_utf16_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+#else
+#error Unsupported size of wchar_t
+#endif
+
+/* The internal character type contains UTF-8
+ */
+#else
+
+typedef char libewf_utf_character_t;
+
+#define PRIc_UTF	"c"
+#define PRIs_UTF	"s"
+
+/* Byte stream functions
+ */
+#define libewf_utf_string_size_from_byte_stream( stream, size_stream, codepage, libewf_utf_string_size, error ) \
+	libuna_utf8_string_size_from_byte_stream( stream, size_stream, codepage, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_byte_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, codepage, error ) \
+	libuna_utf8_string_copy_from_byte_stream( (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, codepage, error )
+
+#define byte_stream_size_from_string( libewf_utf_string, libewf_utf_string_size, codepage, error ) \
+	libuna_byte_stream_size_from_utf8( (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, codepage, error )
+
+#define byte_stream_copy_from_string( stream, size_stream, codepage, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_byte_stream_copy_from_utf8( stream, size_stream, codepage, (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* UTF-8 stream functions
+ */
+#define libewf_utf_string_size_from_utf8_stream( stream, size_stream, libewf_utf_string_size, error ) \
+	libuna_utf8_string_size_from_utf8_stream( stream, size_stream, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_utf8_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, error ) \
+	libuna_utf8_string_copy_from_utf8_stream( (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, error )
+
+#define utf8_stream_size_from_string( libewf_utf_string, size_string, error ) \
+	libuna_utf8_stream_size_from_utf8( (libuna_utf8_character_t *) libewf_utf_string, size_string, error )
+
+#define utf8_stream_copy_from_string( stream, size_stream, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_utf8_stream_copy_from_utf8( stream, size_stream, (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+/* UTF-16 stream functions
+ */
+#define libewf_utf_string_size_from_utf16_stream( stream, size_stream, byte_order, libewf_utf_string_size, error ) \
+	libuna_utf8_string_size_from_utf16_stream( stream, size_stream, byte_order, libewf_utf_string_size, error )
+
+#define libewf_utf_string_copy_from_utf16_stream( libewf_utf_string, libewf_utf_string_size, stream, size_stream, byte_order, error ) \
+	libuna_utf8_string_copy_from_utf16_stream( (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, stream, size_stream, byte_order, error )
+
+#define utf16_stream_size_from_string( libewf_utf_string, size_string, error ) \
+	libuna_utf16_stream_size_from_utf8( (libuna_utf8_character_t *) libewf_utf_string, size_string, error )
+
+#define utf16_stream_copy_from_string( stream, size_stream, byte_order, libewf_utf_string, libewf_utf_string_size, error ) \
+	libuna_utf16_stream_copy_from_utf8( stream, size_stream, byte_order, (libuna_utf8_character_t *) libewf_utf_string, libewf_utf_string_size, error )
+
+#endif
+
+#if defined( __cplusplus )
+}
+#endif
+
+#endif
+

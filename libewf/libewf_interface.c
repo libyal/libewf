@@ -26,8 +26,7 @@
 #include <notify.h>
 #include <system_string.h>
 
-#include <libewf/definitions.h>
-
+#include "libewf_definitions.h"
 #include "libewf_handle.h"
 #include "libewf_hash_values.h"
 #include "libewf_header_values.h"
