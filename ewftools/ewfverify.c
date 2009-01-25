@@ -101,18 +101,11 @@ ssize64_t ewfverify_read_input(
 {
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfverify_read_input";
-	off64_t read_offset                          = 0;
 	size64_t media_size                          = 0;
 	size32_t chunk_size                          = 0;
 	size_t read_size                             = 0;
 	ssize64_t total_read_count                   = 0;
 	ssize_t read_count                           = 0;
-#if defined( HAVE_RAW_ACCESS )
-	uint8_t *raw_read_data                       = NULL;
-	size_t raw_read_buffer_size                  = 0;
-	uint32_t sectors_per_chunk                   = 0;
-	uint32_t bytes_per_sector                    = 0;
-#endif
 
 	if( verification_handle == NULL )
 	{
@@ -188,27 +181,9 @@ ssize64_t ewfverify_read_input(
 		return( -1 );
 	}
 #if defined( HAVE_RAW_ACCESS )
-	if( verification_handle_get_raw_access_values(
-	     verification_handle,
-	     &sectors_per_chunk,
-	     &bytes_per_sector,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine verification handle raw access values.\n",
-		 function );
-
-		return( -1 );
-	}
-#endif
-
-#if defined( HAVE_RAW_ACCESS )
 	/* Make sure SMART chunks fit in the storage media buffer
 	 */
-	data_buffer_size = chunk_size + 16;
+	data_buffer_size = chunk_size;
 #else
 	if( data_buffer_size == 0 )
 	{
@@ -275,7 +250,6 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-#if defined( HAVE_RAW_ACCESS )
 		read_count = verification_handle_read_prepare_buffer(
 		              verification_handle,
 		              storage_media_buffer,
@@ -296,7 +270,6 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-#endif
 		if( read_count > (ssize_t) read_size )
 		{
 			liberror_error_set(
@@ -312,10 +285,12 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
+		total_read_count += (ssize64_t) read_count;
+
 		if( verification_handle_update_integrity_hash(
 		     verification_handle,
 		     storage_media_buffer,
-		     read_size,
+		     read_count,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -331,9 +306,6 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-		read_offset      += (off64_t) read_size;
-		total_read_count += (ssize64_t) read_count;
-
 		if( callback != NULL )
 		{
 			callback(
@@ -605,7 +577,6 @@ int main( int argc, char * const argv[] )
 	{
 		for( ; amount_of_filenames > 0; amount_of_filenames-- )
 		{
-fprintf( stderr, "X: %d: %s\n", amount_of_filenames - 1, ewf_filenames[ amount_of_filenames - 1 ] );
 			memory_free(
 			 ewf_filenames[ amount_of_filenames - 1 ] );
 		}
@@ -669,23 +640,6 @@ fprintf( stderr, "X: %d: %s\n", amount_of_filenames - 1, ewf_filenames[ amount_o
 		}
 		/* Start verifying data
 		 */
-#if defined( USE_LIBEWF_GET_MD5_HASH )
-		if( calculate_sha1 == 1 )
-		{
-			if( libewf_parse_hash_values(
-			     ewfcommon_libewf_handle ) != 1 )
-			{
-				fprintf( stderr, "Unable to get parse hash values.\n" );
-			}
-		}
-#endif
-#if defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
-		if( libewf_parse_hash_values(
-		     ewfcommon_libewf_handle ) != 1 )
-		{
-			fprintf( stderr, "Unable to get parse hash values.\n" );
-		}
-#endif
 		verify_count = ewfverify_read_input(
 		                verification_handle,
 		                wipe_chunk_on_error,
@@ -891,17 +845,16 @@ fprintf( stderr, "X: %d: %s\n", amount_of_filenames - 1, ewf_filenames[ amount_o
 		 stdout,
 		 "\n" );
 
-		/* TODO */
 		ewfoutput_crc_errors_fprint(
 		 stdout,
-		 ewfcommon_libewf_handle,
+		 verification_handle->input_handle,
 		 &amount_of_crc_errors );
 
 		if( log_file_stream != NULL )
 		{
 			ewfoutput_crc_errors_fprint(
 			 log_file_stream,
-			 ewfcommon_libewf_handle,
+			 verification_handle->input_handle,
 			 &amount_of_crc_errors );
 		}
 		if( calculate_md5 == 1 )

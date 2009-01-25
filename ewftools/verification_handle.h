@@ -96,12 +96,10 @@ int verification_handle_open_input(
      int amount_of_files,
      liberror_error_t **error );
 
-#if defined( HAVE_RAW_ACCESS )
 ssize_t verification_handle_read_prepare_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
-#endif
 
 ssize_t verification_handle_read_buffer(
          verification_handle_t *verification_handle,
@@ -124,14 +122,6 @@ int verification_handle_get_values(
      size64_t *media_size,
      uint32_t *chunk_size,
      liberror_error_t **error );
-
-#if defined( HAVE_RAW_ACCESS )
-int verification_handle_get_raw_access_values(
-     verification_handle_t *verification_handle,
-     uint32_t *sectors_per_chunk,
-     uint32_t *bytes_per_sector,
-     liberror_error_t **error );
-#endif
 
 int verification_handle_set_input_values(
      verification_handle_t *verification_handle,

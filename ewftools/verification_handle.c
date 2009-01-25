@@ -312,8 +312,6 @@ int verification_handle_open_input(
 	return( result );
 }
 
-#if defined( HAVE_RAW_ACCESS )
-
 /* Prepares a buffer after reading the input of the verification handle
  * Returns the resulting buffer size or -1 on error
  */
@@ -358,15 +356,16 @@ ssize_t verification_handle_read_prepare_buffer(
 
 		return( -1 );
 	}
-	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
+#if defined( HAVE_RAW_ACCESS )
+	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
 #if defined( HAVE_V2_API )
 	read_count = libewf_raw_read_prepare_buffer(
                       verification_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-                      storage_media_buffer->raw_buffer_amount,
                       storage_media_buffer->compression_buffer,
-                      (size_t *) &( storage_media_buffer->compression_buffer_amount ),
+                      storage_media_buffer->compression_buffer_amount,
+                      storage_media_buffer->raw_buffer,
+                      (size_t *) &( storage_media_buffer->raw_buffer_amount ),
                       storage_media_buffer->is_compressed,
                       storage_media_buffer->crc,
                       storage_media_buffer->process_crc,
@@ -374,10 +373,10 @@ ssize_t verification_handle_read_prepare_buffer(
 #else
 	read_count = libewf_raw_read_prepare_buffer(
                       verification_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-                      storage_media_buffer->raw_buffer_amount,
                       storage_media_buffer->compression_buffer,
-                      (size_t *) &( storage_media_buffer->compression_buffer_amount ),
+                      storage_media_buffer->compression_buffer_amount,
+                      storage_media_buffer->raw_buffer,
+                      (size_t *) &( storage_media_buffer->raw_buffer_amount ),
                       storage_media_buffer->is_compressed,
                       storage_media_buffer->crc,
                       storage_media_buffer->process_crc );
@@ -394,10 +393,22 @@ ssize_t verification_handle_read_prepare_buffer(
 
 		return( -1 );
 	}
+	if( storage_media_buffer->is_compressed == 0 )
+	{
+		storage_media_buffer->data_in_compression_buffer = 1;
+	}
+	else
+	{
+		storage_media_buffer->data_in_compression_buffer = 0;
+	}
+#else
+	read_count = storage_media_buffer->raw_buffer_amount;
+#endif
+	storage_media_buffer->input_size   = read_count;
+	verification_handle->input_offset += read_count;
+
 	return( read_count );
 }
-
-#endif
 
 /* Reads a buffer from the input of the verification handle
  * Returns the amount of bytes written or -1 on error
@@ -448,8 +459,8 @@ ssize_t verification_handle_read_buffer(
 #if defined( HAVE_V2_API )
 	read_count = libewf_raw_read_buffer(
                       verification_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-	              storage_media_buffer->raw_buffer_size,
+                      storage_media_buffer->compression_buffer,
+                      storage_media_buffer->compression_buffer_size,
 	              &( storage_media_buffer->is_compressed ),
 	              &( storage_media_buffer->crc ),
 	              &( storage_media_buffer->process_crc ),
@@ -457,8 +468,8 @@ ssize_t verification_handle_read_buffer(
 #else
 	read_count = libewf_raw_read_buffer(
 	              verification_handle->input_handle,
-	              storage_media_buffer->raw_buffer,
-	              storage_media_buffer->raw_buffer_size,
+	              storage_media_buffer->compression_buffer,
+	              storage_media_buffer->compression_buffer_size,
 	              &( storage_media_buffer->is_compressed ),
 	              &( storage_media_buffer->crc ),
 	              &( storage_media_buffer->process_crc ) );
@@ -488,12 +499,13 @@ ssize_t verification_handle_read_buffer(
 
 		return( -1 );
 	}
-	storage_media_buffer->raw_buffer_amount          = read_count;
-	storage_media_buffer->input_size                 = read_count;
-	storage_media_buffer->offset                     = verification_handle->input_offset;
-	storage_media_buffer->data_in_compression_buffer = storage_media_buffer->is_compressed;
-	verification_handle->input_offset               += read_count;
+	storage_media_buffer->offset = verification_handle->input_offset;
 
+#if defined( HAVE_RAW_ACCESS )
+	storage_media_buffer->compression_buffer_amount = read_count;
+#else
+	storage_media_buffer->raw_buffer_amount         = read_count;
+#endif
 	return( read_count );
 }
 
@@ -503,7 +515,7 @@ ssize_t verification_handle_read_buffer(
 int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
      storage_media_buffer_t *storage_media_buffer,
-     size_t size,
+     size_t read_size,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_update_integrity_hash";
@@ -532,8 +544,8 @@ int verification_handle_update_integrity_hash(
 
 		return( -1 );
 	}
-	if( ( size == 0 )
-	 || ( size > (size_t) SSIZE_MAX ) )
+	if( ( read_size == 0 )
+	 || ( read_size > (size_t) SSIZE_MAX ) )
 	{
 		liberror_error_set(
 		 error,
@@ -565,7 +577,7 @@ int verification_handle_update_integrity_hash(
 		md5_update(
 		 &( verification_handle->md5_context ),
 		 data,
-		 data_size,
+		 read_size,
 		 error );
 
 		if( ( error != NULL )
@@ -587,7 +599,7 @@ int verification_handle_update_integrity_hash(
 		sha1_update(
 		 &( verification_handle->sha1_context ),
 		 data,
-		 data_size,
+		 read_size,
 		 error );
 
 		if( ( error != NULL )
@@ -603,7 +615,7 @@ int verification_handle_update_integrity_hash(
 			return( -1 );
 		}
 	}
-	verification_handle->output_offset += size;
+	verification_handle->output_offset += read_size;
 
 	return( 1 );
 }
@@ -745,86 +757,6 @@ int verification_handle_get_values(
 	return( 1 );
 }
 
-#if defined( HAVE_RAW_ACCESS )
-
-/* Retrieves several verification values
- * The chunk size is set to 0 if not available
- * Returns 1 if successful or -1 on error
- */
-int verification_handle_get_raw_access_values(
-     verification_handle_t *verification_handle,
-     uint32_t *sectors_per_chunk,
-     uint32_t *bytes_per_sector,
-     liberror_error_t **error )
-{
-	static char *function = "verification_handle_get_raw_access_values";
-
-	if( verification_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( verification_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_get_sectors_per_chunk(
-	     verification_handle->input_handle,
-	     sectors_per_chunk,
-	     error ) != 1 )
-#else
-	if( libewf_get_sectors_per_chunk(
-	     verification_handle->input_handle,
-	     sectors_per_chunk ) != 1 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve sectors per chunk.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_get_bytes_per_sector(
-	     verification_handle->input_handle,
-	     bytes_per_sector,
-	     error ) != 1 )
-#else
-	if( libewf_get_bytes_per_sector(
-	     verification_handle->input_handle,
-	     bytes_per_sector ) != 1 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve bytes per sectors.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-#endif
-
 /* Sets the input values of the verification handle
  * Returns 1 if successful or -1 on error
  */
@@ -930,6 +862,36 @@ int verification_handle_finalize(
 
 		return( -1 );
 	}
+#if defined( USE_LIBEWF_GET_MD5_HASH )
+	if( verification_handle->calculate_sha1 != 0 )
+	{
+		if( libewf_parse_hash_values(
+		     verification_handle->input_handle ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to parse hash values.",
+			 function );
+
+			return( -1 );
+		}
+	}
+#elif defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
+	if( libewf_parse_hash_values(
+	     verification_handle->input_handle ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to parse hash values.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( verification_handle->calculate_md5 != 0 )
 	{
 		/* Finalize the MD5 hash calculation
