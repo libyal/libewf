@@ -1,7 +1,7 @@
 /*
  * Crypographic digest context
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -48,7 +48,7 @@ int digest_context_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid digest context.\n",
+		 "%s: invalid digest context.",
 		 function );
 
 		return( -1 );
@@ -60,7 +60,7 @@ int digest_context_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported digest context type.\n",
+		 "%s: unsupported digest context type.",
 		 function );
 
 		return( -1 );
@@ -85,7 +85,7 @@ int digest_context_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize context.\n",
+		 "%s: unable to initialize context.",
 		 function );
 
 		return( 0 );
@@ -114,7 +114,7 @@ int digest_context_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create AES or RSA crypt provider.\n",
+			 "%s: unable to create AES or RSA crypt provider.",
 			 function );
 
 			return( 0 );
@@ -126,7 +126,7 @@ int digest_context_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: unable to create crypt provider.\n",
+		 "%s: unable to create crypt provider.",
 		 function );
 
 		return( 0 );
@@ -150,7 +150,7 @@ int digest_context_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hash object.\n",
+		 "%s: unable to create hash object.",
 		 function );
 
 		CryptReleaseContext(
@@ -180,7 +180,7 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid digest context.\n",
+		 "%s: invalid digest context.",
 		 function );
 
 		return( -1 );
@@ -191,7 +191,7 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -202,7 +202,7 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -217,7 +217,7 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update digest hash.\n",
+		 "%s: unable to update digest hash.",
 		 function );
 
 		return( 0 );
@@ -229,7 +229,7 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid digest context - missing hash.\n",
+		 "%s: invalid digest context - missing hash.",
 		 function );
 
 		return( -1 );
@@ -244,7 +244,7 @@ int digest_context_update(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update digest context hash.\n",
+		 "%s: unable to update digest context hash.",
 		 function );
 
 		return( 0 );
@@ -270,7 +270,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid digest context.\n",
+		 "%s: invalid digest context.",
 		 function );
 
 		return( -1 );
@@ -281,7 +281,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid digest hash.\n",
+		 "%s: invalid digest hash.",
 		 function );
 
 		return( -1 );
@@ -292,7 +292,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid size value exceeds maximum.\n",
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -307,7 +307,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to finalize digest hash.\n",
+		 "%s: unable to finalize digest hash.",
 		 function );
 
 		return( 0 );
@@ -319,7 +319,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to clean up digest context.\n",
+		 "%s: unable to clean up digest context.",
 		 function );
 	}
 #elif defined( HAVE_WINCPRYPT_H )
@@ -329,7 +329,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid digest context - missing hash.\n",
+		 "%s: invalid digest context - missing hash.",
 		 function );
 
 		return( -1 );
@@ -345,7 +345,7 @@ int digest_context_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to finalize digest hash.\n",
+		 "%s: unable to finalize digest hash.",
 		 function );
 
 		return( 0 );

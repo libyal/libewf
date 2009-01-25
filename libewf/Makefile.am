@@ -1,8 +1,4 @@
-if HAVE_LOCAL_LIBUNA
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror -I$(top_srcdir)/libuna
-else
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror
-endif
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror @LIBUNA_CPPFLAGS@ @MEMWATCH_CPPFLAGS@
 
 lib_LTLIBRARIES = libewf.la
 
@@ -59,11 +55,7 @@ libewf_la_SOURCES = \
 	libewf_values_table.c libewf_values_table.h \
 	libewf_write.c libewf_write.h
 
-if HAVE_LOCAL_LIBUNA
-libewf_la_LIBADD  = ../liberror/liberror.la ../libuna/libuna.la
-else
-libewf_la_LIBADD  = ../liberror/liberror.la
-endif
+libewf_la_LIBADD  = ../liberror/liberror.la @LIBUNA_LIBADD@
 
 if HAVE_V2_API
 libewf_la_LDFLAGS = -no-undefined -version-info 2:0:0

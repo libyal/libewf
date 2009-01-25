@@ -1,7 +1,7 @@
 /*
  * List type functions
  *
- * Copyright (C) 2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (C) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.

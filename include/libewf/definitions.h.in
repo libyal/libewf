@@ -1,7 +1,7 @@
 /*
  * Definitions for libewf
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -86,7 +86,8 @@ enum LIBEWF_MEDIA_TYPES
 {
 	LIBEWF_MEDIA_TYPE_REMOVABLE		= 0x00,
 	LIBEWF_MEDIA_TYPE_FIXED			= 0x01,
-	LIBEWF_MEDIA_TYPE_CD			= 0x03
+	LIBEWF_MEDIA_TYPE_CD			= 0x03,
+	LIBEWF_MEDIA_TYPE_RAM			= 0x10
 };
 
 /* Libewf volume type definitions

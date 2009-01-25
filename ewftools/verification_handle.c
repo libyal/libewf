@@ -1,7 +1,7 @@
 /* 
  * Verification handle
  *
- * Copyright (C) 2007-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (C) 2007-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -37,6 +37,7 @@
 
 #include "digest_context.h"
 #include "digest_hash.h"
+#include "ewflibewf.h"
 #include "file_io.h"
 #include "storage_media_buffer.h"
 #include "md5.h"
@@ -44,11 +45,17 @@
 #include "sha1.h"
 #include "verification_handle.h"
 
+#if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
+#define USE_LIBEWF_GET_HASH_VALUE_MD5
+#endif
+
 /* Initializes the verification handle
  * Returns 1 if successful or -1 on error
  */
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
+     uint8_t calculate_md5,
+     uint8_t calculate_sha1,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_allocate";
@@ -59,7 +66,7 @@ int verification_handle_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -75,7 +82,7 @@ int verification_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create verification handle.\n",
+			 "%s: unable to create verification handle.",
 			 function );
 
 			return( -1 );
@@ -89,7 +96,7 @@ int verification_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear verification handle.\n",
+			 "%s: unable to clear verification handle.",
 			 function );
 
 			memory_free(
@@ -108,7 +115,7 @@ int verification_handle_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize input handle.\n",
+			 "%s: unable to initialize input handle.",
 			 function );
 
 			memory_free(
@@ -119,15 +126,19 @@ int verification_handle_initialize(
 			return( -1 );
 		}
 #endif
-		if( md5_initialize(
-		     &( ( *verification_handle )->md5_context ),
-		     error ) != 1 )
+		( *verification_handle )->calculate_md5  = calculate_md5;
+		( *verification_handle )->calculate_sha1 = calculate_sha1;
+
+		if( ( ( *verification_handle )->calculate_md5 != 0 )
+		 && ( md5_initialize(
+		       &( ( *verification_handle )->md5_context ),
+		       error ) != 1 ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize MD5 context.\n",
+			 "%s: unable to initialize MD5 context.",
 			 function );
 
 #if defined( HAVE_V2_API )
@@ -142,8 +153,30 @@ int verification_handle_initialize(
 
 			return( -1 );
 		}
-		( *verification_handle )->input_offset  = 0;
-		( *verification_handle )->output_offset = 0;
+		if( ( ( *verification_handle )->calculate_sha1 != 0 )
+		 && ( sha1_initialize(
+		       &( ( *verification_handle )->sha1_context ),
+		       error ) != 1 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize SHA1 context.",
+			 function );
+
+#if defined( HAVE_V2_API )
+			libewf_handle_free(
+			 &( ( *verification_handle )->input_handle ),
+			 NULL );
+#endif
+			memory_free(
+			 *verification_handle );
+
+			*verification_handle = NULL;
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
@@ -163,7 +196,7 @@ int verification_handle_free(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -180,7 +213,7 @@ int verification_handle_free(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free input handle.\n",
+			 "%s: unable to free input handle.",
 			 function );
 		}
 #endif
@@ -197,13 +230,11 @@ int verification_handle_free(
  */
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     const char *filename,
-     size_t length_filename,
+     char * const * filenames,
+     int amount_of_files,
      liberror_error_t **error )
 {
-	char **filenames      = NULL;
 	static char *function = "verification_handle_open_input";
-	int amount_of_files   = 0;
 	int result            = 1;
 
 	if( verification_handle == NULL )
@@ -212,58 +243,40 @@ int verification_handle_open_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( verification_handle->input_handle == NULL )
+	if( verification_handle->input_handle != NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid verification handle - input handle already set.",
 		 function );
 
 		return( -1 );
 	}
-#if defined( HAVE_V2_API )
-	amount_of_files = libewf_glob(
-	                   filename,
-	                   length_filename,
-	                   LIBEWF_FORMAT_UNKNOWN,
-	                   &filenames,
-	                   error );
-#else
-	amount_of_files = libewf_glob(
-	                   filename,
-	                   length_filename,
-	                   LIBEWF_FORMAT_UNKNOWN,
-	                   &filenames );
-#endif
-
-	if( amount_of_files < 0 )
+	if( filenames == NULL )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to glob filenames.\n",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filenames.",
 		 function );
-
-		memory_free(
-		 filenames );
 
 		return( -1 );
 	}
-	else if( amount_of_files == 0 )
+	if( amount_of_files <= 0 )
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: no files found.\n",
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
+		 "%s: invalid amount of filenames.",
 		 function );
 
 		memory_free(
@@ -274,14 +287,13 @@ int verification_handle_open_input(
 #if defined( HAVE_V2_API )
 	if( libewf_open(
 	     verification_handle->input_handle,
-	     (char * const *) filenames,
+	     filenames,
 	     amount_of_files,
 	     LIBEWF_OPEN_READ,
 	     error ) != 1 )
 #else
-
 	verification_handle->input_handle = libewf_open(
-	                                     (char * const *) filenames,
+	                                     filenames,
 	                                     amount_of_files,
 	                                     LIBEWF_OPEN_READ );
 
@@ -292,22 +304,11 @@ int verification_handle_open_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to open files.\n",
+		 "%s: unable to open files.",
 		 function );
 
-		result = -1;
+		return( 1 );
 	}
-	for( ; amount_of_files > 0; amount_of_files-- )
-	{
-		if( filenames[ amount_of_files - 1 ] != NULL )
-		{
-			memory_free(
-			 filenames[ amount_of_files - 1 ] );
-		}
-	}
-	memory_free(
-	 filenames );
-
 	return( result );
 }
 
@@ -330,7 +331,7 @@ ssize_t verification_handle_read_prepare_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -341,7 +342,7 @@ ssize_t verification_handle_read_prepare_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 "%s: invalid verification handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -352,19 +353,22 @@ ssize_t verification_handle_read_prepare_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.\n",
+		 "%s: invalid storage media buffer.",
 		 function );
 
 		return( -1 );
 	}
+	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
+
 #if defined( HAVE_V2_API )
 	read_count = libewf_raw_read_prepare_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->raw_buffer,
                       storage_media_buffer->raw_buffer_amount,
-                      storage_media_buffer->compressed_buffer,
-                      &( storage_media_buffer->compressed_buffer_amount ),
+                      storage_media_buffer->compression_buffer,
+                      (size_t *) &( storage_media_buffer->compression_buffer_amount ),
                       storage_media_buffer->is_compressed,
+                      storage_media_buffer->crc,
                       storage_media_buffer->process_crc,
 	              error );
 #else
@@ -372,9 +376,10 @@ ssize_t verification_handle_read_prepare_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->raw_buffer,
                       storage_media_buffer->raw_buffer_amount,
-                      storage_media_buffer->compressed_buffer,
-                      &( storage_media_buffer->compressed_buffer_amount ),
+                      storage_media_buffer->compression_buffer,
+                      (size_t *) &( storage_media_buffer->compression_buffer_amount ),
                       storage_media_buffer->is_compressed,
+                      storage_media_buffer->crc,
                       storage_media_buffer->process_crc );
 #endif
 
@@ -384,7 +389,7 @@ ssize_t verification_handle_read_prepare_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to prepare storage media buffer after reading.\n",
+		 "%s: unable to prepare storage media buffer after reading.",
 		 function );
 
 		return( -1 );
@@ -412,7 +417,7 @@ ssize_t verification_handle_read_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -423,7 +428,7 @@ ssize_t verification_handle_read_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 "%s: invalid verification handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -434,7 +439,7 @@ ssize_t verification_handle_read_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.\n",
+		 "%s: invalid storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -444,13 +449,19 @@ ssize_t verification_handle_read_buffer(
 	read_count = libewf_raw_read_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->raw_buffer,
-                      read_size,
+	              storage_media_buffer->raw_buffer_size,
+	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->crc ),
+	              &( storage_media_buffer->process_crc ),
 	              error );
 #else
 	read_count = libewf_raw_read_buffer(
-                      verification_handle->input_handle,
-                      storage_media_buffer->raw_buffer,
-                      read_size );
+	              verification_handle->input_handle,
+	              storage_media_buffer->raw_buffer,
+	              storage_media_buffer->raw_buffer_size,
+	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->crc ),
+	              &( storage_media_buffer->process_crc ) );
 #endif
 #else
 #if defined( HAVE_V2_API )
@@ -472,15 +483,16 @@ ssize_t verification_handle_read_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read storage media buffer.\n",
+		 "%s: unable to read storage media buffer.",
 		 function );
 
 		return( -1 );
 	}
-	storage_media_buffer->raw_buffer_amount = read_count;
-	storage_media_buffer->input_size        = read_count;
-	storage_media_buffer->offset            = verification_handle->input_offset;
-	verification_handle->input_offset      += read_count;
+	storage_media_buffer->raw_buffer_amount          = read_count;
+	storage_media_buffer->input_size                 = read_count;
+	storage_media_buffer->offset                     = verification_handle->input_offset;
+	storage_media_buffer->data_in_compression_buffer = storage_media_buffer->is_compressed;
+	verification_handle->input_offset               += read_count;
 
 	return( read_count );
 }
@@ -495,6 +507,8 @@ int verification_handle_update_integrity_hash(
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_update_integrity_hash";
+	void *data            = NULL;
+	size_t data_size      = 0;
 
 	if( verification_handle == NULL )
 	{
@@ -502,7 +516,7 @@ int verification_handle_update_integrity_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -513,7 +527,7 @@ int verification_handle_update_integrity_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid storage media buffer.\n",
+		 "%s: invalid storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -525,29 +539,69 @@ int verification_handle_update_integrity_hash(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid size value out of range.\n",
+		 "%s: invalid size value out of range.",
 		 function );
 
 		return( -1 );
 	}
-	/* TODO check for return value */
-	md5_update(
-	 &( verification_handle->md5_context ),
-	 storage_media_buffer->raw_buffer,
-	 size,
-	 error );
-
-	if( ( error != NULL )
-	 && ( *error != NULL ) )
+	if( storage_media_buffer_get_data(
+	     storage_media_buffer,
+	     &data,
+	     &data_size,
+	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to update MD5.\n",
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine storage media buffer data.",
 		 function );
 
 		return( -1 );
+	}
+	if( verification_handle->calculate_md5 != 0 )
+	{
+		/* TODO check for return value */
+		md5_update(
+		 &( verification_handle->md5_context ),
+		 data,
+		 data_size,
+		 error );
+
+		if( ( error != NULL )
+		 && ( *error != NULL ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update MD5 digest hash.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	if( verification_handle->calculate_sha1 != 0 )
+	{
+		/* TODO check for return value */
+		sha1_update(
+		 &( verification_handle->sha1_context ),
+		 data,
+		 data_size,
+		 error );
+
+		if( ( error != NULL )
+		 && ( *error != NULL ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to update SHA1 digest hash.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	verification_handle->output_offset += size;
 
@@ -570,7 +624,7 @@ int verification_handle_close(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -581,7 +635,7 @@ int verification_handle_close(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 "%s: invalid verification handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -599,7 +653,7 @@ int verification_handle_close(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input handle.\n",
+		 "%s: unable to close input handle.",
 		 function );
 
 		result = -1;
@@ -625,7 +679,7 @@ int verification_handle_get_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -636,7 +690,7 @@ int verification_handle_get_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 "%s: invalid verification handle - missing input handle.",
 		 function );
 
 		return( -1 );
@@ -647,7 +701,7 @@ int verification_handle_get_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk size.\n",
+		 "%s: invalid chunk size.",
 		 function );
 
 		return( -1 );
@@ -667,7 +721,7 @@ int verification_handle_get_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.\n",
+		 "%s: unable to retrieve media size.",
 		 function );
 
 		return( -1 );
@@ -691,12 +745,92 @@ int verification_handle_get_values(
 	return( 1 );
 }
 
+#if defined( HAVE_RAW_ACCESS )
+
+/* Retrieves several verification values
+ * The chunk size is set to 0 if not available
+ * Returns 1 if successful or -1 on error
+ */
+int verification_handle_get_raw_access_values(
+     verification_handle_t *verification_handle,
+     uint32_t *sectors_per_chunk,
+     uint32_t *bytes_per_sector,
+     liberror_error_t **error )
+{
+	static char *function = "verification_handle_get_raw_access_values";
+
+	if( verification_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid verification handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_get_sectors_per_chunk(
+	     verification_handle->input_handle,
+	     sectors_per_chunk,
+	     error ) != 1 )
+#else
+	if( libewf_get_sectors_per_chunk(
+	     verification_handle->input_handle,
+	     sectors_per_chunk ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve sectors per chunk.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_get_bytes_per_sector(
+	     verification_handle->input_handle,
+	     bytes_per_sector,
+	     error ) != 1 )
+#else
+	if( libewf_get_bytes_per_sector(
+	     verification_handle->input_handle,
+	     bytes_per_sector ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve bytes per sectors.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+#endif
+
 /* Sets the input values of the verification handle
  * Returns 1 if successful or -1 on error
  */
 int verification_handle_set_input_values(
      verification_handle_t *verification_handle,
-     int format,
+     int wipe_chunk_on_error,
      liberror_error_t **error )
 {
 	static char *function = "verification_handle_set_input_values";
@@ -707,7 +841,7 @@ int verification_handle_set_input_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -718,27 +852,27 @@ int verification_handle_set_input_values(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 "%s: invalid verification handle - missing input handle.",
 		 function );
 
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_set_format(
+	if( libewf_set_read_wipe_chunk_on_error(
 	     verification_handle->input_handle,
-	     format,
+	     wipe_chunk_on_error,
 	     error ) != 1 )
 #else
-	if( libewf_set_format(
+	if( libewf_set_read_wipe_chunk_on_error(
 	     verification_handle->input_handle,
-	     format ) != 1 )
+	     wipe_chunk_on_error ) != 1 )
 #endif
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set format in input handle.\n",
+		 "%s: unable to set wipe chunk on error in input handle.",
 		 function );
 
 		return( -1 );
@@ -747,20 +881,32 @@ int verification_handle_set_input_values(
 }
 
 /* Finalizes the verification handle
- * Returns 1 if the verification was successful, 0 if not or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
+     character_t *calculated_md5_hash_string,
+     size_t calculated_md5_hash_string_size,
+     character_t *stored_md5_hash_string,
+     size_t stored_md5_hash_string_size,
+     int *stored_md5_hash_available,
+     character_t *calculated_sha1_hash_string,
+     size_t calculated_sha1_hash_string_size,
+     character_t *stored_sha1_hash_string,
+     size_t stored_sha1_hash_string_size,
+     int *stored_sha1_hash_available,
      liberror_error_t **error )
 {
-	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-	char calculated_md5_hash_string[ 33 ];
-	uint8_t stored_md5_hash_string[ 33 ];
+#if defined( USE_LIBEWF_GET_MD5_HASH )
+        digest_hash_t stored_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+#endif
 
-	static char *function         = "verification_handle_finalize";
-	size_t md5_hash_size          = DIGEST_HASH_SIZE_MD5;
-	size_t md5_hash_string_length = 33;
-	int result                    = 0;
+	digest_hash_t calculated_md5_hash[ DIGEST_HASH_SIZE_MD5 ];
+	digest_hash_t calculated_sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
+
+	static char *function            = "verification_handle_finalize";
+	size_t calculated_md5_hash_size  = DIGEST_HASH_SIZE_MD5;
+	size_t calculated_sha1_hash_size = DIGEST_HASH_SIZE_SHA1;
 
 	if( verification_handle == NULL )
 	{
@@ -768,7 +914,7 @@ int verification_handle_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.\n",
+		 "%s: invalid verification handle.",
 		 function );
 
 		return( -1 );
@@ -779,88 +925,184 @@ int verification_handle_finalize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.\n",
+		 "%s: invalid verification handle - missing input handle.",
 		 function );
 
 		return( -1 );
 	}
-	/* Finalize the MD5 hash calculation
-	 */
-	if( md5_finalize(
-	     &( verification_handle->md5_context ),
-             calculated_md5_hash,
-             &md5_hash_size,
-	     error ) != 1 )
+	if( verification_handle->calculate_md5 != 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to finalize MD5 hash.\n",
-		 function );
+		/* Finalize the MD5 hash calculation
+		 */
+		if( md5_finalize(
+		     &( verification_handle->md5_context ),
+		     calculated_md5_hash,
+		     &calculated_md5_hash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize MD5 hash.",
+			 function );
 
-		return( -1 );
-	}
-	if( digest_hash_copy_to_string(
-	     calculated_md5_hash,
-	     md5_hash_size,
-	     calculated_md5_hash_string,
-	     md5_hash_string_length,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create calculated MD5 hash string.\n",
-		 function );
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_md5_hash,
+		     calculated_md5_hash_size,
+		     calculated_md5_hash_string,
+		     calculated_md5_hash_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set calculated MD5 hash string.",
+			 function );
 
-		return( -1 );
-	}
+			return( -1 );
+		}
+		if( stored_md5_hash_available == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid stored MD5 hash available value.",
+			 function );
+
+			return( -1 );
+		}
+#if defined( USE_LIBEWF_GET_MD5_HASH )
 #if defined( HAVE_V2_API )
-	result = libewf_get_hash_value(
-	          verification_handle->input_handle,
-	          (uint8_t *) "MD5",
-	          3,
-	          stored_md5_hash_string,
-	          md5_hash_string_length,
-	          error );
+		*stored_md5_hash_available = libewf_get_md5_hash(
+					      verification_handle->input_handle,
+					      md5_hash,
+					      DIGEST_HASH_SIZE_MD5,
+					      error );
 #else
-	result = libewf_get_hash_value(
-	          verification_handle->input_handle,
-	          "MD5",
-	          (char *) stored_md5_hash_string,
-	          md5_hash_string_length );
-#endif
-	if( result == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to retrieve stored MD5 hash string.\n",
-		 function );
-
-		return( -1 );
-	}
-	else if( result == 0 )
-	{
-		return( 0 );
-	}
-	if( memory_compare(
-	     calculated_md5_hash_string,
-	     stored_md5_hash_string,
-	     md5_hash_string_length ) != 0 )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf(
-		 "%s: calculated: %s and stored: %s MD5 hash string do not match.\n",
-		 function,
-	         calculated_md5_hash_string,
-		 (char *) stored_md5_hash_string );
+		*stored_md5_hash_available = libewf_get_md5_hash(
+					      verification_handle->input_handle,
+					      md5_hash,
+					      DIGEST_HASH_SIZE_MD5 );
 #endif
 
-		return( 0 );
+		if( *stored_md5_hash_available == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine stored MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     md5_hash,
+		     DIGEST_HASH_SIZE_MD5,
+		     stored_md5_hash_string,
+		     stored_md5_hash_string_size ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBEWF_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set stored MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+#elif defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
+		*stored_md5_hash_available = ewflibewf_get_hash_value(
+		                              verification_handle->input_handle,
+		                              "MD5",
+		                              3,
+		                              stored_md5_hash_string,
+		                              stored_md5_hash_string_size,
+		                              error );
+
+		if( *stored_md5_hash_available == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine stored MD5 hash string.",
+			 function );
+
+			return( -1 );
+		}
+#endif
+	}
+	if( verification_handle->calculate_sha1 != 0 )
+	{
+		/* Finalize the SHA1 hash calculation
+		 */
+		if( sha1_finalize(
+		     &( verification_handle->sha1_context ),
+		     calculated_sha1_hash,
+		     &calculated_sha1_hash_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to finalize SHA1 hash.",
+			 function );
+
+			return( -1 );
+		}
+		if( digest_hash_copy_to_string(
+		     calculated_sha1_hash,
+		     calculated_sha1_hash_size,
+		     calculated_sha1_hash_string,
+		     calculated_sha1_hash_string_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create calculated SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
+		if( stored_sha1_hash_available == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid stored SHA1 hash available value.",
+			 function );
+
+			return( -1 );
+		}
+		*stored_sha1_hash_available = ewflibewf_get_hash_value(
+		                               verification_handle->input_handle,
+		                               "SHA1",
+		                               4,
+		                               stored_sha1_hash_string,
+		                               stored_sha1_hash_string_size,
+		                               error );
+
+		if( *stored_sha1_hash_available == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine stored SHA1 hash string.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }

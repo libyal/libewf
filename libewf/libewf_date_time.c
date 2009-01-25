@@ -1,7 +1,7 @@
 /*
  * Date and time functions
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -57,7 +57,7 @@ struct tm *libewf_date_time_localtime(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid time stamp.\n",
+		 "%s: invalid time stamp.",
 		 function );
 
 		return( NULL );
@@ -71,7 +71,7 @@ struct tm *libewf_date_time_localtime(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create time elements.\n",
+		 "%s: unable to create time elements.",
 		 function );
 
 		return( NULL );
@@ -91,7 +91,7 @@ struct tm *libewf_date_time_localtime(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set time elements.\n",
+		 "%s: unable to set time elements.",
 		 function );
 
 		memory_free(
@@ -109,7 +109,7 @@ struct tm *libewf_date_time_localtime(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create static time elements.\n",
+		 "%s: unable to create static time elements.",
 		 function );
 
 		memory_free(
@@ -126,7 +126,7 @@ struct tm *libewf_date_time_localtime(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set time elements.\n",
+		 "%s: unable to set time elements.",
 		 function );
 
 		memory_free(

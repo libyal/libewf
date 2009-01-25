@@ -1,34 +1,23 @@
 /*
  * Configuration file for Windows native compilation
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- * - Neither the name of the creator, related organisations, nor the names of
- *   its contributors may be used to endorse or promote products derived from
- *   this software without specific prior written permission.
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER, COMPANY AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #if !defined( _CONFIG_WINDOWS_H )
@@ -48,11 +37,11 @@
 #undef HAVE_INTTYPES_H
 #undef HAVE_STDINT_H
 
-#define HAVE_SIZE32_T	0
-#define HAVE_SSIZE32_T	0
-#define HAVE_SIZE64_T	0
-#define HAVE_SSIZE64_T	0
-#define HAVE_OFF64_T	0
+#define HAVE_SIZE32_T   0
+#define HAVE_SSIZE32_T  0
+#define HAVE_SIZE64_T   0
+#define HAVE_SSIZE64_T  0
+#define HAVE_OFF64_T    0
 
 /* Windows does not have %jd and %zd printf conversion specifiers
  */
@@ -71,7 +60,7 @@
 #define HAVE_SHARE_H	1
 
 #if !defined( HAVE_FCNTL_H )
-#define HAVE_FCNTL_H	1
+#define HAVE_FCNTL_H    1
 #endif
 
 /* Windows does not have <sys/ioctl.h> and <sys/utsname.h>
@@ -106,14 +95,8 @@
  * make use of the wide character support functions
  */
 #if !defined( HAVE_WCHAR_H )
-#define HAVE_WCHAR_H            1
+#define HAVE_WCHAR_H		1
 #endif
-
-#if defined( SIZEOF_WCHAR_T )
-#undef SIZEOF_WCHAR_T
-#endif
-
-#define SIZEOF_WCHAR_T		2
 
 /* Make sure the function definitions are available
  * these should be normally defined in config.h
@@ -123,12 +106,11 @@
 #define HAVE_DATE_TIME		1
 #define HAVE_ERROR_STRING	1
 #define HAVE_FILE_IO		1
-#define HAVE_FILE_STREAM_IO	1
 #define HAVE_NARROW_STRING	1
 #define HAVE_WIDE_STRING	1
 
-/* Functions in ewftools/date_time.h
- *  */
+/* Functions in unatools/date_time.h
+ */
 #if defined( HAVE_DATE_TIME )
 #if !defined( HAVE_CTIME_R )
 #define HAVE_CTIME_R		1
@@ -161,8 +143,8 @@
 #undef HAVE_TIME
 #endif
 
-/* Functions in ewftools/error_string.h
- *  */
+/* Functions in unatools/error_string.h
+ */
 #if defined( HAVE_ERROR_STRING )
 #if !defined( HAVE_STRERROR_R )
 #define HAVE_STRERROR_R		1
@@ -175,8 +157,8 @@
 #undef HAVE_WCSERROR_R
 #endif
 
-/* Functions in ewftools/file_io.h
- *  */
+/* Functions in unatools/file_io.h
+ */
 #if defined( HAVE_FILE_IO )
 #if !defined( HAVE_OPEN )
 #define HAVE_OPEN		1
@@ -209,36 +191,8 @@
 #undef HAVE_WRITE
 #endif
 
-/* Functions in ewftools/file_stream_io.h
- *  */
-#if defined( HAVE_FILE_STREAM_IO )
-#if !defined( HAVE_FOPEN )
-#define HAVE_FOPEN		1
-#endif
-
-#define HAVE_WFOPEN		1
-
-#if !defined( HAVE_FCLOSE )
-#define HAVE_FCLOSE		1
-#endif
-
-#if !defined( HAVE_FREAD )
-#define HAVE_FREAD		1
-#endif
-
-#if !defined( HAVE_FWRITE )
-#define HAVE_FWRITE		1
-#endif
-
-#else
-#undef HAVE_FOPEN
-#undef HAVE_WFOPEN
-#undef HAVE_FCLOSE
-#undef HAVE_FREAD
-#undef HAVE_FWRITE
-#endif
 /* Functions in common/narrow_string.h
- *  */
+ */
 #if defined( HAVE_NARROW_STRING )
 #if !defined( HAVE_STRLEN )
 #define HAVE_STRLEN		1
@@ -324,14 +278,6 @@
 #undef HAVE_FGETWS
 #undef HAVE_WTOI64
 #endif
-
-/* Define a string for the acquiry system value in the header values
- */
-#if defined( LIBEWF_OPERATING_SYSTEM )
-#undef LIBEWF_OPERATING_SYSTEM
-#endif
-
-#define LIBEWF_OPERATING_SYSTEM "Microsoft Windows"
 
 #endif
 

@@ -1,7 +1,7 @@
 /* 
  * Storage media buffer
  *
- * Copyright (C) 2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (C) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -49,6 +49,11 @@ struct storage_media_buffer
 	ssize_t raw_buffer_amount;
 
 #if defined( HAVE_RAW_ACCESS )
+        /* Value to indicate if the compression buffer
+	 * contains uncompressed data
+	 */
+        int8_t data_in_compression_buffer;
+
 	/* Value to indicate if the data is compressed
 	 */
 	int8_t is_compressed;
@@ -87,6 +92,26 @@ struct storage_media_buffer
 	 */
 	off64_t offset;
 };
+
+int storage_media_buffer_initialize(
+     storage_media_buffer_t **buffer,
+     size_t size,
+     liberror_error_t **error );
+
+int storage_media_buffer_free(
+     storage_media_buffer_t **buffer,
+     liberror_error_t **error );
+
+int storage_media_buffer_resize(
+     storage_media_buffer_t *buffer,
+     size_t size,
+     liberror_error_t **error );
+
+int storage_media_buffer_get_data(
+     storage_media_buffer_t *buffer,
+     void **data,
+     size_t *size,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

@@ -1,7 +1,7 @@
 /*
  * Common functions for the ewftools
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -141,19 +141,6 @@ ssize_t ewfcommon_raw_write_ewf(
          size_t buffer_size,
          size_t write_size );
 #endif
-
-ssize64_t ewfcommon_read_verify(
-           libewf_handle_t *handle,
-           uint8_t calculate_md5,
-           character_t *md5_hash_string,
-           size_t md5_hash_string_length,
-           uint8_t calculate_sha1,
-           character_t *sha1_hash_string,
-           size_t sha1_hash_string_length,
-           uint8_t swap_byte_pairs,
-           uint8_t wipe_chunk_on_error,
-           size_t data_buffer_size,
-           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 ssize64_t ewfcommon_write_from_file_descriptor(
            libewf_handle_t *handle,

@@ -1,7 +1,7 @@
 /*
  * GUID functions
  *
- * Copyright (c) 2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -67,6 +67,7 @@ int guid_to_string(
 		return( -1 );
 	}
 	/* Create the GUID string
+	 * It is stored as uint32 - uint16 - uint16 - 8 byte array
 	 */
 	print_count = string_snprintf(
 	               string,
@@ -87,9 +88,9 @@ int guid_to_string(
 	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
 	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
 	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 ),
-	               guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ],
-	               guid[ 4 ], guid[ 5 ],
-	               guid[ 6 ], guid[ 7 ],
+	               guid[ 3 ], guid[ 2 ], guid[ 1 ], guid[ 0 ],
+	               guid[ 5 ], guid[ 4 ],
+	               guid[ 7 ], guid[ 6 ],
 	               guid[ 8 ], guid[ 9 ],
 	               guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
 

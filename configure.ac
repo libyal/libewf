@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20081019],
+ [20090125],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20081019])
+ [20090125])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -794,14 +794,14 @@ AS_IF(
 AS_IF(
 	[test "x$ac_libewf_have_libuna" = xyes],
 	[AC_SUBST(
-	  [libewf_pc_libs_private_libuna],
-	  [-luna])
-	 AC_SUBST(
-	  [libewf_spec_requires_libuna],
-	  [libuna])
-	 AC_SUBST(
-	  [libewf_spec_build_requires_libuna],
-	  [libuna-devel]) ],
+	 [libewf_pc_libs_private_libuna],
+	 [-luna])
+	AC_SUBST(
+	 [libewf_spec_requires_libuna],
+	 [libuna])
+	AC_SUBST(
+	 [libewf_spec_build_requires_libuna],
+	 [libuna-devel]) ],
 	[dnl If libuna is not available use the (local) version that came with libewf
 	AC_DEFINE(
 	 [HAVE_LOCAL_LIBUNA],
@@ -819,6 +819,12 @@ AS_IF(
 	AC_SUBST(
 	 [libewf_spec_build_requires_libuna],
 	 [])
+	AC_SUBST(
+	 [LIBUNA_CPPFLAGS],
+	 [-I../libuna])
+	AC_SUBST(
+	 [LIBUNA_LIBADD],
+	 [../libuna/libuna.la])
 	ac_libewf_have_libuna=local])
 
 AM_CONDITIONAL(
@@ -1005,7 +1011,7 @@ AS_IF(
 
 dnl Check if libewf should be build with wide character type support
 AS_IF(
-	[test "x$ac_libewf_enable_wide_character_type" != xno ],
+	[test "x$ac_cv_libewf_enable_wide_character_type" != xno ],
 	[dnl Check for the wide character header
 	AC_CHECK_HEADERS(
 	 [wchar.h],
@@ -1129,7 +1135,7 @@ AS_IF(
 	AC_SUBST(
 	 [HAVE_WIDE_CHARACTER_TYPE],
 	 [1])
-	ac_libewf_enable_wide_character_type=yes],
+	ac_cv_libewf_enable_wide_character_type=yes],
 
 	[AC_SUBST(
 	 [HAVE_WIDE_CHARACTER_TYPE],
@@ -1144,49 +1150,49 @@ AC_SUBST(
 
 dnl Check if ewftools should be build with raw read and write support
 AS_IF(
-	[test "x$ac_libewf_enable_raw_access" != xno],
+	[test "x$ac_cv_libewf_enable_raw_access" != xno],
 	[AC_DEFINE(
 	 [HAVE_RAW_ACCESS],
 	 [1],
 	 [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
-	ac_libewf_enable_raw_access=yes])
+	ac_cv_libewf_enable_raw_access=yes])
 
 dnl Check if libewf should be build with verbose output
 AS_IF(
-	[test "x$ac_libewf_enable_verbose_output" != xno],
+	[test "x$ac_cv_libewf_enable_verbose_output" != xno],
 	[AC_DEFINE(
 	 [HAVE_VERBOSE_OUTPUT],
 	 [1],
 	 [Defines if verbose output should be used] )
-	ac_libewf_enable_verbose_output=yes])
+	ac_cv_libewf_enable_verbose_output=yes])
 
 dnl Check if libewf should be build with debug output
 AS_IF(
-	[test "x$ac_libewf_enable_debug_output" != xno],
+	[test "x$ac_cv_libewf_enable_debug_output" != xno],
 	[AC_DEFINE(
 	 [HAVE_DEBUG_OUTPUT],
 	 [1],
 	 [Defines if debug output should be used] )
-	ac_libewf_enable_debug_output=yes])
+	ac_cv_libewf_enable_debug_output=yes])
 
 dnl Check if libewf python bindings (pyewf) should be built
 AS_IF(
-	[test "x$ac_libewf_enable_python" != xno],
+	[test "x$ac_cv_libewf_enable_python" != xno],
 	[AM_PATH_PYTHON([2.5])
 	LIBEWF_CHECK_PYTHON_DEVEL()
 	AC_DEFINE(
 	 [HAVE_PYTHON],
 	 [1],
 	 [Have Python bindings])
-	ac_libewf_enable_python=yes])
+	ac_cv_libewf_enable_python=yes])
 
 AM_CONDITIONAL(
  HAVE_PYTHON,
- [test "x$ac_libewf_enable_python" != xno])
+ [test "x$ac_cv_libewf_enable_python" != xno])
 
 dnl Check if libewf should be build with experimental version 2 API
 AS_IF(
-	[test "x$ac_libewf_enable_v2_api" != xno],
+	[test "x$ac_cv_libewf_enable_v2_api" != xno],
 	[AC_DEFINE(
 	 [HAVE_V2_API],
 	 [1],
@@ -1194,21 +1200,36 @@ AS_IF(
 	AC_SUBST(
 	 [HAVE_V2_API],
 	 [1])
-	ac_libewf_enable_v2_api=yes],
+	ac_cv_libewf_enable_v2_api=yes],
 	[AC_SUBST(
 	 [HAVE_V2_API],
 	 [0]) ])
 
 AM_CONDITIONAL(
  HAVE_V2_API,
- [test "x$ac_libewf_enable_v2_api" != xno])
+ [test "x$ac_cv_libewf_enable_v2_api" != xno])
 
 dnl Check for the operation system will be used as a fall back in the ewftools
 LIBEWF_DETERMINE_OPERATING_SYSTEM
 
+dnl Set memwatch support
+ac_libewf_have_memwatch=yes
+
+AS_IF(
+	[test "x$ac_libewf_have_memwatch" != xno ],
+	[AC_SUBST(
+	 [MEMWATCH_CPPFLAGS],
+	 ["-DMEMWATCH -DMEMWATCH_STDIO"])
+	AC_SUBST(
+	 [MEMWATCH_LIBADD],
+	 [../common/libmemwatch.la]) ])
+
+AM_CONDITIONAL(
+ [HAVE_MEMWATCH],
+ [test "x$ac_libewf_have_memwatch" != xno])
+
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";
-dnl CFLAGS="$CFLAGS -Wall -DMEMWATCH -DMEMWATCH_STDIO";
 
 dnl Have configure make the Makefiles
 AC_CONFIG_FILES([Makefile])
@@ -1249,11 +1270,11 @@ Building:
    libuuid support:                         $ac_libewf_have_libuuid
 
 Features:
-   Wide character type support:             $ac_libewf_enable_wide_character_type
-   ewftools use raw read and write support: $ac_libewf_enable_raw_access
-   Python (pyewf) support:                  $ac_libewf_enable_python
-   Verbose output:                          $ac_libewf_enable_verbose_output
-   Debug output:                            $ac_libewf_enable_debug_output
-   Experimental version 2 API:              $ac_libewf_enable_v2_api
+   Wide character type support:             $ac_cv_libewf_enable_wide_character_type
+   ewftools use raw read and write support: $ac_cv_libewf_enable_raw_access
+   Python (pyewf) support:                  $ac_cv_libewf_enable_python
+   Verbose output:                          $ac_cv_libewf_enable_verbose_output
+   Debug output:                            $ac_cv_libewf_enable_debug_output
+   Experimental version 2 API:              $ac_cv_libewf_enable_v2_api
 ]);
 

@@ -1,7 +1,7 @@
 /*
  * File reading functions
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -385,8 +385,10 @@ ssize_t libewf_raw_read_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid chunk size too small.",
-		 function );
+		 "%s: invalid chunk size too small (%" PRIzd " < %" PRIzd ").",
+		 function,
+		 chunk_size,
+		 chunk_data_size );
 
 		return( -1 );
 	}

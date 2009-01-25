@@ -2,7 +2,7 @@
  * ewfverify
  * Verifies the integrity of the media data within the EWF file
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -61,11 +61,9 @@
 #include "notify.h"
 #include "process_status.h"
 #include "sha1.h"
+#include "storage_media_buffer.h"
 #include "system_string.h"
-
-#if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
-#define USE_LIBEWF_GET_HASH_VALUE_MD5
-#endif
+#include "verification_handle.h"
 
 /* Prints the executable usage information to the stream
  */
@@ -77,7 +75,7 @@ void usage_fprint(
 		return;
 	}
 	fprintf( stream, "Usage: ewfverify [ -d digest_type ] [ -l log_filename ]\n"
-	                 "                 [ -p process_buffer_size ] [ -hqsvVw ] ewf_files\n\n" );
+	                 "                 [ -p process_buffer_size ] [ -hqvVw ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
@@ -86,11 +84,282 @@ void usage_fprint(
 	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the log_filename\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
-	fprintf( stream, "\t-s:        swap byte pairs of the media data (from AB to BA)\n"
-	                 "\t           (use this for big to little endian conversion and vice versa)\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
 	fprintf( stream, "\t-V:        print version\n" );
 	fprintf( stream, "\t-w:        wipe sectors on CRC error (mimic EnCase like behavior)\n" );
+}
+
+/* Reads the data to calculate the MD5 and SHA1 integrity hashes
+ * Returns the amount of bytes read if successful or -1 on error
+ */
+ssize64_t ewfverify_read_input(
+           verification_handle_t *verification_handle,
+           uint8_t wipe_chunk_on_error,
+           size_t data_buffer_size,
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ),
+           liberror_error_t **error )
+{
+	storage_media_buffer_t *storage_media_buffer = NULL;
+	static char *function                        = "ewfverify_read_input";
+	off64_t read_offset                          = 0;
+	size64_t media_size                          = 0;
+	size32_t chunk_size                          = 0;
+	size_t read_size                             = 0;
+	ssize64_t total_read_count                   = 0;
+	ssize_t read_count                           = 0;
+#if defined( HAVE_RAW_ACCESS )
+	uint8_t *raw_read_data                       = NULL;
+	size_t raw_read_buffer_size                  = 0;
+	uint32_t sectors_per_chunk                   = 0;
+	uint32_t bytes_per_sector                    = 0;
+#endif
+
+	if( verification_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_buffer_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data buffer size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle_get_values(
+	     verification_handle,
+	     &media_size,
+	     &chunk_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine verification handle values.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid chunk size.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size > (uint32_t) INT32_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle_set_input_values(
+	     verification_handle,
+	     wipe_chunk_on_error,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set verification handle input values.\n",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_RAW_ACCESS )
+	if( verification_handle_get_raw_access_values(
+	     verification_handle,
+	     &sectors_per_chunk,
+	     &bytes_per_sector,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine verification handle raw access values.\n",
+		 function );
+
+		return( -1 );
+	}
+#endif
+
+#if defined( HAVE_RAW_ACCESS )
+	/* Make sure SMART chunks fit in the storage media buffer
+	 */
+	data_buffer_size = chunk_size + 16;
+#else
+	if( data_buffer_size == 0 )
+	{
+		data_buffer_size = chunk_size;
+	}
+#endif
+
+	if( storage_media_buffer_initialize(
+	     &storage_media_buffer,
+	     data_buffer_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create storage media buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+
+	while( total_read_count < (ssize64_t) media_size )
+	{
+		read_size = chunk_size;
+
+		if( ( media_size - total_read_count ) < read_size )
+		{
+			read_size = (size_t) ( media_size - total_read_count );
+		}
+		read_count = verification_handle_read_buffer(
+		              verification_handle,
+		              storage_media_buffer,
+		              read_size,
+		              error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			"%s: unable to read data from verification handle.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		if( read_count == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unexpected end of data.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+#if defined( HAVE_RAW_ACCESS )
+		read_count = verification_handle_read_prepare_buffer(
+		              verification_handle,
+		              storage_media_buffer,
+		              error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			"%s: unable to prepare buffer after read.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+#endif
+		if( read_count > (ssize_t) read_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: more bytes read than requested.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		if( verification_handle_update_integrity_hash(
+		     verification_handle,
+		     storage_media_buffer,
+		     read_size,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to update integrity hash(es).\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		read_offset      += (off64_t) read_size;
+		total_read_count += (ssize64_t) read_count;
+
+		if( callback != NULL )
+		{
+			callback(
+			 process_status,
+			 (size64_t) total_read_count,
+			 media_size );
+		}
+		if( ewfcommon_abort != 0 )
+		{
+			break;
+		}
+  	}
+	if( storage_media_buffer_free(
+	     &storage_media_buffer,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free storage media buffer.\n",
+		 function );
+
+		return( -1 );
+	}
+	return( total_read_count );
 }
 
 /* The main program
@@ -101,10 +370,6 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-#if defined( USE_LIBEWF_GET_MD5_HASH )
-	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
-#endif
-
 	liberror_error_t *error                    = NULL;
 
 #if !defined( HAVE_GLOB_H )
@@ -120,6 +385,8 @@ int main( int argc, char * const argv[] )
 	system_character_t **ewf_filenames         = NULL;
 	system_character_t *log_filename           = NULL;
 
+	verification_handle_t *verification_handle = NULL;
+
 	FILE *log_file_stream                      = NULL;
 	void *callback                             = &process_status_update;
 
@@ -130,7 +397,6 @@ int main( int argc, char * const argv[] )
 	uint32_t amount_of_crc_errors              = 0;
 	uint8_t calculate_md5                      = 1;
 	uint8_t calculate_sha1                     = 0;
-	uint8_t swap_byte_pairs                    = 0;
 	uint8_t wipe_chunk_on_error                = 0;
 	uint8_t verbose                            = 0;
 	int amount_of_filenames                    = 0;
@@ -138,8 +404,8 @@ int main( int argc, char * const argv[] )
 	int match_sha1_hash                        = 0;
 	int result                                 = 0;
 	int status                                 = 0;
-	int stored_md5_hash_result                 = 0;
-	int stored_sha1_hash_result                = 0;
+	int stored_md5_hash_available              = 0;
+	int stored_sha1_hash_available             = 0;
 
 	ewfoutput_version_fprint(
 	 stdout,
@@ -148,7 +414,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:sp:qvVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:p:qvVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -210,10 +476,6 @@ int main( int argc, char * const argv[] )
 
 				break;
 
-			case (system_integer_t) 's':
-				swap_byte_pairs = 1;
-
-				break;
 			case (system_integer_t) 'v':
 				verbose = 1;
 
@@ -282,6 +544,26 @@ int main( int argc, char * const argv[] )
 	argv_filenames = &argv[ optind ];
 #endif
 
+	if( verification_handle_initialize(
+	     &verification_handle,
+	     calculate_md5,
+	     calculate_sha1,
+	     &error ) != 1 )
+	{
+		fprintf( stderr, "Unable to create verification handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+#if !defined( HAVE_GLOB_H )
+		glob_free(
+		 &glob );
+#endif
+
+		return( EXIT_FAILURE );
+	}
 	if( amount_of_filenames == 1 )
 	{
 		amount_of_filenames = libewf_glob(
@@ -293,7 +575,11 @@ int main( int argc, char * const argv[] )
 
 		if( amount_of_filenames <= 0 )
 		{
-			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
+			fprintf( stderr, "Unable to resolve EWF filename(s).\n" );
+
+			verification_handle_free(
+			 &verification_handle,
+			 NULL );
 
 #if !defined( HAVE_GLOB_H )
 			glob_free(
@@ -304,18 +590,22 @@ int main( int argc, char * const argv[] )
 		}
 		argv_filenames = (system_character_t * const *) ewf_filenames;
 	}
-	ewfcommon_libewf_handle = libewf_open(
-	                           argv_filenames,
-	                           amount_of_filenames,
-	                           LIBEWF_OPEN_READ );
+	result = verification_handle_open_input(
+	          verification_handle,
+	          argv_filenames,
+	          amount_of_filenames,
+	          &error );
+
 #if !defined( HAVE_GLOB_H )
 	glob_free(
 	 &glob );
 #endif
+
 	if( ewf_filenames != NULL )
 	{
 		for( ; amount_of_filenames > 0; amount_of_filenames-- )
 		{
+fprintf( stderr, "X: %d: %s\n", amount_of_filenames - 1, ewf_filenames[ amount_of_filenames - 1 ] );
 			memory_free(
 			 ewf_filenames[ amount_of_filenames - 1 ] );
 		}
@@ -323,87 +613,22 @@ int main( int argc, char * const argv[] )
 		 ewf_filenames );
 	}
 	if( ( ewfcommon_abort == 0 )
-	 && ( ewfcommon_libewf_handle == NULL ) )
+	 && ( result != 1 ) )
 	{
-		ewfoutput_error_fprint(
+		fprintf(
 		 stderr,
-		 "Unable to open EWF image file(s)" );
+		 "Unable to open EWF image file(s).\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		verification_handle_free(
+		 &verification_handle,
+		 NULL );
 
 		return( EXIT_FAILURE );
-	}
-	if( calculate_md5 == 1 )
-	{
-		stored_md5_hash_string = (character_t *) memory_allocate(
-		                                          sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
-
-		if( stored_md5_hash_string == NULL )
-		{
-			fprintf( stderr, "Unable to create stored MD5 hash string.\n" );
-
-			libewf_close(
-			 ewfcommon_libewf_handle );
-
-			return( EXIT_FAILURE );
-		}
-		calculated_md5_hash_string = (character_t *) memory_allocate(
-		                                              sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
-
-		if( calculated_md5_hash_string == NULL )
-		{
-			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
-
-			memory_free(
-			 stored_md5_hash_string );
-
-			libewf_close(
-			 ewfcommon_libewf_handle );
-
-			return( EXIT_FAILURE );
-		}
-	}
-	if( calculate_sha1 == 1 )
-	{
-		stored_sha1_hash_string = (character_t *) memory_allocate(
-		                                           sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
-
-		if( stored_sha1_hash_string == NULL )
-		{
-			fprintf( stderr, "Unable to create stored SHA1 hash string.\n" );
-
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-			}
-			libewf_close(
-			 ewfcommon_libewf_handle );
-
-			return( EXIT_FAILURE );
-		}
-		calculated_sha1_hash_string = (character_t *) memory_allocate(
-		                                               sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
-
-		if( calculated_sha1_hash_string == NULL )
-		{
-			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
-
-			memory_free(
-			 stored_sha1_hash_string );
-
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-			}
-			libewf_close(
-			 ewfcommon_libewf_handle );
-
-			return( EXIT_FAILURE );
-		}
 	}
 	if( ewfcommon_abort == 0 )
 	{
@@ -416,22 +641,12 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf( stderr, "Unable to initialize process status.\n" );
 
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-			}
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 stored_sha1_hash_string );
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			libewf_close(
-			 ewfcommon_libewf_handle );
+			verification_handle_close(
+			 verification_handle,
+			 NULL );
+			verification_handle_free(
+			 &verification_handle,
+			 NULL );
 
 			return( EXIT_FAILURE );
 		}
@@ -443,22 +658,12 @@ int main( int argc, char * const argv[] )
 			process_status_free(
 			 &process_status );
 
-			if( calculate_md5 == 1 )
-			{
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-			}
-			if( calculate_sha1 == 1 )
-			{
-				memory_free(
-				 stored_sha1_hash_string );
-				memory_free(
-				 calculated_sha1_hash_string );
-			}
-			libewf_close(
-			 ewfcommon_libewf_handle );
+			verification_handle_close(
+			 verification_handle,
+			 NULL );
+			verification_handle_free(
+			 &verification_handle,
+			 NULL );
 
 			return( EXIT_FAILURE );
 		}
@@ -481,18 +686,12 @@ int main( int argc, char * const argv[] )
 			fprintf( stderr, "Unable to get parse hash values.\n" );
 		}
 #endif
-		verify_count = ewfcommon_read_verify(
-		                ewfcommon_libewf_handle,
-		                calculate_md5,
-		                calculated_md5_hash_string,
-		                EWFSTRING_DIGEST_HASH_LENGTH_MD5,
-		                calculate_sha1,
-		                calculated_sha1_hash_string,
-		                EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
-		                swap_byte_pairs,
+		verify_count = ewfverify_read_input(
+		                verification_handle,
 		                wipe_chunk_on_error,
 		                (size_t) process_buffer_size,
-		                callback );
+		                callback,
+		                &error );
 
 		if( verify_count <= -1 )
 		{
@@ -517,22 +716,12 @@ int main( int argc, char * const argv[] )
 		process_status_free(
 		 &process_status );
 
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 stored_md5_hash_string );
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 stored_sha1_hash_string );
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		libewf_close(
-		 ewfcommon_libewf_handle );
+		verification_handle_close(
+		 verification_handle,
+		 NULL );
+		verification_handle_free(
+		 &verification_handle,
+		 NULL );
 
 		return( EXIT_FAILURE );
 	}
@@ -541,22 +730,12 @@ int main( int argc, char * const argv[] )
 	{
 		fprintf( stderr, "Unable to free process status.\n" );
 
-		if( calculate_md5 == 1 )
-		{
-			memory_free(
-			 stored_md5_hash_string );
-			memory_free(
-			 calculated_md5_hash_string );
-		}
-		if( calculate_sha1 == 1 )
-		{
-			memory_free(
-			 stored_sha1_hash_string );
-			memory_free(
-			 calculated_sha1_hash_string );
-		}
-		libewf_close(
-		 ewfcommon_libewf_handle );
+		verification_handle_close(
+		 verification_handle,
+		 NULL );
+		verification_handle_free(
+		 &verification_handle,
+		 NULL );
 
 		return( EXIT_FAILURE );
 	}
@@ -564,125 +743,50 @@ int main( int argc, char * const argv[] )
 	{
 		if( calculate_md5 == 1 )
 		{
-#if defined( USE_LIBEWF_GET_MD5_HASH )
-			stored_md5_hash_result = libewf_get_md5_hash(
-						  ewfcommon_libewf_handle,
-						  md5_hash,
-						  DIGEST_HASH_SIZE_MD5,
-			                          &error );
+			stored_md5_hash_string = (character_t *) memory_allocate(
+								  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
-			if( stored_md5_hash_result == -1 )
+			if( stored_md5_hash_string == NULL )
 			{
-				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
+				fprintf( stderr, "Unable to create stored MD5 hash string.\n" );
 
-				notify_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				if( calculate_sha1 == 1 )
-				{
-					memory_free(
-					 stored_sha1_hash_string );
-					memory_free(
-					 calculated_sha1_hash_string );
-				}
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-
-				libewf_close(
-				 ewfcommon_libewf_handle );
+				verification_handle_close(
+				 verification_handle,
+				 NULL );
+				verification_handle_free(
+				 &verification_handle,
+				 NULL );
 
 				return( EXIT_FAILURE );
 			}
-			if( digest_hash_copy_to_string(
-			     md5_hash,
-			     DIGEST_HASH_SIZE_MD5,
-			     stored_md5_hash_string,
-			     EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) != 1 )
-			{
-				fprintf( stderr, "Unable to get stored MD5 hash string.\n" );
+			calculated_md5_hash_string = (character_t *) memory_allocate(
+								      sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
 
-				if( calculate_sha1 == 1 )
-				{
-					memory_free(
-					 stored_sha1_hash_string );
-					memory_free(
-					 calculated_sha1_hash_string );
-				}
+			if( calculated_md5_hash_string == NULL )
+			{
+				fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
+
 				memory_free(
 				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
 
-				libewf_close(
-				 ewfcommon_libewf_handle );
+				verification_handle_close(
+				 verification_handle,
+				 NULL );
+				verification_handle_free(
+				 &verification_handle,
+				 NULL );
 
 				return( EXIT_FAILURE );
 			}
-#endif
-#if defined( USE_LIBEWF_GET_HASH_VALUE_MD5 )
-			stored_md5_hash_result = ewflibewf_get_hash_value(
-			                           ewfcommon_libewf_handle,
-			                           "MD5",
-			                           3,
-			                           stored_md5_hash_string,
-			                           EWFSTRING_DIGEST_HASH_LENGTH_MD5,
-			                           &error );
-
-			if( stored_md5_hash_result == -1 )
-			{
-				fprintf( stderr, "Unable to get stored MD5 hash.\n" );
-
-				notify_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				if( calculate_sha1 == 1 )
-				{
-					memory_free(
-					 stored_sha1_hash_string );
-					memory_free(
-					 calculated_sha1_hash_string );
-				}
-				memory_free(
-				 stored_md5_hash_string );
-				memory_free(
-				 calculated_md5_hash_string );
-
-				libewf_close(
-				 ewfcommon_libewf_handle );
-
-				return( EXIT_FAILURE );
-			}
-#endif
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_result = ewflibewf_get_hash_value(
-						   ewfcommon_libewf_handle,
-						   "SHA1",
-						   4,
-						   stored_sha1_hash_string,
-						   EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
-						   &error );
+			stored_sha1_hash_string = (character_t *) memory_allocate(
+								   sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
 
-			if( stored_sha1_hash_result == -1 )
+			if( stored_sha1_hash_string == NULL )
 			{
-				fprintf( stderr, "Unable to get stored SHA1 hash.\n" );
-
-				notify_error_backtrace(
-				 error );
-				liberror_error_free(
-				 &error );
-
-				memory_free(
-				 stored_sha1_hash_string );
-				memory_free(
-				 calculated_sha1_hash_string );
+				fprintf( stderr, "Unable to create stored SHA1 hash string.\n" );
 
 				if( calculate_md5 == 1 )
 				{
@@ -691,11 +795,85 @@ int main( int argc, char * const argv[] )
 					memory_free(
 					 calculated_md5_hash_string );
 				}
-				libewf_close(
-				 ewfcommon_libewf_handle );
+				verification_handle_close(
+				 verification_handle,
+				 NULL );
+				verification_handle_free(
+				 &verification_handle,
+				 NULL );
 
 				return( EXIT_FAILURE );
 			}
+			calculated_sha1_hash_string = (character_t *) memory_allocate(
+								       sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+
+			if( calculated_sha1_hash_string == NULL )
+			{
+				fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
+
+				memory_free(
+				 stored_sha1_hash_string );
+
+				if( calculate_md5 == 1 )
+				{
+					memory_free(
+					 stored_md5_hash_string );
+					memory_free(
+					 calculated_md5_hash_string );
+				}
+				verification_handle_close(
+				 verification_handle,
+				 NULL );
+				verification_handle_free(
+				 &verification_handle,
+				 NULL );
+
+				return( EXIT_FAILURE );
+			}
+		}
+		if( verification_handle_finalize(
+		     verification_handle,
+		     calculated_md5_hash_string,
+		     EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+		     stored_md5_hash_string,
+		     EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+		     &stored_md5_hash_available,
+		     calculated_sha1_hash_string,
+		     EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+		     stored_sha1_hash_string,
+		     EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+		     &stored_sha1_hash_available,
+		     &error ) != 1 )
+		{
+			fprintf( stderr, "Unable to finalize verification handle.\n" );
+
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			if( calculate_sha1 == 1 )
+			{
+				memory_free(
+				 stored_sha1_hash_string );
+				memory_free(
+				 calculated_sha1_hash_string );
+			}
+			if( calculate_md5 == 1 )
+			{
+				memory_free(
+				 stored_md5_hash_string );
+				memory_free(
+				 calculated_md5_hash_string );
+			}
+			verification_handle_close(
+			 verification_handle,
+			 NULL );
+			verification_handle_free(
+			 &verification_handle,
+			 NULL );
+
+			return( EXIT_FAILURE );
 		}
 		if( log_filename != NULL )
 		{
@@ -713,6 +891,7 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "\n" );
 
+		/* TODO */
 		ewfoutput_crc_errors_fprint(
 		 stdout,
 		 ewfcommon_libewf_handle,
@@ -727,7 +906,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_md5 == 1 )
 		{
-			if( stored_md5_hash_result == 0 )
+			if( stored_md5_hash_available == 0 )
 			{
 				fprintf( stdout, "MD5 hash stored in file:\tN/A\n" );
 
@@ -762,7 +941,7 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			if( stored_sha1_hash_result == 0 )
+			if( stored_sha1_hash_available == 0 )
 			{
 				fprintf( stdout, "SHA1 hash stored in file:\tN/A\n" );
 
@@ -797,7 +976,7 @@ int main( int argc, char * const argv[] )
 		}
 		ewfoutput_hash_values_fprint(
 		 stdout,
-		 ewfcommon_libewf_handle,
+		 verification_handle->input_handle,
 		 "",
 		 calculate_md5,
 		 calculate_sha1 );
@@ -806,7 +985,7 @@ int main( int argc, char * const argv[] )
 		{
 			ewfoutput_hash_values_fprint(
 			 log_file_stream,
-			 ewfcommon_libewf_handle,
+			 verification_handle->input_handle,
 			 "",
 			 calculate_md5,
 			 calculate_sha1 );
@@ -826,10 +1005,38 @@ int main( int argc, char * const argv[] )
 		memory_free(
 		 calculated_sha1_hash_string );
 	}
-	if( libewf_close(
-	     ewfcommon_libewf_handle ) != 0 )
+	if( verification_handle_close(
+	     verification_handle,
+	     &error ) != 0 )
 	{
 		fprintf( stderr, "Unable to close EWF file(s).\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		if( log_file_stream != NULL )
+		{
+			file_stream_io_fclose(
+			 log_file_stream );
+		}
+		verification_handle_free(
+		 &verification_handle,
+		 NULL );
+
+		return( EXIT_FAILURE );
+	}
+	if( verification_handle_free(
+	     &verification_handle,
+	     &error ) != 1 )
+	{
+		fprintf( stderr, "Unable to free verification handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
 		if( log_file_stream != NULL )
 		{
@@ -864,10 +1071,10 @@ int main( int argc, char * const argv[] )
 	 */
 	if( ( amount_of_crc_errors == 0 )
 	 && ( ( calculate_md5 == 0 )
-	  || ( stored_md5_hash_result == 0 )
+	  || ( stored_md5_hash_available == 0 )
 	  || match_md5_hash )
 	 && ( ( calculate_sha1 == 0 )
-	  || ( stored_sha1_hash_result == 0 )
+	  || ( stored_sha1_hash_available == 0 )
 	  || match_sha1_hash ) )
 	{
 		fprintf( stdout, "\n%" PRIs ": SUCCESS\n",

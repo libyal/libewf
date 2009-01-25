@@ -2,7 +2,7 @@
  * ewfinfo
  * Shows information stored in an EWF file
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -446,6 +446,10 @@ int main( int argc, char * const argv[] )
 			else if( media_type == LIBEWF_MEDIA_TYPE_CD )
 			{
 				fprintf( stdout, "\tMedia type:\t\tCD/DVD\n" );
+			}
+			else if( media_type == LIBEWF_MEDIA_TYPE_RAM )
+			{
+				fprintf( stdout, "\tMedia type:\t\tRAM\n" );
 			}
 			else
 			{

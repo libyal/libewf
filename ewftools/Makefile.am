@@ -1,11 +1,4 @@
-if HAVE_LOCAL_LIBUNA
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror -I$(top_srcdir)/libuna
-else
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror
-endif
-
-MEMWATCH_FILES = \
-	memwatch.c memwatch.h
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/common -I$(top_srcdir)/liberror @LIBUNA_CPPFLAGS@ @MEMWATCH_CPPFLAGS@
 
 bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
 
@@ -34,7 +27,7 @@ ewfacquire_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
+ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -61,7 +54,7 @@ ewfacquirestream_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfacquirestream_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
+ewfacquirestream_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfalter_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -88,7 +81,7 @@ ewfalter_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
+ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -114,7 +107,7 @@ ewfexport_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfexport_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
+ewfexport_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -140,7 +133,7 @@ ewfinfo_SOURCES = \
 	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
-ewfinfo_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
+ewfinfo_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
@@ -164,12 +157,11 @@ ewfverify_SOURCES = \
 	process_status.c process_status.h \
 	sha1.h \
 	string_conversion.c string_conversion.h \
-	storage_media_buffer.h \
+	storage_media_buffer.c storage_media_buffer.h \
 	system_string.c system_string.h \
-	verification_handle.c verification_handle.h \
-	$(MEMWATCH_FILES)
+	verification_handle.c verification_handle.h
 
-ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la
+ewfverify_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 distclean: clean
 	/bin/rm -f Makefile

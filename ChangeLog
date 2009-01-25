@@ -191,6 +191,8 @@ check TODO
 
 * retrieve EWFX xml header directly?
 
+* fix raw access verify of SMART files
+
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -205,6 +207,26 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20090125
+* worked on ewfverify and verification handle
+* fixed missing libewf memwatch flags
+
+Version: 20090124
+* fixed missing quoted in configure.ac
+
+Version: 20090118
+* Updated headers
+* Updated configure.ac to conform to cache value naming schema
+* Updated autoconf/make to use flags and library definitions
+* Fixed missing notify_dump_data in for debug output
+* debug output is only provided on verbose output
+* worked on ewfverify and verification handle
+* Merged changes for EnCase 6.11 winen file format and memory image from 20080609 beta branch
+* Removed byte swap from ewfverify not needed
+
+Version: 20081207
+* fix for printing GUID
 
 Version: 20081019
 * Updated liberror

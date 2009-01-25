@@ -1,7 +1,7 @@
 /* 
  * Verification handle
  *
- * Copyright (C) 2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (C) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -51,6 +51,14 @@ typedef struct verification_handle verification_handle_t;
 
 struct verification_handle
 {
+	/* Value to indicate if the MD5 digest hash should be calculated
+	 */
+	uint8_t calculate_md5;
+
+	/* Value to indicate if the SHA1 digest hash should be calculated
+	 */
+	uint8_t calculate_sha1;
+
 	/* The MD5 digest context
 	 */
 	md5_context_t md5_context;
@@ -74,6 +82,8 @@ struct verification_handle
 
 int verification_handle_initialize(
      verification_handle_t **verification_handle,
+     uint8_t calculate_md5,
+     uint8_t calculate_sha1,
      liberror_error_t **error );
 
 int verification_handle_free(
@@ -82,8 +92,8 @@ int verification_handle_free(
 
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     const char *filename,
-     size_t length_filename,
+     char * const * filenames,
+     int amount_of_files,
      liberror_error_t **error );
 
 #if defined( HAVE_RAW_ACCESS )
@@ -115,13 +125,31 @@ int verification_handle_get_values(
      uint32_t *chunk_size,
      liberror_error_t **error );
 
+#if defined( HAVE_RAW_ACCESS )
+int verification_handle_get_raw_access_values(
+     verification_handle_t *verification_handle,
+     uint32_t *sectors_per_chunk,
+     uint32_t *bytes_per_sector,
+     liberror_error_t **error );
+#endif
+
 int verification_handle_set_input_values(
      verification_handle_t *verification_handle,
-     int format,
+     int wipe_chunk_on_error,
      liberror_error_t **error );
 
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
+     character_t *calculated_md5_hash_string,
+     size_t calculated_md5_hash_string_size,
+     character_t *stored_md5_hash_string,
+     size_t stored_md5_hash_string_size,
+     int *stored_md5_hash_available,
+     character_t *calculated_sha1_hash_string,
+     size_t calculated_sha1_hash_string_size,
+     character_t *stored_sha1_hash_string,
+     size_t stored_sha1_hash_string_size,
+     int *stored_sha1_hash_available,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

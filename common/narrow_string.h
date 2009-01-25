@@ -1,7 +1,7 @@
 /*
  * Narrow character string functions
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -110,18 +110,11 @@ extern "C" {
 	sprintf( target, format, __VA_ARGS__ )
 #endif
 
-/* String retrieve from stream (fgets)
+/* String retrieve form stream (fgets)
  */
 #if defined( HAVE_FGETS )
 #define narrow_string_get_from_stream( string, size, stream ) \
 	fgets( string, size, stream )
-#endif
-
-/* String input conversion (sscanf)
- */
-#if defined( HAVE_SSCANF )
-#define narrow_string_sscanf( string, format, ... ) \
-	sscanf( string, format, __VA_ARGS__ )
 #endif
 
 /* String to singed long long (int64)

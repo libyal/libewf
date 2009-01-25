@@ -1,7 +1,7 @@
 /*
  * Memory functions
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -41,37 +41,46 @@
 extern "C" {
 #endif
 
+/* Memory allocation
+ */
+#if defined( HAVE_MALLOC )
 #define memory_allocate( size ) \
 	malloc( size )
+#endif
 
+/* Memory reallocation
+ */
+#if defined( HAVE_REALLOC )
 #define memory_reallocate( buffer, size ) \
 	realloc( (void *) buffer, size )
+#endif
 
+/* Memory free
+ */
+#if defined( HAVE_FREE )
 #define memory_free( buffer ) \
 	free( (void *) buffer )
+#endif
 
+/* Memory compare
+ */
 #if defined( HAVE_MEMCMP )
 #define memory_compare( buffer1, buffer2, size ) \
 	memcmp( (const void *) buffer1, (const void *) buffer2, size )
-
-#else
-#error Missing function memcmp
 #endif
 
+/* Memory copy
+ */
 #if defined( HAVE_MEMCPY )
 #define memory_copy( destination, source, count ) \
 	memcpy( (void *) destination, (void *) source, count )
-
-#else
-#error Missing function memcpy
 #endif
 
+/* Memory set
+ */
 #if defined( HAVE_MEMSET )
 #define memory_set( buffer, value, count ) \
 	memset( (void *) buffer, (int) value, count )
-
-#else
-#error Missing function memset
 #endif
 
 #if defined( __cplusplus )

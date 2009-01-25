@@ -1,7 +1,7 @@
 /*
  * Notification function
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -55,6 +55,9 @@ void libewf_notify_error_backtrace(
 void libewf_notify_dump_data(
       void *data,
       size_t size );
+
+#define libewf_notify_verbose_dump_data \
+	if( libewf_notify_verbose != 0 ) libewf_notify_dump_data
 
 #if defined( __cplusplus )
 }

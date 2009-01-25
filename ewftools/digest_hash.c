@@ -1,7 +1,7 @@
 /*
  * Crypographic digest hash
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -49,7 +49,7 @@ int digest_hash_copy_to_string(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid digest hash.\n",
+		 "%s: invalid digest hash.",
 		 function );
 
 		return( -1 );
@@ -60,7 +60,7 @@ int digest_hash_copy_to_string(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid digest hash size value exceeds maximum.\n",
+		 "%s: invalid digest hash size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -71,7 +71,7 @@ int digest_hash_copy_to_string(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid string.\n",
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
@@ -82,7 +82,7 @@ int digest_hash_copy_to_string(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid string size value exceeds maximum.\n",
+		 "%s: invalid string size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -95,7 +95,7 @@ int digest_hash_copy_to_string(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: string too small.\n",
+		 "%s: string too small.",
 		 function );
 
 		return( -1 );

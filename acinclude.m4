@@ -5,12 +5,12 @@ AC_DEFUN([LIBEWF_TEST_ENABLE],
 	 [AS_HELP_STRING(
 	  [--enable-$1],
 	  [$3 (default is $4)])],
-	 [ac_libewf_enable_$2=$enableval],
-	 [ac_libewf_enable_$2=$4])dnl
+	 [ac_cv_libewf_enable_$2=$enableval],
+	 [ac_cv_libewf_enable_$2=$4])dnl
 	 AC_CACHE_CHECK(
 	  [whether to enable $3],
-	  [ac_libewf_enable_$2],
-	  [ac_libewf_enable_$2=$4])dnl
+	  [ac_cv_libewf_enable_$2],
+	  [ac_cv_libewf_enable_$2=$4])dnl
 ])
 
 dnl Function to detect whether printf conversion specifier "%jd" is available

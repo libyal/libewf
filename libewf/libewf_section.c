@@ -1,8 +1,7 @@
 /*
  * Section reading/writing functions
  *
- * Copyright (c) 2006-2008,
- Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -169,7 +168,7 @@ ssize_t libewf_section_start_read(
 	}
 #endif
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 section->padding,
 	 40 );
 #endif
@@ -1278,13 +1277,13 @@ ssize_t libewf_section_volume_s01_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown1,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown2,
 	 20 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown3,
 	 45 );
 #endif
@@ -1640,28 +1639,28 @@ ssize_t libewf_section_volume_e01_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown1,
 	 3 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown2,
 	 16 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown3,
 	 3 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown4,
 	 12 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown5,
 	 3 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown6,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->unknown7,
 	 963 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 volume->signature,
 	 5 );
 #endif
@@ -2243,10 +2242,10 @@ ssize_t libewf_section_table_read(
 	 table.base_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 table.padding1,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 table.padding2,
 	 4 );
 #endif
@@ -2597,10 +2596,10 @@ ssize_t libewf_section_table2_read(
 	 table.base_offset );
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 table.padding1,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 table.padding2,
 	 4 );
 #endif
@@ -3290,19 +3289,19 @@ ssize_t libewf_section_ltree_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 ltree->unknown1,
 	 16 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 ltree->tree_size,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 ltree->unknown2,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 ltree->unknown3,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 ltree->unknown4,
 	 20 );
 #endif
@@ -3496,7 +3495,7 @@ ssize_t libewf_section_session_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 ewf_session.unknown1,
 	 28 );
 #endif
@@ -3594,7 +3593,7 @@ ssize_t libewf_section_session_read(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_dump_data(
+		libewf_notify_verbose_dump_data(
 		 ewf_sessions,
 		 ewf_sessions_size );
 #endif
@@ -4010,28 +4009,28 @@ ssize_t libewf_section_data_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown1,
 	 3 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown2,
 	 16 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown3,
 	 3 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown4,
 	 12 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown5,
 	 3 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown6,
 	 4 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->unknown7,
 	 963 );
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 data->signature,
 	 5 );
 #endif
@@ -4533,7 +4532,7 @@ ssize_t libewf_section_error2_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 error2.unknown,
 	 200 );
 #endif
@@ -4630,7 +4629,7 @@ ssize_t libewf_section_error2_read(
 			return( -1 );
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
-		notify_dump_data(
+		libewf_notify_verbose_dump_data(
 		 error2_sectors,
 		 sectors_size );
 #endif
@@ -5006,7 +5005,7 @@ ssize_t libewf_section_hash_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
-	notify_dump_data(
+	libewf_notify_verbose_dump_data(
 	 hash.unknown1,
 	 16 );
 #endif

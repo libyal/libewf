@@ -1,7 +1,7 @@
 /*
  * Wide character string functions
  *
- * Copyright (c) 2006-2008, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -26,10 +26,34 @@
 #include "common.h"
 #include "types.h"
 
-/* Because wchar_t is defined in wchar.h
- * and its included in types.h
- * it's not included here
+#if defined( HAVE_WCHAR_H )
+/* __USE_UNIX98 is required to add swprintf definition
  */
+#if !defined( __USE_UNIX98 )
+#define __USE_UNIX98
+#define LIBCOMMON_DEFINITION_UNIX98
+#endif
+
+/* __USE_ISOC99 is required to add wcstoll and wcstuoll definition
+ */
+#if !defined( __USE_ISOC99 )
+#define __USE_ISOC99
+#define LIBCOMMON_DEFINITION_ISOC99
+#endif
+
+#include <wchar.h>
+
+#if defined( LIBCOMMON_DEFINITION_UNIX98 )
+#undef __USE_UNIX98
+#undef LIBCOMMON_DEFINITION_UNIX98
+#endif
+
+#if defined( LIBCOMMON_DEFINITION_ISOC99 )
+#undef __USE_ISOC99
+#undef LIBCOMMON_DEFINITION_ISOC99
+#endif
+
+#endif
 
 #if defined( __cplusplus )
 extern "C" {
@@ -107,7 +131,7 @@ extern "C" {
 #endif
 #endif
 
-/* String retrieve from stream (fgets)
+/* String retrieve form stream (fgets)
  */
 #if defined( HAVE_FGETWS )
 #define wide_string_get_from_stream( string, size, stream ) \
