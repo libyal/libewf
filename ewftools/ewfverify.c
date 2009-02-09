@@ -943,20 +943,20 @@ int main( int argc, char * const argv[] )
 			 calculate_md5,
 			 calculate_sha1 );
 		}
-	}
-	if( calculate_md5 == 1 )
-	{
-		memory_free(
-		 stored_md5_hash_string );
-		memory_free(
-		 calculated_md5_hash_string );
-	}
-	if( calculate_sha1 == 1 )
-	{
-		memory_free(
-		 stored_sha1_hash_string );
-		memory_free(
-		 calculated_sha1_hash_string );
+		if( calculate_md5 == 1 )
+		{
+			memory_free(
+			 stored_md5_hash_string );
+			memory_free(
+			 calculated_md5_hash_string );
+		}
+		if( calculate_sha1 == 1 )
+		{
+			memory_free(
+			 stored_sha1_hash_string );
+			memory_free(
+			 calculated_sha1_hash_string );
+		}
 	}
 	if( verification_handle_close(
 	     verification_handle,

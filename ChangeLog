@@ -128,6 +128,8 @@ check TODO
 
 ewfinfo parse and format extents header value in more table like manner
 
+update msvscpp files
+
 * create imaging (acquiry)/verify/export handle and move code from ewfcommon
   into handles
   - verification_handle_set_input_values needed ?
@@ -217,6 +219,7 @@ Version: 20090209
 * worked on support for EnCase 6.12 SHA1 hash
 * fixed error in unknown section debug output
 * added support for process identifier and extents header2 values
+* fixed NULL free in ewfverify
 
 Version: 20090125
 * worked on ewfverify and verification handle
