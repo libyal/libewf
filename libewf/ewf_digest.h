@@ -1,7 +1,7 @@
 /*
- * EWF digest hash
+ * EWF degest section
  *
- * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Copyright (c) 2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
  *
  * Refer to AUTHORS for acknowledgements.
@@ -20,8 +20,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWF_DIGEST_HASH_H )
-#define _EWF_DIGEST_HASH_H
+#if !defined( _EWF_DIGEST_H )
+#define _EWF_DIGEST_H
 
 #include <common.h>
 #include <types.h>
@@ -30,9 +30,32 @@
 extern "C" {
 #endif
 
-#define EWF_DIGEST_HASH_SIZE_MD5	(size_t) ( sizeof( ewf_digest_hash_t ) * 16 )
+typedef struct ewf_digest ewf_digest_t;
 
-typedef uint8_t ewf_digest_hash_t;
+struct ewf_digest
+{
+	/* The MD5 hash of the aquired data
+	 * consists of 16 bytes
+	 */
+	uint8_t md5_hash[ 16 ];
+
+	/* The SHA1 hash of the aquired data
+	 * consists of 20 bytes
+	 */
+	uint8_t sha1_hash[ 20 ];
+
+	/* Padding
+	 * consists of 40 bytes
+	 * value should be 0x00
+	 */
+	uint8_t padding1[ 40 ];
+
+	/* The section crc of all (previous) digest data
+	 * consists of 4 bytes (32 bits)
+	 * starts with offset 76
+	 */
+	uint8_t crc[ 4 ];
+};
 
 #if defined( __cplusplus )
 }

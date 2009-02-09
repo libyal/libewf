@@ -871,11 +871,11 @@ void ewfoutput_header_values_fprint(
       libewf_handle_t *handle )
 {
 	char header_identifier[ 64 ];
-	character_t header_value[ 128 ];
+	character_t header_value[ 512 ];
 
 	static char *function           = "ewfoutput_header_values_fprint";
 	size_t header_identifier_length = 64;
-	size_t header_value_length      = 128;
+	size_t header_value_length      = 512;
 	uint32_t amount_of_values       = 0;
 	uint32_t iterator               = 0;
 
@@ -1122,15 +1122,15 @@ void ewfoutput_header_values_fprint(
 	 */
 	if( ewflibewf_get_header_value(
 	     handle,
-	     "unknown_pid",
-	     11,
+	     "process_identifier",
+	     18,
 	     header_value,
 	     header_value_length,
 	     NULL ) == 1 )
 	{
 		fprintf(
 		 stream,
-		 "\tUnknown value pid:\t%" PRIs "\n",
+		 "\tProcess identifier:\t%" PRIs "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1148,15 +1148,15 @@ void ewfoutput_header_values_fprint(
 	}
 	if( ewflibewf_get_header_value(
 	     handle,
-	     "unknown_ext",
-	     11,
+	     "extents",
+	     7,
 	     header_value,
 	     header_value_length,
 	     NULL ) == 1 )
 	{
 		fprintf(
 		 stream,
-		 "\tUnknown value ext:\t%" PRIs "\n",
+		 "\tExtents:\t\t%" PRIs "\n",
 		 header_value );
 	}
 	/* Currently there are 16 default values

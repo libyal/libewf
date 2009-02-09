@@ -274,16 +274,16 @@ int libewf_header_values_initialize(
 	}
 	if( libewf_values_table_set_identifier(
 	     header_values,
-	     LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_PID,
-	     _LIBEWF_STRING( "unknown_pid" ),
-	     11,
+	     LIBEWF_HEADER_VALUES_INDEX_PROCESS_IDENTIFIER,
+	     _LIBEWF_STRING( "process_identifier" ),
+	     18,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set unknown_pid identifier.",
+		 "%s: unable to set process_identifier identifier.",
 		 function );
 
 		return( -1 );
@@ -306,16 +306,16 @@ int libewf_header_values_initialize(
 	}
 	if( libewf_values_table_set_identifier(
 	     header_values,
-	     LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_EXT,
-	     _LIBEWF_STRING( "unknown_ext" ),
-	     11,
+	     LIBEWF_HEADER_VALUES_INDEX_EXTENTS,
+	     _LIBEWF_STRING( "extents" ),
+	     7,
 	     error ) != 1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set unknown_ext identifier.",
+		 "%s: unable to set extents identifier.",
 		 function );
 
 		return( -1 );
@@ -1472,8 +1472,8 @@ int libewf_header_values_parse_header_string(
 				{
 					if( libewf_values_table_set_value(
 					     *header_values,
-					     _LIBEWF_STRING( "unknown_ext" ),
-					     11,
+					     _LIBEWF_STRING( "extents" ),
+					     7,
 					     value_string,
 					     value_string_length,
 					     error ) != 1 )
@@ -1482,7 +1482,7 @@ int libewf_header_values_parse_header_string(
 						 error,
 						 LIBERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to set unknown: ext.",
+						 "%s: unable to set extents.",
 						 function );
 
 						libewf_string_split_values_free(
@@ -1504,8 +1504,8 @@ int libewf_header_values_parse_header_string(
 				{
 					if( libewf_values_table_set_value(
 					     *header_values,
-					     _LIBEWF_STRING( "unknown_pid" ),
-					     11,
+					     _LIBEWF_STRING( "process_identifier" ),
+					     18,
 					     value_string,
 					     value_string_length,
 					     error ) != 1 )
@@ -1514,7 +1514,7 @@ int libewf_header_values_parse_header_string(
 						 error,
 						 LIBERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-						 "%s: unable to set unknown: pid.",
+						 "%s: unable to set process identifier.",
 						 function );
 
 						libewf_string_split_values_free(

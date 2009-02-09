@@ -36,7 +36,6 @@
 #include "libewf_segment_file_handle.h"
 
 #include "ewf_definitions.h"
-#include "ewf_digest_hash.h"
 
 /* Returns the flags for reading
  */
@@ -69,7 +68,7 @@ int libewf_get_sectors_per_chunk(
      libewf_handle_t *handle,
      uint32_t *sectors_per_chunk )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_sectors_per_chunk";
 
@@ -1053,7 +1052,7 @@ int libewf_get_md5_hash(
      uint8_t *md5_hash,
      size_t size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_md5_hash";
 
@@ -1091,12 +1090,13 @@ int libewf_get_md5_hash(
 
 		return( -1 );
 	}
-	if( ( internal_handle->hash_sections->md5_hash_set == 0 )
+	if( ( ( internal_handle->hash_sections->md5_hash_set == 0 )
+	  || ( internal_handle->hash_sections->md5_digest_set == 0 ) )
 	 && ( internal_handle->hash_values != NULL )
 	 && ( libewf_hash_values_generate_md5_hash(
 	       internal_handle->hash_values,
 	       internal_handle->hash_sections->md5_hash,
-	       EWF_DIGEST_HASH_SIZE_MD5,
+	       16,
 	       &( internal_handle->hash_sections->md5_hash_set ),
 	       &error ) != 1 ) )
 	{
@@ -1114,7 +1114,8 @@ int libewf_get_md5_hash(
 
 		return( -1 );
 	}
-	if( internal_handle->hash_sections->md5_hash_set == 0 )
+	if( ( internal_handle->hash_sections->md5_hash_set == 0 )
+	 && ( internal_handle->hash_sections->md5_digest_set == 0 ) )
 	{
 		return( 0 );
 	}
@@ -1134,7 +1135,7 @@ int libewf_get_md5_hash(
 
 		return( -1 );
 	}
-	if( size < EWF_DIGEST_HASH_SIZE_MD5 )
+	if( size < 16 )
 	{
 		liberror_error_set(
 		 &error,
@@ -1150,10 +1151,162 @@ int libewf_get_md5_hash(
 
 		return( -1 );
 	}
+	if( internal_handle->hash_sections->md5_hash_set == 0 )
+	{
+		if( memory_copy(
+		     md5_hash,
+		     internal_handle->hash_sections->md5_digest,
+		     16 ) == NULL )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set MD5 hash.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	else
+	{
+		if( memory_copy(
+		     md5_hash,
+		     internal_handle->hash_sections->md5_hash,
+		     16 ) == NULL )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set MD5 hash.",
+			 function );
+
+			libewf_notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves the SHA1 hash
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_sha1_hash(
+     libewf_handle_t *handle,
+     uint8_t *sha1_hash,
+     size_t size )
+{
+	liberror_error_t *error                   = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_get_sha1_hash";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->hash_sections == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing hash sections.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( internal_handle->hash_sections->sha1_digest_set == 0 )
+	 && ( internal_handle->hash_values != NULL )
+	 && ( libewf_hash_values_generate_sha1_hash(
+	       internal_handle->hash_values,
+	       internal_handle->hash_sections->sha1_digest,
+	       20,
+	       &( internal_handle->hash_sections->sha1_digest_set ),
+	       &error ) != 1 ) )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse MD5 hash value for its value.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error);
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( internal_handle->hash_sections->sha1_digest_set == 0 )
+	{
+		return( 0 );
+	}
+	if( sha1_hash == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid SHA1 hash.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( size < 20 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: SHA1 hash too small.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
 	if( memory_copy(
-	     md5_hash,
-	     internal_handle->hash_sections->md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	     sha1_hash,
+	     internal_handle->hash_sections->sha1_digest,
+	     20 ) == NULL )
 	{
 		liberror_error_set(
 		 &error,
@@ -1181,7 +1334,7 @@ int libewf_get_segment_filename(
      char *filename,
      size_t size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_segment_filename";
 	int result                                = 0;
@@ -1254,7 +1407,7 @@ int libewf_get_segment_filename_wide(
      wchar_t *filename,
      size_t size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_segment_filename_wide";
 	int result                                = 0;
@@ -1327,7 +1480,7 @@ int libewf_get_delta_segment_filename(
      char *filename,
      size_t size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_delta_segment_filename";
 	int result                                = 0;
@@ -1400,7 +1553,7 @@ int libewf_get_delta_segment_filename_wide(
      wchar_t *filename,
      size_t size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_delta_segment_filename_wide";
 	int result                                = 0;
@@ -1471,7 +1624,7 @@ int libewf_get_amount_of_acquiry_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_acquiry_errors";
 
@@ -1540,8 +1693,8 @@ int libewf_get_acquiry_error(
      uint32_t *amount_of_sectors )
 {
 	liberror_error_t *error = NULL;
-	static char *function = "libewf_get_acquiry_error";
-	int result            = 0;
+	static char *function   = "libewf_get_acquiry_error";
+	int result              = 0;
 
 	if( handle == NULL )
 	{
@@ -1590,7 +1743,7 @@ int libewf_get_amount_of_crc_errors(
      libewf_handle_t *handle,
      uint32_t *amount_of_errors )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_crc_errors";
 
@@ -1674,7 +1827,7 @@ int libewf_get_crc_error(
      off64_t *first_sector,
      uint32_t *amount_of_sectors )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_crc_error";
 	int result                                = 0;
@@ -1744,7 +1897,7 @@ int libewf_get_amount_of_sessions(
      libewf_handle_t *handle,
      uint32_t *amount_of_sessions )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_sessions";
 
@@ -1813,8 +1966,8 @@ int libewf_get_session(
      uint32_t *amount_of_sectors )
 {
 	liberror_error_t *error = NULL;
-	static char *function = "libewf_get_session";
-	int result            = 0;
+	static char *function   = "libewf_get_session";
+	int result              = 0;
 
 	if( handle == NULL )
 	{
@@ -1929,7 +2082,7 @@ int libewf_get_header_codepage(
      libewf_handle_t *handle,
      int *header_codepage )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_codepage";
 
@@ -1995,7 +2148,7 @@ int libewf_get_amount_of_header_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_header_values";
 
@@ -2053,7 +2206,7 @@ int libewf_get_header_value_identifier(
      char *identifier,
      size_t identifier_length )
 {
-	liberror_error_t *error                    = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_header_value_identifier";
 	int result                                = 0;
@@ -2210,7 +2363,7 @@ int libewf_get_amount_of_hash_values(
      libewf_handle_t *handle,
      uint32_t *amount_of_values )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_amount_of_hash_values";
 
@@ -2401,7 +2554,7 @@ int libewf_get_hash_value(
 		if( libewf_hash_values_parse_md5_hash(
 		     &( internal_handle->hash_values ),
 		     internal_handle->hash_sections->md5_hash,
-		     EWF_DIGEST_HASH_SIZE_MD5,
+		     16,
 		     &error ) != 1 )
 		{
 			liberror_error_set(
@@ -3375,7 +3528,7 @@ int libewf_set_md5_hash(
      uint8_t *md5_hash,
      size_t size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_md5_hash";
 
@@ -3414,7 +3567,8 @@ int libewf_set_md5_hash(
 		return( -1 );
 	}
 	if( ( internal_handle->read != NULL )
-	 || ( internal_handle->hash_sections->md5_hash_set ) )
+	 || ( internal_handle->hash_sections->md5_hash_set )
+	 || ( internal_handle->hash_sections->md5_digest_set ) )
 	{
 		liberror_error_set(
 		 &error,
@@ -3446,7 +3600,7 @@ int libewf_set_md5_hash(
 
 		return( -1 );
 	}
-	if( size < EWF_DIGEST_HASH_SIZE_MD5 )
+	if( size < 16 )
 	{
 		liberror_error_set(
 		 &error,
@@ -3465,7 +3619,26 @@ int libewf_set_md5_hash(
 	if( memory_copy(
 	     internal_handle->hash_sections->md5_hash,
 	     md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	     16 ) == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set MD5 hash.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     internal_handle->hash_sections->md5_digest,
+	     md5_hash,
+	     16 ) == NULL )
 	{
 		liberror_error_set(
 		 &error,
@@ -3484,7 +3657,7 @@ int libewf_set_md5_hash(
 	if( libewf_hash_values_parse_md5_hash(
 	     &( internal_handle->hash_values ),
 	     md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5,
+	     16,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -3501,7 +3674,147 @@ int libewf_set_md5_hash(
 
 		return( -1 );
 	}
-	internal_handle->hash_sections->md5_hash_set = 1;
+	internal_handle->hash_sections->md5_hash_set   = 1;
+	internal_handle->hash_sections->md5_digest_set = 1;
+
+	return( 1 );
+}
+
+/* Sets the SHA1 hash
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_set_sha1_hash(
+     libewf_handle_t *handle,
+     uint8_t *sha1_hash,
+     size_t size )
+{
+	liberror_error_t *error                   = NULL;
+	libewf_internal_handle_t *internal_handle = NULL;
+	static char *function                     = "libewf_set_sha1_hash";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->hash_sections == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing hash sections.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( ( internal_handle->read != NULL )
+	 || ( internal_handle->hash_sections->sha1_digest_set ) )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: sha1 hash cannot be changed.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( sha1_hash == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid SHA1 hash.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( size < 20 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: SHA1 hash too small.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     internal_handle->hash_sections->sha1_digest,
+	     sha1_hash,
+	     20 ) == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set SHA1 hash.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	if( libewf_hash_values_parse_sha1_hash(
+	     &( internal_handle->hash_values ),
+	     sha1_hash,
+	     20,
+	     &error ) != 1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to parse SHA1 hash for its value.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error);
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	internal_handle->hash_sections->sha1_digest_set = 1;
 
 	return( 1 );
 }
@@ -3514,7 +3827,7 @@ int libewf_set_segment_filename(
      const char *filename,
      size_t length )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_set_segment_filename";
 
@@ -4269,7 +4582,7 @@ int libewf_set_hash_value(
 		if( libewf_hash_values_generate_md5_hash(
 		     internal_handle->hash_values,
 		     internal_handle->hash_sections->md5_hash,
-		     EWF_DIGEST_HASH_SIZE_MD5,
+		     16,
 		     &( internal_handle->hash_sections->md5_hash_set ),
 		     &error ) != 1 )
 		{
@@ -4452,7 +4765,7 @@ int libewf_parse_header_values(
 int libewf_parse_hash_values(
      libewf_handle_t *handle )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_parse_hash_values";
 
@@ -4517,11 +4830,61 @@ int libewf_parse_hash_values(
 
 		return( -1 );
 	}
+	else if( ( internal_handle->hash_sections->md5_digest_set != 0 )
+	      || ( internal_handle->hash_sections->sha1_digest_set != 0 ) )
+	{
+		if( ( internal_handle->hash_sections->md5_digest_set != 0 )
+		 && ( libewf_hash_values_parse_md5_hash(
+		       &( internal_handle->hash_values ),
+		       internal_handle->hash_sections->md5_digest,
+		       16,
+		       &error ) != 1 ) )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse MD5 hash for its value.",
+			 function );
+
+			/* TODO error_tollerance */
+
+			libewf_notify_error_backtrace(
+			 error);
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+		if( ( internal_handle->hash_sections->sha1_digest_set != 0 )
+		 && ( libewf_hash_values_parse_sha1_hash(
+		       &( internal_handle->hash_values ),
+		       internal_handle->hash_sections->sha1_digest,
+		       20,
+		       &error ) != 1 ) )
+		{
+			liberror_error_set(
+			 &error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to parse SHA1 hash for its value.",
+			 function );
+
+			/* TODO error_tollerance */
+
+			libewf_notify_error_backtrace(
+			 error);
+			liberror_error_free(
+			 &error );
+
+			return( -1 );
+		}
+	}
 	else if( ( internal_handle->hash_sections->md5_hash_set != 0 )
 	      && ( libewf_hash_values_parse_md5_hash(
 	            &( internal_handle->hash_values ),
 	            internal_handle->hash_sections->md5_hash,
-	            EWF_DIGEST_HASH_SIZE_MD5,
+	            16,
 	            &error ) != 1 ) )
 	{
 		liberror_error_set(

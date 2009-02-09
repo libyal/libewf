@@ -56,20 +56,20 @@
  * Returns 1 if block is empty, 0 if not or -1 on error
  */
 int libewf_write_test_empty_block(
-     uint8_t *block_buffer,
+     uint8_t *buffer,
      size_t size,
      liberror_error_t **error )
 {
 	static char *function = "libewf_write_test_empty_block";
 	size_t iterator       = 0;
 
-	if( block_buffer == NULL )
+	if( buffer == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid block buffer.",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -87,7 +87,7 @@ int libewf_write_test_empty_block(
 	}
 	for( iterator = 1; iterator < size; iterator++ )
 	{
-		if( block_buffer[ 0 ] != block_buffer[ iterator ] )
+		if( buffer[ 0 ] != buffer[ iterator ] )
 		{
 			return( 0 );
 		}

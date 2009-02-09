@@ -6,7 +6,7 @@ libewf_la_SOURCES = \
 	ewf_crc.h \
 	ewf_data.h \
 	ewf_definitions.h \
-	ewf_digest_hash.h \
+	ewf_digest.h \
 	ewf_error2.h \
 	ewf_file_header.h \
 	ewf_hash.h \

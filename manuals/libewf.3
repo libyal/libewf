@@ -1,4 +1,4 @@
-.Dd January 18, 2009
+.Dd February 9, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -111,6 +111,8 @@ Meta data functions
 .Ft int
 .Fn libewf_get_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size"
 .Ft int
+.Fn libewf_get_sha1_hash "libewf_handle_t *handle, uint8_t *sha1_hash, size_t size"
+.Ft int
 .Fn libewf_get_amount_of_acquiry_errors "libewf_handle_t *handle, uint32_t *amount_of_errors"
 .Ft int
 .Fn libewf_get_acquiry_error "libewf_handle_t *handle, uint32_t index, off64_t *first_sector, uint32_t *amount_of_sectors"
@@ -186,6 +188,8 @@ Meta data functions
 .Fn libewf_set_guid "libewf_handle_t *handle, uint8_t *guid, size_t size"
 .Ft int
 .Fn libewf_set_md5_hash "libewf_handle_t *handle, uint8_t *md5_hash, size_t size"
+.Ft int
+.Fn libewf_set_sha1_hash "libewf_handle_t *handle, uint8_t *sha1_hash, size_t size"
 .Ft int
 .Fn libewf_set_read_wipe_chunk_on_error "libewf_handle_t *handle, uint8_t wipe_on_error"
 .Ft int

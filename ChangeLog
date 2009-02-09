@@ -120,10 +120,13 @@ Code clean up
 
 Testing
 * add export unattended to automated tests
+* add encase 6.12 sha1 support to test
 
 Other:
 check error tollerance
 check TODO
+
+ewfinfo parse and format extents header value in more table like manner
 
 * create imaging (acquiry)/verify/export handle and move code from ewfcommon
   into handles
@@ -193,6 +196,8 @@ check TODO
 
 * fix raw access verify of SMART files
 
+* tools and library support read/write of EnCase 6.12 SHA1
+
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -207,6 +212,11 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20090209
+* worked on support for EnCase 6.12 SHA1 hash
+* fixed error in unknown section debug output
+* added support for process identifier and extents header2 values
 
 Version: 20090125
 * worked on ewfverify and verification handle

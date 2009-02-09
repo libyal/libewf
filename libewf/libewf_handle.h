@@ -43,7 +43,6 @@
 #include "libewf_values_table.h"
 
 #include "ewf_data.h"
-#include "ewf_digest_hash.h"
 #include "ewf_error2.h"
 #include "ewf_table.h"
 

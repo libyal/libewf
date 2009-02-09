@@ -32,7 +32,6 @@
 #include "libewf_string.h"
 
 #include "ewf_definitions.h"
-#include "ewf_digest_hash.h"
 
 /* Initializes the hash values
  * Returns 1 if successful or -1 on error
@@ -112,7 +111,7 @@ int libewf_hash_values_parse_md5_hash(
 
 		return( -1 );
 	}
-	if( md5_hash_size < EWF_DIGEST_HASH_SIZE_MD5 )
+	if( md5_hash_size < 16 )
 	{
 		liberror_error_set(
 		 error,
@@ -216,6 +215,154 @@ int libewf_hash_values_parse_md5_hash(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
 		 "%s: unable to set value with identifier: MD5.",
+		 function );
+	}
+	return( result );
+}
+
+/* Parses an SHA1 hash for its value
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_values_parse_sha1_hash(
+     libewf_values_table_t **hash_values,
+     uint8_t *sha1_hash,
+     size_t sha1_hash_size,
+     liberror_error_t **error )
+{
+	libewf_character_t sha1_hash_string[ 41 ];
+
+	static char *function            = "libewf_hash_values_parse_sha1_hash";
+	size_t sha1_hash_iterator        = 0;
+	size_t sha1_hash_string_iterator = 0;
+	int result                       = 0;
+	uint8_t sha1_digit               = 0;
+
+	if( hash_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid SHA1 hash.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash_size < 20 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: SHA1 hash too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( *hash_values == NULL )
+	{
+		if( libewf_values_table_initialize(
+		     hash_values,
+		     LIBEWF_HASH_VALUES_DEFAULT_AMOUNT,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hash values.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_hash_values_initialize(
+		     *hash_values,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize the hash values.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	result = libewf_values_table_get_value(
+	          *hash_values,
+	          _LIBEWF_STRING( "SHA1" ),
+	          4,
+	          sha1_hash_string,
+	          41,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if MD5 hash value was set.",
+		 function );
+
+		return( -1 );
+	}
+	/* The MD5 hash values has been set
+	 */
+	else if( result == 1 )
+	{
+		return( 1 );
+	}
+	for( sha1_hash_iterator = 0; sha1_hash_iterator < sha1_hash_size; sha1_hash_iterator++ )
+	{
+		sha1_digit = sha1_hash[ sha1_hash_iterator ] / 16;
+
+		if( sha1_digit <= 9 )
+		{
+			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libewf_character_t) ( (uint8_t) '0' + sha1_digit );
+		}
+		else
+		{
+			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libewf_character_t) ( (uint8_t) 'a' + ( sha1_digit - 10 ) );
+		}
+		sha1_digit = sha1_hash[ sha1_hash_iterator ] % 16;
+
+		if( sha1_digit <= 9 )
+		{
+			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libewf_character_t) ( (uint8_t) '0' + sha1_digit );
+		}
+		else
+		{
+			sha1_hash_string[ sha1_hash_string_iterator++ ] = (libewf_character_t) ( (uint8_t) 'a' + ( sha1_digit - 10 ) );
+		}
+	}
+	result = libewf_values_table_set_value(
+		  *hash_values,
+		  _LIBEWF_STRING( "SHA1" ),
+		  4,
+		  sha1_hash_string,
+		  40,
+	          error );
+
+	if( result != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set value with identifier: SHA1.",
 		 function );
 	}
 	return( result );
@@ -910,7 +1057,7 @@ int libewf_hash_values_generate_hash_string_xml(
 	return( 1 );
 }
 
-/* Generate an MD5 xhash
+/* Generate an MD5 hash
  * Returns 1 if successful or -1 on error
  */
 int libewf_hash_values_generate_md5_hash(
@@ -950,7 +1097,7 @@ int libewf_hash_values_generate_md5_hash(
 
 		return( -1 );
 	}
-	if( md5_hash_size < EWF_DIGEST_HASH_SIZE_MD5 )
+	if( md5_hash_size < 16 )
 	{
 		liberror_error_set(
 		 error,
@@ -1038,6 +1185,138 @@ int libewf_hash_values_generate_md5_hash(
 		md5_hash[ md5_hash_iterator++ ] = md5_digit;
 	}
 	*md5_hash_set = 1;
+
+	return( 1 );
+}
+
+/* Generate an SHA1 hash
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_hash_values_generate_sha1_hash(
+     libewf_values_table_t *hash_values,
+     uint8_t *sha1_hash,
+     size_t sha1_hash_size,
+     uint8_t *sha1_hash_set,
+     liberror_error_t **error )
+{
+	libewf_character_t sha1_hash_string[ 41 ];
+
+	static char *function            = "libewf_hash_values_generate_sha1_hash";
+	size_t sha1_hash_iterator        = 0;
+	size_t sha1_hash_string_iterator = 0;
+	int result                       = 0;
+	uint8_t sha1_digit               = 0;
+
+	if( hash_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hash values.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid SHA1 hash.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash_size < 20 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: SHA1 hash too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash_set == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid SHA1 hash set.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_values_table_get_value(
+	          hash_values,
+	          _LIBEWF_STRING( "SHA1" ),
+	          4,
+	          sha1_hash_string,
+	          41,
+	          error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if SHA1 hash value was set.",
+		 function );
+
+		return( -1 );
+	}
+	/* No need to generate the SHA1 hash
+	 */
+	else if( result == 0 )
+	{
+		*sha1_hash_set = 0;
+
+		return( 1 );
+	}
+	for( sha1_hash_string_iterator = 0; sha1_hash_string_iterator < 41; sha1_hash_string_iterator++ )
+	{
+		if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) '0' )
+		 && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) '9' ) )
+		{
+			sha1_digit = (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libewf_character_t) '0' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) 'A' )
+		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) 'F' ) )
+		{
+			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libewf_character_t) 'A' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) 'a' )
+		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) 'f' ) )
+		{
+			sha1_digit = 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libewf_character_t) 'a' );
+		}
+		sha1_hash_string_iterator++;
+
+		sha1_digit *= 16;
+
+		if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) '0' )
+		 && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) '9' ) )
+		{
+			sha1_digit += (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libewf_character_t) '0' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) 'A' )
+		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) 'F' ) )
+		{
+			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libewf_character_t) 'A' );
+		}
+		else if( ( sha1_hash_string[ sha1_hash_string_iterator ] >= (libewf_character_t) 'a' )
+		      && ( sha1_hash_string[ sha1_hash_string_iterator ] <= (libewf_character_t) 'f' ) )
+		{
+			sha1_digit += 10 + (uint8_t) ( sha1_hash_string[ sha1_hash_string_iterator ] - (libewf_character_t) 'a' );
+		}
+		sha1_hash[ sha1_hash_iterator++ ] = sha1_digit;
+	}
+	*sha1_hash_set = 1;
 
 	return( 1 );
 }

@@ -49,6 +49,12 @@ int libewf_hash_values_parse_md5_hash(
      size_t md5_hash_size,
      liberror_error_t **error );
 
+int libewf_hash_values_parse_sha1_hash(
+     libewf_values_table_t **hash_values,
+     uint8_t *sha1_hash,
+     size_t sha1_hash_size,
+     liberror_error_t **error );
+
 int libewf_hash_values_parse_hash_string_xml(
      libewf_values_table_t **hash_values,
      libewf_character_t *hash_string_xml,
@@ -73,6 +79,13 @@ int libewf_hash_values_generate_md5_hash(
      uint8_t *md5_hash,
      size_t md5_hash_size,
      uint8_t *md5_hash_set,
+     liberror_error_t **error );
+
+int libewf_hash_values_generate_sha1_hash(
+     libewf_values_table_t *hash_values,
+     uint8_t *sha1_hash,
+     size_t sha1_hash_size,
+     uint8_t *sha1_hash_set,
      liberror_error_t **error );
 
 int libewf_hash_values_generate_hash_string_xml(

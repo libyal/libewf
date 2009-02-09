@@ -39,6 +39,7 @@
 
 #include "ewf_data.h"
 #include "ewf_definitions.h"
+#include "ewf_digest.h"
 #include "ewf_error2.h"
 #include "ewf_file_header.h"
 #include "ewf_hash.h"
@@ -47,6 +48,49 @@
 #include "ewf_volume.h"
 #include "ewf_volume_smart.h"
 #include "ewfx_delta_chunk.h"
+
+/* Tests if a buffer entirely consists of zero values
+ * Returns 1 if zero, 0 if not, or -1 on error
+ */
+int libewf_section_test_zero(
+     uint8_t *buffer,
+     size_t size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_write_test_zero";
+	size_t iterator       = 0;
+
+	if( buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid buffer.",
+		 function );
+
+		return( -1 );
+	}
+	if( size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	for( iterator = 0; iterator < size; iterator++ )
+	{
+		if( buffer[ iterator ] != 0 )
+		{
+			return( 0 );
+		}
+	}
+	return( 1 );
+}
 
 /* Reads a section start from a segment file
  * Returns the amount of bytes read or -1 on error
@@ -4924,13 +4968,324 @@ ssize_t libewf_section_error2_write(
 	return( section_write_count );
 }
 
+/* Reads a digest section from file
+ * Returns the amount of bytes read or -1 on error
+ */
+ssize_t libewf_section_digest_read(
+         libewf_file_io_pool_t *file_io_pool,
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint8_t *md5_hash,
+         uint8_t *sha1_hash,
+         liberror_error_t **error )
+{
+	ewf_digest_t digest;
+
+	static char *function    = "libewf_section_digest_read";
+	ewf_crc_t calculated_crc = 0;
+	ewf_crc_t stored_crc     = 0;
+	ssize_t read_count       = 0;
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid md5 hash.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid sha1 hash.",
+		 function );
+
+		return( -1 );
+	}
+	read_count = libewf_file_io_pool_read(
+	              file_io_pool,
+	              segment_file_handle->file_io_pool_entry,
+	              (uint8_t *) &digest,
+	              sizeof( ewf_digest_t ),
+	              error );
+
+	if( read_count != (ssize_t) sizeof( ewf_digest_t ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read digest.",
+		 function );
+
+		return( -1 );
+	}
+	calculated_crc = ewf_crc_calculate(
+	                  &digest,
+	                  ( sizeof( ewf_digest_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
+
+	endian_little_convert_32bit(
+	 stored_crc,
+	 digest.crc );
+
+	if( stored_crc != calculated_crc )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_INPUT,
+		 LIBERROR_INPUT_ERROR_CRC_MISMATCH,
+		 "%s: CRC does not match (in file: %" PRIu32 " calculated: %" PRIu32 ").",
+		 function,
+		 stored_crc,
+		 calculated_crc );
+
+		/* TODO error_tollerance */
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_dump_data(
+	 digest.padding1,
+	 40 );
+#endif
+
+	if( memory_copy(
+	     md5_hash,
+	     digest.md5_hash,
+	     16 ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set MD5 hash in handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     sha1_hash,
+	     digest.sha1_hash,
+	     20 ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set SHA1 hash in handle.",
+		 function );
+
+		return( -1 );
+	}
+	return( read_count );
+}
+
+/* Writes a digest section to file
+ * Returns the amount of bytes written or -1 on error
+ */
+ssize_t libewf_section_digest_write(
+         libewf_file_io_pool_t *file_io_pool,
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint8_t *md5_hash,
+         uint8_t *sha1_hash,
+         liberror_error_t **error )
+{
+	ewf_digest_t digest;
+
+	uint8_t *section_type       = (uint8_t *) "digest";
+	static char *function       = "libewf_section_digest_write";
+	ewf_crc_t calculated_crc    = 0;
+	off64_t section_offset      = 0;
+	size_t section_type_length  = 6;
+	ssize_t section_write_count = 0;
+	ssize_t write_count         = 0;
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid md5 hash.",
+		 function );
+
+		return( -1 );
+	}
+	if( sha1_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid sha1 hash.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_file_io_pool_get_offset(
+	     file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     &section_offset,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve current offset in segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_set(
+	     &digest,
+	     0,
+	     sizeof( ewf_digest_t ) ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear digest.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     digest.md5_hash,
+	     md5_hash,
+	     16 ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set MD5 hash.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     digest.sha1_hash,
+	     sha1_hash,
+	     20 ) == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to set MD5 hash.",
+		 function );
+
+		return( -1 );
+	}
+	calculated_crc = ewf_crc_calculate(
+	                  &digest,
+	                  ( sizeof( ewf_digest_t ) - sizeof( ewf_crc_t ) ),
+	                  1 );
+
+	endian_little_revert_32bit(
+	 digest.crc,
+	 calculated_crc );
+
+	section_write_count = libewf_section_start_write(
+	                       file_io_pool,
+	                       segment_file_handle,
+	                       section_offset,
+	                       section_type,
+	                       section_type_length,
+	                       (size64_t) sizeof( ewf_digest_t ),
+	                       error );
+
+	if( section_write_count != (ssize_t) sizeof( ewf_section_t ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write section: %s to file.",
+		 function,
+		 (char *) section_type );
+
+		return( -1 );
+	}
+	write_count = libewf_file_io_pool_write(
+	               file_io_pool,
+	               segment_file_handle->file_io_pool_entry,
+	               (uint8_t *) &digest,
+	               sizeof( ewf_digest_t ),
+	               error );
+
+	if( write_count != (ssize_t) sizeof( ewf_digest_t ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write digest to file.",
+		 function );
+
+		return( -1 );
+	}
+	section_write_count += write_count;
+
+	if( libewf_section_list_append(
+	     segment_file_handle->section_list,
+	     section_type,
+	     section_type_length,
+	     section_offset,
+	     section_offset + section_write_count,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append %s section to section list.",
+		 function,
+		 (char *) section_type );
+
+		return( -1 );
+	}
+	return( section_write_count );
+}
+
+
 /* Reads a hash section from file
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_hash_read(
          libewf_file_io_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_digest_hash_t *md5_hash,
+         uint8_t *md5_hash,
          liberror_error_t **error )
 {
 	ewf_hash_t hash;
@@ -5013,7 +5368,7 @@ ssize_t libewf_section_hash_read(
 	if( memory_copy(
 	     md5_hash,
 	     hash.md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	     16 ) == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -5033,7 +5388,7 @@ ssize_t libewf_section_hash_read(
 ssize_t libewf_section_hash_write(
          libewf_file_io_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_digest_hash_t *md5_hash,
+         uint8_t *md5_hash,
          liberror_error_t **error )
 {
 	ewf_hash_t hash;
@@ -5053,6 +5408,17 @@ ssize_t libewf_section_hash_write(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( md5_hash == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid md5 hash.",
 		 function );
 
 		return( -1 );
@@ -5089,13 +5455,13 @@ ssize_t libewf_section_hash_write(
 	if( memory_copy(
 	     hash.md5_hash,
 	     md5_hash,
-	     EWF_DIGEST_HASH_SIZE_MD5 ) == NULL )
+	     16 ) == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_MEMORY,
 		 LIBERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to set hash.",
+		 "%s: unable to set MD5 hash.",
 		 function );
 
 		return( -1 );
@@ -5173,7 +5539,7 @@ ssize_t libewf_section_hash_write(
 
 /* Writes the last section start to file
  * This is used for the next and done sections,
- these sections point back towards themselves
+ * these sections point back towards themselves
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_last_write(
@@ -6254,7 +6620,7 @@ ssize_t libewf_section_debug_read(
 	if( result == 0 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBEWF_STRING( "COMPRESSED data" ),
+		          _LIBEWF_STRING( "UNCOMPRESSED data" ),
 		          data,
 		          (size_t) section_size,
 	                  error );
@@ -6262,7 +6628,7 @@ ssize_t libewf_section_debug_read(
 	else if( result == 1 )
 	{
 		result = libewf_debug_dump_data(
-		          _LIBEWF_STRING( "UNCOMPRESSED data" ),
+		          _LIBEWF_STRING( "COMPRESSED data" ),
 		          uncompressed_data,
 		          uncompressed_size,
 	                  error );
@@ -6315,6 +6681,7 @@ int libewf_section_read(
 	uint64_t section_size      = 0;
 	uint64_t section_next      = 0;
 	size_t section_type_length = 0;
+	int result                 = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -6727,6 +7094,70 @@ int libewf_section_read(
 		              media_values,
 		              *ewf_format,
  		              error );
+	}
+	/* Read the digest section
+	 * The \0 byte is included in the compare
+	 */
+	else if( memory_compare(
+	          (void *) section->type,
+	          (void *) "digest",
+	          7 ) == 0 )
+	{
+		read_count = libewf_section_digest_read(
+		              file_io_pool,
+		              segment_file_handle,
+		              hash_sections->md5_digest,
+		              hash_sections->sha1_digest,
+ 		              error );
+
+		result = libewf_section_test_zero(
+		          hash_sections->md5_digest,
+		          16,
+		          error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if MD5 hash is empty.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			hash_sections->md5_digest_set = 1;
+		}
+		else
+		{
+			hash_sections->md5_digest_set = 0;
+		}
+		result = libewf_section_test_zero(
+		          hash_sections->sha1_digest,
+		          20,
+		          error );
+
+		if( result == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if SHA1 hash is empty.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			hash_sections->sha1_digest_set = 1;
+		}
+		else
+		{
+			hash_sections->sha1_digest_set = 0;
+		}
 	}
 	/* Read the hash section
 	 * The \0 byte is included in the compare

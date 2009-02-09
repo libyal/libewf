@@ -39,13 +39,17 @@
 
 #include "ewf_crc.h"
 #include "ewf_data.h"
-#include "ewf_digest_hash.h"
 #include "ewf_section.h"
 #include "ewf_table.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
+
+int libewf_section_test_zero(
+     uint8_t *buffer,
+     size_t size,
+     liberror_error_t **error );
 
 ssize_t libewf_section_start_read(
          libewf_file_io_pool_t *file_io_pool,
@@ -259,16 +263,30 @@ ssize_t libewf_section_error2_write(
          libewf_sector_table_t *acquiry_errors,
          liberror_error_t **error );
 
+ssize_t libewf_section_digest_read(
+         libewf_file_io_pool_t *file_io_pool,
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint8_t *md5_hash,
+         uint8_t *sha1_hash,
+         liberror_error_t **error );
+
+ssize_t libewf_section_digest_write(
+         libewf_file_io_pool_t *file_io_pool,
+         libewf_segment_file_handle_t *segment_file_handle,
+         uint8_t *md5_hash,
+         uint8_t *sha1_hash,
+         liberror_error_t **error );
+
 ssize_t libewf_section_hash_read(
          libewf_file_io_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_digest_hash_t *md5_hash,
+         uint8_t *md5_hash,
          liberror_error_t **error );
 
 ssize_t libewf_section_hash_write(
          libewf_file_io_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
-         ewf_digest_hash_t *md5_hash,
+         uint8_t *md5_hash,
          liberror_error_t **error );
 
 ssize_t libewf_section_last_write(

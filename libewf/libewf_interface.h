@@ -100,6 +100,11 @@ LIBEWF_EXTERN int libewf_get_md5_hash(
                    uint8_t *md5_hash,
                    size_t size );
 
+LIBEWF_EXTERN int libewf_get_sha1_hash(
+                   libewf_handle_t *handle,
+                   uint8_t *sha1_hash,
+                   size_t size );
+
 LIBEWF_EXTERN int libewf_get_segment_filename(
                    libewf_handle_t *handle,
                    char *filename,
@@ -243,6 +248,11 @@ LIBEWF_EXTERN int libewf_set_guid(
 LIBEWF_EXTERN int libewf_set_md5_hash(
                    libewf_handle_t *handle,
                    uint8_t *md5_hash,
+                   size_t size );
+
+LIBEWF_EXTERN int libewf_set_sha1_hash(
+                   libewf_handle_t *handle,
+                   uint8_t *sha1_hash,
                    size_t size );
 
 LIBEWF_EXTERN int libewf_set_segment_filename(

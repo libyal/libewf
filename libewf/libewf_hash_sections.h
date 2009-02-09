@@ -28,8 +28,6 @@
 
 #include "libewf_values_table.h"
 
-#include "ewf_digest_hash.h"
-
 #if defined( __cplusplus )
 extern "C" {
 #endif
@@ -48,13 +46,29 @@ struct libewf_hash_sections
 	 */
 	size_t xhash_size;
 
-	/* The MD5 hash of the data
+	/* The MD5 hash of the data as found in the hash section
 	 */
-	ewf_digest_hash_t md5_hash[ EWF_DIGEST_HASH_SIZE_MD5 ];
+	uint8_t md5_hash[ 16 ];
 
 	/* Value to indicate if the MD5 hash was set
 	 */
 	uint8_t md5_hash_set;
+
+	/* The MD5 hash of the data as found in the digest section
+	 */
+	uint8_t md5_digest[ 16 ];
+
+	/* Value to indicate if the MD5 digest was set
+	 */
+	uint8_t md5_digest_set;
+
+	/* The SHA1 hash of the data as found in the digest section
+	 */
+	uint8_t sha1_digest[ 20 ];
+
+	/* Value to indicate if the SHA1 digest was set
+	 */
+	uint8_t sha1_digest_set;
 };
 
 int libewf_hash_sections_initialize(

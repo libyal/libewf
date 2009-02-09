@@ -1773,6 +1773,33 @@ ssize_t libewf_segment_file_write_close(
 			}
 			total_write_count += write_count;
 		}
+		if( format == LIBEWF_FORMAT_ENCASE6 )
+		{
+			/* Write the digest section if required
+			 */
+			if( hash_sections->sha1_digest_set != 0 )
+			{
+				write_count = libewf_section_digest_write(
+					       file_io_pool,
+					       segment_file_handle,
+					       hash_sections->md5_digest,
+					       hash_sections->sha1_digest,
+					       error );
+
+				if( write_count == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_WRITE_FAILED,
+					 "%s: unable to write digest section.",
+					 function );
+
+					return( -1 );
+				}
+				total_write_count += write_count;
+			}
+		}
 		/* Write the hash section if required
 		 */
 		if( hash_sections->md5_hash_set != 0 )
