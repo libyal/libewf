@@ -215,6 +215,10 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+Version: 20090219
+* fixed rogue free of filenames in verification handle in amount_of_files check
+* fixed v2 api support in verification_handle_open
+
 Version: 20090209
 * worked on support for EnCase 6.12 SHA1 hash
 * fixed error in unknown section debug output

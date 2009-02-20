@@ -248,6 +248,19 @@ int verification_handle_open_input(
 
 		return( -1 );
 	}
+#if defined( HAVE_V2_API )
+	if( verification_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid verification handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+#else
 	if( verification_handle->input_handle != NULL )
 	{
 		liberror_error_set(
@@ -259,6 +272,7 @@ int verification_handle_open_input(
 
 		return( -1 );
 	}
+#endif
 	if( filenames == NULL )
 	{
 		liberror_error_set(
@@ -278,9 +292,6 @@ int verification_handle_open_input(
 		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
 		 "%s: invalid amount of filenames.",
 		 function );
-
-		memory_free(
-		 filenames );
 
 		return( -1 );
 	}
