@@ -88,7 +88,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
 #endif
 
 #if defined( HAVE_V2_API )
-LIBEWF_EXTERN int libewf_open(
+LIBEWF_EXTERN int libewf_handle_open(
                    libewf_handle_t *handle,
                    char * const filenames[],
                    int amount_of_files,
@@ -103,7 +103,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open(
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
 #if defined( HAVE_V2_API )
-LIBEWF_EXTERN int libewf_open_wide(
+LIBEWF_EXTERN int libewf_handle_open_wide(
                    libewf_handle_t *handle,
                    wchar_t * const filenames[],
                    int amount_of_files,
@@ -118,7 +118,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
 #endif
 
 #if defined( HAVE_V2_API )
-LIBEWF_EXTERN int libewf_close(
+LIBEWF_EXTERN int libewf_handle_close(
                    libewf_handle_t *handle,
                    liberror_error_t **error );
 #else
@@ -127,7 +127,7 @@ LIBEWF_EXTERN int libewf_close(
 #endif
 
 #if defined( HAVE_V2_API )
-LIBEWF_EXTERN off64_t libewf_seek_offset(
+LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
                        libewf_handle_t *handle,
                        off64_t offset,
                        liberror_error_t **error );
@@ -138,7 +138,7 @@ LIBEWF_EXTERN off64_t libewf_seek_offset(
 #endif
 
 #if defined( HAVE_V2_API )
-LIBEWF_EXTERN off64_t libewf_get_offset(
+LIBEWF_EXTERN off64_t libewf_handle_get_offset(
                        libewf_handle_t *handle,
                        liberror_error_t **error );
 #else

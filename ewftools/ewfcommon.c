@@ -1230,7 +1230,7 @@ ssize64_t ewfcommon_write_from_file_descriptor(
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 	digest_hash_t sha1_hash[ DIGEST_HASH_SIZE_SHA1 ];
 
-	liberror_error_t *error     = NULL;
+	liberror_error_t *error      = NULL;
 	uint8_t *data_buffer         = NULL;
 	static char *function        = "ewfcommon_write_from_file_descriptor";
 	ssize64_t total_write_count  = 0;

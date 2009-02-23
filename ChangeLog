@@ -118,6 +118,7 @@ Code clean up
 * remove file io pool from lower levels and pass file io handle ?
 * refactor libewf_file_io_pool_get_offset out of libewf_section functions?
 * clean up libewf_write_finalize ?
+* remove trailing \n from error messages
 
 Testing
 * add export unattended to automated tests
@@ -229,8 +230,13 @@ CLOSED
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
 
+FIX
+* issue acquiting SHA1 in ewfx 
+
 Version: 20090222
 * worked on locale support
+* worked on imaging handle
+* worked on v2 api
 
 Version: 20090219
 * fixed rogue free of filenames in verification handle in amount_of_files check

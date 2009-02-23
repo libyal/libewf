@@ -189,7 +189,7 @@ LIBEWF_EXTERN int libewf_glob_wide(
  * Returns a pointer to the new instance of handle, NULL on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN int libewf_open(
+LIBEWF_EXTERN int libewf_handle_open(
                    libewf_handle_t *handle,
                    char * const filenames[],
                    int amount_of_files,
@@ -209,7 +209,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open(
  * Returns a pointer to the new instance of handle, NULL on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN int libewf_open_wide(
+LIBEWF_EXTERN int libewf_handle_open_wide(
                    libewf_handle_t *handle,
                    wchar_t * const filenames[],
                    int amount_of_files,
@@ -227,7 +227,7 @@ LIBEWF_EXTERN libewf_handle_t *libewf_open_wide(
  * Returns 0 if successful or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN int libewf_close(
+LIBEWF_EXTERN int libewf_handle_close(
                    libewf_handle_t *handle,
                    libewf_error_t **error );
 #else
@@ -240,7 +240,7 @@ LIBEWF_EXTERN int libewf_close(
  * Returns the offset if seek is successful or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN off64_t libewf_seek_offset(
+LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
                        libewf_handle_t *handle,
                        off64_t offset,
                        libewf_error_t **error );
@@ -254,7 +254,7 @@ LIBEWF_EXTERN off64_t libewf_seek_offset(
  * Returns the offset if successful or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN off64_t libewf_get_offset(
+LIBEWF_EXTERN off64_t libewf_handle_get_offset(
                        libewf_handle_t *handle,
                        libewf_error_t **error );
 #else
@@ -268,7 +268,7 @@ LIBEWF_EXTERN off64_t libewf_get_offset(
  * Returns the resulting chunk size or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
+LIBEWF_EXTERN ssize_t libewf_handle_raw_read_prepare_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t buffer_size,
@@ -296,7 +296,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_prepare_buffer(
  * Returns the amount of bytes read or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
+LIBEWF_EXTERN ssize_t libewf_handle_raw_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
@@ -318,7 +318,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_read_buffer(
  * Returns the amount of bytes read or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_read_buffer(
+LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
@@ -334,7 +334,7 @@ LIBEWF_EXTERN ssize_t libewf_read_buffer(
  * Returns the amount of bytes read or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_read_random(
+LIBEWF_EXTERN ssize_t libewf_handle_read_random(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
@@ -355,7 +355,7 @@ LIBEWF_EXTERN ssize_t libewf_read_random(
  * Returns the resulting chunk size or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_raw_write_prepare_buffer(
+LIBEWF_EXTERN ssize_t libewf_handle_raw_write_prepare_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t buffer_size,
@@ -411,7 +411,7 @@ LIBEWF_EXTERN ssize_t libewf_raw_write_buffer(
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_write_buffer(
+LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
@@ -429,7 +429,7 @@ LIBEWF_EXTERN ssize_t libewf_write_buffer(
  * Returns the amount of input bytes written, 0 when no longer bytes can be written or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_write_random(
+LIBEWF_EXTERN ssize_t libewf_handle_write_random(
                        libewf_handle_t *handle,
                        void *buffer,
                        size_t size,
@@ -448,7 +448,7 @@ LIBEWF_EXTERN ssize_t libewf_write_random(
  * Returns the amount of input bytes written or -1 on error
  */
 #if @HAVE_V2_API@
-LIBEWF_EXTERN ssize_t libewf_write_finalize(
+LIBEWF_EXTERN ssize_t libewf_handle_write_finalize(
                        libewf_handle_t *handle,
                        libewf_error_t **error );
 #else

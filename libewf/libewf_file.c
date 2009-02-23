@@ -729,7 +729,7 @@ int libewf_glob(
      uint8_t format,
      char **filenames[] )
 {
-	liberror_error_t *error     = NULL;
+	liberror_error_t *error   = NULL;
 	char *segment_filename    = NULL;
 	void *reallocation        = NULL;
 	static char *function     = "libewf_glob";
@@ -1283,7 +1283,7 @@ int libewf_glob_wide(
      uint8_t format,
      wchar_t **filenames[] )
 {
-	liberror_error_t *error     = NULL;
+	liberror_error_t *error   = NULL;
 	wchar_t *segment_filename = NULL;
 	void *reallocation        = NULL;
 	static char *function     = "libewf_glob_wide";
@@ -1586,7 +1586,7 @@ int libewf_glob_wide(
  * Returns a pointer to the new instance of handle, NULL on error
  */
 #if defined( HAVE_V2_API )
-int libewf_open(
+int libewf_handle_open(
      libewf_handle_t *handle,
      char * const filenames[],
      int amount_of_files,
@@ -1596,7 +1596,7 @@ int libewf_open(
 	libewf_internal_handle_t *internal_handle = NULL;
 	char *first_delta_segment_filename        = NULL;
 	char *first_segment_filename              = NULL;
-	static char *function                     = "libewf_open";
+	static char *function                     = "libewf_handle_open";
 	size64_t *segment_file_size               = NULL;
 	size_t filename_length                    = 0;
 	uint16_t segment_number                   = 0;
@@ -1962,7 +1962,7 @@ libewf_handle_t *libewf_open(
                   int amount_of_files,
                   uint8_t flags )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_handle_t *handle                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	char *first_delta_segment_filename        = NULL;
@@ -2446,7 +2446,7 @@ libewf_handle_t *libewf_open(
  * Returns a pointer to the new instance of handle, NULL on error
  */
 #if defined( HAVE_V2_API )
-int libewf_open_wide(
+int libewf_handle_open_wide(
      libewf_handle_t *handle,
      wchar_t * const filenames[],
      int amount_of_files,
@@ -2456,7 +2456,7 @@ int libewf_open_wide(
 	libewf_internal_handle_t *internal_handle = NULL;
 	wchar_t *first_delta_segment_filename     = NULL;
 	wchar_t *first_segment_filename           = NULL;
-	static char *function                     = "libewf_open_wide";
+	static char *function                     = "libewf_handle_open_wide";
 	size64_t *segment_file_size               = NULL;
 	size_t filename_length                    = 0;
 	uint16_t segment_number                   = 0;
@@ -2822,7 +2822,7 @@ libewf_handle_t *libewf_open_wide(
                   int amount_of_files,
                   uint8_t flags )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_handle_t *handle                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	wchar_t *first_delta_segment_filename     = NULL;
@@ -3303,12 +3303,12 @@ libewf_handle_t *libewf_open_wide(
  * Returns 0 if successful or -1 on error
  */
 #if defined( HAVE_V2_API )
-int libewf_close(
+int libewf_handle_close(
      libewf_handle_t *handle,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_close";
+	static char *function                     = "libewf_handle_close";
 
 	if( handle == NULL )
 	{
@@ -3440,13 +3440,13 @@ int libewf_close(
  * Returns the offset if seek is successful or -1 on error
  */
 #if defined( HAVE_V2_API )
-off64_t libewf_seek_offset(
+off64_t libewf_handle_seek_offset(
          libewf_handle_t *handle,
          off64_t offset,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_seek_offset";
+	static char *function                     = "libewf_handle_seek_offset";
 	uint64_t chunk                            = 0;
 	uint64_t chunk_offset                     = 0;
 
@@ -3559,7 +3559,7 @@ off64_t libewf_seek_offset(
          libewf_handle_t *handle,
          off64_t offset )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_seek_offset";
 	uint64_t chunk                            = 0;
@@ -3710,12 +3710,12 @@ off64_t libewf_seek_offset(
  * Returns the offset if successful or -1 on error
  */
 #if defined( HAVE_V2_API )
-off64_t libewf_get_offset(
+off64_t libewf_handle_get_offset(
          libewf_handle_t *handle,
          liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_seek_offset";
+	static char *function                     = "libewf_handle_get_offset";
 	off64_t current_offset                    = 0;
 
 	if( handle == NULL )
@@ -3751,9 +3751,9 @@ off64_t libewf_get_offset(
 off64_t libewf_get_offset(
          libewf_handle_t *handle )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_seek_offset";
+	static char *function                     = "libewf_get_offset";
 	off64_t current_offset                    = 0;
 
 	if( handle == NULL )

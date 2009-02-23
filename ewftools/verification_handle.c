@@ -39,10 +39,10 @@
 #include "digest_hash.h"
 #include "ewflibewf.h"
 #include "file_io.h"
-#include "storage_media_buffer.h"
 #include "md5.h"
 #include "notify.h"
 #include "sha1.h"
+#include "storage_media_buffer.h"
 #include "system_string.h"
 #include "verification_handle.h"
 
@@ -297,7 +297,7 @@ int verification_handle_open_input(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_open(
+	if( libewf_handle_open(
 	     verification_handle->input_handle,
 	     filenames,
 	     amount_of_files,
@@ -372,7 +372,7 @@ ssize_t verification_handle_read_prepare_buffer(
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
 #if defined( HAVE_V2_API )
-	read_count = libewf_raw_read_prepare_buffer(
+	read_count = libewf_handle_raw_read_prepare_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->compression_buffer,
                       storage_media_buffer->compression_buffer_amount,
@@ -469,7 +469,7 @@ ssize_t verification_handle_read_buffer(
 	}
 #if defined( HAVE_RAW_ACCESS )
 #if defined( HAVE_V2_API )
-	read_count = libewf_raw_read_buffer(
+	read_count = libewf_handle_raw_read_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->compression_buffer,
                       storage_media_buffer->compression_buffer_size,
@@ -488,7 +488,7 @@ ssize_t verification_handle_read_buffer(
 #endif
 #else
 #if defined( HAVE_V2_API )
-	read_count = libewf_read_buffer(
+	read_count = libewf_handle_read_buffer(
                       verification_handle->input_handle,
                       storage_media_buffer->raw_buffer,
                       read_size,
@@ -632,7 +632,7 @@ int verification_handle_update_integrity_hash(
 	return( 1 );
 }
 
-/* Closes both the input of the verification handle
+/* Closes the verification handle
  * Returns the 0 if succesful or -1 on error
  */
 int verification_handle_close(
@@ -665,7 +665,7 @@ int verification_handle_close(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_close(
+	if( libewf_handle_close(
 	     verification_handle->input_handle,
 	     error ) != 0 )
 #else
@@ -731,7 +731,7 @@ int verification_handle_get_values(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_get_media_size(
+	if( libewf_handle_get_media_size(
 	     verification_handle->input_handle,
 	     media_size,
 	     error ) != 1 )
@@ -751,7 +751,7 @@ int verification_handle_get_values(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_get_chunk_size(
+	if( libewf_handle_get_chunk_size(
 	     verification_handle->input_handle,
 	     chunk_size,
 	     error ) != 1 )
@@ -802,7 +802,7 @@ int verification_handle_set_input_values(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_set_read_wipe_chunk_on_error(
+	if( libewf_handle_set_read_wipe_chunk_on_error(
 	     verification_handle->input_handle,
 	     wipe_chunk_on_error,
 	     error ) != 1 )
@@ -952,7 +952,7 @@ int verification_handle_finalize(
 		}
 #if defined( USE_LIBEWF_GET_MD5_HASH )
 #if defined( HAVE_V2_API )
-		*stored_md5_hash_available = libewf_get_md5_hash(
+		*stored_md5_hash_available = libewf_handle_get_md5_hash(
 					      verification_handle->input_handle,
 					      md5_hash,
 					      DIGEST_HASH_SIZE_MD5,

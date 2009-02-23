@@ -85,8 +85,10 @@ typedef size_t u64;
 #include "file_io.h"
 #include "file_stream_io.h"
 #include "glob.h"
+#include "imaging_handle.h"
 #include "notify.h"
 #include "process_status.h"
+#include "storage_media_buffer.h"
 #include "system_string.h"
 
 #define EWFACQUIRE_INPUT_BUFFER_SIZE	64
@@ -381,6 +383,357 @@ size64_t determine_device_size(
 	return( input_size );
 }
 
+/* Reads data from a file descriptor and writes it in EWF format
+ * Returns the amount of bytes written or -1 on error
+ */
+ssize64_t ewfacquire_read_input(
+           imaging_handle_t *imaging_handle,
+           int input_file_descriptor,
+           size64_t write_size,
+           off64_t write_offset,
+           uint32_t sectors_per_chunk,
+           uint32_t bytes_per_sector,
+           uint8_t read_error_retry,
+           uint32_t sector_error_granularity,
+           uint8_t swap_byte_pairs,
+           uint8_t wipe_chunk_on_error,
+           uint8_t seek_on_error,
+           size_t data_buffer_size,
+           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ),
+           liberror_error_t **error )
+{
+	storage_media_buffer_t *storage_media_buffer = NULL;
+	static char *function                        = "ewfacquire_read_input";
+	ssize64_t total_write_count                  = 0;
+	size32_t chunk_size                          = 0;
+	ssize_t read_count                           = 0;
+	ssize_t process_count                        = 0;
+	ssize_t write_count                          = 0;
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( input_file_descriptor == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_buffer_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data buffer size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle_set_input_values(
+	     imaging_handle,
+	     read_error_retry,
+	     wipe_chunk_on_error,
+	     seek_on_error,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set imaging handle input values.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle_set_output_values(
+	     imaging_handle,
+	     sectors_per_chunk,
+	     bytes_per_sector,
+	     write_size,
+	     sector_error_granularity,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set imaging handle output values.",
+		 function );
+
+		return( -1 );
+	}
+	if( write_size > 0 )
+	{
+		if( write_offset > 0 )
+		{
+			if( write_offset >= (off64_t) write_size )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: invalid write offset.",
+				 function );
+
+				return( -1 );
+			}
+			if( file_io_lseek(
+			     input_file_descriptor,
+			     write_offset,
+			     SEEK_SET ) != (off64_t) write_offset )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_SEEK_FAILED,
+				 "%s: unable to find write offset.",
+				 function );
+
+				return( -1 );
+			}
+		}
+	}
+#if defined( HAVE_VERBOSE_OUTPUT )
+	else if( write_offset > 0 )
+	{
+		notify_warning_printf(
+		 "%s: ignoring write offset in stream mode.\n",
+		 function );
+	}
+#endif
+	chunk_size = sectors_per_chunk * bytes_per_sector;
+
+	if( ( chunk_size == 0 )
+	 || ( chunk_size > (size32_t) INT32_MAX ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid chunk size.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_RAW_ACCESS )
+	/* Make sure SMART chunks fit in the storage media buffer
+	 */
+	data_buffer_size = chunk_size;
+#else
+	if( data_buffer_size == 0 )
+	{
+		data_buffer_size = chunk_size;
+	}
+#endif
+
+	if( storage_media_buffer_initialize(
+	     &storage_media_buffer,
+	     data_buffer_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+
+	while( ( write_size == 0 )
+	    || ( total_write_count < (int64_t) write_size ) )
+	{
+		/* Read a chunk from the file descriptor
+		 */
+		read_count = imaging_handle_read_buffer(
+		              imaging_handle,
+		              input_file_descriptor,
+		              storage_media_buffer,
+		              data_buffer_size,
+		              error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: error reading data from input.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		if( read_count == 0 )
+		{
+			if( write_size != 0 )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_READ_FAILED,
+				 "%s: unexpected end of input.",
+				 function );
+
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
+				return( -1 );
+			}
+			break;
+		}
+		/* Swap byte pairs
+		 */
+		if( ( swap_byte_pairs == 1 )
+		 && ( imaging_handle_swap_byte_pairs(
+		       imaging_handle,
+		       storage_media_buffer,
+		       read_count,
+		       error ) != 1 ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_CONVERSION,
+			 LIBERROR_CONVERSION_ERROR_GENERIC,
+			 "%s: unable to swap byte pairs.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		/* Digest hashes are calcultated after swap
+		 */
+		if( imaging_handle_update_integrity_hash(
+		     imaging_handle,
+		     storage_media_buffer,
+		     read_count,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to update integrity hash(es).",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		process_count = imaging_handle_write_prepare_buffer(
+		                 imaging_handle,
+		                 storage_media_buffer,
+		                 error );
+
+		if( process_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			"%s: unable to prepare buffer before write.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		write_count = imaging_handle_write_buffer(
+		               imaging_handle,
+		               storage_media_buffer,
+		               process_count,
+		               error );
+
+		if( write_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_WRITE_FAILED,
+			 "%s: unable to write data to file.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		total_write_count += read_count;
+
+		/* Callback for status update
+		 */
+		if( callback != NULL )
+		{
+			callback(
+		         process_status,
+		         (size64_t) total_write_count,
+		         write_size );
+		}
+		if( ewfcommon_abort != 0 )
+		{
+			break;
+		}
+	}
+	if( storage_media_buffer_free(
+	     &storage_media_buffer,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	write_count = imaging_handle_write_finalize(
+	               imaging_handle,
+	               error );
+
+	if( write_count == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to finalize write.\n",
+		 function );
+
+		return( -1 );
+	}
+	total_write_count += write_count;
+
+	return( total_write_count );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
@@ -494,7 +847,9 @@ int main( int argc, char * const argv[] )
 		{
 			case (system_integer_t) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs_SYSTEM "\n",
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -507,7 +862,9 @@ int main( int argc, char * const argv[] )
 				     optarg,
 				     &sector_error_granularity ) != 1 )
 				{
-					fprintf( stderr, "Unsuported amount of sector error granularity defaulting to: 64.\n" );
+					fprintf(
+					 stderr,
+					 "Unsuported amount of sector error granularity defaulting to: 64.\n" );
 
 					sector_error_granularity = 64;
 				}
@@ -543,7 +900,9 @@ int main( int argc, char * const argv[] )
 				     &compression_level,
 				     &compress_empty_block ) != 1 )
 				{
-					fprintf( stderr, "Unsupported compression type defaulting to: none.\n" );
+					fprintf(
+					 stderr,
+					 "Unsupported compression type defaulting to: none.\n" );
 
 					compression_level    = LIBEWF_COMPRESSION_NONE;
 					compress_empty_block = 0;
@@ -569,7 +928,9 @@ int main( int argc, char * const argv[] )
 				}
 				else
 				{
-					fprintf( stderr, "Unsupported digest type.\n" );
+					fprintf(
+					 stderr,
+					 "Unsupported digest type.\n" );
 				}
 				break;
 
@@ -593,7 +954,9 @@ int main( int argc, char * const argv[] )
 				     optarg,
 				     &libewf_format ) != 1 )
 				{
-					fprintf( stderr, "Unsupported EWF file format type defaulting to: encase5.\n" );
+					fprintf(
+					 stderr,
+					 "Unsupported EWF file format type defaulting to: encase5.\n" );
 
 					libewf_format = LIBEWF_FORMAT_ENCASE5;
 				}
@@ -608,7 +971,9 @@ int main( int argc, char * const argv[] )
 				     optarg,
 				     &sectors_per_chunk ) != 1 )
 				{
-					fprintf( stderr, "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
+					fprintf(
+					 stderr,
+					 "Unsuported amount of sectors per chunk defaulting to: 64.\n" );
 
 					sectors_per_chunk = 64;
 				}
@@ -634,7 +999,9 @@ int main( int argc, char * const argv[] )
 				     optarg,
 				     &media_type ) != 1 )
 				{
-					fprintf( stderr, "Unsupported media type defaulting to: fixed.\n" );
+					fprintf(
+					 stderr,
+					 "Unsupported media type defaulting to: fixed.\n" );
 
 					media_type = LIBEWF_MEDIA_TYPE_FIXED;
 				}
@@ -649,7 +1016,9 @@ int main( int argc, char * const argv[] )
 				     optarg,
 				     &volume_type ) != 1 )
 				{
-					fprintf( stderr, "Unsupported volume type defaulting to: logical.\n" );
+					fprintf(
+					 stderr,
+					 "Unsupported volume type defaulting to: logical.\n" );
 
 					volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 				}
@@ -707,7 +1076,9 @@ int main( int argc, char * const argv[] )
 				{
 					process_buffer_size = 0;
 
-					fprintf( stderr, "Unsupported process buffer size defaulting to: chunk size.\n" );
+					fprintf(
+					 stderr,
+					 "Unsupported process buffer size defaulting to: chunk size.\n" );
 				}
 				break;
 
@@ -773,7 +1144,9 @@ int main( int argc, char * const argv[] )
 				{
 					segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
-					fprintf( stderr, "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
+					fprintf(
+					 stderr,
+					 "Unsupported segment file size defaulting to: %" PRIu64 ".\n",
 					 segment_file_size );
 				}
 				break;
@@ -809,7 +1182,9 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
-		fprintf( stderr, "Missing source file or device.\n" );
+		fprintf(
+		 stderr,
+		 "Missing source file or device.\n" );
 
 		usage_fprint(
 		 stdout );
@@ -827,7 +1202,9 @@ int main( int argc, char * const argv[] )
 	     _SYSTEM_CHARACTER_T_STRING( "-" ),
 	     1 ) == 0 )
 	{
-		fprintf( stderr, "Reading from stdin not supported.\n" );
+		fprintf(
+		 stderr,
+		 "Reading from stdin not supported.\n" );
 
 		return( EXIT_FAILURE );
 	}
@@ -859,7 +1236,9 @@ int main( int argc, char * const argv[] )
 	     file_descriptor,
 	     &input_file_stat ) != 0 )
 	{
-		fprintf( stderr, "Unable to get status information of file.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to get status information of file.\n" );
 
 		return( EXIT_FAILURE );
 	}
@@ -877,7 +1256,9 @@ int main( int argc, char * const argv[] )
 	}
 	if( input_size <= 0 )
 	{
-		fprintf( stderr, "Unable to determine input size.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to determine input size.\n" );
 
 		return( EXIT_FAILURE );
 	}
@@ -900,7 +1281,9 @@ int main( int argc, char * const argv[] )
 
 			if( target_filename == NULL )
 			{
-				fprintf( stderr, "Unable to create target filename string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to create target filename string.\n" );
 
 				error_abort = 1;
 			}
@@ -909,7 +1292,9 @@ int main( int argc, char * const argv[] )
 				  option_target_filename,
 				  string_length + 1 ) == NULL )
 			{
-				fprintf( stderr, "Unable to set target filename string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to set target filename string.\n" );
 
 				error_abort = 1;
 			}
@@ -922,7 +1307,9 @@ int main( int argc, char * const argv[] )
 
 		if( target_filename == NULL )
 		{
-			fprintf( stderr, "Unable to create target filename string.\n" );
+			fprintf(
+			 stderr,
+			 "Unable to create target filename string.\n" );
 
 			error_abort = 1;
 		}
@@ -935,7 +1322,9 @@ int main( int argc, char * const argv[] )
 			     _SYSTEM_CHARACTER_T_STRING( "acquiry" ),
 			     7 ) == NULL )
 			{
-				fprintf( stderr, "Unable to set target filename string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to set target filename string.\n" );
 
 				error_abort = 1;
 			}
@@ -956,7 +1345,9 @@ int main( int argc, char * const argv[] )
 
 				if( case_number == NULL )
 				{
-					fprintf( stderr, "Unable to create case number string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to create case number string.\n" );
 
 					error_abort = 1;
 				}
@@ -965,7 +1356,9 @@ int main( int argc, char * const argv[] )
 					  option_case_number,
 					  string_length + 1 ) == NULL )
 				{
-					fprintf( stderr, "Unable to set case number string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to set case number string.\n" );
 
 					error_abort = 1;
 				}
@@ -978,7 +1371,9 @@ int main( int argc, char * const argv[] )
 
 			if( case_number == NULL )
 			{
-				fprintf( stderr, "Unable to create case number string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to create case number string.\n" );
 
 				error_abort = 1;
 			}
@@ -998,7 +1393,9 @@ int main( int argc, char * const argv[] )
 
 				if( description == NULL )
 				{
-					fprintf( stderr, "Unable to create description string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to create description string.\n" );
 
 					error_abort = 1;
 				}
@@ -1007,7 +1404,9 @@ int main( int argc, char * const argv[] )
 					  option_description,
 					  string_length + 1 ) == NULL )
 				{
-					fprintf( stderr, "Unable to set description string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to set description string.\n" );
 
 					error_abort = 1;
 				}
@@ -1020,7 +1419,9 @@ int main( int argc, char * const argv[] )
 
 			if( description == NULL )
 			{
-				fprintf( stderr, "Unable to create description string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to create description string.\n" );
 
 				error_abort = 1;
 			}
@@ -1040,7 +1441,9 @@ int main( int argc, char * const argv[] )
 
 				if( examiner_name == NULL )
 				{
-					fprintf( stderr, "Unable to create examiner name string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to create examiner name string.\n" );
 
 					error_abort = 1;
 				}
@@ -1049,7 +1452,9 @@ int main( int argc, char * const argv[] )
 					  option_examiner_name,
 					  string_length + 1 ) == NULL )
 				{
-					fprintf( stderr, "Unable to set examiner name string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to set examiner name string.\n" );
 
 					error_abort = 1;
 				}
@@ -1062,7 +1467,9 @@ int main( int argc, char * const argv[] )
 
 			if( evidence_number == NULL )
 			{
-				fprintf( stderr, "Unable to create evidence number string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to create evidence number string.\n" );
 
 				error_abort = 1;
 			}
@@ -1082,7 +1489,9 @@ int main( int argc, char * const argv[] )
 
 				if( evidence_number == NULL )
 				{
-					fprintf( stderr, "Unable to create evidence number string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to create evidence number string.\n" );
 
 					error_abort = 1;
 				}
@@ -1091,7 +1500,9 @@ int main( int argc, char * const argv[] )
 					  option_evidence_number,
 					  string_length + 1 ) == NULL )
 				{
-					fprintf( stderr, "Unable to set evidence number string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to set evidence number string.\n" );
 
 					error_abort = 1;
 				}
@@ -1104,7 +1515,9 @@ int main( int argc, char * const argv[] )
 
 			if( examiner_name == NULL )
 			{
-				fprintf( stderr, "Unable to create examiner name string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to create examiner name string.\n" );
 
 				error_abort = 1;
 			}
@@ -1124,7 +1537,9 @@ int main( int argc, char * const argv[] )
 
 				if( notes == NULL )
 				{
-					fprintf( stderr, "Unable to create notes string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to create notes string.\n" );
 
 					error_abort = 1;
 				}
@@ -1133,7 +1548,9 @@ int main( int argc, char * const argv[] )
 					  option_notes,
 					  string_length + 1 ) == NULL )
 				{
-					fprintf( stderr, "Unable to set notes string.\n" );
+					fprintf(
+					 stderr,
+					 "Unable to set notes string.\n" );
 
 					error_abort = 1;
 				}
@@ -1146,7 +1563,9 @@ int main( int argc, char * const argv[] )
 
 			if( notes == NULL )
 			{
-				fprintf( stderr, "Unable to create notes string.\n" );
+				fprintf(
+				 stderr,
+				 "Unable to create notes string.\n" );
 
 				error_abort = 1;
 			}
@@ -1191,7 +1610,9 @@ int main( int argc, char * const argv[] )
 	while( ( interactive_mode == 1 )
 	 && ( acquiry_parameters_confirmed == 0 ) )
 	{
-		fprintf( stdout, "Acquiry parameters required, please provide the necessary input\n" );
+		fprintf(
+		 stdout,
+		 "Acquiry parameters required, please provide the necessary input\n" );
 
 		/* Target filename
 		 */
@@ -1203,7 +1624,9 @@ int main( int argc, char * const argv[] )
 				target_filename,
 				1024 ) != 1 )
 			{
-				fprintf( stdout, "Filename is required, please try again or terminate using Ctrl^C.\n" );
+				fprintf(
+				 stdout,
+				 "Filename is required, please try again or terminate using Ctrl^C.\n" );
 			}
 		}
 		/* Case number
@@ -1215,7 +1638,9 @@ int main( int argc, char * const argv[] )
 		       case_number,
 		       256 ) == -1 ) )
 		{
-			fprintf( stdout, "Unable to set case number string.\n" );
+			fprintf(
+			 stdout,
+			 "Unable to set case number string.\n" );
 
 			case_number[ 0 ] = 0;
 		}
@@ -1228,7 +1653,9 @@ int main( int argc, char * const argv[] )
 		       description,
 		       256 ) == -1 ) )
 		{
-			fprintf( stdout, "Unable to set description string.\n" );
+			fprintf(
+			 stdout,
+			 "Unable to set description string.\n" );
 
 			description[ 0 ] = 0;
 		}
@@ -1241,7 +1668,9 @@ int main( int argc, char * const argv[] )
 		       evidence_number,
 		       256 ) == -1 ) )
 		{
-			fprintf( stdout, "Unable to set evidence number string.\n" );
+			fprintf(
+			 stdout,
+			 "Unable to set evidence number string.\n" );
 
 			evidence_number[ 0 ] = 0;
 		}
@@ -1254,7 +1683,9 @@ int main( int argc, char * const argv[] )
 		       examiner_name,
 		       256 ) == -1 ) )
 		{
-			fprintf( stdout, "Unable to set examiner name string.\n" );
+			fprintf(
+			 stdout,
+			 "Unable to set examiner name string.\n" );
 
 			examiner_name[ 0 ] = 0;
 		}
@@ -1267,7 +1698,9 @@ int main( int argc, char * const argv[] )
 		       notes,
 		       256 ) == -1 ) )
 		{
-			fprintf( stdout, "Unable to set notes string.\n" );
+			fprintf(
+			 stdout,
+			 "Unable to set notes string.\n" );
 
 			notes[ 0 ] = 0;
 		}
@@ -1285,7 +1718,9 @@ int main( int argc, char * const argv[] )
 			     EWFINPUT_MEDIA_TYPES_DEFAULT,
 			     &fixed_string_variable ) == -1 )
 			{
-				fprintf( stdout, "Unable to determine media type defaulting to: fixed.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to determine media type defaulting to: fixed.\n" );
 
 				media_type = LIBEWF_MEDIA_TYPE_FIXED;
 			}
@@ -1293,7 +1728,9 @@ int main( int argc, char * const argv[] )
 				  fixed_string_variable,
 				  &media_type ) != 1 )
 			{
-				fprintf( stdout, "Unsupported media type defaulting to: fixed.\n" );
+				fprintf(
+				 stdout,
+				 "Unsupported media type defaulting to: fixed.\n" );
 
 				media_type = LIBEWF_MEDIA_TYPE_FIXED;
 			}
@@ -1312,7 +1749,9 @@ int main( int argc, char * const argv[] )
 			     EWFINPUT_VOLUME_TYPES_DEFAULT,
 			     &fixed_string_variable ) == -1 )
 			{
-				fprintf( stdout, "Unable to determine volume type defaulting to: logical.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to determine volume type defaulting to: logical.\n" );
 
 				volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 			}
@@ -1320,7 +1759,9 @@ int main( int argc, char * const argv[] )
 				  fixed_string_variable,
 				  &volume_type ) != 1 )
 			{
-				fprintf( stdout, "Unsupported volume type defaulting to: logical.\n" );
+				fprintf(
+				 stdout,
+				 "Unsupported volume type defaulting to: logical.\n" );
 
 				volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
 			}
@@ -1339,7 +1780,9 @@ int main( int argc, char * const argv[] )
 			     EWFINPUT_COMPRESSION_LEVELS_DEFAULT,
 			     &fixed_string_variable ) == -1 )
 			{
-				fprintf( stdout, "Unable to determine compression type defaulting to: none.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to determine compression type defaulting to: none.\n" );
 
 				compression_level    = LIBEWF_COMPRESSION_NONE;
 				compress_empty_block = 0;
@@ -1349,7 +1792,9 @@ int main( int argc, char * const argv[] )
 				  &compression_level,
 				  &compress_empty_block ) != 1 )
 			{
-				fprintf( stdout, "Unsupported compression type defaulting to: none.\n" );
+				fprintf(
+				 stdout,
+				 "Unsupported compression type defaulting to: none.\n" );
 
 				compression_level    = LIBEWF_COMPRESSION_NONE;
 				compress_empty_block = 0;
@@ -1369,7 +1814,9 @@ int main( int argc, char * const argv[] )
 			     EWFINPUT_FORMAT_TYPES_DEFAULT,
 			     &fixed_string_variable ) == -1 )
 			{
-				fprintf( stdout, "Unable to determine EWF file format type defaulting to: encase5.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to determine EWF file format type defaulting to: encase5.\n" );
 
 				libewf_format = LIBEWF_FORMAT_ENCASE5;
 			}
@@ -1377,7 +1824,9 @@ int main( int argc, char * const argv[] )
 				  fixed_string_variable,
 				  &libewf_format ) != 1 )
 			{
-				fprintf( stdout, "Unsupported EWF file format type defaulting to: encase5.\n" );
+				fprintf(
+				 stdout,
+				 "Unsupported EWF file format type defaulting to: encase5.\n" );
 
 				libewf_format = LIBEWF_FORMAT_ENCASE5;
 			}
@@ -1397,7 +1846,9 @@ int main( int argc, char * const argv[] )
 		{
 			acquiry_offset = 0;
 
-			fprintf( stdout, "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
+			fprintf(
+			 stdout,
+			 "Unable to determine acquiry offset defaulting to: %" PRIu64 ".\n",
 			 acquiry_offset );
 		}
 		/* Size of data to acquire
@@ -1415,7 +1866,9 @@ int main( int argc, char * const argv[] )
 		{
 			acquiry_size = input_size - acquiry_offset;
 
-			fprintf( stdout, "Unable to determine input size defaulting to: %" PRIu64 ".\n",
+			fprintf(
+			 stdout,
+			 "Unable to determine input size defaulting to: %" PRIu64 ".\n",
 			 acquiry_size );
 		}
 		/* Segment file size
@@ -1448,7 +1901,9 @@ int main( int argc, char * const argv[] )
 
 				segment_file_size = EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE;
 
-				fprintf( stdout, "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
+				fprintf(
+				 stdout,
+				 "Unable to determine segment file size defaulting to: %" PRIu64 ".\n",
 				 segment_file_size );
 			}
 			/* Make sure the segment file size is smaller than or equal to the maximum
@@ -1472,7 +1927,9 @@ int main( int argc, char * const argv[] )
 			     EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT,
 			     &fixed_string_variable ) == -1 )
 			{
-				fprintf( stdout, "Unable to determine sectors per chunk defaulting to: 64.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to determine sectors per chunk defaulting to: 64.\n" );
 
 				sectors_per_chunk = 64;
 			}
@@ -1480,7 +1937,9 @@ int main( int argc, char * const argv[] )
 				  fixed_string_variable,
 				  &sectors_per_chunk ) != 1 )
 			{
-				fprintf( stdout, "Unsupported sectors per chunk defaulting to: 64.\n" );
+				fprintf(
+				 stdout,
+				 "Unsupported sectors per chunk defaulting to: 64.\n" );
 
 				sectors_per_chunk = 64;
 			}
@@ -1501,7 +1960,9 @@ int main( int argc, char * const argv[] )
 			{
 				input_size_variable = 64;
 
-				fprintf( stdout, "Unable to determine sector error granularity defaulting to: %" PRIu64 ".\n",
+				fprintf(
+				 stdout,
+				 "Unable to determine sector error granularity defaulting to: %" PRIu64 ".\n",
 				 input_size_variable );
 			}
 			sector_error_granularity = (uint32_t) input_size_variable;
@@ -1522,7 +1983,9 @@ int main( int argc, char * const argv[] )
 			{
 				input_size_variable = 2;
 
-				fprintf( stdout, "Unable to determine read error retry defaulting to: %" PRIu64 ".\n",
+				fprintf(
+				 stdout,
+				 "Unable to determine read error retry defaulting to: %" PRIu64 ".\n",
 				 input_size_variable );
 			}
 			read_error_retry = (uint8_t) input_size_variable;
@@ -1541,7 +2004,9 @@ int main( int argc, char * const argv[] )
 			     1,
 			     &fixed_string_variable ) == -1 )
 			{
-				fprintf( stdout, "Unable to determine wipe chunk on error defaulting to: no.\n" );
+				fprintf(
+				 stdout,
+				 "Unable to determine wipe chunk on error defaulting to: no.\n" );
 
 				wipe_chunk_on_error = 0;
 			}
@@ -1549,12 +2014,16 @@ int main( int argc, char * const argv[] )
 				  fixed_string_variable,
 				  &wipe_chunk_on_error ) != 1 )
 			{
-				fprintf( stdout, "Unsupported wipe chunk on error defaulting to: no.\n" );
+				fprintf(
+				 stdout,
+				 "Unsupported wipe chunk on error defaulting to: no.\n" );
 
 				wipe_chunk_on_error = 0;
 			}
 		}
-		fprintf( stdout, "\n" );
+		fprintf(
+		 stdout,
+		 "\n" );
 
 		/* Check if user is content with the acquiry parameters
 		 */
@@ -1583,7 +2052,9 @@ int main( int argc, char * const argv[] )
 
 		if( acquiry_parameters_confirmed == -1 )
 		{
-			fprintf( stdout, "Unable to determine if acquiry parameters are correct aborting.\n" );
+			fprintf(
+			 stdout,
+			 "Unable to determine if acquiry parameters are correct aborting.\n" );
 
 			ewfcommon_abort = 1;
 
@@ -1609,7 +2080,9 @@ int main( int argc, char * const argv[] )
 	if( ewfsignal_attach(
 	     ewfcommon_signal_handler ) != 1 )
 	{
-		fprintf( stderr, "Unable to attach signal handler.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to attach signal handler.\n" );
 	}
 	if( ewfcommon_abort == 0 )
 	{
@@ -1651,7 +2124,7 @@ int main( int argc, char * const argv[] )
 
 			error_abort = 1;
 		}
-		else if( libewf_open(
+		else if( libewf_handle_open(
 		          ewfcommon_libewf_handle,
 		          (system_character_t * const *) target_filenames,
 		          1,
@@ -1701,7 +2174,9 @@ int main( int argc, char * const argv[] )
 			  (size64_t) segment_file_size,
 			  sector_error_granularity ) != 1 )
 		{
-			fprintf( stderr, "Unable to initialize settings for EWF file(s).\n" );
+			fprintf(
+			 stderr,
+			 "Unable to initialize settings for EWF file(s).\n" );
 
 			error_abort = 1;
 		}
@@ -1722,7 +2197,7 @@ int main( int argc, char * const argv[] )
 	if( error_abort != 0 )
 	{
 #if defined( HAVE_V2_API )
-		libewf_close(
+		libewf_handle_close(
 		 ewfcommon_libewf_handle,
 		 NULL );
 		libewf_handle_free(
@@ -1745,10 +2220,12 @@ int main( int argc, char * const argv[] )
 
 		if( calculated_md5_hash_string == NULL )
 		{
-			fprintf( stderr, "Unable to create calculated MD5 hash string.\n" );
+			fprintf(
+			 stderr,
+			 "Unable to create calculated MD5 hash string.\n" );
 
 #if defined( HAVE_V2_API )
-			libewf_close(
+			libewf_handle_close(
 			 ewfcommon_libewf_handle,
 			 NULL );
 			libewf_handle_free(
@@ -1772,13 +2249,15 @@ int main( int argc, char * const argv[] )
 
 		if( calculated_sha1_hash_string == NULL )
 		{
-			fprintf( stderr, "Unable to create calculated SHA1 hash string.\n" );
+			fprintf(
+			 stderr,
+			 "Unable to create calculated SHA1 hash string.\n" );
 
 			memory_free(
 			 calculated_md5_hash_string );
 
 #if defined( HAVE_V2_API )
-			libewf_close(
+			libewf_handle_close(
 			 ewfcommon_libewf_handle,
 			 NULL );
 			libewf_handle_free(
@@ -1804,7 +2283,9 @@ int main( int argc, char * const argv[] )
 		     _SYSTEM_CHARACTER_T_STRING( "Written" ),
 		     stdout ) != 1 )
 		{
-			fprintf( stderr, "Unable to initialize process status.\n" );
+			fprintf(
+			 stderr,
+			 "Unable to initialize process status.\n" );
 
 			if( calculate_sha1 == 1 )
 			{
@@ -1817,7 +2298,7 @@ int main( int argc, char * const argv[] )
 				 calculated_md5_hash_string );
 			}
 #if defined( HAVE_V2_API )
-			libewf_close(
+			libewf_handle_close(
 			 ewfcommon_libewf_handle,
 			 NULL );
 			libewf_handle_free(
@@ -1836,7 +2317,9 @@ int main( int argc, char * const argv[] )
 		if( process_status_start(
 		     process_status ) != 1 )
 		{
-			fprintf( stderr, "Unable to start process status.\n" );
+			fprintf(
+			 stderr,
+			 "Unable to start process status.\n" );
 
 			process_status_free(
 			 &process_status );
@@ -1852,7 +2335,7 @@ int main( int argc, char * const argv[] )
 				 calculated_md5_hash_string );
 			}
 #if defined( HAVE_V2_API )
-			libewf_close(
+			libewf_handle_close(
 			 ewfcommon_libewf_handle,
 			 NULL );
 			libewf_handle_free(
@@ -1905,7 +2388,9 @@ int main( int argc, char * const argv[] )
 	if( file_io_close(
 	     file_descriptor ) != 0 )
 	{
-		fprintf( stderr, "Unable to close input.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to close input.\n" );
 
 		process_status_free(
 		 &process_status );
@@ -1921,7 +2406,7 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 		}
 #if defined( HAVE_V2_API )
-		libewf_close(
+		libewf_handle_close(
 		 ewfcommon_libewf_handle,
 		 NULL );
 		libewf_handle_free(
@@ -1943,7 +2428,9 @@ int main( int argc, char * const argv[] )
 	     (size64_t) write_count,
 	     status ) != 1 )
 	{
-		fprintf( stderr, "Unable to stop process status.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to stop process status.\n" );
 
 		process_status_free(
 		 &process_status );
@@ -1959,7 +2446,7 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 		}
 #if defined( HAVE_V2_API )
-		libewf_close(
+		libewf_handle_close(
 		 ewfcommon_libewf_handle,
 		 NULL );
 		libewf_handle_free(
@@ -1975,7 +2462,9 @@ int main( int argc, char * const argv[] )
 	if( process_status_free(
 	     &process_status ) != 1 )
 	{
-		fprintf( stderr, "Unable to free process status.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to free process status.\n" );
 
 		if( calculate_sha1 == 1 )
 		{
@@ -1988,7 +2477,7 @@ int main( int argc, char * const argv[] )
 			 calculated_md5_hash_string );
 		}
 #if defined( HAVE_V2_API )
-		libewf_close(
+		libewf_handle_close(
 		 ewfcommon_libewf_handle,
 		 NULL );
 		libewf_handle_free(
@@ -2011,7 +2500,9 @@ int main( int argc, char * const argv[] )
 
 			if( log_file_stream == NULL )
 			{
-				fprintf( stderr, "Unable to open log file: %s.\n",
+				fprintf(
+				 stderr,
+				 "Unable to open log file: %s.\n",
 				 log_filename );
 			}
 		}
@@ -2029,7 +2520,7 @@ int main( int argc, char * const argv[] )
 		}
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_close(
+	if( libewf_handle_close(
 	     ewfcommon_libewf_handle,
 	     &error ) != 0 )
 	{
@@ -2097,7 +2588,9 @@ int main( int argc, char * const argv[] )
 	if( libewf_close(
 	     ewfcommon_libewf_handle ) != 0 )
 	{
-		fprintf( stderr, "Unable to close EWF file(s).\n" );
+		fprintf(
+		 stderr,
+		 "Unable to close EWF file(s).\n" );
 
 		if( log_file_stream != NULL )
 		{
@@ -2119,7 +2612,9 @@ int main( int argc, char * const argv[] )
 #endif
 	if( ewfsignal_detach() != 1 )
 	{
-		fprintf( stderr, "Unable to detach signal handler.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to detach signal handler.\n" );
 	}
         if( status != PROCESS_STATUS_COMPLETED )
         {
@@ -2142,12 +2637,16 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_md5 == 1 )
 	{
-		fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		fprintf(
+		 stdout,
+		 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 		 calculated_md5_hash_string );
 
 		if( log_file_stream != NULL )
 		{
-			fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			fprintf(
+			 log_file_stream,
+			 "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 			 calculated_md5_hash_string );
 		}
 		memory_free(
@@ -2155,12 +2654,16 @@ int main( int argc, char * const argv[] )
 	}
 	if( calculate_sha1 == 1 )
 	{
-		fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+		fprintf(
+		 stdout,
+		 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 		 calculated_sha1_hash_string );
 
 		if( log_file_stream != NULL )
 		{
-			fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
+			fprintf(
+			 log_file_stream,
+			 "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 			 calculated_sha1_hash_string );
 		}
 		memory_free(
@@ -2171,7 +2674,9 @@ int main( int argc, char * const argv[] )
 		if( file_stream_io_fclose(
 		     log_file_stream ) != 0 )
 		{
-			fprintf( stderr, "Unable to close log file: %s.\n",
+			fprintf(
+			 stderr,
+			 "Unable to close log file: %s.\n",
 			 log_filename );
 		}
 	}

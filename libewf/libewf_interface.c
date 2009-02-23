@@ -546,7 +546,7 @@ int libewf_get_media_size(
      libewf_handle_t *handle,
      size64_t *media_size )
 {
-	liberror_error_t *error                     = NULL;
+	liberror_error_t *error                   = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_get_media_size";
 

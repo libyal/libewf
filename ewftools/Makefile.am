@@ -18,10 +18,12 @@ ewfacquire_SOURCES = \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
+	imaging_handle.c imaging_handle.h \
 	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
+	storage_media_buffer.c storage_media_buffer.h \
 	system_string.c system_string.h
 
 ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@

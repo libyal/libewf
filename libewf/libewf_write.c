@@ -806,6 +806,9 @@ ssize_t libewf_write_process_chunk_data(
 		 && ( compressed_chunk_data == chunk_cache->compressed )
 		 && ( *compressed_chunk_data_size > 0 ) )
 		{
+			liberror_error_free(
+			 error );
+
 			chunk_cache_data_used = (int) ( chunk_data == chunk_cache->data );
 
 			if( libewf_chunk_cache_resize(

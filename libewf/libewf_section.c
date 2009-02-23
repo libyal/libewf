@@ -544,6 +544,9 @@ ssize_t libewf_section_compressed_string_read(
 	while( ( result == -1 )
 	    && ( *uncompressed_string_size > 0 ) )
 	{
+		liberror_error_free(
+		 error );
+
 		reallocation = memory_reallocate(
 		                uncompressed,
 		                sizeof( uint8_t ) * *uncompressed_string_size );
@@ -687,6 +690,9 @@ ssize_t libewf_section_write_compressed_string(
 	if( ( result == -1 )
 	 && ( compressed_string_size > 0 ) )
 	{
+		liberror_error_free(
+		 error );
+
 		reallocation = memory_reallocate(
 		                compressed_string,
 		                ( sizeof( uint8_t ) * compressed_string_size ) );
