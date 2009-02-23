@@ -13,6 +13,30 @@ AC_DEFUN([LIBEWF_TEST_ENABLE],
 	  [ac_cv_libewf_enable_$2=$4])dnl
 ])
 
+dnl Function to detect whether nl_langinfo supports CODESET
+AC_DEFUN([LIBEWF_LANGINFO_CODESET],
+	[AC_CHECK_FUNCS(
+	 [nl_langinfo],
+	 [AC_CACHE_CHECK(
+	  [for nl_langinfo CODESET support],
+	  [ac_cv_libewf_langinfo_codeset],
+	  [AC_LANG_PUSH(C)
+	  AC_LINK_IFELSE(
+	   [AC_LANG_PROGRAM(
+	    [[#include <langinfo.h>]],
+	    [[char* charset = nl_langinfo( CODESET );]] )],
+	   [ac_cv_libewf_langinfo_codeset=yes],
+	   [ac_cv_libewf_langinfo_codeset=no])
+	  AC_LANG_POP(C) ]) ],
+	 [ac_cv_libewf_langinfo_codeset=no] )
+	AS_IF(
+	 [test "x$ac_cv_libewf_langinfo_codeset" = xyes],
+	 [AC_DEFINE(
+	  [HAVE_LANGINFO_CODESET],
+	  [1],
+	  [Define if nl_langinfo has CODESET support.]) ])
+])
+
 dnl Function to detect whether printf conversion specifier "%jd" is available
 AC_DEFUN([LIBEWF_CHECK_PRINTF_JD],
 	[SAVE_CFLAGS="$CFLAGS"

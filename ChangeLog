@@ -93,6 +93,7 @@ API changes
 * LVF
   - libewf_add/remove_file for LVF
 * add function to retrieve the segment file names and amount?
+* rename handle functions to libewf_handle_x
 
 Something for libsmio/smiotools
 * create iso2ewf tool?
@@ -125,6 +126,15 @@ Testing
 Other:
 check error tollerance
 check TODO
+
+* locale support
+  - library data returns UTF-8 (done)
+  - input filenames remain system string (done)
+  - move character_t functionality to system_character_t (done)
+  - remove string conversion code (done)
+  - print output convert to system string
+  - to reduce conversions use as much as possible the system string type in
+    the tools
 
 ewfinfo parse and format extents header value in more table like manner
 
@@ -200,6 +210,10 @@ update msvscpp files
 
 * tools and library support read/write of EnCase 6.12 SHA1
 
+* implement libpff log_handle
+
+* implement liberror in ewftools
+
 CLOSED
 * what about read+write and compression?
   solved by delta files
@@ -214,6 +228,9 @@ CLOSED
   no
 * test if wide character mode is portable between big and little endian platforms due to conversion functions?
   checks out ok
+
+Version: 20090222
+* worked on locale support
 
 Version: 20090219
 * fixed rogue free of filenames in verification handle in amount_of_files check

@@ -1,0 +1,108 @@
+/*
+ * GUID functions
+ *
+ * Copyright (c) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
+ * Hoffmann Investigations. All rights reserved.
+ *
+ * Refer to AUTHORS for acknowledgements.
+ *
+ * This software is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this software.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <common.h>
+#include <types.h>
+
+#include "character_string.h"
+#include "guid.h"
+#include "notify.h"
+
+/* Converts the GUID into a string
+ * Returns 1 if successful or -1 on error
+ */
+int guid_to_string(
+     guid_t *guid,
+     character_t *string,
+     size_t string_size )
+{
+	static char *function = "guid_to_string";
+	ssize_t print_count   = 0;
+
+	if( guid == NULL )
+	{
+		notify_warning_printf( "%s: invalid guid.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string == NULL )
+	{
+		notify_warning_printf( "%s: invalid string.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size < GUID_STRING_LENGTH )
+	{
+		notify_warning_printf( "%s: string too small.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		notify_warning_printf( "%s: invalid string size value exceeds maximum.\n",
+		 function );
+
+		return( -1 );
+	}
+	/* Create the GUID string
+	 * It is stored as uint32 - uint16 - uint16 - 8 byte array
+	 */
+	print_count = string_snprintf(
+	               string,
+	               string_size,
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
+	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 ),
+	               guid[ 3 ], guid[ 2 ], guid[ 1 ], guid[ 0 ],
+	               guid[ 5 ], guid[ 4 ],
+	               guid[ 7 ], guid[ 6 ],
+	               guid[ 8 ], guid[ 9 ],
+	               guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
+
+	if( print_count != 36 )
+	{
+		notify_warning_printf( "%s: unable to format string.\n",
+		 function );
+
+		return( -1 );
+	}
+	string[ 36 ] = 0;
+
+	return( 1 );
+}
+

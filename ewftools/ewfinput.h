@@ -26,7 +26,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "character_string.h"
+#include <liberror.h>
+
 #include "system_string.h"
 
 #if defined( __cplusplus )
@@ -52,84 +53,57 @@ extern "C" {
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_AMOUNT		10
 #define EWFINPUT_SECTOR_PER_BLOCK_SIZES_DEFAULT		0
 
-extern character_t *ewfinput_compression_levels[ 4 ];
-extern character_t *ewfinput_format_types[ 12 ];
+extern system_character_t *ewfinput_compression_levels[ 4 ];
+extern system_character_t *ewfinput_format_types[ 12 ];
 #if defined( LIBEWF_CD_SUPPORT )
-extern character_t *ewfinput_media_types[ 3 ];
+extern system_character_t *ewfinput_media_types[ 3 ];
 #else
-extern character_t *ewfinput_media_types[ 2 ];
+extern system_character_t *ewfinput_media_types[ 2 ];
 #endif
-extern character_t *ewfinput_volume_types[ 2 ];
-extern character_t *ewfinput_sector_per_block_sizes[ 10 ];
-extern character_t *ewfinput_yes_no[ 2 ];
+extern system_character_t *ewfinput_volume_types[ 2 ];
+extern system_character_t *ewfinput_sector_per_block_sizes[ 10 ];
+extern system_character_t *ewfinput_yes_no[ 2 ];
 
 int ewfinput_determine_libewf_format(
-     const character_t *argument,
-     uint8_t *libewf_format );
-
-int ewfinput_determine_libewf_format_system_character(
      const system_character_t *argument,
      uint8_t *libewf_format );
 
 int ewfinput_determine_sectors_per_chunk(
-     const character_t *argument,
-     uint32_t *sectors_per_chunk );
-
-int ewfinput_determine_sectors_per_chunk_system_character(
      const system_character_t *argument,
      uint32_t *sectors_per_chunk );
 
 int ewfinput_determine_compression_level(
-     const character_t *argument,
-     int8_t *compression_level,
-     uint8_t *compress_empty_block );
-
-int ewfinput_determine_compression_level_system_character(
      const system_character_t *argument,
      int8_t *compression_level,
      uint8_t *compress_empty_block );
 
 int ewfinput_determine_media_type(
-     const character_t *argument,
-     uint8_t *media_type );
-
-int ewfinput_determine_media_type_system_character(
      const system_character_t *argument,
      uint8_t *media_type );
 
 int ewfinput_determine_volume_type(
-     const character_t *argument,
-     uint8_t *volume_type );
-
-int ewfinput_determine_volume_type_system_character(
      const system_character_t *argument,
      uint8_t *volume_type );
 
-int ewfinput_determine_header_codepage_system_character(
+int ewfinput_determine_header_codepage(
      const system_character_t *argument,
      int *header_codepage );
 
 int ewfinput_determine_yes_no(
-     const character_t *argument,
+     const system_character_t *argument,
      uint8_t *yes_no_value );
 
 int ewfinput_get_string_variable(
      FILE *stream,
-     character_t *request_string,
-     character_t *string_variable,
-     size_t string_variable_size );
-
-int ewfinput_get_string_variable_system_character(
-     FILE *stream,
-     character_t *request_string,
+     system_character_t *request_string,
      system_character_t *string_variable,
      size_t string_variable_size );
 
 int ewfinput_get_size_variable(
      FILE *stream,
-     character_t *input_buffer,
+     system_character_t *input_buffer,
      size_t input_buffer_size,
-     character_t *request_string,
+     system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
@@ -137,23 +111,24 @@ int ewfinput_get_size_variable(
 
 int ewfinput_get_byte_size_variable(
      FILE *stream,
-     character_t *input_buffer,
+     system_character_t *input_buffer,
      size_t input_buffer_size,
-     character_t *request_string,
+     system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
-     uint64_t *byte_size_variable );
+     uint64_t *byte_size_variable,
+     liberror_error_t **error );
 
 int ewfinput_get_fixed_string_variable(
      FILE *stream,
-     character_t *input_buffer,
+     system_character_t *input_buffer,
      size_t input_buffer_size,
-     character_t *request_string,
-     character_t **values,
+     system_character_t *request_string,
+     system_character_t **values,
      uint8_t amount_of_values,
      uint8_t default_value,
-     character_t **fixed_string_variable );
+     system_character_t **fixed_string_variable );
 
 #if defined( __cplusplus )
 }

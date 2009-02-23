@@ -25,6 +25,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
@@ -44,7 +46,6 @@
 
 #include <libewf.h>
 
-#include "character_string.h"
 #include "byte_size_string.h"
 #include "ewfcommon.h"
 #include "ewfgetopt.h"
@@ -80,17 +81,15 @@ void usage_fprint(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	character_t media_size_string[ 16 ];
-	character_t guid_string[ GUID_STRING_LENGTH ];
+	system_character_t media_size_string[ 16 ];
+	system_character_t guid_string[ GUID_STRING_SIZE ];
 	uint8_t guid[ 16 ];
-
-	character_t *program                       = _CHARACTER_T_STRING( "ewfinfo" );
 
 	system_character_t * const *argv_filenames = NULL;
 	system_character_t **ewf_filenames         = NULL;
@@ -98,7 +97,10 @@ int main( int argc, char * const argv[] )
 #if !defined( HAVE_GLOB_H )
 	glob_t *glob                               = NULL;
 #endif
+	liberror_error_t *error                    = NULL;
+
 	char *file_format_string                   = NULL;
+	char *program                              = "ewfinfo";
 	system_integer_t option                    = 0;
 	size64_t media_size                        = 0;
 	uint32_t bytes_per_sector                  = 0;
@@ -118,6 +120,24 @@ int main( int argc, char * const argv[] )
 	int amount_of_filenames                    = 0;
 	int result                                 = 0;
 
+	notify_set_values(
+	 stderr,
+	 verbose );
+
+	if( system_string_initialize(
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize system string.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( EXIT_FAILURE );
+	}
 	ewfoutput_version_fprint(
 	 stdout,
 	 program );
@@ -244,9 +264,6 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-	notify_set_values(
 	 stderr,
 	 verbose );
 
@@ -517,11 +534,12 @@ int main( int argc, char * const argv[] )
 				  media_size_string,
 				  16,
 				  media_size,
-				  BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+				  BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+			          NULL );
 
 			if( result == 1 )
 			{
-				fprintf( stdout, "\tMedia size:\t\t%" PRIs " (%" PRIu64 " bytes)\n",
+				fprintf( stdout, "\tMedia size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
 				 media_size_string, media_size );
 			}
 			else
@@ -584,10 +602,12 @@ int main( int argc, char * const argv[] )
 			{
 				if( guid_to_string(
 				     (guid_t *) guid,
+				     LIBEWF_ENDIAN_LITTLE,
 				     guid_string,
-				     GUID_STRING_LENGTH ) == 1 )
+				     GUID_STRING_SIZE,
+				     NULL ) == 1 )
 				{
-					fprintf( stdout, "\tGUID:\t\t\t%" PRIs "\n",
+					fprintf( stdout, "\tGUID:\t\t\t%" PRIs_SYSTEM "\n",
 					 guid_string );
 				}
 			}
@@ -628,7 +648,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		fprintf( stdout, "%" PRIs ": ABORTED\n",
+		fprintf( stdout, "%s: ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

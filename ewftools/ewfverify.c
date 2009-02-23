@@ -46,7 +46,6 @@
 
 #include <libewf.h>
 
-#include "character_string.h"
 #include "byte_size_string.h"
 #include "digest_context.h"
 #include "ewfcommon.h"
@@ -54,7 +53,6 @@
 #include "ewflibewf.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
-#include "ewfstring.h"
 #include "file_stream_io.h"
 #include "glob.h"
 #include "md5.h"
@@ -336,49 +334,67 @@ ssize64_t ewfverify_read_input(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	liberror_error_t *error                    = NULL;
+	liberror_error_t *error                         = NULL;
+
+	system_character_t * const *argv_filenames      = NULL;
+	system_character_t **ewf_filenames              = NULL;
 
 #if !defined( HAVE_GLOB_H )
-	glob_t *glob                               = NULL;
+	glob_t *glob                                    = NULL;
 #endif
-	character_t *calculated_md5_hash_string    = NULL;
-	character_t *calculated_sha1_hash_string   = NULL;
-	character_t *program                       = _CHARACTER_T_STRING( "ewfverify" );
-	character_t *stored_md5_hash_string        = NULL;
-	character_t *stored_sha1_hash_string       = NULL;
+	system_character_t *calculated_md5_hash_string  = NULL;
+	system_character_t *calculated_sha1_hash_string = NULL;
+	system_character_t *log_filename                = NULL;
+	system_character_t *stored_md5_hash_string      = NULL;
+	system_character_t *stored_sha1_hash_string     = NULL;
 
-	system_character_t * const *argv_filenames = NULL;
-	system_character_t **ewf_filenames         = NULL;
-	system_character_t *log_filename           = NULL;
+	verification_handle_t *verification_handle      = NULL;
 
-	verification_handle_t *verification_handle = NULL;
+	FILE *log_file_stream                           = NULL;
+	char *program                                   = "ewfverify";
+	void *callback                                  = &process_status_update;
 
-	FILE *log_file_stream                      = NULL;
-	void *callback                             = &process_status_update;
+	system_integer_t option                         = 0;
+	ssize64_t verify_count                          = 0;
+	size_t string_length                            = 0;
+	uint64_t process_buffer_size                    = 0;
+	uint32_t amount_of_crc_errors                   = 0;
+	uint8_t calculate_md5                           = 1;
+	uint8_t calculate_sha1                          = 0;
+	uint8_t wipe_chunk_on_error                     = 0;
+	uint8_t verbose                                 = 0;
+	int amount_of_filenames                         = 0;
+	int match_md5_hash                              = 0;
+	int match_sha1_hash                             = 0;
+	int result                                      = 0;
+	int status                                      = 0;
+	int stored_md5_hash_available                   = 0;
+	int stored_sha1_hash_available                  = 0;
 
-	system_integer_t option                    = 0;
-	ssize64_t verify_count                     = 0;
-	size_t string_length                       = 0;
-	uint64_t process_buffer_size               = 0;
-	uint32_t amount_of_crc_errors              = 0;
-	uint8_t calculate_md5                      = 1;
-	uint8_t calculate_sha1                     = 0;
-	uint8_t wipe_chunk_on_error                = 0;
-	uint8_t verbose                            = 0;
-	int amount_of_filenames                    = 0;
-	int match_md5_hash                         = 0;
-	int match_sha1_hash                        = 0;
-	int result                                 = 0;
-	int status                                 = 0;
-	int stored_md5_hash_available              = 0;
-	int stored_sha1_hash_available             = 0;
+	notify_set_values(
+	 stderr,
+	 verbose );
 
+	if( system_string_initialize(
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize system string.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( EXIT_FAILURE );
+	}
 	ewfoutput_version_fprint(
 	 stdout,
 	 program );
@@ -429,11 +445,19 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = byte_size_string_convert_system_character(
+				result = byte_size_string_convert(
 				          optarg,
 				          string_length,
-				          &process_buffer_size );
+				          &process_buffer_size,
+				          &error );
 
+				if( result != 1 )
+				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
 				if( ( result != 1 )
 				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
 				{
@@ -475,9 +499,6 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-	notify_set_values(
 	 stderr,
 	 verbose );
 
@@ -605,9 +626,9 @@ int main( int argc, char * const argv[] )
 	{
 		if( process_status_initialize(
 		     &process_status,
-		     _CHARACTER_T_STRING( "Verify" ),
-		     _CHARACTER_T_STRING( "verified" ),
-		     _CHARACTER_T_STRING( "Read" ),
+		     _SYSTEM_CHARACTER_T_STRING( "Verify" ),
+		     _SYSTEM_CHARACTER_T_STRING( "verified" ),
+		     _SYSTEM_CHARACTER_T_STRING( "Read" ),
 		     stdout ) != 1 )
 		{
 			fprintf( stderr, "Unable to initialize process status.\n" );
@@ -697,8 +718,8 @@ int main( int argc, char * const argv[] )
 	{
 		if( calculate_md5 == 1 )
 		{
-			stored_md5_hash_string = (character_t *) memory_allocate(
-								  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+			stored_md5_hash_string = (system_character_t *) memory_allocate(
+			                                                 sizeof( system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( stored_md5_hash_string == NULL )
 			{
@@ -713,8 +734,8 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			calculated_md5_hash_string = (character_t *) memory_allocate(
-								      sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+			calculated_md5_hash_string = (system_character_t *) memory_allocate(
+			                                                     sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( calculated_md5_hash_string == NULL )
 			{
@@ -735,8 +756,8 @@ int main( int argc, char * const argv[] )
 		}
 		if( calculate_sha1 == 1 )
 		{
-			stored_sha1_hash_string = (character_t *) memory_allocate(
-								   sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+			stored_sha1_hash_string = (system_character_t *) memory_allocate(
+			                                                  sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( stored_sha1_hash_string == NULL )
 			{
@@ -758,8 +779,8 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 			}
-			calculated_sha1_hash_string = (character_t *) memory_allocate(
-								       sizeof( character_t )* EWFSTRING_DIGEST_HASH_LENGTH_SHA1 );
+			calculated_sha1_hash_string = (system_character_t *) memory_allocate(
+			                                                      sizeof( system_character_t )* DIGEST_HASH_STRING_SIZE_SHA1 );
 
 			if( calculated_sha1_hash_string == NULL )
 			{
@@ -788,14 +809,14 @@ int main( int argc, char * const argv[] )
 		if( verification_handle_finalize(
 		     verification_handle,
 		     calculated_md5_hash_string,
-		     EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+		     DIGEST_HASH_STRING_SIZE_MD5,
 		     stored_md5_hash_string,
-		     EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+		     DIGEST_HASH_STRING_SIZE_MD5,
 		     &stored_md5_hash_available,
 		     calculated_sha1_hash_string,
-		     EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+		     DIGEST_HASH_STRING_SIZE_SHA1,
 		     stored_sha1_hash_string,
-		     EWFSTRING_DIGEST_HASH_LENGTH_SHA1,
+		     DIGEST_HASH_STRING_SIZE_SHA1,
 		     &stored_sha1_hash_available,
 		     &error ) != 1 )
 		{
@@ -870,27 +891,27 @@ int main( int argc, char * const argv[] )
 			}
 			else
 			{
-				fprintf( stdout, "MD5 hash stored in file:\t%" PRIs "\n",
+				fprintf( stdout, "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
 				 stored_md5_hash_string );
 
 				if( log_file_stream != NULL )
 				{
-					fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs "\n",
+					fprintf( log_file_stream, "MD5 hash stored in file:\t%" PRIs_SYSTEM "\n",
 					 stored_md5_hash_string );
 				}
 			}
-			fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs "\n",
+			fprintf( stdout, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 			 calculated_md5_hash_string );
 
 			if( log_file_stream != NULL )
 			{
-				fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs "\n",
+				fprintf( log_file_stream, "MD5 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 				 calculated_md5_hash_string );
 			}
-			match_md5_hash = ( string_compare(
+			match_md5_hash = ( system_string_compare(
 					    stored_md5_hash_string,
 					    calculated_md5_hash_string,
-					    EWFSTRING_DIGEST_HASH_LENGTH_MD5 ) == 0 );
+					    DIGEST_HASH_STRING_SIZE_MD5 ) == 0 );
 		}
 		if( calculate_sha1 == 1 )
 		{
@@ -905,27 +926,27 @@ int main( int argc, char * const argv[] )
 			}
 			else
 			{
-				fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs "\n",
+				fprintf( stdout, "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
 				 stored_sha1_hash_string );
 
 				if( log_file_stream != NULL )
 				{
-					fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs "\n",
+					fprintf( log_file_stream, "SHA1 hash stored in file:\t%" PRIs_SYSTEM "\n",
 					 stored_sha1_hash_string );
 				}
 			}
-			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs "\n",
+			fprintf( stdout, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 			 calculated_sha1_hash_string );
 
 			if( log_file_stream != NULL )
 			{
-				fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs "\n",
+				fprintf( log_file_stream, "SHA1 hash calculated over data:\t%" PRIs_SYSTEM "\n",
 				 calculated_sha1_hash_string );
 			}
-			match_sha1_hash = ( string_compare(
+			match_sha1_hash = ( system_string_compare(
 					     stored_sha1_hash_string,
 					     calculated_sha1_hash_string,
-					     EWFSTRING_DIGEST_HASH_LENGTH_SHA1 ) == 0 );
+					     DIGEST_HASH_STRING_SIZE_SHA1 ) == 0 );
 		}
 		ewfoutput_hash_values_fprint(
 		 stdout,
@@ -1030,14 +1051,14 @@ int main( int argc, char * const argv[] )
 	  || ( stored_sha1_hash_available == 0 )
 	  || match_sha1_hash ) )
 	{
-		fprintf( stdout, "\n%" PRIs ": SUCCESS\n",
+		fprintf( stdout, "\n%s: SUCCESS\n",
 		 program );
 
 		result = EXIT_SUCCESS;
 	}
 	else
 	{
-		fprintf( stdout, "\n%" PRIs ": FAILURE\n",
+		fprintf( stdout, "\n%s: FAILURE\n",
 		 program );
 
 		result = EXIT_FAILURE;

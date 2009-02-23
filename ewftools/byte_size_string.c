@@ -23,102 +23,38 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "byte_size_string.h"
-#include "character_string.h"
 #include "notify.h"
 #include "system_string.h"
-
-/* Determines the factor string of a certain factor value
- * Returns the string if successful or NULL on error
- */
-const character_t *byte_size_string_get_factor_string(
-                    int8_t factor )
-{
-	switch( factor )
-	{
-		case 0:
-			return( _CHARACTER_T_STRING( "" ) );
-		case 1:
-			return( _CHARACTER_T_STRING( "K" ) );
-		case 2:
-			return( _CHARACTER_T_STRING( "M" ) );
-		case 3:
-			return( _CHARACTER_T_STRING( "G" ) );
-		case 4:
-			return( _CHARACTER_T_STRING( "T" ) );
-		case 5:
-			return( _CHARACTER_T_STRING( "P" ) );
-		case 6:
-			return( _CHARACTER_T_STRING( "E" ) );
-		case 7:
-			return( _CHARACTER_T_STRING( "Z" ) );
-		case 8:
-			return( _CHARACTER_T_STRING( "Y" ) );
-		default :
-			break;
-	}
-	return( NULL );
-}
-
-/* Determines the factor from a factor string
- * Returns the factor if successful or -1 on error
- */
-int8_t byte_size_string_get_factor(
-        character_t factor )
-{
-	switch( factor )
-	{
-		case 'k':
-		case 'K':
-			return( 1 );
-		case 'm':
-		case 'M':
-			return( 2 );
-		case 'g':
-		case 'G':
-			return( 3 );
-		case 't':
-		case 'T':
-			return( 4 );
-		case 'p':
-		case 'P':
-			return( 5 );
-		case 'e':
-		case 'E':
-			return( 6 );
-		case 'z':
-		case 'Z':
-			return( 7 );
-		case 'y':
-		case 'Y':
-			return( 8 );
-		default :
-			break;
-	}
-	return( -1 );
-}
 
 /* Creates a human readable byte size string
  * Returns 1 if successful or -1 on error
  */
 int byte_size_string_create(
-     character_t *byte_size_string,
+     system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
-     int units )
+     int units,
+     liberror_error_t **error )
 {
-	const character_t *factor_string = NULL;
-	const character_t *units_string  = NULL;
-	static char *function            = "byte_size_string_create";
-	ssize_t print_count              = 0;
-	uint64_t factored_size           = 0;
-	uint64_t last_factored_size      = 0;
-	int8_t factor                    = 0;
-	int8_t remainder                 = -1;
+	const system_character_t *factor_string = NULL;
+	const system_character_t *units_string  = NULL;
+	static char *function                   = "byte_size_string_create";
+	ssize_t print_count                     = 0;
+	uint64_t factored_size                  = 0;
+	uint64_t last_factored_size             = 0;
+	int8_t factor                           = 0;
+	int8_t remainder                        = -1;
 
 	if( byte_size_string == NULL )
 	{
-		notify_warning_printf( "%s: invalid byte size string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte size string.\n",
 		 function );
 
 		return( -1 );
@@ -127,7 +63,11 @@ int byte_size_string_create(
 	 */
 	if( byte_size_string_length < 9 )
 	{
-		notify_warning_printf( "%s: byte size string too small.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: byte size string too small.",
 		 function );
 
 		return( -1 );
@@ -135,11 +75,11 @@ int byte_size_string_create(
 	if( ( size < 1024 )
 	 || ( units == BYTE_SIZE_STRING_UNIT_MEGABYTE ) )
 	{
-		units_string = _CHARACTER_T_STRING( "B" );
+		units_string = _SYSTEM_CHARACTER_T_STRING( "B" );
 	}
 	else if( units == BYTE_SIZE_STRING_UNIT_MEBIBYTE )
 	{
-		units_string = _CHARACTER_T_STRING( "iB" );
+		units_string = _SYSTEM_CHARACTER_T_STRING( "iB" );
 	}
 	factored_size = size;
 
@@ -157,23 +97,47 @@ int byte_size_string_create(
 			last_factored_size %= units;
 			remainder           = (int8_t) ( last_factored_size / 100 );
 		}
-		if( factor > 8 )
-		{
-			notify_warning_printf( "%s: a size with a factor larger than 8 currently not supported.\n",
-			 function );
-
-			return( -1 );
-		}
 	}
-	factor_string = byte_size_string_get_factor_string(
-	                 factor );
-
-	if( factor_string == NULL )
+	if( factor > 8 )
 	{
-		notify_warning_printf( "%s: unable to create factor string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: factor size greater than 8 unsuported.\n",
 		 function );
 
 		return( -1 );
+	}
+	switch( factor )
+	{
+		case 0:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "" );
+			break;
+		case 1:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "K" );
+			break;
+		case 2:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "M" );
+			break;
+		case 3:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "G" );
+			break;
+		case 4:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "T" );
+			break;
+		case 5:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "P" );
+			break;
+		case 6:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "E" );
+			break;
+		case 7:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "Z" );
+			break;
+		case 8:
+			factor_string = _SYSTEM_CHARACTER_T_STRING( "Y" );
+			break;
 	}
 	if( remainder > 9 )
 	{
@@ -181,13 +145,13 @@ int byte_size_string_create(
 	}
 	if( remainder >= 0 )
 	{
-		print_count = string_snprintf(
+		print_count = system_string_snprintf(
 		               byte_size_string,
 		               byte_size_string_length,
-		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIu64 )
-		               _CHARACTER_T_STRING( ".%" ) _CHARACTER_T_STRING( PRIu8 )
-		               _CHARACTER_T_STRING( " %" ) _CHARACTER_T_STRING( PRIs )
-		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ),
+		               _SYSTEM_CHARACTER_T_STRING( "%" ) _SYSTEM_CHARACTER_T_STRING( PRIu64 )
+		               _SYSTEM_CHARACTER_T_STRING( ".%" ) _SYSTEM_CHARACTER_T_STRING( PRIu8 )
+		               _SYSTEM_CHARACTER_T_STRING( " %" ) _SYSTEM_CHARACTER_T_STRING( PRIs_SYSTEM )
+		               _SYSTEM_CHARACTER_T_STRING( "%" ) _SYSTEM_CHARACTER_T_STRING( PRIs_SYSTEM ),
 		               factored_size,
 		               remainder,
 		               factor_string,
@@ -195,19 +159,24 @@ int byte_size_string_create(
 	}
 	else
 	{
-		print_count = string_snprintf(
+		print_count = system_string_snprintf(
 		               byte_size_string,
 		               byte_size_string_length,
-		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIu64 )
-		               _CHARACTER_T_STRING( " %" ) _CHARACTER_T_STRING( PRIs )
-		               _CHARACTER_T_STRING( "%" ) _CHARACTER_T_STRING( PRIs ),
+		               _SYSTEM_CHARACTER_T_STRING( "%" ) _SYSTEM_CHARACTER_T_STRING( PRIu64 )
+		               _SYSTEM_CHARACTER_T_STRING( " %" ) _SYSTEM_CHARACTER_T_STRING( PRIs_SYSTEM )
+		               _SYSTEM_CHARACTER_T_STRING( "%" ) _SYSTEM_CHARACTER_T_STRING( PRIs_SYSTEM ),
 		               factored_size,
 		               factor_string,
 		               units_string );
 	}
-	if( print_count < 0 )
+	if( ( print_count < 0 )
+	 || ( (size_t) print_count > byte_size_string_length ) )
 	{
-		notify_warning_printf( "%s: unable to set byte size string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set byte size string.",
 		 function );
 
 		return( -1 );
@@ -219,9 +188,10 @@ int byte_size_string_create(
  * Returns 1 if successful or -1 on error
  */
 int byte_size_string_convert(
-     const character_t *byte_size_string,
+     const system_character_t *byte_size_string,
      size_t byte_size_string_length,
-     uint64_t *size )
+     uint64_t *size,
+     liberror_error_t **error )
 {
 	static char *function            = "byte_size_string_convert";
 	size_t byte_size_string_iterator = 0;
@@ -232,14 +202,22 @@ int byte_size_string_convert(
 
 	if( byte_size_string == NULL )
 	{
-		notify_warning_printf( "%s: invalid byte size string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte size string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( size == NULL )
 	{
-		notify_warning_printf( "%s: invalid size.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid size.\n",
 		 function );
 
 		return( -1 );
@@ -292,191 +270,48 @@ int byte_size_string_convert(
 	{
 		byte_size_string_iterator++;
 	}
-	factor = byte_size_string_get_factor(
-	          byte_size_string[ byte_size_string_iterator ] );
-
-	if( factor < 0 )
-	{
-		notify_warning_printf( "%s: invalid factor.\n",
-		 function );
-
-		return( -1 );
-	}
-	byte_size_string_iterator++;
-
-	if( ( byte_size_string[ byte_size_string_iterator ] == 'i' )
-	 && ( byte_size_string[ byte_size_string_iterator + 1 ] == 'B' ) )
-	{
-		units = BYTE_SIZE_STRING_UNIT_MEBIBYTE;
-
-		byte_size_string_iterator += 2;
-	}
-	else if( byte_size_string[ byte_size_string_iterator ] == 'B' )
-	{
-		units = BYTE_SIZE_STRING_UNIT_MEGABYTE;
-
-		byte_size_string_iterator++;
-	}
-	else
-	{
-		notify_warning_printf( "%s: invalid units.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( factor > 0 )
-	{
-		if( remainder > 0 )
-		{
-			byte_size *= units;
-
-			factor--;
-
-			byte_size += ( remainder * 10 );
-		}
-		for( ; factor > 0; factor-- )
-		{
-			byte_size *= units;
-		}
-	}
-	else if( remainder >= 0 )
-	{
-		notify_warning_printf( "%s: ignoring byte value remainder.\n",
-		 function );
-	}
-	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
-	{
-#if defined( HAVE_VERBOSE_OUTPUT )
-		notify_verbose_printf( "%s: trailing data in byte size string.\n",
-		 function );
-#endif
-	}
-	*size = byte_size;
-
-	return( 1 );
-}
-
-/* Determines the factor from a factor string
- * Returns the factor if successful or -1 on error
- */
-int8_t byte_size_string_get_factor_system_character(
-        system_character_t factor )
-{
-	switch( factor )
+	switch( byte_size_string[ byte_size_string_iterator ] )
 	{
 		case 'k':
 		case 'K':
-			return( 1 );
+			factor = 1;
+			break;
 		case 'm':
 		case 'M':
-			return( 2 );
+			factor = 2;
+			break;
 		case 'g':
 		case 'G':
-			return( 3 );
+			factor = 3;
+			break;
 		case 't':
 		case 'T':
-			return( 4 );
+			factor = 4;
+			break;
 		case 'p':
 		case 'P':
-			return( 5 );
+			factor = 5;
+			break;
 		case 'e':
 		case 'E':
-			return( 6 );
+			factor = 6;
+			break;
 		case 'z':
 		case 'Z':
-			return( 7 );
+			factor = 7;
+			break;
 		case 'y':
 		case 'Y':
-			return( 8 );
-		default :
+			factor = 8;
 			break;
 	}
-	return( -1 );
-}
-
-/* Converts a human readable byte size string into a value
- * Returns 1 if successful or -1 on error
- */
-int byte_size_string_convert_system_character(
-     const system_character_t *byte_size_string,
-     size_t byte_size_string_length,
-     uint64_t *size )
-{
-	static char *function            = "byte_size_string_convert_system_character";
-	size_t byte_size_string_iterator = 0;
-	uint64_t byte_size               = 0;
-	int8_t factor                    = 0;
-	int8_t remainder                 = -1;
-	int units                        = 0;
-
-	if( byte_size_string == NULL )
-	{
-		notify_warning_printf( "%s: invalid byte size string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( size == NULL )
-	{
-		notify_warning_printf( "%s: invalid size.\n",
-		 function );
-
-		return( -1 );
-	}
-	while( byte_size_string_iterator < byte_size_string_length )
-	{
-		if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
-		 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
-		{
-			break;
-		}
-		byte_size *= 10;
-		byte_size += ( byte_size_string[ byte_size_string_iterator ] - '0' );
-
-		byte_size_string_iterator++;
-	}
-	if( byte_size_string[ byte_size_string_iterator ] == '.' )
-	{
-		byte_size_string_iterator++;
-
-		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
-		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
-		{
-			remainder = ( byte_size_string[ byte_size_string_iterator ] - '0' );
-
-			byte_size_string_iterator++;
-		}
-		remainder *= 10;
-
-		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
-		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
-		{
-			remainder += ( byte_size_string[ byte_size_string_iterator ] - '0' );
-
-			byte_size_string_iterator++;
-		}
-		/* Ignore more than 2 digits after separator
-		 */
-		while( byte_size_string_iterator < byte_size_string_length )
-		{
-			if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
-			 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
-			{
-				break;
-			}
-			byte_size_string_iterator++;
-		}
-	}
-	if( byte_size_string[ byte_size_string_iterator ] == ' ' )
-	{
-		byte_size_string_iterator++;
-	}
-	factor = byte_size_string_get_factor_system_character(
-	          byte_size_string[ byte_size_string_iterator ] );
-
 	if( factor < 0 )
 	{
-		notify_warning_printf( "%s: invalid factor.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid factor.\n",
 		 function );
 
 		return( -1 );
@@ -498,7 +333,11 @@ int byte_size_string_convert_system_character(
 	}
 	else
 	{
-		notify_warning_printf( "%s: invalid units.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid units.\n",
 		 function );
 
 		return( -1 );
@@ -518,17 +357,24 @@ int byte_size_string_convert_system_character(
 			byte_size *= units;
 		}
 	}
+#if defined( HAVE_VERBOSE_OUTPUT )
 	else if( remainder >= 0 )
 	{
-		notify_warning_printf( "%s: ignoring byte value remainder.\n",
+		notify_warning_printf(
+		 "%s: ignoring byte value remainder.\n",
 		 function );
 	}
+#endif
+#if defined( HAVE_VERBOSE_OUTPUT )
 	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
 	{
-		notify_warning_printf( "%s: trailing data in byte size string.\n",
+		notify_warning_printf(
+		 "%s: trailing data in byte size string.\n",
 		 function );
 	}
+#endif
 	*size = byte_size;
 
 	return( 1 );
 }
+

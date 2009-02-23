@@ -32,7 +32,6 @@
 
 #include <libewf/handle.h>
 
-#include "character_string.h"
 #include "date_time.h"
 #include "system_string.h"
 
@@ -42,7 +41,7 @@ extern "C" {
 
 void ewfoutput_version_fprint(
       FILE *stream,
-      character_t *program );
+      const char *program );
 
 void ewfoutput_copyright_fprint(
       FILE *stream );
@@ -68,11 +67,11 @@ void ewfoutput_bytes_fprint(
 void ewfoutput_acquiry_parameters_fprint(
       FILE *stream,
       system_character_t *filename,
-      character_t *case_number,
-      character_t *description,
-      character_t *evidence_number,
-      character_t *examiner_name,
-      character_t *notes,
+      system_character_t *case_number,
+      system_character_t *description,
+      system_character_t *evidence_number,
+      system_character_t *examiner_name,
+      system_character_t *notes,
       uint8_t media_type,
       uint8_t volume_type,
       int8_t compression_level,

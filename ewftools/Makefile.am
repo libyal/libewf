@@ -4,7 +4,6 @@ bin_PROGRAMS = ewfacquire ewfacquirestream ewfalter ewfexport ewfinfo ewfverify
 
 ewfacquire_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	character_string.c character_string.h \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
@@ -16,7 +15,6 @@ ewfacquire_SOURCES = \
 	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
-	ewfstring.c ewfstring.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
@@ -24,14 +22,12 @@ ewfacquire_SOURCES = \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
-	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
 ewfacquire_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfacquirestream_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	character_string.c character_string.h \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
@@ -43,7 +39,6 @@ ewfacquirestream_SOURCES = \
 	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
-	ewfstring.c ewfstring.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
@@ -51,14 +46,12 @@ ewfacquirestream_SOURCES = \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
-	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
 ewfacquirestream_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfalter_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	character_string.c character_string.h \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
@@ -70,7 +63,6 @@ ewfalter_SOURCES = \
 	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
-	ewfstring.c ewfstring.h \
 	file_io.c file_io.h \
 	file_stream_io.h \
 	glob.c glob.h \
@@ -78,14 +70,12 @@ ewfalter_SOURCES = \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
-	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
 ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfexport_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	character_string.c character_string.h \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
@@ -97,21 +87,18 @@ ewfexport_SOURCES = \
 	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
-	ewfstring.c ewfstring.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
 	md5.h \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
-	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
 ewfexport_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfinfo_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	character_string.c character_string.h \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
@@ -122,7 +109,6 @@ ewfinfo_SOURCES = \
 	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
-	ewfstring.c ewfstring.h \
 	file_io.c file_io.h \
 	glob.c glob.h \
 	guid.c guid.h \
@@ -130,14 +116,12 @@ ewfinfo_SOURCES = \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
-	string_conversion.c string_conversion.h \
 	system_string.c system_string.h
 
 ewfinfo_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfverify_SOURCES = \
 	byte_size_string.c byte_size_string.h \
-	character_string.c character_string.h \
 	date_time.c date_time.h \
 	digest_context.c digest_context.h \
 	digest_hash.c digest_hash.h \
@@ -147,7 +131,6 @@ ewfverify_SOURCES = \
 	ewflibewf.c ewflibewf.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
-	ewfstring.c ewfstring.h \
 	ewfverify.c \
 	file_io.c file_io.h \
 	file_stream_io.h \
@@ -156,7 +139,6 @@ ewfverify_SOURCES = \
 	notify.c notify.h \
 	process_status.c process_status.h \
 	sha1.h \
-	string_conversion.c string_conversion.h \
 	storage_media_buffer.c storage_media_buffer.h \
 	system_string.c system_string.h \
 	verification_handle.c verification_handle.h

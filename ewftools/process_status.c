@@ -25,7 +25,6 @@
 #include <types.h>
 
 #include "byte_size_string.h"
-#include "character_string.h"
 #include "date_time.h"
 #include "notify.h"
 #include "process_status.h"
@@ -38,9 +37,9 @@ process_status_t *process_status = NULL;
  */
 int process_status_initialize(
      process_status_t **process_status,
-     const character_t *status_process_string,
-     const character_t *status_update_string,
-     const character_t *status_summary_string,
+     const system_character_t *status_process_string,
+     const system_character_t *status_update_string,
+     const system_character_t *status_summary_string,
      FILE *output_stream )
 {
 	static char *function = "process_status_initialize";
@@ -55,7 +54,7 @@ int process_status_initialize(
 	if( *process_status == NULL )
 	{
 		*process_status = (process_status_t *) memory_allocate(
-		                                           sizeof( process_status_t ) );
+		                                        sizeof( process_status_t ) );
 
 		if( *process_status == NULL )
 		{
@@ -172,7 +171,7 @@ void process_status_bytes_per_second_fprint(
       size64_t bytes,
       time_t seconds )
 {
-	character_t bytes_per_second_string[ 16 ];
+	system_character_t bytes_per_second_string[ 16 ];
 
 	size64_t bytes_per_second = 0;
 	int result                = 0;
@@ -191,7 +190,8 @@ void process_status_bytes_per_second_fprint(
 			          bytes_per_second_string,
 			          10,
 			          bytes_per_second,
-			          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+			          NULL );
 		}
 		fprintf(
 		 stream,
@@ -201,7 +201,7 @@ void process_status_bytes_per_second_fprint(
 		{
 			fprintf(
 			 stream,
-			 " %" PRIs "/s (%" PRIu64 " bytes/second)",
+			 " %" PRIs_SYSTEM "/s (%" PRIu64 " bytes/second)",
 			 bytes_per_second_string, bytes_per_second );
 		}
 		else
@@ -221,7 +221,7 @@ void process_status_bytes_fprint(
       FILE *stream,
       size64_t bytes )
 {
-	character_t bytes_string[ 16 ];
+	system_character_t bytes_string[ 16 ];
 
 	int result = 0;
 
@@ -235,13 +235,14 @@ void process_status_bytes_fprint(
 		          bytes_string,
 		          10,
 		          bytes,
-		          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		          NULL );
 	}
 	if( result == 1 )
 	{
 		fprintf(
 		 stream,
-		 " %" PRIs " (%" PRIi64 " bytes)",
+		 " %" PRIs_SYSTEM " (%" PRIi64 " bytes)",
 		 bytes_string, bytes );
 	}
 	else
@@ -282,12 +283,12 @@ int process_status_start(
 		     time_string,
 		     32 ) == NULL )
 		{
-			fprintf( stderr, "%" PRIs " started.\n",
+			fprintf( stderr, "%" PRIs_SYSTEM " started.\n",
 			 process_status->status_process_string );
 		}
 		else
 		{
-			fprintf( stderr, "%" PRIs " started at: %" PRIs_SYSTEM "\n",
+			fprintf( stderr, "%" PRIs_SYSTEM " started at: %" PRIs_SYSTEM "\n",
 			 process_status->status_process_string, time_string );
 		}
 		fprintf( stderr, "This could take a while.\n\n" );
@@ -341,7 +342,7 @@ int process_status_update(
 
 			fprintf(
 			 process_status->output_stream,
-			 "        %" PRIs "",
+			 "        %" PRIs_SYSTEM "",
 			 process_status->status_update_string );
 
 			process_status_bytes_fprint(
@@ -440,7 +441,7 @@ int process_status_update_unknown_total(
 
 				fprintf(
 				 process_status->output_stream,
-				 "Status: %" PRIs "",
+				 "Status: %" PRIs_SYSTEM "",
 				 process_status->status_update_string );
 
 				process_status_bytes_fprint(
@@ -485,9 +486,9 @@ int process_status_stop(
 {
 	system_character_t time_string[ 32 ];
 
-	static char *function            = "process_status_start";
-	const character_t *status_string = NULL;
-	time_t seconds_total             = 0;
+	static char *function                   = "process_status_start";
+	const system_character_t *status_string = NULL;
+	time_t seconds_total                    = 0;
 
 	if( process_status == NULL )
 	{
@@ -513,19 +514,19 @@ int process_status_stop(
 	{
 		if( status == PROCESS_STATUS_ABORTED )
 		{
-			status_string = _CHARACTER_T_STRING( "aborted" );
+			status_string = _SYSTEM_CHARACTER_T_STRING( "aborted" );
 		}
 		else if( status == PROCESS_STATUS_COMPLETED )
 		{
-			status_string = _CHARACTER_T_STRING( "completed" );
+			status_string = _SYSTEM_CHARACTER_T_STRING( "completed" );
 		}
 		else if( status == PROCESS_STATUS_FAILED )
 		{
-			status_string = _CHARACTER_T_STRING( "failed" );
+			status_string = _SYSTEM_CHARACTER_T_STRING( "failed" );
 		}
 		fprintf(
 		 process_status->output_stream,
-		 "%" PRIs " %" PRIs "",
+		 "%" PRIs_SYSTEM " %" PRIs_SYSTEM "",
 		 process_status->status_process_string,
 		 status_string );
 
@@ -552,7 +553,7 @@ int process_status_stop(
 
 			fprintf(
 			process_status->output_stream,
-			"%" PRIs ":",
+			"%" PRIs_SYSTEM ":",
 			process_status->status_summary_string );
 
 			process_status_bytes_fprint(

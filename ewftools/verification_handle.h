@@ -42,6 +42,7 @@
 #include "md5.h"
 #include "sha1.h"
 #include "storage_media_buffer.h"
+#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -130,14 +131,14 @@ int verification_handle_set_input_values(
 
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     character_t *calculated_md5_hash_string,
+     system_character_t *calculated_md5_hash_string,
      size_t calculated_md5_hash_string_size,
-     character_t *stored_md5_hash_string,
+     system_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     character_t *calculated_sha1_hash_string,
+     system_character_t *calculated_sha1_hash_string,
      size_t calculated_sha1_hash_string_size,
-     character_t *stored_sha1_hash_string,
+     system_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
      liberror_error_t **error );

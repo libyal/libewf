@@ -24,6 +24,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -41,199 +43,72 @@
 
 #include <libewf.h>
 
-#include "character_string.h"
 #include "byte_size_string.h"
 #include "ewfinput.h"
-#include "ewfstring.h"
 #include "notify.h"
 #include "system_string.h"
 
 /* Input selection defintions
  */
-character_t *ewfinput_compression_levels[ 4 ] = \
- { _CHARACTER_T_STRING( "none" ),
-   _CHARACTER_T_STRING( "empty-block" ),
-   _CHARACTER_T_STRING( "fast" ),
-   _CHARACTER_T_STRING( "best" ) };
+system_character_t *ewfinput_compression_levels[ 4 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "none" ),
+   _SYSTEM_CHARACTER_T_STRING( "empty-block" ),
+   _SYSTEM_CHARACTER_T_STRING( "fast" ),
+   _SYSTEM_CHARACTER_T_STRING( "best" ) };
 
-character_t *ewfinput_format_types[ 12 ] = \
- { _CHARACTER_T_STRING( "ewf" ),
-   _CHARACTER_T_STRING( "smart" ),
-   _CHARACTER_T_STRING( "ftk" ),
-   _CHARACTER_T_STRING( "encase1" ),
-   _CHARACTER_T_STRING( "encase2" ),
-   _CHARACTER_T_STRING( "encase3" ),
-   _CHARACTER_T_STRING( "encase4" ),
-   _CHARACTER_T_STRING( "encase5" ),
-   _CHARACTER_T_STRING( "encase6" ),
-   _CHARACTER_T_STRING( "linen5" ),
-   _CHARACTER_T_STRING( "linen6" ),
-   _CHARACTER_T_STRING( "ewfx" ) };
+system_character_t *ewfinput_format_types[ 12 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "ewf" ),
+   _SYSTEM_CHARACTER_T_STRING( "smart" ),
+   _SYSTEM_CHARACTER_T_STRING( "ftk" ),
+   _SYSTEM_CHARACTER_T_STRING( "encase1" ),
+   _SYSTEM_CHARACTER_T_STRING( "encase2" ),
+   _SYSTEM_CHARACTER_T_STRING( "encase3" ),
+   _SYSTEM_CHARACTER_T_STRING( "encase4" ),
+   _SYSTEM_CHARACTER_T_STRING( "encase5" ),
+   _SYSTEM_CHARACTER_T_STRING( "encase6" ),
+   _SYSTEM_CHARACTER_T_STRING( "linen5" ),
+   _SYSTEM_CHARACTER_T_STRING( "linen6" ),
+   _SYSTEM_CHARACTER_T_STRING( "ewfx" ) };
 
 #if defined( LIBEWF_CD_SUPPORT )
-character_t *ewfinput_media_types[ 3 ] = \
- { _CHARACTER_T_STRING( "fixed" ),
-   _CHARACTER_T_STRING( "removable" ),
-   _CHARACTER_T_STRING( "cd" ) };
+system_character_t *ewfinput_media_types[ 3 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "fixed" ),
+   _SYSTEM_CHARACTER_T_STRING( "removable" ),
+   _SYSTEM_CHARACTER_T_STRING( "cd" ) };
 #else
-character_t *ewfinput_media_types[ 2 ] = \
- { _CHARACTER_T_STRING( "fixed" ),
-   _CHARACTER_T_STRING( "removable" ) };
+system_character_t *ewfinput_media_types[ 2 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "fixed" ),
+   _SYSTEM_CHARACTER_T_STRING( "removable" ) };
 #endif
 
-character_t *ewfinput_volume_types[ 2 ] = \
- { _CHARACTER_T_STRING( "logical" ),
-   _CHARACTER_T_STRING( "physical" ) };
+system_character_t *ewfinput_volume_types[ 2 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "logical" ),
+   _SYSTEM_CHARACTER_T_STRING( "physical" ) };
 
-character_t *ewfinput_sector_per_block_sizes[ 10 ] = \
- { _CHARACTER_T_STRING( "64" ),
-   _CHARACTER_T_STRING( "128" ),
-   _CHARACTER_T_STRING( "256" ),
-   _CHARACTER_T_STRING( "512" ),
-   _CHARACTER_T_STRING( "1024" ),
-   _CHARACTER_T_STRING( "2048" ),
-   _CHARACTER_T_STRING( "4096" ),
-   _CHARACTER_T_STRING( "8192" ),
-   _CHARACTER_T_STRING( "16384" ),
-   _CHARACTER_T_STRING( "32768" ) };
+system_character_t *ewfinput_sector_per_block_sizes[ 10 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "64" ),
+   _SYSTEM_CHARACTER_T_STRING( "128" ),
+   _SYSTEM_CHARACTER_T_STRING( "256" ),
+   _SYSTEM_CHARACTER_T_STRING( "512" ),
+   _SYSTEM_CHARACTER_T_STRING( "1024" ),
+   _SYSTEM_CHARACTER_T_STRING( "2048" ),
+   _SYSTEM_CHARACTER_T_STRING( "4096" ),
+   _SYSTEM_CHARACTER_T_STRING( "8192" ),
+   _SYSTEM_CHARACTER_T_STRING( "16384" ),
+   _SYSTEM_CHARACTER_T_STRING( "32768" ) };
 
-character_t *ewfinput_yes_no[ 2 ] = \
- { _CHARACTER_T_STRING( "yes" ),
-   _CHARACTER_T_STRING( "no" ) };
+system_character_t *ewfinput_yes_no[ 2 ] = \
+ { _SYSTEM_CHARACTER_T_STRING( "yes" ),
+   _SYSTEM_CHARACTER_T_STRING( "no" ) };
 
 /* Determines the sectors per chunk value from an argument string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_libewf_format(
-     const character_t *argument,
-     uint8_t *libewf_format )
-{
-	static char *function = "ewfinput_determine_libewf_format";
-	int result            = -1;
-
-	if( argument == NULL )
-	{
-		notify_warning_printf( "%s: invalid argument string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_format == NULL )
-	{
-		notify_warning_printf( "%s: invalid libewf format.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_compare(
-	     argument,
-	     _CHARACTER_T_STRING( "smart" ),
-	     3 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_SMART;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "ftk" ),
-	          3 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_FTK;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "encase1" ),
-	          7 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE1;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "encase2" ),
-	          7 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE2;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "encase3" ),
-	          7 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE3;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "encase4" ),
-	          7 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE4;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "encase5" ),
-	          7 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE5;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "encase6" ),
-	          7 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_ENCASE6;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "linen5" ),
-	          6 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_LINEN5;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "linen6" ),
-	          6 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_LINEN6;
-		result         = 1;
-	}
-	/* This check must before the check for "ewf"
-	 */
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "ewfx" ),
-	          4 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_EWFX;
-		result         = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "ewf" ),
-	          3 ) == 0 )
-	{
-		*libewf_format = LIBEWF_FORMAT_EWF;
-		result         = 1;
-	}
-	return( result );
-}
-
-/* Determines the sectors per chunk value from an argument string
- * Returns 1 if successful or -1 on error
- */
-int ewfinput_determine_libewf_format_system_character(
      const system_character_t *argument,
      uint8_t *libewf_format )
 {
-	static char *function = "ewfinput_determine_libewf_format_system_character";
+	static char *function = "ewfinput_determine_libewf_format";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -355,117 +230,10 @@ int ewfinput_determine_libewf_format_system_character(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_sectors_per_chunk(
-     const character_t *argument,
-     uint32_t *sectors_per_chunk )
-{
-	static char *function = "ewfinput_determine_sectors_per_chunk";
-	int result            = -1;
-
-	if( argument == NULL )
-	{
-		notify_warning_printf( "%s: invalid argument string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( sectors_per_chunk == NULL )
-	{
-		notify_warning_printf( "%s: invalid sectors per chunk.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_compare(
-	     argument,
-	     _CHARACTER_T_STRING( "32768" ),
-	     5 ) == 0 )
-	{
-		*sectors_per_chunk = 32768;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "16384" ),
-	          5 ) == 0 )
-	{
-		*sectors_per_chunk = 16384;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "8192" ),
-	          4 ) == 0 )
-	{
-		*sectors_per_chunk = 8192;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "4096" ),
-	          4 ) == 0 )
-	{
-		*sectors_per_chunk = 4096;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "2048" ),
-	          4 ) == 0 )
-	{
-		*sectors_per_chunk = 2048;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "1024" ),
-	          4 ) == 0 )
-	{
-		*sectors_per_chunk = 1024;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "512" ),
-	          3 ) == 0 )
-	{
-		*sectors_per_chunk = 512;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "256" ),
-	          3 ) == 0 )
-	{
-		*sectors_per_chunk = 256;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "128" ),
-	          3 ) == 0 )
-	{
-		*sectors_per_chunk = 128;
-		result             = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "64" ),
-	          2 ) == 0 )
-	{
-		*sectors_per_chunk = 64;
-		result             = 1;
-	}
-	return( result );
-}
-
-/* Determines the sectors per chunk value from an argument string
- * Returns 1 if successful or -1 on error
- */
-int ewfinput_determine_sectors_per_chunk_system_character(
      const system_character_t *argument,
      uint32_t *sectors_per_chunk )
 {
-	static char *function = "ewfinput_determine_sectors_per_chunk_system_character";
+	static char *function = "ewfinput_determine_sectors_per_chunk";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -569,91 +337,11 @@ int ewfinput_determine_sectors_per_chunk_system_character(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_compression_level(
-     const character_t *argument,
-     int8_t *compression_level,
-     uint8_t *compress_empty_block )
-{
-	static char *function = "ewfinput_determine_compression_level";
-	int result            = -1;
-
-	if( argument == NULL )
-	{
-		notify_warning_printf( "%s: invalid argument string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( compression_level == NULL )
-	{
-		notify_warning_printf( "%s: invalid compression level.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( compress_empty_block == NULL )
-	{
-		notify_warning_printf( "%s: invalid compress empty block.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_compare(
-	     argument,
-	     _CHARACTER_T_STRING( "none" ),
-	     4 ) == 0 )
-	{
-		*compression_level    = LIBEWF_COMPRESSION_NONE;
-		*compress_empty_block = 0;
-		result                = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "empty-block" ),
-	          11 ) == 0 )
-	{
-		*compression_level    = LIBEWF_COMPRESSION_NONE;
-		*compress_empty_block = 1;
-		result                = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "empty_block" ),
-	          11 ) == 0 )
-	{
-		*compression_level    = LIBEWF_COMPRESSION_NONE;
-		*compress_empty_block = 1;
-		result                = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "fast" ),
-	          4 ) == 0 )
-	{
-		*compression_level    = LIBEWF_COMPRESSION_FAST;
-		*compress_empty_block = 0;
-		result                = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "best" ),
-	          4 ) == 0 )
-	{
-		*compression_level    = LIBEWF_COMPRESSION_BEST;
-		*compress_empty_block = 0;
-		result                = 1;
-	}
-	return( result );
-}
-
-/* Determines the compression level value from an argument string
- * Returns 1 if successful or -1 on error
- */
-int ewfinput_determine_compression_level_system_character(
      const system_character_t *argument,
      int8_t *compression_level,
      uint8_t *compress_empty_block )
 {
-	static char *function = "ewfinput_determine_compression_level_system_character";
+	static char *function = "ewfinput_determine_compression_level";
 	int result            = 1;
 
 	if( argument == NULL )
@@ -729,63 +417,10 @@ int ewfinput_determine_compression_level_system_character(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_media_type(
-     const character_t *argument,
-     uint8_t *media_type )
-{
-	static char *function = "ewfinput_determine_media_type";
-	int result            = -1;
-
-	if( argument == NULL )
-	{
-		notify_warning_printf( "%s: invalid argument string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( media_type == NULL )
-	{
-		notify_warning_printf( "%s: invalid media type.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_compare(
-	     argument,
-	     _CHARACTER_T_STRING( "fixed" ),
-	          5 ) == 0 )
-	{
-		*media_type = LIBEWF_MEDIA_TYPE_FIXED;
-		result      = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "removable" ),
-	          9 ) == 0 )
-	{
-		*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
-		result      = 1;
-	}
-#if defined( LIBEWF_CD_SUPPORT )
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "cd" ),
-	          2 ) == 0 )
-	{
-		*media_type = LIBEWF_MEDIA_TYPE_CD;
-		result      = 1;
-	}
-#endif
-	return( result );
-}
-
-/* Determines the media type value from an argument string
- * Returns 1 if successful or -1 on error
- */
-int ewfinput_determine_media_type_system_character(
      const system_character_t *argument,
      uint8_t *media_type )
 {
-	static char *function = "ewfinput_determine_media_type_system_character";
+	static char *function = "ewfinput_determine_media_type";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -835,53 +470,10 @@ int ewfinput_determine_media_type_system_character(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_volume_type(
-     const character_t *argument,
-     uint8_t *volume_type )
-{
-	static char *function = "ewfinput_determine_volume_type";
-	int result            = -1;
-
-	if( argument == NULL )
-	{
-		notify_warning_printf( "%s: invalid argument string.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( volume_type == NULL )
-	{
-		notify_warning_printf( "%s: invalid volume type.\n",
-		 function );
-
-		return( -1 );
-	}
-	if( string_compare(
-	     argument,
-	     _CHARACTER_T_STRING( "logical" ),
-	     7 ) == 0 )
-	{
-		*volume_type = LIBEWF_VOLUME_TYPE_LOGICAL;
-		result       = 1;
-	}
-	else if( string_compare(
-	          argument,
-	          _CHARACTER_T_STRING( "physical" ),
-	          8 ) == 0 )
-	{
-		*volume_type = LIBEWF_VOLUME_TYPE_PHYSICAL;
-		result       = 1;
-	}
-	return( result );
-}
-
-/* Determines the volume type value from an argument string
- * Returns 1 if successful or -1 on error
- */
-int ewfinput_determine_volume_type_system_character(
      const system_character_t *argument,
      uint8_t *volume_type )
 {
-	static char *function = "ewfinput_determine_volume_type_system_character";
+	static char *function = "ewfinput_determine_volume_type";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -920,11 +512,11 @@ int ewfinput_determine_volume_type_system_character(
 /* Determines the codepage from an argument string
  * Returns 1 if successful or -1 on error
  */
-int ewfinput_determine_header_codepage_system_character(
+int ewfinput_determine_header_codepage(
      const system_character_t *argument,
      int *header_codepage )
 {
-	static char *function = "ewfinput_determine_header_codepage_system_character";
+	static char *function = "ewfinput_determine_header_codepage";
 	int result            = -1;
 
 	if( argument == NULL )
@@ -1028,7 +620,7 @@ int ewfinput_determine_header_codepage_system_character(
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_yes_no(
-     const character_t *argument,
+     const system_character_t *argument,
      uint8_t *yes_no_value )
 {
 	static char *function = "ewfinput_determine_yes_no";
@@ -1048,17 +640,17 @@ int ewfinput_determine_yes_no(
 
 		return( -1 );
 	}
-	if( string_compare(
+	if( system_string_compare(
 	     argument,
-	     _CHARACTER_T_STRING( "yes" ),
+	     _SYSTEM_CHARACTER_T_STRING( "yes" ),
 	     3 ) == 0 )
 	{
 		*yes_no_value = 1;
 		result        = 1;
 	}
-	else if( string_compare(
+	else if( system_string_compare(
 	          argument,
-	          _CHARACTER_T_STRING( "no" ),
+	          _SYSTEM_CHARACTER_T_STRING( "no" ),
 	          2 ) == 0 )
 	{
 		*yes_no_value = 0;
@@ -1072,14 +664,14 @@ int ewfinput_determine_yes_no(
  */
 int ewfinput_get_string_variable(
      FILE *stream,
-     character_t *request_string,
-     character_t *string_variable,
+     system_character_t *request_string,
+     system_character_t *string_variable,
      size_t string_variable_size )
 {
-	character_t *end_of_input  = NULL;
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_variabl_string";
-	ssize_t input_length       = 0;
+	system_character_t *end_of_input  = NULL;
+	system_character_t *result_string = NULL;
+	static char *function             = "ewfinput_get_variabl_string";
+	ssize_t input_length              = 0;
 
 	if( stream == NULL )
 	{
@@ -1117,19 +709,19 @@ int ewfinput_get_string_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs ": ",
+		 "%" PRIs_SYSTEM ": ",
 		 request_string );
 
-		result_string = string_get_from_stream(
+		result_string = system_string_get_from_stream(
 		                 string_variable,
 		                 string_variable_size - 1,
 		                 stdin );
 
 		if( result_string != NULL )
 		{
-			end_of_input = string_search(
+			end_of_input = system_string_search(
 			                string_variable,
-			                (character_t) '\n',
+			                (system_character_t) '\n',
 			                string_variable_size );
 
 			/* Input was larger than size of buffer
@@ -1140,14 +732,14 @@ int ewfinput_get_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = string_get_from_stream(
+					result_string = system_string_get_from_stream(
 					                 string_variable,
 					                 string_variable_size - 1,
 					                 stdin );
 
-					end_of_input = string_search(
+					end_of_input = system_string_search(
 					                string_variable,
-					                (character_t) '\n',
+					                (system_character_t) '\n',
 					                string_variable_size );
 
 				}
@@ -1179,93 +771,23 @@ int ewfinput_get_string_variable(
 	return( 1 );
 }
 
-/* Get a string variable
- * Returns 1 if successful, 0 if no input was provided or -1 on error
- */
-int ewfinput_get_string_variable_system_character(
-     FILE *stream,
-     character_t *request_string,
-     system_character_t *string_variable,
-     size_t string_variable_size )
-{
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_string_variable_system_character";
-	int result                 = 0;
-
-	if( sizeof( system_character_t ) != sizeof( character_t ) )
-	{
-		result_string = (character_t *) memory_allocate(
-		                                 sizeof( character_t ) * string_variable_size );
-
-		if( result_string == NULL )
-		{
-			notify_warning_printf( "%s: unable to create conversion string.\n",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
-	{
-		result_string = (character_t *) string_variable;
-	}
-	result = ewfinput_get_string_variable(
-	          stream,
-	          request_string,
-	          result_string,
-	          string_variable_size );
-
-	if( result == -1 )
-	{
-		notify_warning_printf( "%s: unable to get string variable.\n",
-		 function );
-
-		if( sizeof( system_character_t ) != sizeof( character_t ) )
-		{
-			memory_free(
-			 result_string );
-		}
-		return( -1 );
-	}
-	else if( ( result == 1 )
-	      && ( sizeof( system_character_t ) != sizeof( character_t ) ) )
-	{
-		if( ewfstring_copy_character_string_to_system_string(
-		     string_variable,
-		     result_string,
-		     string_variable_size ) != 1 )
-		{
-			notify_warning_printf( "%s: unable to set conversion string.\n",
-			 function );
-
-			memory_free(
-			 result_string );
-
-			return( -1 );
-		}
-		memory_free(
-		 result_string );
-	}
-	return( result );
-}
-
 /* Get a size variable
  * Returns 1 if successful, 0 if no input was provided or -1 on error
  */
 int ewfinput_get_size_variable(
      FILE *stream,
-     character_t *input_buffer,
+     system_character_t *input_buffer,
      size_t input_buffer_size,
-     character_t *request_string,
+     system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
      uint64_t *size_variable )
 {
-	character_t *end_of_input  = NULL;
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_size_variable";
-	ssize_t input_length       = 0;
+	system_character_t *end_of_input  = NULL;
+	system_character_t *result_string = NULL;
+	static char *function             = "ewfinput_get_size_variable";
+	ssize_t input_length              = 0;
 
 	if( stream == NULL )
 	{
@@ -1310,22 +832,22 @@ int ewfinput_get_size_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
+		 "%" PRIs_SYSTEM " (%" PRIu64 " >= value >= %" PRIu64 ") [%" PRIu64 "]: ",
 		 request_string,
 		 minimum,
 		 maximum,
 		 default_value );
 
-		result_string = string_get_from_stream(
+		result_string = system_string_get_from_stream(
 		                 input_buffer,
 		                 input_buffer_size - 1,
 		                 stdin );
 
 		if( result_string != NULL )
 		{
-			end_of_input = string_search(
+			end_of_input = system_string_search(
 			                input_buffer,
-			                (character_t) '\n',
+			                (system_character_t) '\n',
 			                input_buffer_size );
 
 			/* Input was larger than size of buffer
@@ -1336,14 +858,14 @@ int ewfinput_get_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = string_get_from_stream(
+					result_string = system_string_get_from_stream(
 					                 input_buffer,
 					                 input_buffer_size - 1,
 					                 stdin );
 
-					end_of_input = string_search(
+					end_of_input = system_string_search(
 					                input_buffer,
-					                (character_t) '\n',
+					                (system_character_t) '\n',
 					                input_buffer_size );
 
 				}
@@ -1361,10 +883,11 @@ int ewfinput_get_size_variable(
 
 				return( 0 );
 			}
-			if( string_to_uint64(
+			if( system_string_to_uint64(
 			     input_buffer,
 			     input_length,
-			     size_variable ) != 1 )
+			     size_variable,
+			     NULL ) != 1 )
 			{
 				fprintf(
 				 stream,
@@ -1397,33 +920,42 @@ int ewfinput_get_size_variable(
  */
 int ewfinput_get_byte_size_variable(
      FILE *stream,
-     character_t *input_buffer,
+     system_character_t *input_buffer,
      size_t input_buffer_size,
-     character_t *request_string,
+     system_character_t *request_string,
      uint64_t minimum,
      uint64_t maximum,
      uint64_t default_value,
-     uint64_t *byte_size_variable )
+     uint64_t *byte_size_variable,
+     liberror_error_t **error )
 {
-	character_t minimum_size_string[ 16 ];
-	character_t maximum_size_string[ 16 ];
-	character_t default_size_string[ 16 ];
+	system_character_t minimum_size_string[ 16 ];
+	system_character_t maximum_size_string[ 16 ];
+	system_character_t default_size_string[ 16 ];
 
-	character_t *end_of_input  = NULL;
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_byte_size_variable";
-	ssize_t input_length       = 0;
+	system_character_t *end_of_input  = NULL;
+	system_character_t *result_string = NULL;
+	static char *function             = "ewfinput_get_byte_size_variable";
+	ssize_t input_length              = 0;
 
 	if( stream == NULL )
 	{
-		notify_warning_printf( "%s: invalid output stream.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid output stream.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( input_buffer == NULL )
 	{
-		notify_warning_printf( "%s: invalid input buffer.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid input buffer.\n",
 		 function );
 
 		return( -1 );
@@ -1437,14 +969,22 @@ int ewfinput_get_byte_size_variable(
 	}
 	if( request_string == NULL )
 	{
-		notify_warning_printf( "%s: invalid request string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid request string.\n",
 		 function );
 
 		return( -1 );
 	}
 	if( byte_size_variable == NULL )
 	{
-		notify_warning_printf( "%s: invalid byte size variable.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid byte size variable.\n",
 		 function );
 
 		return( -1 );
@@ -1453,9 +993,14 @@ int ewfinput_get_byte_size_variable(
 	     minimum_size_string,
 	     16,
 	     minimum,
-	     BYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
+	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to create minimum byte size string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to create minimum byte size string.\n",
 		 function );
 
 		return( -1 );
@@ -1464,9 +1009,14 @@ int ewfinput_get_byte_size_variable(
 	     default_size_string,
 	     16,
 	     default_value,
-	     BYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
+	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to create default byte size string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to create default byte size string.\n",
 		 function );
 
 		return( -1 );
@@ -1475,9 +1025,14 @@ int ewfinput_get_byte_size_variable(
 	     maximum_size_string,
 	     16,
 	     maximum,
-	     BYTE_SIZE_STRING_UNIT_MEBIBYTE ) != 1 )
+	     BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	     error ) != 1 )
 	{
-		notify_warning_printf( "%s: unable to create maximum byte size string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to create maximum byte size string.\n",
 		 function );
 
 		return( -1 );
@@ -1490,22 +1045,22 @@ int ewfinput_get_byte_size_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs " (%" PRIs " >= value >= %" PRIs ") [%" PRIs "]: ",
+		 "%" PRIs_SYSTEM " (%" PRIs_SYSTEM " >= value >= %" PRIs_SYSTEM ") [%" PRIs_SYSTEM "]: ",
 		 request_string,
 		 minimum_size_string,
 		 maximum_size_string,
 		 default_size_string );
 
-		result_string = string_get_from_stream(
+		result_string = system_string_get_from_stream(
 		                 input_buffer,
 		                 input_buffer_size - 1,
 		                 stdin );
 
 		if( result_string != NULL )
 		{
-			end_of_input = string_search(
+			end_of_input = system_string_search(
 			                input_buffer,
-			                (character_t) '\n',
+			                (system_character_t) '\n',
 			                input_buffer_size );
 
 			/* Input was larger than size of buffer
@@ -1516,14 +1071,14 @@ int ewfinput_get_byte_size_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = string_get_from_stream(
+					result_string = system_string_get_from_stream(
 					                 input_buffer,
 					                 input_buffer_size - 1,
 					                 stdin );
 
-					end_of_input = string_search(
+					end_of_input = system_string_search(
 					                input_buffer,
-					                (character_t) '\n',
+					                (system_character_t) '\n',
 					                input_buffer_size );
 
 				}
@@ -1544,7 +1099,8 @@ int ewfinput_get_byte_size_variable(
 			if( byte_size_string_convert(
 			     input_buffer,
 			     (size_t) input_length,
-			     byte_size_variable ) != 1 )
+			     byte_size_variable,
+			     NULL ) != 1 )
 			{
 				fprintf(
 				 stream,
@@ -1577,21 +1133,21 @@ int ewfinput_get_byte_size_variable(
  */
 int ewfinput_get_fixed_string_variable(
      FILE *stream,
-     character_t *input_buffer,
+     system_character_t *input_buffer,
      size_t input_buffer_size,
-     character_t *request_string,
-     character_t **values,
+     system_character_t *request_string,
+     system_character_t **values,
      uint8_t amount_of_values,
      uint8_t default_value,
-     character_t **fixed_string_variable )
+     system_character_t **fixed_string_variable )
 {
 
-	character_t *end_of_input  = NULL;
-	character_t *result_string = NULL;
-	static char *function      = "ewfinput_get_fixed_value";
-	size_t value_length        = 0;
-	ssize_t input_length       = 0;
-	uint8_t value_iterator     = 0;
+	system_character_t *end_of_input  = NULL;
+	system_character_t *result_string = NULL;
+	static char *function             = "ewfinput_get_fixed_value";
+	size_t value_length               = 0;
+	ssize_t input_length              = 0;
+	uint8_t value_iterator            = 0;
 
 	if( stream == NULL )
 	{
@@ -1639,7 +1195,7 @@ int ewfinput_get_fixed_string_variable(
 	{
 		fprintf(
 		 stream,
-		 "%" PRIs " (",
+		 "%" PRIs_SYSTEM " (",
 		 request_string );
 
 		for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
@@ -1652,24 +1208,24 @@ int ewfinput_get_fixed_string_variable(
 			}
 			fprintf(
 			 stream,
-			 "%" PRIs "",
+			 "%" PRIs_SYSTEM "",
 			 values[ value_iterator ] );
 		}
 		fprintf(
 		 stream,
-		 ") [%" PRIs "]: ",
+		 ") [%" PRIs_SYSTEM "]: ",
 		 values[ default_value ] );
 
-		result_string = string_get_from_stream(
+		result_string = system_string_get_from_stream(
 		                 input_buffer,
 		                 input_buffer_size - 1,
 		                 stdin );
 
 		if( result_string != NULL )
 		{
-			end_of_input = string_search(
+			end_of_input = system_string_search(
 			                input_buffer,
-			                (character_t) '\n',
+			                (system_character_t) '\n',
 			                input_buffer_size );
 
 			/* Input was larger than size of buffer
@@ -1680,14 +1236,14 @@ int ewfinput_get_fixed_string_variable(
 				 */
 				while( end_of_input == NULL )
 				{
-					result_string = string_get_from_stream(
+					result_string = system_string_get_from_stream(
 					                 input_buffer,
 					                 input_buffer_size - 1,
 					                 stdin );
 
-					end_of_input = string_search(
+					end_of_input = system_string_search(
 					                input_buffer,
-					                (character_t) '\n',
+					                (system_character_t) '\n',
 					                input_buffer_size );
 
 				}
@@ -1707,11 +1263,11 @@ int ewfinput_get_fixed_string_variable(
 			}
 			for( value_iterator = 0; value_iterator < amount_of_values; value_iterator++ )
 			{
-				value_length = string_length(
+				value_length = system_string_length(
 						values[ value_iterator ] );
 
 				if( ( value_length == (size_t) input_length )
-				 && ( string_compare(
+				 && ( system_string_compare(
 				       input_buffer,
 				       values[ value_iterator ],
 				       value_length ) == 0 ) )

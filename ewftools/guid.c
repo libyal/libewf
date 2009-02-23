@@ -21,47 +21,79 @@
  */
 
 #include <common.h>
+#include <endian.h>
 #include <types.h>
 
-#include "character_string.h"
+#include <liberror.h>
+
 #include "guid.h"
-#include "notify.h"
+#include "system_string.h"
 
 /* Converts the GUID into a string
  * Returns 1 if successful or -1 on error
  */
 int guid_to_string(
      guid_t *guid,
-     character_t *string,
-     size_t string_size )
+     int byte_order,
+     system_character_t *string,
+     size_t string_size,
+     liberror_error_t **error )
 {
 	static char *function = "guid_to_string";
-	ssize_t print_count   = 0;
+	int print_count       = 0;
 
 	if( guid == NULL )
 	{
-		notify_warning_printf( "%s: invalid guid.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid guid.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( byte_order != LIBEWF_ENDIAN_BIG )
+	 && ( byte_order != LIBEWF_ENDIAN_LITTLE ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported byte order.",
 		 function );
 
 		return( -1 );
 	}
 	if( string == NULL )
 	{
-		notify_warning_printf( "%s: invalid string.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
 		 function );
 
 		return( -1 );
 	}
-	if( string_size < GUID_STRING_LENGTH )
+	if( string_size < GUID_STRING_SIZE )
 	{
-		notify_warning_printf( "%s: string too small.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: string too small.",
 		 function );
 
 		return( -1 );
 	}
 	if( string_size > (size_t) SSIZE_MAX )
 	{
-		notify_warning_printf( "%s: invalid string size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -69,40 +101,73 @@ int guid_to_string(
 	/* Create the GUID string
 	 * It is stored as uint32 - uint16 - uint16 - 8 byte array
 	 */
-	print_count = string_snprintf(
-	               string,
-	               string_size,
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "-%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 )
-	               _CHARACTER_T_STRING( "%.2" ) _CHARACTER_T_STRING( PRIx8 ),
-	               guid[ 3 ], guid[ 2 ], guid[ 1 ], guid[ 0 ],
-	               guid[ 5 ], guid[ 4 ],
-	               guid[ 7 ], guid[ 6 ],
-	               guid[ 8 ], guid[ 9 ],
-	               guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
-
-	if( print_count != 36 )
+	if( byte_order == LIBEWF_ENDIAN_BIG )
 	{
-		notify_warning_printf( "%s: unable to format string.\n",
+		print_count = system_string_snprintf(
+			       string,
+			       string_size,
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 ),
+			       guid[ 0 ], guid[ 1 ], guid[ 2 ], guid[ 3 ],
+			       guid[ 4 ], guid[ 5 ],
+			       guid[ 6 ], guid[ 7 ],
+			       guid[ 8 ], guid[ 9 ],
+			       guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
+	}
+	else if( byte_order == LIBEWF_ENDIAN_LITTLE )
+	{
+		print_count = system_string_snprintf(
+			       string,
+			       string_size,
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "-%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 )
+			       _SYSTEM_CHARACTER_T_STRING( "%.2" ) _SYSTEM_CHARACTER_T_STRING( PRIx8 ),
+			       guid[ 3 ], guid[ 2 ], guid[ 1 ], guid[ 0 ],
+			       guid[ 5 ], guid[ 4 ],
+			       guid[ 7 ], guid[ 6 ],
+			       guid[ 8 ], guid[ 9 ],
+			       guid[ 10 ], guid[ 11 ], guid[ 12 ], guid[ 13 ], guid[ 14 ], guid[ 15 ] );
+	}
+
+	if( ( print_count < 0 )
+	 || ( (size_t) print_count > string_size ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set string.",
 		 function );
 
 		return( -1 );
 	}
-	string[ 36 ] = 0;
-
 	return( 1 );
 }
 

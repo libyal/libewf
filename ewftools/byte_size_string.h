@@ -26,7 +26,8 @@
 #include <common.h>
 #include <types.h>
 
-#include "character_string.h"
+#include <liberror.h>
+
 #include "system_string.h"
 
 #if defined( __cplusplus )
@@ -36,30 +37,18 @@ extern "C" {
 #define BYTE_SIZE_STRING_UNIT_MEGABYTE		1000
 #define BYTE_SIZE_STRING_UNIT_MEBIBYTE		1024
 
-const character_t *byte_size_string_get_factor_string(
-                    int8_t factor );
-
-int8_t byte_size_string_get_factor(
-        character_t factor );
-
 int byte_size_string_create(
-     character_t *byte_size_string,
+     system_character_t *byte_size_string,
      size_t byte_size_string_length,
      uint64_t size,
-     int units );
+     int units,
+     liberror_error_t **error );
 
 int byte_size_string_convert(
-     const character_t *byte_size_string,
-     size_t byte_size_string_length,
-     uint64_t *size );
-
-int8_t byte_size_string_get_factor_system_character(
-        system_character_t factor );
-
-int byte_size_string_convert_system_character(
      const system_character_t *byte_size_string,
      size_t byte_size_string_length,
-     uint64_t *size );
+     uint64_t *size,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

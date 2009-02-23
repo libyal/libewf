@@ -28,8 +28,8 @@
 
 #include <stdio.h>
 
-#include "character_string.h"
 #include "date_time.h"
+#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -55,15 +55,15 @@ struct process_status
 {
 	/* The status process string
 	 */
-	const character_t *status_process_string;
+	const system_character_t *status_process_string;
 
 	/* The status update string
 	 */
-	const character_t *status_update_string;
+	const system_character_t *status_update_string;
 
 	/* The status summary string
 	 */
-	const character_t *status_summary_string;
+	const system_character_t *status_summary_string;
 
 	/* The ouput stream
 	 */
@@ -103,9 +103,9 @@ void process_status_bytes_fprint(
 
 int process_status_initialize(
      process_status_t **process_status,
-     const character_t *status_process_string,
-     const character_t *status_update_string,
-     const character_t *status_summary_string,
+     const system_character_t *status_process_string,
+     const system_character_t *status_update_string,
+     const system_character_t *status_summary_string,
      FILE *output_stream );
 
 int process_status_free(

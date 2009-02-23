@@ -77,13 +77,11 @@
 
 #include <libewf.h>
 
-#include "character_string.h"
 #include "byte_size_string.h"
 #include "date_time.h"
 #include "digest_context.h"
 #include "error_string.h"
 #include "ewflibewf.h"
-#include "ewfstring.h"
 #include "ewfoutput.h"
 #include "md5.h"
 #include "notify.h"
@@ -94,7 +92,7 @@
  */
 void ewfoutput_version_fprint(
       FILE *stream,
-      character_t *program )
+      const char *program )
 {
 	static char *function = "ewfoutput_version_fprint";
 
@@ -116,7 +114,7 @@ void ewfoutput_version_fprint(
 	}
 	fprintf(
 	 stream,
-	 "%" PRIs " %s (libewf %s",
+	 "%s %s (libewf %s",
 	 program,
 	 LIBEWF_VERSION_STRING,
 	 LIBEWF_VERSION_STRING );
@@ -314,7 +312,7 @@ void ewfoutput_bytes_per_second_fprint(
       size64_t bytes,
       time_t seconds )
 {
-	character_t bytes_per_second_string[ 16 ];
+	system_character_t bytes_per_second_string[ 16 ];
 
 	size64_t bytes_per_second = 0;
 	int result                = 0;
@@ -333,7 +331,8 @@ void ewfoutput_bytes_per_second_fprint(
 			          bytes_per_second_string,
 			          10,
 			          bytes_per_second,
-			          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+			          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+			          NULL );
 		}
 		fprintf(
 		 stream,
@@ -343,7 +342,7 @@ void ewfoutput_bytes_per_second_fprint(
 		{
 			fprintf(
 			 stream,
-			 " %" PRIs "/s (%" PRIu64 " bytes/second)",
+			 " %" PRIs_SYSTEM "/s (%" PRIu64 " bytes/second)",
 			 bytes_per_second_string, bytes_per_second );
 		}
 		else
@@ -363,7 +362,7 @@ void ewfoutput_bytes_fprint(
       FILE *stream,
       size64_t bytes )
 {
-	character_t bytes_string[ 16 ];
+	system_character_t bytes_string[ 16 ];
 
 	int result = 0;
 
@@ -377,13 +376,14 @@ void ewfoutput_bytes_fprint(
 		          bytes_string,
 		          10,
 		          bytes,
-		          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+		          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+		          NULL );
 	}
 	if( result == 1 )
 	{
 		fprintf(
 		 stream,
-		 " %" PRIs " (%" PRIi64 " bytes)",
+		 " %" PRIs_SYSTEM " (%" PRIi64 " bytes)",
 		 bytes_string, bytes );
 	}
 	else
@@ -400,11 +400,11 @@ void ewfoutput_bytes_fprint(
 void ewfoutput_acquiry_parameters_fprint(
       FILE *stream,
       system_character_t *filename,
-      character_t *case_number,
-      character_t *description,
-      character_t *evidence_number,
-      character_t *examiner_name,
-      character_t *notes,
+      system_character_t *case_number,
+      system_character_t *description,
+      system_character_t *evidence_number,
+      system_character_t *examiner_name,
+      system_character_t *notes,
       uint8_t media_type,
       uint8_t volume_type,
       int8_t compression_level,
@@ -418,8 +418,8 @@ void ewfoutput_acquiry_parameters_fprint(
       uint8_t read_error_retry,
       uint8_t wipe_block_on_read_error )
 {
-	character_t acquiry_size_string[ 16 ];
-	character_t segment_file_size_string[ 16 ];
+	system_character_t acquiry_size_string[ 16 ];
+	system_character_t segment_file_size_string[ 16 ];
 
 	static char *function = "ewfoutput_acquiry_parameters_fprint";
 	int result            = 0;
@@ -446,7 +446,7 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( case_number != NULL )
 	{
-		fprintf( stream, "%" PRIs "",
+		fprintf( stream, "%" PRIs_SYSTEM "",
 		 case_number );
 	}
 	fprintf( stream, "\n" );
@@ -455,7 +455,7 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( description != NULL )
 	{
-		fprintf( stream, "%" PRIs "",
+		fprintf( stream, "%" PRIs_SYSTEM "",
 		 description );
 	}
 	fprintf( stream, "\n" );
@@ -464,7 +464,7 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( evidence_number != NULL )
 	{
-		fprintf( stream, "%" PRIs "",
+		fprintf( stream, "%" PRIs_SYSTEM "",
 		 evidence_number );
 	}
 	fprintf( stream, "\n" );
@@ -473,7 +473,7 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( examiner_name != NULL )
 	{
-		fprintf( stream, "%" PRIs "",
+		fprintf( stream, "%" PRIs_SYSTEM "",
 		 examiner_name );
 	}
 	fprintf( stream, "\n" );
@@ -482,7 +482,7 @@ void ewfoutput_acquiry_parameters_fprint(
 
 	if( notes != NULL )
 	{
-		fprintf( stream, "%" PRIs "",
+		fprintf( stream, "%" PRIs_SYSTEM "",
 		 notes );
 	}
 	fprintf( stream, "\n" );
@@ -595,7 +595,8 @@ void ewfoutput_acquiry_parameters_fprint(
 	          acquiry_size_string,
 	          16,
 	          acquiry_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	          NULL );
 
 	fprintf( stream, "Amount of bytes to acquire:\t" );
 
@@ -606,7 +607,7 @@ void ewfoutput_acquiry_parameters_fprint(
 	}
 	else if( result == 1 )
 	{
-		fprintf( stream, "%" PRIs " (%" PRIu64 " bytes)",
+		fprintf( stream, "%" PRIs_SYSTEM " (%" PRIu64 " bytes)",
 		 acquiry_size_string, acquiry_size );
 	}
 	else
@@ -620,13 +621,14 @@ void ewfoutput_acquiry_parameters_fprint(
 	          segment_file_size_string,
 	          16,
 	          segment_file_size,
-	          BYTE_SIZE_STRING_UNIT_MEBIBYTE );
+	          BYTE_SIZE_STRING_UNIT_MEBIBYTE,
+	          NULL );
 
 	fprintf( stream, "Evidence segment file size:\t" );
 
 	if( result == 1 )
 	{
-		fprintf( stream, "%" PRIs " (%" PRIu64 " bytes)",
+		fprintf( stream, "%" PRIs_SYSTEM " (%" PRIu64 " bytes)",
 		 segment_file_size_string, segment_file_size );
 	}
 	else
@@ -871,7 +873,7 @@ void ewfoutput_header_values_fprint(
       libewf_handle_t *handle )
 {
 	char header_identifier[ 64 ];
-	character_t header_value[ 512 ];
+	system_character_t header_value[ 512 ];
 
 	static char *function           = "ewfoutput_header_values_fprint";
 	size_t header_identifier_length = 64;
@@ -923,7 +925,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tCase number:\t\t%" PRIs "\n",
+		 "\tCase number:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -936,7 +938,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tDescription:\t\t%" PRIs "\n",
+		 "\tDescription:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -949,7 +951,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tExaminer name:\t\t%" PRIs "\n",
+		 "\tExaminer name:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -962,7 +964,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tEvidence number:\t%" PRIs "\n",
+		 "\tEvidence number:\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -975,7 +977,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tNotes:\t\t\t%" PRIs "\n",
+		 "\tNotes:\t\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -988,7 +990,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tAcquiry date:\t\t%" PRIs "\n",
+		 "\tAcquiry date:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1001,7 +1003,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tSystem date:\t\t%" PRIs "\n",
+		 "\tSystem date:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1014,7 +1016,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tOperating system used:\t%" PRIs "\n",
+		 "\tOperating system used:\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1027,7 +1029,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tSoftware version used:\t%" PRIs "\n",
+		 "\tSoftware version used:\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1040,7 +1042,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tPassword:\t\t(hash: %" PRIs ")\n",
+		 "\tPassword:\t\t(hash: %" PRIs_SYSTEM ")\n",
 		 header_value );
 	}
 	else
@@ -1061,25 +1063,26 @@ void ewfoutput_header_values_fprint(
 		 stream,
 		 "\tCompression type:\t" );
 
-		if( string_compare(
-		     header_value,
-		     LIBEWF_COMPRESSION_TYPE_NONE, 1 ) == 0 )
+		if( header_value_length != 1 )
+		{
+			fprintf(
+			 stream,
+			 "unknown compression: %" PRIs_SYSTEM "\n",
+			 header_value );
+		}
+		else if( header_value[ 0 ] == (system_character_t) LIBEWF_COMPRESSION_TYPE_NONE )
 		{
 			fprintf(
 			 stream,
 			 "no compression\n" );
 		}
-		else if( string_compare(
-		          header_value,
-		          LIBEWF_COMPRESSION_TYPE_FAST, 1 ) == 0 )
+		else if( header_value[ 0 ] == (system_character_t) LIBEWF_COMPRESSION_TYPE_FAST )
 		{
 			fprintf(
 			 stream,
 			 "good (fast) compression\n" );
 		}
-		else if( string_compare(
-		          header_value,
-		          LIBEWF_COMPRESSION_TYPE_BEST, 1 ) == 0 )
+		else if( header_value[ 0 ] == (system_character_t) LIBEWF_COMPRESSION_TYPE_BEST )
 		{
 			fprintf(
 			 stream,
@@ -1089,7 +1092,8 @@ void ewfoutput_header_values_fprint(
 		{
 			fprintf(
 			 stream,
-			 "unknown compression\n" );
+			 "unknown compression: %" PRIc_SYSTEM "\n",
+			 header_value[ 0 ] );
 		}
 	}
 	if( ewflibewf_get_header_value(
@@ -1102,7 +1106,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tModel:\t\t\t%" PRIs "\n",
+		 "\tModel:\t\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1115,7 +1119,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tSerial number:\t\t%" PRIs "\n",
+		 "\tSerial number:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	/* TODO figure out what this value represents and add get & set API functions to libewf
@@ -1130,7 +1134,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tProcess identifier:\t%" PRIs "\n",
+		 "\tProcess identifier:\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1143,7 +1147,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tUnknown value dc:\t%" PRIs "\n",
+		 "\tUnknown value dc:\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	if( ewflibewf_get_header_value(
@@ -1156,7 +1160,7 @@ void ewfoutput_header_values_fprint(
 	{
 		fprintf(
 		 stream,
-		 "\tExtents:\t\t%" PRIs "\n",
+		 "\tExtents:\t\t%" PRIs_SYSTEM "\n",
 		 header_value );
 	}
 	/* Currently there are 16 default values
@@ -1197,7 +1201,7 @@ void ewfoutput_header_values_fprint(
 			{
 				fprintf(
 				 stream,
-				 "\t%s: %" PRIs "\n",
+				 "\t%s: %" PRIs_SYSTEM "\n",
 				 header_identifier,
 				 header_value );
 			}
@@ -1215,18 +1219,18 @@ void ewfoutput_hash_values_fprint(
       uint8_t ignore_sha1 )
 {
 	char hash_identifier[ 32 ];
-	character_t hash_value[ 128 ];
+	system_character_t hash_value[ 128 ];
 	digest_hash_t md5_hash[ DIGEST_HASH_SIZE_MD5 ];
 
-	character_t *stored_md5_hash_string  = NULL;
-	liberror_error_t *error              = NULL;
-	static char *function                = "ewfoutput_hash_values_fprint";
-	uint32_t hash_identifier_length      = 32;
-	uint32_t hash_value_length           = 128;
-	uint32_t amount_of_values            = 0;
-	uint32_t iterator                    = 0;
-	uint8_t print_additional_hash_values = 1;
-	int result                           = 0;
+	system_character_t *stored_md5_hash_string = NULL;
+	liberror_error_t *error                    = NULL;
+	static char *function                      = "ewfoutput_hash_values_fprint";
+	uint32_t hash_identifier_length            = 32;
+	uint32_t hash_value_length                 = 128;
+	uint32_t amount_of_values                  = 0;
+	uint32_t iterator                          = 0;
+	uint8_t print_additional_hash_values       = 1;
+	int result                                 = 0;
 
 	if( stream == NULL )
 	{
@@ -1271,8 +1275,8 @@ void ewfoutput_hash_values_fprint(
 		}
 		else
 		{
-			stored_md5_hash_string = (character_t *) memory_allocate(
-								  sizeof( character_t ) * EWFSTRING_DIGEST_HASH_LENGTH_MD5 );
+			stored_md5_hash_string = (system_character_t *) memory_allocate(
+								  sizeof( system_character_t ) * DIGEST_HASH_STRING_SIZE_MD5 );
 
 			if( stored_md5_hash_string == NULL )
 			{
@@ -1285,7 +1289,7 @@ void ewfoutput_hash_values_fprint(
 			     md5_hash,
 			     DIGEST_HASH_SIZE_MD5,
 			     stored_md5_hash_string,
-			     EWFSTRING_DIGEST_HASH_LENGTH_MD5,
+			     DIGEST_HASH_STRING_SIZE_MD5,
 			     &error ) != 1 )
 			{
 				notify_warning_printf( "%s: unable to set MD5 hash string.\n",
@@ -1300,7 +1304,7 @@ void ewfoutput_hash_values_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tMD5 hash in file:\t%" PRIs "\n",
+			 "\tMD5 hash in file:\t%" PRIs_SYSTEM "\n",
 			 stored_md5_hash_string );
 
 			memory_free(
@@ -1376,7 +1380,7 @@ void ewfoutput_hash_values_fprint(
 						}
 						fprintf(
 						 stream,
-						 "%s%s:\t%" PRIs "\n",
+						 "%s%s:\t%" PRIs_SYSTEM "\n",
 						 indentation,
 						 hash_identifier,
 						 hash_value );

@@ -43,6 +43,7 @@
 #include "md5.h"
 #include "notify.h"
 #include "sha1.h"
+#include "system_string.h"
 #include "verification_handle.h"
 
 #if !defined( USE_LIBEWF_GET_HASH_VALUE_MD5 ) && !defined( USE_LIBEWF_GET_MD5_HASH )
@@ -828,14 +829,14 @@ int verification_handle_set_input_values(
  */
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
-     character_t *calculated_md5_hash_string,
+     system_character_t *calculated_md5_hash_string,
      size_t calculated_md5_hash_string_size,
-     character_t *stored_md5_hash_string,
+     system_character_t *stored_md5_hash_string,
      size_t stored_md5_hash_string_size,
      int *stored_md5_hash_available,
-     character_t *calculated_sha1_hash_string,
+     system_character_t *calculated_sha1_hash_string,
      size_t calculated_sha1_hash_string_size,
-     character_t *stored_sha1_hash_string,
+     system_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
      liberror_error_t **error )

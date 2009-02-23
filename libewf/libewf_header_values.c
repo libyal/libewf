@@ -2827,15 +2827,15 @@ int libewf_header_values_generate_header_string_type1(
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = (libewf_character_t *) LIBEWF_COMPRESSION_TYPE_NONE;
+			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_NONE;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = (libewf_character_t *) LIBEWF_COMPRESSION_TYPE_FAST;
+			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_FAST;
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = (libewf_character_t *) LIBEWF_COMPRESSION_TYPE_BEST;
+			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_BEST;
 		}
 		*header_string_size += libewf_string_length(
 		                        compression_type );
@@ -3210,15 +3210,15 @@ int libewf_header_values_generate_header_string_type2(
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = (libewf_character_t *) LIBEWF_COMPRESSION_TYPE_NONE;
+			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_NONE;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = (libewf_character_t *) LIBEWF_COMPRESSION_TYPE_FAST;
+			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_FAST;
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = (libewf_character_t *) LIBEWF_COMPRESSION_TYPE_BEST;
+			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_BEST;
 		}
 		*header_string_size += libewf_string_length(
 		                        compression_type );

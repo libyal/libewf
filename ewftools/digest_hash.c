@@ -25,8 +25,8 @@
 
 #include <liberror.h>
 
-#include "character_string.h"
 #include "digest_hash.h"
+#include "system_string.h"
 
 /* Converts the EWF digest hash to a printable string
  * Returns 1 if successful or -1 on error
@@ -34,7 +34,7 @@
 int digest_hash_copy_to_string(
      digest_hash_t *digest_hash,
      size_t digest_hash_size,
-     character_t *string,
+     system_character_t *string,
      size_t string_size,
      liberror_error_t **error )
 {
@@ -106,21 +106,21 @@ int digest_hash_copy_to_string(
 
 		if( digest_digit <= 9 )
 		{
-			string[ string_iterator++ ] = (character_t) ( (uint8_t) '0' + digest_digit );
+			string[ string_iterator++ ] = (system_character_t) ( (uint8_t) '0' + digest_digit );
 		}
 		else
 		{
-			string[ string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
+			string[ string_iterator++ ] = (system_character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
 		}
 		digest_digit = digest_hash[ digest_hash_iterator ] % 16;
 
 		if( digest_digit <= 9 )
 		{
-			string[ string_iterator++ ] = (character_t) ( (uint8_t) '0' + digest_digit );
+			string[ string_iterator++ ] = (system_character_t) ( (uint8_t) '0' + digest_digit );
 		}
 		else
 		{
-			string[ string_iterator++ ] = (character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
+			string[ string_iterator++ ] = (system_character_t) ( (uint8_t) 'a' + ( digest_digit - 10 ) );
 		}
 	}
 	string[ string_iterator ] = 0;

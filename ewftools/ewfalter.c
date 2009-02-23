@@ -25,6 +25,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <stdio.h>
 
 #if defined( HAVE_UNISTD_H )
@@ -81,24 +83,25 @@ void usage_fprint(
 
 /* The main program
  */
-#if defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
+	system_character_t input_buffer[ EWFALTER_INPUT_BUFFER_SIZE ];
 
 #if !defined( HAVE_GLOB_H )
-	glob_t *glob                            = NULL;
+	glob_t *glob                               = NULL;
 #endif
 
-	character_t *program                       = _CHARACTER_T_STRING( "ewfalter" );
+	liberror_error_t *error                    = NULL;
 
 	system_character_t * const *argv_filenames = NULL;
 	system_character_t **ewf_filenames         = NULL;
 	system_character_t *target_filename        = NULL;
 
+	char *program                              = "ewfalter";
 	uint8_t *process_buffer                    = NULL;
 	system_integer_t option                    = 0;
 	off64_t write_offset                       = 0;
@@ -115,11 +118,29 @@ int main( int argc, char * const argv[] )
 	int amount_of_filenames                    = 0;
 	int result                                 = 0;
 
+	notify_set_values(
+	 stderr,
+	 verbose );
+
+	if( system_string_initialize(
+	     &error ) != 1 )
+	{
+		fprintf(
+		 stderr,
+		 "Unable to initialize system string.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( EXIT_FAILURE );
+	}
 	ewfoutput_version_fprint(
 	 stdout,
 	 program );
 
-	fprintf( stdout, "%" PRIs " is for testing purposes only.\n",
+	fprintf( stdout, "%" PRIs_SYSTEM " is for testing purposes only.\n",
 	 program );
 
 	while( ( option = ewfgetopt(
@@ -149,11 +170,19 @@ int main( int argc, char * const argv[] )
 				string_length = system_string_length(
 				                 optarg );
 
-				result = byte_size_string_convert_system_character(
+				result = byte_size_string_convert(
 				          optarg,
 				          string_length,
-				          &process_buffer_size );
+				          &process_buffer_size,
+				          &error );
 
+				if( result != 1 )
+				{
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
 				if( ( result != 1 )
 				 || ( process_buffer_size > (uint64_t) SSIZE_MAX ) )
 				{
@@ -198,9 +227,6 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	libewf_set_notify_values(
-	 stderr,
-	 verbose );
-	notify_set_values(
 	 stderr,
 	 verbose );
 
@@ -310,7 +336,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     input_buffer,
 		     EWFALTER_INPUT_BUFFER_SIZE,
-		     _CHARACTER_T_STRING( "Start altering at offset" ),
+		     _SYSTEM_CHARACTER_T_STRING( "Start altering at offset" ),
 		     0,
 		     media_size,
 		     0,
@@ -325,7 +351,7 @@ int main( int argc, char * const argv[] )
 		     stdout,
 		     input_buffer,
 		     EWFALTER_INPUT_BUFFER_SIZE,
-		     _CHARACTER_T_STRING( "Amount of bytes to alter" ),
+		     _SYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
 		     0,
 		     ( media_size - alter_offset ),
 		     ( media_size - alter_offset ),
@@ -342,7 +368,7 @@ int main( int argc, char * const argv[] )
 			     stdout,
 			     input_buffer,
 			     EWFALTER_INPUT_BUFFER_SIZE,
-			     _CHARACTER_T_STRING( "Alteration buffer size" ),
+			     _SYSTEM_CHARACTER_T_STRING( "Alteration buffer size" ),
 			     1,
 			     SSIZE_MAX,
 			     ( 64 * 512 ),
@@ -519,7 +545,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfcommon_abort != 0 )
 	{
-		fprintf( stdout, "%" PRIs ": ABORTED\n",
+		fprintf( stdout, "%s: ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

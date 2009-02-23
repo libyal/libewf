@@ -26,24 +26,20 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
-#include "system_string.h"
+#include "character_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-#define GUID_STRING_SIZE	37
+#define GUID_STRING_LENGTH	37
 
 typedef uint8_t guid_t;
 
 int guid_to_string(
      guid_t *guid,
-     int byte_order,
-     system_character_t *string,
-     size_t string_size,
-     liberror_error_t **error );
+     character_t *string,
+     size_t length );
 
 #if defined( __cplusplus )
 }

@@ -30,7 +30,7 @@
 
 #include <libewf/handle.h>
 
-#include "character_string.h"
+#include "system_string.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -40,7 +40,7 @@ int ewflibewf_get_header_value(
      libewf_handle_t *handle,
      const char *utf8_header_value_identifier,
      size_t utf8_header_value_identifier_length,
-     character_t *header_value,
+     system_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error );
 
@@ -48,14 +48,14 @@ int ewflibewf_set_header_value(
      libewf_handle_t *handle,
      const char *header_value_identifier,
      size_t utf8_header_value_identifier_length,
-     character_t *header_value,
+     system_character_t *header_value,
      liberror_error_t **error );
 
 int ewflibewf_get_hash_value(
      libewf_handle_t *handle,
      const char *utf8_hash_value_identifier,
      size_t utf8_header_value_identifier_length,
-     character_t *hash_value,
+     system_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error );
 
@@ -63,7 +63,7 @@ int ewflibewf_set_hash_value(
      libewf_handle_t *handle,
      const char *hash_value_identifier,
      size_t utf8_header_value_identifier_length,
-     character_t *hash_value,
+     system_character_t *hash_value,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

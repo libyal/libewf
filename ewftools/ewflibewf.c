@@ -36,8 +36,8 @@
 
 #include <libewf.h>
 
-#include "character_string.h"
 #include "ewflibewf.h"
+#include "system_string.h"
 
 /* Retrieves the header value from the libewf handle
  * Returns 1 if successful, 0 if value not present or -1 on error
@@ -46,7 +46,7 @@ int ewflibewf_get_header_value(
      libewf_handle_t *handle,
      const char *utf8_header_value_identifier,
      size_t utf8_header_value_identifier_length,
-     character_t *header_value,
+     system_character_t *header_value,
      size_t header_value_size,
      liberror_error_t **error )
 {
@@ -165,7 +165,7 @@ int ewflibewf_set_header_value(
      libewf_handle_t *handle,
      const char *utf8_header_value_identifier,
      size_t utf8_header_value_identifier_length,
-     character_t *header_value, 
+     system_character_t *header_value, 
      liberror_error_t **error )
 {
 	char *utf8_header_value         = NULL;
@@ -202,7 +202,7 @@ int ewflibewf_set_header_value(
 	}
 	else
 	{
-		header_value_length = string_length(
+		header_value_length = system_string_length(
 		                       header_value );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
@@ -295,7 +295,7 @@ int ewflibewf_get_hash_value(
      libewf_handle_t *handle,
      const char *utf8_hash_value_identifier,
      size_t utf8_hash_value_identifier_length,
-     character_t *hash_value,
+     system_character_t *hash_value,
      size_t hash_value_size,
      liberror_error_t **error )
 {
@@ -414,7 +414,7 @@ int ewflibewf_set_hash_value(
      libewf_handle_t *handle,
      const char *utf8_hash_value_identifier,
      size_t utf8_hash_value_identifier_length,
-     character_t *hash_value, 
+     system_character_t *hash_value, 
      liberror_error_t **error )
 {
 	char *utf8_hash_value         = NULL;
@@ -451,7 +451,7 @@ int ewflibewf_set_hash_value(
 	}
 	else
 	{
-		hash_value_length = string_length(
+		hash_value_length = system_string_length(
 		                     hash_value );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
