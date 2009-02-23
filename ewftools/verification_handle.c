@@ -58,7 +58,7 @@ int verification_handle_initialize(
      uint8_t calculate_sha1,
      liberror_error_t **error )
 {
-	static char *function = "verification_handle_allocate";
+	static char *function = "verification_handle_initialize";
 
 	if( verification_handle == NULL )
 	{
