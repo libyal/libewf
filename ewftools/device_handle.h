@@ -78,6 +78,19 @@ struct device_handle
 	/* Value to indicate the media size value was set
 	 */
 	uint8_t media_size_set;
+
+	/* The amount of read error retries
+	 */
+	int8_t read_error_retry;
+
+	/* The amount of bytes to skip on a read error
+	 */
+	uint32_t byte_error_granularity;
+
+	/* Value to indicate if the block that is made up by the
+	 * byte error granularity should be wiped on read error
+	 */
+	uint8_t wipe_block_on_read_error;
 };
 
 int device_handle_initialize(
@@ -117,6 +130,13 @@ int device_handle_get_media_size(
 int device_handle_get_bytes_per_sector(
      device_handle_t *device_handle,
      uint32_t *bytes_per_sector,
+     liberror_error_t **error );
+
+int device_handle_set_read_error_values(
+     device_handle_t *device_handle,
+     int8_t read_error_retry,
+     uint32_t byte_error_granularity,
+     uint8_t wipe_block_on_read_error,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

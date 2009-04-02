@@ -91,68 +91,40 @@ int file_io_wopen(
 
 #endif
 
-#if defined( HAVE_READ )
 #if defined( WINAPI )
 #define file_io_read( file_descriptor, buffer, size ) \
 	_read( file_descriptor, (void *) buffer, (unsigned int) size )
 
-#else
+#elif defined( HAVE_READ )
 #define file_io_read( file_descriptor, buffer, size ) \
 	read( file_descriptor, (void *) buffer, size )
 #endif
-#endif
 
-#if defined( HAVE_LSEEK )
 #if defined( WINAPI )
 #define file_io_lseek( file_descriptor, offset, whence ) \
 	_lseeki64( file_descriptor, offset, whence )
 
-#else
+#elif defined( HAVE_LSEEK )
 #define file_io_lseek( file_descriptor, offset, whence ) \
 	lseek( file_descriptor, offset, whence )
 #endif
-#endif
 
-#if defined( HAVE_WRITE )
 #if defined( WINAPI )
 #define file_io_write( file_descriptor, buffer, size ) \
 	_write( file_descriptor, (const void *) buffer, (unsigned int) size )
 
-#else
+#elif defined( HAVE_WRITE )
 #define file_io_write( file_descriptor, buffer, size ) \
 	write( file_descriptor, (const void *) buffer, size )
 #endif
-#endif
 
-#if defined( HAVE_CLOSE )
 #if defined( WINAPI )
 #define file_io_close( file_descriptor ) \
 	_close( file_descriptor )
 
-#else
+#elif defined( HAVE_CLOSE )
 #define file_io_close( file_descriptor ) \
 	close( file_descriptor )
-#endif
-#endif
-
-#if defined( HAVE_UMASK )
-#if defined( WINAPI )
-#error Unsuported function umask for WINAPI
-
-#else
-#define file_io_umask( mask ) \
-	umask( mask )
-#endif
-#endif
-
-#if defined( HAVE_UNLINK )
-#if defined( WINAPI )
-#error Unsuported function unlink for WINAPI
-
-#else
-#define file_io_unlink( filename ) \
-	unlink( filename )
-#endif
 #endif
 
 #if defined( __cplusplus )

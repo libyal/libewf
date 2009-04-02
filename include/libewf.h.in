@@ -1052,6 +1052,15 @@ LIBEWF_EXTERN int libewf_get_amount_of_header_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values );
 
+/* Retrieves the header value identifier size specified by its index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_header_value_identifier_size(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   size_t *identifier_size );
+
 /* Retrieves the header value identifier specified by its index
  * The strings are encoded in UTF-8
  * The identifier size should include the end of string character
@@ -1062,6 +1071,15 @@ LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    uint32_t index,
                    char *identifier,
                    size_t identifier_size );
+
+/* Retrieves the header value size specified by the identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_header_value_size(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   size_t *value_size );
 
 /* Retrieves the header value specified by the identifier
  * The strings are encoded in UTF-8
@@ -1262,6 +1280,15 @@ LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values );
 
+/* Retrieves the hash value identifier size specified by its index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_hash_value_identifier_size(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   size_t *identifier_size );
+
 /* Retrieves the hash value identifier specified by its index
  * The strings are encoded in UTF-8
  * The identifier size should include the end of string character
@@ -1272,6 +1299,15 @@ LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    uint32_t index,
                    char *identifier,
                    size_t identifier_size );
+
+/* Retrieves the hash value size specified by the identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+LIBEWF_EXTERN int libewf_get_hash_value_size(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   size_t *value_size );
 
 /* Retrieves the hash value specified by the identifier
  * The strings are encoded in UTF-8

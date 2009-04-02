@@ -1,19 +1,8 @@
-Library:
-* improved internal code structure
-* added raw read and write functions that will allow to read
-  'raw' chunk data
-* improved read and write support uses delta segment files
-  no changes are stored in the EWF files use ewfexport to
-  create a set of changed EWF files for EnCase and FTK
-* MD5 calculation no longer part of library
-* added expirimental read/write support for > 2Gb segment files for EnCase 6.7
+library:
+* added support for EnCase 6.12 SHA-1 digest hash
+* update for version 2 of the API
 
-EWF tools:
-* ewfexport no longer writes to stdout per default, default is now export.raw
-  specify '-t -' to write to stdout only for continuous raw output
-
-Platform support:
-* Microsoft Visual Studio 2005 (express) project files have been
-  added to the package
-* Debian package support added
+ewftools:
+* ewfacquire supports \\.\PhysicalDrive# on Windows
+  requires MS Visual Studio build
 

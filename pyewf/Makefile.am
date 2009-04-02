@@ -9,7 +9,7 @@ pyewf_la_SOURCES = \
 	pyewf.c pyewf.h \
 	pyewf_file.c pyewf_file.h
 
-pyewf_la_LIBADD   = ../common/libcommon.la ../libewf/libewf.la
+pyewf_la_LIBADD   = ../libewf/libewf.la
 pyewf_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
 pyewf_la_LDFLAGS  = -module $(PYTHON_LDFLAGS)
 

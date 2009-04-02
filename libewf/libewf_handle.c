@@ -2341,7 +2341,7 @@ ssize_t libewf_handle_write_chunk(
 		               internal_handle->io_handle,
 		               internal_handle->media_values,
 		               internal_handle->offset_table,
-		               internal_handle->segment_table,
+		               internal_handle->delta_segment_table,
 		               internal_handle->header_sections,
 		               internal_handle->io_handle->current_chunk,
 		               chunk_buffer,

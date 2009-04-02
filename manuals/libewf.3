@@ -1,4 +1,4 @@
-.Dd April 1, 2009
+.Dd April 2, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -255,7 +255,11 @@ Meta data functions (APIv1)
 .Ft int
 .Fn libewf_get_amount_of_header_values "libewf_handle_t *handle, uint32_t *amount_of_values"
 .Ft int
+.Fn libewf_get_header_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size"
+.Ft int
 .Fn libewf_get_header_value_identifier "libewf_handle_t *handle, uint32_t index, char *identifier, size_t identifier_size"
+.Ft int
+.Fn libewf_get_header_value_size "libewf_handle_t *handle, const char *identifier, size_t *value_size"
 .Ft int
 .Fn libewf_get_header_value "libewf_handle_t *handle, const char *identifier, char *value, size_t value_size"
 .Ft int
@@ -315,7 +319,11 @@ Meta data functions (APIv1)
 .Ft int
 .Fn libewf_get_amount_of_hash_values "libewf_handle_t *handle, uint32_t *amount_of_values"
 .Ft int
+.Fn libewf_get_hash_value_identifier_size "libewf_handle_t *handle, uint32_t index, size_t *identifier_size"
+.Ft int
 .Fn libewf_get_hash_value_identifier "libewf_handle_t *handle, uint32_t index, char *identifier, size_t identifier_size"
+.Ft int
+.Fn libewf_get_hash_value_size "libewf_handle_t *handle, const char *identifier, size_t *value_size"
 .Ft int
 .Fn libewf_get_hash_value "libewf_handle_t *handle, const char *identifier, char *value, size_t value_size"
 .Ft int

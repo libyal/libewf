@@ -631,7 +631,7 @@ ssize_t device_handle_read_buffer(
 	     (LPDWORD) &read_count,
 	     NULL ) == 0 )
 #else
-	read_count = file_io_read(
+	read_count = read(
 	              device_handle->file_descriptor,
 	              storage_media_buffer->raw_buffer,
 	              read_size );
@@ -669,7 +669,7 @@ ssize_t device_handle_read_buffer(
 	     (LPDWORD) &read_count,
 	     NULL ) == 0 )
 #else
-	read_count = file_io_read(
+	read_count = read(
 	              device_handle->file_descriptor,
 	              buffer,
 	              read_size );
@@ -1118,6 +1118,36 @@ int device_handle_get_bytes_per_sector(
 #endif
 
 	*bytes_per_sector = device_handle->bytes_per_sector;
+
+	return( 1 );
+}
+
+/* Set the read error values in the device handle
+ * Returns 1 if successful or -1 on error
+ */
+int device_handle_set_read_error_values(
+     device_handle_t *device_handle,
+     int8_t read_error_retry,
+     uint32_t byte_error_granularity,
+     uint8_t wipe_block_on_read_error,
+     liberror_error_t **error )
+{
+	static char *function = "device_handle_set_read_error_values";
+
+	if( device_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid device handle.",
+		 function );
+
+		return( -1 );
+	}
+	device_handle->read_error_retry         = read_error_retry;
+	device_handle->byte_error_granularity   = byte_error_granularity;
+	device_handle->wipe_block_on_read_error = wipe_block_on_read_error;
 
 	return( 1 );
 }

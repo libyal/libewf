@@ -2375,6 +2375,42 @@ int libewf_get_amount_of_header_values(
 	return( 1 );
 }
 
+/* Retrieves the header value identifier size specified by its index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_header_value_identifier_size(
+     libewf_handle_t *handle,
+     uint32_t index,
+     size_t *identifier_size )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "libewf_get_header_value_identifier_size";
+	int result              = 0;
+
+	result = libewf_handle_get_header_value_identifier_size(
+	          handle,
+	          index,
+	          identifier_size,
+	          &error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value identifier size.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
 /* Retrieves the header value identifier specified by its index
  * The strings are encoded in UTF-8
  * The identifier size should include the end of string character
@@ -2405,6 +2441,64 @@ int libewf_get_header_value_identifier(
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve header value identifier.",
 		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+/* Retrieves the header value size specified by the identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_header_value_size(
+     libewf_handle_t *handle,
+     const char *identifier,
+     size_t *value_size )
+{
+	liberror_error_t *error  = NULL;
+	static char *function    = "libewf_get_header_value_size";
+	size_t identifier_length = 0;
+	int result               = 0;
+
+	if( identifier == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	identifier_length = narrow_string_length(
+	                     identifier );
+
+	result = libewf_handle_get_header_value_size(
+	          handle,
+	          (uint8_t *) identifier,
+	          identifier_length,
+	          value_size,
+	          &error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve header value size: %s.",
+		 function,
+		 identifier );
 
 		libewf_notify_error_backtrace(
 		 error );
@@ -2632,6 +2726,43 @@ int libewf_get_amount_of_hash_values(
 	return( 1 );
 }
 
+/* Retrieves the hash value identifier size specified by its index
+ * The identifier size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_hash_value_identifier_size(
+     libewf_handle_t *handle,
+     uint32_t index,
+     size_t *identifier_size )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "libewf_get_hash_value_identifier_size";
+	int result              = 0;
+
+	result = libewf_handle_get_hash_value_identifier_size(
+	          handle,
+	          index,
+	          identifier_size,
+	          &error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value identifier size.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+
 /* Retrieves the hash value identifier specified by its index
  * The strings are encoded in UTF-8
  * The identifier size should include the end of string character
@@ -2721,6 +2852,64 @@ int libewf_get_hash_value(
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
 		 "%s: unable to retrieve hash value: %s.",
+		 function,
+		 identifier );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+	}
+	return( result );
+}
+
+/* Retrieves the hash value size specified by the identifier
+ * The value size includes the end of string character
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_get_hash_value_size(
+     libewf_handle_t *handle,
+     const char *identifier,
+     size_t *value_size )
+{
+	liberror_error_t *error  = NULL;
+	static char *function    = "libewf_get_hash_value_size";
+	size_t identifier_length = 0;
+	int result               = 0;
+
+	if( identifier == NULL )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid indentifier.",
+		 function );
+
+		libewf_notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( -1 );
+	}
+	identifier_length = narrow_string_length(
+	                     identifier );
+
+	result = libewf_handle_get_hash_value_size(
+	          handle,
+	          (uint8_t *) identifier,
+	          identifier_length,
+	          value_size,
+	          &error );
+
+	if( result == -1 )
+	{
+		liberror_error_set(
+		 &error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hash value size: %s.",
 		 function,
 		 identifier );
 

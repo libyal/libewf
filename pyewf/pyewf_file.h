@@ -2,6 +2,7 @@
  * File Object definition for libewf Python bindings
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
+ * Copyright (c) 2009, Joachim Metz <forensics@hoffmannbv.nl>
  *
  * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
@@ -27,6 +28,10 @@
 
 #include <common.h>
 #include <types.h>
+
+/* Fix HAVE_FSTAT define in pyport.h
+ */
+#undef HAVE_FSTAT
 
 #include <Python.h>
 

@@ -360,11 +360,21 @@ LIBEWF_EXTERN int libewf_get_amount_of_header_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values );
 
+LIBEWF_EXTERN int libewf_get_header_value_identifier_size(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   size_t *identifier_size );
+
 LIBEWF_EXTERN int libewf_get_header_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
                    char *identifier,
                    size_t identifier_size );
+
+LIBEWF_EXTERN int libewf_get_header_value_size(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   size_t *value_size );
 
 LIBEWF_EXTERN int libewf_get_header_value(
                    libewf_handle_t *handle,
@@ -390,11 +400,21 @@ LIBEWF_EXTERN int libewf_get_amount_of_hash_values(
                    libewf_handle_t *handle,
                    uint32_t *amount_of_values );
 
+LIBEWF_EXTERN int libewf_get_hash_value_identifier_size(
+                   libewf_handle_t *handle,
+                   uint32_t index,
+                   size_t *identifier_size );
+
 LIBEWF_EXTERN int libewf_get_hash_value_identifier(
                    libewf_handle_t *handle,
                    uint32_t index,
                    char *identifier,
                    size_t identifier_size );
+
+LIBEWF_EXTERN int libewf_get_hash_value_size(
+                   libewf_handle_t *handle,
+                   const char *identifier,
+                   size_t *value_size );
 
 LIBEWF_EXTERN int libewf_get_hash_value(
                    libewf_handle_t *handle,

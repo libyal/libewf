@@ -2,6 +2,7 @@
  * File Object definition for libewf Python bindings
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
+ * Copyright (c) 2009, Joachim Metz <forensics@hoffmannbv.nl>
  *
  * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
@@ -23,19 +24,18 @@
  */
 
 #include <common.h>
-#include <character_string.h>
+#include <narrow_string.h>
 #include <memory.h>
-#include <string_conversion.h>
-#include <system_string.h>
+#include <wide_string.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
 
-#if defined( HAVE_STRING_H )
-#include <string.h>
-#endif
+/* Fix HAVE_FSTAT define in pyport.h
+ */
+#undef HAVE_FSTAT
 
 #include <Python.h>
 
@@ -51,12 +51,13 @@ int pyewf_file_initialize(
      PyObject *arguments,
      PyObject *keywords )
 {
-	system_character_t **filenames = NULL;
-	static char *keyword_list[]    = { "files", NULL };
-	PyObject *sequence_object      = NULL;
-	PyObject *string_object        = NULL;
-	int number_of_filenames        = 0;
-	int filename_iterator          = 0;
+	char **filenames            = NULL;
+	static char *keyword_list[] = { "files", NULL };
+	PyObject *sequence_object   = NULL;
+	PyObject *string_object     = NULL;
+	size_t filename_size        = 0;
+	int number_of_filenames     = 0;
+	int filename_iterator       = 0;
 
 	pyewf_file->read_offset = 0;
 	pyewf_file->media_size  = 0;
@@ -91,8 +92,8 @@ int pyewf_file_initialize(
 
 		return( -1 );
 	}
-	filenames = (system_character_t **) memory_allocate(
-	                                     sizeof( system_character_t * ) * number_of_filenames );
+	filenames = (char **) memory_allocate(
+	                       sizeof( char * ) * number_of_filenames );
 
 	if( filenames == NULL )
 	{
@@ -105,7 +106,7 @@ int pyewf_file_initialize(
 	if( memory_set(
 	     filenames,
 	     0,
-	     sizeof( system_character_t * ) * number_of_filenames ) == NULL )
+	     sizeof( char * ) * number_of_filenames ) == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
@@ -122,22 +123,98 @@ int pyewf_file_initialize(
 		                 sequence_object,
 		                 filename_iterator );
 
-		filenames[ filename_iterator ] = system_string_duplicate(
-		                                  PyString_AsString(
-		                                   string_object ),
-		                                   PyString_Size(
-		                                    string_object ) );
+		filename_size = PyString_Size(
+		                 string_object );
+
+		filenames[ filename_iterator ] = (char *) memory_allocate(
+		                                           sizeof( char ) * filename_size );
+
+		if( filenames[ filename_iterator ] == NULL )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "Unable to create filename" );
+
+			for( ; filename_iterator > 0; filename_iterator-- )
+			{
+				memory_free(
+				 filenames[ filename_iterator - 1 ] );
+			}
+			memory_free(
+			 filenames );
+
+			return( -1 );
+		}
+		if( narrow_string_copy(
+		     filenames[ filename_iterator ],
+		     PyString_AsString(
+		      string_object ),
+		     filename_size ) == NULL )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "Unable to set filename" );
+
+			for( ; filename_iterator > 0; filename_iterator-- )
+			{
+				memory_free(
+				 filenames[ filename_iterator - 1 ] );
+			}
+			memory_free(
+			 filenames );
+
+			return( -1 );
+		}
+		( filenames[ filename_iterator ] )[ filename_size - 1 ] = 0;
 
 		Py_DECREF(
 		 string_object );
 	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_initialize(
+	     &( pyewf_file->handle ),
+	     NULL ) != 1 )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "libewf_handle_initialize failed to initialize handle" );
+
+		for( filename_iterator = 0; filename_iterator < number_of_filenames; filename_iterator++ )
+		{
+			memory_free(
+			 filenames[ filename_iterator ] );
+		}
+		memory_free(
+		 filenames );
+
+		return( -1 );
+	}
+	if( libewf_handle_open(
+	     pyewf_file->handle,
+             filenames,
+             number_of_filenames,
+             LIBEWF_OPEN_READ,
+	     NULL ) != 1 )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "libewf_handle_open failed to open file(s)" );
+
+		for( filename_iterator = 0; filename_iterator < number_of_filenames; filename_iterator++ )
+		{
+			memory_free(
+			 filenames[ filename_iterator ] );
+		}
+		memory_free(
+		 filenames );
+
+		return( -1 );
+	}
+#else
 	pyewf_file->handle = libewf_open(
 	                      filenames,
 	                      number_of_filenames,
 	                      LIBEWF_OPEN_READ );
-
-	memory_free(
-	 filenames );
 
 	if( pyewf_file->handle == NULL )
 	{
@@ -145,12 +222,49 @@ int pyewf_file_initialize(
 		 PyExc_IOError,
 		 "libewf_open failed to open file(s)" );
 
+		for( filename_iterator = 0; filename_iterator < number_of_filenames; filename_iterator++ )
+		{
+			memory_free(
+			 filenames[ filename_iterator ] );
+		}
+		memory_free(
+		 filenames );
+
 		return( -1 );
 	}
-	libewf_get_media_size(
-	 pyewf_file->handle,
-	 &( pyewf_file->media_size ) );
+#endif
+	for( filename_iterator = 0; filename_iterator < number_of_filenames; filename_iterator++ )
+	{
+		memory_free(
+		 filenames[ filename_iterator ] );
+	}
+	memory_free(
+	 filenames );
 
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_media_size(
+	     pyewf_file->handle,
+	     &( pyewf_file->media_size ),
+	     NULL ) != 1 )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "libewf_handle_get_media_size failed to retrieve media size" );
+
+		return( -1 );
+	}
+#else
+	if( libewf_get_media_size(
+	     pyewf_file->handle,
+	     &( pyewf_file->media_size ) ) != 1 )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "libewf_get_media_size failed to retrieve media size" );
+
+		return( -1 );
+	}
+#endif
 	return( 0 );
 }
 
@@ -169,13 +283,31 @@ void pyewf_file_free(
 PyObject* pyewf_file_close(
            pyewf_file_t *pyewf_file )
 {
-	if( libewf_close(pyewf_file->handle) != 0 )
+#if defined( HAVE_V2_API )
+	if( libewf_handle_close(
+	     pyewf_file->handle ) != 0 )
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
-		         "libewf_close was unable to close file(s)" ) );
+		         "libewf_handle_close failed to close file(s)" ) );
 	}
-	Py_RETURN_NONE;
+	if( libewf_handle_free(
+	     &( pyewf_file->handle ) ) != 1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_free failed to free handle" ) );
+	}
+#else
+	if( libewf_close(
+	     pyewf_file->handle ) != 0 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_close failed to close file(s)" ) );
+	}
+#endif
+	return( Py_None );
 }
 
 /* Read media data from a pyewf file object
@@ -221,6 +353,23 @@ PyObject* pyewf_file_read(
 	               NULL,
 	               read_size );
 
+#if defined( HAVE_V2_API )
+	read_count = libewf_handle_read_buffer(
+	              pyewf_file->handle,
+	              PyString_AsString(
+	               result_data),
+	              read_size,
+	              NULL );
+
+	if( read_count != (ssize_t) read_size )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_read_buffer failed to read data (requested %" PRId32 ", returned %" PRIzd ")",
+		         read_size,
+		         read_count ) );
+	}
+#else
 	read_count = libewf_read_buffer(
 	              pyewf_file->handle,
 	              PyString_AsString(
@@ -231,10 +380,11 @@ PyObject* pyewf_file_read(
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
-		         "libewf_read failed to read data (requested %" PRId32 ", returned %" PRIzd ")",
+		         "libewf_read_buffer failed to read data (requested %" PRId32 ", returned %" PRIzd ")",
 		         read_size,
 		         read_count ) );
 	}
+#endif
 	pyewf_file->read_offset += read_count;
 
 	return( result_data );
@@ -284,6 +434,18 @@ PyObject* pyewf_file_seek_offset(
 			         "Invalid argument (whence): %d",
 			         whence ) );
 	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_seek_offset(
+	     pyewf_file->handle,
+	     pyewf_file->read_offset ) < 0 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_seek_offset failed (tried to seek to %" PRIu64 " - %" PRIu64 ")",
+		         pyewf_file->read_offset,
+		         pyewf_file->media_size ) );
+	}
+#else
 	if( libewf_seek_offset(
 	     pyewf_file->handle,
 	     pyewf_file->read_offset ) < 0 )
@@ -294,7 +456,8 @@ PyObject* pyewf_file_seek_offset(
 		         pyewf_file->read_offset,
 		         pyewf_file->media_size ) );
 	}
-	Py_RETURN_NONE;
+#endif
+	return( Py_None );
 }
 
 /* Retrieves the current offset in the media data
@@ -305,67 +468,24 @@ PyObject* pyewf_file_get_offset(
 {
 	off64_t current_offset = 0;
 
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_offset(
+	     pyewf_file->handle,
+	     &current_offset,
+	     NULL ) != 1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_get_offset failed to get offset" ) );
+	}
+#else
 	current_offset = libewf_get_offset(
 	                  pyewf_file->handle );
+#endif
 
 	return( PyLong_FromLongLong(
 	         current_offset ) );
 }
-
-/* The following (regular) header values exist:
- *
- * case_number
- * description
- * examinier_name
- * evidence_number
- * notes
- * acquiry_date
- * system_date
- * acquiry_operating_system
- * acquiry_software_version
- * password
- * compression_type
- * model
- * serial_number
- *
- * The following hash values exist
- * 
- * MD5
- * SHA1
- *
- * The following media information is present:
- *
- * sectors per chunk
- * bytes per sector
- * amount of sectors
- * chunk size
- * error granularity
- * compression values
- * media size
- * media type
- * media flags
- * volume type
- * format
- * guid
- * md5 hash
- * segment filename
- * delta segment filename
- * amount of acquiry errors
- * acquiry error
- * amount of crc errors
- * crc error
- * amount of sessions
- * session
- * write amount of chunks
- * 
- */
-
-/* Limit the maximum size of a header value to 128 bytes
- * The same limit ewfinfo currenlty uses
- * There is no limit according to the file format however
- * the tooling (read EnCase) uses an unknown limit smaller than 128 bytes
- */
-#define PYEWF_FILE_HEADER_VALUE_LENGTH	128
 
 /* Retrieves a header value
  * Returns a Python object holding the offset if successful or NULL on error
@@ -373,22 +493,17 @@ PyObject* pyewf_file_get_offset(
 PyObject *pyewf_file_get_header_value(
            pyewf_file_t *pyewf_file,
            PyObject *arguments,
-           PyObject *keywords)
+           PyObject *keywords )
 {
-	character_t header_value[ PYEWF_FILE_HEADER_VALUE_LENGTH ];
+	PyObject *string_object               = NULL;
+	static char *keyword_list[]           = { "identifier", NULL };
+	char *header_value_identifier         = NULL;
+	char *header_value                    = NULL;
+	size_t header_value_size              = 0;
+	int result                            = 0;
 
-	static char *keyword_list[]  = { "identifier", NULL };
-	character_t *safe_identifier = NULL;
-	char *narrow_identifier      = NULL;
-	char *safe_header_value      = NULL;
-	int result                   = 0;
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	character_t identifier[ PYEWF_FILE_HEADER_VALUE_LENGTH ];
-	char narrow_header_value[ PYEWF_FILE_HEADER_VALUE_LENGTH ];
-
-	size_t identifier_length   = 0;
-	size_t header_value_length = 0;
+#if defined( HAVE_V2_API )
+	size_t header_value_identifier_length = 0;
 #endif
 
 	if( PyArg_ParseTupleAndKeywords(
@@ -396,13 +511,23 @@ PyObject *pyewf_file_get_header_value(
 	     keywords,
 	     "s",
 	     keyword_list,
-	     &narrow_identifier ) == 0 )
+	     &header_value_identifier ) == 0 )
 	{
 		return( NULL );
 	}
-	/* This function checks if the header values already have been parsed and
-	 * returns immediately, so it shouldn't hurt to call it every time.
+	/* Make sure the header values are parsed
 	 */
+#if defined( HAVE_V2_API )
+	if( libewf_handle_parse_header_values(
+	     pyewf_file->handle,
+	     LIBEWF_DATE_FORMAT_CTIME,
+	     NULL ) == -1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_parse_header_values failed to parse header values" ) );
+	}
+#else
 	if( libewf_parse_header_values(
 	     pyewf_file->handle,
 	     LIBEWF_DATE_FORMAT_CTIME ) == -1 )
@@ -411,66 +536,109 @@ PyObject *pyewf_file_get_header_value(
 		         PyExc_IOError,
 		         "libewf_parse_header_values failed to parse header values" ) );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	identifier_length = strlen(
-	                     narrow_identifier );
-
-	if( libewf_string_copy_char_to_wchar(
-	     identifier,
-	     narrow_identifier,
-	     identifier_length ) != 1 )
-	{
-		return( PyErr_Format(
-		         PyExc_RuntimeError,
-		         "Unable to create identifier string" ) );
-	}
-	safe_identifier = (character_t *) identifier;
-#else
-	safe_identifier = (character_t *) narrow_identifier;
 #endif
-	result = libewf_get_header_value(
-	          pyewf_file->handle,
-	          safe_identifier,
-	          header_value,
-	          PYEWF_FILE_HEADER_VALUE_LENGTH );
+#if defined( HAVE_V2_API )
+	header_value_identifier_length = narrow_string_length(
+	                                  header_value_identifier );
 
-	if( result == 0 )
-	{
-		/* Header value not present
-		 */
-		return( Py_None );
-	}
-	else if( result == -1 )
+	result = libewf_handle_get_header_value_size(
+	          pyewf_file->handle,
+	          header_value_identifier,
+	          header_value_identifier_length,
+	          &header_value_size,
+	          NULL );
+
+	if( result == -1 )
 	{
 		return( PyErr_Format(
 		         PyExc_IOError,
-	                 "libewf_get_header_value unable to retrieve header value" ) );
+	                 "libewf_handle_get_header_value_size unable to retrieve header value size: %s",
+		         header_value_identifier ) );
 	}
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	header_value_length = string_length(
-	                       header_value );
-
-	if( header_value_length >= PYEWF_FILE_HEADER_VALUE_LENGTH )
-	{
-		return( PyErr_Format(
-		         PyExc_RuntimeError,
-		         "Unable to create safe header value string" ) );
-	}
-	if( libewf_string_copy_wchar_to_char(
-	     narrow_header_value,
-	     header_value,
-	     ( header_value_length + 1 ) ) != 1 )
-	{
-		return( PyErr_Format(
-		         PyExc_RuntimeError,
-		         "Unable to create safe header value string" ) );
-	}
-	safe_header_value = narrow_header_value;
 #else
-	safe_header_value = (char *) header_value;
+	result = libewf_get_header_value_size(
+	          pyewf_file->handle,
+	          header_value_identifier,
+	          &header_value_size );
+
+	if( result == -1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+	                 "libewf_get_header_value_size unable to retrieve header value size: %s",
+		         header_value_identifier ) );
+	}
 #endif
-	return( PyString_FromString(
-	         safe_header_value ) );
+	/* Check if header value is present
+	 */
+	else if( result == 0 )
+	{
+		return( Py_None );
+	}
+	header_value = (char *) memory_allocate(
+	                         sizeof( char ) * header_value_size );
+
+	if( header_value == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "Unable to create header value" );
+
+		return( NULL );
+	}
+#if defined( HAVE_V2_API )
+	result = libewf_handle_get_header_value(
+	          pyewf_file->handle,
+	          header_value_identifier,
+	          header_value_identifier_length,
+	          header_value,
+	          header_value_size,
+	          NULL );
+
+	if( result == -1 )
+	{
+		memory_free(
+		 header_value );
+
+		return( PyErr_Format(
+		         PyExc_IOError,
+	                 "libewf_handle_get_header_value_size unable to retrieve header value: %s",
+		         header_value_identifier ) );
+	}
+#else
+	result = libewf_get_header_value(
+	          pyewf_file->handle,
+	          header_value_identifier,
+	          header_value,
+	          header_value_size );
+
+	if( result == -1 )
+	{
+		memory_free(
+		 header_value );
+
+		return( PyErr_Format(
+		         PyExc_IOError,
+	                 "libewf_get_header_value unable to retrieve header value: %s",
+		         header_value_identifier ) );
+	}
+#endif
+	/* Check if header value is present
+	 */
+	else if( result == 0 )
+	{
+		memory_free(
+		 header_value );
+
+		return( Py_None );
+	}
+	string_object = PyString_FromString(
+	                 header_value );
+
+	memory_free(
+	 header_value );
+
+	return( string_object );
 }
 
 /* Retrieves the header values
@@ -479,40 +647,32 @@ PyObject *pyewf_file_get_header_value(
 PyObject *pyewf_file_get_header_values(
            pyewf_file_t *pyewf_file )
 {
-	character_t header_value[ PYEWF_FILE_HEADER_VALUE_LENGTH ];
+	PyObject *dictionary_object           = NULL;
+	PyObject *string_object               = NULL;
+	char *header_value                    = NULL;
+	char *header_value_identifier         = NULL;
+	uint32_t amount_of_header_values      = 0;
+	uint32_t header_value_iterator        = 0;
+	size_t header_value_size              = 0;
+	size_t header_value_identifier_size   = 0;
 
-	character_t *identifiers[] = { _CHARACTER_T_STRING( "case_number" ),
-	                               _CHARACTER_T_STRING( "description" ),
-	                               _CHARACTER_T_STRING( "examinier_name" ),
-	                               _CHARACTER_T_STRING( "evidence_number" ),
-	                               _CHARACTER_T_STRING( "notes" ),
-	                               _CHARACTER_T_STRING( "acquiry_date" ),
-	                               _CHARACTER_T_STRING( "system_date" ),
-	                               _CHARACTER_T_STRING( "acquiry_operating_system" ),
-	                               _CHARACTER_T_STRING( "acquiry_software_version" ),
-	                               _CHARACTER_T_STRING( "password" ),
-	                               _CHARACTER_T_STRING( "compression_type" ),
-	                               _CHARACTER_T_STRING( "model" ),
-	                               _CHARACTER_T_STRING( "serial_number" ),
-	                               NULL  };
-
-	PyObject *dictionary_object = NULL;
-	PyObject *string_object     = NULL;
-	character_t **identifier    = NULL;
-	char *safe_identifier       = NULL;
-	char *safe_header_value     = NULL;
-
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-	char narrow_identifier[ PYEWF_FILE_HEADER_VALUE_LENGTH ];
-	char narrow_header_value[ PYEWF_FILE_HEADER_VALUE_LENGTH ];
-
-	size_t identifier_length   = 0;
-	size_t header_value_length = 0;
+#if defined( HAVE_V2_API )
+	size_t header_value_identifier_length = 0;
 #endif
 
-	/* This function checks if the header values already have been parsed and
-	 * returns immediately, so it shouldn't hurt to call it every time.
+	/* Make sure the header values are parsed
 	 */
+#if defined( HAVE_V2_API )
+	if( libewf_handle_parse_header_values(
+	     pyewf_file->handle,
+	     LIBEWF_DATE_FORMAT_CTIME,
+	     NULL ) == -1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_parse_header_values failed to parse header values" ) );
+	}
+#else
 	if( libewf_parse_header_values(
 	     pyewf_file->handle,
 	     LIBEWF_DATE_FORMAT_CTIME ) == -1 )
@@ -521,71 +681,177 @@ PyObject *pyewf_file_get_header_values(
 		         PyExc_IOError,
 		         "libewf_parse_header_values failed to parse header values" ) );
 	}
+#endif
+#if defined( HAVE_V2_API )
+	if( libewf_handle_get_amount_of_header_values(
+	     pyewf_file->handle,
+	     &amount_of_header_values ) != 1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_handle_get_amount_of_header_values failed to retrieve amount of header values" ) );
+	}
+#else
+	if( libewf_get_amount_of_header_values(
+	     pyewf_file->handle,
+	     &amount_of_header_values ) != 1 )
+	{
+		return( PyErr_Format(
+		         PyExc_IOError,
+		         "libewf_get_amount_of_header_values failed to retrieve amount of header values" ) );
+	}
+#endif
 	dictionary_object = PyDict_New();
 
-	for( identifier = identifiers; *identifier != NULL; identifier++ )
+	for( header_value_iterator = 0; header_value_iterator < amount_of_header_values; header_value_iterator++ )
 	{
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_header_value_identifier_size(
+		     pyewf_file->handle,
+		     header_value_iterator,
+		     &header_value_identifier_size,
+		     NULL ) != 1 )
+		{
+			return( PyErr_Format(
+				 PyExc_IOError,
+				 "libewf_handle_get_header_value_identifier_size unable to retrieve header value identifier size: %d",
+				 header_value_iterator ) );
+		}
+#else
+		if( libewf_get_header_value_identifier_size(
+		     pyewf_file->handle,
+		     header_value_iterator,
+		     &header_value_identifier_size ) != 1 )
+		{
+			return( PyErr_Format(
+				 PyExc_IOError,
+				 "libewf_get_header_value_identifier_size unable to retrieve header value identifier size: %d",
+				 header_value_iterator ) );
+		}
+#endif
+		header_value_identifier = (char *) memory_allocate(
+		                                    sizeof( char ) * header_value_identifier_size );
+
+		if( header_value_identifier == NULL )
+		{
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "Unable to create header value identifier" );
+
+			return( NULL );
+		}
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_header_value_identifier(
+		     pyewf_file->handle,
+		     header_value_iterator,
+		     header_value_identifier,
+		     header_value_identifier_size,
+		     NULL ) != 1 )
+		{
+			memory_free(
+			 header_value_identifier );
+
+			return( PyErr_Format(
+				 PyExc_IOError,
+				 "libewf_handle_get_header_value_identifier unable to retrieve header value identifier: %d",
+				 header_value_iterator ) );
+		}
+#else
+		if( libewf_get_header_value_identifier(
+		     pyewf_file->handle,
+		     header_value_iterator,
+		     header_value_identifier,
+		     header_value_identifier_size ) != 1 )
+		{
+			memory_free(
+			 header_value_identifier );
+
+			return( PyErr_Format(
+				 PyExc_IOError,
+				 "libewf_get_header_value_identifier unable to retrieve header value identifier: %d",
+				 header_value_iterator ) );
+		}
+#endif
+#if defined( HAVE_V2_API )
+		header_value_identifier_length = narrow_string_length(
+						  header_value_identifier );
+
+		if( libewf_handle_get_header_value_size(
+		     pyewf_file->handle,
+		     header_value_identifier,
+		     header_value_identifier_length,
+		     &header_value_size,
+		     NULL ) != 1 )
+		{
+			memory_free(
+			 header_value_identifier );
+
+			return( PyErr_Format(
+				 PyExc_IOError,
+				 "libewf_handle_get_header_value_size unable to retrieve header value size: %s",
+				 header_value_identifier ) );
+		}
+#else
+		if( libewf_get_header_value_size(
+		     pyewf_file->handle,
+		     header_value_identifier,
+		     &header_value_size ) != 1 )
+		{
+			memory_free(
+			 header_value_identifier );
+
+			return( PyErr_Format(
+				 PyExc_IOError,
+				 "libewf_get_header_value_size unable to retrieve header value size: %s",
+				 header_value_identifier ) );
+		}
+#endif
+		header_value = (char *) memory_allocate(
+		                         sizeof( char ) * header_value_size );
+
+		if( header_value == NULL )
+		{
+			memory_free(
+			 header_value_identifier );
+
+			PyErr_Format(
+			 PyExc_MemoryError,
+			 "Unable to create header value" );
+
+			return( NULL );
+		}
+		/* Ignore emtpy header values
+		 */
+#if defined( HAVE_V2_API )
+		if( libewf_handle_get_header_value(
+		     pyewf_file->handle,
+		     header_value_identifier,
+		     header_value_identifier_length,
+		     header_value,
+		     header_value_size ) == 1 )
+#else
 		if( libewf_get_header_value(
 		     pyewf_file->handle,
-		     *identifier,
+		     header_value_identifier,
 		     header_value,
-		     PYEWF_FILE_HEADER_VALUE_LENGTH ) == 1 )
-		{
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
-			identifier_length = string_length(
-					     *identifier );
-
-			if( identifier_length >= PYEWF_FILE_HEADER_VALUE_LENGTH )
-			{
-				return( PyErr_Format(
-					 PyExc_RuntimeError,
-					 "Unable to create safe identifier string" ) );
-			}
-			if( libewf_string_copy_wchar_to_char(
-			     narrow_identifier,
-			     *identifier,
-			     ( identifier_length + 1 ) ) != 1 )
-			{
-				return( PyErr_Format(
-					 PyExc_RuntimeError,
-					 "Unable to create safe identifier string" ) );
-			}
-			safe_identifier = narrow_identifier;
-
-			header_value_length = string_length(
-					       header_value );
-
-			if( header_value_length >= PYEWF_FILE_HEADER_VALUE_LENGTH )
-			{
-				return( PyErr_Format(
-					 PyExc_RuntimeError,
-					 "Unable to create safe header value string" ) );
-			}
-			if( libewf_string_copy_wchar_to_char(
-			     narrow_header_value,
-			     header_value,
-			     ( header_value_length + 1 ) ) != 1 )
-			{
-				return( PyErr_Format(
-					 PyExc_RuntimeError,
-					 "Unable to create safe header value string" ) );
-			}
-			safe_header_value = narrow_header_value;
-#else
-			safe_identifier   = (char *) *identifier;
-			safe_header_value = (char *) header_value;
+		     header_value_size ) == 1 )
 #endif
+		{
 			string_object = PyString_FromFormat(
-			                 safe_header_value );
+			                 header_value );
 
 			PyDict_SetItemString(
 			 dictionary_object,
-			 safe_identifier,
+			 header_value_identifier,
 			 string_object );
 
 			Py_DECREF(
 			 string_object );
 		}
+		memory_free(
+		 header_value_identifier );
+		memory_free(
+		 header_value );
 	}
 	return( dictionary_object );
 }

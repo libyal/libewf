@@ -2,6 +2,7 @@
  * Python bindings for libewf (pyewf)
  *
  * Copyright (c) 2008, David Collett <david.collett@gmail.com>
+ * Copyright (c) 2009, Joachim Metz <forensics@hoffmannbv.nl>
  *
  * Integration into libewf package by Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations.
@@ -26,6 +27,10 @@
 #define _PYEWF_H
 
 #include <common.h>
+
+/* Fix HAVE_FSTAT define in pyport.h
+ */
+#undef HAVE_FSTAT
 
 #include <Python.h>
 

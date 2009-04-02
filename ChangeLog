@@ -104,6 +104,9 @@ IO abstraction
 * remove libbfio_io_pool from lower levels (libewf_section functions) and pass libbfio_io_handle?
   (no, because pool manages if a file io handle is open or closed)
 
+Python bindings
+* implement error backtrace support in v2 API version
+
 Deployment
 * debian package
   - implement non local libuna and libbfio support like in spec file
@@ -135,6 +138,7 @@ ewftools:
   - read from pipe - what about input size?
   - adjust error granularity if error granularity < process buffer size
   - add resume on error
+  - move ewfacquire_read_buffer to device_handle, list read errors
 * device handle
   - add native Windows support for accessing devices (completed physical drive support)
   - detect removable disk
@@ -190,7 +194,6 @@ Code clean up
 Testing
 * add export unattended to automated tests
 * add encase 6.12 sha1 support to test
-* check buffer size test - EWFCOMMON_BUFFER_SIZE is no longer used
 * check read error handling (linux, mac)
 
 Windows build
@@ -237,15 +240,17 @@ CLOSED
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   no
 
-FIX:
-* missing output file while acquiring ewfacquirestream with block size 32768
-* raw access in ewfexport for export of ewf
-* chunk and crc buffer alignment support
+next beta release:
+* implement chunk and crc buffer alignment support
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
-* fallback to ASCII for unknown locale (cygwin ?)
+* fix raw access in ewfalter/ewfexport
+
+Version: 20090402
+* Worked on pyewf
+* Removed EWFCOMMON_BUFFER_SIZE from tests
 
 Version: 20090401
 * Fixed some small errors in API version 1 legacy support
