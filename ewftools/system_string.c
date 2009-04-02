@@ -136,7 +136,17 @@ int system_string_initialize(
 
 	/* Determine codepage
 	 */
-	if( charset_length == 5 )
+	if( charset_length == 8 )
+	{
+		if( narrow_string_compare(
+		     "US-ASCII",
+		     charset,
+		     8 ) == 0 )
+		{
+			system_string_ascii_codepage = LIBUNA_CODEPAGE_ASCII;
+		}
+	}
+	else if( charset_length == 5 )
 	{
 		if( narrow_string_compare(
 		     "UTF-8",

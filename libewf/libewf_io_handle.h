@@ -62,10 +62,10 @@ struct libewf_io_handle
 	 */
 	int8_t compression_level;
 
-	/* Value to indicate if empty block should be compressed
-	 * even if no compression is used
+	/* Value to indicate certain compression modes
+	 * like empty block compression
 	 */
-	uint8_t compress_empty_block;
+	uint8_t compression_flags;
 };
 
 int libewf_io_handle_initialize(

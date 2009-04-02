@@ -80,6 +80,12 @@ enum LIBEWF_COMPRESSION_LEVELS
 	LIBEWF_COMPRESSION_BEST			= 2,
 };
 
+/* The libewf compression flags
+ * bit 1	set to 1 for emtpy block compression
+ * bit 2-8	not used
+ */
+#define LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK	(uint8_t) 0x01
+
 /* Libewf media type definitions
  */
 enum LIBEWF_MEDIA_TYPES

@@ -210,10 +210,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_write.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_write_io_handle.c"
 				>
 			</File>
@@ -413,10 +409,6 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_values_table.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_write.h"
 				>
 			</File>
 			<File

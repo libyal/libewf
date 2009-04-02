@@ -538,7 +538,7 @@ int libewf_handle_set_error_granularity(
 int libewf_handle_get_compression_values(
      libewf_handle_t *handle,
      int8_t *compression_level,
-     uint8_t *compress_empty_block,
+     uint8_t *compression_flags,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -579,19 +579,19 @@ int libewf_handle_get_compression_values(
 
 		return( -1 );
 	}
-	if( compress_empty_block == NULL )
+	if( compression_flags == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid compress empty block.",
+		 "%s: invalid compression flags.",
 		 function );
 
 		return( -1 );
 	}
-	*compression_level    = internal_handle->io_handle->compression_level;
-	*compress_empty_block = internal_handle->io_handle->compress_empty_block;
+	*compression_level = internal_handle->io_handle->compression_level;
+	*compression_flags = internal_handle->io_handle->compression_flags;
 
 	return( 1 );
 }
@@ -602,7 +602,7 @@ int libewf_handle_get_compression_values(
 int libewf_handle_set_compression_values(
      libewf_handle_t *handle,
      int8_t compression_level,
-     uint8_t compress_empty_block ,
+     uint8_t compression_flags ,
      liberror_error_t **error )
 {
 	libewf_internal_handle_t *internal_handle = NULL;
@@ -658,17 +658,8 @@ int libewf_handle_set_compression_values(
 		return( -1 );
 	}
 	internal_handle->io_handle->compression_level = compression_level;
+	internal_handle->io_handle->compression_flags = compression_flags;
 
-	/* Compress empty block is only useful when no compression is used
-	 */
-	if( compression_level == EWF_COMPRESSION_NONE )
-	{
-		internal_handle->io_handle->compress_empty_block = compress_empty_block;
-	}
-	else
-	{
-		internal_handle->io_handle->compress_empty_block = 0;
-	}
 	return( 1 );
 }
 

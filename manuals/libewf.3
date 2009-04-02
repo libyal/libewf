@@ -1,4 +1,4 @@
-.Dd March 28, 2009
+.Dd April 1, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -349,9 +349,9 @@ Meta data functions (APIv2)
 .Ft int
 .Fn libewf_handle_set_error_granularity "libewf_handle_t *handle, uint32_t error_granularity, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_get_compression_values "libewf_handle_t *handle, int8_t *compression_level, uint8_t *compress_empty_block, libewf_error_t **error"
+.Fn libewf_handle_get_compression_values "libewf_handle_t *handle, int8_t *compression_level, uint8_t *compression_flags, libewf_error_t **error"
 .Ft int
-.Fn libewf_handle_set_compression_values "libewf_handle_t *handle, int8_t compression_level, uint8_t compress_empty_block, libewf_error_t **error"
+.Fn libewf_handle_set_compression_values "libewf_handle_t *handle, int8_t compression_level, uint8_t compression_flags, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_get_media_size "libewf_handle_t *handle, size64_t *media_size, libewf_error_t **error"
 .Ft int

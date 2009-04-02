@@ -34,6 +34,7 @@
 #include "libewf_libbfio.h"
 #include "libewf_media_values.h"
 #include "libewf_notify.h"
+#include "libewf_read_io_handle.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
@@ -691,7 +692,7 @@ ssize_t libewf_write_io_handle_process_chunk(
          libewf_chunk_cache_t *chunk_cache,
          libewf_media_values_t *media_values,
          int8_t compression_level,
-         uint8_t compress_empty_block,
+         uint8_t compression_flags,
          uint8_t ewf_format,
          uint8_t *chunk_data,
          size_t chunk_data_size,
@@ -816,8 +817,7 @@ ssize_t libewf_write_io_handle_process_chunk(
 
 	/* Compress empty blocks if necessary
 	 */
-	if( ( chunk_compression_level == EWF_COMPRESSION_NONE )
-	 && ( compress_empty_block == 1 ) )
+	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
 	{
 		result = libewf_write_io_handle_test_empty_block(
 		          chunk_data,
@@ -837,7 +837,14 @@ ssize_t libewf_write_io_handle_process_chunk(
 		}
 		else if( result == 1 )
 		{
-			chunk_compression_level = EWF_COMPRESSION_DEFAULT;
+			if( chunk_compression_level == EWF_COMPRESSION_NONE )
+			{
+				chunk_compression_level = EWF_COMPRESSION_DEFAULT;
+			}
+		}
+		else
+		{
+		 	chunk_compression_level = EWF_COMPRESSION_NONE;
 		}
 	}
 	/* The compressed data size contains the maximum allowed buffer size on entry
@@ -2302,13 +2309,23 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	return( total_write_count );
 }
 
-#ifdef REFACTOR
 /* Writes a new chunk of data in EWF format from a buffer at the current offset
  * The necessary settings of the write values must have been made
  * Returns the amount of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
-ssize_t libewf_write_chunk_data_new(
-         libewf_internal_handle_t *internal_handle,
+ssize_t libewf_write_io_handle_write_new_chunk_data(
+         libewf_write_io_handle_t *write_io_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_media_values_t *media_values,
+         libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_values_table_t **header_values,
+         libewf_values_table_t *hash_values,
+         libewf_header_sections_t *header_sections,
+         libewf_hash_sections_t *hash_sections,
+         libewf_sector_table_t *sessions,
+         libewf_sector_table_t *acquiry_errors,
+         libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          void *buffer,
          size_t buffer_size,
@@ -2317,7 +2334,7 @@ ssize_t libewf_write_chunk_data_new(
          liberror_error_t **error )
 {
 	uint8_t *chunk_data               = NULL;
-	static char *function             = "libewf_write_chunk_data_new";
+	static char *function             = "libewf_write_io_handle_write_new_chunk_data";
 	ewf_crc_t chunk_crc               = 0;
 	ssize_t chunk_data_size           = 0;
 	ssize_t write_count               = 0;
@@ -2329,46 +2346,46 @@ ssize_t libewf_write_chunk_data_new(
 	int8_t is_compressed              = 0;
 	int8_t write_crc                  = 0;
 
-	if( internal_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
+	if( write_io_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.",
+		 "%s: invalid write io handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->media_values == NULL )
+	if( io_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->write_io_handle == NULL )
+	if( media_values == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing write io handle.",
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_cache == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid chunk cache.",
 		 function );
 
 		return( -1 );
@@ -2390,7 +2407,7 @@ ssize_t libewf_write_chunk_data_new(
 
 		return( -1 );
 	}
-	if( buffer == internal_handle->chunk_cache->compressed )
+	if( buffer == chunk_cache->compressed )
 	{
 		liberror_error_set(
 		 error,
@@ -2411,13 +2428,13 @@ ssize_t libewf_write_chunk_data_new(
 
 	/* Determine the size of data to read
 	 */
-	if( data_size < (size_t) internal_handle->media_values->chunk_size )
+	if( data_size < (size_t) media_values->chunk_size )
 	{
 		read_size = (size_t) data_size;
 	}
 	else
 	{
-		read_size = internal_handle->media_values->chunk_size;
+		read_size = media_values->chunk_size;
 	}
 	if( read_size > (size_t) SSIZE_MAX )
 	{
@@ -2435,9 +2452,9 @@ ssize_t libewf_write_chunk_data_new(
 	 *  or no data was previously copied into the chunk cache
 	 *   and the buffer contains the necessary amount of bytes to fill a chunk
 	 */
-	if( ( buffer == internal_handle->chunk_cache->data )
-	 || ( ( internal_handle->chunk_cache->offset == 0 )
-	 && ( data_size >= (size_t) internal_handle->media_values->chunk_size ) ) )
+	if( ( buffer == chunk_cache->data )
+	 || ( ( chunk_cache->offset == 0 )
+	 && ( data_size >= (size_t) media_values->chunk_size ) ) )
 	{
 		chunk_data = (uint8_t *) buffer;
 		write_size = read_size;
@@ -2447,8 +2464,8 @@ ssize_t libewf_write_chunk_data_new(
 		/* Check if data is present in the chunk cache
 		 * and calculate the amount of data to read from the buffer
 		 */
-		remaining_chunk_size = internal_handle->media_values->chunk_size
-		                     - internal_handle->chunk_cache->offset;
+		remaining_chunk_size = media_values->chunk_size
+		                     - chunk_cache->offset;
 
 		if( read_size > (size_t) remaining_chunk_size )
 		{
@@ -2462,7 +2479,7 @@ ssize_t libewf_write_chunk_data_new(
 #endif
 
 		if( memory_copy(
-		     &internal_handle->chunk_cache->data[ internal_handle->chunk_cache->offset ],
+		     &( chunk_cache->data[ chunk_cache->offset ] ),
 		     buffer,
 		     read_size ) == NULL )
 		{
@@ -2475,18 +2492,18 @@ ssize_t libewf_write_chunk_data_new(
 
 			return( -1 );
 		}
-		internal_handle->chunk_cache->chunk  = chunk;
-		internal_handle->chunk_cache->amount = internal_handle->chunk_cache->offset + read_size;
+		chunk_cache->chunk  = chunk;
+		chunk_cache->amount = chunk_cache->offset + read_size;
 
 		/* Adjust the chunk cache offset
 		 */
-		if( internal_handle->chunk_cache->amount == internal_handle->media_values->chunk_size )
+		if( chunk_cache->amount == media_values->chunk_size )
 		{
-			internal_handle->chunk_cache->offset = 0;
+			chunk_cache->offset = 0;
 		}
-		else if( internal_handle->chunk_cache->amount < internal_handle->media_values->chunk_size )
+		else if( chunk_cache->amount < media_values->chunk_size )
 		{
-			internal_handle->chunk_cache->offset = internal_handle->chunk_cache->amount;
+			chunk_cache->offset = chunk_cache->amount;
 		}
 		else
 		{
@@ -2499,31 +2516,31 @@ ssize_t libewf_write_chunk_data_new(
 
 			return( -1 );
 		}
-		chunk_data = internal_handle->chunk_cache->data;
-		write_size = internal_handle->chunk_cache->amount;
+		chunk_data = chunk_cache->data;
+		write_size = chunk_cache->amount;
 	}
-	if( ( write_size == internal_handle->media_values->chunk_size )
-	 || ( ( internal_handle->media_values->media_size != 0 )
-	  && ( ( write_io_handle->input_write_count + (ssize64_t) write_size ) == (ssize64_t) internal_handle->media_values->media_size ) )
+	if( ( write_size == media_values->chunk_size )
+	 || ( ( media_values->media_size != 0 )
+	  && ( ( write_io_handle->input_write_count + (ssize64_t) write_size ) == (ssize64_t) media_values->media_size ) )
 	 || ( force_write != 0 ) )
 	{
-		chunk_cache_data_used = (int) ( chunk_data == internal_handle->chunk_cache->data );
+		chunk_cache_data_used = (int) ( chunk_data == chunk_cache->data );
 
 		/* The compressed data size contains the maximum allowed buffer size
 		 */
-		compressed_chunk_data_size = internal_handle->chunk_cache->allocated_size;
+		compressed_chunk_data_size = chunk_cache->allocated_size;
 
 		/* Compress the chunk if necessary and determine its CRC
 		 */
 		chunk_data_size = libewf_write_io_handle_process_chunk(
-				   internal_handle->chunk_cache,
-				   internal_handle->media_values,
-				   internal_handle->io_handle->compression_level,
-				   internal_handle->io_handle->compress_empty_block,
-				   internal_handle->io_handle->ewf_format,
+				   chunk_cache,
+				   media_values,
+				   io_handle->compression_level,
+				   io_handle->compression_flags,
+				   io_handle->ewf_format,
 				   chunk_data,
 				   write_size,
-				   internal_handle->chunk_cache->compressed,
+				   chunk_cache->compressed,
 				   &compressed_chunk_data_size,
 				   &is_compressed,
 				   &chunk_crc,
@@ -2542,30 +2559,30 @@ ssize_t libewf_write_chunk_data_new(
 			return( -1 );
 		}
 		/* Make sure to update the chunk_data pointer if
-		 * internal_handle->chunk_cache->data has been reallocated by
+		 * chunk_cache->data has been reallocated by
 		 * libewf_write_io_handle_process_chunk()
 		 */
 		if( ( chunk_cache_data_used == 1 )
-		 && ( chunk_data != internal_handle->chunk_cache->data ) )
+		 && ( chunk_data != chunk_cache->data ) )
 		{
-			chunk_data = internal_handle->chunk_cache->data;
+			chunk_data = chunk_cache->data;
 		}
 		if( is_compressed != 0 )
 		{
-			chunk_data = internal_handle->chunk_cache->compressed;
+			chunk_data = chunk_cache->compressed;
 		}
 		write_count = libewf_write_io_handle_write_new_chunk(
-		               internal_handle->write_io_handle,
-		               internal_handle->io_handle,
-		               internal_handle->media_values,
-		               internal_handle->offset_table,
-		               internal_handle->segment_table,
-		               &( internal_handle->header_values ),
-		               internal_handle->hash_values,
-		               internal_handle->header_sections,
-		               internal_handle->hash_sections,
-		               internal_handle->sessions,
-		               internal_handle->acquiry_errors,
+		               write_io_handle,
+		               io_handle,
+		               media_values,
+		               offset_table,
+		               segment_table,
+		               header_values,
+		               hash_values,
+		               header_sections,
+		               hash_sections,
+		               sessions,
+		               acquiry_errors,
 		               chunk,
 		               chunk_data,
 		               chunk_data_size,
@@ -2596,8 +2613,15 @@ ssize_t libewf_write_chunk_data_new(
  * The necessary settings of the write values must have been made
  * Returns the amount of data bytes written, 0 when no longer bytes can be written or -1 on error
  */
-ssize_t libewf_write_chunk_data_existing(
-         libewf_internal_handle_t *internal_handle,
+ssize_t libewf_write_io_handle_write_existing_chunk_data(
+         libewf_write_io_handle_t *write_io_handle,
+         libewf_read_io_handle_t *read_io_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_media_values_t *media_values,
+         libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *delta_segment_table,
+         libewf_header_sections_t *header_sections,
+         libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          uint32_t chunk_offset,
          void *buffer,
@@ -2606,69 +2630,69 @@ ssize_t libewf_write_chunk_data_existing(
          liberror_error_t **error )
 {
 	uint8_t *chunk_data         = NULL;
-	static char *function       = "libewf_write_chunk_data_existing";
+	static char *function       = "libewf_write_io_handle_write_existing_chunk_data";
 	ewf_crc_t chunk_crc         = 0;
 	size_t remaining_chunk_size = 0;
 	ssize_t read_count          = 0;
 	ssize_t write_count         = 0;
 	size_t write_size           = 0;
 
-	if( internal_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->chunk_cache == NULL )
+	if( write_io_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing chunk cache.",
+		 "%s: invalid write io handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->media_values == NULL )
+	if( io_handle == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->write_io_handle == NULL )
+	if( media_values == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing write io handle.",
+		 "%s: invalid media values.",
 		 function );
 
 		return( -1 );
 	}
-	if( internal_handle->offset_table == NULL )
+	if( offset_table == NULL )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.",
+		 "%s: invalid offset table.",
 		 function );
 
 		return( -1 );
 	}
-	if( chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
+	if( chunk_cache == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid chunk cache.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk >= offset_table->amount_of_chunk_offsets )
 	{
 		liberror_error_set(
 		 error,
@@ -2690,8 +2714,8 @@ ssize_t libewf_write_chunk_data_existing(
 
 		return( -1 );
 	}
-	if( ( buffer == internal_handle->chunk_cache->data )
-	 || ( buffer == internal_handle->chunk_cache->compressed ) )
+	if( ( buffer == chunk_cache->data )
+	 || ( buffer == chunk_cache->compressed ) )
 	{
 		liberror_error_set(
 		 error,
@@ -2723,32 +2747,32 @@ ssize_t libewf_write_chunk_data_existing(
 
 	/* Check if the data size exceeds the chunk size
 	 */
-	if( data_size > (size_t) internal_handle->media_values->chunk_size )
+	if( data_size > (size_t) media_values->chunk_size )
 	{
-		data_size = (size_t) internal_handle->media_values->chunk_size;
+		data_size = (size_t) media_values->chunk_size;
 	}
 	/* Check if the data in the buffer aligns with a chunk
 	 */
 	if( ( chunk_offset == 0 )
-	 && ( data_size == internal_handle->media_values->chunk_size ) )
+	 && ( data_size == media_values->chunk_size ) )
 	{
 		chunk_data = buffer;
-		write_size = (size_t) internal_handle->media_values->chunk_size;
+		write_size = (size_t) media_values->chunk_size;
 	}
 	else
 	{
 		/* Read the chunk data into the chunk cache
 		 */
 		read_count = libewf_read_io_handle_read_chunk_data(
-		              internal_handle->read_io_handle,
-		              file_io_pool,
-		              internal_handle->media_values,
-		              internal_handle->offset_table,
-		              internal_handle->chunk_cache,
+		              read_io_handle,
+		              io_handle,
+		              media_values,
+		              offset_table,
+		              chunk_cache,
 		              chunk,
 		              0,
-		              internal_handle->chunk_cache->data,
-		              internal_handle->chunk_cache->allocated_size,
+		              chunk_cache->data,
+		              chunk_cache->allocated_size,
 		              error );
 
 		if( read_count <= -1 )
@@ -2762,10 +2786,10 @@ ssize_t libewf_write_chunk_data_existing(
 
 			return( -1 );
 		}
-		internal_handle->io_handle->current_chunk_offset = chunk_offset;
+		io_handle->current_chunk_offset = chunk_offset;
 
-		remaining_chunk_size = internal_handle->media_values->chunk_size
-		                     - internal_handle->io_handle->current_chunk_offset;
+		remaining_chunk_size = media_values->chunk_size
+		                     - io_handle->current_chunk_offset;
 
 		if( data_size > (size_t) remaining_chunk_size )
 		{
@@ -2783,7 +2807,7 @@ ssize_t libewf_write_chunk_data_existing(
 		/* Update the chunk data
 		 */
 		if( memory_copy(
-		     &( internal_handle->chunk_cache->data[ chunk_offset ] ),
+		     &( chunk_cache->data[ chunk_offset ] ),
 		     buffer,
 		     data_size ) == NULL )
 		{
@@ -2797,7 +2821,7 @@ ssize_t libewf_write_chunk_data_existing(
 
 			return( -1 );
 		}
-		chunk_data = internal_handle->chunk_cache->data;
+		chunk_data = chunk_cache->data;
 		write_size = (size_t) read_count;
 	}
 	/* Calculate the new CRC
@@ -2808,12 +2832,12 @@ ssize_t libewf_write_chunk_data_existing(
 	             1 );
 
 	write_count = libewf_write_io_handle_write_existing_chunk(
-	               internal_handle->write_io_handle,
-	               internal_handle->io_handle,
-	               internal_handle->media_values,
-	               internal_handle->offset_table,
-	               internal_handle->segment_table,
-	               internal_handle->header_sections,
+	               write_io_handle,
+	               io_handle,
+	               media_values,
+	               offset_table,
+	               delta_segment_table,
+	               header_sections,
 	               chunk,
 	               chunk_data,
 	               write_size,
@@ -2838,5 +2862,4 @@ ssize_t libewf_write_chunk_data_existing(
 	 */
 	return( (ssize_t) data_size );
 }
-#endif
 

@@ -28,10 +28,10 @@
 
 #include <liberror.h>
 
+#include "libewf_definitions.h"
 #include "libewf_handle.h"
 #include "libewf_metadata.h"
 #include "libewf_notify.h"
-#include "libewf_write.h"
 
 #if defined( HAVE_V1_API )
 
@@ -1307,13 +1307,14 @@ int libewf_get_compression_values(
      int8_t *compression_level,
      uint8_t *compress_empty_block )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_get_compression_values";
+	liberror_error_t *error   = NULL;
+	static char *function     = "libewf_get_compression_values";
+	uint8_t compression_flags = 0;
 
 	if( libewf_handle_get_compression_values(
 	     handle,
 	     compression_level,
-	     compress_empty_block,
+	     &compression_flags,
 	     &error ) != 1 )
 	{
 		liberror_error_set(
@@ -1330,6 +1331,14 @@ int libewf_get_compression_values(
 
 		return( -1 );
 	}
+	if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
+	{
+		*compress_empty_block = 1;
+	}
+	else
+	{
+		*compress_empty_block = 0;
+	}
 	return( 1 );
 }
 
@@ -1341,13 +1350,18 @@ int libewf_set_compression_values(
      int8_t compression_level,
      uint8_t compress_empty_block )
 {
-	liberror_error_t *error = NULL;
-	static char *function   = "libewf_set_compression_values";
+	liberror_error_t *error   = NULL;
+	static char *function     = "libewf_set_compression_values";
+	uint8_t compression_flags = 0;
 
+	if( compress_empty_block != 0 )
+	{
+		compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+	}
 	if( libewf_handle_set_compression_values(
 	     handle,
 	     compression_level,
-	     compress_empty_block,
+	     compression_flags,
 	     &error ) != 1 )
 	{
 		liberror_error_set(

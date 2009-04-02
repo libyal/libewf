@@ -52,7 +52,6 @@ libewf_la_SOURCES = \
 	libewf_support.c libewf_support.h \
 	libewf_system_string.h \
 	libewf_values_table.c libewf_values_table.h \
-	libewf_write.c libewf_write.h \
 	libewf_write_io_handle.c libewf_write_io_handle.h
 
 libewf_la_LIBADD  = ../liberror/liberror.la @LIBUNA_LIBADD@ @LIBBFIO_LIBADD@

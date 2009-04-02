@@ -83,20 +83,11 @@ Python bindings
 * rewrite pyewf to match libewf API
 
 API changes
-* change compress empty-block into a compression level (no)
-  - change compress_emtpy_block into a compression flag
-  - allow to set compression level for compress empty block
 * allow for chunk data and CRC alignment (possible performance enhancement)
 * APIv2
-  - add identifier_length to hash_/header_values functions (completed)
-  - change char to uint8_t to prevent mis interpretation of UTF-8 string type (completed)
-  - add get header/hash value size (completed)
-  - rename handle functions to libewf_handle_x (completed)
-  - rename api raw functions to read chunk, read prepare chunk (completed)
   - add error parameter (largely completed)
      libewf_set_notify_values
      libewf_signal_abort
-  - seek offset add whence that supports SEEK_SET, SEEK_END with 0 offset
   - remove write_finalize?
 * low level API
   - add function to retrieve the segment file names and amount?
@@ -106,6 +97,7 @@ API changes
 * libbfio API extension
   - add means to set pools open handle limit in libewf (partial completed)
   - add means to obtain libbio handle of media data in ewf
+  - add means to set narrow string codepage
 * file structure API extension (idea)
 
 IO abstraction
@@ -248,7 +240,6 @@ CLOSED
 FIX:
 * missing output file while acquiring ewfacquirestream with block size 32768
 * raw access in ewfexport for export of ewf
-* refactor libewf_write to libewf_write_io_handle
 * chunk and crc buffer alignment support
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
@@ -258,6 +249,11 @@ FIX:
 
 Version: 20090401
 * Fixed some small errors in API version 1 legacy support
+* changed compress_emtpy_block into a compression flag
+* changed empty block compression behavior for all compression levels
+* add whence SEEK_SET, SEEK_END with 0 offset support to seek_offset
+* refactored libewf_write to libewf_write_io_handle
+* added support for Cygwin US-ASCII character set to system string
 
 Version: 20090330
 * Updated caseless compare functions with WINAPI support

@@ -36,7 +36,6 @@
 #include "libewf_segment_file.h"
 #include "libewf_segment_file_handle.h"
 #include "libewf_string.h"
-#include "libewf_write.h"
 #include "libewf_write_io_handle.h"
 
 #include "ewf_crc.h"
@@ -1552,7 +1551,6 @@ off64_t libewf_handle_seek_offset(
 {
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_seek_offset";
-	off64_t current_offset                    = 0;
 	uint64_t chunk                            = 0;
 	uint64_t chunk_offset                     = 0;
 
@@ -1580,8 +1578,9 @@ off64_t libewf_handle_seek_offset(
 
 		return( -1 );
 	}
-	/* TODO implement SEEK_CUR, SEEK_END */
-	if( whence != SEEK_SET )
+	if( ( whence != SEEK_CUR )
+	 && ( whence != SEEK_END )
+	 && ( whence != SEEK_SET ) )
 	{
 		liberror_error_set(
 		 error,
@@ -1592,12 +1591,14 @@ off64_t libewf_handle_seek_offset(
 
 		return( -1 );
 	}
-	current_offset = ( internal_handle->media_values->chunk_size * internal_handle->io_handle->current_chunk )
-	               + internal_handle->io_handle->current_chunk_offset;
-
 	if( whence == SEEK_CUR )
 	{	
-		offset += current_offset;
+		offset += (off64_t) ( ( internal_handle->media_values->chunk_size * internal_handle->io_handle->current_chunk )
+		                      + internal_handle->io_handle->current_chunk_offset );
+	}
+	else if( whence == SEEK_END )
+	{	
+		offset += (off64_t) internal_handle->media_values->media_size;
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libewf_notify_verbose_printf(
@@ -2164,8 +2165,8 @@ ssize_t libewf_handle_prepare_write_chunk(
 	chunk_data_size = libewf_write_io_handle_process_chunk(
 	                   internal_handle->chunk_cache,
 	                   internal_handle->media_values,
-	                   internal_handle->io_handle->compress_empty_block,
-	                   internal_handle->io_handle->compress_empty_block,
+	                   internal_handle->io_handle->compression_level,
+	                   internal_handle->io_handle->compression_flags,
 	                   internal_handle->io_handle->ewf_format,
 	                   (uint8_t *) chunk_buffer,
 	                   chunk_buffer_size,
@@ -2549,8 +2550,15 @@ ssize_t libewf_handle_write_buffer(
 
 				return( -1 );
 			}
-			write_count = libewf_write_chunk_data_existing(
-			               internal_handle,
+			write_count = libewf_write_io_handle_write_existing_chunk_data(
+			               internal_handle->write_io_handle,
+			               internal_handle->read_io_handle,
+			               internal_handle->io_handle,
+			               internal_handle->media_values,
+			               internal_handle->offset_table,
+			               internal_handle->delta_segment_table,
+			               internal_handle->header_sections,
+			               internal_handle->chunk_cache,
 			               internal_handle->io_handle->current_chunk,
 			               internal_handle->io_handle->current_chunk_offset,
 			               (void *) &( (uint8_t *) buffer )[ total_write_count ],
@@ -2560,8 +2568,19 @@ ssize_t libewf_handle_write_buffer(
 		}
 		else
 		{
-			write_count = libewf_write_chunk_data_new(
-			               internal_handle,
+			write_count = libewf_write_io_handle_write_new_chunk_data(
+			               internal_handle->write_io_handle,
+			               internal_handle->io_handle,
+			               internal_handle->media_values,
+			               internal_handle->offset_table,
+			               internal_handle->segment_table,
+			               &( internal_handle->header_values ),
+			               internal_handle->hash_values,
+			               internal_handle->header_sections,
+			               internal_handle->hash_sections,
+			               internal_handle->sessions,
+			               internal_handle->acquiry_errors,
+			               internal_handle->chunk_cache,
 			               internal_handle->io_handle->current_chunk,
 			               (void *) &( (uint8_t *) buffer )[ total_write_count ],
 			               size,
@@ -2784,8 +2803,19 @@ ssize_t libewf_handle_write_finalize(
 		 internal_handle->chunk_cache->amount );
 #endif
 
-		write_count = libewf_write_chunk_data_new(
-		               internal_handle,
+		write_count = libewf_write_io_handle_write_new_chunk_data(
+		               internal_handle->write_io_handle,
+		               internal_handle->io_handle,
+		               internal_handle->media_values,
+		               internal_handle->offset_table,
+		               internal_handle->segment_table,
+		               &( internal_handle->header_values ),
+		               internal_handle->hash_values,
+		               internal_handle->header_sections,
+		               internal_handle->hash_sections,
+		               internal_handle->sessions,
+		               internal_handle->acquiry_errors,
+		               internal_handle->chunk_cache,
 		               internal_handle->io_handle->current_chunk,
 		               internal_handle->chunk_cache->data,
 		               internal_handle->chunk_cache->amount,

@@ -81,13 +81,13 @@ LIBEWF_EXTERN int libewf_handle_set_error_granularity(
 LIBEWF_EXTERN int libewf_handle_get_compression_values(
                    libewf_handle_t *handle,
                    int8_t *compression_level,
-                   uint8_t *compress_empty_block,
+                   uint8_t *compression_flags,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_set_compression_values(
                    libewf_handle_t *handle,
                    int8_t compression_level,
-                   uint8_t compress_empty_block,
+                   uint8_t compression_flags,
                    liberror_error_t **error );
 
 LIBEWF_EXTERN int libewf_handle_get_media_size(

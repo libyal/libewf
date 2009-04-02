@@ -33,6 +33,7 @@
 #include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
+#include "libewf_read_io_handle.h"
 #include "libewf_sector_table.h"
 #include "libewf_segment_table.h"
 #include "libewf_values_table.h"
@@ -207,7 +208,7 @@ ssize_t libewf_write_io_handle_process_chunk(
          libewf_chunk_cache_t *chunk_cache,
          libewf_media_values_t *media_values,
          int8_t compression_level,
-         uint8_t compress_empty_block,
+         uint8_t compression_flags,
          uint8_t ewf_format,
          uint8_t *chunk_data,
          size_t chunk_data_size,
@@ -255,9 +256,19 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          int8_t write_crc,
          liberror_error_t **error );
 
-#ifdef REFACTOR
-ssize_t libewf_write_chunk_data_new(
-         libewf_internal_handle_t *internal_handle,
+ssize_t libewf_write_io_handle_write_new_chunk_data(
+         libewf_write_io_handle_t *write_io_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_media_values_t *media_values,
+         libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *segment_table,
+         libewf_values_table_t **header_values,
+         libewf_values_table_t *hash_values,
+         libewf_header_sections_t *header_sections,
+         libewf_hash_sections_t *hash_sections,
+         libewf_sector_table_t *sessions,
+         libewf_sector_table_t *acquiry_errors,
+         libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          void *buffer,
          size_t buffer_size,
@@ -265,15 +276,21 @@ ssize_t libewf_write_chunk_data_new(
          int8_t force_write,
          liberror_error_t **error );
 
-ssize_t libewf_write_chunk_data_existing(
-         libewf_internal_handle_t *internal_handle,
+ssize_t libewf_write_io_handle_write_existing_chunk_data(
+         libewf_write_io_handle_t *write_io_handle,
+         libewf_read_io_handle_t *read_io_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_media_values_t *media_values,
+         libewf_offset_table_t *offset_table,
+         libewf_segment_table_t *delta_segment_table,
+         libewf_header_sections_t *header_sections,
+         libewf_chunk_cache_t *chunk_cache,
          uint32_t chunk,
          uint32_t chunk_offset,
          void *buffer,
          size_t buffer_size,
          size_t data_size,
          liberror_error_t **error );
-#endif
 
 #if defined( __cplusplus )
 }
