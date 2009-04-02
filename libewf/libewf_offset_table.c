@@ -28,6 +28,7 @@
 #include <liberror.h>
 
 #include "libewf_definitions.h"
+#include "libewf_libbfio.h"
 #include "libewf_list_type.h"
 #include "libewf_notify.h"
 #include "libewf_offset_table.h"
@@ -1373,7 +1374,7 @@ int libewf_offset_table_compare_last_offset(
 off64_t libewf_offset_table_seek_chunk_offset(
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          liberror_error_t **error )
 {
 	static char *function = "libewf_segment_table_seek_chunk_offset";
@@ -1425,7 +1426,7 @@ off64_t libewf_offset_table_seek_chunk_offset(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_seek_offset(
+	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     offset_table->chunk_offset[ chunk ].segment_file_handle->file_io_pool_entry,
 	     offset_table->chunk_offset[ chunk ].file_offset,

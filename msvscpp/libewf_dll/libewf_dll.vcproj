@@ -38,8 +38,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libewf;..\zlib\include"
-				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;LIBEWF_DLL_EXPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\..\libewf;..\zlib\include"
+				PreprocessorDefinitions="_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_EXPORT"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				CompileAs="1"
@@ -114,19 +114,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_file.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_handle.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_pool.c"
+				RelativePath="..\..\libewf\libewf_error.c"
 				>
 			</File>
 			<File
@@ -154,7 +142,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_interface.c"
+				RelativePath="..\..\libewf\libewf_io_handle.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_legacy.c"
 				>
 			</File>
 			<File
@@ -166,6 +158,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_metadata.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_notify.c"
 				>
 			</File>
@@ -174,7 +170,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_read.c"
+				RelativePath="..\..\libewf\libewf_read_io_handle.c"
 				>
 			</File>
 			<File
@@ -217,6 +213,10 @@
 				RelativePath="..\..\libewf\libewf_write.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_write_io_handle.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -236,7 +236,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\ewf_digest_hash.h"
+				RelativePath="..\..\libewf\ewf_digest.h"
 				>
 			</File>
 			<File
@@ -312,22 +312,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_file.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_handle.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\libewf\libewf_file_io_pool.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\libewf\libewf_filename.h"
 				>
 			</File>
@@ -352,7 +336,15 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_interface.h"
+				RelativePath="..\..\libewf\libewf_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_legacy.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_libbfio.h"
 				>
 			</File>
 			<File
@@ -368,6 +360,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libewf\libewf_metadata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libewf\libewf_notify.h"
 				>
 			</File>
@@ -376,7 +372,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\libewf\libewf_read.h"
+				RelativePath="..\..\libewf\libewf_read_io_handle.h"
 				>
 			</File>
 			<File
@@ -421,6 +417,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libewf\libewf_write.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libewf\libewf_write_io_handle.h"
 				>
 			</File>
 		</Filter>

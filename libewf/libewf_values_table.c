@@ -27,7 +27,6 @@
 #include <wide_string.h>
 
 #include "libewf_definitions.h"
-#include "libewf_string.h"
 #include "libewf_values_table.h"
 
 /* Initializes the values table
@@ -66,7 +65,7 @@ int libewf_values_table_initialize(
 	}
 	if( *values_table == NULL )
 	{
-		values_table_string_size = amount_of_values * sizeof( libewf_character_t * );
+		values_table_string_size = amount_of_values * sizeof( uint8_t * );
 
 		if( values_table_string_size > (size_t) SSIZE_MAX )
 		{
@@ -106,8 +105,8 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
-		( *values_table )->identifier = (libewf_character_t **) memory_allocate(
-		                                                         values_table_string_size );
+		( *values_table )->identifier = (uint8_t **) memory_allocate(
+		                                              values_table_string_size );
 
 		if( ( *values_table )->identifier == NULL )
 		{
@@ -182,8 +181,8 @@ int libewf_values_table_initialize(
 
 			return( -1 );
 		}
-		( *values_table )->value = (libewf_character_t **) memory_allocate(
-		                                                    values_table_string_size );
+		( *values_table )->value = (uint8_t **) memory_allocate(
+		                                         values_table_string_size );
 
 		if( ( *values_table )->value == NULL )
 		{
@@ -380,7 +379,7 @@ int libewf_values_table_resize(
 	}
 	if( values_table->amount_of_values < amount_of_values )
 	{
-		values_table_string_size = amount_of_values * sizeof( libewf_character_t * );
+		values_table_string_size = amount_of_values * sizeof( uint8_t * );
 
 		if( values_table_string_size > (ssize_t) SSIZE_MAX )
 		{
@@ -421,12 +420,12 @@ int libewf_values_table_resize(
 
 			return( -1 );
 		}
-		values_table->identifier = (libewf_character_t **) reallocation;
+		values_table->identifier = (uint8_t **) reallocation;
 
 		if( memory_set(
 		     &( values_table->identifier[ values_table->amount_of_values ] ),
 		     0,
-		     sizeof( libewf_character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
+		     sizeof( uint8_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -483,12 +482,12 @@ int libewf_values_table_resize(
 
 			return( -1 );
 		}
-		values_table->value = (libewf_character_t **) reallocation;
+		values_table->value = (uint8_t **) reallocation;
 
 		if( memory_set(
 		     &( values_table->value[ values_table->amount_of_values ] ),
 		     0,
-		     sizeof( libewf_character_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
+		     sizeof( uint8_t * ) * ( amount_of_values - values_table->amount_of_values ) ) == NULL )
 		{
 			liberror_error_set(
 			 error,
@@ -540,7 +539,7 @@ int libewf_values_table_resize(
  */
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
      int *index,
      liberror_error_t **error )
@@ -644,9 +643,9 @@ int libewf_values_table_get_index(
 		{
 			continue;
 		}
-		if( libewf_string_compare(
-		     identifier,
-		     values_table->identifier[ values_table_iterator ],
+		if( narrow_string_compare(
+		     (char *) identifier,
+		     (char *) values_table->identifier[ values_table_iterator ],
 		     identifier_length ) == 0 )
 		{
 			*index = values_table_iterator;
@@ -657,13 +656,91 @@ int libewf_values_table_get_index(
 	return( 0 );
 }
 
+/* Retrieves an identifiers size in the values table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_values_table_get_identifier_size(
+     libewf_values_table_t *values_table,
+     int index,
+     size_t *identifier_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_values_table_get_identifier_size";
+
+	if( values_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid values table.",
+		 function );
+
+		return( -1 );
+	}
+	if( identifier_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid identifier size.",
+		 function );
+
+		return( -1 );
+	}
+	if( values_table->amount_of_values == 0 )
+	{
+		return( 0 );
+	}
+	if( ( index < 0 )
+	 || ( index >= values_table->amount_of_values ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: index out of range.\n",
+		 function );
+
+		return( -1 );
+	}
+	if( values_table->identifier[ index ] == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing identifier for index: %d.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	if( values_table->identifier_length[ index ] == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing identifier size for length: %d.",
+		 function,
+		 index );
+
+		return( -1 );
+	}
+	*identifier_size = values_table->identifier_length[ index ] + 1;
+
+	return( 1 );
+}
+
 /* Retrieves an identifier in the values table
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
-     libewf_character_t *identifier,
+     uint8_t *identifier,
      size_t identifier_size,
      liberror_error_t **error )
 {
@@ -710,7 +787,14 @@ int libewf_values_table_get_identifier(
 	if( ( index < 0 )
 	 || ( index >= values_table->amount_of_values ) )
 	{
-		return( 0 );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: index out of range.\n",
+		 function );
+
+		return( -1 );
 	}
 	if( values_table->identifier[ index ] == NULL )
 	{
@@ -749,9 +833,9 @@ int libewf_values_table_get_identifier(
 
 		return( -1 );
 	}
-	if( libewf_string_copy(
-	     identifier,
-	     values_table->identifier[ index ],
+	if( narrow_string_copy(
+	     (char *) identifier,
+	     (char *) values_table->identifier[ index ],
 	     values_table->identifier_length[ index ] ) == NULL )
 	{
 		liberror_error_set(
@@ -775,7 +859,7 @@ int libewf_values_table_get_identifier(
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
      liberror_error_t **error )
 {
@@ -855,8 +939,8 @@ int libewf_values_table_set_identifier(
 	}
 	values_table->identifier_length[ index ] = identifier_length;
 
-	values_table->identifier[ index ] = (libewf_character_t *) memory_allocate(
-							            sizeof( libewf_character_t ) * ( values_table->identifier_length[ index ] + 1 ) );
+	values_table->identifier[ index ] = (uint8_t *) memory_allocate(
+							 sizeof( uint8_t ) * ( values_table->identifier_length[ index ] + 1 ) );
 
 	if( values_table->identifier[ index ] == NULL )
 	{
@@ -869,9 +953,9 @@ int libewf_values_table_set_identifier(
 
 		return( -1 );
 	}
-	if( libewf_string_copy(
-	     values_table->identifier[ index ],
-	     identifier,
+	if( narrow_string_copy(
+	     (char *) values_table->identifier[ index ],
+	     (char *) identifier,
 	     identifier_length ) == NULL )
 	{
 		liberror_error_set(
@@ -894,14 +978,72 @@ int libewf_values_table_set_identifier(
 	return( 1 );
 }
 
+/* Retrieves a values size in the values table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_values_table_get_value_size(
+     libewf_values_table_t *values_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *value_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_values_table_get_value_size";
+	int index             = 0;
+	int result            = 0;
+
+	if( value_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value size.",
+		 function );
+
+		return( -1 );
+	}
+	result = libewf_values_table_get_index(
+	          values_table,
+	          identifier,
+	          identifier_length,
+	          &index,
+	          error );
+
+	if( result <= -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to find index for: %s.",
+		 function,
+		 (char *) identifier );
+
+		return( -1 );
+	}
+	else if( result == 0 )
+	{
+		return( 0 );
+	}
+	if( ( values_table->value[ index ] == NULL )
+	 || ( values_table->value_length[ index ] == 0 ) )
+	{
+		return( 0 );
+	}
+	*value_size = values_table->value_length[ index ] + 1;
+
+	return( 1 );
+}
+
 /* Retrieves a value in the values table
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
-     libewf_character_t *value,
+     uint8_t *value,
      size_t value_size,
      liberror_error_t **error )
 {
@@ -973,9 +1115,9 @@ int libewf_values_table_get_value(
 
 		return( -1 );
 	}
-	if( libewf_string_copy(
-	     value,
-	     values_table->value[ index ],
+	if( narrow_string_copy(
+	     (char *) value,
+	     (char *) values_table->value[ index ],
 	     values_table->value_length[ index ] ) == NULL )
 	{
 		liberror_error_set(
@@ -998,9 +1140,9 @@ int libewf_values_table_get_value(
  */
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
-     const libewf_character_t *value,
+     const uint8_t *value,
      size_t value_length,
      liberror_error_t **error )
 {
@@ -1083,8 +1225,8 @@ int libewf_values_table_set_value(
 		}
 		values_table->value_length[ index ] = value_length;
 
-		values_table->value[ index ] = (libewf_character_t *) memory_allocate(
-		                                                       sizeof( libewf_character_t ) * ( values_table->value_length[ index ] + 1 ) );
+		values_table->value[ index ] = (uint8_t *) memory_allocate(
+		                                            sizeof( uint8_t ) * ( values_table->value_length[ index ] + 1 ) );
 
 		if( values_table->value[ index ] == NULL )
 		{
@@ -1097,9 +1239,9 @@ int libewf_values_table_set_value(
 
 			return( -1 );
 		}
-		if( libewf_string_copy(
-		     values_table->value[ index ],
-		     value,
+		if( narrow_string_copy(
+		     (char *) values_table->value[ index ],
+		     (char *) value,
 		     value_length ) == NULL )
 		{
 			liberror_error_set(

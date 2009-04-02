@@ -34,6 +34,7 @@
 #include "libewf_compression.h"
 #include "libewf_debug.h"
 #include "libewf_header_values.h"
+#include "libewf_libbfio.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
 
@@ -96,7 +97,7 @@ int libewf_section_test_zero(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_start_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t section_start_offset,
          ewf_section_t *section,
@@ -153,7 +154,7 @@ ssize_t libewf_section_start_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) section,
@@ -254,7 +255,7 @@ ssize_t libewf_section_start_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_start_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t segment_file_offset,
          uint8_t *section_type,
@@ -394,7 +395,7 @@ ssize_t libewf_section_start_write(
 	 calculated_crc );
 #endif
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &section,
@@ -419,7 +420,7 @@ ssize_t libewf_section_start_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_compressed_string_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t compressed_string_size,
          uint8_t **uncompressed_string,
@@ -492,7 +493,7 @@ ssize_t libewf_section_compressed_string_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              compressed_string,
@@ -602,7 +603,7 @@ ssize_t libewf_section_compressed_string_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_write_compressed_string(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t segment_file_offset,
          uint8_t *section_type,
@@ -758,7 +759,7 @@ ssize_t libewf_section_write_compressed_string(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               compressed_string,
@@ -806,7 +807,7 @@ ssize_t libewf_section_write_compressed_string(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_header_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_header,
@@ -930,7 +931,7 @@ ssize_t libewf_section_header_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_header_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *header,
          size_t header_size,
@@ -952,7 +953,7 @@ ssize_t libewf_section_header_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -1014,7 +1015,7 @@ ssize_t libewf_section_header_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_header2_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_header2,
@@ -1138,7 +1139,7 @@ ssize_t libewf_section_header2_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_header2_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *header2,
          size_t header2_size,
@@ -1160,7 +1161,7 @@ ssize_t libewf_section_header2_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -1222,7 +1223,7 @@ ssize_t libewf_section_header2_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_s01_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
          uint8_t *format,
@@ -1281,7 +1282,7 @@ ssize_t libewf_section_volume_s01_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) volume,
@@ -1375,7 +1376,7 @@ ssize_t libewf_section_volume_s01_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_volume_s01_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
          uint8_t format,
@@ -1413,7 +1414,7 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -1532,7 +1533,7 @@ ssize_t libewf_section_volume_s01_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) volume,
@@ -1581,7 +1582,7 @@ ssize_t libewf_section_volume_s01_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_e01_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
          int8_t *compression_level,
@@ -1640,7 +1641,7 @@ ssize_t libewf_section_volume_e01_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) volume,
@@ -1766,7 +1767,7 @@ ssize_t libewf_section_volume_e01_read(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_e01_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
          int8_t compression_level,
@@ -1805,7 +1806,7 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -1953,7 +1954,7 @@ ssize_t libewf_section_volume_e01_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) volume,
@@ -2002,7 +2003,7 @@ ssize_t libewf_section_volume_e01_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_volume_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          libewf_media_values_t *media_values,
@@ -2165,7 +2166,7 @@ ssize_t libewf_section_volume_read(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_table_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint32_t media_amount_of_chunks,
@@ -2239,7 +2240,7 @@ ssize_t libewf_section_table_read(
 
 		return( -1 );
 	}
-	section_read_count = libewf_file_io_pool_read(
+	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
 	                      (uint8_t *) &table,
@@ -2347,7 +2348,7 @@ ssize_t libewf_section_table_read(
 
 			return( -1 );
 		}
-		read_count = libewf_file_io_pool_read(
+		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              (uint8_t *) offsets,
@@ -2381,7 +2382,7 @@ ssize_t libewf_section_table_read(
 			                  offsets_size,
 			                  1 );
 
-			read_count = libewf_file_io_pool_read(
+			read_count = libbfio_pool_read(
 			              file_io_pool,
 			              segment_file_handle->file_io_pool_entry,
 			              stored_crc_buffer,
@@ -2492,7 +2493,7 @@ ssize_t libewf_section_table_read(
 			 "%s: unexpected data found after table offsets.\n",
 			 function );
 		}
-		if( libewf_file_io_pool_seek_offset(
+		if( libbfio_pool_seek_offset(
 		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     section_size - section_read_count,
@@ -2519,7 +2520,7 @@ ssize_t libewf_section_table_read(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_table2_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint32_t media_amount_of_chunks,
@@ -2593,7 +2594,7 @@ ssize_t libewf_section_table2_read(
 
 		return( -1 );
 	}
-	section_read_count = libewf_file_io_pool_read(
+	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
 	                      (uint8_t *) &table,
@@ -2701,7 +2702,7 @@ ssize_t libewf_section_table2_read(
 
 			return( -1 );
 		}
-		read_count = libewf_file_io_pool_read(
+		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              (uint8_t *) offsets,
@@ -2735,7 +2736,7 @@ ssize_t libewf_section_table2_read(
 			                  offsets_size,
 			                  1 );
 
-			read_count = libewf_file_io_pool_read(
+			read_count = libbfio_pool_read(
 			              file_io_pool,
 			              segment_file_handle->file_io_pool_entry,
 			              stored_crc_buffer,
@@ -2841,7 +2842,7 @@ ssize_t libewf_section_table2_read(
 			 "%s: unexpected data found after table offsets.\n",
 			 function );
 		}
-		if( libewf_file_io_pool_seek_offset(
+		if( libbfio_pool_seek_offset(
 		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     section_size - section_read_count,
@@ -2868,7 +2869,7 @@ ssize_t libewf_section_table2_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_table_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          off64_t base_offset,
          ewf_table_offset_t *offsets,
@@ -2926,7 +2927,7 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -3008,7 +3009,7 @@ ssize_t libewf_section_table_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &table,
@@ -3028,7 +3029,7 @@ ssize_t libewf_section_table_write(
 	}
 	section_write_count += write_count;
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) offsets,
@@ -3054,7 +3055,7 @@ ssize_t libewf_section_table_write(
 		 calculated_crc_buffer,
 		 calculated_crc );
 
-		write_count = libewf_file_io_pool_write(
+		write_count = libbfio_pool_write(
 		               file_io_pool,
 		               segment_file_handle->file_io_pool_entry,
 	        	       calculated_crc_buffer,
@@ -3100,7 +3101,7 @@ ssize_t libewf_section_table_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize64_t libewf_section_sectors_read(
-           libewf_file_io_pool_t *file_io_pool,
+           libbfio_pool_t *file_io_pool,
            libewf_segment_file_handle_t *segment_file_handle,
            size64_t section_size,
            uint8_t ewf_format,
@@ -3140,7 +3141,7 @@ ssize64_t libewf_section_sectors_read(
 	}
 	/* Skip the chunk data within the section
 	 */
-	if( libewf_file_io_pool_seek_offset(
+	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     section_size,
@@ -3164,7 +3165,7 @@ ssize64_t libewf_section_sectors_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_sectors_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size64_t sectors_data_size,
          uint8_t no_section_append,
@@ -3187,7 +3188,7 @@ ssize_t libewf_section_sectors_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -3249,7 +3250,7 @@ ssize_t libewf_section_sectors_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_ltree_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t *ewf_format,
@@ -3317,7 +3318,7 @@ ssize_t libewf_section_ltree_read(
 
 		return( -1 );
 	}
-	section_read_count = libewf_file_io_pool_read(
+	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
 	                      (uint8_t *) ltree,
@@ -3375,7 +3376,7 @@ ssize_t libewf_section_ltree_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              ltree_data,
@@ -3429,7 +3430,7 @@ ssize_t libewf_section_ltree_read(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_session_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
          libewf_sector_table_t *sessions,
@@ -3502,7 +3503,7 @@ ssize_t libewf_section_session_read(
 		 "%s: EWF-S01 format should not contain session section.\n",
 		 function );
 	}
-	section_read_count = libewf_file_io_pool_read(
+	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
 	                      (uint8_t *) &ewf_session,
@@ -3572,7 +3573,7 @@ ssize_t libewf_section_session_read(
 
 			return( -1 );
 		}
-		read_count = libewf_file_io_pool_read(
+		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              (uint8_t *) ewf_sessions,
@@ -3600,7 +3601,7 @@ ssize_t libewf_section_session_read(
 		                  ewf_sessions_size,
 		                  1 );
 
-		read_count = libewf_file_io_pool_read(
+		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              stored_crc_buffer,
@@ -3711,7 +3712,7 @@ ssize_t libewf_section_session_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_session_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_sector_table_t *sessions,
          liberror_error_t **error )
@@ -3753,7 +3754,7 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -3847,7 +3848,7 @@ ssize_t libewf_section_session_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &ewf_session,
@@ -3870,7 +3871,7 @@ ssize_t libewf_section_session_write(
 	}
 	section_write_count += write_count;
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) ewf_sessions,
@@ -3897,7 +3898,7 @@ ssize_t libewf_section_session_write(
 	 calculated_crc_buffer,
 	 calculated_crc );
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
  	               calculated_crc_buffer,
@@ -3942,7 +3943,7 @@ ssize_t libewf_section_session_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_data_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          libewf_media_values_t *media_values,
@@ -4013,7 +4014,7 @@ ssize_t libewf_section_data_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) data,
@@ -4249,7 +4250,7 @@ ssize_t libewf_section_data_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_data_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_media_values_t *media_values,
          int8_t compression_level,
@@ -4299,7 +4300,7 @@ ssize_t libewf_section_data_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -4429,7 +4430,7 @@ ssize_t libewf_section_data_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) *cached_data_section,
@@ -4475,7 +4476,7 @@ ssize_t libewf_section_data_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_error2_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_sector_table_t *acquiry_errors,
          size_t section_size,
@@ -4535,7 +4536,7 @@ ssize_t libewf_section_error2_read(
 		 "%s: EWF-S01 format should not contain error2 section.\n",
 		 function );
 	}
-	section_read_count = libewf_file_io_pool_read(
+	section_read_count = libbfio_pool_read(
 	                      file_io_pool,
 	                      segment_file_handle->file_io_pool_entry,
 	                      (uint8_t *) &error2,
@@ -4605,7 +4606,7 @@ ssize_t libewf_section_error2_read(
 
 			return( -1 );
 		}
-		read_count = libewf_file_io_pool_read(
+		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              (uint8_t *) error2_sectors,
@@ -4633,7 +4634,7 @@ ssize_t libewf_section_error2_read(
 		                  sectors_size,
 		                  1 );
 
-		read_count = libewf_file_io_pool_read(
+		read_count = libbfio_pool_read(
 		              file_io_pool,
 		              segment_file_handle->file_io_pool_entry,
 		              stored_crc_buffer,
@@ -4743,7 +4744,7 @@ ssize_t libewf_section_error2_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_error2_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_sector_table_t *acquiry_errors,
          liberror_error_t **error )
@@ -4785,7 +4786,7 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -4883,7 +4884,7 @@ ssize_t libewf_section_error2_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &error2,
@@ -4906,7 +4907,7 @@ ssize_t libewf_section_error2_write(
 	}
 	section_write_count += write_count;
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) error2_sectors,
@@ -4933,7 +4934,7 @@ ssize_t libewf_section_error2_write(
 	 calculated_crc_buffer,
 	 calculated_crc );
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
  	               calculated_crc_buffer,
@@ -4978,7 +4979,7 @@ ssize_t libewf_section_error2_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_digest_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *md5_hash,
          uint8_t *sha1_hash,
@@ -5024,7 +5025,7 @@ ssize_t libewf_section_digest_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) &digest,
@@ -5067,6 +5068,21 @@ ssize_t libewf_section_digest_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: MD5 hash.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 digest.md5_hash,
+	 16 );
+	libewf_notify_verbose_printf(
+	 "%s: SHA1 hash.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 digest.sha1_hash,
+	 20 );
+	libewf_notify_verbose_printf(
+	 "%s: padding.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 digest.padding1,
 	 40 );
@@ -5107,7 +5123,7 @@ ssize_t libewf_section_digest_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_digest_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *md5_hash,
          uint8_t *sha1_hash,
@@ -5156,7 +5172,7 @@ ssize_t libewf_section_digest_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -5213,6 +5229,20 @@ ssize_t libewf_section_digest_write(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: MD5 hash.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 digest.md5_hash,
+	 16 );
+	libewf_notify_verbose_printf(
+	 "%s: SHA1 hash.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 digest.sha1_hash,
+	 20 );
+#endif
 	calculated_crc = ewf_crc_calculate(
 	                  &digest,
 	                  ( sizeof( ewf_digest_t ) - sizeof( ewf_crc_t ) ),
@@ -5243,7 +5273,7 @@ ssize_t libewf_section_digest_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &digest,
@@ -5289,7 +5319,7 @@ ssize_t libewf_section_digest_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_hash_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *md5_hash,
          liberror_error_t **error )
@@ -5323,7 +5353,7 @@ ssize_t libewf_section_hash_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) &hash,
@@ -5366,6 +5396,15 @@ ssize_t libewf_section_hash_read(
 		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: MD5 hash.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 hash.md5_hash,
+	 16 );
+	libewf_notify_verbose_printf(
+	 "%s: padding.\n",
+	 function );
 	libewf_notify_verbose_dump_data(
 	 hash.unknown1,
 	 16 );
@@ -5392,7 +5431,7 @@ ssize_t libewf_section_hash_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_hash_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *md5_hash,
          liberror_error_t **error )
@@ -5429,7 +5468,7 @@ ssize_t libewf_section_hash_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -5472,6 +5511,14 @@ ssize_t libewf_section_hash_write(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	libewf_notify_verbose_printf(
+	 "%s: MD5 hash.\n",
+	 function );
+	libewf_notify_verbose_dump_data(
+	 hash.md5_hash,
+	 16 );
+#endif
 	calculated_crc = ewf_crc_calculate(
 	                  &hash,
 	                  ( sizeof( ewf_hash_t ) - sizeof( ewf_crc_t ) ),
@@ -5502,7 +5549,7 @@ ssize_t libewf_section_hash_write(
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &hash,
@@ -5549,7 +5596,7 @@ ssize_t libewf_section_hash_write(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_last_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *section_type,
          size_t section_type_length,
@@ -5620,7 +5667,7 @@ ssize_t libewf_section_last_write(
 	{
 		section_size = (uint64_t) sizeof( ewf_section_t );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     (off64_t *) &section_offset,
@@ -5666,7 +5713,7 @@ ssize_t libewf_section_last_write(
 	 section.crc,
 	 calculated_crc );
 
-	section_write_count = libewf_file_io_pool_write(
+	section_write_count = libbfio_pool_write(
 	                       file_io_pool,
 	                       segment_file_handle->file_io_pool_entry,
 	                       (uint8_t *) &section,
@@ -5710,7 +5757,7 @@ ssize_t libewf_section_last_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_xheader_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_xheader,
@@ -5834,7 +5881,7 @@ ssize_t libewf_section_xheader_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_xheader_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *xheader,
          size_t xheader_size,
@@ -5856,7 +5903,7 @@ ssize_t libewf_section_xheader_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -5918,7 +5965,7 @@ ssize_t libewf_section_xheader_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_xhash_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          uint8_t **cached_xhash,
@@ -6042,7 +6089,7 @@ ssize_t libewf_section_xhash_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_xhash_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint8_t *xhash,
          size_t xhash_size,
@@ -6064,7 +6111,7 @@ ssize_t libewf_section_xhash_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -6126,7 +6173,7 @@ ssize_t libewf_section_xhash_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_delta_chunk_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size_t section_size,
          libewf_offset_table_t *offset_table,
@@ -6174,7 +6221,7 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) &delta_chunk_header,
@@ -6252,7 +6299,7 @@ ssize_t libewf_section_delta_chunk_read(
 	}
 	/* Update the chunk data in the offset table
 	 */
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &( offset_table->chunk_offset[ chunk ].file_offset ),
@@ -6270,10 +6317,13 @@ ssize_t libewf_section_delta_chunk_read(
 	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
 	offset_table->chunk_offset[ chunk ].flags               = 0;
+#if defined( HAVE_DEBUG_OUTPUT )
+	offset_table->chunk_offset[ chunk ].is_delta_chunk      = 1;
+#endif
 
 	/* Skip the chunk data within the section
 	 */
-	if( libewf_file_io_pool_seek_offset(
+	if( libbfio_pool_seek_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     section_size - read_count,
@@ -6296,7 +6346,7 @@ ssize_t libewf_section_delta_chunk_read(
  * Returns the amount of bytes written or -1 on error
  */
 ssize_t libewf_section_delta_chunk_write(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint32_t chunk,
          uint8_t *chunk_data,
@@ -6341,7 +6391,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
+	if( libbfio_pool_get_offset(
 	     file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &section_offset,
@@ -6419,11 +6469,12 @@ ssize_t libewf_section_delta_chunk_write(
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_WRITE_FAILED,
 		 "%s: unable to write section: %s to file.",
-		 function );
+		 function,
+		 (char *) section_type );
 
 		return( -1 );
 	}
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &delta_chunk_header,
@@ -6443,7 +6494,7 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	section_write_count += write_count;
 
-	write_count = libewf_file_io_pool_write(
+	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               chunk_data,
@@ -6469,7 +6520,7 @@ ssize_t libewf_section_delta_chunk_write(
 		 calculated_crc_buffer,
 		 *chunk_crc );
 
-		write_count = libewf_file_io_pool_write(
+		write_count = libbfio_pool_write(
 		               file_io_pool,
 		               segment_file_handle->file_io_pool_entry,
 			       calculated_crc_buffer,
@@ -6517,7 +6568,7 @@ ssize_t libewf_section_delta_chunk_write(
  * Returns the amount of bytes read or -1 on error
  */
 ssize_t libewf_section_debug_read(
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          size64_t section_size,
          liberror_error_t **error )
@@ -6578,11 +6629,11 @@ ssize_t libewf_section_debug_read(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              data,
-	              section_size,
+	              (size_t) section_size,
 	              error );
 
 	if( read_count != (ssize_t) section_size )
@@ -6665,7 +6716,7 @@ ssize_t libewf_section_debug_read(
  * Returns 1 if successful or -1 on error
  */
 int libewf_section_read(
-     libewf_file_io_pool_t *file_io_pool,
+     libbfio_pool_t *file_io_pool,
      libewf_segment_file_handle_t *segment_file_handle,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
@@ -7241,7 +7292,7 @@ int libewf_section_read(
 #else
 		/* Skip the data within the section
 		 */
-		if( libewf_file_io_pool_seek_offset(
+		if( libbfio_pool_seek_offset(
 		     file_io_pool,
 		     segment_file_handle->file_io_pool_entry,
 		     section_end_offset,

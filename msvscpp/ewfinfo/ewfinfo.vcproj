@@ -41,8 +41,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\zlib\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\zlib\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
@@ -108,15 +108,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\character_string.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\date_time.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\digest_context.c"
 				>
 			</File>
 			<File
@@ -128,23 +120,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfgetopt.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfinfo.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfinput.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewflibewf.c"
 				>
 			</File>
 			<File
@@ -156,14 +136,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfstring.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\file_io.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\glob.c"
 				>
 			</File>
@@ -172,15 +144,11 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\info_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\notify.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\process_status.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\string_conversion.c"
 				>
 			</File>
 			<File
@@ -198,15 +166,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\character_string.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\date_time.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\digest_context.h"
 				>
 			</File>
 			<File
@@ -218,19 +178,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfcommon.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfgetopt.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfinput.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewflibewf.h"
 				>
 			</File>
 			<File
@@ -242,18 +190,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewfstring.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\file_io.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\file_stream_io.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\glob.h"
 				>
 			</File>
@@ -262,23 +198,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\md5.h"
+				RelativePath="..\..\ewftools\info_handle.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\notify.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\process_status.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\sha1.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\string_conversion.h"
 				>
 			</File>
 			<File

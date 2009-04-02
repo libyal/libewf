@@ -30,7 +30,6 @@
 
 #include <libewf/handle.h>
 
-#include "libewf_error.h"
 #include "libewf_extern.h"
 
 #if defined( __cplusplus )
@@ -40,19 +39,72 @@ extern "C" {
 LIBEWF_EXTERN const char *libewf_get_version(
                            void );
 
-LIBEWF_EXTERN int libewf_signal_abort(
-                   libewf_handle_t *handle );
+LIBEWF_EXTERN uint8_t libewf_get_flags_read(
+                       void );
 
-LIBEWF_EXTERN void libewf_error_free(
-                    libewf_error_t **error );
+LIBEWF_EXTERN uint8_t libewf_get_flags_read_write(
+                       void );
 
-LIBEWF_EXTERN void libewf_error_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
+LIBEWF_EXTERN uint8_t libewf_get_flags_write(
+                       void );
 
-LIBEWF_EXTERN void libewf_error_backtrace_fprint(
-                    libewf_error_t *error,
-                    FILE *stream );
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_check_file_signature(
+                   const char *filename,
+                   liberror_error_t **error );
+#else
+LIBEWF_EXTERN int libewf_check_file_signature(
+                   const char *filename );
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_check_file_signature_wide(
+                   const wchar_t *filename,
+                   liberror_error_t **error );
+#else
+LIBEWF_EXTERN int libewf_check_file_signature_wide(
+                   const wchar_t *filename );
+#endif
+#endif
+
+int libewf_check_file_signature_handle(
+     libbfio_handle_t *bfio_handle,
+     liberror_error_t **error );
+
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_glob(
+                   const char *filename,
+                   size_t length,
+                   uint8_t format,
+                   char **filenames[],
+                   int *amount_of_filenames,
+                   liberror_error_t **error );
+#else
+LIBEWF_EXTERN int libewf_glob(
+                   const char *filename,
+                   size_t length,
+                   uint8_t format,
+                   char **filenames[] );
+#endif
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#if defined( HAVE_V2_API )
+LIBEWF_EXTERN int libewf_glob_wide(
+                   const wchar_t *filename,
+                   size_t length,
+                   uint8_t format,
+                   wchar_t **filenames[],
+                   int *amount_of_filenames,
+                   liberror_error_t **error );
+#else
+LIBEWF_EXTERN int libewf_glob_wide(
+                   const wchar_t *filename,
+                   size_t length,
+                   uint8_t format,
+                   wchar_t **filenames[] );
+#endif
+#endif
 
 #if defined( __cplusplus )
 }

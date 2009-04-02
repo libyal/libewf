@@ -1,4 +1,4 @@
-.Dd January 18, 2009
+.Dd March 2, 2009
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -53,7 +53,7 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # ewfinfo -d dm floppy.E01
-ewfinfo 20080907 (libewf 20080907, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfinfo 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
 
 Acquiry information
         Case number:            1
@@ -69,13 +69,17 @@ Acquiry information
 
 Media information
         Media type:             removable disk
-        Media is physical:      no
-        Amount of sectors:      2880
+        Volume type:            logical
         Bytes per sector:       512
+        Amount of sectors:      2880
         Media size:             1.4 MiB (1474560 bytes)
+	Error granularity:	64
         Compression type:       best compression
         GUID:                   c1450a26-2737-eb43-a2c3-448ae3f05a51
-        MD5 hash in file:       ae1ce8f5ac079d3ee93f97fe3792bda3
+
+Digest hash information
+        MD5:                    ae1ce8f5ac079d3ee93f97fe3792bda3
+
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled. Verbose and debug output are only printed when enabled at compilation.

@@ -24,8 +24,28 @@
 #define _LIBEWF_INTERNAL_ERROR_H
 
 #include <common.h>
+#include <types.h>
+
+#include <stdio.h>
 
 #include <libewf/error.h>
+
+#include "libewf_extern.h"
+
+#if defined( __cplusplus )
+extern "C" {
+#endif
+
+LIBEWF_EXTERN void libewf_error_free(
+                    libewf_error_t **error );
+
+LIBEWF_EXTERN void libewf_error_fprint(
+                    libewf_error_t *error,
+                    FILE *stream );
+
+LIBEWF_EXTERN void libewf_error_backtrace_fprint(
+                    libewf_error_t *error,
+                    FILE *stream );
 
 #if defined( __cplusplus )
 }

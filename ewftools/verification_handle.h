@@ -28,6 +28,8 @@
 
 #include <liberror.h>
 
+#include <stdio.h>
+
 /* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf_extern.h
  */
@@ -72,6 +74,14 @@ struct verification_handle
 	 */
 	libewf_handle_t *input_handle;
 
+	/* The chunk size
+	 */
+	uint32_t chunk_size;
+
+	/* The amount of bytes per sector
+	 */
+	uint32_t bytes_per_sector;
+
 	/* The last offset of the input data
 	 */
 	off64_t input_offset;
@@ -79,6 +89,10 @@ struct verification_handle
 	/* The last offset of the output data
 	 */
 	off64_t output_offset;
+
+	/* Value to indicate if the chuck should be wiped on error
+	 */
+	int wipe_chunk_on_error;
 };
 
 int verification_handle_initialize(
@@ -91,10 +105,14 @@ int verification_handle_free(
      verification_handle_t **verification_handle,
      liberror_error_t **error );
 
+int verification_handle_signal_abort(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error );
+
 int verification_handle_open_input(
      verification_handle_t *verification_handle,
-     char * const * filenames,
-     int amount_of_files,
+     system_character_t * const * filenames,
+     int amount_of_filenames,
      liberror_error_t **error );
 
 ssize_t verification_handle_read_prepare_buffer(
@@ -124,10 +142,29 @@ int verification_handle_get_values(
      uint32_t *chunk_size,
      liberror_error_t **error );
 
+int verification_handle_get_amount_of_crc_errors(
+     verification_handle_t *verification_handle,
+     uint32_t *amount_of_errors,
+     liberror_error_t **error );
+
+int verification_handle_get_hash_value(
+     verification_handle_t *verification_handle,
+     char *hash_value_identifier,
+     size_t hash_value_identifier_length,
+     system_character_t *hash_value,
+     size_t hash_value_size,
+     liberror_error_t **error );
+
 int verification_handle_set_input_values(
      verification_handle_t *verification_handle,
      int wipe_chunk_on_error,
      liberror_error_t **error );
+
+int verification_handle_add_read_error(
+      verification_handle_t *verification_handle,
+      off64_t start_offset,
+      size_t amount_of_bytes,
+      liberror_error_t **error );
 
 int verification_handle_finalize(
      verification_handle_t *verification_handle,
@@ -141,6 +178,16 @@ int verification_handle_finalize(
      system_character_t *stored_sha1_hash_string,
      size_t stored_sha1_hash_string_size,
      int *stored_sha1_hash_available,
+     liberror_error_t **error );
+
+int verification_handle_additional_hash_values_fprint(
+     verification_handle_t *verification_handle,
+     FILE *stream,
+     liberror_error_t **error );
+
+int verification_handle_crc_errors_fprint(
+     verification_handle_t *verification_handle,
+     FILE *stream,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

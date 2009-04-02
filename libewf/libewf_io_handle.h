@@ -1,5 +1,5 @@
 /*
- * String functions for the ewftools
+ * IO handle functions
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,35 +20,61 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _EWFSTRING_H )
-#define _EWFSTRING_H
+#if !defined( _LIBEWF_IO_HANDLE_H )
+#define _LIBEWF_IO_HANDLE_H
 
 #include <common.h>
-#include <narrow_string.h>
 #include <types.h>
-#include <wide_string.h>
 
-#include "character_string.h"
-#include "system_string.h"
+#include <liberror.h>
+
+#include "libewf_libbfio.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-/* The length of hash strings
- */
-#define EWFSTRING_DIGEST_HASH_LENGTH_MD5	33
-#define EWFSTRING_DIGEST_HASH_LENGTH_SHA1	41
+typedef struct libewf_io_handle libewf_io_handle_t;
 
-int ewfstring_copy_system_string_to_character_string(
-     character_t *destination,
-     const system_character_t *source,
-     size_t length );
+struct libewf_io_handle
+{
+	/* The file io pool
+	 */
+	libbfio_pool_t *file_io_pool;
 
-int ewfstring_copy_character_string_to_system_string(
-     system_character_t *destination,
-     const character_t *source,
-     size_t length );
+	/* The current chunk
+	 */
+	uint32_t current_chunk;
+
+	/* The current chunk offset
+	 */
+	uint32_t current_chunk_offset;
+
+	/* Value to indicate which file format is used
+	 */
+	uint8_t format;
+
+	/* Value to indicate which ewf format is used
+	 */
+	uint8_t ewf_format;
+
+	/* Value to indicate the compression level used
+	 */
+	int8_t compression_level;
+
+	/* Value to indicate if empty block should be compressed
+	 * even if no compression is used
+	 */
+	uint8_t compress_empty_block;
+};
+
+int libewf_io_handle_initialize(
+     libewf_io_handle_t **io_handle,
+     liberror_error_t **error );
+
+int libewf_io_handle_free(
+     libewf_io_handle_t **io_handle,
+     liberror_error_t **error );
 
 #if defined( __cplusplus )
 }

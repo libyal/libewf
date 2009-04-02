@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include "system_string.h"
 
 #if defined( __cplusplus )
@@ -68,19 +70,23 @@ struct glob
 };
 
 int glob_initialize(
-     glob_t **glob );
+     glob_t **glob,
+     liberror_error_t **error );
 
 int glob_free(
-     glob_t **glob );
+     glob_t **glob,
+     liberror_error_t **error );
 
 int glob_resize(
      glob_t *glob,
-     int new_amount_of_results );
+     int new_amount_of_results,
+     liberror_error_t **error );
 
 int glob_resolve(
      glob_t *glob,
      system_character_t * const patterns[],
-     int amount_of_patterns );
+     int amount_of_patterns,
+     liberror_error_t **error );
 
 #endif
 

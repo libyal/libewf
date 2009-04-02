@@ -41,8 +41,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\zlib\include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;LIBEWF_DLL_IMPORT"
+				AdditionalIncludeDirectories="..\..\include;..\..\common;..\..\liberror;..\..\libuna;..\..\libbfio;..\zlib\include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;HAVE_LOCAL_LIBUNA;HAVE_LOCAL_LIBBFIO;LIBEWF_DLL_IMPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
@@ -108,11 +108,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\character_string.c"
+				RelativePath="..\..\ewftools\date_time.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\date_time.c"
+				RelativePath="..\..\ewftools\device_handle.c"
 				>
 			</File>
 			<File
@@ -144,19 +144,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewflibewf.c"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfoutput.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfsignal.c"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfstring.c"
 				>
 			</File>
 			<File
@@ -168,6 +160,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ewftools\imaging_handle.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ewftools\notify.c"
 				>
 			</File>
@@ -176,7 +172,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\string_conversion.c"
+				RelativePath="..\..\ewftools\storage_media_buffer.c"
 				>
 			</File>
 			<File
@@ -194,11 +190,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\character_string.h"
+				RelativePath="..\..\ewftools\date_time.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\date_time.h"
+				RelativePath="..\..\ewftools\device_handle.h"
 				>
 			</File>
 			<File
@@ -226,19 +222,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\ewflibewf.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ewftools\ewfoutput.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\ewftools\ewfsignal.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ewftools\ewfstring.h"
 				>
 			</File>
 			<File
@@ -251,6 +239,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ewftools\glob.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ewftools\imaging_handle.h"
 				>
 			</File>
 			<File
@@ -270,7 +262,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ewftools\string_conversion.h"
+				RelativePath="..\..\ewftools\storage_media_buffer.h"
 				>
 			</File>
 			<File

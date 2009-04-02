@@ -70,16 +70,11 @@ system_character_t *ewfinput_format_types[ 12 ] = \
    _SYSTEM_CHARACTER_T_STRING( "linen6" ),
    _SYSTEM_CHARACTER_T_STRING( "ewfx" ) };
 
-#if defined( LIBEWF_CD_SUPPORT )
-system_character_t *ewfinput_media_types[ 3 ] = \
+system_character_t *ewfinput_media_types[ 4 ] = \
  { _SYSTEM_CHARACTER_T_STRING( "fixed" ),
    _SYSTEM_CHARACTER_T_STRING( "removable" ),
-   _SYSTEM_CHARACTER_T_STRING( "cd" ) };
-#else
-system_character_t *ewfinput_media_types[ 2 ] = \
- { _SYSTEM_CHARACTER_T_STRING( "fixed" ),
-   _SYSTEM_CHARACTER_T_STRING( "removable" ) };
-#endif
+   _SYSTEM_CHARACTER_T_STRING( "optical" ),
+   _SYSTEM_CHARACTER_T_STRING( "memory" ) };
 
 system_character_t *ewfinput_volume_types[ 2 ] = \
  { _SYSTEM_CHARACTER_T_STRING( "logical" ),
@@ -453,16 +448,22 @@ int ewfinput_determine_media_type(
 		*media_type = LIBEWF_MEDIA_TYPE_REMOVABLE;
 		result      = 1;
 	}
-#if defined( LIBEWF_CD_SUPPORT )
 	else if( system_string_compare(
 	          argument,
-	          _SYSTEM_CHARACTER_T_STRING( "cd" ),
-	          2 ) == 0 )
+	          _SYSTEM_CHARACTER_T_STRING( "optical" ),
+	          7 ) == 0 )
 	{
-		*media_type = LIBEWF_MEDIA_TYPE_CD;
+		*media_type = LIBEWF_MEDIA_TYPE_OPTICAL;
 		result      = 1;
 	}
-#endif
+	else if( system_string_compare(
+	          argument,
+	          _SYSTEM_CHARACTER_T_STRING( "memory" ),
+	          6 ) == 0 )
+	{
+		*media_type = LIBEWF_MEDIA_TYPE_MEMORY;
+		result      = 1;
+	}
 	return( result );
 }
 

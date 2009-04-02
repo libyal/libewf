@@ -26,6 +26,8 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <stdio.h>
 
 #include "date_time.h"

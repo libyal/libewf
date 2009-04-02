@@ -24,6 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
+#include <stdio.h>
+
 #include "byte_size_string.h"
 #include "date_time.h"
 #include "notify.h"

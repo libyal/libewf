@@ -62,10 +62,6 @@ extern "C" {
 #define LIBEWF_HEADER_VALUES_INDEX_UNKNOWN_DC			14
 #define LIBEWF_HEADER_VALUES_INDEX_EXTENTS			15
 
-#define LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_NONE		_LIBEWF_STRING( "n" )
-#define LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_BEST		_LIBEWF_STRING( "b" )
-#define LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_FAST		_LIBEWF_STRING( "f" )
-
 int libewf_header_values_initialize(
      libewf_values_table_t *header_values,
      liberror_error_t **error );

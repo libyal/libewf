@@ -32,9 +32,10 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_GETOPT ) && !defined( HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS )
+#if defined( HAVE_GETOPT )
 #define ewfgetopt( argument_count, argument_values, options_string ) \
 	getopt( argument_count, argument_values, options_string )
+
 #else
 
 /* The current option argument

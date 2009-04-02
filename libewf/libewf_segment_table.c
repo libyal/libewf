@@ -26,9 +26,8 @@
 
 #include "libewf_definitions.h"
 #include "libewf_filename.h"
-#include "libewf_file_io.h"
-#include "libewf_file_io_handle.h"
-#include "libewf_file_io_pool.h"
+#include "libewf_io_handle.h"
+#include "libewf_libbfio.h"
 #include "libewf_notify.h"
 #include "libewf_segment_file.h"
 #include "libewf_segment_table.h"
@@ -293,16 +292,13 @@ int libewf_segment_table_resize(
  */
 int libewf_segment_table_build(
      libewf_segment_table_t *segment_table,
-     libewf_file_io_pool_t *file_io_pool,
+     libewf_io_handle_t *io_handle,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
      libewf_media_values_t *media_values,
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
-     int8_t *compression_level,
-     uint8_t *format,
-     uint8_t *ewf_format,
      size64_t *segment_file_size,
      int *abort,
      liberror_error_t **error )
@@ -347,7 +343,7 @@ int libewf_segment_table_build(
 
 		result = libewf_segment_file_read_sections(
 		          segment_table->segment_file_handle[ segment_number ],
-		          file_io_pool,
+		          io_handle,
 		          &last_segment_file,
 		          header_sections,
 		          hash_sections,
@@ -355,9 +351,6 @@ int libewf_segment_table_build(
 		          offset_table,
 		          sessions,
 		          acquiry_errors,
-		          compression_level,
-		          format,
-		          ewf_format,
 		          segment_file_size,
 		          error );
 
@@ -404,7 +397,66 @@ int libewf_segment_table_build(
 	return( 1 );
 }
 
-/* retrieves the basename in the segment table
+/* Retrieves the size of the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename_size(
+     libewf_segment_table_t *segment_table,
+     size_t *basename_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_basename_size";
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename size.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( narrow_string_size_from_libewf_system_string(
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     basename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	*basename_size = segment_table->basename_size;
+#endif
+
+	return( 1 );
+}
+
+/* Retrieves the basename in the segment table
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_segment_table_get_basename(
@@ -635,7 +687,66 @@ int libewf_segment_table_set_basename(
 }
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
-/* retrieves the basename in the segment table
+/* Retrieves the size of the basename in the segment table
+ * Returns 1 if successful, 0 if value not present or -1 on error
+ */
+int libewf_segment_table_get_basename_size_wide(
+     libewf_segment_table_t *segment_table,
+     size_t *basename_size,
+     liberror_error_t **error )
+{
+	static char *function = "libewf_segment_table_get_basename_size_wide";
+
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( basename_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid basename size.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->basename == NULL )
+	{
+		return( 0 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	*basename_size = segment_table->basename_size;
+#else
+	if( wide_string_size_from_libewf_system_string(
+	     segment_table->basename,
+	     segment_table->basename_size,
+	     basename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine basename size.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+
+	return( 1 );
+}
+
+/* Retrieves the basename in the segment table
  * Returns 1 if successful, 0 if value not present or -1 on error
  */
 int libewf_segment_table_get_basename_wide(
@@ -872,18 +983,29 @@ int libewf_segment_table_set_basename_wide(
 int libewf_segment_table_create_segment_file(
      libewf_segment_table_t *segment_table,
      uint16_t segment_number,
-     libewf_file_io_pool_t *file_io_pool,
+     libewf_io_handle_t *io_handle,
      int16_t maximum_amount_of_segments,
      uint8_t segment_file_type,
-     uint8_t format,
-     uint8_t ewf_format,
      liberror_error_t **error )
 {
-	libewf_file_io_handle_t *file_io_handle = NULL;
-	static char *function                   = "libewf_segment_table_create_segment_file";
-	int file_io_pool_entry                  = 0;
-	int flags                               = 0;
+	libbfio_handle_t *file_io_handle    = NULL;
+	libewf_system_character_t *filename = NULL;
+	static char *function               = "libewf_segment_table_create_segment_file";
+	size_t filename_size                = 0;
+	int file_io_pool_entry              = 0;
+	int flags                           = 0;
 
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( segment_table == NULL )
 	{
 		liberror_error_set(
@@ -962,31 +1084,16 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_create_file_io_handle(
-	     file_io_pool,
-	     &file_io_handle,
-	     &file_io_pool_entry,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_OPEN_FAILED,
-		 "%s: unable to create file io pool entry.",
-		 function );
-
-		return( -1 );
-	}
 	if( libewf_filename_create(
-	     &( file_io_handle->filename ),
-	     &( file_io_handle->filename_size ),
+	     &filename,
+	     &filename_size,
 	     segment_table->basename,
 	     segment_table->basename_size - 1,
 	     segment_number,
 	     maximum_amount_of_segments,
 	     segment_file_type,
-	     format,
-	     ewf_format,
+	     io_handle->format,
+	     io_handle->ewf_format,
 	     error ) != 1 )
 	{
 		liberror_error_set(
@@ -998,7 +1105,7 @@ int libewf_segment_table_create_segment_file(
 
 		return( -1 );
 	}
-	if( file_io_handle->filename == NULL )
+	if( filename == NULL )
 	{
 		liberror_error_set(
 		 error,
@@ -1011,22 +1118,90 @@ int libewf_segment_table_create_segment_file(
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: created segment file: %" PRIu16 " with filename: %" PRIs_LIBEWF_SYSTEM ".\n",
+	 "%s: creating segment file: %" PRIu16 " with filename: %" PRIs_LIBEWF_SYSTEM ".\n",
 	 function,
 	 segment_number,
-	 file_io_handle->filename );
+	 filename );
 #endif
+
+	if( libbfio_file_initialize(
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file io handle.",
+		 function );
+
+		memory_free(
+		 filename );
+
+		return( -1 );
+	}
+#if defined( LIBEWF_WIDE_SYSTEM_CHARACTER_TYPE )
+	if( libbfio_file_set_name_wide(
+	     file_io_handle,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+#else
+	if( libbfio_file_set_name(
+	     file_io_handle,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to set filename in file io handle.",
+		 function );
+
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+		memory_free(
+		 filename );
+
+		return( -1 );
+	}
+	memory_free(
+	 filename );
 
 	if( segment_file_type == LIBEWF_SEGMENT_FILE_TYPE_DWF )
 	{
-		flags = LIBEWF_FILE_IO_O_RDWR | LIBEWF_FILE_IO_O_CREAT | LIBEWF_FILE_IO_O_TRUNC;
+		flags = LIBBFIO_OPEN_READ_WRITE_TRUNCATE;
 	}
 	else
 	{
-		flags = LIBEWF_FILE_IO_O_WRONLY | LIBEWF_FILE_IO_O_CREAT | LIBEWF_FILE_IO_O_TRUNC;
+		flags = LIBBFIO_OPEN_WRITE_TRUNCATE;
 	}
-	if( libewf_file_io_pool_open(
-	     file_io_pool,
+	if( libbfio_pool_add_handle(
+	     io_handle->file_io_pool,
+	     &file_io_pool_entry,
+	     file_io_handle,
+	     flags,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to add file io handle to pool.",
+		 function );
+
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+
+		return( -1 );
+	}
+	if( libbfio_pool_open(
+	     io_handle->file_io_pool,
 	     file_io_pool_entry,
 	     flags,
 	     error ) != 1 )

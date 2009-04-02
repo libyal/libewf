@@ -1,5 +1,5 @@
 /*
- * GUID functions
+ * The libbfio header wrapper
  *
  * Copyright (c) 2008-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,29 +20,34 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _GUID_H )
-#define _GUID_H
+#if !defined( _LIBEWF_LIBBFIO_H )
+#define _LIBEWF_LIBBFIO_H
 
 #include <common.h>
-#include <types.h>
 
-#include "character_string.h"
+/* Define HAVE_LOCAL_LIBBFIO for local use of libbfio
+ */
+#if( HAVE_LOCAL_LIBBFIO )
 
-#if defined( __cplusplus )
-extern "C" {
+#include <libbfio_definitions.h>
+#include <libbfio_file.h>
+#include <libbfio_handle.h>
+#include <libbfio_pool.h>
+#include <libbfio_types.h>
+
+#elif defined( HAVE_LIBBFIO_H )
+
+/* If libtool DLL support is enabled set LIBBFIO_DLL_IMPORT
+ * before including libbfio.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT )
+#define LIBBFIO_DLL_IMPORT
 #endif
 
-#define GUID_STRING_LENGTH	37
+#include <libbfio.h>
 
-typedef uint8_t guid_t;
-
-int guid_to_string(
-     guid_t *guid,
-     character_t *string,
-     size_t length );
-
-#if defined( __cplusplus )
-}
+#else
+#error Missing libbfio.h
 #endif
 
 #endif

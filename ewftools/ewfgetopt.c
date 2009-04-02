@@ -62,7 +62,7 @@ system_integer_t ewfgetopt(
 
 	if( optind >= argument_count )
 	{
-		return( -1 );
+		return( (system_integer_t) -1 );
 	}
 	argument_value = argument_values[ optind ];
 
@@ -70,13 +70,13 @@ system_integer_t ewfgetopt(
 	 */
 	if( *argument_value == (system_character_t) '\0' )
 	{
-		return( -1 );
+		return( (system_integer_t) -1 );
 	}
 	/* Check if the first character is a option marker '-'
 	 */
 	if( *argument_value != (system_character_t) '-' )
 	{
-		return( -1 );
+		return( (system_integer_t) -1 );
 	}
 	argument_value++;
 
@@ -86,7 +86,7 @@ system_integer_t ewfgetopt(
 	{
 		optind++;
 
-		return( -1 );
+		return( (system_integer_t) -1 );
 	}
 	optopt       = *argument_value;
 	option_value = system_string_search(
@@ -110,7 +110,8 @@ system_integer_t ewfgetopt(
 		if( ( *options_string != (system_character_t) ':' )
 		 && ( optopt != (system_integer_t) '?' ) )
 		{
-			notify_warning_printf( "%s: no such option: %" PRIc_SYSTEM ".\n",
+			notify_warning_printf(
+			 "%s: no such option: %" PRIc_SYSTEM ".\n",
 			 function,
 			 optopt );
 		}
@@ -149,7 +150,8 @@ system_integer_t ewfgetopt(
 			{
 				return( (system_integer_t) ':' );
 			}
-			notify_warning_printf( "%s: option: %" PRIc_SYSTEM " requires an argument.\n",
+			notify_warning_printf(
+			 "%s: option: %" PRIc_SYSTEM " requires an argument.\n",
 			 function,
 			 optopt );
 
@@ -159,7 +161,7 @@ system_integer_t ewfgetopt(
 
 		optind++;
 	}
-	return( (system_integer_t) optopt );
+	return( optopt );
 }
 
 #endif

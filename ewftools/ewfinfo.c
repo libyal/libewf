@@ -47,14 +47,17 @@
 #include <libewf.h>
 
 #include "byte_size_string.h"
-#include "ewfcommon.h"
 #include "ewfgetopt.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "glob.h"
 #include "guid.h"
+#include "info_handle.h"
 #include "notify.h"
 #include "system_string.h"
+
+info_handle_t *ewfinfo_info_handle = NULL;
+int ewfinfo_abort                  = 0;
 
 /* Prints the executable usage information
  */
@@ -65,6 +68,9 @@ void usage_fprint(
 	{
 		return;
 	}
+	fprintf( stream, "Use ewfinfo to determine information about the EWF format (Expert Witness\n"
+	                 "Compression Format).\n\n" );
+
 	fprintf( stream, "Usage: ewfinfo [ -d date_format ] [ -ehimvV ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
@@ -79,6 +85,43 @@ void usage_fprint(
 	fprintf( stream, "\t-V:        print version\n" );
 }
 
+/* Signal handler for ewfinfo
+ */
+void ewfinfo_signal_handler(
+      ewfsignal_t signal )
+{
+	liberror_error_t *error = NULL;
+	static char *function   = "ewfinfo_signal_handler";
+
+	ewfinfo_abort = 1;
+
+	if( ( ewfinfo_info_handle != NULL )
+	 && ( info_handle_signal_abort(
+	       ewfinfo_info_handle,
+	       &error ) != 1 ) )
+	{
+		notify_warning_printf(
+		 "%s: unable to signal info handle to abort.\n",
+		 function );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return;
+	}
+	/* Force stdin to close otherwise any function reading it will remain blocked
+	 */
+	if( file_io_close(
+	     0 ) != 0 )
+	{
+		notify_warning_printf(
+		 "%s: unable to close stdin.\n",
+		 function );
+	}
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
@@ -87,33 +130,16 @@ int wmain( int argc, wchar_t * const argv[] )
 int main( int argc, char * const argv[] )
 #endif
 {
-	system_character_t media_size_string[ 16 ];
-	system_character_t guid_string[ GUID_STRING_SIZE ];
-	uint8_t guid[ 16 ];
-
 	system_character_t * const *argv_filenames = NULL;
-	system_character_t **ewf_filenames         = NULL;
 
 #if !defined( HAVE_GLOB_H )
 	glob_t *glob                               = NULL;
 #endif
+	info_handle_t *info_handle                 = NULL;
 	liberror_error_t *error                    = NULL;
 
-	char *file_format_string                   = NULL;
-	char *program                              = "ewfinfo";
+	system_character_t *program                = _SYSTEM_CHARACTER_T_STRING( "ewfinfo" );
 	system_integer_t option                    = 0;
-	size64_t media_size                        = 0;
-	uint32_t bytes_per_sector                  = 0;
-	uint32_t amount_of_sectors                 = 0;
-	uint32_t error_granularity                 = 0;
-	uint32_t amount_of_acquiry_errors          = 0;
-	uint32_t amount_of_sessions                = 0;
-	int8_t compression_level                   = 0;
-	uint8_t compress_empty_block               = 0;
-	uint8_t media_type                         = 0;
-	uint8_t media_flags                        = 0;
-	uint8_t volume_type                        = 0;
-	uint8_t format                             = 0;
 	uint8_t verbose                            = 0;
 	uint8_t date_format                        = LIBEWF_DATE_FORMAT_CTIME;
 	char info_option                           = 'a';
@@ -122,7 +148,7 @@ int main( int argc, char * const argv[] )
 
 	notify_set_values(
 	 stderr,
-	 verbose );
+	 1 );
 
 	if( system_string_initialize(
 	     &error ) != 1 )
@@ -151,7 +177,9 @@ int main( int argc, char * const argv[] )
 		{
 			case (system_integer_t) '?':
 			default:
-				fprintf( stderr, "Invalid argument: %" PRIs_SYSTEM "\n",
+				fprintf(
+				 stderr,
+				 "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind ] );
 
 				usage_fprint(
@@ -186,7 +214,9 @@ int main( int argc, char * const argv[] )
 				          _SYSTEM_CHARACTER_T_STRING( "ctime" ),
 				          3 ) != 0 )
 				{
-					fprintf( stderr, "Unsupported date format: %" PRIs_SYSTEM " using default ctime.\n",
+					fprintf(
+					 stderr,
+					 "Unsupported date format: %" PRIs_SYSTEM " using default ctime.\n",
 					 optarg );
 				}
 				break;
@@ -194,7 +224,9 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'e':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc_SYSTEM " and %c\n",
+					fprintf(
+					 stderr,
+					 "Conflicting options: %" PRIc_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -215,7 +247,9 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'i':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc_SYSTEM " and %c\n",
+					fprintf(
+					 stderr,
+					 "Conflicting options: %" PRIc_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -230,7 +264,9 @@ int main( int argc, char * const argv[] )
 			case (system_integer_t) 'm':
 				if( info_option != 'a' )
 				{
-					fprintf( stderr, "Conflicting options: %" PRIc_SYSTEM " and %c\n",
+					fprintf(
+					 stderr,
+					 "Conflicting options: %" PRIc_SYSTEM " and %c\n",
 					 option, info_option );
 
 					usage_fprint(
@@ -256,399 +292,263 @@ int main( int argc, char * const argv[] )
 	}
 	if( optind == argc )
 	{
-		fprintf( stderr, "Missing EWF image file(s).\n" );
+		fprintf(
+		 stderr,
+		 "Missing EWF image file(s).\n" );
 
 		usage_fprint(
 		 stdout );
 
 		return( EXIT_FAILURE );
 	}
+	notify_set_values(
+	 stderr,
+	 verbose );
 	libewf_set_notify_values(
 	 stderr,
 	 verbose );
 
 	if( ewfsignal_attach(
-	     ewfcommon_signal_handler ) != 1 )
+	     ewfinfo_signal_handler ) != 1 )
 	{
-		fprintf( stderr, "Unable to attach signal handler.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to attach signal handler.\n" );
 	}
-	amount_of_filenames = argc - optind;
-
 #if !defined( HAVE_GLOB_H )
 	if( glob_initialize(
-	     &glob ) != 1 )
+	     &glob,
+	     &error ) != 1 )
 	{
-		fprintf( stderr, "Unable to initialize glob.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to initialize glob.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
 		return( EXIT_FAILURE );
 	}
-	amount_of_filenames = glob_resolve(
-	                       glob,
-	                       &argv[ optind ],
-	                       ( argc - optind ) );
-
-	if( ( amount_of_filenames <= 0 )
-	 || ( amount_of_filenames > (int) UINT16_MAX ) )
+	if( glob_resolve(
+	     glob,
+	     &argv[ optind ],
+	     argc - optind,
+	     &error ) != 1 )
 	{
-		fprintf( stderr, "Unable to resolve glob.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to resolve glob.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
 		glob_free(
-		 &glob );
+		 &glob,
+		 NULL );
 
 		return( EXIT_FAILURE );
 	}
-	argv_filenames = glob->result;
+	argv_filenames      = glob->result;
+	amount_of_filenames = glob->amount_of_results;
 #else
-	argv_filenames = &argv[ optind ];
+	argv_filenames      = &argv[ optind ];
+	amount_of_filenames = argc - optind;
+
 #endif
 
-	if( amount_of_filenames == 1 )
+	if( info_handle_initialize(
+	     &info_handle,
+	     &error ) != 1 )
 	{
-		amount_of_filenames = libewf_glob(
-		                       argv_filenames[ 0 ],
-		                       system_string_length(
-		                        argv_filenames[ 0 ] ),
-		                       LIBEWF_FORMAT_UNKNOWN,
-		                       &ewf_filenames );
+		fprintf(
+		 stderr,
+		 "Unable to create info handle.\n" );
 
-		if( amount_of_filenames <= 0 )
-		{
-			fprintf( stderr, "Unable to resolve ewf file(s).\n" );
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
 
 #if !defined( HAVE_GLOB_H )
-			glob_free(
-			 &glob );
+		glob_free(
+		 &glob,
+		 NULL );
 #endif
 
-			return( EXIT_FAILURE );
-		}
-		argv_filenames = (system_character_t * const *) ewf_filenames;
+		return( EXIT_FAILURE );
 	}
-	ewfcommon_libewf_handle = libewf_open(
-	                           argv_filenames,
-	                           amount_of_filenames,
-	                           LIBEWF_OPEN_READ );
+	result = info_handle_open_input(
+	          info_handle,
+	          argv_filenames,
+	          amount_of_filenames,
+	          &error );
+
 #if !defined( HAVE_GLOB_H )
-	glob_free(
-	 &glob );
-#endif
-	if( ewf_filenames != NULL )
+	if( glob_free(
+	     &glob,
+	     &error ) != 1 )
 	{
-		for( ; amount_of_filenames > 0; amount_of_filenames-- )
-		{
-			memory_free(
-			 ewf_filenames[ amount_of_filenames - 1 ] );
-		}
-		memory_free(
-		 ewf_filenames );
+		fprintf(
+		 stderr,
+		 "Unable to free glob.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( EXIT_FAILURE );
 	}
-	if( ( ewfcommon_abort == 0 )
-	 && ( ewfcommon_libewf_handle == NULL ) )
+#endif
+
+	if( ( ewfinfo_abort == 0 )
+	 && ( result != 1 ) )
 	{
 		ewfoutput_error_fprint(
-		 stderr, "Unable to open EWF file(s)" );
+		 stderr,
+		 "Unable to open EWF file(s)" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		info_handle_free(
+		 &info_handle,
+		 NULL );
 
 		return( EXIT_FAILURE );
 	}
-	if( ( ewfcommon_abort == 0 )
-	 && ( libewf_parse_header_values(
-		     ewfcommon_libewf_handle,
-		     date_format ) != 1 ) )
-	{
-		fprintf( stderr, "Unable to parse header values.\n" );
-	}
-	if( ( ewfcommon_abort == 0 )
-	 && ( libewf_get_format(
-	       ewfcommon_libewf_handle,
-	       &format ) != 1 ) )
-	{
-		fprintf( stderr, "Unable to determine format.\n" );
-	}
-	else if( verbose == 1 )
-	{
-		switch( format )
-		{
-			case LIBEWF_FORMAT_EWF:
-				file_format_string = "original EWF";
-				break;
-
-			case LIBEWF_FORMAT_SMART:
-				file_format_string = "SMART";
-				break;
-
-			case LIBEWF_FORMAT_FTK:
-				file_format_string = "FTK Imager";
-				break;
-
-			case LIBEWF_FORMAT_ENCASE1:
-				file_format_string = "EnCase 1";
-				break;
-
-			case LIBEWF_FORMAT_ENCASE2:
-				file_format_string = "EnCase 2";
-				break;
-
-			case LIBEWF_FORMAT_ENCASE3:
-				file_format_string = "EnCase 3";
-				break;
-
-			case LIBEWF_FORMAT_ENCASE4:
-				file_format_string = "EnCase 4";
-				break;
-
-			case LIBEWF_FORMAT_ENCASE5:
-				file_format_string = "EnCase 5";
-				break;
-
-			case LIBEWF_FORMAT_ENCASE6:
-				file_format_string = "EnCase 6";
-				break;
-
-			case LIBEWF_FORMAT_LINEN5:
-				file_format_string = "linen 5";
-				break;
-
-			case LIBEWF_FORMAT_LINEN6:
-				file_format_string = "linen 6";
-				break;
-
-			case LIBEWF_FORMAT_EWFX:
-				file_format_string = "extended EWF (libewf)";
-				break;
-
-			case LIBEWF_FORMAT_UNKNOWN:
-			default:
-				file_format_string = "unknown";
-				break;
-
-		}
-		fprintf( stdout, "File format:\t\t\t%s\n\n",
-		 file_format_string );
-	}
-	if( ( ewfcommon_abort == 0 )
+	if( ( ewfinfo_abort == 0 )
 	 && ( ( info_option == 'a' )
 	  || ( info_option == 'i' ) ) )
 	{
-		fprintf( stdout, "Acquiry information\n" );
-
-		ewfoutput_header_values_fprint(
-		 stdout,
-		 ewfcommon_libewf_handle );
-
-		fprintf( stdout, "\n" );
+		if( info_handle_header_values_fprint(
+		     info_handle,
+		     date_format,
+		     stdout,
+		     &error ) != 1 )
+		{
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
-	if( ( ewfcommon_abort == 0 )
+	if( ( ewfinfo_abort == 0 )
 	 && ( ( info_option == 'a' )
 	  || ( info_option == 'm' ) ) )
 	{
-		fprintf( stdout, "Media information\n" );
+		if( info_handle_media_information_fprint(
+		     info_handle,
+		     stdout,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to print media information.\n" );
 
-		if( ( format != LIBEWF_FORMAT_EWF )
-		 && ( format != LIBEWF_FORMAT_SMART ) )
-		{
-			if( libewf_get_media_type(
-			     ewfcommon_libewf_handle,
-			     &media_type ) != 1 )
-			{
-				fprintf( stderr, "Unable to determine media type.\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_REMOVABLE )
-			{
-				fprintf( stdout, "\tMedia type:\t\tremovable disk\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_FIXED )
-			{
-				fprintf( stdout, "\tMedia type:\t\tfixed disk\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_CD )
-			{
-				fprintf( stdout, "\tMedia type:\t\tCD/DVD\n" );
-			}
-			else if( media_type == LIBEWF_MEDIA_TYPE_RAM )
-			{
-				fprintf( stdout, "\tMedia type:\t\tRAM\n" );
-			}
-			else
-			{
-				fprintf( stdout, "\tMedia type:\t\tunknown (0x%" PRIx8 ")\n",
-				 media_type );
-			}
-			if( libewf_get_media_flags(
-			     ewfcommon_libewf_handle,
-			     &media_flags ) != 1 )
-			{
-				fprintf( stderr, "Unable to determine media flags.\n" );
-			}
-			else if( verbose == 1 )
-			{
-				fprintf( stdout, "\tMedia flags:\t\t0x%" PRIx8 "\n",
-				 media_flags );
-			}
-			if( libewf_get_volume_type(
-			     ewfcommon_libewf_handle,
-			     &volume_type ) != 1 )
-			{
-				fprintf( stderr, "Unable to determine volume type.\n" );
-			}
-			else if( volume_type == LIBEWF_VOLUME_TYPE_LOGICAL )
-			{
-				fprintf( stdout, "\tMedia is physical:\tno\n" );
-			}
-			else if( volume_type == LIBEWF_VOLUME_TYPE_PHYSICAL )
-			{
-				fprintf( stdout, "\tMedia is physical:\tyes\n" );
-			}
-			else
-			{
-				fprintf( stdout, "\tVolume type:\t\tunknown (0x%" PRIx8 ")\n",
-				 volume_type );
-			}
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 		}
-		if( libewf_get_amount_of_sectors(
-		     ewfcommon_libewf_handle,
-		     &amount_of_sectors ) == 1 )
+		if( info_handle_hash_values_fprint(
+		     info_handle,
+		     stdout,
+		     &error ) != 1 )
 		{
-			fprintf( stdout, "\tAmount of sectors:\t%" PRIu32 "\n",
-			 amount_of_sectors );
-		}
-		else
-		{
-			fprintf( stderr, "Unable to determine amount of sectors.\n" );
-		}
-		if( libewf_get_bytes_per_sector(
-		     ewfcommon_libewf_handle,
-		     &bytes_per_sector ) == 1 )
-		{
-			fprintf( stdout, "\tBytes per sector:\t%" PRIu32 "\n",
-			 bytes_per_sector );
-		}
-		else
-		{
-			fprintf( stderr, "Unable to determine bytes per sector.\n" );
-		}
-		if( libewf_get_media_size(
-		     ewfcommon_libewf_handle,
-		     &media_size ) == 1 )
-		{
-			result = byte_size_string_create(
-				  media_size_string,
-				  16,
-				  media_size,
-				  BYTE_SIZE_STRING_UNIT_MEBIBYTE,
-			          NULL );
+			fprintf(
+			 stderr,
+			 "Unable to print hash values.\n" );
 
-			if( result == 1 )
-			{
-				fprintf( stdout, "\tMedia size:\t\t%" PRIs_SYSTEM " (%" PRIu64 " bytes)\n",
-				 media_size_string, media_size );
-			}
-			else
-			{
-				fprintf( stdout, "\tMedia size:\t\t%" PRIu64 " bytes\n",
-				 media_size );
-			}
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
 		}
-		else
+		if( info_handle_sessions_fprint(
+		     info_handle,
+		     stdout,
+		     &error ) != 1 )
 		{
-			fprintf( stderr, "Unable to determine media size.\n" );
-		}
-		if( ( format == LIBEWF_FORMAT_ENCASE5 )
-		 || ( format == LIBEWF_FORMAT_ENCASE6 )
-		 || ( format == LIBEWF_FORMAT_LINEN5 )
-		 || ( format == LIBEWF_FORMAT_LINEN6 )
-		 || ( format == LIBEWF_FORMAT_EWFX ) )
-		{
-			if( libewf_get_error_granularity(
-			     ewfcommon_libewf_handle,
-			     &error_granularity ) == 1 )
-			{
-				fprintf( stdout, "\tError granularity:\t%" PRIu32 "\n",
-				 error_granularity );
-			}
-			else
-			{
-				fprintf( stderr, "Unable to determine error granularity.\n" );
-			}
-			if( libewf_get_compression_values(
-			     ewfcommon_libewf_handle,
-			     &compression_level,
-			     &compress_empty_block ) == 1 )
-			{
-				if( compression_level == LIBEWF_COMPRESSION_NONE )
-				{
-					fprintf( stdout, "\tCompression type:\tno compression\n" );
-				}
-				else if( compression_level == LIBEWF_COMPRESSION_FAST )
-				{
-					fprintf( stdout, "\tCompression type:\tgood (fast) compression\n" );
-				}
-				else if( compression_level == LIBEWF_COMPRESSION_BEST )
-				{
-					fprintf( stdout, "\tCompression type:\tbest compression\n" );
-				}
-				else
-				{
-					fprintf( stdout, "\tCompression type:\tunknown compression\n" );
-				}
-			}
-			else
-			{
-				fprintf( stderr, "Unable to determine compression level.\n" );
-			}
-			if( libewf_get_guid(
-			     ewfcommon_libewf_handle,
-			     guid,
-			     16 ) == 1 )
-			{
-				if( guid_to_string(
-				     (guid_t *) guid,
-				     LIBEWF_ENDIAN_LITTLE,
-				     guid_string,
-				     GUID_STRING_SIZE,
-				     NULL ) == 1 )
-				{
-					fprintf( stdout, "\tGUID:\t\t\t%" PRIs_SYSTEM "\n",
-					 guid_string );
-				}
-			}
-		}
-		ewfoutput_hash_values_fprint(
-		 stdout,
-		 ewfcommon_libewf_handle,
-		 "\t",
-		 0,
-		 0 );
+			fprintf(
+			 stderr,
+			 "Unable to print sessions.\n" );
 
-		fprintf( stdout, "\n" );
-
-		ewfoutput_sessions_fprint(
-		 stdout,
-		 ewfcommon_libewf_handle,
-		 &amount_of_sessions );
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
-	if( ( ewfcommon_abort == 0 )
+	if( ( ewfinfo_abort == 0 )
 	 && ( ( info_option == 'a' )
 	  || ( info_option == 'e' ) ) )
 	{
-		ewfoutput_acquiry_errors_fprint(
-		 stdout,
-		 ewfcommon_libewf_handle,
-		 &amount_of_acquiry_errors );
+		if( info_handle_acquiry_errors_fprint(
+		     info_handle,
+		     stdout,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to print acquiry errors.\n" );
+
+			notify_error_backtrace(
+			 error );
+			liberror_error_free(
+			 &error );
+		}
 	}
 	if( ewfsignal_detach() != 1 )
 	{
-		fprintf( stderr, "Unable to detach signal handler.\n" );
+		fprintf(
+		 stderr,
+		 "Unable to detach signal handler.\n" );
 	}
-	if( libewf_close(
-	     ewfcommon_libewf_handle ) != 0 )
+	if( info_handle_close(
+	     info_handle,
+	     &error ) != 0 )
 	{
-		fprintf( stderr, "Unable to close EWF file(s).\n" );
+		fprintf(
+		 stderr,
+		 "Unable to close EWF file(s).\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		info_handle_free(
+		 &info_handle,
+		 NULL );
 
 		return( EXIT_FAILURE );
 	}
-	if( ewfcommon_abort != 0 )
+	if( info_handle_free(
+	     &info_handle,
+	     &error ) != 1 )
 	{
-		fprintf( stdout, "%s: ABORTED\n",
+		fprintf(
+		 stderr,
+		 "Unable to free info handle.\n" );
+
+		notify_error_backtrace(
+		 error );
+		liberror_error_free(
+		 &error );
+
+		return( EXIT_FAILURE );
+	}
+	if( ewfinfo_abort != 0 )
+	{
+		fprintf(
+		 stdout, "%s: ABORTED\n",
 		 program );
 
 		return( EXIT_FAILURE );

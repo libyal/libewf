@@ -40,11 +40,7 @@ extern "C" {
 #define EWFINPUT_FORMAT_TYPES_AMOUNT			12
 #define EWFINPUT_FORMAT_TYPES_DEFAULT			7
 
-#if defined( LIBEWF_CD_SUPPORT )
-#define EWFINPUT_MEDIA_TYPES_AMOUNT			3
-#else
-#define EWFINPUT_MEDIA_TYPES_AMOUNT			2
-#endif
+#define EWFINPUT_MEDIA_TYPES_AMOUNT			4
 #define EWFINPUT_MEDIA_TYPES_DEFAULT			0
 
 #define EWFINPUT_VOLUME_TYPES_AMOUNT			2
@@ -55,11 +51,7 @@ extern "C" {
 
 extern system_character_t *ewfinput_compression_levels[ 4 ];
 extern system_character_t *ewfinput_format_types[ 12 ];
-#if defined( LIBEWF_CD_SUPPORT )
-extern system_character_t *ewfinput_media_types[ 3 ];
-#else
-extern system_character_t *ewfinput_media_types[ 2 ];
-#endif
+extern system_character_t *ewfinput_media_types[ 4 ];
 extern system_character_t *ewfinput_volume_types[ 2 ];
 extern system_character_t *ewfinput_sector_per_block_sizes[ 10 ];
 extern system_character_t *ewfinput_yes_no[ 2 ];

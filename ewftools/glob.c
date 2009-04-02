@@ -24,6 +24,8 @@
 #include <memory.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <errno.h>
 
 #if defined( HAVE_STDLIB_H )
@@ -44,13 +46,18 @@
  * Returns 1 if successful or -1 on error
  */
 int glob_initialize(
-     glob_t **glob )
+     glob_t **glob,
+     liberror_error_t **error )
 {
 	static char *function = "glob_initialize";
 
 	if( glob == NULL )
 	{
-		notify_warning_printf( "%s: invalid glob.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid glob.",
 		 function );
 
 		return( -1 );
@@ -58,11 +65,15 @@ int glob_initialize(
 	if( *glob == NULL )
 	{
 		*glob = (glob_t *) memory_allocate(
-		                       sizeof( glob_t ) );
+		                    sizeof( glob_t ) );
 
 		if( *glob == NULL )
 		{
-			notify_warning_printf( "%s: unable to allocate glob.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create glob.",
 			 function );
 
 			return( -1 );
@@ -72,7 +83,11 @@ int glob_initialize(
 		     0,
 		     sizeof( glob_t ) ) == NULL )
 		{
-			notify_warning_printf( "%s: unable to clear glob.\n",
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to clear glob.",
 			 function );
 
 			memory_free(
@@ -92,14 +107,19 @@ int glob_initialize(
  * Returns 1 if successful or -1 on error
  */
 int glob_free(
-     glob_t **glob )
+     glob_t **glob,
+     liberror_error_t **error )
 {
 	static char *function = "glob_free";
 	int result_iterator   = 0;
 
 	if( glob == NULL )
 	{
-		notify_warning_printf( "%s: invalid glob.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid glob.",
 		 function );
 
 		return( -1 );
@@ -132,7 +152,8 @@ int glob_free(
  */
 int glob_resize(
      glob_t *glob,
-     int new_amount_of_results )
+     int new_amount_of_results,
+     liberror_error_t **error )
 {
 	void *reallocation    = NULL;
 	static char *function = "glob_resize";
@@ -141,14 +162,22 @@ int glob_resize(
 
 	if( glob == NULL )
 	{
-		notify_warning_printf( "%s: invalid glob.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid glob.",
 		 function );
 
 		return( -1 );
 	}
 	if( glob->amount_of_results >= new_amount_of_results )
 	{
-		notify_warning_printf( "%s: new amount less equal than current amount.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: new amount less equal than current amount.",
 		 function );
 
 		return( -1 );
@@ -159,7 +188,11 @@ int glob_resize(
 	if( ( previous_size > (size_t) SSIZE_MAX )
 	 || ( new_size > (size_t) SSIZE_MAX ) )
 	{
-		notify_warning_printf( "%s: invalid size value exceeds maximum.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -170,7 +203,11 @@ int glob_resize(
 
 	if( reallocation == NULL )
 	{
-		notify_warning_printf( "%s: unable to reallocate glob results.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to reallocate glob results.",
 		 function );
 
 		return( -1 );
@@ -182,7 +219,11 @@ int glob_resize(
 	     0,
 	     ( new_size - previous_size ) ) == NULL )
 	{
-		notify_warning_printf( "%s: unable to clear glob.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_MEMORY,
+		 LIBERROR_MEMORY_ERROR_SET_FAILED,
+		 "%s: unable to clear glob.",
 		 function );
 
 		return( -1 );
@@ -198,7 +239,8 @@ int glob_resize(
 int glob_resolve(
      glob_t *glob,
      system_character_t * const patterns[],
-     int amount_of_patterns )
+     int amount_of_patterns,
+     liberror_error_t **error )
 {
 #if defined( WINAPI )
 	struct glob_finddata_t find_data;
@@ -218,7 +260,11 @@ int glob_resolve(
 
 	if( glob == NULL )
 	{
-		notify_warning_printf( "%s: invalid glob.\n",
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid glob.",
 		 function );
 
 		return( -1 );
@@ -259,7 +305,8 @@ int glob_resolve(
 			{
 				if( glob_resize(
 				     glob,
-				     ( glob->amount_of_results + 1 ) ) != 1 )
+				     glob->amount_of_results + 1,
+				     error ) != 1 )
 				{
 					notify_warning_printf( "%s: unable to resize glob.\n",
 					 function );

@@ -26,47 +26,43 @@
 #include <common.h>
 #include <types.h>
 
+#include <liberror.h>
+
 #include <libewf/handle.h>
 
-#if defined( HAVE_V2_API )
-#include "libewf_extern.h"
-#endif
-
 #include "libewf_chunk_cache.h"
-#include "libewf_file_io_pool.h"
+#include "libewf_extern.h"
 #include "libewf_hash_sections.h"
+#include "libewf_libbfio.h"
 #include "libewf_header_sections.h"
+#include "libewf_io_handle.h"
 #include "libewf_media_values.h"
 #include "libewf_offset_table.h"
+#include "libewf_read_io_handle.h"
 #include "libewf_segment_table.h"
 #include "libewf_sector_table.h"
 #include "libewf_values_table.h"
-
-#include "ewf_data.h"
-#include "ewf_error2.h"
-#include "ewf_table.h"
+#include "libewf_write_io_handle.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
 typedef struct libewf_internal_handle libewf_internal_handle_t;
-typedef struct libewf_internal_handle_read libewf_internal_handle_read_t;
-typedef struct libewf_internal_handle_write libewf_internal_handle_write_t;
 
 struct libewf_internal_handle
 {
-	/* A specific subhandle for read specific values
+	/* The io handle
 	 */
-	libewf_internal_handle_read_t *read;
+	libewf_io_handle_t *io_handle;
 
-	/* A specific subhandle for write specific values
+	/* The read io handle
 	 */
-	libewf_internal_handle_write_t *write;
+	libewf_read_io_handle_t *read_io_handle;
 
-	/* The file io pool
+	/* The write io handle
 	 */
-	libewf_file_io_pool_t *file_io_pool;
+	libewf_write_io_handle_t *write_io_handle;
 
 	/* The list of segment files
 	 */
@@ -113,183 +109,212 @@ struct libewf_internal_handle
 	 */
 	libewf_sector_table_t *acquiry_errors;
 
-	/* The current chunk
-	 */
-	uint32_t current_chunk;
-
-	/* The current chunk offset
-	 */
-	uint32_t current_chunk_offset;
-
-	/* Value to indicate the compression level used
-	 */
-	int8_t compression_level;
-
-	/* Value to indicate if empty block should be compressed
-	 * even if no compression is used
-	 */
-	uint8_t compress_empty_block;
-
-	/* Value to indicate which file format is used
-	 */
-	uint8_t format;
-
-	/* Value to indicate which ewf format is used
-	 */
-	uint8_t ewf_format;
-
 	/* Value to indicate if abort was signalled
 	 */
 	int abort;
 };
 
-/* Additional subhandle for read specific parameters
- */
-struct libewf_internal_handle_read
-{
-	/* The sectors with CRC errors
-	 */
-	libewf_sector_table_t *crc_errors;
-
-	/* A value to indicate if a chunk should be wiped on error
-	 */
-	uint8_t wipe_on_error;
-};
-
-/* Additional subhandle for write specific parameters
- */
-struct libewf_internal_handle_write
-{
-	/* A cached version of the data section
-	 */
-	ewf_data_t *data_section;
-
-	/* A cached version of the table offsets
-	 */
-	ewf_table_offset_t *table_offsets;
-
-	/* The amount of allocated table offsets
-	 */
-	uint32_t amount_of_table_offsets;
-
-	/* The amount of bytes of the input written
-	 */
-	ssize64_t input_write_count;
-
-	/* The total amount of bytes written
-	 */
-	ssize64_t write_count;
-
-	/* The maximum segment file size
-	 */
-	size64_t maximum_segment_file_size;
-
-	/* The segment file size
-	 */
-	size64_t segment_file_size;
-
-	/* The remaining segment file size
-	 */
-	ssize64_t remaining_segment_file_size;
-
-	/* The delta segment file size
-	 */
-	size64_t delta_segment_file_size;
-
-	/* The maximum amount of segments
-	 */
-	uint16_t maximum_amount_of_segments;
-
-	/* The amount of bytes written to a section containing chunks
-	 */
-	ssize64_t chunks_section_write_count;
-
-        /* The amount of chunks written
-         */
-        uint32_t amount_of_chunks;
-
-        /* The determined (estimated) amount of chunks per segment
-         */
-        uint32_t chunks_per_segment;
-
-        /* The determined (estimated) amount of chunks per chunks section
-         */
-        uint32_t chunks_per_chunks_section;
-
-        /* The amount of chunks written of the current segment file
-         */
-        uint32_t segment_amount_of_chunks;
-
-        /* The maximum amount of chunks that can be written to a chunks section
-         */
-        uint32_t maximum_section_amount_of_chunks;
-
-        /* The amount of chunks written of the current chunks section
-         */
-        uint32_t section_amount_of_chunks;
-
-	/* The offset of the chunks section within the current segment file
-	 */
-	off64_t chunks_section_offset;
-
-	/* The current chunks section number
-	 */
-	uint8_t chunks_section_number;
-
-	/* Value to indicate if the offset table should not be restricted
-	 * to the maximum amount of offsets
-	 */
-	uint8_t unrestrict_offset_amount;
-
-	/* Value to indicate the write values were initialized
-	 */
-	uint8_t values_initialized;
-
-	/* Value to indicate a new chunks section should be created
-	 */
-	uint8_t create_chunks_section;
-
-	/* Value to indicate if the write has been finalized
-	 */
-	uint8_t write_finalized;
-};
-
-#if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_handle_initialize(
                    libewf_handle_t **handle,
                    liberror_error_t **error );
-#else
-int libewf_handle_initialize(
-     libewf_handle_t **handle,
-     uint8_t flags,
-     liberror_error_t **error );
-#endif
 
-#if defined( HAVE_V2_API )
 LIBEWF_EXTERN int libewf_handle_free(
                    libewf_handle_t **handle,
                    liberror_error_t **error );
-#else
-int libewf_handle_free(
-     libewf_handle_t **handle,
-     liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_signal_abort(
+                   libewf_handle_t *handle,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_open(
+                   libewf_handle_t *handle,
+                   char * const filenames[],
+                   int amount_of_filenames,
+                   uint8_t flags,
+                   liberror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_handle_open_wide(
+                   libewf_handle_t *handle,
+                   wchar_t * const filenames[],
+                   int amount_of_filenames,
+                   uint8_t flags,
+                   liberror_error_t **error );
 #endif
 
-int libewf_internal_handle_subhandle_read_initialize(
-     libewf_internal_handle_read_t **subhandle_read,
-     liberror_error_t **error );
+LIBEWF_EXTERN int libewf_handle_open_pool(
+                   libewf_handle_t *handle,
+                   libbfio_pool_t *file_io_pool,
+                   uint8_t flags,
+                   liberror_error_t **error );
 
-int libewf_internal_handle_subhandle_read_free(
-     libewf_internal_handle_read_t **subhandle_read,
-     liberror_error_t **error );
+LIBEWF_EXTERN int libewf_handle_close(
+                   libewf_handle_t *handle,
+                   liberror_error_t **error );
 
-int libewf_internal_handle_subhandle_write_initialize(
-     libewf_internal_handle_write_t **subhandle_write,
-     liberror_error_t **error );
+LIBEWF_EXTERN off64_t libewf_handle_seek_offset(
+                       libewf_handle_t *handle,
+                       off64_t offset,
+                       int whence,
+                       liberror_error_t **error );
 
-int libewf_internal_handle_subhandle_write_free(
-     libewf_internal_handle_write_t **subhandle_write,
-     liberror_error_t **error );
+LIBEWF_EXTERN ssize_t libewf_handle_prepare_read_chunk(
+                       libewf_handle_t *handle,
+                       void *chunk_buffer,
+                       size_t chunk_buffer_size,
+                       void *uncompressed_buffer,
+                       size_t *uncompressed_buffer_size,
+                       int8_t is_compressed,
+                       uint32_t chunk_crc,
+                       int8_t read_crc,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
+                       libewf_handle_t *handle,
+                       void *chunk_buffer,
+                       size_t chunk_buffer_size,
+                       int8_t *is_compressed,
+                       uint32_t *chunk_crc,
+                       int8_t *read_crc,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_read_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_read_random(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t size,
+                       off64_t offset,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_prepare_write_chunk(
+                       libewf_handle_t *handle,
+                       void *chunk_buffer,
+                       size_t chunk_buffer_size,
+                       void *compressed_buffer,
+                       size_t *compressed_buffer_size,
+                       int8_t *is_compressed,
+                       uint32_t *chunk_crc,
+                       int8_t *write_crc,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
+                       libewf_handle_t *handle,
+                       void *chunk_buffer,
+                       size_t chunk_buffer_size,
+                       size_t data_size,
+                       int8_t is_compressed,
+                       uint32_t chunk_crc,
+                       int8_t write_crc,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_write_buffer(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_write_random(
+                       libewf_handle_t *handle,
+                       void *buffer,
+                       size_t buffer_size,
+                       off64_t offset,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN ssize_t libewf_handle_write_finalize(
+                       libewf_handle_t *handle,
+                       liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_offset(
+                   libewf_handle_t *handle,
+                   off64_t *offset,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_segment_filename_size(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_segment_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_segment_filename(
+                   libewf_handle_t *handle,
+                   const char *filename,
+                   size_t filename_length,
+                   liberror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_handle_get_segment_filename_size_wide(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   const wchar_t *filename,
+                   size_t filename_length,
+                   liberror_error_t **error );
+#endif
+
+LIBEWF_EXTERN int libewf_handle_set_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t segment_file_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_filename_size(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_delta_segment_filename(
+                   libewf_handle_t *handle,
+                   const char *filename,
+                   size_t filename_length,
+                   liberror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_filename_size_wide(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_set_delta_segment_filename_wide(
+                   libewf_handle_t *handle,
+                   const wchar_t *filename,
+                   size_t filename_length,
+                   liberror_error_t **error );
+#endif
+
+LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
+                   libewf_handle_t *handle,
+                   size64_t delta_segment_file_size,
+                   liberror_error_t **error );
 
 int libewf_internal_handle_add_segment_file(
      libewf_internal_handle_t *internal_handle,
@@ -314,10 +339,6 @@ int libewf_internal_handle_set_media_values(
 int libewf_internal_handle_set_format(
      libewf_internal_handle_t *internal_handle,
      uint8_t format,
-     liberror_error_t **error );
-
-int libewf_internal_handle_create_header_values(
-     libewf_internal_handle_t *internal_handle,
      liberror_error_t **error );
 
 int libewf_internal_handle_write_initialize(

@@ -56,6 +56,22 @@ extern "C" {
 	strcmp( string1, string2 )
 #endif
 
+/* Caseless string compare
+ */
+#if defined( WINAPI )
+#define narrow_string_compare_no_case( string1, string2, size ) \
+        _strnicmp( string1, string2, size )
+
+
+#elif defined( HAVE_STRNCASECMP )
+#define narrow_string_compare_no_case( string1, string2, size ) \
+	strncasecmp( string1, string2, size )
+
+#elif defined( HAVE_STRCASECMP )
+#define narrow_string_compare_no_case( string1, string2, size ) \
+	strcasecmp( string1, string2 )
+#endif
+
 /* String copy
  */
 #if defined( HAVE_STRNCPY )
@@ -95,31 +111,36 @@ extern "C" {
 
 /* String formatted print (snprinf)
  */
-#if defined( HAVE_SNPRINTF )
 #if defined( WINAPI )
 #define narrow_string_snprintf( target, size, format, ... ) \
 	sprintf_s( target, size, format, __VA_ARGS__ )
 
-#else
+#elif defined( HAVE_SNPRINTF )
 #define narrow_string_snprintf( target, size, format, ... ) \
 	snprintf( target, size, format, __VA_ARGS__ )
-#endif
 
 #elif defined( HAVE_SPRINTF )
 #define narrow_string_snprintf( target, size, format, ... ) \
 	sprintf( target, format, __VA_ARGS__ )
 #endif
 
-/* String retrieve form stream (fgets)
+/* String retrieve from stream (fgets)
  */
 #if defined( HAVE_FGETS )
 #define narrow_string_get_from_stream( string, size, stream ) \
 	fgets( string, size, stream )
 #endif
 
+/* String input conversion (sscanf)
+ */
+#if defined( HAVE_SSCANF )
+#define narrow_string_sscanf( string, format, ... ) \
+	sscanf( string, format, __VA_ARGS__ )
+#endif
+
 /* String to singed long long (int64)
  */
-#if defined( HAVE_ATOI64 )
+#if defined( WINAPI )
 #define narrow_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) _atoi64( string )
 
@@ -134,7 +155,7 @@ extern "C" {
 
 /* String to unsigned long long (uint64)
  */
-#if defined( HAVE_ATOI64 )
+#if defined( WINAPI )
 #define narrow_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) _atoi64( string )
 

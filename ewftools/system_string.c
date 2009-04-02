@@ -50,7 +50,6 @@
 #include <libuna.h>
 #endif
 
-#include "notify.h"
 #include "system_string.h"
 
 #if !defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
@@ -467,7 +466,8 @@ int system_string_size_from_utf8_string(
 #else
 	if( system_string_is_unicode != 0 )
 	{
-		*string_size = utf8_string_size;
+		*string_size = 1 + narrow_string_length(
+		                    (char *) utf8_string );
 	}
 	else if( libuna_byte_stream_size_from_utf8(
 	          (libuna_utf8_character_t *) utf8_string,
@@ -547,14 +547,14 @@ int system_string_copy_from_utf8_string(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
 #if SIZEOF_WCHAR_T == 4
-	if( libuna_utf32_string_copy_from_utf8_string(
+	if( libuna_utf32_string_copy_from_utf8(
 	     (libuna_utf32_character_t *) string,
 	     string_size,
 	     (libuna_utf8_character_t *) utf8_string,
 	     utf8_string_size,
 	     error ) != 1 )
 #elif SIZEOF_WCHAR_T == 2
-	if( libuna_utf16_string_copy_from_utf8_string(
+	if( libuna_utf16_string_copy_from_utf8(
 	     (libuna_utf16_character_t *) string,
 	     string_size,
 	     (libuna_utf8_character_t *) utf8_string,
@@ -613,6 +613,232 @@ int system_string_copy_from_utf8_string(
 		 LIBERROR_ERROR_DOMAIN_CONVERSION,
 		 LIBERROR_CONVERSION_ERROR_GENERIC,
 		 "%s: unable to set string.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+/* Determines the UTF-8 string size from the system string
+ * Returns 1 if successful or -1 on error
+ */
+int utf8_string_size_from_system_string(
+     const system_character_t *string,
+     size_t string_size,
+     size_t *utf8_string_size,
+     liberror_error_t **error )
+{
+	static char *function = "utf8_string_size_from_system_string";
+
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if SIZEOF_WCHAR_T == 4
+	if( libuna_utf8_string_size_from_utf32(
+	     (libuna_utf32_character_t *) string,
+	     string_size,
+	     utf8_string_size,
+	     error ) != 1 )
+#elif SIZEOF_WCHAR_T == 2
+	if( libuna_utf8_string_size_from_utf16(
+	     (libuna_utf16_character_t *) string,
+	     string_size,
+	     utf8_string_size,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( system_string_is_unicode != 0 )
+	{
+		*utf8_string_size = 1 + system_string_length(
+		                         string );
+	}
+	else if( libuna_utf8_string_size_from_byte_stream(
+	          (uint8_t *) string,
+	          string_size,
+	          system_string_ascii_codepage,
+	          utf8_string_size,
+	          error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to determine UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( 1 );
+}
+
+/* Copies the UTF-8 string size from the system string
+ * Returns 1 if successful or -1 on error
+ */
+int utf8_string_copy_from_system_string(
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     const system_character_t *string,
+     size_t string_size,
+     liberror_error_t **error )
+{
+	static char *function = "utf8_string_copy_from_system_string";
+
+	if( utf8_string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-8 string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( string == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid string.",
+		 function );
+
+		return( -1 );
+	}
+	if( string_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid string size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+#if SIZEOF_WCHAR_T == 4
+	if( libuna_utf8_string_copy_from_utf32(
+	     (libuna_utf8_character_t *) utf8_string,
+	     utf8_string_size,
+	     (libuna_utf32_character_t *) string,
+	     string_size,
+	     error ) != 1 )
+#elif SIZEOF_WCHAR_T == 2
+	if( libuna_utf8_string_copy_from_utf16(
+	     (libuna_utf8_character_t *) utf8_string,
+	     utf8_string_size,
+	     (libuna_utf16_character_t *) string,
+	     string_size,
+	     error ) != 1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+#else
+	if( system_string_is_unicode != 0 )
+	{
+		if( utf8_string_size < string_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+			 "%s: UTF-8 string too small.",
+			 function );
+
+			return( -1 );
+		}
+		if( memory_copy(
+		     utf8_string,
+		     string,
+		     string_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to set string.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( libuna_utf8_string_copy_from_byte_stream(
+	          (libuna_utf8_character_t *) utf8_string,
+	          utf8_string_size,
+	          (uint8_t *) string,
+	          string_size,
+	          system_string_ascii_codepage,
+	          error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_CONVERSION,
+		 LIBERROR_CONVERSION_ERROR_GENERIC,
+		 "%s: unable to set UTF-8 string.",
 		 function );
 
 		return( -1 );

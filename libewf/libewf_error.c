@@ -1,5 +1,5 @@
 /*
- * String conversion functions
+ * Error functions
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -20,35 +20,43 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _STRING_CONVERSION_H )
-#define _STRING_CONVERSION_H
-
 #include <common.h>
-#include <narrow_string.h>
 #include <types.h>
-#include <wide_string.h>
 
-#if defined( __cplusplus )
-extern "C" {
-#endif
+#include <liberror.h>
 
-#if defined( HAVE_WIDE_CHARACTER_TYPE )
+#include <stdio.h>
 
-int string_copy_wchar_to_char(
-     char *destination,
-     const wchar_t *source,
-     size_t size );
+#include "libewf_error.h"
 
-int string_copy_char_to_wchar(
-     wchar_t *destination,
-     const char *source,
-     size_t size );
-
-#endif
-
-#if defined( __cplusplus )
+/* Free an error and its elements
+ */
+void libewf_error_free(
+      libewf_error_t **error )
+{
+	liberror_error_free(
+	 (liberror_error_t **) error );
 }
-#endif
 
-#endif
+/* Prints a descriptive string of the error to the stream
+ */
+void libewf_error_fprint(
+      libewf_error_t *error,
+      FILE *stream )
+{
+	liberror_error_fprint(
+	 (liberror_error_t *) error,
+	 stream );
+}
+
+/* Prints a backtrace of the error to the stream
+ */
+void libewf_error_backtrace_fprint(
+      libewf_error_t *error,
+      FILE *stream )
+{
+	liberror_error_backtrace_fprint(
+	 (liberror_error_t *) error,
+	 stream );
+}
 

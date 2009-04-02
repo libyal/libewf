@@ -26,34 +26,10 @@
 #include "common.h"
 #include "types.h"
 
-#if defined( HAVE_WCHAR_H )
-/* __USE_UNIX98 is required to add swprintf definition
+/* Because wchar_t is defined in wchar.h
+ * and its included in types.h
+ * it's not included here
  */
-#if !defined( __USE_UNIX98 )
-#define __USE_UNIX98
-#define LIBCOMMON_DEFINITION_UNIX98
-#endif
-
-/* __USE_ISOC99 is required to add wcstoll and wcstuoll definition
- */
-#if !defined( __USE_ISOC99 )
-#define __USE_ISOC99
-#define LIBCOMMON_DEFINITION_ISOC99
-#endif
-
-#include <wchar.h>
-
-#if defined( LIBCOMMON_DEFINITION_UNIX98 )
-#undef __USE_UNIX98
-#undef LIBCOMMON_DEFINITION_UNIX98
-#endif
-
-#if defined( LIBCOMMON_DEFINITION_ISOC99 )
-#undef __USE_ISOC99
-#undef LIBCOMMON_DEFINITION_ISOC99
-#endif
-
-#endif
 
 #if defined( __cplusplus )
 extern "C" {
@@ -79,6 +55,21 @@ extern "C" {
 #elif defined( HAVE_WCSCMP )
 #define wide_string_compare( string1, string2, size ) \
 	wcscmp( string1, string2 )
+#endif
+
+/* Caseless string compare
+ */
+#if defined( WINAPI )
+#define wide_string_compare_no_case( string1, string2, size ) \
+	_wcsnicmp( string1, string2, size )
+
+#elif defined( HAVE_WCSNCASECMP )
+#define wide_string_compare_no_case( string1, string2, size ) \
+	wcsncasecmp( string1, string2, size )
+
+#elif defined( HAVE_WCSCASECMP )
+#define wide_string_compare_no_case( string1, string2, size ) \
+	wcscasecmp( string1, string2 )
 #endif
 
 /* String copy
@@ -120,18 +111,16 @@ extern "C" {
 
 /* String formatted print (snprinf)
  */
-#if defined( HAVE_SWPRINTF )
 #if defined( WINAPI )
 #define wide_string_snprintf( target, size, format, ... ) \
 	swprintf_s( target, size, format, __VA_ARGS__ )
 
-#else
+#elif defined( HAVE_SWPRINTF )
 #define wide_string_snprintf( target, size, format, ... ) \
 	swprintf( target, size, format, __VA_ARGS__ )
 #endif
-#endif
 
-/* String retrieve form stream (fgets)
+/* String retrieve from stream (fgets)
  */
 #if defined( HAVE_FGETWS )
 #define wide_string_get_from_stream( string, size, stream ) \
@@ -140,7 +129,7 @@ extern "C" {
 
 /* String to singed long long (int64)
  */
-#if defined( HAVE_WTOI64 )
+#if defined( WINAPI )
 #define wide_string_to_signed_long_long( string, end_of_string, base ) \
 	(int64_t) _wtoi64( string )
 
@@ -151,7 +140,7 @@ extern "C" {
 
 /* String to unsinged long long (uint64)
  */
-#if defined( HAVE_WTOI64 )
+#if defined( WINAPI )
 #define wide_string_to_unsigned_long_long( string, end_of_string, base ) \
 	(uint64_t) _wtoi64( string )
 

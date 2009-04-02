@@ -60,6 +60,12 @@ struct libewf_chunk_offset
 	 * 0x04 indicates if the chunk is corrupted
 	 */
 	uint8_t flags;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	/* Value to indicate if the chunk is stored in a delta segment file
+	 */
+	uint8_t is_delta_chunk;
+#endif
 };
 
 #if defined( __cplusplus )

@@ -91,12 +91,27 @@
  */
 #undef HAVE_SIGNAL_H
 
+/* Windows does not have <langinfo.h>
+ */
+#undef HAVE_LANGINFO_H
+#undef HAVE_LANGINFO_CODESET
+
 /* If wide character support was enabled
  * make use of the wide character support functions
  */
+#if !defined( HAVE_WIDE_CHARACTER_TYPE )
+#define HAVE_WIDE_CHARACTER_TYPE
+#endif
+
 #if !defined( HAVE_WCHAR_H )
 #define HAVE_WCHAR_H		1
 #endif
+
+#if defined( SIZEOF_WCHAR_T )
+#undef SIZEOF_WCHAR_T
+#endif
+
+#define SIZEOF_WCHAR_T		2
 
 /* Make sure the function definitions are available
  * these should be normally defined in config.h
@@ -214,15 +229,9 @@
 #define HAVE_STRRCHR		1
 #endif
 
-#if !defined( HAVE_SNPRINTF )
-#define HAVE_SNPRINTF		1
-#endif
-
 #if !defined( HAVE_FGETS )
 #define HAVE_FGETS		1
 #endif
-
-#define HAVE_ATOI64		1
 
 #else
 #undef HAVE_STRLEN
@@ -230,9 +239,7 @@
 #undef HAVE_STRNCPY
 #undef HAVE_STRCHR
 #undef HAVE_STRRCHR
-#undef HAVE_SNPRINTF
 #undef HAVE_FGETS
-#undef HAVE_ATOI64
 #endif
 
 /* Functions in common/wide_string.h
@@ -258,15 +265,9 @@
 #define HAVE_WCSRCHR		1
 #endif
 
-#if !defined( HAVE_SWPRINTF )
-#define HAVE_SWPRINTF		1
-#endif
-
 #if !defined( HAVE_FGETWS )
 #define HAVE_FGETWS		1
 #endif
-
-#define HAVE_WTOI64		1
 
 #else
 #undef HAVE_WCSLEN
@@ -274,10 +275,18 @@
 #undef HAVE_WCSNCPY
 #undef HAVE_WCSCHR
 #undef HAVE_WCSRCHR
-#undef HAVE_SWPRINTF
 #undef HAVE_FGETWS
-#undef HAVE_WTOI64
 #endif
+
+/* Use the native WINAPI functions instead of the POSIX like functions
+#define USE_NATIVE_WINAPI_FUNCTIONS	1
+ */
+
+#if defined( LIBEWF_OPERATING_SYSTEM )
+#undef LIBEWF_OPERATING_SYSTEM
+#endif
+
+#define LIBEWF_OPERATING_SYSTEM		"Windows"
 
 #endif
 

@@ -31,34 +31,44 @@
 extern "C" {
 #endif
 
-#if defined( HAVE_FOPEN )
+#if defined( HAVE_FOPEN ) || defined( WINAPI )
 #define file_stream_io_fopen( filename, mode ) \
 	fopen( filename, mode )
 #endif
 
-#if defined( HAVE_WFOPEN )
+#if defined( WINAPI )
 #define file_stream_io_wfopen( filename, mode ) \
 	_wfopen( filename, mode )
 #endif
 
-#if defined( HAVE_FCLOSE )
+#if defined( HAVE_FCLOSE ) || defined( WINAPI )
 #define file_stream_io_fclose( file_stream ) \
 	fclose( file_stream )
 #endif
 
-#if defined( HAVE_FREAD )
+#if defined( HAVE_FREAD ) || defined( WINAPI )
 #define file_stream_io_fread( stream, data, size ) \
 	fread( data, 1, size, stream )
 #endif
 
-#if defined( HAVE_FWRITE )
+#if defined( HAVE_FWRITE ) || defined( WINAPI )
 #define file_stream_io_fwrite( stream, data, size ) \
 	fwrite( data, 1, size, stream )
 #endif
 
-#if defined( HAVE_FEOF )
+#if defined( HAVE_FEOF ) || defined( WINAPI )
 #define file_stream_io_feof( stream ) \
         feof( stream )
+#endif
+
+#if defined( HAVE_FGETS ) || defined( WINAPI )
+#define file_stream_io_get_narrow_string( string, size, stream ) \
+        fgets( string, size, stream )
+#endif
+
+#if defined( HAVE_FGETWS ) || defined( WINAPI )
+#define file_stream_io_get_wide_string( string, size, stream ) \
+        fgetws( string, size, stream )
 #endif
 
 #if defined( __cplusplus )

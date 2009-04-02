@@ -79,18 +79,6 @@ struct storage_media_buffer
 	 */
 	uint32_t crc;
 #endif
-
-	/* The amount of bytes of input
-	 */
-	size_t input_size;
-
-	/* The amount of bytes of output
-	 */
-	size_t output_size;
-
-	/* The offset
-	 */
-	off64_t offset;
 };
 
 int storage_media_buffer_initialize(

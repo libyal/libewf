@@ -33,14 +33,8 @@
 #include <libewf/definitions.h>
 #include <libewf/handle.h>
 
-#include "date_time.h"
-#include "digest_context.h"
 #include "error_string.h"
 #include "ewfsignal.h"
-#include "file_stream_io.h"
-#include "md5.h"
-#include "process_status.h"
-#include "sha1.h"
 #include "system_string.h"
 
 #define EWFCOMMON_DEFAULT_SEGMENT_FILE_SIZE		LIBEWF_DEFAULT_SEGMENT_FILE_SIZE
@@ -56,23 +50,11 @@ extern "C" {
 #define ewfcommon_strerror( error_number ) \
         error_string_wcserror( error_number )
 
-#define ewfcommon_fopen( filename, mode ) \
-	file_stream_io_wfopen( filename, mode )
-
 #else
 #define ewfcommon_strerror( error_number ) \
         error_string_strerror( error_number )
 
-#define ewfcommon_fopen( filename, mode ) \
-	file_stream_io_fopen( filename, mode )
-
 #endif
-
-extern int ewfcommon_abort;
-extern libewf_handle_t *ewfcommon_libewf_handle;
-
-void ewfcommon_signal_handler(
-      ewfsignal_t signal );
 
 int ewfcommon_swap_byte_pairs(
      uint8_t *buffer,
@@ -86,122 +68,6 @@ int ewfcommon_determine_operating_system_string(
 int ewfcommon_determine_guid(
      uint8_t *guid,
      uint8_t libewf_format );
-
-int ewfcommon_initialize_write(
-     libewf_handle_t *handle,
-     system_character_t *case_number,
-     system_character_t *description,
-     system_character_t *evidence_number,
-     system_character_t *examiner_name,
-     system_character_t *notes,
-     system_character_t *acquiry_operating_system,
-     system_character_t *acquiry_software,
-     system_character_t *acquiry_software_version,
-     uint8_t media_type,
-     uint8_t volume_type,
-     int8_t compression_level,
-     uint8_t compress_empty_block,
-     uint8_t libewf_format,
-     size64_t segment_file_size,
-     uint32_t sector_error_granularity );
-
-ssize32_t ewfcommon_read_input(
-           libewf_handle_t *handle,
-           int file_descriptor,
-           uint8_t *buffer,
-           size_t buffer_size,
-           size32_t chunk_size,
-           uint32_t bytes_per_sector,
-           ssize64_t total_read_count,
-           size64_t total_input_size,
-           uint8_t read_error_retry,
-           uint32_t sector_error_granularity,
-           uint8_t wipe_chunk_on_error,
-           uint8_t seek_on_error );
-
-#if defined( HAVE_RAW_ACCESS )
-ssize_t ewfcommon_raw_read_ewf(
-         libewf_handle_t *handle,
-         uint8_t *raw_buffer,
-         size_t raw_buffer_size,
-         uint8_t **buffer,
-         size_t buffer_size,
-         size_t read_size,
-         off64_t read_offset,
-         size64_t media_size,
-         uint32_t sectors_per_chunk,
-         uint32_t bytes_per_sector,
-         uint8_t wipe_chunk_on_error );
-
-ssize_t ewfcommon_raw_write_ewf(
-         libewf_handle_t *handle,
-         uint8_t *raw_buffer,
-         size_t raw_buffer_size,
-         uint8_t *buffer,
-         size_t buffer_size,
-         size_t write_size );
-#endif
-
-ssize64_t ewfcommon_write_from_file_descriptor(
-           libewf_handle_t *handle,
-           int input_file_descriptor,
-           size64_t write_size,
-           off64_t write_offset,
-           uint32_t sectors_per_chunk,
-           uint32_t bytes_per_sector,
-           uint8_t read_error_retry,
-           uint32_t sector_error_granularity,
-           uint8_t calculate_md5,
-           system_character_t *md5_hash_string,
-           size_t md5_hash_string_length,
-           uint8_t calculate_sha1,
-           system_character_t *sha1_hash_string,
-           size_t sha1_hash_string_length,
-           uint8_t swap_byte_pairs,
-           uint8_t wipe_chunk_on_error,
-           uint8_t seek_on_error,
-           size_t data_buffer_size,
-           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
-
-ssize64_t ewfcommon_export_raw(
-           libewf_handle_t *handle,
-           system_character_t *target_filename,
-           size64_t export_size,
-           off64_t read_offset,
-           uint8_t calculate_md5,
-           system_character_t *md5_hash_string,
-           size_t md5_hash_string_length,
-           uint8_t calculate_sha1,
-           system_character_t *sha1_hash_string,
-           size_t sha1_hash_string_length,
-           uint8_t swap_byte_pairs,
-           uint8_t wipe_chunk_on_error,
-           size_t data_buffer_size,
-           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
-
-ssize64_t ewfcommon_export_ewf(
-           libewf_handle_t *handle,
-           libewf_handle_t *export_handle,
-           int8_t compression_level,
-           uint8_t compress_empty_block,
-           uint8_t libewf_format,
-           size64_t segment_file_size,
-           size64_t export_size,
-           off64_t read_offset,
-           uint32_t export_sectors_per_chunk,
-           uint8_t calculate_md5,
-           system_character_t *md5_hash_string,
-           size_t md5_hash_string_length,
-           uint8_t calculate_sha1,
-           system_character_t *sha1_hash_string,
-           size_t sha1_hash_string_length,
-           uint8_t swap_byte_pairs,
-           uint8_t wipe_chunk_on_error,
-           size_t data_buffer_size,
-           system_character_t *acquiry_operating_system,
-           system_character_t *acquiry_software,
-           system_character_t *acquiry_software_version,
-           void (*callback)( process_status_t *process_status, size64_t bytes_read, size64_t bytes_total ) );
 
 #if defined( __cplusplus )
 }

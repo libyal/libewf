@@ -1,4 +1,4 @@
-.Dd January 18, 2009
+.Dd March 2, 2009
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -53,7 +53,7 @@ the file format to write to, options: raw (default), ewf, smart, ftk, encase1, e
 .It Fl h
 shows this help
 .It Fl l Ar log_filename
-logs verification errors and the digest (hash) to the log filename
+logs export errors and the digest (hash) to the log filename
 .It Fl o Ar offset
 the offset to start the export (default is 0)
 .It Fl p Ar process_buffer_size
@@ -82,7 +82,7 @@ None
 will ask the information it needs.
 .Bd -literal
 # ewfexport floppy.E01
-ewfexport 20080907 (libewf 20080907, libuca 20080904, zlib 1.2.3, libcrypto 0.9.8, libuuid)
+ewfexport 20090229 (libewf 20090229, libuna 20090124, zlib 1.2.3, libcrypto 0.9.8g, libuuid)
 
 Information for export required, please provide the necessary input
 Export to file format (raw, ewf, smart, ftk, encase1, encase2, encase3, encase4, encase5, encase6, linen5, linen6, ewfx) [raw]:
@@ -90,7 +90,7 @@ Target path and filename with extension or - for stdout: floppy.raw
 Start export at offset (0 >= value >= 1474560) [0]:
 Amount of bytes to export (0 >= value >= 1474560) [1474560]:
 
-Export started at: Sun Sep  7 19:19:40 2008
+Export started at: Sat Feb 28 19:19:40 2009
 
 This could take a while.
 
@@ -103,7 +103,7 @@ Status: at 100%.
         exported 1.4 MiB (1474560 bytes) of total 1.4 MiB (1474560 bytes).
         completion in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 
-Export completed at: Sun Sep  7 19:19:41 2008
+Export completed at: Sat Feb 28 19:19:41 2009
 
 Written: 1.4 MiB (1474560 bytes) in 1 second(s) with 1 MiB/s (1474560 bytes/second).
 MD5 hash calculated over data:  ae1ce8f5ac079d3ee93f97fe3792bda3

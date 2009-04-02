@@ -54,7 +54,7 @@ int byte_size_string_create(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid byte size string.\n",
+		 "%s: invalid byte size string.",
 		 function );
 
 		return( -1 );
@@ -104,7 +104,7 @@ int byte_size_string_create(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: factor size greater than 8 unsuported.\n",
+		 "%s: factor size greater than 8 unsuported.",
 		 function );
 
 		return( -1 );
@@ -206,7 +206,7 @@ int byte_size_string_convert(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid byte size string.\n",
+		 "%s: invalid byte size string.",
 		 function );
 
 		return( -1 );
@@ -217,40 +217,40 @@ int byte_size_string_convert(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid size.\n",
+		 "%s: invalid size.",
 		 function );
 
 		return( -1 );
 	}
 	while( byte_size_string_iterator < byte_size_string_length )
 	{
-		if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
-		 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
+		if( ( byte_size_string[ byte_size_string_iterator ] < (system_character_t) '0' )
+		 || ( byte_size_string[ byte_size_string_iterator ] > (system_character_t) '9' ) )
 		{
 			break;
 		}
 		byte_size *= 10;
-		byte_size += ( byte_size_string[ byte_size_string_iterator ] - '0' );
+		byte_size += ( byte_size_string[ byte_size_string_iterator ] - (system_character_t) '0' );
 
 		byte_size_string_iterator++;
 	}
-	if( byte_size_string[ byte_size_string_iterator ] == '.' )
+	if( byte_size_string[ byte_size_string_iterator ] == (system_character_t) '.' )
 	{
 		byte_size_string_iterator++;
 
-		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
-		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
+		if( ( byte_size_string[ byte_size_string_iterator ] >= (system_character_t) '0' )
+		 && ( byte_size_string[ byte_size_string_iterator ] <= (system_character_t) '9' ) )
 		{
-			remainder = (int8_t) ( byte_size_string[ byte_size_string_iterator ] - '0' );
+			remainder = (int8_t) ( byte_size_string[ byte_size_string_iterator ] - (system_character_t) '0' );
 
 			byte_size_string_iterator++;
 		}
 		remainder *= 10;
 
-		if( ( byte_size_string[ byte_size_string_iterator ] >= '0' )
-		 && ( byte_size_string[ byte_size_string_iterator ] <= '9' ) )
+		if( ( byte_size_string[ byte_size_string_iterator ] >= (system_character_t) '0' )
+		 && ( byte_size_string[ byte_size_string_iterator ] <= (system_character_t) '9' ) )
 		{
-			remainder += (int8_t) ( byte_size_string[ byte_size_string_iterator ] - '0' );
+			remainder += (int8_t) ( byte_size_string[ byte_size_string_iterator ] - (system_character_t) '0' );
 
 			byte_size_string_iterator++;
 		}
@@ -258,15 +258,15 @@ int byte_size_string_convert(
 		 */
 		while( byte_size_string_iterator < byte_size_string_length )
 		{
-			if( ( byte_size_string[ byte_size_string_iterator ] < '0' )
-			 || ( byte_size_string[ byte_size_string_iterator ] > '9' ) )
+			if( ( byte_size_string[ byte_size_string_iterator ] < (system_character_t) '0' )
+			 || ( byte_size_string[ byte_size_string_iterator ] > (system_character_t) '9' ) )
 			{
 				break;
 			}
 			byte_size_string_iterator++;
 		}
 	}
-	if( byte_size_string[ byte_size_string_iterator ] == ' ' )
+	if( byte_size_string[ byte_size_string_iterator ] == (system_character_t) ' ' )
 	{
 		byte_size_string_iterator++;
 	}
@@ -311,21 +311,27 @@ int byte_size_string_convert(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid factor.\n",
+		 "%s: invalid factor.",
 		 function );
 
 		return( -1 );
 	}
-	byte_size_string_iterator++;
-
-	if( ( byte_size_string[ byte_size_string_iterator ] == 'i' )
-	 && ( byte_size_string[ byte_size_string_iterator + 1 ] == 'B' ) )
+	else if( factor > 1 )
+	{
+		byte_size_string_iterator++;
+	}
+	if( byte_size_string_iterator >= byte_size_string_length )
+	{
+		units = BYTE_SIZE_STRING_UNIT_MEBIBYTE;
+	}
+	else if( ( byte_size_string[ byte_size_string_iterator ] == (system_character_t) 'i' )
+	      && ( byte_size_string[ byte_size_string_iterator + 1 ] == (system_character_t) 'B' ) )
 	{
 		units = BYTE_SIZE_STRING_UNIT_MEBIBYTE;
 
 		byte_size_string_iterator += 2;
 	}
-	else if( byte_size_string[ byte_size_string_iterator ] == 'B' )
+	else if( byte_size_string[ byte_size_string_iterator ] == (system_character_t) 'B' )
 	{
 		units = BYTE_SIZE_STRING_UNIT_MEGABYTE;
 
@@ -337,7 +343,7 @@ int byte_size_string_convert(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid units.\n",
+		 "%s: invalid units.",
 		 function );
 
 		return( -1 );
@@ -366,7 +372,7 @@ int byte_size_string_convert(
 	}
 #endif
 #if defined( HAVE_VERBOSE_OUTPUT )
-	if( byte_size_string[ byte_size_string_iterator ] != '\0' )
+	if( byte_size_string[ byte_size_string_iterator ] != 0 )
 	{
 		notify_warning_printf(
 		 "%s: trailing data in byte size string.\n",

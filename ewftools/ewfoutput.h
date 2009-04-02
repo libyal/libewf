@@ -26,13 +26,8 @@
 #include <common.h>
 #include <types.h>
 
-#include <liberror.h>
-
 #include <stdio.h>
 
-#include <libewf/handle.h>
-
-#include "date_time.h"
 #include "system_string.h"
 
 #if defined( __cplusplus )
@@ -41,7 +36,7 @@ extern "C" {
 
 void ewfoutput_version_fprint(
       FILE *stream,
-      const char *program );
+      const system_character_t *program );
 
 void ewfoutput_copyright_fprint(
       FILE *stream );
@@ -50,66 +45,6 @@ void ewfoutput_error_fprint(
       FILE *stream,
       char *format,
       ... );
-
-void ewfoutput_timestamp_fprint(
-      FILE *stream,
-      time_t timestamp );
-
-void ewfoutput_bytes_per_second_fprint(
-      FILE *stream,
-      size64_t bytes,
-      time_t seconds );
-
-void ewfoutput_bytes_fprint(
-      FILE *stream,
-      size64_t bytes );
-
-void ewfoutput_acquiry_parameters_fprint(
-      FILE *stream,
-      system_character_t *filename,
-      system_character_t *case_number,
-      system_character_t *description,
-      system_character_t *evidence_number,
-      system_character_t *examiner_name,
-      system_character_t *notes,
-      uint8_t media_type,
-      uint8_t volume_type,
-      int8_t compression_level,
-      uint8_t compress_empty_block,
-      uint8_t libewf_format,
-      off64_t acquiry_offset,
-      size64_t acquiry_size,
-      size64_t segment_file_size,
-      uint32_t sectors_per_chunk,
-      uint32_t sector_error_granularity,
-      uint8_t read_error_retry,
-      uint8_t wipe_block_on_read_error );
-
-void ewfoutput_acquiry_errors_fprint(
-      FILE *stream,
-      libewf_handle_t *handle,
-      uint32_t *amount_of_errors );
-
-void ewfoutput_crc_errors_fprint(
-      FILE *stream,
-      libewf_handle_t *handle,
-      uint32_t *amount_of_errors );
-
-void ewfoutput_sessions_fprint(
-      FILE *stream,
-      libewf_handle_t *handle,
-      uint32_t *amount_of_sessions );
-
-void ewfoutput_header_values_fprint(
-      FILE *stream,
-      libewf_handle_t *handle );
-
-void ewfoutput_hash_values_fprint(
-      FILE *stream,
-      libewf_handle_t *handle,
-      const char *indentation,
-      uint8_t ignore_md5,
-      uint8_t ignore_sha1 );
 
 #if defined( __cplusplus )
 }

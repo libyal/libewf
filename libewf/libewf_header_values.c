@@ -2827,15 +2827,15 @@ int libewf_header_values_generate_header_string_type1(
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_NONE;
+			compression_type = _LIBEWF_STRING( LIBEWF_COMPRESSION_TYPE_NONE );
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_FAST;
+			compression_type = _LIBEWF_STRING( LIBEWF_COMPRESSION_TYPE_FAST );
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_BEST;
+			compression_type = _LIBEWF_STRING( LIBEWF_COMPRESSION_TYPE_BEST );
 		}
 		*header_string_size += libewf_string_length(
 		                        compression_type );
@@ -3210,15 +3210,15 @@ int libewf_header_values_generate_header_string_type2(
 	{
 		if( compression_level == EWF_COMPRESSION_NONE )
 		{
-			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_NONE;
+			compression_type = _LIBEWF_STRING( LIBEWF_COMPRESSION_TYPE_NONE );;
 		}
 		else if( compression_level == EWF_COMPRESSION_FAST )
 		{
-			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_FAST;
+			compression_type = _LIBEWF_STRING( LIBEWF_COMPRESSION_TYPE_FAST );
 		}
 		else if( compression_level == EWF_COMPRESSION_BEST )
 		{
-			compression_type = LIBEWF_HEADER_VALUE_COMPRESSION_TYPE_BEST;
+			compression_type = _LIBEWF_STRING( LIBEWF_COMPRESSION_TYPE_BEST );
 		}
 		*header_string_size += libewf_string_length(
 		                        compression_type );
@@ -5696,6 +5696,7 @@ int libewf_convert_date_xheader_value(
 	static char *function              = "libewf_convert_date_xheader_value";
 	time_t timestamp                   = 0;
 	size_t amount_of_date_elements     = 0;
+	int empty_date_element_correction  = 0;
 
 	if( header_value == NULL )
 	{
@@ -5818,7 +5819,8 @@ int libewf_convert_date_xheader_value(
 
 			return( -1 );
 		}
-		if( amount_of_date_elements != 6 )
+		if( ( amount_of_date_elements != 6 )
+		 && ( amount_of_date_elements != 7 ) )
 		{
 			liberror_error_set(
 			 error,
@@ -5834,12 +5836,19 @@ int libewf_convert_date_xheader_value(
 
 			return( -1 );
 		}
+		/* The ctime formatted string use an additional space
+		 * when the day is less than 10
+		 */
+		if( amount_of_date_elements == 7 )
+		{
+			empty_date_element_correction = 1;
+		}
 		/* Set the year
 		 */
-		time_elements.tm_year = (int) ( ( ( date_elements[ 4 ][ 0 ] - (libewf_character_t) '0' ) * 1000 )
-				      + ( ( date_elements[ 4 ][ 1 ] - (libewf_character_t) '0' ) * 100 )
-				      + ( ( date_elements[ 4 ][ 2 ] - (libewf_character_t) '0' ) * 10 )
-				      + ( date_elements[ 4 ][ 3 ] - (libewf_character_t) '0' )
+		time_elements.tm_year = (int) ( ( ( date_elements[ empty_date_element_correction + 4 ][ 0 ] - (libewf_character_t) '0' ) * 1000 )
+				      + ( ( date_elements[ empty_date_element_correction + 4 ][ 1 ] - (libewf_character_t) '0' ) * 100 )
+				      + ( ( date_elements[ empty_date_element_correction + 4 ][ 2 ] - (libewf_character_t) '0' ) * 10 )
+				      + ( date_elements[ empty_date_element_correction + 4 ][ 3 ] - (libewf_character_t) '0' )
 				      - 1900 );
 
 		/* Set the month
@@ -5930,29 +5939,29 @@ int libewf_convert_date_xheader_value(
 		}
 		/* Set the day of the month
 		 */
-		if( date_elements[ 2 ][ 1 ] == 0 )
+		if( date_elements[ empty_date_element_correction + 2 ][ 1 ] == 0 )
 		{
-			time_elements.tm_mday = (int) ( date_elements[ 2 ][ 0 ] - (libewf_character_t) '0' );
+			time_elements.tm_mday = (int) ( date_elements[ empty_date_element_correction + 2 ][ 0 ] - (libewf_character_t) '0' );
 		}
 		else
 		{
-			time_elements.tm_mday = (int) ( ( ( date_elements[ 2 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-					      + ( date_elements[ 2 ][ 1 ] - (libewf_character_t) '0' ) );
+			time_elements.tm_mday = (int) ( ( ( date_elements[ empty_date_element_correction + 2 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
+					      + ( date_elements[ empty_date_element_correction + 2 ][ 1 ] - (libewf_character_t) '0' ) );
 		}
 		/* Set the hour
 		 */
-		time_elements.tm_hour = (int) ( ( ( date_elements[ 3 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
-				      + ( date_elements[ 3 ][ 1 ] - (libewf_character_t) '0' ) );
+		time_elements.tm_hour = (int) ( ( ( date_elements[ empty_date_element_correction + 3 ][ 0 ] - (libewf_character_t) '0' ) * 10 )
+				      + ( date_elements[ empty_date_element_correction + 3 ][ 1 ] - (libewf_character_t) '0' ) );
 
 		/* Set the minutes
 		 */
-		time_elements.tm_min  = (int) ( ( ( date_elements[ 3 ][ 3 ] - (libewf_character_t) '0' ) * 10 )
-				      + ( date_elements[ 3 ][ 4 ] - (libewf_character_t) '0' ) );
+		time_elements.tm_min  = (int) ( ( ( date_elements[ empty_date_element_correction + 3 ][ 3 ] - (libewf_character_t) '0' ) * 10 )
+				      + ( date_elements[ empty_date_element_correction + 3 ][ 4 ] - (libewf_character_t) '0' ) );
 
 		/* Set the seconds
 		 */
-		time_elements.tm_sec = (int) ( ( ( date_elements[ 3 ][ 6 ] - (libewf_character_t) '0' ) * 10 )
-				     + ( date_elements[ 3 ][ 7 ] - (libewf_character_t) '0' ) );
+		time_elements.tm_sec = (int) ( ( ( date_elements[ empty_date_element_correction + 3 ][ 6 ] - (libewf_character_t) '0' ) * 10 )
+				     + ( date_elements[ empty_date_element_correction + 3 ][ 7 ] - (libewf_character_t) '0' ) );
 
 		/* Set to ignore the daylight saving time
 		 */

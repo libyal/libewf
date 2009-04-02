@@ -72,33 +72,9 @@ struct imaging_handle
 	 */
 	libewf_handle_t *output_handle;
 
-	/* The last offset of the input data
+	/* The amount of bytes per sector
 	 */
-	off64_t input_offset;
-
-	/* The last offset of the output data
-	 */
-	off64_t output_offset;
-
-	/* TODO refactor */
-	size32_t chunk_size;
 	uint32_t bytes_per_sector;
-	size64_t media_size;
-	uint32_t error_granularity;
-
-	/* The amount of retries after a read error
-	 */
-	uint8_t read_error_retry;
-
-	/* Value to indicate if the chunk
-	 * is wiped on error
-	 */
-	uint8_t wipe_chunk_on_error;
-
-	/* Value to indicate if the next sector
-	 * is seeked on error
-	 */
-	uint8_t seek_on_error;
 };
 
 int imaging_handle_initialize(
@@ -111,18 +87,14 @@ int imaging_handle_free(
      imaging_handle_t **imaging_handle,
      liberror_error_t **error );
 
-int imaging_handle_open_output(
+int imaging_handle_signal_abort(
      imaging_handle_t *imaging_handle,
-     char * const * filenames,
-     int amount_of_files,
      liberror_error_t **error );
 
-ssize_t imaging_handle_read_buffer(
-         imaging_handle_t *imaging_handle,
-         int input_file_descriptor,
-         storage_media_buffer_t *storage_media_buffer,
-         size_t read_size,
-         liberror_error_t **error );
+int imaging_handle_open_output(
+     imaging_handle_t *imaging_handle,
+     const system_character_t *filename,
+     liberror_error_t **error );
 
 ssize_t imaging_handle_write_prepare_buffer(
          imaging_handle_t *imaging_handle,
@@ -133,11 +105,6 @@ ssize_t imaging_handle_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
-         liberror_error_t **error );
-
-/* TODO refactor ? */
-ssize_t imaging_handle_write_finalize(
-         imaging_handle_t *imaging_handle,
          liberror_error_t **error );
 
 int imaging_handle_swap_byte_pairs(
@@ -156,27 +123,66 @@ int imaging_handle_close(
      imaging_handle_t *imaging_handle,
      liberror_error_t **error );
 
-int imaging_handle_set_input_values(
+int imaging_handle_get_chunk_size(
      imaging_handle_t *imaging_handle,
-     uint8_t read_error_retry,
-     uint8_t wipe_chunk_on_error,
-     uint8_t seek_on_error,
+     size32_t *chunk_size,
      liberror_error_t **error );
 
 int imaging_handle_set_output_values(
      imaging_handle_t *imaging_handle,
-     uint32_t sectors_per_chunk,
+     system_character_t *case_number,
+     system_character_t *description,
+     system_character_t *evidence_number,
+     system_character_t *examiner_name,
+     system_character_t *notes,
+     system_character_t *acquiry_operating_system,
+     system_character_t *acquiry_software,
+     system_character_t *acquiry_software_version,
      uint32_t bytes_per_sector,
      size64_t media_size,
-     uint32_t error_granularity,
+     uint8_t media_type,
+     uint8_t volume_type,
+     int8_t compression_level,
+     uint8_t compress_empty_block,
+     uint8_t libewf_format,
+     size64_t segment_file_size,
+     uint32_t sectors_per_chunk,
+     uint32_t sector_error_granularity,
      liberror_error_t **error );
 
-int imaging_handle_finalize(
+int imaging_handle_set_header_value(
      imaging_handle_t *imaging_handle,
-     system_character_t *calculated_md5_hash_string,
-     size_t calculated_md5_hash_string_size,
-     system_character_t *calculated_sha1_hash_string,
-     size_t calculated_sha1_hash_string_size,
+     char *header_value_identifier,
+     size_t header_value_identifier_length,
+     system_character_t *header_value,
+     size_t header_value_length,
+     liberror_error_t **error );
+
+int imaging_handle_set_hash_value(
+     imaging_handle_t *imaging_handle,
+     char *hash_value_identifier,
+     size_t hash_value_identifier_length,
+     system_character_t *hash_value,
+     size_t hash_value_length,
+     liberror_error_t **error );
+
+int imaging_handle_add_read_error(
+      imaging_handle_t *imaging_handle,
+      off64_t start_offset,
+      size_t amount_of_bytes,
+      liberror_error_t **error );
+
+ssize_t imaging_handle_finalize(
+         imaging_handle_t *imaging_handle,
+         system_character_t *calculated_md5_hash_string,
+         size_t calculated_md5_hash_string_size,
+         system_character_t *calculated_sha1_hash_string,
+         size_t calculated_sha1_hash_string_size,
+         liberror_error_t **error );
+
+int imaging_handle_acquiry_errors_fprint(
+     imaging_handle_t *imaging_handle,
+     FILE *stream,
      liberror_error_t **error );
 
 #if defined( __cplusplus )

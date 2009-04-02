@@ -44,7 +44,7 @@ struct libewf_values_table
 
 	/* The value identifiers
 	 */
-	libewf_character_t **identifier;
+	uint8_t **identifier;
 
 	/* The value identifier lengths
 	 */
@@ -52,7 +52,7 @@ struct libewf_values_table
 
 	/* The values
 	 */
-	libewf_character_t **value;
+	uint8_t **value;
 
 	/* The value lengths
 	 */
@@ -75,38 +75,51 @@ int libewf_values_table_resize(
 
 int libewf_values_table_get_index(
      libewf_values_table_t *values_table,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
      int *index,
+     liberror_error_t **error );
+
+int libewf_values_table_get_identifier_size(
+     libewf_values_table_t *values_table,
+     int index,
+     size_t *identifier_size,
      liberror_error_t **error );
 
 int libewf_values_table_get_identifier(
      libewf_values_table_t *values_table,
      int index,
-     libewf_character_t *identifier,
+     uint8_t *identifier,
      size_t identifier_size,
      liberror_error_t **error );
 
 int libewf_values_table_set_identifier(
      libewf_values_table_t *values_table,
      int index,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t indentifier_length,
+     liberror_error_t **error );
+
+int libewf_values_table_get_value_size(
+     libewf_values_table_t *values_table,
+     const uint8_t *identifier,
+     size_t identifier_length,
+     size_t *value_size,
      liberror_error_t **error );
 
 int libewf_values_table_get_value(
      libewf_values_table_t *values_table,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
-     libewf_character_t *value,
+     uint8_t *value,
      size_t value_size,
      liberror_error_t **error );
 
 int libewf_values_table_set_value(
      libewf_values_table_t *values_table,
-     const libewf_character_t *identifier,
+     const uint8_t *identifier,
      size_t identifier_length,
-     const libewf_character_t *value,
+     const uint8_t *value,
      size_t value_length,
      liberror_error_t **error );
 

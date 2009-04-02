@@ -28,9 +28,9 @@
 #include <liberror.h>
 
 #include "libewf_definitions.h"
-#include "libewf_file_io.h"
-#include "libewf_file_io_pool.h"
 #include "libewf_hash_values.h"
+#include "libewf_io_handle.h"
+#include "libewf_libbfio.h"
 #include "libewf_notify.h"
 #include "libewf_section.h"
 #include "libewf_segment_file.h"
@@ -52,7 +52,7 @@ const uint8_t lvf_file_signature[ 8 ] = { 0x4c, 0x56, 0x46, 0x09, 0x0D, 0x0A, 0x
 ssize_t libewf_segment_file_read_file_header(
          libewf_segment_file_handle_t *segment_file_handle,
          uint16_t *segment_number,
-         libewf_file_io_pool_t *file_io_pool,
+         libbfio_pool_t *file_io_pool,
          liberror_error_t **error )
 {
 	ewf_file_header_t file_header;
@@ -82,7 +82,7 @@ ssize_t libewf_segment_file_read_file_header(
 
 		return( -1 );
 	}
-	read_count = libewf_file_io_pool_read(
+	read_count = libbfio_pool_read(
 	              file_io_pool,
 	              segment_file_handle->file_io_pool_entry,
 	              (uint8_t *) &file_header,
@@ -147,7 +147,7 @@ ssize_t libewf_segment_file_read_file_header(
  */
 int libewf_segment_file_read_sections(
      libewf_segment_file_handle_t *segment_file_handle,
-     libewf_file_io_pool_t *file_io_pool,
+     libewf_io_handle_t *io_handle,
      int *last_segment_file,
      libewf_header_sections_t *header_sections,
      libewf_hash_sections_t *hash_sections,
@@ -155,9 +155,6 @@ int libewf_segment_file_read_sections(
      libewf_offset_table_t *offset_table,
      libewf_sector_table_t *sessions,
      libewf_sector_table_t *acquiry_errors,
-     int8_t *compression_level,
-     uint8_t *format,
-     uint8_t *ewf_format,
      size64_t *segment_file_size,
      liberror_error_t **error )
 {
@@ -174,6 +171,17 @@ int libewf_segment_file_read_sections(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -198,7 +206,7 @@ int libewf_segment_file_read_sections(
 	while( result != -1 )
 	{
 		result = libewf_section_read(
-		          file_io_pool,
+		          io_handle->file_io_pool,
 		          segment_file_handle,
 		          header_sections,
 		          hash_sections,
@@ -206,9 +214,9 @@ int libewf_segment_file_read_sections(
 		          offset_table,
 		          sessions,
 		          acquiry_errors,
-		          compression_level,
-		          format,
-		          ewf_format,
+		          &( io_handle->compression_level ),
+		          &( io_handle->format ),
+		          &( io_handle->ewf_format ),
 		          segment_file_size,
 		          &section,
 		          &previous_offset,
@@ -252,10 +260,8 @@ int libewf_segment_file_read_sections(
  */
 ssize_t libewf_segment_file_write_headers(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          libewf_header_sections_t *header_sections,
-         int8_t compression_level,
-         uint8_t format,
          liberror_error_t **error )
 {
 	static char *function     = "libewf_segment_file_write_headers";
@@ -271,6 +277,17 @@ ssize_t libewf_segment_file_write_headers(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -302,19 +319,19 @@ ssize_t libewf_segment_file_write_headers(
 	 */
 	header_size = header_sections->header_size - 1;
 
-	if( ( format == LIBEWF_FORMAT_EWF )
-	 || ( format == LIBEWF_FORMAT_SMART )
-	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
+	if( ( io_handle->format == LIBEWF_FORMAT_EWF )
+	 || ( io_handle->format == LIBEWF_FORMAT_SMART )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 		/* The header should be written only once
 		 * and using the compression used in the file
 		 */
 		write_count = libewf_section_header_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
-		               compression_level,
+		               io_handle->compression_level,
 		               error );
 
 		if( write_count == -1 )
@@ -332,17 +349,17 @@ ssize_t libewf_segment_file_write_headers(
 
 		header_sections->amount_of_header_sections += 1;
 	}
-	else if( ( format == LIBEWF_FORMAT_ENCASE2 )
-	 || ( format == LIBEWF_FORMAT_ENCASE3 )
-	 || ( format == LIBEWF_FORMAT_LINEN5 )
-	 || ( format == LIBEWF_FORMAT_LINEN6 )
-	 || ( format == LIBEWF_FORMAT_FTK ) )
+	else if( ( io_handle->format == LIBEWF_FORMAT_ENCASE2 )
+	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
+	      || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
+	      || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+	      || ( io_handle->format == LIBEWF_FORMAT_FTK ) )
 	{
 		/* The header should be written twice
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -363,7 +380,7 @@ ssize_t libewf_segment_file_write_headers(
 		total_write_count += write_count;
 
 		write_count = libewf_section_header_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -385,9 +402,9 @@ ssize_t libewf_segment_file_write_headers(
 
 		header_sections->amount_of_header_sections += 2;
 	}
-	else if( ( format == LIBEWF_FORMAT_ENCASE4 )
-	 || ( format == LIBEWF_FORMAT_ENCASE5 )
-	 || ( format == LIBEWF_FORMAT_ENCASE6 ) )
+	else if( ( io_handle->format == LIBEWF_FORMAT_ENCASE4 )
+	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
+	      || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 ) )
 	{
 		if( ( header_sections->header2 == NULL )
 		 && ( header_sections->header2_size == 0 ) )
@@ -409,7 +426,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
@@ -430,7 +447,7 @@ ssize_t libewf_segment_file_write_headers(
 		total_write_count += write_count;
 
 		write_count = libewf_section_header2_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
@@ -454,7 +471,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -478,7 +495,7 @@ ssize_t libewf_segment_file_write_headers(
 	}
 	/* EWFX uses the header and header2 for backwards compatibility
 	 */
-	else if( format == LIBEWF_FORMAT_EWFX )
+	else if( io_handle->format == LIBEWF_FORMAT_EWFX )
 	{
 		if( ( header_sections->xheader == NULL )
 		 && ( header_sections->xheader_size == 0 ) )
@@ -512,7 +529,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_xheader_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->xheader,
 		               header_sections->xheader_size,
@@ -536,7 +553,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header2_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header2,
 		               header2_size,
@@ -560,7 +577,7 @@ ssize_t libewf_segment_file_write_headers(
 		 * the default compression is used
 		 */
 		write_count = libewf_section_header_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               header_sections->header,
 		               header_size,
@@ -590,10 +607,8 @@ ssize_t libewf_segment_file_write_headers(
  */
 ssize_t libewf_segment_file_write_last_section(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          int last_segment_file,
-         uint8_t format,
-         uint8_t ewf_format,
          liberror_error_t **error )
 {
 	uint8_t *last_section_type = NULL;
@@ -611,6 +626,17 @@ ssize_t libewf_segment_file_write_last_section(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( last_segment_file == 0 )
 	{
 		last_section_type = (uint8_t *) "next";
@@ -622,12 +648,12 @@ ssize_t libewf_segment_file_write_last_section(
 	/* Write next or done section
 	 */
 	write_count = libewf_section_last_write(
-		       file_io_pool,
+		       io_handle->file_io_pool,
 		       segment_file_handle,
 		       last_section_type,
 		       4,
-		       format,
-		       ewf_format,
+		       io_handle->format,
+		       io_handle->ewf_format,
 	               error );
 
 	if( write_count == -1 )
@@ -650,14 +676,11 @@ ssize_t libewf_segment_file_write_last_section(
  */
 ssize_t libewf_segment_file_write_start(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          uint16_t segment_number,
          uint8_t segment_file_type,
          libewf_media_values_t *media_values,
          libewf_header_sections_t *header_sections,
-         int8_t compression_level,
-         uint8_t format,
-         uint8_t ewf_format,
          ewf_data_t **cached_data_section,
          liberror_error_t **error )
 {
@@ -675,6 +698,17 @@ ssize_t libewf_segment_file_write_start(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -763,8 +797,8 @@ ssize_t libewf_segment_file_write_start(
 
 	/* Write segment file header
 	 */
-	write_count = libewf_file_io_pool_write(
-	               file_io_pool,
+	write_count = libbfio_pool_write(
+	               io_handle->file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               (uint8_t *) &file_header,
 	               sizeof( ewf_file_header_t ),
@@ -792,10 +826,8 @@ ssize_t libewf_segment_file_write_start(
 			 */
 			write_count = libewf_segment_file_write_headers(
 				       segment_file_handle,
-				       file_io_pool,
+				       io_handle,
 				       header_sections,
-				       compression_level,
-				       format,
 			               error );
 
 			if( write_count == -1 )
@@ -811,28 +843,28 @@ ssize_t libewf_segment_file_write_start(
 			}
 			total_write_count += write_count;
 
-			if( ewf_format == EWF_FORMAT_S01 )
+			if( io_handle->ewf_format == EWF_FORMAT_S01 )
 			{
 				/* Write volume (SMART) section
 				 */
 				write_count = libewf_section_volume_s01_write(
-					       file_io_pool,
+					       io_handle->file_io_pool,
 					       segment_file_handle,
 					       media_values,
-					       format,
+					       io_handle->format,
 					       0,
 				               error );
 			}
-			else if( ewf_format == EWF_FORMAT_E01 )
+			else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 			{
 				/* Write volume section
 				 */
 				write_count = libewf_section_volume_e01_write(
-					       file_io_pool,
+					       io_handle->file_io_pool,
 					       segment_file_handle,
 					       media_values,
-					       compression_level,
-					       format,
+					       io_handle->compression_level,
+					       io_handle->format,
 					       0,
 				               error );
 			}
@@ -855,16 +887,16 @@ ssize_t libewf_segment_file_write_start(
 			}
 			total_write_count += write_count;
 		}
-		else if( ewf_format == EWF_FORMAT_E01 )
+		else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 		{
 			/* Write data section
 			 */
 			write_count = libewf_section_data_write(
-				       file_io_pool,
+				       io_handle->file_io_pool,
 				       segment_file_handle,
 				       media_values,
-				       compression_level,
-				       format,
+				       io_handle->compression_level,
+				       io_handle->format,
 				       cached_data_section,
 				       0,
 			               error );
@@ -891,15 +923,13 @@ ssize_t libewf_segment_file_write_start(
  */
 ssize_t libewf_segment_file_write_chunks_section_start(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
          ewf_table_offset_t *table_offsets,
          uint32_t amount_of_table_offsets,
          size32_t chunk_size,
          uint32_t total_chunk_amount,
          uint32_t segment_chunk_amount,
-         uint8_t format,
-         uint8_t ewf_format,
          liberror_error_t **error )
 {
 	static char *function = "libewf_segment_file_write_chunks_section_start";
@@ -913,6 +943,17 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -967,13 +1008,13 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 
 		return( -1 );
 	}
-	if( ( ewf_format == EWF_FORMAT_S01 )
-	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
+	if( ( io_handle->ewf_format == EWF_FORMAT_S01 )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 		/* Write table section start
 		 */
 		write_count = libewf_section_table_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               0,
 		               table_offsets,
@@ -981,8 +1022,8 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		               (uint8_t *) "table",
 		               5,
 		               0,
-		               format,
-		               ewf_format,
+		               io_handle->format,
+		               io_handle->ewf_format,
 		               1,
 		               error );
 
@@ -998,7 +1039,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 			return( -1 );
 		}
 	}
-	else if( ewf_format == EWF_FORMAT_E01 )
+	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
 		section_size = segment_chunk_amount
 		             * ( chunk_size + sizeof( ewf_crc_t ) );
@@ -1006,7 +1047,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 		/* Write sectors section start
 		 */
 		write_count = libewf_section_sectors_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               section_size,
 		               1,
@@ -1033,7 +1074,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
  */
 ssize_t libewf_segment_file_write_chunks_data(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_data,
@@ -1061,6 +1102,17 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -1119,8 +1171,8 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
-	     file_io_pool,
+	if( libbfio_pool_get_offset(
+	     io_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &segment_file_offset,
 	     error ) != 1 )
@@ -1172,8 +1224,8 @@ ssize_t libewf_segment_file_write_chunks_data(
 
 	/* Write the chunk data to the segment file
 	 */
-	write_count = libewf_file_io_pool_write(
-	               file_io_pool,
+	write_count = libbfio_pool_write(
+	               io_handle->file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
 	               chunk_data,
 	               chunk_data_size,
@@ -1200,8 +1252,8 @@ ssize_t libewf_segment_file_write_chunks_data(
 		 crc_buffer,
 		 *chunk_crc );
 
-		write_count = libewf_file_io_pool_write(
-		               file_io_pool,
+		write_count = libbfio_pool_write(
+		               io_handle->file_io_pool,
 		               segment_file_handle->file_io_pool_entry,
 		               crc_buffer,
 		               sizeof( ewf_crc_t ),
@@ -1229,7 +1281,7 @@ ssize_t libewf_segment_file_write_chunks_data(
  */
 ssize_t libewf_segment_file_write_chunks_correction(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
          ewf_table_offset_t *table_offsets,
          uint32_t amount_of_table_offsets,
@@ -1237,8 +1289,6 @@ ssize_t libewf_segment_file_write_chunks_correction(
          size64_t chunks_section_size,
          uint32_t amount_of_chunks,
          uint32_t section_amount_of_chunks,
-         uint8_t format,
-         uint8_t ewf_format,
          liberror_error_t **error )
 {
 	uint8_t *table_section_string    = NULL;
@@ -1259,7 +1309,18 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
-	if( ( ( format == LIBEWF_FORMAT_ENCASE6 )
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 	  && ( chunks_section_size >= (size64_t) INT64_MAX ) )
 	 || ( chunks_section_size >= (size64_t) INT32_MAX ) )
 	{
@@ -1272,8 +1333,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
-	if( ( format == LIBEWF_FORMAT_ENCASE6 )
-	 || ( format == LIBEWF_FORMAT_LINEN6 ) )
+	if( ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+	 || ( io_handle->format == LIBEWF_FORMAT_LINEN6 ) )
 	{
 		base_offset = chunks_section_offset;
 	}
@@ -1295,8 +1356,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
-	     file_io_pool,
+	if( libbfio_pool_get_offset(
+	     io_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &last_segment_file_offset,
 	     error ) != 1 )
@@ -1319,8 +1380,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	 chunks_section_offset );
 #endif
 
-	if( libewf_file_io_pool_seek_offset(
-	     file_io_pool,
+	if( libbfio_pool_seek_offset(
+	     io_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     chunks_section_offset,
 	     SEEK_SET,
@@ -1335,8 +1396,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
-	if( ( ewf_format == EWF_FORMAT_S01 )
-	 || ( format == LIBEWF_FORMAT_ENCASE1 ) )
+	if( ( io_handle->ewf_format == EWF_FORMAT_S01 )
+	 || ( io_handle->format == LIBEWF_FORMAT_ENCASE1 ) )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		libewf_notify_verbose_printf(
@@ -1349,7 +1410,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Rewrite table section start
 		 */
 		write_count = libewf_section_table_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               0,
 		               table_offsets,
@@ -1357,8 +1418,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		               (uint8_t *) "table",
 		               5,
 		               (size_t) chunks_section_size,
-		               format,
-		               ewf_format,
+		               io_handle->format,
+		               io_handle->ewf_format,
 		               0,
 		               error );
 
@@ -1375,7 +1436,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 			return( -1 );
 		}
 	}
-	else if( ewf_format == EWF_FORMAT_E01 )
+	else if( io_handle->ewf_format == EWF_FORMAT_E01 )
 	{
 #if defined( HAVE_VERBOSE_OUTPUT )
 		libewf_notify_verbose_printf(
@@ -1388,7 +1449,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Rewrite sectors section start
 		 */
 		write_count = libewf_section_sectors_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               chunks_section_size,
 		               0,
@@ -1415,8 +1476,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	 last_segment_file_offset );
 #endif
 
-	if( libewf_file_io_pool_seek_offset(
-	     file_io_pool,
+	if( libbfio_pool_seek_offset(
+	     io_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     last_segment_file_offset,
 	     SEEK_SET,
@@ -1431,13 +1492,13 @@ ssize_t libewf_segment_file_write_chunks_correction(
 
 		return( -1 );
 	}
-	if( ( ewf_format == EWF_FORMAT_E01 )
-	 && ( format != LIBEWF_FORMAT_ENCASE1 ) )
+	if( ( io_handle->ewf_format == EWF_FORMAT_E01 )
+	 && ( io_handle->format != LIBEWF_FORMAT_ENCASE1 ) )
 	{
 		/* Write table section start
 		 */
 		write_count = libewf_section_table_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               base_offset,
 		               table_offsets,
@@ -1445,8 +1506,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		               (uint8_t *) "table",
 		               5,
 		               0,
-		               format,
-		               ewf_format,
+		               io_handle->format,
+		               io_handle->ewf_format,
 		               0,
 		               error );
 
@@ -1466,7 +1527,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		/* Write table2 section start
 		 */
 		write_count = libewf_section_table_write(
-		               file_io_pool,
+		               io_handle->file_io_pool,
 		               segment_file_handle,
 		               base_offset,
 		               table_offsets,
@@ -1474,8 +1535,8 @@ ssize_t libewf_segment_file_write_chunks_correction(
 		               (uint8_t *) "table2",
 		               6,
 		               0,
-		               format,
-		               ewf_format,
+		               io_handle->format,
+		               io_handle->ewf_format,
 		               0,
 		               error );
 
@@ -1500,7 +1561,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
  */
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
          uint8_t *chunk_data,
@@ -1521,6 +1582,17 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -1551,8 +1623,8 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 		return( -1 );
 	}
-	if( libewf_file_io_pool_get_offset(
-	     file_io_pool,
+	if( libbfio_pool_get_offset(
+	     io_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     &segment_file_offset,
 	     error ) != 1 )
@@ -1581,7 +1653,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	/* Write the chunk in the delta segment file
 	 */
 	write_count = libewf_section_delta_chunk_write(
-	               file_io_pool,
+	               io_handle->file_io_pool,
 	               segment_file_handle,
 	               chunk,
 	               chunk_data,
@@ -1602,6 +1674,20 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( ewf_crc_t );
 		offset_table->chunk_offset[ chunk ].flags               = 0;
+#if defined( HAVE_DEBUG_OUTPUT )
+		offset_table->chunk_offset[ chunk ].is_delta_chunk      = 1;
+#endif
+	}
+	else if( write_count < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write delta chunk.",
+		 function );
+
+		return( -1 );
 	}
 	return( write_count );
 }
@@ -1611,7 +1697,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
  */
 ssize_t libewf_segment_file_write_close(
          libewf_segment_file_handle_t *segment_file_handle,
-         libewf_file_io_pool_t *file_io_pool,
+         libewf_io_handle_t *io_handle,
          uint16_t segment_number,
          uint32_t segment_amount_of_chunks,
          int last_segment_file,
@@ -1620,9 +1706,6 @@ ssize_t libewf_segment_file_write_close(
          libewf_media_values_t *media_values,
          libewf_sector_table_t *sessions,
          libewf_sector_table_t *acquiry_errors,
-         int8_t compression_level,
-         uint8_t format,
-         uint8_t ewf_format,
          ewf_data_t **cached_data_section,
 	 liberror_error_t **error )
 {
@@ -1637,6 +1720,17 @@ ssize_t libewf_segment_file_write_close(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
 		 function );
 
 		return( -1 );
@@ -1689,15 +1783,15 @@ ssize_t libewf_segment_file_write_close(
 	{
 		/* Write the data section for a single segment file only for EWF-E01
 		 */
-		if( ( ewf_format == EWF_FORMAT_E01 )
+		if( ( io_handle->ewf_format == EWF_FORMAT_E01 )
 		 && ( segment_number == 1 ) )
 		{
 			write_count = libewf_section_data_write(
-				       file_io_pool,
+				       io_handle->file_io_pool,
 				       segment_file_handle,
 				       media_values,
-				       compression_level,
-				       format,
+				       io_handle->compression_level,
+				       io_handle->format,
 				       cached_data_section,
 				       0,
 			               error );
@@ -1718,14 +1812,14 @@ ssize_t libewf_segment_file_write_close(
 		/* Write the session section if required
 		 */
 		if( ( sessions->amount > 0 )
-		 && ( ( format == LIBEWF_FORMAT_ENCASE5 )
-		  || ( format == LIBEWF_FORMAT_ENCASE6 )
-		  || ( format == LIBEWF_FORMAT_LINEN5 )
-		  || ( format == LIBEWF_FORMAT_LINEN6 )
-		  || ( format == LIBEWF_FORMAT_EWFX ) ) )
+		 && ( ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
+		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		  || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
+		  || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		  || ( io_handle->format == LIBEWF_FORMAT_EWFX ) ) )
 		{
 			write_count = libewf_section_session_write(
-			               file_io_pool,
+			               io_handle->file_io_pool,
 			               segment_file_handle,
 			               sessions,
 			               error );
@@ -1746,16 +1840,16 @@ ssize_t libewf_segment_file_write_close(
 		/* Write the error2 section if required
 		 */
 		if( ( acquiry_errors->amount > 0 )
-		 && ( ( format == LIBEWF_FORMAT_ENCASE3 )
-		  || ( format == LIBEWF_FORMAT_ENCASE4 )
-		  || ( format == LIBEWF_FORMAT_ENCASE5 )
-		  || ( format == LIBEWF_FORMAT_ENCASE6 )
-		  || ( format == LIBEWF_FORMAT_LINEN5 )
-		  || ( format == LIBEWF_FORMAT_LINEN6 )
-		  || ( format == LIBEWF_FORMAT_EWFX ) ) )
+		 && ( ( io_handle->format == LIBEWF_FORMAT_ENCASE3 )
+		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE4 )
+		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE5 )
+		  || ( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
+		  || ( io_handle->format == LIBEWF_FORMAT_LINEN5 )
+		  || ( io_handle->format == LIBEWF_FORMAT_LINEN6 )
+		  || ( io_handle->format == LIBEWF_FORMAT_EWFX ) ) )
 		{
 			write_count = libewf_section_error2_write(
-			               file_io_pool,
+			               io_handle->file_io_pool,
 			               segment_file_handle,
 			               acquiry_errors,
 			               error );
@@ -1773,14 +1867,14 @@ ssize_t libewf_segment_file_write_close(
 			}
 			total_write_count += write_count;
 		}
-		if( format == LIBEWF_FORMAT_ENCASE6 )
+		if( io_handle->format == LIBEWF_FORMAT_ENCASE6 )
 		{
 			/* Write the digest section if required
 			 */
 			if( hash_sections->sha1_digest_set != 0 )
 			{
 				write_count = libewf_section_digest_write(
-					       file_io_pool,
+					       io_handle->file_io_pool,
 					       segment_file_handle,
 					       hash_sections->md5_digest,
 					       hash_sections->sha1_digest,
@@ -1805,7 +1899,7 @@ ssize_t libewf_segment_file_write_close(
 		if( hash_sections->md5_hash_set != 0 )
 		{
 			write_count = libewf_section_hash_write(
-			               file_io_pool,
+			               io_handle->file_io_pool,
 			               segment_file_handle,
 			               hash_sections->md5_hash,
 			               error );
@@ -1825,7 +1919,7 @@ ssize_t libewf_segment_file_write_close(
 		}
 		/* Write the xhash section
 		 */
-		if( format == LIBEWF_FORMAT_EWFX )
+		if( io_handle->format == LIBEWF_FORMAT_EWFX )
 		{
 			if( hash_sections->xhash != NULL )
 			{
@@ -1856,7 +1950,7 @@ ssize_t libewf_segment_file_write_close(
 				return( -1 );
 			}
 			write_count = libewf_section_xhash_write(
-			               file_io_pool,
+			               io_handle->file_io_pool,
 			               segment_file_handle,
 			               hash_sections->xhash,
 			               hash_sections->xhash_size,
@@ -1882,10 +1976,8 @@ ssize_t libewf_segment_file_write_close(
 	 */
 	write_count = libewf_segment_file_write_last_section(
 		       segment_file_handle,
-		       file_io_pool,
+		       io_handle,
 	               last_segment_file,
-	               format,
-	               ewf_format,
 	               error );
 
 	if( write_count == -1 )
@@ -1903,8 +1995,8 @@ ssize_t libewf_segment_file_write_close(
 
 	segment_file_handle->amount_of_chunks = segment_amount_of_chunks;
 
-	if( libewf_file_io_pool_close(
-	     file_io_pool,
+	if( libbfio_pool_close(
+	     io_handle->file_io_pool,
 	     segment_file_handle->file_io_pool_entry,
 	     error ) != 0 )
 	{

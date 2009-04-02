@@ -1,16 +1,21 @@
 Roadmap:
-* low level and high level api
+* low level and high level api (part of v2 api)
   - to allow raw access to sections etc. (for recovery)
-* xsignature section to sign xhash and/or hash
 * resume write i.e. system failure (check to which part of the EWF files is ok)
 * lvf support
+  - add support for interaction with data in ltree section
+  - use libpff like item approach?
+* xsignature section to sign xhash and/or hash
 * library/tools enhancements (getoptlong)
-* internationalisation (gettext)
-  - UTF support
+* internationalisation
+  - Unicode support (added)
+  - locale support
+  - multi language string support (gettext)
 * enhance thread safety
   - protect writing to internal data structures
   - protect reading when writing to internal data structures
   - thread safe functions
+  - check for race conditions especially on change of data elements
 
 Further analysis of the EWF format:
 * password hash
@@ -19,24 +24,19 @@ Further analysis of the EWF format:
 * values in ltree strings (EWF-L01 LVF)
 * values in session section (+/-)
 
-To do/think about:
-* all: add LVF support - ltree section
-* all: check for race conditions especially on change of data elements
-* all: allow for multiple language support - what about gettext?
-* ewftools: add getoptlong
-* ewfacquire
-  - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
-  - warn if values exceed maximum segment count
-  - add native Windows support for accessing devices
-  - read from pipe - what about input size?
-* windows port
-  - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
-  - reduce _s function to pre MVC 2005 variants provides for wider support
-  - improve globbing support ?
-* add daylight savings correction to ewfx date/time string?
+Features
+* tools and library support read/write of EnCase 6.12 SHA1
+* what about header values parsing with preservation of timestamps?
+  - store a timestamp string in the header value and convert them in ewfinfo
+  - use internal format of date/time string convert them in interface
+* implement low memory usage option
+  - trade off IO versus memory use
+  - for write only offset table is not needed etc.
+* ewfx: add daylight savings correction to date/time strings
+  or determine UTC correction (localtime - gmtime)
 
 Recovery and analysis:
-* ewfacquire: detect disk full and ask for new segment file location?
+* imaging: detect disk full and ask for new segment file location?
   - have libewf allow to set the segment file path during write (done)
   - like alternative segment file path in EnCase
     however EnCase seems to fully test if the segment file upfront by
@@ -46,9 +46,6 @@ Recovery and analysis:
   - error resistency
 * all: recovering corrupt EWF files (missing segment file, corrupt sections, etc.)
   - can the values in data be used to correct a corrupted volume ?
-* ewfdebug: create a tool to analyse a single segment file
-* ewfrecover: create a tool recover ewf files
-* ewfverify: detect and show which files are corrupted
 
 Additional (integrity) checks:
 * check if successive headers match first header ?
@@ -72,34 +69,113 @@ Possible performance improvements:
 * optimize empty block test
 * optimize string functions
   - pass length/size as much as possible
-* remove libewf_get_write_amount_of_chunks from ewfcommon_read_input and use local variable instead
-  - currently only used for verbose output
 * reduce amount of write by aligining chunk data and CRC
   - requires rewrite of some functions, CRC should be passed as buffer
 
-Error handling
+Error handling/tollerance
 * what about a function that translates error into an equivalent errno?
 * have wchar error messages for WINAPI?
+* improve offset table correction
+  - if not correctable skip chunk while reading and mark as crc error
+    or try to determine offset/size of chunk somehow
 
 Python bindings
 * rewrite pyewf to match libewf API
 
 API changes
-* change compress empty-block into a compression level
-* add identifier_length to hash_/header_values functions
+* change compress empty-block into a compression level (no)
+  - change compress_emtpy_block into a compression flag
+  - allow to set compression level for compress empty block
 * allow for chunk data and CRC alignment (possible performance enhancement)
+* APIv2
+  - add identifier_length to hash_/header_values functions (completed)
+  - change char to uint8_t to prevent mis interpretation of UTF-8 string type (completed)
+  - add get header/hash value size (completed)
+  - rename handle functions to libewf_handle_x (completed)
+  - rename api raw functions to read chunk, read prepare chunk (completed)
+  - add error parameter (largely completed)
+     libewf_set_notify_values
+     libewf_signal_abort
+  - seek offset add whence that supports SEEK_SET, SEEK_END with 0 offset
+  - remove write_finalize?
 * low level API
-  - file structure API
+  - add function to retrieve the segment file names and amount?
+  - add function to retrieve EWFX xml header/hash directly
 * LVF
   - libewf_add/remove_file for LVF
-* add function to retrieve the segment file names and amount?
-* rename handle functions to libewf_handle_x
+* libbfio API extension
+  - add means to set pools open handle limit in libewf (partial completed)
+  - add means to obtain libbio handle of media data in ewf
+* file structure API extension (idea)
 
-Something for libsmio/smiotools
-* create iso2ewf tool?
-* implement raw split support in ewfexport and ewfacquire?
-* ewfacquire: allow for multiple raw files as input
-  - make a generic media access solution also useable for revit?
+IO abstraction
+* remove libbfio_io_pool from lower levels (libewf_section functions) and pass libbfio_io_handle?
+  (no, because pool manages if a file io handle is open or closed)
+
+Deployment
+* debian package
+  - implement non local libuna and libbfio support like in spec file
+* configure
+  - change raw-access to low-level-functions
+  - remove enable-v1-api after testing
+
+ewftools:
+* add getoptlong support
+* log handle
+  - implement libpff log handle
+* liberror
+  - implement use of liberror
+  - complete liberror usage in glob.[ch] and update libpff version
+  - process_status.[ch]
+  - date_time.[ch]
+  - ewfcommon.[ch]
+  - ewfinput.[ch]
+  - ewfoutput.[ch]
+  - ewfsignal.[ch] ?
+* make compilation resilient for missing crypto library
+  - compile on system without libcrypto
+  - remove the cryptographic options if crypto library is missing
+* have failed on open return a more sensible error (extract from error)
+* fix ewfcommon_signal_handler per tool
+* ewfacquire
+  - restrict error granularity and amount per sectors to > encase5 and > linen5 format ?
+  - warn if values exceed maximum segment count
+  - read from pipe - what about input size?
+  - adjust error granularity if error granularity < process buffer size
+  - add resume on error
+* device handle
+  - add native Windows support for accessing devices (completed physical drive support)
+  - detect removable disk
+  - detect optical disk
+  - move fstat to file_io ?
+  - refactor file_io out of device_handle ? (and remove file_io ?)
+  - improve error detection and output (refactor error string like libbfio)
+* ewfacquirestream
+  - implement -B as write size upper boundary
+  - implement -o as skip of an amount of bytes ?
+  - what about wipe on error - does this do anything? (remove if not used)
+  - add parameter to set sector size?
+  - allow user to set bytes per sector for raw file conversion
+* stream handle
+  - implement
+* ewfalter
+  - allow to set maximum delta file size default 4 GiB?
+  - overwrite alter buffer size with -p option?
+  - implement alteration handle
+* ewfexport
+  - implement more ewfacquire acquiry parameters?
+  - handle different input and ouput chunk sizes in raw access
+* ewfinfo
+  - format extents header value in more table like manner
+  - compare GUID output with EnCase
+  - refactor ewfoutput_acquiry_errors_fprint to info handle
+* ewfverify
+  - detect and show which files are corrupted
+* ewfdebug
+  - create a tool to analyse a single segment file
+  - implement low and high level api separation
+* ewfrecover
+  - create a tool recover ewf files
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -111,22 +187,28 @@ Known issues:
   This actually is a bug in EnCase 6.7.1 the behavior is gone in EnCase 6.8
 * MS Visual Studio C++ does not allow pre compiler macro in macro definitions
 
-Next release(s):
-
 Code clean up
-* rewrite ewfglob marcros to function macros (including arguments)
-* remove file io pool from lower levels and pass file io handle ?
-* refactor libewf_file_io_pool_get_offset out of libewf_section functions?
+* rewrite glob marcros to function macros (including arguments) ?
 * clean up libewf_write_finalize ?
 * remove trailing \n from error messages
+* rename length into size, make sure string size contains end of string character
+  - length is used when the value does not contain the EOS
+  - size is used when the value contains the EOS or otherwise
 
 Testing
 * add export unattended to automated tests
 * add encase 6.12 sha1 support to test
+* check buffer size test - EWFCOMMON_BUFFER_SIZE is no longer used
+* check read error handling (linux, mac)
 
-Other:
-check error tollerance
-check TODO
+Windows build
+* GUID support
+* windows port
+  - some of the Windows functions are MVC 2005 specific - figure out a way to warn about the compiler used
+  - reduce _s function to pre MVC 2005 variants provides for wider support
+    (no, alternative is to use native winapi functions instead of posix like functions)
+  - improve globbing support
+    (no. not necessary at the moment)
 
 * locale support
   - library data returns UTF-8 (done)
@@ -136,102 +218,179 @@ check TODO
   - print output convert to system string
   - to reduce conversions use as much as possible the system string type in
     the tools
-
-ewfinfo parse and format extents header value in more table like manner
-
-update msvscpp files
-
-* create imaging (acquiry)/verify/export handle and move code from ewfcommon
-  into handles
-  - verification_handle_set_input_values needed ?
-
-* Add description of functionality of tools in usage information
-
-* remove HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
-* check into compression definition
-
-* move fgets to file stream IO
-
-* use internal format of date/time string convert them in interface
-* what about header values parsing with preservation of timestamps?
-  store a timestamp string in the header value and convert them in ewfinfo
-
-* have failed on open return a more sensible error (do not rely on errno)
-
-* API changes
-  - add error parameter (V2)
-  - remove write_finalize in API v2?
-  - Change char to uint8_t to prevent mis interpretation of UTF-8 string type
-
 * separate narrow and wide character library functions
   - Linux can change wide character into UTF8
   - Windows uses an ASCII codepage as narrow character string
-
-* ewfinput have ewfinput_get_string_variable_system_character get its own
-  input without the conversion function?
-
-* ewfexport implement more ewfacquire acquiry parameters?
-
-* have segment file number in libewf_raw_read_chunk for warning output?
-
-* improve offset table correction
-  - if not correctable skip chunk while reading and mark as crc error
-    or try to determine offset/size of chunk somehow
-
-* make compilation resilient for missing crypto library
-  - compile on system without libcrypto
-  - remove the cryptographic options if crypto library is missing
-
 * implement libuna
   - handle codepage in ewftools use -p option
   - add '-p list' option? to list codepages
-  - what about LC_TYPE setting in ewftools
 * ewftools check char/wchar in/output
+* windows Unicode/ASCII support and the use of CreateFile (check for value passed by MSVSCPP)
+  General option, Character Set, Not Set (_UNICODE, UNICODE)
 
-* rename length into size, make sure string size contains end of string character
-  - length is used when the value does not contain the EOS
-  - size is used when the value contains the EOS or otherwise
+* have segment file number in libewf_raw_read_chunk for warning output?
 
-* implement low memory usage option
-  - trade off IO versus memory use
-  - for write only offset table is not needed etc.
-
-* implement file io pooling?
-  - add means to set open file handle limit
-
-* ewfalter
-  - allow to set maximum delta file size default 4 GiB?
-  - overwrite alter buffer size with -p option?
-
-* change libewf_system_string_to_(u)int64 to return 1 or -1
-
-* retrieve EWFX xml header directly?
-
-* fix raw access verify of SMART files
-
-* tools and library support read/write of EnCase 6.12 SHA1
-
-* implement libpff log_handle
-
-* implement liberror in ewftools
+Other:
+check error tollerance
+check TODO
 
 CLOSED
 * what about read+write and compression?
   solved by delta files
 * do not finalize on error
-  no, does not add any additional value
-  if a write error did occur the library should not make any guesses about if
-  this is write or wrong
+  no, do not add any additional data if a write error did occur the library
+  should not make any guesses about if this is write or wrong
 * file: add function/flag to open segments files progressively using only the basename (like write)
-  no the glob function provides for a way to determine segment filenames using
-  the basename
+  no, the glob function provides for a way to determine segment filenames using the basename
 * ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
   no
-* test if wide character mode is portable between big and little endian platforms due to conversion functions?
-  checks out ok
 
-FIX
-* issue acquiting SHA1 in ewfx 
+FIX:
+* missing output file while acquiring ewfacquirestream with block size 32768
+* raw access in ewfexport for export of ewf
+* refactor libewf_write to libewf_write_io_handle
+* chunk and crc buffer alignment support
+* check sprintf use
+   - liberror -> liberror_error_vsnprintf
+   - libewf -> libewf_hash_values, libewf_header_values
+   - ewftools -> byte_size_string, guid
+* fallback to ASCII for unknown locale (cygwin ?)
+
+Version: 20090330
+* Updated caseless compare functions with WINAPI support
+
+Version: 20090329
+* removed libbfio_file_io.[ch]
+* worked on adding system error string support to libbfio error messages
+* fixed multiple errors
+* cleaned end of lines in error in libbfio
+* worked on Windows PhysicalDrive device access
+
+Version: 20090328
+* updated narrow and wide string definitions
+* removed HAVE_WIDE_CHARACTER_SUPPORT_FUNCTIONS
+* change LIBBFIO_WIDE_SYSTEM_CHARACTER_TYPE into LIBBFIO_WIDE_SYSTEM_CHARACTER_T
+  and implemented WINAPI UNICODE system string detection
+* worked on removing libbfio_file_io.[ch]
+
+Version: 20090326
+* updated type.h with corrected printf format specifiers for Windows
+
+Version: 20090325
+* updated windows config
+
+Version: 20090324
+* worked on native WINAPI file access in libbfio and device_handle
+* fixed SetFilePointerEx offset correction for SEEK_CUR
+
+Version: 20090323
+* updated make dist for missing libbfio msvscpp files
+* fixes for msvscpp build
+* updated config_windows.h
+* worked on native WINAPI file access in libbfio and device_handle
+
+Version: 20090316
+* worked on refactorin libewf_write
+
+Version: 20090315
+* worked on implementig v2 api in ewftools
+* moved fgets to file stream IO
+* renamed v2 api raw read/write functions
+* refactored libewf_read into libewf_handle and libewf_read_io_handle
+* refactored libewf_write into libewf_handle and libewf_write_io_handle
+* worked on libewf_handle_open_pool
+* removed libewf_internal_handle_create_header_values, default header values are now empty
+
+Version: 20090314
+* added verion 1 api disable functionality to configure.ac for testing purposes
+* worked on signal handler for ewftools handles
+
+Version: 20090313
+* worked on unifying header/hash value functions ini the ewftools
+* worked on alteration handle
+
+Version: 20090312
+* added support for separate libbfio
+* updated glob.[ch]
+
+Version: 20090310
+* added segment file name size functions
+* changed program to system string
+
+Version: 20090309
+* added values table get identifier and value size functions
+
+Version: 20090308
+* worked on libbfio support
+  - created libbfio_pool
+  - refactor libbfio_handle initialization out of libbfio_pool
+  - implemented SEEK_END in libbfio_file and libbfio_handle
+* implemented libbfio_pool in libewf
+* worked on v2 api
+* changed libewf_character_t into uint8_t in libewf_values_table
+* implemented libbfio_file_exists
+
+Version: 20090307
+* worked on libbfio support
+* worked on v2 api
+
+Version: 20090304
+* worked on v2 api
+
+Version: 20090303
+* worked on raw access in verification handle
+* worked on raw access in export handle
+
+Version: 20090302
+* worked on raw access in export handle
+* updated manuals
+
+Version: 20090301
+* fixed regarding additional space in date value in libewf_convert_date_xheader_value
+* worked on export handle
+* fixed empty chunk issue in libewf_read_process_chunk_data
+* worked on info handle
+* fixed offset correction error in libewf_file_io_handle_seek_offset
+* fixed memory leak in libewf_open introduced by legacy change
+* removed ewflibewf
+* fixed wide character type support compilation
+
+Version: 20090228
+* worked on simplifying read input function for ewfacquire(stream)
+* worked on device handle - moved device code in ewfacquire to device handle
+* added support for missing units in byte size string (defaults to mebibytes)
+* fixed byte size string increment for no factor definition
+* ewfacquire added -P option to set bytes per sector
+* updated manuals
+* added support for optical disk and memory media type in ewfacquire(stream)
+* if removable or optical media type are chosen ewfacquire now defaults volume type to logical
+* worked on info handle
+* worked on export handle
+
+Version: 20090227
+* worked on imaging handle - refactored read input function
+* worked on simplifying read input function for ewfacquire(stream)
+* fixed missing verbose output
+* worked on detection of sector size
+
+Version: 20090225
+* worked on imaging handle raw access support
+* worked on v2 api
+* fixed delcaration error in libewf_error.h
+* moved error functions to libewf_error.c
+* moved remaining function in libewf_file to libewf_support
+* removed libewf_file
+* added description of functionality of tools in usage information
+* renamed libewf_interface into libewf_metadata
+* implemented imaging handle in ewfacquirestream
+
+Version: 20090224
+* worked on imaging handle
+* worked on v2 api
+* MD5 and SHA1 digest are now set by libewf_set_hash_value function
+
+Version: 20090223
+* worked on imaging handle
 
 Version: 20090222
 * worked on locale support
