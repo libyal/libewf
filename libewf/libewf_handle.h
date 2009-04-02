@@ -44,6 +44,11 @@
 #include "libewf_values_table.h"
 #include "libewf_write_io_handle.h"
 
+/* For some reason MSVSCPP requires this include
+ * to not mess up the exported functions
+ */
+#include "libewf_legacy.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif

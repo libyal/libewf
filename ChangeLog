@@ -256,6 +256,9 @@ FIX:
    - ewftools -> byte_size_string, guid
 * fallback to ASCII for unknown locale (cygwin ?)
 
+Version: 20090401
+* Fixed some small errors in API version 1 legacy support
+
 Version: 20090330
 * Updated caseless compare functions with WINAPI support
 

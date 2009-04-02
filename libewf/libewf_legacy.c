@@ -490,7 +490,7 @@ ssize_t libewf_raw_write_prepare_buffer(
 	static char *function   = "libewf_raw_write_prepare_buffer";
 	ssize_t chunk_data_size = 0;
 
-	chunk_data_size = libewf_handle_raw_write_prepare_buffer(
+	chunk_data_size = libewf_handle_prepare_write_chunk(
 	                   handle,
 	                   buffer,
 	                   buffer_size,
@@ -540,7 +540,7 @@ ssize_t libewf_raw_write_buffer(
 	static char *function   = "libewf_raw_write_buffer";
 	ssize_t write_count     = 0;
 
-	write_count = libewf_handle_raw_write_buffer(
+	write_count = libewf_handle_write_chunk(
 	               handle,
 	               buffer,
 	               buffer_size,
