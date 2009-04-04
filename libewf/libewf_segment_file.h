@@ -102,19 +102,7 @@ ssize_t libewf_segment_file_write_chunks_section_start(
          uint32_t segment_chunk_amount,
          liberror_error_t **error );
 
-ssize_t libewf_segment_file_write_chunks_data(
-         libewf_segment_file_handle_t *segment_file_handle,
-         libewf_io_handle_t *io_handle,
-         libewf_offset_table_t *offset_table,
-         uint32_t chunk,
-         uint8_t *chunk_data,
-         size_t chunk_data_size,
-         int8_t is_compressed,
-         ewf_crc_t *chunk_crc,
-         int8_t write_crc,
-         liberror_error_t **error );
-
-ssize_t libewf_segment_file_write_chunks_correction(
+ssize_t libewf_segment_file_write_chunks_section_correction(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
@@ -126,13 +114,27 @@ ssize_t libewf_segment_file_write_chunks_correction(
          uint32_t section_amount_of_chunks,
          liberror_error_t **error );
 
+ssize_t libewf_segment_file_write_chunk(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_offset_table_t *offset_table,
+         uint32_t chunk,
+         uint8_t *chunk_buffer,
+         size_t chunk_size,
+         int8_t is_compressed,
+         uint8_t *crc_buffer,
+         ewf_crc_t *chunk_crc,
+         int8_t write_crc,
+         liberror_error_t **error );
+
 ssize_t libewf_segment_file_write_delta_chunk(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
-         uint8_t *chunk_data,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
+         uint8_t *crc_buffer,
          ewf_crc_t *chunk_crc,
          uint8_t write_crc,
 	 uint8_t no_section_append,

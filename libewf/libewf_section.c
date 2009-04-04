@@ -6314,12 +6314,11 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
+fprintf( stderr, "X: %" PRIzd "\n", offset_table->chunk_offset[ chunk ].file_offset );
+
 	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
-	offset_table->chunk_offset[ chunk ].flags               = 0;
-#if defined( HAVE_DEBUG_OUTPUT )
-	offset_table->chunk_offset[ chunk ].is_delta_chunk      = 1;
-#endif
+	offset_table->chunk_offset[ chunk ].flags               = LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK;
 
 	/* Skip the chunk data within the section
 	 */
@@ -6349,15 +6348,15 @@ ssize_t libewf_section_delta_chunk_write(
          libbfio_pool_t *file_io_pool,
          libewf_segment_file_handle_t *segment_file_handle,
          uint32_t chunk,
-         uint8_t *chunk_data,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
+         uint8_t *crc_buffer,
          ewf_crc_t *chunk_crc,
          uint8_t write_crc,
          uint8_t no_section_append,
          liberror_error_t **error )
 {
 	ewfx_delta_chunk_header_t delta_chunk_header;
-	uint8_t calculated_crc_buffer[ 4 ];
 
 	uint8_t *section_type       = (uint8_t *) "delta_chunk";
 	static char *function       = "libewf_section_delta_chunk_write";
@@ -6367,7 +6366,7 @@ ssize_t libewf_section_delta_chunk_write(
 	ssize_t write_count         = 0;
 	size_t section_type_length  = 11;
 	size_t section_size         = 0;
-	size_t chunk_data_size      = 0;
+	size_t write_size           = 0;
 
 	if( segment_file_handle == NULL )
 	{
@@ -6376,6 +6375,17 @@ ssize_t libewf_section_delta_chunk_write(
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid segment file.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk buffer.",
 		 function );
 
 		return( -1 );
@@ -6420,11 +6430,11 @@ ssize_t libewf_section_delta_chunk_write(
 
 		return( -1 );
 	}
-	chunk_data_size = chunk_size;
+	write_size = chunk_size;
 
 	if( write_crc != 0 )
 	{
-		chunk_data_size += sizeof( ewf_crc_t );
+		write_size += sizeof( ewf_crc_t );
 	}
 	/* The chunk value is stored + 1 count in the file
 	 */
@@ -6434,7 +6444,7 @@ ssize_t libewf_section_delta_chunk_write(
 
 	endian_little_revert_32bit(
 	 delta_chunk_header.chunk_size,
-	 (uint32_t) chunk_data_size );
+	 (uint32_t) write_size );
 
 	delta_chunk_header.padding[ 0 ] = (uint8_t) 'D';
 	delta_chunk_header.padding[ 1 ] = (uint8_t) 'E';
@@ -6451,7 +6461,7 @@ ssize_t libewf_section_delta_chunk_write(
 	 delta_chunk_header.crc,
 	 calculated_crc );
 
-	section_size = sizeof( ewfx_delta_chunk_header_t ) + chunk_data_size;
+	section_size = sizeof( ewfx_delta_chunk_header_t ) + write_size;
 
 	section_write_count = libewf_section_start_write(
 	                       file_io_pool,
@@ -6481,7 +6491,7 @@ ssize_t libewf_section_delta_chunk_write(
 	               sizeof( ewfx_delta_chunk_header_t ),
 	               error );
 
-	if( write_count == -1 )
+	if( write_count != (ssize_t) sizeof( ewfx_delta_chunk_header_t ) )
 	{
 		liberror_error_set(
 		 error,
@@ -6494,14 +6504,38 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	section_write_count += write_count;
 
+	write_size = chunk_size;
+
+	if( write_crc != 0 )
+	{
+		if( crc_buffer == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid crc buffer.",
+			 function );
+
+			return( -1 );
+		}
+		endian_little_revert_32bit(
+		 crc_buffer,
+		 *chunk_crc );
+
+		if( &( chunk_buffer[ chunk_size ] ) == crc_buffer )
+		{
+			write_size += sizeof( ewf_crc_t );
+		}
+	}
 	write_count = libbfio_pool_write(
 	               file_io_pool,
 	               segment_file_handle->file_io_pool_entry,
-	               chunk_data,
-	               chunk_size,
+	               chunk_buffer,
+	               write_size,
 	               error );
 
-	if( write_count == -1 )
+	if( write_count != (ssize_t) write_size )
 	{
 		liberror_error_set(
 		 error,
@@ -6514,16 +6548,13 @@ ssize_t libewf_section_delta_chunk_write(
 	}
 	section_write_count += write_count;
 
-	if( write_crc != 0 )
+	if( ( write_crc != 0 )
+	 && ( &( chunk_buffer[ chunk_size ] ) != crc_buffer ) )
 	{
-		endian_little_revert_32bit(
-		 calculated_crc_buffer,
-		 *chunk_crc );
-
 		write_count = libbfio_pool_write(
 		               file_io_pool,
 		               segment_file_handle->file_io_pool_entry,
-			       calculated_crc_buffer,
+			       crc_buffer,
 			       sizeof( ewf_crc_t ),
 		               error );
 

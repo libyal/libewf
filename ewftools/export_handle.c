@@ -908,6 +908,7 @@ ssize_t export_handle_read_buffer(
                       storage_media_buffer->compression_buffer,
                       storage_media_buffer->compression_buffer_size,
 	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->compression_buffer[ storage_media_buffer->raw_buffer_size ] ),
 	              &( storage_media_buffer->crc ),
 	              &( storage_media_buffer->process_crc ),
 	              error );

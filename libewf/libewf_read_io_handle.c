@@ -329,8 +329,8 @@ ssize_t libewf_read_io_handle_read_chunk(
         char *chunk_type                                  = NULL;
 #endif
 	static char *function                             = "libewf_read_io_handle_read_chunk";
-	ssize_t chunk_read_count                          = 0;
-	ssize_t crc_read_count                            = 0;
+	ssize_t read_count                                = 0;
+	ssize_t total_read_count                          = 0;
 	size_t chunk_size                                 = 0;
 
 	if( io_handle == NULL )
@@ -441,14 +441,6 @@ ssize_t libewf_read_io_handle_read_chunk(
 	*chunk_crc = 0;
 	*read_crc  = 0;
 
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( offset_table->chunk_offset[ chunk ].is_delta_chunk )
-	{
-		libewf_notify_verbose_printf(
-		 "%s: delta chunk.\n",
-		 function );
-	}
-#endif
 	/* Determine the size of the chunk including the CRC
 	 */
 	chunk_size = offset_table->chunk_offset[ chunk ].size;
@@ -500,31 +492,47 @@ ssize_t libewf_read_io_handle_read_chunk(
 		return( -1 );
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
+	if( ( offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK ) == LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK )
+	{
+		chunk_type = "uncompressed delta";
+	}
+	else if( *is_compressed == 0 )
+	{
+		chunk_type = "uncompressed";
+	}
+	else
+	{
+		chunk_type = "compressed";
+	}
 	libewf_notify_verbose_printf(
-	 "%s: reading chunk at offset: %" PRIjd ".\n",
+	 "%s: reading %s chunk %" PRIu32 " of %" PRIu32 " at offset: %" PRIu64 " with size: %" PRIzd ".\n",
 	 function,
-	 offset_table->chunk_offset[ chunk ].file_offset );
+	 chunk_type,
+	 chunk + 1,
+	 offset_table->amount_of_chunk_offsets,
+	 offset_table->chunk_offset[ chunk ].file_offset,
+	 offset_table->chunk_offset[ chunk ].size );
 #endif
 
 	/* Check if the chunk and crc buffers are aligned
 	 * if so read the chunk and crc at the same time
 	 */
-	if( ( *read_crc != 0 )
+	if( ( *is_compressed == 0 )
+	 && ( *read_crc != 0 )
 	 && ( &( chunk_buffer[ chunk_size ] ) == crc_buffer ) )
 	{
 		chunk_size += sizeof( ewf_crc_t );
 	}
-
 	/* Read the chunk data
 	 */
-	chunk_read_count = libbfio_pool_read(
-			    io_handle->file_io_pool,
-			    segment_file_handle->file_io_pool_entry,
-			    chunk_buffer,
-			    chunk_size,
-	                    error );
+	read_count = libbfio_pool_read(
+	              io_handle->file_io_pool,
+	              segment_file_handle->file_io_pool_entry,
+	              chunk_buffer,
+	              chunk_size,
+	              error );
 
-	if( chunk_read_count != (ssize_t) chunk_size )
+	if( read_count != (ssize_t) chunk_size )
 	{
 		liberror_error_set(
 		 error,
@@ -535,10 +543,15 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 		return( -1 );
 	}
+	total_read_count += read_count;
+
 	/* Determine if the CRC should be read seperately
 	 */
 	if( *read_crc != 0 )
 	{
+		/* Check if the chunk and crc buffers are aligned
+		 * if not the chunk and crc need to be read separately
+		 */
 		if( &( chunk_buffer[ chunk_size ] ) != crc_buffer )
 		{
 			if( crc_buffer == NULL )
@@ -552,14 +565,14 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 				return( -1 );
 			}
-			crc_read_count = libbfio_pool_read(
-					  io_handle->file_io_pool,
-					  segment_file_handle->file_io_pool_entry,
-					  crc_buffer,
-					  sizeof( ewf_crc_t ),
-					  error );
+			read_count = libbfio_pool_read(
+			              io_handle->file_io_pool,
+			              segment_file_handle->file_io_pool_entry,
+			              crc_buffer,
+			              sizeof( ewf_crc_t ),
+			              error );
 
-			if( crc_read_count != (ssize_t) sizeof( ewf_crc_t ) )
+			if( read_count != (ssize_t) sizeof( ewf_crc_t ) )
 			{
 				liberror_error_set(
 				 error,
@@ -571,33 +584,13 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 				return( -1 );
 			}
-		}
-		else
-		{
-			chunk_size -= sizeof( ewf_crc_t );
+			total_read_count += read_count;
 		}
 		endian_little_convert_32bit(
 		 *chunk_crc,
 		 crc_buffer );
 	}
-#if defined( HAVE_VERBOSE_OUTPUT )
-	if( *is_compressed == 0 )
-	{
-		chunk_type = "UNCOMPRESSED";
-	}
-	else
-	{
-		chunk_type = "COMPRESSED";
-	}
-	libewf_notify_verbose_printf(
-	 "%s: chunk %" PRIu32 " of %" PRIu32 " is %s and has size: %" PRIzd ".\n",
-	 function,
-	 chunk + 1,
-	 offset_table->amount_of_chunk_offsets,
-	 chunk_type,
-	 offset_table->chunk_offset[ chunk ].size );
-#endif
-	return( chunk_read_count );
+	return( total_read_count );
 }
 
 /* Reads a certain chunk of data from the segment file(s)
@@ -618,14 +611,16 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 {
 	uint8_t stored_crc_buffer[ 4 ];
 
-	uint8_t *chunk_data        = NULL;
-	uint8_t *chunk_read        = NULL;
+	uint8_t *chunk_buffer      = NULL;
+	uint8_t *chunk_read_buffer = NULL;
+	uint8_t *crc_read_buffer   = NULL;
 	static char *function      = "libewf_read_io_handle_read_chunk_data";
 	ewf_crc_t chunk_crc        = 0;
 	off64_t sector             = 0;
-	ssize_t chunk_read_count   = 0;
 	size_t chunk_data_size     = 0;
+	size_t chunk_size          = 0;
 	size_t bytes_available     = 0;
+	ssize_t read_count         = 0;
 	uint32_t amount_of_sectors = 0;
 	int chunk_cache_data_used  = 0;
 	uint8_t crc_mismatch       = 0;
@@ -716,24 +711,24 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	{
 		/* Determine the size of the chunk including the CRC
 		 */
-		chunk_data_size = offset_table->chunk_offset[ chunk ].size;
+		chunk_size = offset_table->chunk_offset[ chunk ].size;
 
 		/* Make sure the chunk cache is large enough
 		 */
 		chunk_cache_data_used = (int) ( buffer == chunk_cache->data );
 
-		if( chunk_data_size > chunk_cache->allocated_size )
+		if( chunk_size > chunk_cache->allocated_size )
 		{
 #if defined( HAVE_VERBOSE_OUTPUT )
 			libewf_notify_verbose_printf(
-			 "%s: reallocating chunk data size: %" PRIzu ".\n",
+			 "%s: reallocating chunk size: %" PRIzu ".\n",
 			 function,
-			 chunk_data_size );
+			 chunk_size );
 #endif
 
 			if( libewf_chunk_cache_resize(
 			     chunk_cache,
-			     chunk_data_size,
+			     chunk_size,
 			     error ) != 1 )
 			{
 				liberror_error_set(
@@ -761,7 +756,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		{
 			is_compressed = 1;
 		}
-		chunk_data = chunk_cache->data;
+		chunk_buffer = chunk_cache->data;
 
 		/* Directly read to the buffer if
 		 *  the buffer isn't the chunk cache
@@ -774,38 +769,48 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		 && ( size >= (size_t) media_values->chunk_size )
 		 && ( is_compressed == 0 ) )
 		{
-			chunk_data = buffer;
+			chunk_buffer = buffer;
 
 			/* The CRC is read seperately for uncompressed chunks
 			 */
-			chunk_data_size -= sizeof( ewf_crc_t );
+			chunk_size -= sizeof( ewf_crc_t );
 		}
 		/* Determine if the chunk data should be directly read into chunk data buffer
 		 * or to use the intermediate storage for a compressed chunk
 		 */
 		if( is_compressed == 1 )
 		{
-			chunk_read = chunk_cache->compressed;
+			chunk_read_buffer = chunk_cache->compressed;
 		}
 		else
 		{
-			chunk_read = chunk_data;
+			chunk_read_buffer = chunk_buffer;
+		}
+		/* Use chunk and crc buffer alignment when the chunk cache data is directly being passed
+		 */
+		if( chunk_read_buffer == chunk_cache->data )
+		{
+			crc_read_buffer = &( chunk_read_buffer[ media_values->chunk_size ] );
+		}
+		else
+		{
+			crc_read_buffer = stored_crc_buffer;
 		}
 		/* Read the chunk
 		 */
-		chunk_read_count = libewf_read_io_handle_read_chunk(
-		                    io_handle,
-		                    offset_table,
-		                    chunk,
-		                    chunk_read,
-		                    chunk_data_size,
-		                    &is_compressed,
-		                    stored_crc_buffer,
-		                    &chunk_crc,
-		                    &read_crc,
-		                    error );
+		read_count = libewf_read_io_handle_read_chunk(
+		              io_handle,
+		              offset_table,
+		              chunk,
+		              chunk_read_buffer,
+		              chunk_size,
+		              &is_compressed,
+		              crc_read_buffer,
+		              &chunk_crc,
+		              &read_crc,
+		              error );
 
-		if( chunk_read_count <= -1 )
+		if( read_count <= -1 )
 		{
 			liberror_error_set(
 			 error,
@@ -821,10 +826,14 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			chunk_data_size = media_values->chunk_size
 			                + sizeof( ewf_crc_t );
 		}
+		else
+		{
+			chunk_data_size = chunk_size;
+		}
 		if( libewf_read_io_handle_process_chunk(
-		     chunk_read,
-		     chunk_read_count,
-		     chunk_data,
+		     chunk_read_buffer,
+		     chunk_size,
+		     chunk_buffer,
 		     &chunk_data_size,
 		     is_compressed,
 		     chunk_crc,
@@ -847,7 +856,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 			 */
 			if( ( read_io_handle->wipe_on_error != 0 )
 			 && ( memory_set(
-			       chunk_read,
+			       chunk_read_buffer,
 			       0,
 			       size ) == NULL ) )
 			{
@@ -889,7 +898,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		}
 		/* Flag that the chunk was cached
 		 */
-		if( chunk_data == chunk_cache->data )
+		if( chunk_buffer == chunk_cache->data )
 		{
 			chunk_cache->chunk  = chunk;
 			chunk_cache->amount = chunk_data_size;
@@ -899,7 +908,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	}
 	else
 	{
-		chunk_data      = chunk_cache->data;
+		chunk_buffer    = chunk_cache->data;
 		chunk_data_size = chunk_cache->amount;
 	}
 	/* Determine the available amount of data within the cached chunk
@@ -937,7 +946,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 	/* If the data was read into the chunk cache copy it to the buffer
 	 *  and the buffer is not the chunk cache itself
 	 */
-	if( ( chunk_data == chunk_cache->data )
+	if( ( chunk_buffer == chunk_cache->data )
 	 && ( buffer != chunk_cache->data ) )
 	{
 		/* Copy the relevant data to buffer
@@ -945,7 +954,7 @@ ssize_t libewf_read_io_handle_read_chunk_data(
 		if( ( bytes_available > 0 )
 		 && ( memory_copy(
 		       buffer,
-		       &( chunk_data[ chunk_offset ] ),
+		       &( chunk_buffer[ chunk_offset ] ),
 		       bytes_available ) == NULL ) )
 		{
 			liberror_error_set(

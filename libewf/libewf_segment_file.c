@@ -1068,218 +1068,11 @@ ssize_t libewf_segment_file_write_chunks_section_start(
 	return( write_count );
 }
 
-/* Write a chunk of data to a segment file and update the offset table
- * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
- * Returns the amount of bytes written or -1 on error
- */
-ssize_t libewf_segment_file_write_chunks_data(
-         libewf_segment_file_handle_t *segment_file_handle,
-         libewf_io_handle_t *io_handle,
-         libewf_offset_table_t *offset_table,
-         uint32_t chunk,
-         uint8_t *chunk_data,
-         size_t chunk_data_size,
-         int8_t is_compressed,
-         ewf_crc_t *chunk_crc,
-         int8_t write_crc,
-         liberror_error_t **error )
-{
-	uint8_t crc_buffer[ 4 ];
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-	char *chunk_type            = NULL;
-#endif
-	static char *function       = "libewf_segment_file_write_chunks_data";
-	off64_t segment_file_offset = 0;
-	ssize_t write_count         = 0;
-	ssize_t total_write_count   = 0;
-	size_t chunk_size           = chunk_data_size;
-
-	if( segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid segment file handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( io_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid io handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_crc == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk CRC.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_data_size > (size_t) SSIZE_MAX )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( write_crc != 0 )
-	{
-		chunk_size += sizeof( ewf_crc_t );
-	}
-	/* Make sure the chunk is available in the offset table
-	 */
-	if( ( offset_table->amount_of_chunk_offsets < ( chunk + 1 ) )
-	 && ( libewf_offset_table_resize(
-	       offset_table,
-	       chunk + 1,
-	       error ) != 1 ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( libbfio_pool_get_offset(
-	     io_handle->file_io_pool,
-	     segment_file_handle->file_io_pool_entry,
-	     &segment_file_offset,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve current offset in segment file.",
-		 function );
-
-		return( -1 );
-	}
-	/* Set the values in the offset table
-	 */
-	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
-	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
-	offset_table->chunk_offset[ chunk ].size                = chunk_size;
-
-	if( is_compressed == 0 )
-	{
-		offset_table->chunk_offset[ chunk ].flags = 0;
-	}
-	else
-	{
-		offset_table->chunk_offset[ chunk ].flags |= LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED;
-	}
-
-#if defined( HAVE_VERBOSE_OUTPUT )
-	/* Print a verbose notification
-	 */
-	if( is_compressed == 0 )
-	{
-		chunk_type = "UNCOMPRESSED";
-	}
-	else
-	{
-		chunk_type = "COMPRESSED";
-	}
-	libewf_notify_verbose_printf(
-	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
-	 function,
-	 chunk_type,
-	 chunk + 1,
-	 segment_file_offset,
-	 chunk_size,
-	 *chunk_crc );
-#endif
-
-	/* Write the chunk data to the segment file
-	 */
-	write_count = libbfio_pool_write(
-	               io_handle->file_io_pool,
-	               segment_file_handle->file_io_pool_entry,
-	               chunk_data,
-	               chunk_data_size,
-	               error );
-
-	if( write_count != (ssize_t) chunk_data_size )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to write data.",
-		 function );
-
-		return( -1 );
-	}
-	total_write_count += write_count;
-
-	/* Write the CRC if necessary
-	 */
-	if( write_crc != 0 )
-	{
-		endian_little_revert_32bit(
-		 crc_buffer,
-		 *chunk_crc );
-
-		write_count = libbfio_pool_write(
-		               io_handle->file_io_pool,
-		               segment_file_handle->file_io_pool_entry,
-		               crc_buffer,
-		               sizeof( ewf_crc_t ),
-		               error );
-
-		if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write CRC.",
-			 function );
-
-			return( -1 );
-		}
-		total_write_count += write_count;
-	}
-	return( total_write_count );
-}
-
 /* Correct the sections before the actual data chunks
  * Also write the necessary sections after the actual data chunks to file (like table and table2 sections for EWF-E01 format)
  * Returns the amount of bytes written or -1 on error
  */
-ssize_t libewf_segment_file_write_chunks_correction(
+ssize_t libewf_segment_file_write_chunks_section_correction(
          libewf_segment_file_handle_t *segment_file_handle,
          libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
@@ -1292,7 +1085,7 @@ ssize_t libewf_segment_file_write_chunks_correction(
          liberror_error_t **error )
 {
 	uint8_t *table_section_string    = NULL;
-	static char *function            = "libewf_segment_file_write_chunks_correction";
+	static char *function            = "libewf_segment_file_write_chunks_section_correction";
 	off64_t last_segment_file_offset = 0;
 	off64_t base_offset              = 0;
 	ssize_t total_write_count        = 0;
@@ -1556,6 +1349,240 @@ ssize_t libewf_segment_file_write_chunks_correction(
 	return( total_write_count );
 }
 
+/* Write a chunk of data to a segment file and update the offset table
+ * Set write_crc to a non 0 value if the CRC is not provided within the chunk data
+ * Returns the amount of bytes written or -1 on error
+ */
+ssize_t libewf_segment_file_write_chunk(
+         libewf_segment_file_handle_t *segment_file_handle,
+         libewf_io_handle_t *io_handle,
+         libewf_offset_table_t *offset_table,
+         uint32_t chunk,
+         uint8_t *chunk_buffer,
+         size_t chunk_size,
+         int8_t is_compressed,
+         uint8_t *crc_buffer,
+         ewf_crc_t *chunk_crc,
+         int8_t write_crc,
+         liberror_error_t **error )
+{
+#if defined( HAVE_VERBOSE_OUTPUT )
+	char *chunk_type            = NULL;
+#endif
+	static char *function       = "libewf_segment_file_write_chunk";
+	off64_t segment_file_offset = 0;
+	size_t write_size           = 0;
+	ssize_t write_count         = 0;
+	ssize_t total_write_count   = 0;
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment file handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_crc == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk CRC.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size > (size_t) SSIZE_MAX )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid chunk size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	/* Make sure the chunk is available in the offset table
+	 */
+	if( ( offset_table->amount_of_chunk_offsets < ( chunk + 1 ) )
+	 && ( libewf_offset_table_resize(
+	       offset_table,
+	       chunk + 1,
+	       error ) != 1 ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_RESIZE_FAILED,
+		 "%s: unable to resize offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_pool_get_offset(
+	     io_handle->file_io_pool,
+	     segment_file_handle->file_io_pool_entry,
+	     &segment_file_offset,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve current offset in segment file.",
+		 function );
+
+		return( -1 );
+	}
+	/* Set the values in the offset table
+	 */
+	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
+	offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
+	offset_table->chunk_offset[ chunk ].size                = chunk_size;
+
+	if( write_crc != 0 )
+	{
+		offset_table->chunk_offset[ chunk ].size += sizeof( ewf_crc_t );
+	}
+	if( is_compressed == 0 )
+	{
+		offset_table->chunk_offset[ chunk ].flags = 0;
+	}
+	else
+	{
+		offset_table->chunk_offset[ chunk ].flags |= LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED;
+	}
+
+#if defined( HAVE_VERBOSE_OUTPUT )
+	/* Print a verbose notification
+	 */
+	if( is_compressed == 0 )
+	{
+		chunk_type = "uncompressed";
+	}
+	else
+	{
+		chunk_type = "compressed";
+	}
+	libewf_notify_verbose_printf(
+	 "%s: writing %s chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	 function,
+	 chunk_type,
+	 chunk + 1,
+	 segment_file_offset,
+	 offset_table->chunk_offset[ chunk ].size,
+	 *chunk_crc );
+#endif
+
+	write_size = chunk_size;
+
+	/* Check if the chunk and crc buffers are aligned
+	 * if so write the chunk and crc at the same time
+	 */
+	if( ( is_compressed == 0 )
+	 && ( write_crc != 0 )
+	 && ( &( chunk_buffer[ chunk_size ] ) == crc_buffer ) )
+	{
+		write_size += sizeof( ewf_crc_t );
+	}
+	/* Write the chunk data to the segment file
+	 */
+	write_count = libbfio_pool_write(
+	               io_handle->file_io_pool,
+	               segment_file_handle->file_io_pool_entry,
+	               chunk_buffer,
+	               write_size,
+	               error );
+
+	if( write_count != (ssize_t) write_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_WRITE_FAILED,
+		 "%s: unable to write data.",
+		 function );
+
+		return( -1 );
+	}
+	total_write_count += write_count;
+
+	/* Write the CRC if necessary
+	 */
+	if( write_crc != 0 )
+	{
+		/* Check if the chunk and crc buffers are aligned
+		 * if not the chunk and crc need to be written separately
+		 */
+		if( &( chunk_buffer[ chunk_size ] ) != crc_buffer )
+		{
+			if( crc_buffer == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+				 "%s: invalid CRC buffer.",
+				 function );
+
+				return( -1 );
+			}
+			endian_little_revert_32bit(
+			 crc_buffer,
+			 *chunk_crc );
+
+			write_count = libbfio_pool_write(
+				       io_handle->file_io_pool,
+				       segment_file_handle->file_io_pool_entry,
+				       crc_buffer,
+				       sizeof( ewf_crc_t ),
+				       error );
+
+			if( write_count != (ssize_t) sizeof( ewf_crc_t ) )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_IO,
+				 LIBERROR_IO_ERROR_WRITE_FAILED,
+				 "%s: unable to write CRC.",
+				 function );
+
+				return( -1 );
+			}
+			total_write_count += write_count;
+		}
+	}
+	return( total_write_count );
+}
+
 /* Write a delta chunk of data to a segment file and update the offset table
  * Returns the amount of bytes written or -1 on error
  */
@@ -1564,8 +1591,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
          libewf_io_handle_t *io_handle,
          libewf_offset_table_t *offset_table,
          uint32_t chunk,
-         uint8_t *chunk_data,
+         uint8_t *chunk_buffer,
          size_t chunk_size,
+         uint8_t *crc_buffer,
          ewf_crc_t *chunk_crc,
          uint8_t write_crc,
 	 uint8_t no_section_append,
@@ -1642,7 +1670,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: writing UNCOMPRESSED delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
+	 "%s: writing uncompressed delta chunk: %" PRIu32 " at offset: %" PRIjd " with size: %" PRIzu ", with CRC: %" PRIu32 ".\n",
 	 function,
 	 ( chunk + 1 ),
 	 segment_file_offset,
@@ -1656,8 +1684,9 @@ ssize_t libewf_segment_file_write_delta_chunk(
 	               io_handle->file_io_pool,
 	               segment_file_handle,
 	               chunk,
-	               chunk_data,
+	               chunk_buffer,
 	               chunk_size,
+	               crc_buffer,
 	               chunk_crc,
 	               write_crc,
 	               no_section_append,
@@ -1673,10 +1702,7 @@ ssize_t libewf_segment_file_write_delta_chunk(
 		offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 		offset_table->chunk_offset[ chunk ].file_offset         = segment_file_offset;
 		offset_table->chunk_offset[ chunk ].size                = chunk_size + sizeof( ewf_crc_t );
-		offset_table->chunk_offset[ chunk ].flags               = 0;
-#if defined( HAVE_DEBUG_OUTPUT )
-		offset_table->chunk_offset[ chunk ].is_delta_chunk      = 1;
-#endif
+		offset_table->chunk_offset[ chunk ].flags               = LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK;
 	}
 	else if( write_count < 0 )
 	{

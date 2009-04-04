@@ -1,4 +1,4 @@
-.Dd April 2, 2009
+.Dd April 4, 2009
 .Dt libewf 3
 .Os libewf
 .Sh NAME
@@ -125,7 +125,7 @@ File/Handle functions (APIv2)
 .Ft ssize_t
 .Fn libewf_handle_prepare_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *uncompressed_buffer, size_t *uncompressed_buffer_size, int8_t is_compressed, EWF_CRC chunk_crc, int8_t read_crc, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *read_crc, libewf_error_t **error"
+.Fn libewf_handle_read_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, int8_t *is_compressed, uint8_t *crc_buffer, uint32_t *chunk_crc, int8_t *read_crc, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_read_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t
@@ -133,7 +133,7 @@ File/Handle functions (APIv2)
 .Ft ssize_t
 .Fn libewf_handle_prepare_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, void *compressed_buffer, size_t *compressed_buffer_size, int8_t *is_compressed, uint32_t *chunk_crc, int8_t *write_crc, libewf_error_t **error"
 .Ft ssize_t
-.Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, uint32_t chunk_crc, int8_t write_crc, libewf_error_t **error"
+.Fn libewf_handle_write_chunk "libewf_handle_t *handle, void *chunk_buffer, size_t chunk_buffer_size, size_t data_size, int8_t is_compressed, uint8_t *crc_buffer, uint32_t chunk_crc, int8_t write_crc, libewf_error_t **error"
 .Ft ssize_t
 .Fn libewf_handle_write_buffer "libewf_handle_t *handle, void *buffer, size_t buffer_size, libewf_error_t **error"
 .Ft ssize_t

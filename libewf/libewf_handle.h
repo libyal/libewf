@@ -179,6 +179,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_read_chunk(
                        void *chunk_buffer,
                        size_t chunk_buffer_size,
                        int8_t *is_compressed,
+                       uint8_t *crc_buffer,
                        uint32_t *chunk_crc,
                        int8_t *read_crc,
                        liberror_error_t **error );
@@ -213,6 +214,7 @@ LIBEWF_EXTERN ssize_t libewf_handle_write_chunk(
                        size_t chunk_buffer_size,
                        size_t data_size,
                        int8_t is_compressed,
+                       uint8_t *crc_buffer,
                        uint32_t chunk_crc,
                        int8_t write_crc,
                        liberror_error_t **error );

@@ -362,6 +362,8 @@ ssize_t libewf_raw_read_buffer(
          uint32_t *chunk_crc,
          int8_t *read_crc )
 {
+	uint8_t crc_buffer[ 4 ];
+
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_raw_read_buffer";
 	ssize_t read_count      = 0;
@@ -371,6 +373,7 @@ ssize_t libewf_raw_read_buffer(
 	              buffer,
 	              buffer_size,
 	              is_compressed,
+	              crc_buffer,
 	              chunk_crc,
 	              read_crc,
 	              &error );
@@ -536,6 +539,8 @@ ssize_t libewf_raw_write_buffer(
          uint32_t chunk_crc,
          int8_t write_crc )
 {
+	uint8_t crc_buffer[ 4 ];
+
 	liberror_error_t *error = NULL;
 	static char *function   = "libewf_raw_write_buffer";
 	ssize_t write_count     = 0;
@@ -546,6 +551,7 @@ ssize_t libewf_raw_write_buffer(
 	               buffer_size,
 	               data_size,
 	               is_compressed,
+	               crc_buffer,
 	               chunk_crc,
 	               write_crc,
 	               &error );

@@ -37,6 +37,7 @@ extern "C" {
 #define LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED	0x01
 #define LIBEWF_CHUNK_OFFSET_FLAGS_TAINTED 	0x02
 #define LIBEWF_CHUNK_OFFSET_FLAGS_CORRUPTED 	0x04
+#define LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK 	0x80
 
 typedef struct libewf_chunk_offset libewf_chunk_offset_t;
 
@@ -58,14 +59,9 @@ struct libewf_chunk_offset
 	 * 0x01 indicates if the chunk is compressed
 	 * 0x02 indicates if the chunk is tainted and possibly corrupted
 	 * 0x04 indicates if the chunk is corrupted
+	 * 0x80 indicates if the chunk is a delta chunk
 	 */
 	uint8_t flags;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	/* Value to indicate if the chunk is stored in a delta segment file
-	 */
-	uint8_t is_delta_chunk;
-#endif
 };
 
 #if defined( __cplusplus )

@@ -240,7 +240,6 @@ CLOSED
   no
 
 next beta release:
-* implement chunk and crc buffer alignment support
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
@@ -248,7 +247,11 @@ next beta release:
 * fix raw access in ewfalter/ewfexport
   - delta chunk CRC ?
 * add API function to retrieve current segment filename
-* fix crc mismatch in read delta chunk
+
+Version: 20090404
+* implemented chunk and crc buffer alignment
+* fixed offset error in libbfio_handle_seek_offset, due to introduction of whence
+* fixed crc mismatch in read delta chunk
 
 Version: 20090403
 * added configure option for static executables

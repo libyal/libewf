@@ -1036,6 +1036,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
+         uint8_t *crc_buffer,
          ewf_crc_t chunk_crc,
          int8_t write_crc,
          liberror_error_t **error )
@@ -1207,7 +1208,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	}
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: writing chunk of size: %" PRIzu " with data of size: %" PRIzd ".\n",
+	 "%s: writing chunk with size: %" PRIzd "(data size: %" PRIzd ").\n",
 	 function,
 	 chunk_size,
 	 chunk_data_size );
@@ -1570,7 +1571,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 	 segment_number );
 #endif
 
-	write_count = libewf_segment_file_write_chunks_data(
+	write_count = libewf_segment_file_write_chunk(
 		       segment_table->segment_file_handle[ segment_number ],
 		       io_handle,
 		       offset_table,
@@ -1578,6 +1579,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 		       chunk_buffer,
 		       chunk_size,
 		       is_compressed,
+		       crc_buffer,
 		       &chunk_crc,
 		       write_crc,
 	               error );
@@ -1689,7 +1691,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
 
 		/* Correct the offset, size in the chunks section
 		 */
-		write_count = libewf_segment_file_write_chunks_correction(
+		write_count = libewf_segment_file_write_chunks_section_correction(
 		               segment_table->segment_file_handle[ segment_number ],
 		               io_handle,
 		               offset_table,
@@ -1806,6 +1808,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
+         uint8_t *crc_buffer,
          ewf_crc_t chunk_crc,
          int8_t write_crc,
          liberror_error_t **error )
@@ -1971,7 +1974,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 #if defined( HAVE_VERBOSE_OUTPUT )
 	libewf_notify_verbose_printf(
-	 "%s: writing delta chunk: %" PRIu32 " of size: %" PRIzu " with data of size: %" PRIzd ".\n",
+	 "%s: writing delta chunk: %" PRIu32 " with size: %" PRIzd " (data size: %" PRIzd ").\n",
 	 function,
 	 ( chunk + 1 ),
 	 chunk_size,
@@ -2088,7 +2091,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 				return( -1 );
 			}
-			segment_file_offset = last_section_start_offset + chunk_size + sizeof( ewf_crc_t ) + sizeof( ewf_section_t );
+			segment_file_offset = last_section_start_offset
+			                    + chunk_size
+			                    + sizeof( ewf_crc_t )
+			                    + sizeof( ewf_section_t );
 
 			/* Check if chunk fits in exisiting delta segment file
 			 */
@@ -2213,7 +2219,9 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 	}
 	else
 	{
-		segment_file_offset = offset_table->chunk_offset[ chunk ].file_offset - sizeof( ewfx_delta_chunk_header_t ) - sizeof( ewf_section_t );
+		segment_file_offset = offset_table->chunk_offset[ chunk ].file_offset
+		                    - sizeof( ewfx_delta_chunk_header_t )
+		                    - sizeof( ewf_section_t );
 
 		if( libbfio_pool_seek_offset(
 		     io_handle->file_io_pool,
@@ -2264,6 +2272,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 		       chunk,
 		       chunk_buffer,
 		       chunk_size,
+		       crc_buffer,
 		       &chunk_crc,
 	               write_crc,
 	               no_section_append,
@@ -2333,7 +2342,10 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
          int8_t force_write,
          liberror_error_t **error )
 {
-	uint8_t *chunk_data               = NULL;
+	uint8_t stored_crc_buffer[ 4 ];
+
+	uint8_t *chunk_buffer             = NULL;
+	uint8_t *crc_buffer               = NULL;
 	static char *function             = "libewf_write_io_handle_write_new_chunk_data";
 	ewf_crc_t chunk_crc               = 0;
 	ssize_t chunk_data_size           = 0;
@@ -2456,8 +2468,8 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 	 || ( ( chunk_cache->offset == 0 )
 	 && ( data_size >= (size_t) media_values->chunk_size ) ) )
 	{
-		chunk_data = (uint8_t *) buffer;
-		write_size = read_size;
+		chunk_buffer = (uint8_t *) buffer;
+		write_size   = read_size;
 	}
 	else
 	{
@@ -2516,15 +2528,25 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 
 			return( -1 );
 		}
-		chunk_data = chunk_cache->data;
-		write_size = chunk_cache->amount;
+		chunk_buffer = chunk_cache->data;
+		write_size   = chunk_cache->amount;
+	}
+	/* Use chunk and crc buffer alignment when the chunk cache data is directly being passed
+	 */
+	if( chunk_buffer == chunk_cache->data )
+	{
+		crc_buffer = &( chunk_buffer[ media_values->chunk_size ] );
+	}
+	else
+	{
+		crc_buffer = stored_crc_buffer;
 	}
 	if( ( write_size == media_values->chunk_size )
 	 || ( ( media_values->media_size != 0 )
 	  && ( ( write_io_handle->input_write_count + (ssize64_t) write_size ) == (ssize64_t) media_values->media_size ) )
 	 || ( force_write != 0 ) )
 	{
-		chunk_cache_data_used = (int) ( chunk_data == chunk_cache->data );
+		chunk_cache_data_used = (int) ( chunk_buffer == chunk_cache->data );
 
 		/* The compressed data size contains the maximum allowed buffer size
 		 */
@@ -2538,7 +2560,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 				   io_handle->compression_level,
 				   io_handle->compression_flags,
 				   io_handle->ewf_format,
-				   chunk_data,
+				   chunk_buffer,
 				   write_size,
 				   chunk_cache->compressed,
 				   &compressed_chunk_data_size,
@@ -2558,18 +2580,18 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 
 			return( -1 );
 		}
-		/* Make sure to update the chunk_data pointer if
+		/* Make sure to update the chunk_buffer pointer if
 		 * chunk_cache->data has been reallocated by
 		 * libewf_write_io_handle_process_chunk()
 		 */
 		if( ( chunk_cache_data_used == 1 )
-		 && ( chunk_data != chunk_cache->data ) )
+		 && ( chunk_buffer != chunk_cache->data ) )
 		{
-			chunk_data = chunk_cache->data;
+			chunk_buffer = chunk_cache->data;
 		}
 		if( is_compressed != 0 )
 		{
-			chunk_data = chunk_cache->compressed;
+			chunk_buffer = chunk_cache->compressed;
 		}
 		write_count = libewf_write_io_handle_write_new_chunk(
 		               write_io_handle,
@@ -2584,10 +2606,11 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 		               sessions,
 		               acquiry_errors,
 		               chunk,
-		               chunk_data,
+		               chunk_buffer,
 		               chunk_data_size,
 		               write_size,
 		               is_compressed,
+		               crc_buffer,
 		               chunk_crc,
 		               write_crc,
 		               error );
@@ -2629,7 +2652,10 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
          size_t data_size,
          liberror_error_t **error )
 {
-	uint8_t *chunk_data         = NULL;
+	uint8_t stored_crc_buffer[ 4 ];
+
+	uint8_t *chunk_buffer       = NULL;
+	uint8_t *crc_buffer         = NULL;
 	static char *function       = "libewf_write_io_handle_write_existing_chunk_data";
 	ewf_crc_t chunk_crc         = 0;
 	size_t remaining_chunk_size = 0;
@@ -2756,8 +2782,8 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	if( ( chunk_offset == 0 )
 	 && ( data_size == media_values->chunk_size ) )
 	{
-		chunk_data = buffer;
-		write_size = (size_t) media_values->chunk_size;
+		chunk_buffer = buffer;
+		write_size   = (size_t) media_values->chunk_size;
 	}
 	else
 	{
@@ -2821,13 +2847,23 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 
 			return( -1 );
 		}
-		chunk_data = chunk_cache->data;
-		write_size = (size_t) read_count;
+		chunk_buffer = chunk_cache->data;
+		write_size   = (size_t) read_count;
+	}
+	/* Use chunk and crc buffer alignment when the chunk cache data is directly being passed
+	 */
+	if( chunk_buffer == chunk_cache->data )
+	{
+		crc_buffer = &( chunk_buffer[ media_values->chunk_size ] );
+	}
+	else
+	{
+		crc_buffer = stored_crc_buffer;
 	}
 	/* Calculate the new CRC
          */
         chunk_crc = ewf_crc_calculate(
-	             chunk_data,
+	             chunk_buffer,
 	             write_size,
 	             1 );
 
@@ -2839,10 +2875,11 @@ ssize_t libewf_write_io_handle_write_existing_chunk_data(
 	               delta_segment_table,
 	               header_sections,
 	               chunk,
-	               chunk_data,
+	               chunk_buffer,
 	               write_size,
 	               write_size,
 	               0,
+	               crc_buffer,
 	               chunk_crc,
 	               1,
 	               error );

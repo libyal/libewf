@@ -1793,12 +1793,11 @@ ssize_t libewf_handle_read_chunk(
          void *chunk_buffer,
          size_t chunk_buffer_size,
          int8_t *is_compressed,
+         uint8_t *crc_buffer,
          uint32_t *chunk_crc,
          int8_t *read_crc,
          liberror_error_t **error )
 {
-	uint8_t stored_crc_buffer[ 4 ];
-
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_read_chunk";
 	ssize_t read_count                        = 0;
@@ -1846,12 +1845,16 @@ ssize_t libewf_handle_read_chunk(
 	              chunk_buffer,
 	              chunk_buffer_size,
 	              is_compressed,
-	              stored_crc_buffer,
+	              crc_buffer,
 	              (ewf_crc_t *) chunk_crc,
 	              read_crc,
 	              error );
 
-	if( read_count <= -1 )
+	if( read_count > 0 )
+	{
+		internal_handle->io_handle->current_chunk += 1;
+	}
+	else if( read_count <= -1 )
 	{
 		liberror_error_set(
 		 error,
@@ -1860,9 +1863,6 @@ ssize_t libewf_handle_read_chunk(
 		 "%s: unable to read chunk.",
 		 function );
 	}
-	/* TODO check if this is needed on error */
-	internal_handle->io_handle->current_chunk += 1;
-
 	return( read_count );
 }
 
@@ -2204,6 +2204,7 @@ ssize_t libewf_handle_write_chunk(
          size_t chunk_buffer_size,
          size_t data_size,
          int8_t is_compressed,
+         uint8_t *crc_buffer,
          uint32_t chunk_crc,
          int8_t write_crc,
          liberror_error_t **error )
@@ -2350,6 +2351,7 @@ ssize_t libewf_handle_write_chunk(
 		               chunk_buffer_size,
 		               data_size,
 		               is_compressed,
+		               crc_buffer,
 		               (ewf_crc_t) chunk_crc,
 		               write_crc,
 		               error );
@@ -2373,6 +2375,7 @@ ssize_t libewf_handle_write_chunk(
 		               chunk_buffer_size,
 		               data_size,
 		               is_compressed,
+		               crc_buffer,
 		               (ewf_crc_t) chunk_crc,
 		               write_crc,
 		               error );
@@ -2897,7 +2900,7 @@ ssize_t libewf_handle_write_finalize(
 				internal_handle->write_io_handle->table_offsets           = (ewf_table_offset_t *) reallocation;
 				internal_handle->write_io_handle->amount_of_table_offsets = internal_handle->write_io_handle->section_amount_of_chunks;
 			}
-			write_count = libewf_segment_file_write_chunks_correction(
+			write_count = libewf_segment_file_write_chunks_section_correction(
 				       segment_file_handle,
 				       internal_handle->io_handle,
 				       internal_handle->offset_table,

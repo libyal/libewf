@@ -359,7 +359,7 @@ ssize64_t ewfalter_alter_input(
 
 			return( -1 );
 		}
-		storage_media_buffer->raw_buffer_amount = process_buffer_size;
+		storage_media_buffer->raw_buffer_amount = write_size;
 
 		buffer_offset = 0;
 
@@ -500,6 +500,8 @@ int main( int argc, char * const argv[] )
 	uint64_t alter_size                        = 0;
 	uint64_t process_buffer_size               = 0;
 	uint8_t verbose                            = 0;
+	int alteration_run                         = 0;
+	int alteration_runs                        = 1;
 	int amount_of_filenames                    = 0;
 	int argument_set_offset                    = 0;
 	int argument_set_size                      = 0;
@@ -933,66 +935,44 @@ int main( int argc, char * const argv[] )
 	}
 	if( ewfalter_abort == 0 )
 	{
-		/* First alteration run
-		 */
-		alter_count = ewfalter_alter_input(
-		               alteration_handle,
-		               (size64_t) alter_size,
-		               (off64_t) alter_offset,
-		               (size_t) process_buffer_size,
-		               &error );
-
-		if( alter_count <= -1 )
+		for( alteration_run = 0; alteration_run < alteration_runs; alteration_run++ )
 		{
 			fprintf(
 			 stdout,
-			 "Alteration failed.\n" );
+			 "Alteration run: %d\n",
+			 alteration_run + 1 );
 
-			notify_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
+			alter_count = ewfalter_alter_input(
+				       alteration_handle,
+				       (size64_t) alter_size,
+				       (off64_t) alter_offset,
+				       (size_t) process_buffer_size,
+				       &error );
 
-			alteration_handle_close(
-			 alteration_handle,
-			 NULL );
-			alteration_handle_free(
-			 &alteration_handle,
-			 NULL );
+			if( alter_count <= -1 )
+			{
+				fprintf(
+				 stdout,
+				 "Alteration failed.\n" );
 
-			return( EXIT_FAILURE );
-		}
-	}
-	if( ewfalter_abort == 0 )
-	{
-		/* Second alteration run
-		 */
-		alter_count = ewfalter_alter_input(
-		               alteration_handle,
-		               (size64_t) alter_size,
-		               (off64_t) alter_offset,
-		               (size_t) process_buffer_size,
-		               &error );
+				notify_error_backtrace(
+				 error );
+				liberror_error_free(
+				 &error );
 
-		if( alter_count <= -1 )
-		{
-			fprintf(
-			 stdout,
-			 "Alteration failed.\n" );
+				alteration_handle_close(
+				 alteration_handle,
+				 NULL );
+				alteration_handle_free(
+				 &alteration_handle,
+				 NULL );
 
-			notify_error_backtrace(
-			 error );
-			liberror_error_free(
-			 &error );
-
-			alteration_handle_close(
-			 alteration_handle,
-			 NULL );
-			alteration_handle_free(
-			 &alteration_handle,
-			 NULL );
-
-			return( EXIT_FAILURE );
+				return( EXIT_FAILURE );
+			}
+			if( ewfalter_abort != 0 )
+			{
+				break;
+			}
 		}
 	}
 	if( alteration_handle_close(

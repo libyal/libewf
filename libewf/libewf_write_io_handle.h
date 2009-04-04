@@ -236,6 +236,7 @@ ssize_t libewf_write_io_handle_write_new_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
+         uint8_t *crc_buffer,
          ewf_crc_t chunk_crc,
          int8_t write_crc,
          liberror_error_t **error );
@@ -252,6 +253,7 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
          size_t chunk_size,
          size_t chunk_data_size,
          int8_t is_compressed,
+         uint8_t *crc_buffer,
          ewf_crc_t chunk_crc,
          int8_t write_crc,
          liberror_error_t **error );
