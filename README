@@ -5,6 +5,14 @@ Libewf requires:
   or Windows Crypto API from the Windows Platform SDK
 
 
+Static compilation
+Creating a static library
+./configure --enable-shared=no
+
+Creating static executables
+CFLAGS=-static ./configure
+
+
 Creating a libewf DLL
 Currently 2 methods of creating a libewf DLL are supported:
 * using libtool

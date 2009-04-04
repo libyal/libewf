@@ -76,8 +76,10 @@ void usage_fprint(
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
+	fprintf( stream, "\t-B:        specify the amount of bytes to alter (default is all bytes)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
+	fprintf( stream, "\t-o:        specify the offset to start to alter (default is 0)\n" );
 	fprintf( stream, "\t-p:        specify the process buffer size (default is the chunk size)\n" );
 	fprintf( stream, "\t-t:        specify the target delta path and base filename (default is the same\n"
 	                 "\t           as the ewf_files)\n" );
@@ -99,9 +101,14 @@ ssize64_t ewfalter_alter_input(
 	static char *function                        = "ewfalter_alter_input";
 	ssize64_t alter_count                        = 0;
 	size_t write_size                            = 0;
+	size_t buffer_offset                         = 0;
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
 	uint32_t chunk_size                          = 0;
+
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	ssize_t read_count                           = 0;
+#endif
 
 	if( alteration_handle == NULL )
 	{
@@ -150,7 +157,7 @@ ssize64_t ewfalter_alter_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* Make sure SMART chunks fit in the storage media buffer
 	 */
 	process_buffer_size = (size_t) chunk_size;
@@ -175,28 +182,6 @@ ssize64_t ewfalter_alter_input(
 
 		return( -1 );
 	}
-	/* Fill the storage media buffer with X
-	 */
-	if( memory_set(
-	     storage_media_buffer->raw_buffer,
-	     'X',
-	     process_buffer_size ) == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_MEMORY,
-		 LIBERROR_MEMORY_ERROR_SET_FAILED,
-		 "%s: unable to set storage media buffer.",
-		 function );
-
-		storage_media_buffer_free(
-		 &storage_media_buffer,
-		 NULL );
-
-		return( -1 );
-	}
-	storage_media_buffer->raw_buffer_amount = process_buffer_size;
-
 	/* Find the first alteration offset
 	 */
 	if( alteration_handle_seek_offset(
@@ -217,8 +202,129 @@ ssize64_t ewfalter_alter_input(
 
 		return( -1 );
 	}
-	while( alter_count < (ssize64_t) alter_size )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	buffer_offset = alter_offset % process_buffer_size;
+	alter_offset  = ( alter_offset / process_buffer_size ) * process_buffer_size;
+#endif
+
+	while( alter_size > 0 )
 	{
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* Read the buffer
+		 */
+		read_count = alteration_handle_read_buffer(
+			      alteration_handle,
+			      storage_media_buffer,
+			      process_buffer_size,
+			      error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			"%s: unable to read data.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		if( read_count == 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: unexpected end of data.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		read_count = alteration_handle_read_prepare_buffer(
+			      alteration_handle,
+			      storage_media_buffer,
+			      error );
+
+		if( read_count < 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			"%s: unable to prepare buffer after read.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		if( read_count > (ssize_t) process_buffer_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_READ_FAILED,
+			 "%s: more bytes read than requested.\n",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		/* if the data is in compression buffer move data to raw buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			if( memory_copy(
+			     storage_media_buffer->raw_buffer,
+			     storage_media_buffer->compression_buffer,
+			     storage_media_buffer->compression_buffer_amount ) == NULL )
+			{
+				liberror_error_set(
+				 error,
+				 LIBERROR_ERROR_DOMAIN_MEMORY,
+				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+				 "%s: unable to data from compression buffer to raw buffer.",
+				 function );
+
+				return( -1 );
+			}
+			storage_media_buffer->data_in_compression_buffer = 0;
+			storage_media_buffer->compression_buffer_amount  = storage_media_buffer->raw_buffer_amount;
+		}
+		/* Move the file pointer back to the previous chunk
+		 */
+		if( alteration_handle_seek_offset(
+		     alteration_handle,
+		     alter_offset,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek alteration offset.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+#endif
 		if( alter_size > (size64_t) process_buffer_size )
 		{
 			write_size = process_buffer_size;
@@ -227,6 +333,38 @@ ssize64_t ewfalter_alter_input(
 		{
 			write_size = (size_t) alter_size;
 		}
+		if( ( buffer_offset + write_size ) > process_buffer_size )
+		{
+			write_size = process_buffer_size - buffer_offset;
+		}
+		alter_size -= write_size;
+
+		/* Fill the buffer with X
+		 */
+		if( memory_set(
+		     &( storage_media_buffer->raw_buffer[ buffer_offset ] ),
+		     'X',
+		     write_size ) == NULL )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_MEMORY,
+			 LIBERROR_MEMORY_ERROR_SET_FAILED,
+			 "%s: unable to set storage media buffer.",
+			 function );
+
+			storage_media_buffer_free(
+			 &storage_media_buffer,
+			 NULL );
+
+			return( -1 );
+		}
+		storage_media_buffer->raw_buffer_amount = process_buffer_size;
+
+		buffer_offset = 0;
+
+		/* Write the buffer
+		 */
 		process_count = alteration_handle_write_prepare_buffer(
 		                 alteration_handle,
 		                 storage_media_buffer,
@@ -268,7 +406,10 @@ ssize64_t ewfalter_alter_input(
 
 			return( -1 );
 		}
-		alter_count += write_size;
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		alter_offset += process_buffer_size;
+#endif
+		alter_count  += write_size;
 
 		if( ewfalter_abort != 0 )
 		{
@@ -360,6 +501,8 @@ int main( int argc, char * const argv[] )
 	uint64_t process_buffer_size               = 0;
 	uint8_t verbose                            = 0;
 	int amount_of_filenames                    = 0;
+	int argument_set_offset                    = 0;
+	int argument_set_size                      = 0;
 	int result                                 = 0;
 
 	notify_set_values(
@@ -392,7 +535,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 			   argc,
 			   argv,
-			   _SYSTEM_CHARACTER_T_STRING( "hp:qt:vV" ) ) ) != (system_integer_t) -1 )
+			   _SYSTEM_CHARACTER_T_STRING( "B:ho:p:qt:vV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -408,11 +551,62 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
+			case (system_integer_t) 'B':
+				string_length = system_string_length(
+				                 optarg );
+
+				if( system_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &alter_size,
+				     &error ) != 1 )
+				{
+					alter_size = 0;
+
+					fprintf(
+					 stderr,
+					 "Unsupported alter size defaulting to: all bytes.\n" );
+
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
+				argument_set_size = 1;
+
+				break;
+
 			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (system_integer_t) 'o':
+				string_length = system_string_length(
+				                 optarg );
+
+				if( system_string_to_uint64(
+				     optarg,
+				     string_length + 1,
+				     &alter_offset,
+				     &error ) != 1 )
+				{
+					alter_offset = 0;
+
+					fprintf(
+					 stderr,
+					 "Unsupported alter offset defaulting to: %" PRIu64 ".\n",
+					 alter_offset );
+
+					notify_error_backtrace(
+					 error );
+					liberror_error_free(
+					 &error );
+				}
+				argument_set_offset = 1;
+
+				break;
 
 			case (system_integer_t) 'p':
 				string_length = system_string_length(
@@ -632,15 +826,16 @@ int main( int argc, char * const argv[] )
 		 stdout,
 		 "Information for alter required, please provide the necessary input\n" );
 
-		if( ewfinput_get_size_variable(
-		     stdout,
-		     input_buffer,
-		     EWFALTER_INPUT_BUFFER_SIZE,
-		     _SYSTEM_CHARACTER_T_STRING( "Start altering at offset" ),
-		     0,
-		     media_size,
-		     0,
-		     &alter_offset ) == -1 )
+		if( ( argument_set_offset == 0 )
+		 && ( ewfinput_get_size_variable(
+		       stdout,
+		       input_buffer,
+		       EWFALTER_INPUT_BUFFER_SIZE,
+		       _SYSTEM_CHARACTER_T_STRING( "Start altering at offset" ),
+		       0,
+		       media_size,
+		       0,
+		       &alter_offset ) == -1 ) )
 		{
 			alter_offset = 0;
 
@@ -649,15 +844,16 @@ int main( int argc, char * const argv[] )
 			 "Unable to determine the altertion offset defaulting to: %" PRIu64 ".\n",
 			 alter_offset );
 		}
-		if( ewfinput_get_size_variable(
-		     stdout,
-		     input_buffer,
-		     EWFALTER_INPUT_BUFFER_SIZE,
-		     _SYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
-		     0,
-		     ( media_size - alter_offset ),
-		     ( media_size - alter_offset ),
-		     &alter_size ) == -1 )
+		if( ( argument_set_size == 0 )
+		 && ( ewfinput_get_size_variable(
+		       stdout,
+		       input_buffer,
+		       EWFALTER_INPUT_BUFFER_SIZE,
+		       _SYSTEM_CHARACTER_T_STRING( "Amount of bytes to alter" ),
+		       0,
+		       ( media_size - alter_offset ),
+		       ( media_size - alter_offset ),
+		       &alter_size ) == -1 ) )
 		{
 			alter_size = media_size - alter_offset;
 

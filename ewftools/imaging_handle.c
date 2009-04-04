@@ -431,7 +431,7 @@ ssize_t imaging_handle_write_prepare_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
 
 #if defined( HAVE_V2_API )
@@ -487,7 +487,7 @@ ssize_t imaging_handle_write_buffer(
 	static char *function        = "imaging_handle_write_buffer";
 	ssize_t write_count          = 0;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	uint8_t *raw_write_buffer    = NULL;
 	size_t raw_write_buffer_size = 0;
 #endif
@@ -529,7 +529,7 @@ ssize_t imaging_handle_write_buffer(
 	{
 		return( 0 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( storage_media_buffer->is_compressed == 0 )
 	{
 		raw_write_buffer      = storage_media_buffer->raw_buffer;

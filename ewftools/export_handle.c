@@ -755,7 +755,7 @@ ssize_t export_handle_read_prepare_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
 #if defined( HAVE_V2_API )
@@ -901,7 +901,7 @@ ssize_t export_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 #if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_chunk(
                       export_handle->input_handle,
@@ -945,7 +945,7 @@ ssize_t export_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = read_count;
 #else
 	storage_media_buffer->raw_buffer_amount = read_count;
@@ -987,7 +987,7 @@ ssize_t export_handle_write_prepare_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* if the data is in compression buffer move data to raw buffer
 	 */
 	if( storage_media_buffer->data_in_compression_buffer == 1 )
@@ -1023,7 +1023,7 @@ ssize_t export_handle_write_prepare_buffer(
 
 			return( -1 );
 		}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
 
 #if defined( HAVE_V2_API )
@@ -1083,7 +1083,7 @@ ssize_t export_handle_write_buffer(
 	static char *function        = "export_handle_write_buffer";
 	ssize_t write_count          = 0;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	uint8_t *raw_write_buffer    = NULL;
 	size_t raw_write_buffer_size = 0;
 #endif
@@ -1127,7 +1127,7 @@ ssize_t export_handle_write_buffer(
 
 			return( -1 );
 		}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		if( storage_media_buffer->is_compressed == 0 )
 		{
 			raw_write_buffer      = storage_media_buffer->raw_buffer;
@@ -2273,7 +2273,7 @@ int export_handle_add_read_error(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( export_handle->input_handle == NULL )
 	{
 		liberror_error_set(
@@ -2300,7 +2300,7 @@ int export_handle_add_read_error(
 	start_sector      = start_offset / export_handle->bytes_per_sector;
 	amount_of_sectors = (uint32_t) ( amount_of_bytes / export_handle->bytes_per_sector );
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 #if defined( HAVE_V2_API )
 	if( libewf_handle_add_crc_error(
 	     export_handle->input_handle,

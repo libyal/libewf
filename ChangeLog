@@ -1,6 +1,6 @@
 Roadmap:
 * low level and high level api (part of v2 api)
-  - to allow raw access to sections etc. (for recovery)
+  - to allow low level access to sections etc. (for recovery)
 * resume write i.e. system failure (check to which part of the EWF files is ok)
 * lvf support
   - add support for interaction with data in ltree section
@@ -111,7 +111,6 @@ Deployment
 * debian package
   - implement non local libuna and libbfio support like in spec file
 * configure
-  - change raw-access to low-level-functions
   - remove enable-v1-api after testing
 
 ewftools:
@@ -160,7 +159,7 @@ ewftools:
   - implement alteration handle
 * ewfexport
   - implement more ewfacquire acquiry parameters?
-  - handle different input and ouput chunk sizes in raw access
+  - handle different input and ouput chunk sizes in low level functions build
 * ewfinfo
   - format extents header value in more table like manner
   - compare GUID output with EnCase
@@ -247,6 +246,15 @@ next beta release:
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
 * fix raw access in ewfalter/ewfexport
+  - delta chunk CRC ?
+* add API function to retrieve current segment filename
+* fix crc mismatch in read delta chunk
+
+Version: 20090403
+* added configure option for static executables
+* change raw-access configure option to low-level-functions
+* fixed on raw access in ewfalter
+* fixed read/write write beyond file size corruption
 
 Version: 20090402
 * Worked on pyewf

@@ -182,7 +182,7 @@ ssize64_t ewfverify_read_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* Make sure SMART chunks fit in the storage media buffer
 	 */
 	process_buffer_size = chunk_size;

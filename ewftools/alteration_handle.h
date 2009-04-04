@@ -78,6 +78,19 @@ off64_t alteration_handle_seek_offset(
          off64_t offset,
          liberror_error_t **error );
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+ssize_t alteration_handle_read_prepare_buffer(
+         alteration_handle_t *alteration_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         liberror_error_t **error );
+
+ssize_t alteration_handle_read_buffer(
+         alteration_handle_t *alteration_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         size_t read_size,
+         liberror_error_t **error );
+#endif
+
 ssize_t alteration_handle_write_prepare_buffer(
          alteration_handle_t *alteration_handle,
          storage_media_buffer_t *storage_media_buffer,

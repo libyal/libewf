@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090402],
+ [20090403],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090402])
+ [20090403])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -25,9 +25,14 @@ LIBEWF_TEST_ENABLE(
  [enable wide character type support],
  [no])
 LIBEWF_TEST_ENABLE(
- [raw-access],
- [raw_access],
- [use libewf's raw read and write functionality in the ewf tools],
+ [static-executables],
+ [static_executables],
+ [build the ewftools as static executables],
+ [no])
+LIBEWF_TEST_ENABLE(
+ [low-level-functions],
+ [low_level_functions],
+ [use libewf's low level read and write functions in the ewftools],
  [no])
 LIBEWF_TEST_ENABLE(
  [low-memory-usage],
@@ -1263,14 +1268,22 @@ AS_IF(
 	 [HAVE_WCHAR_H],
 	 [0]) ])
 
-dnl Check if ewftools should be build with raw read and write support
+dnl Check if ewftools should be build as static executables
 AS_IF(
-	[test "x$ac_cv_libewf_enable_raw_access" != xno],
+	[test "x$ac_cv_libewf_enable_static_executables" != xno],
+	[STATIC_LDFLAGS="-all-static";
+	AC_SUBST(
+	 [STATIC_LDFLAGS])
+	ac_cv_libewf_enable_static_executables=yes])
+
+dnl Check if ewftools should be build with low level read and write functions
+AS_IF(
+	[test "x$ac_cv_libewf_enable_low_level_functions" != xno],
 	[AC_DEFINE(
-	 [HAVE_RAW_ACCESS],
+	 [HAVE_LOW_LEVEL_FUNCTIONS],
 	 [1],
-	 [Defines if libewf's read and write raw functionality should be used in the ewf tools] )
-	ac_cv_libewf_enable_raw_access=yes])
+	 [Defines if libewf's low level read and write functions should be used in the ewf tools] )
+	ac_cv_libewf_enable_low_level_functions=yes])
 
 dnl Check if libewf should be build with verbose output
 AS_IF(
@@ -1398,20 +1411,21 @@ AC_OUTPUT
 dnl Print a summary
 AC_MSG_NOTICE([
 Building:
-   libuna support:                          $ac_libewf_have_libuna
-   libbfio support:                         $ac_libewf_have_libbfio
-   libcrypto EVP support:                   $ac_libewf_have_libcrypto_evp
-   libcrypto MD5 support:                   $ac_libewf_have_libcrypto_md5
-   libcrypto SHA1 support:                  $ac_libewf_have_libcrypto_sha1
-   libuuid support:                         $ac_libewf_have_libuuid
+   libuna support:                                  $ac_libewf_have_libuna
+   libbfio support:                                 $ac_libewf_have_libbfio
+   libcrypto EVP support:                           $ac_libewf_have_libcrypto_evp
+   libcrypto MD5 support:                           $ac_libewf_have_libcrypto_md5
+   libcrypto SHA1 support:                          $ac_libewf_have_libcrypto_sha1
+   libuuid support:                                 $ac_libewf_have_libuuid
 
 Features:
-   Wide character type support:             $ac_cv_libewf_enable_wide_character_type
-   ewftools use raw read and write support: $ac_cv_libewf_enable_raw_access
-   Python (pyewf) support:                  $ac_cv_libewf_enable_python
-   Verbose output:                          $ac_cv_libewf_enable_verbose_output
-   Debug output:                            $ac_cv_libewf_enable_debug_output
-   Version 1 API:                           $ac_cv_libewf_enable_v1_api
-   Experimental version 2 API:              $ac_cv_libewf_enable_v2_api
+   Wide character type support:                     $ac_cv_libewf_enable_wide_character_type
+   ewftools are build as static executables:        $ac_cv_libewf_enable_static_executables
+   ewftools use low level read and write functions: $ac_cv_libewf_enable_low_level_functions
+   Python (pyewf) support:                          $ac_cv_libewf_enable_python
+   Verbose output:                                  $ac_cv_libewf_enable_verbose_output
+   Debug output:                                    $ac_cv_libewf_enable_debug_output
+   Version 1 API:                                   $ac_cv_libewf_enable_v1_api
+   Experimental version 2 API:                      $ac_cv_libewf_enable_v2_api
 ]);
 

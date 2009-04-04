@@ -454,6 +454,180 @@ off64_t alteration_handle_seek_offset(
 	return( offset );
 }
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+
+/* Prepares a buffer after reading the input of the alteration handle
+ * Returns the resulting buffer size or -1 on error
+ */
+ssize_t alteration_handle_read_prepare_buffer(
+         alteration_handle_t *alteration_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         liberror_error_t **error )
+{
+	static char *function = "alteration_handle_read_prepare_buffer";
+	ssize_t process_count = 0;
+
+	if( alteration_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid alteration handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( alteration_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid alteration handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
+
+#if defined( HAVE_V2_API )
+	process_count = libewf_handle_prepare_read_chunk(
+	                 alteration_handle->input_handle,
+	                 storage_media_buffer->compression_buffer,
+	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->raw_buffer,
+	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 storage_media_buffer->is_compressed,
+	                 storage_media_buffer->crc,
+	                 storage_media_buffer->process_crc,
+	                 error );
+#else
+	process_count = libewf_raw_read_prepare_buffer(
+	                 alteration_handle->input_handle,
+	                 storage_media_buffer->compression_buffer,
+	                 storage_media_buffer->compression_buffer_amount,
+	                 storage_media_buffer->raw_buffer,
+	                 (size_t *) &( storage_media_buffer->raw_buffer_amount ),
+	                 storage_media_buffer->is_compressed,
+	                 storage_media_buffer->crc,
+	                 storage_media_buffer->process_crc );
+#endif
+
+	if( process_count == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to prepare storage media buffer after reading.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer->is_compressed == 0 )
+	{
+		storage_media_buffer->data_in_compression_buffer = 1;
+	}
+	else
+	{
+		storage_media_buffer->data_in_compression_buffer = 0;
+	}
+	return( process_count );
+}
+
+/* Reads a buffer from the input of the alteration handle
+ * Returns the amount of bytes written or -1 on error
+ */
+ssize_t alteration_handle_read_buffer(
+         alteration_handle_t *alteration_handle,
+         storage_media_buffer_t *storage_media_buffer,
+         size_t read_size,
+         liberror_error_t **error )
+{
+	static char *function = "alteration_handle_read_buffer";
+	ssize_t read_count    = 0;
+
+	if( alteration_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid alteration handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( alteration_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid alteration handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( storage_media_buffer == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	read_count = libewf_handle_read_chunk(
+                      alteration_handle->input_handle,
+                      storage_media_buffer->compression_buffer,
+                      storage_media_buffer->compression_buffer_size,
+	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->crc ),
+	              &( storage_media_buffer->process_crc ),
+	              error );
+#else
+	read_count = libewf_raw_read_buffer(
+	              alteration_handle->input_handle,
+	              storage_media_buffer->compression_buffer,
+	              storage_media_buffer->compression_buffer_size,
+	              &( storage_media_buffer->is_compressed ),
+	              &( storage_media_buffer->crc ),
+	              &( storage_media_buffer->process_crc ) );
+#endif
+	if( read_count == -1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read storage media buffer.",
+		 function );
+
+		return( -1 );
+	}
+	storage_media_buffer->compression_buffer_amount = read_count;
+
+	return( read_count );
+}
+
+#endif
+
 /* Prepares a buffer before writing the output of the alteration handle
  * Returns the resulting buffer size or -1 on error
  */
@@ -498,7 +672,7 @@ ssize_t alteration_handle_write_prepare_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = storage_media_buffer->compression_buffer_size;
 
 #if defined( HAVE_V2_API )
@@ -554,7 +728,7 @@ ssize_t alteration_handle_write_buffer(
 	static char *function        = "alteration_handle_write_buffer";
 	ssize_t write_count          = 0;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	uint8_t *raw_write_buffer    = NULL;
 	size_t raw_write_buffer_size = 0;
 #endif
@@ -596,7 +770,7 @@ ssize_t alteration_handle_write_buffer(
 	{
 		return( 0 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( storage_media_buffer->is_compressed == 0 )
 	{
 		raw_write_buffer      = storage_media_buffer->raw_buffer;

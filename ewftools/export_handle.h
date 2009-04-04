@@ -224,7 +224,7 @@ int export_handle_set_hash_value(
      size_t hash_value_length,
      liberror_error_t **error );
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 int export_handle_add_read_error(
       export_handle_t *export_handle,
       off64_t start_offset,

@@ -118,7 +118,7 @@ int storage_media_buffer_initialize(
 			}
 			( *buffer )->raw_buffer_size = size;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 			( *buffer )->compression_buffer = (uint8_t *) memory_allocate(
 			                                               sizeof( uint8_t ) * ( size * 2 ) );
 			
@@ -175,7 +175,7 @@ int storage_media_buffer_free(
 			memory_free(
 			 ( *buffer )->raw_buffer );
 		}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		if( ( *buffer )->compression_buffer != NULL )
 		{
 			memory_free(
@@ -233,7 +233,7 @@ int storage_media_buffer_resize(
 		buffer->raw_buffer_size   = size;
 		buffer->raw_buffer_amount = 0;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		/* The compression buffer is cleared
 		 */
 		if( buffer->compression_buffer != NULL )
@@ -294,7 +294,7 @@ int storage_media_buffer_get_data(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	if( buffer->data_in_compression_buffer == 0 )
 	{
 		*data = (void *) buffer->raw_buffer;

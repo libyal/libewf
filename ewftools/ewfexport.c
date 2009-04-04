@@ -307,7 +307,7 @@ ssize64_t ewfexport_read_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	process_buffer_size = (size_t) input_chunk_size;
 #else
 	if( process_buffer_size == 0 )

@@ -48,7 +48,7 @@ struct storage_media_buffer
 	 */
 	ssize_t raw_buffer_amount;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
         /* Value to indicate if the compression buffer
 	 * contains uncompressed data
 	 */

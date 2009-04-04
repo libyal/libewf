@@ -933,7 +933,7 @@ ssize64_t ewfacquirestream_read_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* Make sure SMART chunks fit in the storage media buffer
 	 */
 	process_buffer_size = (size_t) chunk_size;
@@ -1002,7 +1002,7 @@ ssize64_t ewfacquirestream_read_input(
 		}
 		amount_of_chunks++;
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		storage_media_buffer->data_in_compression_buffer = 0;
 #endif
 		storage_media_buffer->raw_buffer_amount = read_count;

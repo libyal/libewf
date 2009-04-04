@@ -2319,20 +2319,22 @@ ssize_t libewf_handle_write_chunk(
 	 data_size );
 #endif
 
-	/* Check if chunk has already been created within a segment file
-	 */
-	if( ( internal_handle->io_handle->current_chunk < internal_handle->offset_table->amount_of_chunk_offsets )
-	 && ( internal_handle->offset_table->chunk_offset != NULL )
-	 && ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle != NULL ) )
+
+	if( internal_handle->read_io_handle != NULL )
 	{
-		if( internal_handle->read_io_handle == NULL )
+		/* Check if chunk has already been created within a segment file
+		 */
+		if( ( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
+		 || ( internal_handle->offset_table->chunk_offset == NULL )
+		 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: cannot rewrite existing chunk.",
-			 function );
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: chunk: %d does not exist.",
+			 function,
+			 ( internal_handle->io_handle->current_chunk + 1 ) );
 
 			return( -1 );
 		}
@@ -2533,20 +2535,21 @@ ssize_t libewf_handle_write_buffer(
 	}
 	while( size > 0 )
 	{
-		/* Check if chunk has already been created within a segment file
-		 */
-		if( ( internal_handle->io_handle->current_chunk < internal_handle->offset_table->amount_of_chunk_offsets )
-		 && ( internal_handle->offset_table->chunk_offset != NULL )
-		 && ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle != NULL ) )
+		if( internal_handle->read_io_handle != NULL )
 		{
-			if( internal_handle->read_io_handle == NULL )
+			/* Check if chunk has already been created within a segment file
+			 */
+			if( ( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
+			 || ( internal_handle->offset_table->chunk_offset == NULL )
+			 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
 			{
 				liberror_error_set(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-				 "%s: cannot rewrite existing chunk.",
-				 function );
+				 "%s: chunk: %d does not exist.",
+				 function,
+				 ( internal_handle->io_handle->current_chunk + 1 ) );
 
 				return( -1 );
 			}

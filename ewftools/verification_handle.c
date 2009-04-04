@@ -505,7 +505,7 @@ ssize_t verification_handle_read_prepare_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->raw_buffer_amount = storage_media_buffer->raw_buffer_size;
 
 #if defined( HAVE_V2_API )
@@ -651,7 +651,7 @@ ssize_t verification_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 #if defined( HAVE_V2_API )
 	read_count = libewf_handle_read_chunk(
                       verification_handle->input_handle,
@@ -695,7 +695,7 @@ ssize_t verification_handle_read_buffer(
 
 		return( -1 );
 	}
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = read_count;
 #else
 	storage_media_buffer->raw_buffer_amount = read_count;
@@ -1225,7 +1225,7 @@ int verification_handle_set_input_values(
 	return( 1 );
 }
 
-#if defined( HAVE_RAW_ACCESS )
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 
 /* Appends a read error to the output handle
  * Returns 1 if successful or -1 on error
