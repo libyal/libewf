@@ -156,6 +156,10 @@ File/Handle functions (APIv2)
 .Fn libewf_handle_set_delta_segment_filename "libewf_handle_t *handle, const char *filename, size_t filename_length, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_delta_segment_file_size "libewf_handle_t *handle, size64_t delta_segment_file_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_filename_size "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_filename "libewf_handle_t *handle, char *filename, size_t filename_size, libewf_error_t **error"
 .Pp
 Available when compiled with wide character string support:
 .Ft int
@@ -172,6 +176,10 @@ Available when compiled with wide character string support:
 .Fn libewf_handle_get_delta_segment_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t filename_size, libewf_error_t **error"
 .Ft int
 .Fn libewf_handle_set_delta_segment_filename_wide "libewf_handle_t *handle, const wchar_t *filename, size_t filename_length, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_filename_size_wide "libewf_handle_t *handle, size_t *filename_size, libewf_error_t **error"
+.Ft int
+.Fn libewf_handle_get_filename_wide "libewf_handle_t *handle, wchar_t *filename, size_t filename_size, libewf_error_t **error"
 .Pp
 Meta data functions (APIv1)
 .Ft int

@@ -805,7 +805,7 @@ int libewf_handle_open(
 			}
 		}
 	}
-	if( libewf_handle_open_pool(
+	if( libewf_handle_open_file_io_pool(
 	     handle,
 	     file_io_pool,
 	     flags,
@@ -1114,7 +1114,7 @@ int libewf_handle_open_wide(
 			}
 		}
 	}
-	if( libewf_handle_open_pool(
+	if( libewf_handle_open_file_io_pool(
 	     handle,
 	     file_io_pool,
 	     flags,
@@ -1212,7 +1212,7 @@ int libewf_handle_open_wide(
 /* Opens a set of EWF file(s) using a Basic File IO (bfio) pool
  * Returns 1 if successful or -1 on error
  */
-int libewf_handle_open_pool(
+int libewf_handle_open_file_io_pool(
      libewf_handle_t *handle,
      libbfio_pool_t *file_io_pool,
      uint8_t flags,
@@ -1220,7 +1220,7 @@ int libewf_handle_open_pool(
 {
 	libbfio_handle_t *file_io_handle          = NULL;
 	libewf_internal_handle_t *internal_handle = NULL;
-	static char *function                     = "libewf_handle_open_pool";
+	static char *function                     = "libewf_handle_open_file_io_pool";
 	size64_t *segment_file_size               = NULL;
 	uint16_t segment_number                   = 0;
 	int amount_of_handles                     = 0;
@@ -4213,6 +4213,358 @@ int libewf_handle_set_delta_segment_file_size(
 	}
 	internal_handle->write_io_handle->delta_segment_file_size = delta_segment_file_size;
 
+	return( 1 );
+}
+
+/* Retrieves the filename size of the (delta) segment file of the current chunk
+ * The filename size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_filename_size(
+     libewf_handle_t *handle,
+     size_t *filename_size,
+     liberror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle = NULL;
+	static char *function            = "libewf_handle_get_filename_size";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_file_io_handle(
+	     handle,
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file io handle for current chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_file_get_name_size(
+	     file_io_handle,
+	     filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve filename size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the filename of the (delta) segment file of the current chunk
+ * The filename size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_filename(
+     libewf_handle_t *handle,
+     char *filename,
+     size_t filename_size,
+     liberror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle = NULL;
+	static char *function            = "libewf_handle_get_filename";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_file_io_handle(
+	     handle,
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file io handle for current chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_file_get_name(
+	     file_io_handle,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve filename.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+
+/* Retrieves the filename size of the (delta) segment file of the current chunk
+ * The filename size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_filename_size_wide(
+     libewf_handle_t *handle,
+     size_t *filename_size,
+     liberror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle = NULL;
+	static char *function            = "libewf_handle_get_filename_size_wide";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_file_io_handle(
+	     handle,
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file io handle for current chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_file_get_name_size_wide(
+	     file_io_handle,
+	     filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve filename size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the filename of the (delta) segment file of the current chunk
+ * The filename size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_filename_wide(
+     libewf_handle_t *handle,
+     wchar_t *filename,
+     size_t filename_size,
+     liberror_error_t **error )
+{
+	libbfio_handle_t *file_io_handle = NULL;
+	static char *function            = "libewf_handle_get_filename_wide";
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( libewf_handle_get_file_io_handle(
+	     handle,
+	     &file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file io handle for current chunk.",
+		 function );
+
+		return( -1 );
+	}
+	if( libbfio_file_get_name_wide(
+	     file_io_handle,
+	     filename,
+	     filename_size,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve filename.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+#endif
+
+/* Retrieves the file io handle of the (delta) segment file of the current chunk
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_handle_get_file_io_handle(
+     libewf_handle_t *handle,
+     libbfio_handle_t **file_io_handle,
+     liberror_error_t **error )
+{
+	libewf_internal_handle_t *internal_handle         = NULL;
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	static char *function                             = "libewf_handle_get_file_io_handle";
+	int file_io_pool_entry                            = 0;
+
+	if( handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid handle.",
+		 function );
+
+		return( -1 );
+	}
+	internal_handle = (libewf_internal_handle_t *) handle;
+
+	if( internal_handle->io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle->file_io_pool == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - invalid IO handle - missing file IO pool.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - missing offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->offset_table->chunk_offset == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid handle - invalid offset table - missing chunk offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid current chunk value out of range.",
+		 function );
+
+		return( -1 );
+	}
+	segment_file_handle = internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle;
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment file handle for chunk: %" PRIu32 ".",
+		 function,
+		 internal_handle->io_handle->current_chunk + 1 );
+
+		return( -1 );
+	}
+	file_io_pool_entry = segment_file_handle->file_io_pool_entry;
+
+	if( libbfio_pool_get_handle(
+	     internal_handle->io_handle->file_io_pool,
+	     file_io_pool_entry,
+	     file_io_handle,
+	     error ) != 1 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve file io handle for pool entry: %d (chunk: %" PRIu32 ").",
+		 function,
+		 file_io_pool_entry,
+		 internal_handle->io_handle->current_chunk + 1 );
+
+		return( -1 );
+	}
 	return( 1 );
 }
 

@@ -98,20 +98,8 @@ API changes
   - add means to set pools open handle limit in libewf (partial completed)
   - add means to obtain libbio handle of media data in ewf
   - add means to set narrow string codepage
+  - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
 * file structure API extension (idea)
-
-IO abstraction
-* remove libbfio_io_pool from lower levels (libewf_section functions) and pass libbfio_io_handle?
-  (no, because pool manages if a file io handle is open or closed)
-
-Python bindings
-* implement error backtrace support in v2 API version
-
-Deployment
-* debian package
-  - implement non local libuna and libbfio support like in spec file
-* configure
-  - remove enable-v1-api after testing
 
 ewftools:
 * add getoptlong support
@@ -224,35 +212,36 @@ Windows build
 
 * have segment file number in libewf_raw_read_chunk for warning output?
 
+Next stable release:
+
+Python bindings
+* implement error backtrace support in v2 API version
+
+Deployment
+* debian package
+  - implement non local libuna and libbfio support like in spec file
+* configure
+  - remove enable-v1-api after testing
+
 Other:
-check error tollerance
-check TODO
+* check error tollerance
+* check TODO
 
-CLOSED
-* what about read+write and compression?
-  solved by delta files
-* do not finalize on error
-  no, do not add any additional data if a write error did occur the library
-  should not make any guesses about if this is write or wrong
-* file: add function/flag to open segments files progressively using only the basename (like write)
-  no, the glob function provides for a way to determine segment filenames using the basename
-* ewfacquire: add entire disk (physical) and partition only (logical) to volume type description
-  no
-
-next beta release:
+Next beta release:
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
-* fix raw access in ewfexport
 * add API function to retrieve current segment filename
+* fix ewfexport different input and output chunk sizes for low level functions
+* uses buffer alignment in ewftools handles instead of crc buffer
 
 Version: 20090404
 * implemented chunk and crc buffer alignment
-* fixed offset error in libbfio_handle_seek_offset, due to introduction of whence
 * fixed crc mismatch in read delta chunk
 * added support for delta chunks in libewf_handle_prepare_write_chunk
 * added chunk size restriction in libewf_write_io_handle_write_existing_chunk
+* updated libbfio
 
 Version: 20090403
 * added configure option for static executables

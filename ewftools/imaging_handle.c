@@ -484,6 +484,10 @@ ssize_t imaging_handle_write_buffer(
          size_t write_size,
          liberror_error_t **error )
 {
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS ) && defined( HAVE_V2_API )
+	uint8_t crc_buffer[ 4 ];
+#endif
+
 	static char *function        = "imaging_handle_write_buffer";
 	ssize_t write_count          = 0;
 
@@ -558,6 +562,7 @@ ssize_t imaging_handle_write_buffer(
 	               raw_write_buffer_size,
 	               storage_media_buffer->raw_buffer_amount,
 	               storage_media_buffer->is_compressed,
+	               crc_buffer,
 	               storage_media_buffer->crc,
 	               storage_media_buffer->process_crc,
 	               error );

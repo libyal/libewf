@@ -750,6 +750,46 @@ LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
 
 #endif
 
+/* Retrieves the filename size of the (delta) segment file of the current chunk
+ * The filename size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_filename_size(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   libewf_error_t **error );
+
+/* Retrieves the filename of the (delta) segment file of the current chunk
+ * The filename size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t filename_size,
+                   libewf_error_t **error );
+
+#if defined( LIBEWF_WIDE_CHARACTER_TYPE )
+/* Retrieves the filename size of the (delta) segment file of the current chunk
+ * The filename size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_filename_size_wide(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   libewf_error_t **error );
+
+/* Retrieves the filename of the (delta) segment file of the current chunk
+ * The filename size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBEWF_EXTERN int libewf_handle_get_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t filename_size,
+                   libewf_error_t **error );
+#endif
+
 /* -------------------------------------------------------------------------
  * Meta data functions (APIv1)
  * ------------------------------------------------------------------------- */

@@ -147,7 +147,7 @@ LIBEWF_EXTERN int libewf_handle_open_wide(
                    liberror_error_t **error );
 #endif
 
-LIBEWF_EXTERN int libewf_handle_open_pool(
+LIBEWF_EXTERN int libewf_handle_open_file_io_pool(
                    libewf_handle_t *handle,
                    libbfio_pool_t *file_io_pool,
                    uint8_t flags,
@@ -321,6 +321,35 @@ LIBEWF_EXTERN int libewf_handle_set_delta_segment_filename_wide(
 LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
                    libewf_handle_t *handle,
                    size64_t delta_segment_file_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_filename_size(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_filename(
+                   libewf_handle_t *handle,
+                   char *filename,
+                   size_t filename_size,
+                   liberror_error_t **error );
+
+#if defined( HAVE_WIDE_CHARACTER_TYPE )
+LIBEWF_EXTERN int libewf_handle_get_filename_size_wide(
+                   libewf_handle_t *handle,
+                   size_t *filename_size,
+                   liberror_error_t **error );
+
+LIBEWF_EXTERN int libewf_handle_get_filename_wide(
+                   libewf_handle_t *handle,
+                   wchar_t *filename,
+                   size_t filename_size,
+                   liberror_error_t **error );
+#endif
+
+LIBEWF_EXTERN int libewf_handle_get_file_io_handle(
+                   libewf_handle_t *handle,
+                   libbfio_handle_t **file_io_handle,
                    liberror_error_t **error );
 
 int libewf_internal_handle_add_segment_file(
