@@ -107,6 +107,7 @@ ssize64_t ewfverify_read_input(
 	size32_t chunk_size                          = 0;
 	size_t read_size                             = 0;
 	ssize64_t total_read_count                   = 0;
+	ssize_t process_count                        = 0;
 	ssize_t read_count                           = 0;
 
 	if( verification_handle == NULL )
@@ -252,12 +253,12 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-		read_count = verification_handle_read_prepare_buffer(
-		              verification_handle,
-		              storage_media_buffer,
-		              error );
+		process_count = verification_handle_read_prepare_buffer(
+		                 verification_handle,
+		                 storage_media_buffer,
+		                 error );
 
-		if( read_count < 0 )
+		if( process_count < 0 )
 		{
 			liberror_error_set(
 			 error,
@@ -272,7 +273,7 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-		if( read_count > (ssize_t) read_size )
+		if( process_count > (ssize_t) read_size )
 		{
 			liberror_error_set(
 			 error,
@@ -287,12 +288,20 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-		total_read_count += (ssize64_t) read_count;
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* Set the amount of chunk data in the buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			storage_media_buffer->compression_buffer_amount = process_count;
+		}
+#endif
+		total_read_count += (ssize64_t) process_count;
 
 		if( verification_handle_update_integrity_hash(
 		     verification_handle,
 		     storage_media_buffer,
-		     read_count,
+		     process_count,
 		     error ) != 1 )
 		{
 			liberror_error_set(

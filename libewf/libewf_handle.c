@@ -2113,6 +2113,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	libewf_internal_handle_t *internal_handle = NULL;
 	static char *function                     = "libewf_handle_prepare_write_chunk";
 	ssize_t chunk_data_size                   = 0;
+	uint8_t chunk_exists                      = 0;
 
 	if( handle == NULL )
 	{
@@ -2162,6 +2163,26 @@ ssize_t libewf_handle_prepare_write_chunk(
 
 		return( -1 );
 	}
+	if( internal_handle->read_io_handle != NULL )
+	{
+		/* Check if chunk has already been created within a segment file
+		 */
+		if( ( internal_handle->io_handle->current_chunk >= internal_handle->offset_table->amount_of_chunk_offsets )
+		 || ( internal_handle->offset_table->chunk_offset == NULL )
+		 || ( internal_handle->offset_table->chunk_offset[ internal_handle->io_handle->current_chunk ].segment_file_handle == NULL ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: chunk: %d does not exist.",
+			 function,
+			 ( internal_handle->io_handle->current_chunk + 1 ) );
+
+			return( -1 );
+		}
+		chunk_exists = 1;
+	}
 	chunk_data_size = libewf_write_io_handle_process_chunk(
 	                   internal_handle->chunk_cache,
 	                   internal_handle->media_values,
@@ -2173,6 +2194,7 @@ ssize_t libewf_handle_prepare_write_chunk(
 	                   (uint8_t *) compressed_buffer,
 	                   compressed_buffer_size,
 	                   is_compressed,
+	                   chunk_exists,
 	                   (ewf_crc_t *) chunk_crc,
 	                   write_crc,
 	                   error );
@@ -2319,7 +2341,6 @@ ssize_t libewf_handle_write_chunk(
 	 chunk_buffer_size,
 	 data_size );
 #endif
-
 
 	if( internal_handle->read_io_handle != NULL )
 	{

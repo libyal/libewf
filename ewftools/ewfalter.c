@@ -182,6 +182,11 @@ ssize64_t ewfalter_alter_input(
 
 		return( -1 );
 	}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+	buffer_offset = alter_offset % process_buffer_size;
+	alter_offset  = ( alter_offset / process_buffer_size ) * process_buffer_size;
+#endif
+
 	/* Find the first alteration offset
 	 */
 	if( alteration_handle_seek_offset(
@@ -202,11 +207,6 @@ ssize64_t ewfalter_alter_input(
 
 		return( -1 );
 	}
-#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-	buffer_offset = alter_offset % process_buffer_size;
-	alter_offset  = ( alter_offset / process_buffer_size ) * process_buffer_size;
-#endif
-
 	while( alter_size > 0 )
 	{
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
@@ -248,12 +248,12 @@ ssize64_t ewfalter_alter_input(
 
 			return( -1 );
 		}
-		read_count = alteration_handle_read_prepare_buffer(
-			      alteration_handle,
-			      storage_media_buffer,
-			      error );
+		process_count = alteration_handle_read_prepare_buffer(
+		                 alteration_handle,
+		                 storage_media_buffer,
+		                 error );
 
-		if( read_count < 0 )
+		if( process_count < 0 )
 		{
 			liberror_error_set(
 			 error,
@@ -268,7 +268,7 @@ ssize64_t ewfalter_alter_input(
 
 			return( -1 );
 		}
-		if( read_count > (ssize_t) process_buffer_size )
+		if( process_count > (ssize_t) process_buffer_size )
 		{
 			liberror_error_set(
 			 error,
@@ -290,7 +290,7 @@ ssize64_t ewfalter_alter_input(
 			if( memory_copy(
 			     storage_media_buffer->raw_buffer,
 			     storage_media_buffer->compression_buffer,
-			     storage_media_buffer->compression_buffer_amount ) == NULL )
+			     process_count ) == NULL )
 			{
 				liberror_error_set(
 				 error,
@@ -299,10 +299,14 @@ ssize64_t ewfalter_alter_input(
 				 "%s: unable to data from compression buffer to raw buffer.",
 				 function );
 
+				storage_media_buffer_free(
+				 &storage_media_buffer,
+				 NULL );
+
 				return( -1 );
 			}
 			storage_media_buffer->data_in_compression_buffer = 0;
-			storage_media_buffer->compression_buffer_amount  = storage_media_buffer->raw_buffer_amount;
+			storage_media_buffer->raw_buffer_amount          = process_count;
 		}
 		/* Move the file pointer back to the previous chunk
 		 */
@@ -359,7 +363,11 @@ ssize64_t ewfalter_alter_input(
 
 			return( -1 );
 		}
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		storage_media_buffer->raw_buffer_amount = process_buffer_size;
+#else
 		storage_media_buffer->raw_buffer_amount = write_size;
+#endif
 
 		buffer_offset = 0;
 

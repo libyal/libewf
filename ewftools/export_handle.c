@@ -780,7 +780,6 @@ ssize_t export_handle_read_prepare_buffer(
 	                 storage_media_buffer->crc,
 	                 storage_media_buffer->process_crc );
 #endif
-
 	if( process_count == -1 )
 	{
 		liberror_error_free(
@@ -949,7 +948,7 @@ ssize_t export_handle_read_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = read_count;
 #else
-	storage_media_buffer->raw_buffer_amount = read_count;
+	storage_media_buffer->raw_buffer_amount         = read_count;
 #endif
 
 	return( read_count );
@@ -1008,7 +1007,7 @@ ssize_t export_handle_write_prepare_buffer(
 			return( -1 );
 		}
 		storage_media_buffer->data_in_compression_buffer = 0;
-		storage_media_buffer->compression_buffer_amount  = storage_media_buffer->raw_buffer_amount;
+		storage_media_buffer->raw_buffer_amount          = storage_media_buffer->compression_buffer_amount;
 	}
 #endif
 	if( export_handle->output_format == EXPORT_HANDLE_OUTPUT_FORMAT_EWF )

@@ -699,6 +699,7 @@ ssize_t libewf_write_io_handle_process_chunk(
          uint8_t *compressed_chunk_data,
          size_t *compressed_chunk_data_size,
          int8_t *is_compressed,
+         uint8_t chunk_exists,
          ewf_crc_t *chunk_crc,
          int8_t *write_crc,
          liberror_error_t **error )
@@ -771,8 +772,10 @@ ssize_t libewf_write_io_handle_process_chunk(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_TOO_LARGE,
-		 "%s: invalid chunk data size value exceeds media values chunk size.",
-		 function );
+		 "%s: invalid chunk data size: %" PRIzd " value exceeds media values chunk size: %" PRIzd ".",
+		 function,
+		 chunk_data_size,
+		 media_values->chunk_size );
 
 		return( -1 );
 	}
@@ -960,9 +963,10 @@ ssize_t libewf_write_io_handle_process_chunk(
 			return( -1 );
 		}
 	}
-	if( ( ewf_format == EWF_FORMAT_S01 )
-	 || ( ( *compressed_chunk_data_size > 0 )
-	  && ( *compressed_chunk_data_size < media_values->chunk_size ) ) )
+	if( ( chunk_exists == 0 )
+	 && ( ( ewf_format == EWF_FORMAT_S01 )
+	  || ( ( *compressed_chunk_data_size > 0 )
+	   && ( *compressed_chunk_data_size < media_values->chunk_size ) ) ) )
 	{
 		data_write_size = *compressed_chunk_data_size;
 		chunk_data      = compressed_chunk_data;
@@ -1946,6 +1950,19 @@ ssize_t libewf_write_io_handle_write_existing_chunk(
 
 		return( -1 );
 	}
+	if( chunk_size != media_values->chunk_size )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_CONFLICTING_VALUE,
+		 "%s: invalid chunk size: %" PRIzd " expected size: %" PRIzd ".",
+		 function,
+		 chunk_size,
+		 media_values->chunk_size );
+
+		return( -1 );
+	}
 	if( is_compressed != 0 )
 	{
 		liberror_error_set(
@@ -2565,6 +2582,7 @@ ssize_t libewf_write_io_handle_write_new_chunk_data(
 				   chunk_cache->compressed,
 				   &compressed_chunk_data_size,
 				   &is_compressed,
+				   0,
 				   &chunk_crc,
 				   &write_crc,
 		                   error );

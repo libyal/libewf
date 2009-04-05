@@ -6314,8 +6314,6 @@ ssize_t libewf_section_delta_chunk_read(
 
 		return( -1 );
 	}
-fprintf( stderr, "X: %" PRIzd "\n", offset_table->chunk_offset[ chunk ].file_offset );
-
 	offset_table->chunk_offset[ chunk ].segment_file_handle = segment_file_handle;
 	offset_table->chunk_offset[ chunk ].size                = chunk_size;
 	offset_table->chunk_offset[ chunk ].flags               = LIBEWF_CHUNK_OFFSET_FLAGS_DELTA_CHUNK;

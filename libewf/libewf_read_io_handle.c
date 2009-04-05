@@ -438,8 +438,9 @@ ssize_t libewf_read_io_handle_read_chunk(
 	{
 		return( 0 );
 	}
-	*chunk_crc = 0;
-	*read_crc  = 0;
+	*chunk_crc     = 0;
+	*read_crc      = 0;
+	*is_compressed = 0;
 
 	/* Determine the size of the chunk including the CRC
 	 */
@@ -447,18 +448,14 @@ ssize_t libewf_read_io_handle_read_chunk(
 
 	/* Determine if the chunk is compressed or not
 	 */
-	if( ( offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == 0 )
-	{
-		if( chunk_buffer_size < chunk_size )
-		{
-			chunk_size -= sizeof( ewf_crc_t );
-			*read_crc   = 1;
-		}
-		*is_compressed = 0;
-	}
-	else
+	if( ( offset_table->chunk_offset[ chunk ].flags & LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED ) == LIBEWF_CHUNK_OFFSET_FLAGS_COMPRESSED )
 	{
 		*is_compressed = 1;
+	}
+	else if( chunk_buffer_size < chunk_size )
+	{
+		chunk_size -= sizeof( ewf_crc_t );
+		*read_crc   = 1;
 	}
 	segment_file_handle = offset_table->chunk_offset[ chunk ].segment_file_handle;
 

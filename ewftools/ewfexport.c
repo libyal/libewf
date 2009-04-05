@@ -374,12 +374,12 @@ ssize64_t ewfexport_read_input(
 
 			return( -1 );
 		}
-		read_count = export_handle_read_prepare_buffer(
-		              export_handle,
-		              storage_media_buffer,
-		              error );
+		process_count = export_handle_read_prepare_buffer(
+		                 export_handle,
+		                 storage_media_buffer,
+		                 error );
 
-		if( read_count < 0 )
+		if( process_count < 0 )
 		{
 			liberror_error_set(
 			 error,
@@ -394,7 +394,7 @@ ssize64_t ewfexport_read_input(
 
 			return( -1 );
 		}
-		if( read_count > (ssize_t) read_size )
+		if( process_count > (ssize_t) read_size )
 		{
 			liberror_error_set(
 			 error,
@@ -409,14 +409,21 @@ ssize64_t ewfexport_read_input(
 
 			return( -1 );
 		}
-
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
+		/* Set the amount of chunk data in the buffer
+		 */
+		if( storage_media_buffer->data_in_compression_buffer == 1 )
+		{
+			storage_media_buffer->compression_buffer_amount = process_count;
+		}
+#endif
 		/* Swap byte pairs
 		 */
 		if( ( swap_byte_pairs == 1 )
 		 && ( export_handle_swap_byte_pairs(
 		       export_handle,
 		       storage_media_buffer,
-		       read_count,
+		       process_count,
 		       error ) != 1 ) )
 		{
 			liberror_error_set(
@@ -437,7 +444,7 @@ ssize64_t ewfexport_read_input(
 		if( export_handle_update_integrity_hash(
 		     export_handle,
 		     storage_media_buffer,
-		     read_count,
+		     process_count,
 		     error ) != 1 )
 		{
 			liberror_error_set(
@@ -453,6 +460,8 @@ ssize64_t ewfexport_read_input(
 
 			return( -1 );
 		}
+		total_read_count += process_count;
+
 		process_count = export_handle_write_prepare_buffer(
 		                 export_handle,
 		                 storage_media_buffer,
@@ -494,8 +503,6 @@ ssize64_t ewfexport_read_input(
 
 			return( -1 );
 		}
-		total_read_count += read_count;
-
 		if( callback != NULL )
 		{
 			callback(

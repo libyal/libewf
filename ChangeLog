@@ -244,14 +244,15 @@ next beta release:
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
-* fix raw access in ewfalter/ewfexport
-  - delta chunk CRC ?
+* fix raw access in ewfexport
 * add API function to retrieve current segment filename
 
 Version: 20090404
 * implemented chunk and crc buffer alignment
 * fixed offset error in libbfio_handle_seek_offset, due to introduction of whence
 * fixed crc mismatch in read delta chunk
+* added support for delta chunks in libewf_handle_prepare_write_chunk
+* added chunk size restriction in libewf_write_io_handle_write_existing_chunk
 
 Version: 20090403
 * added configure option for static executables

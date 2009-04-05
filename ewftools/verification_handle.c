@@ -699,7 +699,7 @@ ssize_t verification_handle_read_buffer(
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	storage_media_buffer->compression_buffer_amount = read_count;
 #else
-	storage_media_buffer->raw_buffer_amount = read_count;
+	storage_media_buffer->raw_buffer_amount         = read_count;
 #endif
 
 	return( read_count );

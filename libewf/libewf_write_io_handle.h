@@ -215,6 +215,7 @@ ssize_t libewf_write_io_handle_process_chunk(
          uint8_t *compressed_chunk_data,
          size_t *compressed_chunk_data_size,
          int8_t *is_compressed,
+         uint8_t chunk_exists,
          ewf_crc_t *chunk_crc,
          int8_t *write_crc,
          liberror_error_t **error );
