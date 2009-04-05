@@ -47,6 +47,7 @@
 #include <libewf.h>
 
 #include "ewfgetopt.h"
+#include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "glob.h"
@@ -66,10 +67,13 @@ void usage_fprint(
         }
 	fprintf( stream, "Use ewfdebug to analyze EWF file(s).\n\n" );
 
-	fprintf( stream, "Usage: ewfdebug [ -hqvV ] ewf_files\n\n" );
+	fprintf( stream, "Usage: ewfdebug [ -A codepage ] [ -hqvV ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-1250,\n"
+	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
 	fprintf( stream, "\t-v:        verbose output to stderr\n" );
@@ -142,6 +146,7 @@ int main( int argc, char * const argv[] )
 	system_integer_t option                    = 0;
 	uint8_t verbose                            = 0;
 	int amount_of_filenames                    = 0;
+	int header_codepage                        = LIBEWF_CODEPAGE_ASCII;
 	int result                                 = 0;
 
 	notify_set_values(
@@ -169,7 +174,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 			   argc,
 			   argv,
-			   _SYSTEM_CHARACTER_T_STRING( "hqvV" ) ) ) != (system_integer_t) -1 )
+			   _SYSTEM_CHARACTER_T_STRING( "A:hqvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -184,6 +189,19 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'A':
+				if( ewfinput_determine_header_codepage(
+				     optarg,
+				     &header_codepage ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsuported header codepage defaulting to: ascii.\n" );
+
+					header_codepage = LIBEWF_CODEPAGE_ASCII;
+				}
+				break;
 
 			case (system_integer_t) 'h':
 				usage_fprint(

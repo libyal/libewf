@@ -129,8 +129,9 @@ void usage_fprint(
 	fprintf( stream, "Use ewfacquirestream to acquire data from a pipe and store it in the EWF format\n"
 	                 "(Expert Witness Compression Format).\n\n" );
 
-	fprintf( stream, "Usage: ewfacquirestream [ -b amount_of_sectors ] [ -c compression_type ]\n"
-	                 "                        [ -C case_number ] [ -d digest_type ] [ -D description ]\n"
+	fprintf( stream, "Usage: ewfacquirestream [ -A codepage ] [ -b amount_of_sectors ]\n"
+	                 "                        [ -c compression_type ] [ -C case_number ]\n"
+	                 "                        [ -d digest_type ] [ -D description ]\n"
 	                 "                        [ -e examiner_name ] [ -E evidence_number ]\n"
 	                 "                        [ -f format ] [ -l log_filename ] [ -m media_type ]\n"
 	                 "                        [ -M volume_type ] [ -N notes ]\n"
@@ -139,6 +140,9 @@ void usage_fprint(
 
 	fprintf( stream, "\tReads data from stdin\n\n" );
 
+	fprintf( stream, "\t-A: codepage of header section, options: ascii (default), windows-1250,\n"
+	                 "\t    windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	                 "\t    windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-b: specify the amount of sectors to read at once (per chunk), options:\n"
 	                 "\t    64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768\n" );
 	fprintf( stream, "\t-c: specify the compression type, options: none (default), empty-block, fast\n"
@@ -1236,6 +1240,7 @@ int main( int argc, char * const argv[] )
 	uint8_t volume_type                             = LIBEWF_VOLUME_TYPE_PHYSICAL;
 	uint8_t wipe_block_on_read_error                = 0;
 	int error_abort                                 = 0;
+	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
 	int result                                      = 0;
 	int status                                      = 0;
 
@@ -1281,7 +1286,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "b:c:C:d:D:e:E:f:hl:m:M:N:p:qsS:t:vVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "A:b:c:C:d:D:e:E:f:hl:m:M:N:p:qsS:t:vVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -1296,6 +1301,19 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'A':
+				if( ewfinput_determine_header_codepage(
+				     optarg,
+				     &header_codepage ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsuported header codepage defaulting to: ascii.\n" );
+
+					header_codepage = LIBEWF_CODEPAGE_ASCII;
+				}
+				break;
 
 			case (system_integer_t) 'b':
 				if( ewfinput_determine_sectors_per_chunk(

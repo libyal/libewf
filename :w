@@ -127,7 +127,7 @@ ewftools:
   - add resume on error
   - move ewfacquire_read_buffer to device_handle, list read errors
 * device handle
-  - add Windows support for accessing memory device
+  - add native Windows support for accessing memory device
   - detect removable disk
   - detect optical disk
   - move fstat to file_io ?
@@ -142,6 +142,8 @@ ewftools:
   - implement
 * ewfalter
   - allow to set maximum delta file size default 4 GiB?
+  - overwrite alter buffer size with -p option?
+  - implement alteration handle
 * ewfexport
   - implement more ewfacquire acquiry parameters?
   - handle different input and ouput chunk sizes in low level functions build
@@ -149,6 +151,7 @@ ewftools:
   - format extents header value in more table like manner
   - compare GUID output with EnCase
 * ewfverify
+  - detect and show which files are corrupted
 * ewfdebug
   - create a tool to analyse a single segment file
   - implement low and high level api separation
@@ -188,9 +191,24 @@ Windows build
     (no. not necessary at the moment)
 
 * locale support
+  - library data returns UTF-8 (done)
+  - input filenames remain system string (done)
+  - move character_t functionality to system_character_t (done)
+  - remove string conversion code (done)
   - print output convert to system string
-  - reduce string conversions, use as much as possible the system string type in the tools
+  - to reduce conversions use as much as possible the system string type in
+    the tools
+* separate narrow and wide character library functions
+  - Linux can change wide character into UTF8
+  - Windows uses an ASCII codepage as narrow character string
+* implement libuna
+  - handle codepage in ewftools use -p option
+  - add '-p list' option? to list codepages
 * ewftools check char/wchar in/output
+* windows Unicode/ASCII support and the use of CreateFile (check for value passed by MSVSCPP)
+  General option, Character Set, Not Set (_UNICODE, UNICODE)
+
+* have segment file number in libewf_raw_read_chunk for warning output?
 
 Next stable release:
 
@@ -213,8 +231,6 @@ Next beta release:
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
 * fix ewfexport different input and output chunk sizes for low level functions
-* add set_header_codepage to ewftools
-* have segment file number in libewf_raw_read_chunk for warning output?
 
 Version: 20090404
 * implemented chunk and crc buffer alignment
@@ -224,8 +240,6 @@ Version: 20090404
 * updated libbfio
 * added APIv2 function to retrieve current segment filename
 * refactored file_io out of device_handle
-* ewfexport, ewfverify now show which files contain CRC errors when compiled with APIv2 support
-* worked on header codepage support in ewftools
 
 Version: 20090403
 * added configure option for static executables

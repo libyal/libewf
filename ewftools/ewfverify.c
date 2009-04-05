@@ -49,6 +49,7 @@
 #include "byte_size_string.h"
 #include "digest_context.h"
 #include "ewfgetopt.h"
+#include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "file_stream_io.h"
@@ -76,11 +77,14 @@ void usage_fprint(
 	fprintf( stream, "Use ewfverify to verify data stored in the EWF format (Expert Witness Compression\n"
 	                 "Format).\n\n" );
 
-	fprintf( stream, "Usage: ewfverify [ -d digest_type ] [ -l log_filename ]\n"
+	fprintf( stream, "Usage: ewfverify [ -A codepage ] [ -d digest_type ] [ -l log_filename ]\n"
 	                 "                 [ -p process_buffer_size ] [ -hqvVw ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-1250,\n"
+	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-d:        calculate additional digest (hash) types besides md5, options: sha1\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-l:        logs verification errors and the digest (hash) to the log_filename\n" );
@@ -419,6 +423,7 @@ int main( int argc, char * const argv[] )
 	uint8_t wipe_chunk_on_error                     = 0;
 	uint8_t verbose                                 = 0;
 	int amount_of_filenames                         = 0;
+	int header_codepage                             = LIBEWF_CODEPAGE_ASCII;
 	int match_md5_hash                              = 0;
 	int match_sha1_hash                             = 0;
 	int result                                      = 0;
@@ -451,7 +456,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "d:hl:p:qvVw" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "A:d:hl:p:qvVw" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -466,6 +471,19 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'A':
+				if( ewfinput_determine_header_codepage(
+				     optarg,
+				     &header_codepage ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsuported header codepage defaulting to: ascii.\n" );
+
+					header_codepage = LIBEWF_CODEPAGE_ASCII;
+				}
+				break;
 
 			case (system_integer_t) 'd':
 				if( system_string_compare(

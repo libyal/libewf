@@ -48,6 +48,7 @@
 
 #include "byte_size_string.h"
 #include "ewfgetopt.h"
+#include "ewfinput.h"
 #include "ewfoutput.h"
 #include "ewfsignal.h"
 #include "glob.h"
@@ -71,10 +72,13 @@ void usage_fprint(
 	fprintf( stream, "Use ewfinfo to determine information about the EWF format (Expert Witness\n"
 	                 "Compression Format).\n\n" );
 
-	fprintf( stream, "Usage: ewfinfo [ -d date_format ] [ -ehimvV ] ewf_files\n\n" );
+	fprintf( stream, "Usage: ewfinfo [ -A codepage ] [ -d date_format ] [ -ehimvV ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-1250,\n"
+	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-d:        specify the date format, options: ctime (default), dm (day/month),\n"
 	                 "\t           md (month/day), iso8601\n" );
 	fprintf( stream, "\t-e:        only show EWF read error information\n" );
@@ -144,6 +148,7 @@ int main( int argc, char * const argv[] )
 	uint8_t date_format                        = LIBEWF_DATE_FORMAT_CTIME;
 	char info_option                           = 'a';
 	int amount_of_filenames                    = 0;
+	int header_codepage                        = LIBEWF_CODEPAGE_ASCII;
 	int result                                 = 0;
 
 	notify_set_values(
@@ -171,7 +176,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_CHARACTER_T_STRING( "d:ehimvV" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_CHARACTER_T_STRING( "A:d:ehimvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -186,6 +191,19 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'A':
+				if( ewfinput_determine_header_codepage(
+				     optarg,
+				     &header_codepage ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsuported header codepage defaulting to: ascii.\n" );
+
+					header_codepage = LIBEWF_CODEPAGE_ASCII;
+				}
+				break;
 
 			case (system_integer_t) 'd':
 				if( system_string_compare(

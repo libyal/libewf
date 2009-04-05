@@ -1,4 +1,4 @@
-.Dd March 2, 2009
+.Dd April 4, 2009
 .Dt ewfinfo
 .Os libewf
 .Sh NAME
@@ -6,6 +6,7 @@
 .Nd show meta data stored in EWF files
 .Sh SYNOPSIS
 .Nm ewfinfo
+.Op Fl A Ar codepage
 .Op Fl d Ar date_format
 .Op Fl ehimvV
 .Ar ewf_files
@@ -31,6 +32,8 @@ the first or the entire set of EWF segment files
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl A Ar codepage
+the codepage of header section, options: ascii (default), windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
 .It Fl d Ar date_format
 the date format, options: ctime (default), dm (day/month), md (month/day), iso8601
 .It Fl e

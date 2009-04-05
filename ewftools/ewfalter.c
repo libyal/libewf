@@ -71,11 +71,14 @@ void usage_fprint(
         }
 	fprintf( stream, "Use ewfalter to test the libewf delta segment file support.\n\n" );
 
-	fprintf( stream, "Usage: ewfalter [ -p process_buffer_size ] [ -t target_file ] [ -hqvV ]\n"
-	                 "                ewf_files\n\n" );
+	fprintf( stream, "Usage: ewfalter [ -A codepage ] [ -p process_buffer_size ] [ -t target_file ]\n"
+	                 "                [ -hqvV ] ewf_files\n\n" );
 
 	fprintf( stream, "\tewf_files: the first or the entire set of EWF segment files\n\n" );
 
+	fprintf( stream, "\t-A:        codepage of header section, options: ascii (default), windows-1250,\n"
+	                 "\t           windows-1251, windows-1252, windows-1253, windows-1254,\n"
+	                 "\t           windows-1255, windows-1256, windows-1257, windows-1258\n" );
 	fprintf( stream, "\t-B:        specify the amount of bytes to alter (default is all bytes)\n" );
 	fprintf( stream, "\t-h:        shows this help\n" );
 	fprintf( stream, "\t-q:        quiet shows no status information\n" );
@@ -513,6 +516,7 @@ int main( int argc, char * const argv[] )
 	int amount_of_filenames                    = 0;
 	int argument_set_offset                    = 0;
 	int argument_set_size                      = 0;
+	int header_codepage                        = LIBEWF_CODEPAGE_ASCII;
 	int result                                 = 0;
 
 	notify_set_values(
@@ -545,7 +549,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = ewfgetopt(
 			   argc,
 			   argv,
-			   _SYSTEM_CHARACTER_T_STRING( "B:ho:p:qt:vV" ) ) ) != (system_integer_t) -1 )
+			   _SYSTEM_CHARACTER_T_STRING( "A:B:ho:p:qt:vV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -560,6 +564,19 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_FAILURE );
+
+			case (system_integer_t) 'A':
+				if( ewfinput_determine_header_codepage(
+				     optarg,
+				     &header_codepage ) != 1 )
+				{
+					fprintf(
+					 stderr,
+					 "Unsuported header codepage defaulting to: ascii.\n" );
+
+					header_codepage = LIBEWF_CODEPAGE_ASCII;
+				}
+				break;
 
 			case (system_integer_t) 'B':
 				string_length = system_string_length(

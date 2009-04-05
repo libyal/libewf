@@ -70,9 +70,11 @@ ewfalter_SOURCES = \
 ewfalter_LDADD  = ../liberror/liberror.la ../libewf/libewf.la @MEMWATCH_LIBADD@
 
 ewfdebug_SOURCES = \
+	byte_size_string.c byte_size_string.h \
 	error_string.c error_string.h \
 	ewfdebug.c \
 	ewfgetopt.c ewfgetopt.h \
+	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	glob.c glob.h \
@@ -112,6 +114,7 @@ ewfinfo_SOURCES = \
 	error_string.c error_string.h \
 	ewfgetopt.c ewfgetopt.h \
 	ewfinfo.c \
+	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	glob.c glob.h \
@@ -129,6 +132,7 @@ ewfverify_SOURCES = \
 	digest_hash.c digest_hash.h \
 	error_string.c error_string.h \
 	ewfgetopt.c ewfgetopt.h \
+	ewfinput.c ewfinput.h \
 	ewfoutput.c ewfoutput.h \
 	ewfsignal.c ewfsignal.h \
 	ewfverify.c \

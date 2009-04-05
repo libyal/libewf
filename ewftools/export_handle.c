@@ -2557,12 +2557,20 @@ int export_handle_crc_errors_fprint(
      FILE *stream,
      liberror_error_t **error )
 {
-	static char *function      = "export_handle_crc_errors_fprint";
-	off64_t first_sector       = 0;
-	uint32_t amount_of_errors  = 0;
-	uint32_t amount_of_sectors = 0;
-	uint32_t error_iterator    = 0;
-	int result                 = 1;
+	static char *function             = "export_handle_crc_errors_fprint";
+	off64_t first_sector              = 0;
+	off64_t last_sector               = 0;
+	uint32_t amount_of_errors         = 0;
+	uint32_t amount_of_sectors        = 0;
+	uint32_t error_iterator           = 0;
+	int result                        = 1;
+
+#if defined( HAVE_V2_API )
+	system_character_t *filename      = NULL;
+	system_character_t *last_filename = NULL;
+	size_t filename_size              = 0;
+	size_t last_filename_size         = 0;
+#endif
 
 	if( export_handle == NULL )
 	{
@@ -2659,10 +2667,160 @@ int export_handle_crc_errors_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 "\tin sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
 			 (uint64_t) first_sector,
 			 (uint64_t) ( first_sector + amount_of_sectors ),
 			 amount_of_sectors );
+
+#if defined( HAVE_V2_API )
+			fprintf(
+			 stream,
+			 " in segment file(s):" );
+
+			last_sector   = ( first_sector + amount_of_sectors ) * export_handle->bytes_per_sector;
+			first_sector *= export_handle->bytes_per_sector;
+
+			while( first_sector < last_sector )
+			{
+				if( libewf_handle_seek_offset(
+				     export_handle->input_handle,
+				     first_sector,
+				     SEEK_SET,
+				     error ) == -1 )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_IO,
+					 LIBERROR_IO_ERROR_SEEK_FAILED,
+					 "%s: unable to seek offset: %" PRIu64 ".\n",
+					 function,
+					 first_sector );
+
+					if( last_filename != NULL )
+					{
+						memory_free(
+						 last_filename );
+					}
+					return( -1 );
+				}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+				if( libewf_handle_get_filename_size_wide(
+				     export_handle->input_handle,
+				     &filename_size,
+				     error ) != 1 )
+#else
+				if( libewf_handle_get_filename_size(
+				     export_handle->input_handle,
+				     &filename_size,
+				     error ) != 1 )
+#endif
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve filename size.\n",
+					 function );
+
+					if( last_filename != NULL )
+					{
+						memory_free(
+						 last_filename );
+					}
+					return( -1 );
+				}
+				filename = (system_character_t *) memory_allocate(
+				                                   sizeof( system_character_t ) * filename_size ); 
+
+
+				if( filename == NULL )
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_MEMORY,
+					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
+					 "%s: unable to create filename.\n",
+					 function );
+
+					if( last_filename != NULL )
+					{
+						memory_free(
+						 last_filename );
+					}
+					return( -1 );
+				}
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER_T )
+				if( libewf_handle_get_filename_wide(
+				     export_handle->input_handle,
+				     filename,
+				     256,
+				     error ) != 1 )
+#else
+				if( libewf_handle_get_filename(
+				     export_handle->input_handle,
+				     filename,
+				     256,
+				     error ) != 1 )
+#endif
+				{
+					liberror_error_set(
+					 error,
+					 LIBERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+					 "%s: unable to retrieve filename.\n",
+					 function );
+
+					if( last_filename != NULL )
+					{
+						memory_free(
+						 last_filename );
+					}
+					memory_free(
+					 filename );
+
+					return( -1 );
+				}
+				if( last_filename == NULL )
+				{
+					fprintf(
+					 stream,
+					 " %s",
+					 filename );
+
+					last_filename      = filename;
+					last_filename_size = filename_size;
+				}
+				else if( ( last_filename_size != filename_size )
+				      || ( memory_compare(
+				            last_filename,
+				            filename,
+				            filename_size ) != 0 ) )
+				{
+					fprintf(
+					 stream,
+					 ", %s",
+					 filename );
+
+					memory_free(
+					 last_filename );
+
+					last_filename      = filename;
+					last_filename_size = filename_size;
+				}
+				memory_free(
+				 filename );
+
+				first_sector += export_handle->chunk_size;
+			}
+			memory_free(
+			 last_filename );
+
+			last_filename      = NULL;
+			last_filename_size = 0;
+#endif
+			fprintf(
+			 stream,
+			 "\n" );
 		}
 		fprintf(
 		 stream,

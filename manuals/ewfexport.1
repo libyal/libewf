@@ -1,4 +1,4 @@
-.Dd March 2, 2009
+.Dd April 4, 2009
 .Dt ewfexport
 .Os libewf
 .Sh NAME
@@ -6,6 +6,7 @@
 .Nd exports media data stored in EWF files
 .Sh SYNOPSIS
 .Nm ewfexport
+.Op Fl A Ar codepage
 .Op Fl b Ar amount_of_sectors
 .Op Fl B Ar amount_of_bytes
 .Op Fl c Ar compression_type
@@ -40,6 +41,8 @@ the first or the entire set of EWF segment files
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl A Ar codepage
+the codepage of header section, options: ascii (default), windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258
 .It Fl b Ar amount_of_sectors
 the amount of sectors to read at once (per chunk), options: 64 (default), 128, 256, 512, 1024, 2048, 4096, 8192, 16384 or 32768 (not used for raw format)
 .It Fl B Ar amount_of_bytes

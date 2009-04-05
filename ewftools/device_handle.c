@@ -361,10 +361,9 @@ int device_handle_open_input(
 		file_size = ( (size64_t) large_integer_size.HighPart << 32 ) + large_integer_size.LowPart;
 	}
 #else
-	/* TODO refactor */
-	device_handle->file_descriptor = system_string_open(
+	device_handle->file_descriptor = open(
 	                                  filename,
-	                                  FILE_IO_O_RDONLY );
+	                                  O_RDONLY );
 
 	if( device_handle->file_descriptor == -1 )
 	{
