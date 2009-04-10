@@ -25,7 +25,6 @@
 
 #if defined( WINAPI ) ||  @HAVE_WIDE_CHARACTER_TYPE@
 #define LIBEWF_WIDE_CHARACTER_TYPE      1
-
 #endif
 
 #endif
