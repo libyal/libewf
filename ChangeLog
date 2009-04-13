@@ -101,6 +101,7 @@ API changes
   - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
 * file structure API extension (idea)
 * add wide character functions definitions by default?
+* change crc_buffer from uint8_t * to void *
 
 ewftools:
 * add getoptlong support
@@ -162,6 +163,7 @@ ewftools:
   - used storage_media_buffer_get_data in byte swap function
 * info handle
   - move input handle initialize to info_handle_open_input function ?
+  - implement use of libewf_handle_get_header_value_identifier_size for V2 API support
 * imaging handle
   - move output handle initialize to imaging_handle_open_output function ?
   - used storage_media_buffer_get_data in byte swap function
@@ -227,6 +229,13 @@ Next beta release:
 * fix ewfexport different input and output chunk sizes for low level functions
 * add set_header_codepage to ewftools
 * have segment file number in libewf_raw_read_chunk for warning output?
+
+Version: 20090412
+* refactored order of functions handles: open, close, read, write, seek
+* corrected LIBEWF_DLL_EXPORT in ewftools to LIBEWF_DLL_IMPORT
+* worked on imaging handle and ewfacquire
+* fixed double free in verification and export handle
+* updated libbfio
 
 Version: 20090411
 * fixed misplaces #endif in libewf header file

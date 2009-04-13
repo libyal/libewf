@@ -106,11 +106,9 @@ int device_handle_open_input(
      const system_character_t *filename,
      liberror_error_t **error );
 
-off64_t device_handle_seek_offset(
-         device_handle_t *device_handle,
-         off64_t offset,
-         int whence,
-         liberror_error_t **error );
+int device_handle_close(
+     device_handle_t *device_handle,
+     liberror_error_t **error );
 
 ssize_t device_handle_read_buffer(
          device_handle_t *device_handle,
@@ -118,9 +116,11 @@ ssize_t device_handle_read_buffer(
          size_t read_size,
          liberror_error_t **error );
 
-int device_handle_close(
-     device_handle_t *device_handle,
-     liberror_error_t **error );
+off64_t device_handle_seek_offset(
+         device_handle_t *device_handle,
+         off64_t offset,
+         int whence,
+         liberror_error_t **error );
 
 int device_handle_get_media_size(
      device_handle_t *device_handle,

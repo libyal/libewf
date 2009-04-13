@@ -41,7 +41,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -257,7 +257,7 @@ ssize64_t ewfverify_read_input(
 
 			return( -1 );
 		}
-		process_count = verification_handle_read_prepare_buffer(
+		process_count = verification_handle_prepare_read_buffer(
 		                 verification_handle,
 		                 storage_media_buffer,
 		                 error );

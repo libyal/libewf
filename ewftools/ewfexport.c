@@ -257,46 +257,49 @@ ssize64_t ewfexport_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid size.\n",
+		 "%s: invalid size value out of range.\n",
 		 function );
 
 		return( -1 );
 	}
-	if( read_offset >= (off64_t) media_size )
+	if( read_offset > 0 )
 	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid offset.\n",
-		 function );
+		if( read_offset >= (off64_t) media_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: invalid offset.\n",
+			 function );
 
-		return( -1 );
-	}
-	if( ( export_size + read_offset ) > media_size )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: unable to export beyond size of media.\n",
-		 function );
+			return( -1 );
+		}
+		if( ( export_size + read_offset ) > media_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: unable to export beyond size of media.\n",
+			 function );
 
-		return( -1 );
-	}
-	if( export_handle_seek_offset(
-	     export_handle,
-	     read_offset,
-	     error ) == -1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		"%s: unable to seek offset.\n",
-		 function );
+			return( -1 );
+		}
+		if( export_handle_seek_offset(
+		     export_handle,
+		     read_offset,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_SEEK_FAILED,
+			"%s: unable to seek offset.\n",
+			 function );
 
-		return( -1 );
+			return( -1 );
+		}
 	}
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	process_buffer_size = (size_t) input_chunk_size;
@@ -365,7 +368,7 @@ ssize64_t ewfexport_read_input(
 
 			return( -1 );
 		}
-		process_count = export_handle_read_prepare_buffer(
+		process_count = export_handle_prepare_read_buffer(
 		                 export_handle,
 		                 storage_media_buffer,
 		                 error );
@@ -453,7 +456,7 @@ ssize64_t ewfexport_read_input(
 		}
 		total_read_count += process_count;
 
-		process_count = export_handle_write_prepare_buffer(
+		process_count = export_handle_prepare_write_buffer(
 		                 export_handle,
 		                 storage_media_buffer,
 		                 error );
@@ -1796,7 +1799,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to print crc errors.\n" );
+			 "Unable to print export errors.\n" );
 
 			notify_error_backtrace(
 			 error );
@@ -1811,7 +1814,7 @@ int main( int argc, char * const argv[] )
 		{
 			fprintf(
 			 stderr,
-			 "Unable to write crc errors in log file.\n" );
+			 "Unable to write export errors in log file.\n" );
 
 			notify_error_backtrace(
 			 error );

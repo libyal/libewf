@@ -34,7 +34,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -655,15 +655,14 @@ int export_handle_open_output(
 	return( 1 );
 }
 
-/* Seeks the offset
- * Returns the resulting offset or -1 on error
+/* Closes the export handle
+ * Returns the 0 if succesful or -1 on error
  */
-off64_t export_handle_seek_offset(
-         export_handle_t *export_handle,
-         off64_t offset,
-         liberror_error_t **error )
+int export_handle_close(
+     export_handle_t *export_handle,
+     liberror_error_t **error )
 {
-	static char *function = "export_handle_seek_offset";
+	static char *function = "export_handle_close";
 
 	if( export_handle == NULL )
 	{
@@ -688,38 +687,80 @@ off64_t export_handle_seek_offset(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_seek_offset(
+	if( libewf_handle_close(
 	     export_handle->input_handle,
-	     offset,
-	     SEEK_SET,
-	     error ) == -1 )
+	     error ) != 0 )
 #else
-	if( libewf_seek_offset(
-	     export_handle->input_handle,
-	     offset ) == -1 )
+	if( libewf_close(
+	     export_handle->input_handle ) != 0 )
 #endif
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset.",
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close input handle.",
 		 function );
 
 		return( -1 );
 	}
-	return( offset );
+#if !defined( HAVE_V2_API )
+	export_handle->input_handle = NULL;
+#endif
+
+	if( export_handle->ewf_output_handle != NULL )
+	{
+#if defined( HAVE_V2_API )
+		if( libewf_handle_close(
+		     export_handle->ewf_output_handle,
+		     error ) != 0 )
+#else
+		if( libewf_close(
+		     export_handle->ewf_output_handle ) != 0 )
+#endif
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close ewf output handle.",
+			 function );
+
+			return( -1 );
+		}
+#if !defined( HAVE_V2_API )
+		export_handle->ewf_output_handle = NULL;
+#endif
+	}
+
+	if( export_handle->raw_output_file_descriptor != -1 )
+	{
+		if( file_io_close(
+		     export_handle->raw_output_file_descriptor ) != 0 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_CLOSE_FAILED,
+			 "%s: unable to close raw output file descriptor.",
+			 function );
+
+			return( 1 );
+		}
+		export_handle->raw_output_file_descriptor = -1;
+	}
+	return( 0 );
 }
 
 /* Prepares a buffer after reading the input of the export handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t export_handle_read_prepare_buffer(
+ssize_t export_handle_prepare_read_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error )
 {
-	static char *function = "export_handle_read_prepare_buffer";
+	static char *function = "export_handle_prepare_read_buffer";
 	ssize_t process_count = 0;
 
 	if( export_handle == NULL )
@@ -770,7 +811,7 @@ ssize_t export_handle_read_prepare_buffer(
 	                 storage_media_buffer->process_crc,
 	                 error );
 #else
-	process_count = libewf_raw_read_prepare_buffer(
+	process_count = libewf_raw_prepare_read_buffer(
 	                 export_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
 	                 storage_media_buffer->compression_buffer_amount,
@@ -847,11 +888,10 @@ ssize_t export_handle_read_prepare_buffer(
 	{
 		storage_media_buffer->data_in_compression_buffer = 0;
 	}
+	export_handle->input_offset += process_count;
 #else
 	process_count = storage_media_buffer->raw_buffer_amount;
 #endif
-	export_handle->input_offset += process_count;
-
 	return( process_count );
 }
 
@@ -957,12 +997,12 @@ ssize_t export_handle_read_buffer(
 /* Prepares a buffer before writing the output of the export handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t export_handle_write_prepare_buffer(
+ssize_t export_handle_prepare_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error )
 {
-	static char *function = "export_handle_write_prepare_buffer";
+	static char *function = "export_handle_prepare_write_buffer";
 	ssize_t process_count = 0;
 
 	if( export_handle == NULL )
@@ -1038,7 +1078,7 @@ ssize_t export_handle_write_prepare_buffer(
 				 &( storage_media_buffer->process_crc ),
 				 error );
 #else
-		process_count = libewf_raw_write_prepare_buffer(
+		process_count = libewf_raw_prepare_write_buffer(
 				 export_handle->ewf_output_handle,
 				 storage_media_buffer->raw_buffer,
 				 storage_media_buffer->raw_buffer_amount,
@@ -1233,6 +1273,62 @@ ssize_t export_handle_write_buffer(
 	return( write_count );
 }
 
+/* Seeks the offset
+ * Returns the resulting offset or -1 on error
+ */
+off64_t export_handle_seek_offset(
+         export_handle_t *export_handle,
+         off64_t offset,
+         liberror_error_t **error )
+{
+	static char *function = "export_handle_seek_offset";
+
+	if( export_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid export handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_seek_offset(
+	     export_handle->input_handle,
+	     offset,
+	     SEEK_SET,
+	     error ) == -1 )
+#else
+	if( libewf_seek_offset(
+	     export_handle->input_handle,
+	     offset ) == -1 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset.",
+		 function );
+
+		return( -1 );
+	}
+	return( offset );
+}
+
 /* Swaps the byte order of byte pairs within a buffer of a certain size
  * Returns 1 if successful, -1 on error
  */
@@ -1422,14 +1518,15 @@ int export_handle_update_integrity_hash(
 	return( 1 );
 }
 
-/* Closes the export handle
- * Returns the 0 if succesful or -1 on error
+/* Retrieves the input media size
+ * Returns the 1 if succesful or -1 on error
  */
-int export_handle_close(
+int export_handle_get_input_media_size(
      export_handle_t *export_handle,
+     size64_t *media_size,
      liberror_error_t **error )
 {
-	static char *function = "export_handle_close";
+	static char *function = "export_handle_get_input_media_size";
 
 	if( export_handle == NULL )
 	{
@@ -1454,69 +1551,92 @@ int export_handle_close(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_close(
+	if( libewf_handle_get_media_size(
 	     export_handle->input_handle,
-	     error ) != 0 )
+	     media_size,
+	     error ) != 1 )
 #else
-	if( libewf_close(
-	     export_handle->input_handle ) != 0 )
+	if( libewf_get_media_size(
+	     export_handle->input_handle,
+	     media_size ) != 1 )
 #endif
 	{
 		liberror_error_set(
 		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input handle.",
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve media size.",
 		 function );
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	export_handle->input_handle = NULL;
-#endif
+	return( 1 );
+}
 
-	if( export_handle->ewf_output_handle != NULL )
+/* Retrieves the chunk size
+ * Returns 1 if successful or -1 on error
+ */
+int export_handle_get_input_chunk_size(
+     export_handle_t *export_handle,
+     size32_t *chunk_size,
+     liberror_error_t **error )
+{
+	static char *function = "export_handle_get_input_chunk_size";
+
+	if( export_handle == NULL )
 	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( export_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid export handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( chunk_size == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid chunk size.",
+		 function );
+
+		return( -1 );
+	}
 #if defined( HAVE_V2_API )
-		if( libewf_handle_close(
-		     export_handle->ewf_output_handle,
-		     error ) != 0 )
+	if( libewf_handle_get_chunk_size(
+	     export_handle->input_handle,
+	     chunk_size,
+	     error ) != 1 )
 #else
-		if( libewf_close(
-		     export_handle->ewf_output_handle ) != 0 )
+	if( libewf_get_chunk_size(
+	     export_handle->input_handle,
+	     chunk_size ) != 1 )
 #endif
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close ewf output handle.",
-			 function );
-
-			return( -1 );
-		}
-#if !defined( HAVE_V2_API )
-		export_handle->ewf_output_handle = NULL;
-#endif
-	}
-
-	if( export_handle->raw_output_file_descriptor != -1 )
 	{
-		if( file_io_close(
-		     export_handle->raw_output_file_descriptor ) != 0 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_CLOSE_FAILED,
-			 "%s: unable to close raw output file descriptor.",
-			 function );
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve chunk size.",
+		 function );
 
-			return( 1 );
-		}
-		export_handle->raw_output_file_descriptor = -1;
+		return( -1 );
 	}
-	return( 0 );
+	return( 1 );
 }
 
 /* Sets the output values of the export handle
@@ -1889,127 +2009,6 @@ int export_handle_set_output_values(
 			return( -1 );
 		}
 #endif
-	}
-	return( 1 );
-}
-
-/* Retrieves the input media size
- * Returns the 1 if succesful or -1 on error
- */
-int export_handle_get_input_media_size(
-     export_handle_t *export_handle,
-     size64_t *media_size,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_get_input_media_size";
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_media_size(
-	     export_handle->input_handle,
-	     media_size,
-	     error ) != 1 )
-#else
-	if( libewf_get_media_size(
-	     export_handle->input_handle,
-	     media_size ) != 1 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve media size.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves the chunk size
- * Returns 1 if successful or -1 on error
- */
-int export_handle_get_input_chunk_size(
-     export_handle_t *export_handle,
-     size32_t *chunk_size,
-     liberror_error_t **error )
-{
-	static char *function = "export_handle_get_input_chunk_size";
-
-	if( export_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid export handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( export_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid export handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( chunk_size == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid chunk size.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_get_chunk_size(
-	     export_handle->input_handle,
-	     chunk_size,
-	     error ) != 1 )
-#else
-	if( libewf_get_chunk_size(
-	     export_handle->input_handle,
-	     chunk_size ) != 1 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve chunk size.",
-		 function );
-
-		return( -1 );
 	}
 	return( 1 );
 }
@@ -2667,7 +2666,7 @@ int export_handle_crc_errors_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tin sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
+			 "\tat sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
 			 (uint64_t) first_sector,
 			 (uint64_t) ( first_sector + amount_of_sectors ),
 			 amount_of_sectors );
@@ -2807,9 +2806,6 @@ int export_handle_crc_errors_fprint(
 					last_filename      = filename;
 					last_filename_size = filename_size;
 				}
-				memory_free(
-				 filename );
-
 				first_sector += export_handle->chunk_size;
 			}
 			memory_free(

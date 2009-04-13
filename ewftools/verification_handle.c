@@ -30,7 +30,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -461,15 +461,70 @@ int verification_handle_open_input(
 	return( result );
 }
 
+/* Closes the verification handle
+ * Returns the 0 if succesful or -1 on error
+ */
+int verification_handle_close(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error )
+{
+	static char *function = "verification_handle_close";
+
+	if( verification_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid verification handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( verification_handle->input_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid verification handle - missing input handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_close(
+	     verification_handle->input_handle,
+	     error ) != 0 )
+#else
+	if( libewf_close(
+	     verification_handle->input_handle ) != 0 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close input handle.",
+		 function );
+
+		return( -1 );
+	}
+#if !defined( HAVE_V2_API )
+	verification_handle->input_handle = NULL;
+#endif
+	return( 0 );
+}
+
 /* Prepares a buffer after reading the input of the verification handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t verification_handle_read_prepare_buffer(
+ssize_t verification_handle_prepare_read_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error )
 {
-	static char *function = "verification_handle_read_prepare_buffer";
+	static char *function = "verification_handle_prepare_read_buffer";
 	ssize_t process_count = 0;
 
 	if( verification_handle == NULL )
@@ -520,7 +575,7 @@ ssize_t verification_handle_read_prepare_buffer(
 	                 storage_media_buffer->process_crc,
 	                 error );
 #else
-	process_count = libewf_raw_read_prepare_buffer(
+	process_count = libewf_raw_prepare_read_buffer(
 	                 verification_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
 	                 storage_media_buffer->compression_buffer_amount,
@@ -811,64 +866,7 @@ int verification_handle_update_integrity_hash(
 			return( -1 );
 		}
 	}
-	verification_handle->output_offset += read_size;
-
 	return( 1 );
-}
-
-/* Closes the verification handle
- * Returns the 0 if succesful or -1 on error
- */
-int verification_handle_close(
-     verification_handle_t *verification_handle,
-     liberror_error_t **error )
-{
-	static char *function = "verification_handle_close";
-
-	if( verification_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid verification handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( verification_handle->input_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid verification handle - missing input handle.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_close(
-	     verification_handle->input_handle,
-	     error ) != 0 )
-#else
-	if( libewf_close(
-	     verification_handle->input_handle ) != 0 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input handle.",
-		 function );
-
-		return( -1 );
-	}
-#if !defined( HAVE_V2_API )
-	verification_handle->input_handle = NULL;
-#endif
-	return( 0 );
 }
 
 /* Retrieves several verification values
@@ -1883,7 +1881,7 @@ int verification_handle_crc_errors_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tin sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
+			 "\tat sector(s): %" PRId64 " - %" PRId64 " (amount: %" PRIu32 ")",
 			 (uint64_t) first_sector,
 			 (uint64_t) ( first_sector + amount_of_sectors ),
 			 amount_of_sectors );
@@ -2023,9 +2021,6 @@ int verification_handle_crc_errors_fprint(
 					last_filename      = filename;
 					last_filename_size = filename_size;
 				}
-				memory_free(
-				 filename );
-
 				first_sector += verification_handle->chunk_size;
 			}
 			memory_free(

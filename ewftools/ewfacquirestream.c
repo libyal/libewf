@@ -1054,7 +1054,7 @@ ssize64_t ewfacquirestream_read_input(
 
 			return( -1 );
 		}
-		process_count = imaging_handle_write_prepare_buffer(
+		process_count = imaging_handle_prepare_write_buffer(
 		                 imaging_handle,
 		                 storage_media_buffer,
 		                 error );

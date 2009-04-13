@@ -251,7 +251,7 @@ ssize64_t ewfalter_alter_input(
 
 			return( -1 );
 		}
-		process_count = alteration_handle_read_prepare_buffer(
+		process_count = alteration_handle_prepare_read_buffer(
 		                 alteration_handle,
 		                 storage_media_buffer,
 		                 error );
@@ -376,7 +376,7 @@ ssize64_t ewfalter_alter_input(
 
 		/* Write the buffer
 		 */
-		process_count = alteration_handle_write_prepare_buffer(
+		process_count = alteration_handle_prepare_write_buffer(
 		                 alteration_handle,
 		                 storage_media_buffer,
 		                 error );

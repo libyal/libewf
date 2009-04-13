@@ -30,7 +30,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -396,15 +396,14 @@ int alteration_handle_open_input(
 	return( result );
 }
 
-/* Seeks the offset in the input file
- * Returns the new offset if successful or -1 on error
+/* Closes the alteration handle
+ * Returns the 0 if succesful or -1 on error
  */
-off64_t alteration_handle_seek_offset(
-         alteration_handle_t *alteration_handle,
-         off64_t offset,
-         liberror_error_t **error )
+int alteration_handle_close(
+     alteration_handle_t *alteration_handle,
+     liberror_error_t **error )
 {
-	static char *function = "alteration_handle_seek_offset";
+	static char *function = "alteration_handle_close";
 
 	if( alteration_handle == NULL )
 	{
@@ -429,29 +428,27 @@ off64_t alteration_handle_seek_offset(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	offset = libewf_handle_seek_offset(
-	          alteration_handle->input_handle,
-	          offset,
-	          SEEK_SET,
-	          error );
+	if( libewf_handle_close(
+	     alteration_handle->input_handle,
+	     error ) != 0 )
 #else
-	offset = libewf_seek_offset(
-	          alteration_handle->input_handle,
-	          offset );
+	if( libewf_close(
+	     alteration_handle->input_handle ) != 0 )
 #endif
-
-	if( offset == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in input handle.",
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close input handle.",
 		 function );
 
 		return( -1 );
 	}
-	return( offset );
+#if !defined( HAVE_V2_API )
+	alteration_handle->input_handle = NULL;
+#endif
+	return( 0 );
 }
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
@@ -459,12 +456,12 @@ off64_t alteration_handle_seek_offset(
 /* Prepares a buffer after reading the input of the alteration handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t alteration_handle_read_prepare_buffer(
+ssize_t alteration_handle_prepare_read_buffer(
          alteration_handle_t *alteration_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error )
 {
-	static char *function = "alteration_handle_read_prepare_buffer";
+	static char *function = "alteration_handle_prepare_read_buffer";
 	ssize_t process_count = 0;
 
 	if( alteration_handle == NULL )
@@ -514,7 +511,7 @@ ssize_t alteration_handle_read_prepare_buffer(
 	                 storage_media_buffer->process_crc,
 	                 error );
 #else
-	process_count = libewf_raw_read_prepare_buffer(
+	process_count = libewf_raw_prepare_read_buffer(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->compression_buffer,
 	                 storage_media_buffer->compression_buffer_amount,
@@ -632,12 +629,12 @@ ssize_t alteration_handle_read_buffer(
 /* Prepares a buffer before writing the output of the alteration handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t alteration_handle_write_prepare_buffer(
+ssize_t alteration_handle_prepare_write_buffer(
          alteration_handle_t *alteration_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error )
 {
-	static char *function = "alteration_handle_write_prepare_buffer";
+	static char *function = "alteration_handle_prepare_write_buffer";
 	ssize_t process_count = 0;
 
 	if( alteration_handle == NULL )
@@ -688,7 +685,7 @@ ssize_t alteration_handle_write_prepare_buffer(
 	                 &( storage_media_buffer->process_crc ),
 	                 error );
 #else
-	process_count = libewf_raw_write_prepare_buffer(
+	process_count = libewf_raw_prepare_write_buffer(
 	                 alteration_handle->input_handle,
 	                 storage_media_buffer->raw_buffer,
 	                 storage_media_buffer->raw_buffer_amount,
@@ -846,14 +843,15 @@ ssize_t alteration_handle_write_buffer(
 	return( write_count );
 }
 
-/* Closes the alteration handle
- * Returns the 0 if succesful or -1 on error
+/* Seeks the offset in the input file
+ * Returns the new offset if successful or -1 on error
  */
-int alteration_handle_close(
-     alteration_handle_t *alteration_handle,
-     liberror_error_t **error )
+off64_t alteration_handle_seek_offset(
+         alteration_handle_t *alteration_handle,
+         off64_t offset,
+         liberror_error_t **error )
 {
-	static char *function = "alteration_handle_close";
+	static char *function = "alteration_handle_seek_offset";
 
 	if( alteration_handle == NULL )
 	{
@@ -878,27 +876,29 @@ int alteration_handle_close(
 		return( -1 );
 	}
 #if defined( HAVE_V2_API )
-	if( libewf_handle_close(
-	     alteration_handle->input_handle,
-	     error ) != 0 )
+	offset = libewf_handle_seek_offset(
+	          alteration_handle->input_handle,
+	          offset,
+	          SEEK_SET,
+	          error );
 #else
-	if( libewf_close(
-	     alteration_handle->input_handle ) != 0 )
+	offset = libewf_seek_offset(
+	          alteration_handle->input_handle,
+	          offset );
 #endif
+
+	if( offset == -1 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close input handle.",
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset in input handle.",
 		 function );
 
 		return( -1 );
 	}
-#if !defined( HAVE_V2_API )
-	alteration_handle->input_handle = NULL;
-#endif
-	return( 0 );
+	return( offset );
 }
 
 /* Retrieves the media size

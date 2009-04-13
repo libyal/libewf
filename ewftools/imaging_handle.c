@@ -34,7 +34,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -387,15 +387,70 @@ int imaging_handle_open_output(
 	return( 1 );
 }
 
+/* Closes the imaging handle
+ * Returns the 0 if succesful or -1 on error
+ */
+int imaging_handle_close(
+     imaging_handle_t *imaging_handle,
+     liberror_error_t **error )
+{
+	static char *function = "imaging_handle_close";
+
+	if( imaging_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid imaging handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( imaging_handle->output_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid imaging handle - missing output handle.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_V2_API )
+	if( libewf_handle_close(
+	     imaging_handle->output_handle,
+	     error ) != 0 )
+#else
+	if( libewf_close(
+	     imaging_handle->output_handle ) != 0 )
+#endif
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close output handle.",
+		 function );
+
+		return( -1 );
+	}
+#if !defined( HAVE_V2_API )
+	imaging_handle->output_handle = NULL;
+#endif
+	return( 0 );
+}
+
 /* Prepares a buffer before writing the output of the imaging handle
  * Returns the resulting buffer size or -1 on error
  */
-ssize_t imaging_handle_write_prepare_buffer(
+ssize_t imaging_handle_prepare_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error )
 {
-	static char *function = "imaging_handle_write_prepare_buffer";
+	static char *function = "imaging_handle_prepare_write_buffer";
 	ssize_t process_count = 0;
 
 	if( imaging_handle == NULL )
@@ -446,7 +501,7 @@ ssize_t imaging_handle_write_prepare_buffer(
 	                 &( storage_media_buffer->process_crc ),
 	                 error );
 #else
-	process_count = libewf_raw_write_prepare_buffer(
+	process_count = libewf_raw_prepare_write_buffer(
 	                 imaging_handle->output_handle,
 	                 storage_media_buffer->raw_buffer,
 	                 storage_media_buffer->raw_buffer_amount,
@@ -791,61 +846,6 @@ int imaging_handle_update_integrity_hash(
 		}
 	}
 	return( 1 );
-}
-
-/* Closes the imaging handle
- * Returns the 0 if succesful or -1 on error
- */
-int imaging_handle_close(
-     imaging_handle_t *imaging_handle,
-     liberror_error_t **error )
-{
-	static char *function = "imaging_handle_close";
-
-	if( imaging_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid imaging handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( imaging_handle->output_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid imaging handle - missing output handle.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_V2_API )
-	if( libewf_handle_close(
-	     imaging_handle->output_handle,
-	     error ) != 0 )
-#else
-	if( libewf_close(
-	     imaging_handle->output_handle ) != 0 )
-#endif
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close output handle.",
-		 function );
-
-		return( -1 );
-	}
-#if !defined( HAVE_V2_API )
-	imaging_handle->output_handle = NULL;
-#endif
-	return( 0 );
 }
 
 /* Retrieves the chunk size
@@ -1994,7 +1994,7 @@ int imaging_handle_acquiry_errors_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
 			 (uint64_t) first_sector,
 			 (uint64_t) ( first_sector + amount_of_sectors ),
 			 amount_of_sectors );

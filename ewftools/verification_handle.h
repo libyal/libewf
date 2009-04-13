@@ -34,7 +34,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -86,11 +86,7 @@ struct verification_handle
 	 */
 	off64_t input_offset;
 
-	/* The last offset of the output data
-	 */
-	off64_t output_offset;
-
-	/* Value to indicate if the chuck should be wiped on error
+	/* Value to indicate if the chunk should be wiped on error
 	 */
 	int wipe_chunk_on_error;
 };
@@ -115,7 +111,11 @@ int verification_handle_open_input(
      int amount_of_filenames,
      liberror_error_t **error );
 
-ssize_t verification_handle_read_prepare_buffer(
+int verification_handle_close(
+     verification_handle_t *verification_handle,
+     liberror_error_t **error );
+
+ssize_t verification_handle_prepare_read_buffer(
          verification_handle_t *verification_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
@@ -130,10 +130,6 @@ int verification_handle_update_integrity_hash(
      verification_handle_t *verification_handle,
      storage_media_buffer_t *storage_media_buffer,
      size_t read_size,
-     liberror_error_t **error );
-
-int verification_handle_close(
-     verification_handle_t *verification_handle,
      liberror_error_t **error );
 
 int verification_handle_get_values(

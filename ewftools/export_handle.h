@@ -32,7 +32,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -98,19 +98,17 @@ struct export_handle
 	 */
 	uint32_t bytes_per_sector;
 
+#if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 	/* The last offset of the input data
 	 */
 	off64_t input_offset;
-
-	/* The last offset of the output data
-	 */
-	off64_t output_offset;
+#endif
 
 	/* Value to indicate if the write is compressed
 	 */
 	int write_compressed;
 
-	/* Value to indicate if the chuck should be wiped on error
+	/* Value to indicate if the chunk should be wiped on error
 	 */
 	int wipe_chunk_on_error;
 };
@@ -141,12 +139,11 @@ int export_handle_open_output(
      const system_character_t *filename,
      liberror_error_t **error );
 
-off64_t export_handle_seek_offset(
-         export_handle_t *export_handle,
-         off64_t offset,
-         liberror_error_t **error );
+int export_handle_close(
+     export_handle_t *export_handle,
+     liberror_error_t **error );
 
-ssize_t export_handle_read_prepare_buffer(
+ssize_t export_handle_prepare_read_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
@@ -157,7 +154,7 @@ ssize_t export_handle_read_buffer(
          size_t read_size,
          liberror_error_t **error );
 
-ssize_t export_handle_write_prepare_buffer(
+ssize_t export_handle_prepare_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
@@ -166,6 +163,11 @@ ssize_t export_handle_write_buffer(
          export_handle_t *export_handle,
          storage_media_buffer_t *storage_media_buffer,
          size_t write_size,
+         liberror_error_t **error );
+
+off64_t export_handle_seek_offset(
+         export_handle_t *export_handle,
+         off64_t offset,
          liberror_error_t **error );
 
 int export_handle_swap_byte_pairs(
@@ -180,8 +182,14 @@ int export_handle_update_integrity_hash(
      size_t read_size,
      liberror_error_t **error );
 
-int export_handle_close(
+int export_handle_get_input_media_size(
      export_handle_t *export_handle,
+     size64_t *media_size,
+     liberror_error_t **error );
+
+int export_handle_get_input_chunk_size(
+     export_handle_t *export_handle,
+     size32_t *chunk_size,
      liberror_error_t **error );
 
 int export_handle_set_output_values(
@@ -196,16 +204,6 @@ int export_handle_set_output_values(
      size64_t segment_file_size,
      uint32_t sectors_per_chunk,
      uint8_t wipe_chunk_on_error,
-     liberror_error_t **error );
-
-int export_handle_get_input_media_size(
-     export_handle_t *export_handle,
-     size64_t *media_size,
-     liberror_error_t **error );
-
-int export_handle_get_input_chunk_size(
-     export_handle_t *export_handle,
-     size32_t *chunk_size,
      liberror_error_t **error );
 
 int export_handle_set_header_value(

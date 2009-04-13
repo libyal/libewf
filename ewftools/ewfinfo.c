@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #endif
 
-/* If libtool DLL support is enabled set LIBEWF_DLL_EXPORT
+/* If libtool DLL support is enabled set LIBEWF_DLL_IMPORT
  * before including libewf.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )

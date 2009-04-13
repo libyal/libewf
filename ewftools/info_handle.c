@@ -31,7 +31,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -2276,7 +2276,7 @@ int info_handle_acquiry_errors_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
 			 (uint64_t) first_sector,
 			 (uint64_t) ( first_sector + amount_of_sectors ),
 			 amount_of_sectors );
@@ -2398,7 +2398,7 @@ int info_handle_sessions_fprint(
 			}
 			fprintf(
 			 stream,
-			 "\tin sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
+			 "\tat sector(s): %" PRIu64 " - %" PRIu64 " amount: %" PRIu32 "\n",
 			 (uint64_t) first_sector,
 			 (uint64_t) ( first_sector + amount_of_sectors ),
 			 amount_of_sectors );

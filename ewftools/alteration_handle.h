@@ -34,7 +34,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -73,13 +73,12 @@ int alteration_handle_open_input(
      int amount_of_filenames,
      liberror_error_t **error );
 
-off64_t alteration_handle_seek_offset(
-         alteration_handle_t *alteration_handle,
-         off64_t offset,
-         liberror_error_t **error );
+int alteration_handle_close(
+     alteration_handle_t *alteration_handle,
+     liberror_error_t **error );
 
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
-ssize_t alteration_handle_read_prepare_buffer(
+ssize_t alteration_handle_prepare_read_buffer(
          alteration_handle_t *alteration_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
@@ -91,7 +90,7 @@ ssize_t alteration_handle_read_buffer(
          liberror_error_t **error );
 #endif
 
-ssize_t alteration_handle_write_prepare_buffer(
+ssize_t alteration_handle_prepare_write_buffer(
          alteration_handle_t *alteration_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
@@ -102,9 +101,10 @@ ssize_t alteration_handle_write_buffer(
          size_t write_size,
          liberror_error_t **error );
 
-int alteration_handle_close(
-     alteration_handle_t *alteration_handle,
-     liberror_error_t **error );
+off64_t alteration_handle_seek_offset(
+         alteration_handle_t *alteration_handle,
+         off64_t offset,
+         liberror_error_t **error );
 
 int alteration_handle_get_media_size(
      alteration_handle_t *alteration_handle,

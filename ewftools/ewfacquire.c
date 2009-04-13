@@ -1,6 +1,6 @@
 /*
  * ewfacquire
- * Reads data from a file and writes it in EWF format
+ * Reads data from a file or device and writes it in EWF format
  *
  * Copyright (c) 2006-2009, Joachim Metz <forensics@hoffmannbv.nl>,
  * Hoffmann Investigations. All rights reserved.
@@ -1098,8 +1098,9 @@ ssize_t ewfacquire_read_buffer(
 ssize64_t ewfacquire_read_input(
            imaging_handle_t *imaging_handle,
            device_handle_t *device_handle,
-           size64_t write_size,
-           off64_t write_offset,
+           size64_t media_size,
+           size64_t acquiry_size,
+           off64_t acquiry_offset,
            uint32_t bytes_per_sector,
            uint8_t swap_byte_pairs,
            uint32_t sector_error_granularity,
@@ -1116,10 +1117,10 @@ ssize64_t ewfacquire_read_input(
 	storage_media_buffer_t *storage_media_buffer = NULL;
 	static char *function                        = "ewfacquire_read_input";
 	ssize64_t total_write_count                  = 0;
+	size_t write_size                            = 0;
 	ssize_t read_count                           = 0;
 	ssize_t process_count                        = 0;
 	ssize_t write_count                          = 0;
-	uint32_t amount_of_chunks                    = 0;
 	uint32_t byte_error_granularity              = 0;
 	uint32_t chunk_size                          = 0;
 
@@ -1156,33 +1157,46 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	if( write_size == 0 )
+	if( ( acquiry_size == 0 )
+         || ( acquiry_size > media_size )
+         || ( acquiry_size > (ssize64_t) INT64_MAX ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_VALUE_ZERO_OR_LESS,
-		 "%s: invalid write size value zero or less .",
+		 LIBERROR_ARGUMENT_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid write size value out of range.",
 		 function );
 
 		return( -1 );
 	}
-	if( write_offset > 0 )
+	if( acquiry_offset > 0 )
 	{
-		if( write_offset >= (off64_t) write_size )
+		if( acquiry_offset >= (off64_t) acquiry_size )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 			 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid write offset.",
+			 "%s: invalid acquiry offset.",
+			 function );
+
+			return( -1 );
+		}
+		if( ( acquiry_size + acquiry_offset ) > media_size )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: unable to acquire beyond size of media.\n",
 			 function );
 
 			return( -1 );
 		}
 		if( device_handle_seek_offset(
 		     device_handle,
-		     write_offset,
+		     acquiry_offset,
 		     SEEK_SET,
 		     error ) == -1 )
 		{
@@ -1190,7 +1204,7 @@ ssize64_t ewfacquire_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to find write offset.",
+			 "%s: unable to find acquiry offset.",
 			 function );
 
 			return( -1 );
@@ -1248,10 +1262,14 @@ ssize64_t ewfacquire_read_input(
 
 		return( -1 );
 	}
-	while( total_write_count < (ssize64_t) write_size )
+	while( total_write_count < (ssize64_t) acquiry_size )
 	{
-		/* Read a chunk from the file descriptor
-		 */
+		write_size = process_buffer_size;
+
+		if( ( acquiry_size - total_write_count ) < write_size )
+		{
+			write_size = (size_t) ( acquiry_size - total_write_count );
+		}
 		read_count = ewfacquire_read_buffer(
 		              imaging_handle,
 		              device_handle,
@@ -1263,14 +1281,6 @@ ssize64_t ewfacquire_read_input(
 		              byte_error_granularity,
 		              wipe_block_on_read_error,
 		              error );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		notify_verbose_printf(
-		 "%s: read chunk: %" PRIi32 " with size: %" PRIzd ".\n",
-		 function,
-		 amount_of_chunks + 1,
-		 read_count );
-#endif
 
 		if( read_count < 0 )
 		{
@@ -1302,8 +1312,6 @@ ssize64_t ewfacquire_read_input(
 
 			return( -1 );
 		}
-		amount_of_chunks++;
-
 #if defined( HAVE_LOW_LEVEL_FUNCTIONS )
 		storage_media_buffer->data_in_compression_buffer = 0;
 #endif
@@ -1352,7 +1360,7 @@ ssize64_t ewfacquire_read_input(
 
 			return( -1 );
 		}
-		process_count = imaging_handle_write_prepare_buffer(
+		process_count = imaging_handle_prepare_write_buffer(
 		                 imaging_handle,
 		                 storage_media_buffer,
 		                 error );
@@ -1526,8 +1534,8 @@ int main( int argc, char * const argv[] )
 	uint64_t acquiry_offset                         = 0;
 	uint64_t acquiry_size                           = 0;
 	uint64_t input_size_variable                    = 0;
-	uint64_t input_size                             = 0;
 	uint64_t maximum_segment_file_size              = 0;
+	uint64_t media_size                             = 0;
 	uint64_t process_buffer_size                    = 0;
 	uint64_t segment_file_size                      = 0;
 	uint32_t bytes_per_sector                       = 512;
@@ -2065,7 +2073,7 @@ int main( int argc, char * const argv[] )
 	}
 	if( device_handle_get_media_size(
 	     device_handle,
-	     &input_size,
+	     &media_size,
 	     &error ) != 1 )
 	{
 		fprintf(
@@ -2111,9 +2119,9 @@ int main( int argc, char * const argv[] )
 		return( EXIT_FAILURE );
 	}
 	if( ( acquiry_size == 0 )
-	 || ( acquiry_size > ( input_size - acquiry_offset ) ) )
+	 || ( acquiry_size > ( media_size - acquiry_offset ) ) )
 	{
-		acquiry_size = input_size - acquiry_offset;
+		acquiry_size = media_size - acquiry_offset;
 	}
 	/* Create the input buffers
 	 */
@@ -2702,7 +2710,7 @@ int main( int argc, char * const argv[] )
 		       EWFACQUIRE_INPUT_BUFFER_SIZE,
 		       _SYSTEM_CHARACTER_T_STRING( "Start to acquire at offset" ),
 		       0,
-		       input_size,
+		       media_size,
 		       0,
 		       &acquiry_offset ) == -1 ) )
 		{
@@ -2722,11 +2730,11 @@ int main( int argc, char * const argv[] )
 		       EWFACQUIRE_INPUT_BUFFER_SIZE,
 		       _SYSTEM_CHARACTER_T_STRING( "The amount of bytes to acquire" ),
 		       0,
-		       ( input_size - acquiry_offset ),
-		       ( input_size - acquiry_offset ),
+		       ( media_size - acquiry_offset ),
+		       ( media_size - acquiry_offset ),
 		       &acquiry_size ) == -1 ) )
 		{
-			acquiry_size = input_size - acquiry_offset;
+			acquiry_size = media_size - acquiry_offset;
 
 			fprintf(
 			 stdout,
@@ -3224,6 +3232,7 @@ int main( int argc, char * const argv[] )
 		write_count = ewfacquire_read_input(
 		               ewfacquire_imaging_handle,
 			       device_handle,
+			       media_size,
 			       acquiry_size,
 			       acquiry_offset,
 			       bytes_per_sector,

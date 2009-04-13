@@ -421,21 +421,14 @@ int device_handle_open_input(
 	return( 1 );
 }
 
-/* Seeks the offset in the input file
- * Returns the new offset if successful or -1 on error
+/* Closes the device handle
+ * Returns the 0 if succesful or -1 on error
  */
-off64_t device_handle_seek_offset(
-         device_handle_t *device_handle,
-         off64_t offset,
-         int whence,
-         liberror_error_t **error )
+int device_handle_close(
+     device_handle_t *device_handle,
+     liberror_error_t **error )
 {
-	static char *function              = "device_handle_seek_offset";
-
-#if defined( WINAPI )
-	LARGE_INTEGER large_integer_offset = { 0, 0 };
-	DWORD move_method                  = 0;
-#endif
+	static char *function = "device_handle_close";
 
 	if( device_handle == NULL )
 	{
@@ -460,6 +453,18 @@ off64_t device_handle_seek_offset(
 
 		return( -1 );
 	}
+	if( CloseHandle(
+	     device_handle->file_handle ) == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file handle.",
+		 function );
+
+		return( -1 );
+	}
 #else
 	if( device_handle->file_descriptor == -1 )
 	{
@@ -472,85 +477,20 @@ off64_t device_handle_seek_offset(
 
 		return( -1 );
 	}
-#endif
-	if( ( whence != SEEK_CUR )
-	 && ( whence != SEEK_END )
-	 && ( whence != SEEK_SET ) )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported whence.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( WINAPI )
-	if( whence == SEEK_SET )
-	{
-		move_method = FILE_BEGIN;
-	}
-	else if( whence == SEEK_CUR )
-	{
-		move_method = FILE_CURRENT;
-	}
-	else if( whence == SEEK_END )
-	{
-		move_method = FILE_END;
-	}
-	large_integer_offset.LowPart  = (DWORD) ( 0x0ffffffff & offset );
-	large_integer_offset.HighPart = (LONG) ( offset >> 32 );
-
-        if( SetFilePointerEx(
-             device_handle->file_handle,
-             large_integer_offset,
-             NULL,
-             move_method ) == 0 )
+	if( close(
+	     device_handle->file_descriptor ) != 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset: %" PRIi64 " in input handle.",
-		 function,
-		 offset );
-
-		return( -1 );
-	}
-	offset = ( (off64_t) large_integer_offset.HighPart << 32 ) + large_integer_offset.LowPart;
-
-	if( offset < 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: invalid offset: %" PRIi64 " returned.",
-		 function,
-		 offset );
-
-		return( -1 );
-	}
-#else
-	lseek(
-	 device_handle->file_descriptor,
-	 offset,
-	 whence );
-
-	if( offset < 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek offset in input handle.",
+		 LIBERROR_IO_ERROR_CLOSE_FAILED,
+		 "%s: unable to close file descriptor.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	return( offset );
+	return( 0 );
 }
 
 /* Reads a buffer from the input of the device handle
@@ -690,14 +630,21 @@ ssize_t device_handle_read_buffer(
 	return( read_count );
 }
 
-/* Closes the device handle
- * Returns the 0 if succesful or -1 on error
+/* Seeks the offset in the input file
+ * Returns the new offset if successful or -1 on error
  */
-int device_handle_close(
-     device_handle_t *device_handle,
-     liberror_error_t **error )
+off64_t device_handle_seek_offset(
+         device_handle_t *device_handle,
+         off64_t offset,
+         int whence,
+         liberror_error_t **error )
 {
-	static char *function = "device_handle_close";
+	static char *function              = "device_handle_seek_offset";
+
+#if defined( WINAPI )
+	LARGE_INTEGER large_integer_offset = { 0, 0 };
+	DWORD move_method                  = 0;
+#endif
 
 	if( device_handle == NULL )
 	{
@@ -722,18 +669,6 @@ int device_handle_close(
 
 		return( -1 );
 	}
-	if( CloseHandle(
-	     device_handle->file_handle ) == 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file handle.",
-		 function );
-
-		return( -1 );
-	}
 #else
 	if( device_handle->file_descriptor == -1 )
 	{
@@ -746,20 +681,85 @@ int device_handle_close(
 
 		return( -1 );
 	}
-	if( close(
-	     device_handle->file_descriptor ) != 0 )
+#endif
+	if( ( whence != SEEK_CUR )
+	 && ( whence != SEEK_END )
+	 && ( whence != SEEK_SET ) )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported whence.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( WINAPI )
+	if( whence == SEEK_SET )
+	{
+		move_method = FILE_BEGIN;
+	}
+	else if( whence == SEEK_CUR )
+	{
+		move_method = FILE_CURRENT;
+	}
+	else if( whence == SEEK_END )
+	{
+		move_method = FILE_END;
+	}
+	large_integer_offset.LowPart  = (DWORD) ( 0x0ffffffff & offset );
+	large_integer_offset.HighPart = (LONG) ( offset >> 32 );
+
+        if( SetFilePointerEx(
+             device_handle->file_handle,
+             large_integer_offset,
+             NULL,
+             move_method ) == 0 )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
-		 LIBERROR_IO_ERROR_CLOSE_FAILED,
-		 "%s: unable to close file descriptor.",
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset: %" PRIi64 " in input handle.",
+		 function,
+		 offset );
+
+		return( -1 );
+	}
+	offset = ( (off64_t) large_integer_offset.HighPart << 32 ) + large_integer_offset.LowPart;
+
+	if( offset < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: invalid offset: %" PRIi64 " returned.",
+		 function,
+		 offset );
+
+		return( -1 );
+	}
+#else
+	lseek(
+	 device_handle->file_descriptor,
+	 offset,
+	 whence );
+
+	if( offset < 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_IO,
+		 LIBERROR_IO_ERROR_SEEK_FAILED,
+		 "%s: unable to seek offset in input handle.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	return( 0 );
+	return( offset );
 }
 
 /* Retrieves the media size

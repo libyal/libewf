@@ -32,7 +32,7 @@
  * before including libewf_extern.h
  */
 #if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBEWF_DLL_EXPORT
+#define LIBEWF_DLL_IMPORT
 #endif
 
 #include <libewf.h>
@@ -68,7 +68,7 @@ struct imaging_handle
 	 */
 	sha1_context_t sha1_context;
 
-	/* The libewf input handle
+	/* The libewf output handle
 	 */
 	libewf_handle_t *output_handle;
 
@@ -96,7 +96,11 @@ int imaging_handle_open_output(
      const system_character_t *filename,
      liberror_error_t **error );
 
-ssize_t imaging_handle_write_prepare_buffer(
+int imaging_handle_close(
+     imaging_handle_t *imaging_handle,
+     liberror_error_t **error );
+
+ssize_t imaging_handle_prepare_write_buffer(
          imaging_handle_t *imaging_handle,
          storage_media_buffer_t *storage_media_buffer,
          liberror_error_t **error );
@@ -117,10 +121,6 @@ int imaging_handle_update_integrity_hash(
      imaging_handle_t *imaging_handle,
      storage_media_buffer_t *storage_media_buffer,
      size_t read_size,
-     liberror_error_t **error );
-
-int imaging_handle_close(
-     imaging_handle_t *imaging_handle,
      liberror_error_t **error );
 
 int imaging_handle_get_chunk_size(
