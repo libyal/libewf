@@ -29,18 +29,6 @@
 
 #include <stdio.h>
 
-#if defined( HAVE_UNISTD_H )
-#include <unistd.h>
-#endif
-
-#if defined( HAVE_FCNTL_H )
-#include <fcntl.h>
-#endif
-
-#if defined( HAVE_IO_H )
-#include <io.h>
-#endif
-
 #if defined( HAVE_STDLIB_H )
 #include <stdlib.h>
 #endif
@@ -634,7 +622,7 @@ int main( int argc, char * const argv[] )
 	uint32_t sectors_per_chunk                      = 64;
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;
-	uint8_t compress_empty_block                    = 0;
+	uint8_t compression_flags                       = 0;
 	uint8_t export_handle_output_format             = 0;
 	uint8_t libewf_format                           = LIBEWF_FORMAT_ENCASE5;
 	uint8_t swap_byte_pairs                         = 0;
@@ -782,14 +770,14 @@ int main( int argc, char * const argv[] )
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
-				     &compress_empty_block ) != 1 )
+				     &compression_flags ) != 1 )
 				{
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
 
-					compression_level    = LIBEWF_COMPRESSION_NONE;
-					compress_empty_block = 0;
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
 				}
 				else
 				{
@@ -1305,20 +1293,20 @@ int main( int argc, char * const argv[] )
 					 stderr,
 					 "Unable to determine compression type defaulting to: none.\n" );
 
-					compression_level    = LIBEWF_COMPRESSION_NONE;
-					compress_empty_block = 0;
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
 				}
 				else if( ewfinput_determine_compression_level(
 				          fixed_string_variable,
 				          &compression_level,
-				          &compress_empty_block ) != 1 )
+				          &compression_flags ) != 1 )
 				{
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
 
-					compression_level    = LIBEWF_COMPRESSION_NONE;
-					compress_empty_block = 0;
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
 				}
 			}
 			/* Segment file size
@@ -1656,7 +1644,7 @@ int main( int argc, char * const argv[] )
 		     acquiry_software_version,
 		     export_size,
 		     compression_level,
-		     compress_empty_block,
+		     compression_flags,
 		     libewf_format,
 		     segment_file_size,
 		     sectors_per_chunk,

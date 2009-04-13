@@ -100,6 +100,7 @@ API changes
   - add means to set narrow string codepage
   - export libewf_handle_get_file_io_handle, libewf_handle_open_file_io_pool
 * file structure API extension (idea)
+* add wide character functions definitions by default?
 
 ewftools:
 * add getoptlong support
@@ -154,6 +155,16 @@ ewftools:
   - implement low and high level api separation
 * ewfrecover
   - create a tool recover ewf files
+* ewfinput
+  - rename ewfinput_determine_libewf_format to ewfinput_determine_ewf_format
+* export handle
+  - move input handle initialize to export_handle_open_input function ?
+  - used storage_media_buffer_get_data in byte swap function
+* info handle
+  - move input handle initialize to info_handle_open_input function ?
+* imaging handle
+  - move output handle initialize to imaging_handle_open_output function ?
+  - used storage_media_buffer_get_data in byte swap function
 
 Known issues:
 * error acquiring USB floppy with bad blocks under FreeBSD - no problem with internal floppy drive
@@ -206,6 +217,7 @@ Deployment
 Other:
 * check error tollerance
 * check TODO
+* check DLL import definitions in ewftools
 
 Next beta release:
 * check sprintf use
@@ -215,6 +227,11 @@ Next beta release:
 * fix ewfexport different input and output chunk sizes for low level functions
 * add set_header_codepage to ewftools
 * have segment file number in libewf_raw_read_chunk for warning output?
+
+Version: 20090411
+* fixed misplaces #endif in libewf header file
+* fixed smart string length in ewfinput
+* changed compress empty block into compression flags in ewftools
 
 Version: 20090410
 * small adjustments

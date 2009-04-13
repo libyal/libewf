@@ -748,8 +748,6 @@ LIBEWF_EXTERN int libewf_handle_set_delta_segment_file_size(
                    size64_t delta_segment_file_size,
                    libewf_error_t **error );
 
-#endif
-
 /* Retrieves the filename size of the (delta) segment file of the current chunk
  * The filename size includes the end of string character
  * Returns 1 if successful or -1 on error
@@ -788,6 +786,8 @@ LIBEWF_EXTERN int libewf_handle_get_filename_wide(
                    wchar_t *filename,
                    size_t filename_size,
                    libewf_error_t **error );
+#endif
+
 #endif
 
 /* -------------------------------------------------------------------------

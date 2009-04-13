@@ -72,7 +72,7 @@ int info_handle_initialize(
 	if( *info_handle == NULL )
 	{
 		*info_handle = (info_handle_t *) memory_allocate(
-								  sizeof( info_handle_t ) );
+		                                  sizeof( info_handle_t ) );
 
 		if( *info_handle == NULL )
 		{
@@ -1350,12 +1350,12 @@ int info_handle_header_values_fprint(
 					continue;
 				}
 				header_value_result = info_handle_get_header_value(
-						       info_handle,
-						       header_value_identifier,
-						       header_value_identifier_size - 1,
-						       header_value,
-						       header_value_size,
-						       error );
+				                       info_handle,
+				                       header_value_identifier,
+				                       header_value_identifier_size - 1,
+				                       header_value,
+				                       header_value_size,
+				                       error );
 
 				if( header_value_result == 1 )
 				{
@@ -1399,19 +1399,19 @@ int info_handle_media_information_fprint(
         system_character_t guid_string[ GUID_STRING_SIZE ];
         uint8_t guid[ 16 ];
 
-	char *format_string          = NULL;
-	static char *function        = "info_handle_media_information_fprint";
-	size64_t media_size          = 0;
-	uint32_t bytes_per_sector    = 0;
-	uint32_t amount_of_sectors   = 0;
-	uint32_t error_granularity   = 0;
-	uint8_t compress_empty_block = 0;
-	uint8_t media_type           = 0;
-	uint8_t media_flags          = 0;
-	uint8_t volume_type          = 0;
-	uint8_t format               = 0;
-	int8_t compression_level     = 0;
-	int result                   = 1;
+	char *format_string        = NULL;
+	static char *function      = "info_handle_media_information_fprint";
+	size64_t media_size        = 0;
+	uint32_t bytes_per_sector  = 0;
+	uint32_t amount_of_sectors = 0;
+	uint32_t error_granularity = 0;
+	uint8_t compression_flags  = 0;
+	uint8_t media_type         = 0;
+	uint8_t media_flags        = 0;
+	uint8_t volume_type        = 0;
+	uint8_t format             = 0;
+	int8_t compression_level   = 0;
+	int result                 = 1;
 
 	if( info_handle == NULL )
 	{
@@ -1799,13 +1799,13 @@ int info_handle_media_information_fprint(
 		if( libewf_handle_get_compression_values(
 		     info_handle->input_handle,
 		     &compression_level,
-		     &compress_empty_block,
+		     &compression_flags,
 		     error ) == 1 )
 #else
 		if( libewf_get_compression_values(
 		     info_handle->input_handle,
 		     &compression_level,
-		     &compress_empty_block ) == 1 )
+		     &compression_flags ) == 1 )
 #endif
 		{
 			if( compression_level == LIBEWF_COMPRESSION_NONE )

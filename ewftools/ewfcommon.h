@@ -31,7 +31,6 @@
 #include <stdio.h>
 
 #include <libewf/definitions.h>
-#include <libewf/handle.h>
 
 #include "error_string.h"
 #include "ewfsignal.h"

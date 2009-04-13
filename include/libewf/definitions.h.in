@@ -45,7 +45,7 @@
 #define LIBEWF_OPEN_WRITE			( LIBEWF_FLAG_WRITE )
 #define LIBEWF_OPEN_READ_WRITE			( LIBEWF_FLAG_READ | LIBEWF_FLAG_WRITE )
 
-/* Libewf file formats
+/* The file formats
  */
 enum LIBEWF_FORMAT
 {
@@ -71,7 +71,11 @@ enum LIBEWF_FORMAT
 	LIBEWF_FORMAT_EWFX			= 0x71
 };
 
-/* Libewf compression level definitions
+/* The default segment file size
+ */
+#define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE	( 1500 * 1024 * 1024 )
+
+/* The compression level definitions
  */
 enum LIBEWF_COMPRESSION_LEVELS
 {
@@ -86,7 +90,7 @@ enum LIBEWF_COMPRESSION_LEVELS
  */
 #define LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK	(uint8_t) 0x01
 
-/* Libewf media type definitions
+/* The media type definitions
  */
 enum LIBEWF_MEDIA_TYPES
 {
@@ -96,7 +100,7 @@ enum LIBEWF_MEDIA_TYPES
 	LIBEWF_MEDIA_TYPE_MEMORY		= 0x10
 };
 
-/* Libewf volume type definitions
+/* The volume type definitions
  */
 enum LIBEWF_VOLUME_TYPES
 {
@@ -104,7 +108,7 @@ enum LIBEWF_VOLUME_TYPES
 	LIBEWF_VOLUME_TYPE_PHYSICAL		= 0x01
 };
 
-/* Libwef date representation format
+/* The date representation formats
  */
 enum LIBEWF_DATE_FORMATS
 {
@@ -114,17 +118,13 @@ enum LIBEWF_DATE_FORMATS
 	LIBEWF_DATE_FORMAT_CTIME		= 0x04
 };
 
-/* Libewf compression types
+/* The compression types
  */
 #define LIBEWF_COMPRESSION_TYPE_NONE		"n"
 #define LIBEWF_COMPRESSION_TYPE_FAST		"f"
 #define LIBEWF_COMPRESSION_TYPE_BEST		"b"
 
-/* Libewf default segment file size
- */
-#define LIBEWF_DEFAULT_SEGMENT_FILE_SIZE	( 1500 * 1024 * 1024 )
-
-/* Libewf segment file type definitions
+/* The segment file type definitions
  */
 enum LIBEWF_SEGMENT_FILE_TYPES
 {

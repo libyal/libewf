@@ -143,7 +143,7 @@ int imaging_handle_set_output_values(
      uint8_t media_type,
      uint8_t volume_type,
      int8_t compression_level,
-     uint8_t compress_empty_block,
+     uint8_t compression_flags,
      uint8_t libewf_format,
      size64_t segment_file_size,
      uint32_t sectors_per_chunk,

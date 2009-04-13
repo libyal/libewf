@@ -67,7 +67,7 @@ int ewfinput_determine_sectors_per_chunk(
 int ewfinput_determine_compression_level(
      const system_character_t *argument,
      int8_t *compression_level,
-     uint8_t *compress_empty_block );
+     uint8_t *compression_flags );
 
 int ewfinput_determine_media_type(
      const system_character_t *argument,

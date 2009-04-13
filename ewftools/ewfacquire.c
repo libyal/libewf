@@ -204,7 +204,7 @@ int8_t ewfacquire_confirm_acquiry_parameters(
         uint8_t media_type,
         uint8_t volume_type,
         int8_t compression_level,
-        uint8_t compress_empty_block,
+        uint8_t compression_flags,
         uint8_t libewf_format,
         off64_t acquiry_offset,
         size64_t acquiry_size,
@@ -400,17 +400,17 @@ int8_t ewfacquire_confirm_acquiry_parameters(
 	}
 	else if( compression_level == LIBEWF_COMPRESSION_NONE )
 	{
-		if( compress_empty_block == 0 )
+		if( ( compression_flags & LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK ) == LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK )
 		{
 			fprintf(
 			 stream,
-			 "none\n" );
+			 "empty block\n" );
 		}
 		else
 		{
 			fprintf(
 			 stream,
-			 "empty block\n" );
+			 "none\n" );
 		}
 	}
 	fprintf(
@@ -1535,7 +1535,7 @@ int main( int argc, char * const argv[] )
 	uint32_t sectors_per_chunk                      = 0;
 	uint8_t calculate_md5                           = 1;
 	uint8_t calculate_sha1                          = 0;
-	uint8_t compress_empty_block                    = 0;
+	uint8_t compression_flags                       = 0;
 	uint8_t libewf_format                           = LIBEWF_FORMAT_ENCASE5;
 	uint8_t media_type                              = LIBEWF_MEDIA_TYPE_FIXED;
 	uint8_t read_error_retry                        = 2;
@@ -1664,14 +1664,14 @@ int main( int argc, char * const argv[] )
 				if( ewfinput_determine_compression_level(
 				     optarg,
 				     &compression_level,
-				     &compress_empty_block ) != 1 )
+				     &compression_flags ) != 1 )
 				{
 					fprintf(
 					 stderr,
 					 "Unsupported compression type defaulting to: none.\n" );
 
-					compression_level    = LIBEWF_COMPRESSION_NONE;
-					compress_empty_block = 0;
+					compression_level = LIBEWF_COMPRESSION_NONE;
+					compression_flags = 0;
 				}
 				else
 				{
@@ -2646,20 +2646,20 @@ int main( int argc, char * const argv[] )
 				 stdout,
 				 "Unable to determine compression type defaulting to: none.\n" );
 
-				compression_level    = LIBEWF_COMPRESSION_NONE;
-				compress_empty_block = 0;
+				compression_level = LIBEWF_COMPRESSION_NONE;
+				compression_flags = 0;
 			}
 			else if( ewfinput_determine_compression_level(
 				  fixed_string_variable,
 				  &compression_level,
-				  &compress_empty_block ) != 1 )
+				  &compression_flags ) != 1 )
 			{
 				fprintf(
 				 stdout,
 				 "Unsupported compression type defaulting to: none.\n" );
 
-				compression_level    = LIBEWF_COMPRESSION_NONE;
-				compress_empty_block = 0;
+				compression_level = LIBEWF_COMPRESSION_NONE;
+				compression_flags = 0;
 			}
 		}
 		/* File format
@@ -2925,7 +2925,7 @@ int main( int argc, char * const argv[] )
 		                                media_type,
 		                                volume_type,
 		                                compression_level,
-		                                compress_empty_block,
+		                                compression_flags,
 		                                libewf_format,
 		                                (off64_t) acquiry_offset,
 		                                (size64_t) acquiry_size,
@@ -3035,7 +3035,7 @@ int main( int argc, char * const argv[] )
 		          media_type,
 		          volume_type,
 		          compression_level,
-		          compress_empty_block,
+		          compression_flags,
 		          libewf_format,
 		          segment_file_size,
 		          sectors_per_chunk,

@@ -191,7 +191,7 @@ int export_handle_set_output_values(
      system_character_t *acquiry_software_version,
      size64_t media_size,
      int8_t compression_level,
-     uint8_t compress_empty_block,
+     uint8_t compression_flags,
      uint8_t libewf_format,
      size64_t segment_file_size,
      uint32_t sectors_per_chunk,

@@ -96,7 +96,7 @@ system_character_t *ewfinput_yes_no[ 2 ] = \
  { _SYSTEM_CHARACTER_T_STRING( "yes" ),
    _SYSTEM_CHARACTER_T_STRING( "no" ) };
 
-/* Determines the sectors per chunk value from an argument string
+/* Determines the EWF format from an argument string
  * Returns 1 if successful or -1 on error
  */
 int ewfinput_determine_libewf_format(
@@ -123,7 +123,7 @@ int ewfinput_determine_libewf_format(
 	if( system_string_compare(
 	     argument,
 	     _SYSTEM_CHARACTER_T_STRING( "smart" ),
-	     3 ) == 0 )
+	     5 ) == 0 )
 	{
 		*libewf_format = LIBEWF_FORMAT_SMART;
 		result         = 1;
@@ -334,7 +334,7 @@ int ewfinput_determine_sectors_per_chunk(
 int ewfinput_determine_compression_level(
      const system_character_t *argument,
      int8_t *compression_level,
-     uint8_t *compress_empty_block )
+     uint8_t *compression_flags )
 {
 	static char *function = "ewfinput_determine_compression_level";
 	int result            = 1;
@@ -353,9 +353,9 @@ int ewfinput_determine_compression_level(
 
 		return( -1 );
 	}
-	if( compress_empty_block == NULL )
+	if( compression_flags == NULL )
 	{
-		notify_warning_printf( "%s: invalid compress empty block.\n",
+		notify_warning_printf( "%s: invalid compression flags.\n",
 		 function );
 
 		return( -1 );
@@ -365,45 +365,45 @@ int ewfinput_determine_compression_level(
 	     _SYSTEM_CHARACTER_T_STRING( "none" ),
 	     4 ) == 0 )
 	{
-		*compression_level    = LIBEWF_COMPRESSION_NONE;
-		*compress_empty_block = 0;
-		result                = 1;
+		*compression_level = LIBEWF_COMPRESSION_NONE;
+		*compression_flags = 0;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "empty-block" ),
 	          11 ) == 0 )
 	{
-		*compression_level    = LIBEWF_COMPRESSION_NONE;
-		*compress_empty_block = 1;
-		result                = 1;
+		*compression_level = LIBEWF_COMPRESSION_NONE;
+		*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "empty_block" ),
 	          11 ) == 0 )
 	{
-		*compression_level    = LIBEWF_COMPRESSION_NONE;
-		*compress_empty_block = 1;
-		result                = 1;
+		*compression_level = LIBEWF_COMPRESSION_NONE;
+		*compression_flags = LIBEWF_FLAG_COMPRESS_EMPTY_BLOCK;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "fast" ),
 	          4 ) == 0 )
 	{
-		*compression_level    = LIBEWF_COMPRESSION_FAST;
-		*compress_empty_block = 0;
-		result                = 1;
+		*compression_level = LIBEWF_COMPRESSION_FAST;
+		*compression_flags = 0;
+		result             = 1;
 	}
 	else if( system_string_compare(
 	          argument,
 	          _SYSTEM_CHARACTER_T_STRING( "best" ),
 	          4 ) == 0 )
 	{
-		*compression_level    = LIBEWF_COMPRESSION_BEST;
-		*compress_empty_block = 0;
-		result                = 1;
+		*compression_level = LIBEWF_COMPRESSION_BEST;
+		*compression_flags = 0;
+		result             = 1;
 	}
 	return( result );
 }

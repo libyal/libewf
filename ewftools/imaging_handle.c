@@ -932,7 +932,7 @@ int imaging_handle_set_output_values(
      uint8_t media_type,
      uint8_t volume_type,
      int8_t compression_level,
-     uint8_t compress_empty_block,
+     uint8_t compression_flags,
      uint8_t libewf_format,
      size64_t segment_file_size,
      uint32_t sectors_per_chunk,
@@ -1214,13 +1214,13 @@ int imaging_handle_set_output_values(
 	if( libewf_handle_set_compression_values(
 	     imaging_handle->output_handle,
 	     compression_level,
-	     compress_empty_block,
+	     compression_flags,
 	     error ) != 1 )
 #else
 	if( libewf_set_compression_values(
 	     imaging_handle->output_handle,
 	     compression_level,
-	     compress_empty_block ) != 1 )
+	     compression_flags ) != 1 )
 #endif
 	{
 		liberror_error_set(
