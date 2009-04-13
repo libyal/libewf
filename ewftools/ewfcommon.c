@@ -42,14 +42,6 @@
 #include <sys/utsname.h>
 #endif
 
-#if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBZ )
-#include <zlib.h>
-#endif
-
-#if defined( HAVE_OPENSSL_OPENSSLV_H ) && defined( HAVE_LIBCRYPTO )
-#include <openssl/opensslv.h>
-#endif
-
 #if defined( HAVE_UUID_UUID_H ) && defined( HAVE_LIBUUID )
 #include <uuid/uuid.h>
 #endif

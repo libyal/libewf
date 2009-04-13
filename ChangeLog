@@ -216,7 +216,11 @@ Next beta release:
 * add set_header_codepage to ewftools
 * have segment file number in libewf_raw_read_chunk for warning output?
 
+Version: 20090410
+* small adjustments
+
 Version: 20090405
+* small adjustments
 
 Version: 20090404
 * implemented chunk and crc buffer alignment
