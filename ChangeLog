@@ -230,6 +230,9 @@ Next beta release:
 * add set_header_codepage to ewftools
 * have segment file number in libewf_raw_read_chunk for warning output?
 
+Version: 20090414
+* added to do to ewfexport
+
 Version: 20090412
 * refactored order of functions handles: open, close, read, write, seek
 * corrected LIBEWF_DLL_EXPORT in ewftools to LIBEWF_DLL_IMPORT

@@ -1239,6 +1239,7 @@ int main( int argc, char * const argv[] )
 
 				output_raw = 1;
 			}
+			/* TODO is this necessary ? */
 			else if( system_string_compare(
 			          fixed_string_variable,
 			          _SYSTEM_CHARACTER_T_STRING( "raw" ),
