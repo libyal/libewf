@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libewf],
- [20090414],
+ [20090415],
  [forensics@hoffmannbv.nl])
 
 AC_CONFIG_SRCDIR(
@@ -10,7 +10,7 @@ AC_CONFIG_SRCDIR(
 
 AM_INIT_AUTOMAKE(
  [libewf],
- [20090414])
+ [20090415])
 
 dnl Check for host type
 AC_CANONICAL_HOST
@@ -1033,13 +1033,13 @@ AS_IF(
 	])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_evp" == xno],
+	[test "x$ac_libewf_have_libcrypto_evp" = xno],
 	[AC_SUBST(
 	 [HAVE_OPENSSL_EVP_H],
 	 [0])] )
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_evp" == xyes],
+	[test "x$ac_libewf_have_libcrypto_evp" = xyes],
 	[ac_libewf_have_libcrypto_md5=evp
 	ac_libewf_have_libcrypto_sha1=evp])
 
@@ -1072,7 +1072,7 @@ AS_IF(
 	])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_md5" == xno],
+	[test "x$ac_libewf_have_libcrypto_md5" = xno],
 	[AC_MSG_NOTICE(
 	 [No support for calculating MD5 hashes, if required install (openssl) libcrypto with MD5 support.])
 	])
@@ -1106,7 +1106,7 @@ AS_IF(
 	])
 
 AS_IF(
-	[test "x$ac_libewf_have_libcrypto_sha1" == xno],
+	[test "x$ac_libewf_have_libcrypto_sha1" = xno],
 	[AC_MSG_NOTICE(
 	 [No support for calculating SHA1 hashes, if required install (openssl) libcrypto with SHA1 support.])
 	])

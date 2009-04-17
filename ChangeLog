@@ -230,6 +230,9 @@ Next beta release:
 * add set_header_codepage to ewftools
 * have segment file number in libewf_raw_read_chunk for warning output?
 
+Version: 20090415
+* fixed == in configure.ac
+
 Version: 20090414
 * added to do to ewfexport
 
