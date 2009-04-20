@@ -1017,7 +1017,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid output stream.\n",
+		 "%s: invalid output stream.",
 		 function );
 
 		return( -1 );
@@ -1028,7 +1028,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid input buffer.\n",
+		 "%s: invalid input buffer.",
 		 function );
 
 		return( -1 );
@@ -1046,7 +1046,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid request string.\n",
+		 "%s: invalid request string.",
 		 function );
 
 		return( -1 );
@@ -1057,7 +1057,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid byte size variable.\n",
+		 "%s: invalid byte size variable.",
 		 function );
 
 		return( -1 );
@@ -1073,7 +1073,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to create minimum byte size string.\n",
+		 "%s: unable to create minimum byte size string.",
 		 function );
 
 		return( -1 );
@@ -1089,7 +1089,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to create default byte size string.\n",
+		 "%s: unable to create default byte size string.",
 		 function );
 
 		return( -1 );
@@ -1105,7 +1105,7 @@ int ewfinput_get_byte_size_variable(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to create maximum byte size string.\n",
+		 "%s: unable to create maximum byte size string.",
 		 function );
 
 		return( -1 );

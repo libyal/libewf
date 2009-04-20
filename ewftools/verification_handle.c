@@ -605,7 +605,7 @@ ssize_t verification_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe raw buffer.\n",
+				 "%s: unable to wipe raw buffer.",
 				 function );
 
 				return( -1 );
@@ -619,7 +619,7 @@ ssize_t verification_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe compression buffer.\n",
+				 "%s: unable to wipe compression buffer.",
 				 function );
 
 				return( -1 );
@@ -639,7 +639,7 @@ ssize_t verification_handle_prepare_read_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add read error.\n",
+			 "%s: unable to add read error.",
 			 function );
 
 			return( -1 );
@@ -1038,7 +1038,7 @@ int verification_handle_get_amount_of_crc_errors(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of CRC errors.\n",
+		 "%s: unable to retrieve the amount of CRC errors.",
 		 function );
 
 		return( -1 );
@@ -1347,7 +1347,7 @@ int verification_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add CRC errror.\n",
+		 "%s: unable to add CRC errror.",
 		 function );
 
 		return( -1 );
@@ -1690,7 +1690,7 @@ int verification_handle_additional_hash_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to parse hash values.\n",
+		 "%s: unable to parse hash values.",
 		 function );
 
 		return( -1 );
@@ -1710,7 +1710,7 @@ int verification_handle_additional_hash_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of hash values.\n",
+		 "%s: unable to retrieve amount of hash values.",
 		 function );
 
 		return( -1 );
@@ -1728,7 +1728,7 @@ int verification_handle_additional_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier size for index: %" PRIu32 ".\n",
+			 "%s: unable to retrieve the hash identifier size for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -1754,7 +1754,7 @@ int verification_handle_additional_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
+			 "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -1790,7 +1790,7 @@ int verification_handle_additional_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash value for identifier: %s.\n",
+			 "%s: unable to retrieve the hash value for identifier: %s.",
 			 function,
 			 hash_identifier );
 
@@ -1887,7 +1887,7 @@ int verification_handle_crc_errors_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of CRC errors.\n",
+		 "%s: unable to retrieve the amount of CRC errors.",
 		 function );
 
 		return( -1 );
@@ -1923,7 +1923,7 @@ int verification_handle_crc_errors_fprint(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve the CRC error: %" PRIu32 ".\n",
+				 "%s: unable to retrieve the CRC error: %" PRIu32 ".",
 				 function,
 				 error_iterator );
 
@@ -1963,7 +1963,7 @@ int verification_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_IO,
 					 LIBERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: %" PRIu64 ".\n",
+					 "%s: unable to seek offset: %" PRIu64 ".",
 					 function,
 					 first_sector );
 
@@ -1990,7 +1990,7 @@ int verification_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve filename size.\n",
+					 "%s: unable to retrieve filename size.",
 					 function );
 
 					if( last_filename != NULL )
@@ -2010,7 +2010,7 @@ int verification_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_MEMORY,
 					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create filename.\n",
+					 "%s: unable to create filename.",
 					 function );
 
 					if( last_filename != NULL )
@@ -2038,7 +2038,7 @@ int verification_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve filename.\n",
+					 "%s: unable to retrieve filename.",
 					 function );
 
 					if( last_filename != NULL )

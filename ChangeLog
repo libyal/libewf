@@ -20,7 +20,7 @@ Roadmap:
 Further analysis of the EWF format:
 * password hash
 * 16 bytes in hash section (EWF-E01)
-* values in EnCase5 header2 (+/-)
+* values in EnCase5/6 header2 (+/-)
 * values in ltree strings (EWF-L01 LVF)
 * values in session section (+/-)
 
@@ -168,8 +168,6 @@ Known issues:
 
 Code clean up
 * rewrite glob marcros to function macros (including arguments) ?
-* clean up libewf_write_finalize ?
-* remove trailing \n from error messages
 * rename length into size, make sure string size contains end of string character
   - length is used when the value does not contain the EOS
   - size is used when the value contains the EOS or otherwise
@@ -204,28 +202,28 @@ Deployment
 * configure
   - remove enable-v1-api after testing?
 
-Other:
-* check TODO
-
 Next beta release:
 * check sprintf use
    - liberror -> liberror_error_vsnprintf
    - libewf -> libewf_hash_values, libewf_header_values
    - ewftools -> byte_size_string, guid
 * fix ewfexport different input and output chunk sizes for low level functions
+
+Work in progress:
 * what about header values parsing with preservation of timestamps?
   - change localtime to gmtime in libewf_date_time_values_copy_to_string ?
   - force set header value to require string formatted in the date format ?
-
+* check TODO
 * resume acquiry
   - improve resume write initialize in library
   - move segment file size from write io handle to segment table or io handle ?
     set segment file size on read
-* move write initialize functions to write io handle
 
 Version: 20090420
 * moved write finalize function to write io handle
-* refactored write finalize function
+* refactored sections correction out of write finalize function into separate functions
+* removed \n from error strings in libewf and ewftools
+* moved write initialize and resume functions to write io handle
 
 Version: 20090419
 * worked on date and time strings

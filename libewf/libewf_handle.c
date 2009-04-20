@@ -1538,15 +1538,35 @@ int libewf_handle_open_file_io_pool(
 	if( ( ( flags & LIBEWF_FLAG_WRITE ) == LIBEWF_FLAG_WRITE )
 	 && ( ( flags & LIBEWF_FLAG_RESUME ) == LIBEWF_FLAG_RESUME ) )
 	{
-		 if( libewf_internal_handle_resume_write_initialize(
-		      internal_handle,
-		      error ) != 1 )
+		if( ( internal_handle->write_io_handle->values_initialized == 0 )
+		 && ( libewf_write_io_handle_initialize_values(
+		       internal_handle->write_io_handle,
+		       internal_handle->io_handle,
+		       internal_handle->media_values,
+		       error ) != 1 ) )
 		{
 			liberror_error_set(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to initialize handle for resume write.",
+			 "%s: unable to initialize write io handle values.",
+			 function );
+
+			return( -1 );
+		}
+		if( libewf_write_io_handle_initialize_resume(
+		     internal_handle->write_io_handle,
+		     internal_handle->io_handle,
+		     internal_handle->media_values,
+		     internal_handle->offset_table,
+		     internal_handle->segment_table,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to initialize write io handle to resume.",
 			 function );
 
 			return( -1 );
@@ -2341,15 +2361,17 @@ ssize_t libewf_handle_write_chunk(
 		return( -1 );
 	}
 	if( ( internal_handle->write_io_handle->values_initialized == 0 )
-	 && ( libewf_internal_handle_write_initialize(
-	       internal_handle,
+	 && ( libewf_write_io_handle_initialize_values(
+	       internal_handle->write_io_handle,
+	       internal_handle->io_handle,
+	       internal_handle->media_values,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize handle to write.",
+		 "%s: unable to initialize write io handle values.",
 		 function );
 
 		return( -1 );
@@ -2530,15 +2552,17 @@ ssize_t libewf_handle_write_buffer(
 		return( -1 );
 	}
 	if( ( internal_handle->write_io_handle->values_initialized == 0 )
-	 && ( libewf_internal_handle_write_initialize(
-	       internal_handle,
+	 && ( libewf_write_io_handle_initialize_values(
+	       internal_handle->write_io_handle,
+	       internal_handle->io_handle,
+	       internal_handle->media_values,
 	       error ) != 1 ) )
 	{
 		liberror_error_set(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize handle to write.",
+		 "%s: unable to initialize write io handle values.",
 		 function );
 
 		return( -1 );
@@ -4728,341 +4752,6 @@ int libewf_internal_handle_set_format(
 
 			return( -1 );
 		}
-	}
-	return( 1 );
-}
-
-/* Initializes the handle to write
- * Returns 1 if successful or -1 on error
- */
-int libewf_internal_handle_write_initialize(
-     libewf_internal_handle_t *internal_handle,
-     liberror_error_t **error )
-{
-	static char *function               = "libewf_internal_handle_write_initialize";
-	int64_t required_amount_of_segments = 0;
-
-	if( internal_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->media_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing media values.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write_io_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing write io handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->write_io_handle->values_initialized != 0 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: write values were initialized and cannot be initialized anymore.",
-		 function );
-
-		return( -1 );
-	}
-	/* Determine the EWF file format
-	 */
-	if( internal_handle->io_handle->format == LIBEWF_FORMAT_LVF )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: writing format LVF currently not supported.",
-		 function );
-
-		return( -1 );
-	}
-	/* If no input write size was provided check if EWF file format allows for streaming
-	 */
-	if( internal_handle->media_values->media_size == 0 )
-	{
-		if( ( internal_handle->io_handle->format != LIBEWF_FORMAT_ENCASE2 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_ENCASE3 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_ENCASE4 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_ENCASE5 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_ENCASE6 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_LINEN5 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_LINEN6 )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_FTK )
-		 && ( internal_handle->io_handle->format != LIBEWF_FORMAT_EWFX ) )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: EWF file format does not allow for streaming write.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* If an input write size was provided
-	 */
-	else if( internal_handle->media_values->media_size > 0 )
-	{
-		/* Determine the required amount of segments allowed to write
-		 */
-		required_amount_of_segments = (int64_t) internal_handle->media_values->media_size
-		                            / (int64_t) internal_handle->write_io_handle->segment_file_size;
-
-		if( required_amount_of_segments > (int64_t) internal_handle->write_io_handle->maximum_amount_of_segments )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: the settings exceed the maximum amount of allowed segment files.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	/* Flag that the write values were initialized
-	 */
-	internal_handle->write_io_handle->values_initialized = 1;
-
-	return( 1 );
-}
-
-/* Initializes the handle to resume write
- * Returns 1 if successful or -1 on error
- */
-int libewf_internal_handle_resume_write_initialize(
-     libewf_internal_handle_t *internal_handle,
-     liberror_error_t **error )
-{
-	libewf_segment_file_handle_t *segment_file_handle = NULL;
-	libewf_section_list_values_t *last_section_values = NULL;
-	static char *function                             = "libewf_internal_handle_resume_write_initialize";
-	uint16_t segment_number                           = 0;
-	uint8_t resume_in_chunks_section                  = 0;
-
-	if( internal_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->io_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->offset_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing offset table.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - missing segment table.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_handle->segment_table->segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid handle - invalid segment table - missing segment file handles.",
-		 function );
-
-		return( -1 );
-	}
-	if( libewf_internal_handle_write_initialize(
-	     internal_handle,
-	     error ) != 1 )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize handle to write.",
-		 function );
-
-		return( -1 );
-	}
-	segment_number = internal_handle->segment_table->amount - 1;
-
-	segment_file_handle = internal_handle->segment_table->segment_file_handle[ segment_number ];
-
-	if( segment_file_handle == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing segment file handle: %" PRIu16 ".",
-		 function,
-		 segment_number );
-
-		return( -1 );
-	}
-	if( segment_file_handle->section_list == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing section list.",
-		 function );
-
-		return( -1 );
-	}
-	if( segment_file_handle->section_list->last == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing last section list element.",
-		 function );
-
-		return( -1 );
-	}
-	last_section_values = (libewf_section_list_values_t * ) segment_file_handle->section_list->last->value;
-
-	if( last_section_values == NULL )
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing last section values.",
-		 function );
-
-		return( -1 );
-	}
-	if( memory_compare(
-	     (void *) last_section_values->type,
-	     (void *) "next",
-	     5 ) == 0 )
-	{
-	}
-	else if( memory_compare(
-	          (void *) last_section_values->type,
-	          (void *) "sectors",
-	          8 ) == 0 )
-	{
-		resume_in_chunks_section = 1;
-	}
-	else
-	{
-		liberror_error_set(
-		 error,
-		 LIBERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: resume from section: %s not supported.",
-		 function,
-		 (char *) last_section_values->type );
-
-		return( -1 );
-	}
-	/* Set offset into media data
-	 */
-	internal_handle->io_handle->current_chunk        = internal_handle->offset_table->last_chunk_offset_compared + 1;
-	internal_handle->io_handle->current_chunk_offset = 0;
-
-	fprintf( stderr, "O: %" PRIu32 "\n", internal_handle->io_handle->current_chunk );
-
-	/* Set write handle values
-	 */
-	internal_handle->write_io_handle->amount_of_chunks   = internal_handle->io_handle->current_chunk;
-	internal_handle->write_io_handle->input_write_count  = internal_handle->write_io_handle->amount_of_chunks
-	                                                     * internal_handle->media_values->chunk_size;
-
-	fprintf( stderr, "AC: %" PRIu32 "\n", internal_handle->write_io_handle->amount_of_chunks );
-	fprintf( stderr, "IWC: %" PRIu64 "\n", internal_handle->write_io_handle->input_write_count );
-
-	if( resume_in_chunks_section != 0 )
-	{
-		if( libbfio_pool_reopen(
-		     internal_handle->io_handle->file_io_pool,
-		     segment_file_handle->file_io_pool_entry,
-		     LIBBFIO_OPEN_READ_WRITE,
-		     error ) != 1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to reopen segment file: %" PRIu16 ".",
-			 function,
-			 segment_number );
-
-			return( -1 );
-		}
-		if( libbfio_pool_seek_offset(
-		     internal_handle->io_handle->file_io_pool,
-		     segment_file_handle->file_io_pool_entry,
-		     last_section_values->start_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			liberror_error_set(
-			 error,
-			 LIBERROR_ERROR_DOMAIN_IO,
-			 LIBERROR_IO_ERROR_OPEN_FAILED,
-			 "%s: unable to seek last section start offset: %" PRIu64 " in segment file: %" PRIu16 ".",
-			 function,
-			 last_section_values->start_offset,
-			 segment_number );
-
-			return( -1 );
-		}
-		segment_file_handle->write_open = 1;
-
-		internal_handle->write_io_handle->create_chunks_section = 1;
 	}
 	return( 1 );
 }

@@ -225,7 +225,7 @@ ssize64_t ewfalter_alter_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to read data.\n",
+			"%s: unable to read data.",
 			 function );
 
 			storage_media_buffer_free(
@@ -240,7 +240,7 @@ ssize64_t ewfalter_alter_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unexpected end of data.\n",
+			 "%s: unexpected end of data.",
 			 function );
 
 			storage_media_buffer_free(
@@ -260,7 +260,7 @@ ssize64_t ewfalter_alter_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to prepare buffer after read.\n",
+			"%s: unable to prepare buffer after read.",
 			 function );
 
 			storage_media_buffer_free(
@@ -275,7 +275,7 @@ ssize64_t ewfalter_alter_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.\n",
+			 "%s: more bytes read than requested.",
 			 function );
 
 			storage_media_buffer_free(

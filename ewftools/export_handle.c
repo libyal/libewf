@@ -840,7 +840,7 @@ ssize_t export_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe compression buffer.\n",
+				 "%s: unable to wipe compression buffer.",
 				 function );
 
 				return( -1 );
@@ -854,7 +854,7 @@ ssize_t export_handle_prepare_read_buffer(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_SET_FAILED,
-				 "%s: unable to wipe raw buffer.\n",
+				 "%s: unable to wipe raw buffer.",
 				 function );
 
 				return( -1 );
@@ -874,7 +874,7 @@ ssize_t export_handle_prepare_read_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add read error.\n",
+			 "%s: unable to add read error.",
 			 function );
 
 			return( -1 );
@@ -1188,7 +1188,7 @@ ssize_t export_handle_write_buffer(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: mismatch in write size and amount of bytes in storage media buffer.\n",
+			 "%s: mismatch in write size and amount of bytes in storage media buffer.",
 			 function );
 
 			return( -1 );
@@ -2398,7 +2398,7 @@ int export_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add CRC errror.\n",
+		 "%s: unable to add CRC errror.",
 		 function );
 
 		return( -1 );
@@ -2435,7 +2435,7 @@ int export_handle_add_read_error(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to add acquiry errror.\n",
+			 "%s: unable to add acquiry errror.",
 			 function );
 
 			return( -1 );
@@ -2769,7 +2769,7 @@ int export_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_IO,
 					 LIBERROR_IO_ERROR_SEEK_FAILED,
-					 "%s: unable to seek offset: %" PRIu64 ".\n",
+					 "%s: unable to seek offset: %" PRIu64 ".",
 					 function,
 					 first_sector );
 
@@ -2796,7 +2796,7 @@ int export_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve filename size.\n",
+					 "%s: unable to retrieve filename size.",
 					 function );
 
 					if( last_filename != NULL )
@@ -2816,7 +2816,7 @@ int export_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_MEMORY,
 					 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-					 "%s: unable to create filename.\n",
+					 "%s: unable to create filename.",
 					 function );
 
 					if( last_filename != NULL )
@@ -2844,7 +2844,7 @@ int export_handle_crc_errors_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve filename.\n",
+					 "%s: unable to retrieve filename.",
 					 function );
 
 					if( last_filename != NULL )

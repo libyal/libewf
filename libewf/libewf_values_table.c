@@ -700,7 +700,7 @@ int libewf_values_table_get_identifier_size(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: index out of range.\n",
+		 "%s: index out of range.",
 		 function );
 
 		return( -1 );
@@ -791,7 +791,7 @@ int libewf_values_table_get_identifier(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: index out of range.\n",
+		 "%s: index out of range.",
 		 function );
 
 		return( -1 );

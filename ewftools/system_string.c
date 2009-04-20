@@ -87,7 +87,7 @@ int system_string_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine locale.\n",
+		 "%s: unable to determine locale.",
 		 function );
 
 		return( -1 );
@@ -102,7 +102,7 @@ int system_string_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine character set.\n",
+		 "%s: unable to determine character set.",
 		 function );
 
 		return( -1 );
@@ -124,7 +124,7 @@ int system_string_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine character set.\n",
+		 "%s: unable to determine character set.",
 		 function );
 
 		return( -1 );
@@ -234,7 +234,7 @@ int system_string_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: unsupported character set: %s.\n",
+			 "%s: unsupported character set: %s.",
 			 function,
 			 charset );
 

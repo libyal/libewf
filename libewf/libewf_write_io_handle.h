@@ -153,6 +153,20 @@ int libewf_write_io_handle_free(
      libewf_write_io_handle_t **write_io_handle,
      liberror_error_t **error );
 
+int libewf_write_io_handle_initialize_values(
+     libewf_write_io_handle_t *write_io_handle,
+     libewf_io_handle_t *io_handle,
+     libewf_media_values_t *media_values,
+     liberror_error_t **error );
+
+int libewf_write_io_handle_initialize_resume(
+     libewf_write_io_handle_t *write_io_handle,
+     libewf_io_handle_t *io_handle,
+     libewf_media_values_t *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_segment_table_t *segment_table,
+     liberror_error_t **error );
+
 int libewf_write_io_handle_test_empty_block(
      uint8_t *block_buffer,
      size_t size,

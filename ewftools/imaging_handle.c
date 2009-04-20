@@ -877,7 +877,7 @@ ssize_t imaging_handle_write_buffer(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: mismatch in write size and amount of bytes in storage media buffer.\n",
+		 "%s: mismatch in write size and amount of bytes in storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -2591,7 +2591,7 @@ int imaging_handle_add_read_error(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_APPEND_FAILED,
-		 "%s: unable to add acquiry errror.\n",
+		 "%s: unable to add acquiry errror.",
 		 function );
 
 		return( -1 );

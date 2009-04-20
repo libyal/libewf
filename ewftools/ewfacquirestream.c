@@ -1152,7 +1152,7 @@ ssize64_t ewfacquirestream_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to finalize write.\n",
+		 "%s: unable to finalize write.",
 		 function );
 
 		return( -1 );

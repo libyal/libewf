@@ -120,7 +120,7 @@ int ewfcommon_determine_operating_system_string(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid operating system string.\n",
+		 "%s: invalid operating system string.",
 		 function );
 
 		return( -1 );

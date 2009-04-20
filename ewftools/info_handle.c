@@ -874,7 +874,7 @@ int info_handle_header_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve the amount of header values.\n",
+		 "%s: unable to retrieve the amount of header values.",
 		 function );
 
 		return( -1 );
@@ -1409,7 +1409,7 @@ int info_handle_header_values_fprint(
 					 error,
 					 LIBERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve the header identifier for index: %" PRIu32 ".\n",
+					 "%s: unable to retrieve the header identifier for index: %" PRIu32 ".",
 					 function,
 					 header_value_iterator );
 
@@ -2035,7 +2035,7 @@ int info_handle_hash_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve MD5 hash.\n",
+		 "%s: unable to retrieve MD5 hash.",
 		 function );
 
 		return;
@@ -2051,7 +2051,7 @@ int info_handle_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create MD5 hash string.\n",
+			 "%s: unable to create MD5 hash string.",
 			 function );
 
 			return;
@@ -2067,7 +2067,7 @@ int info_handle_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set MD5 hash string.\n",
+			 "%s: unable to set MD5 hash string.",
 			 function );
 
 			memory_free(
@@ -2105,7 +2105,7 @@ int info_handle_hash_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to parse hash values.\n",
+		 "%s: unable to parse hash values.",
 		 function );
 
 		return( -1 );
@@ -2125,7 +2125,7 @@ int info_handle_hash_values_fprint(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve amount of hash values.\n",
+		 "%s: unable to retrieve amount of hash values.",
 		 function );
 
 		return( -1 );
@@ -2143,7 +2143,7 @@ int info_handle_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier size for index: %" PRIu32 ".\n",
+			 "%s: unable to retrieve the hash identifier size for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -2169,7 +2169,7 @@ int info_handle_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".\n",
+			 "%s: unable to retrieve the hash identifier for index: %" PRIu32 ".",
 			 function,
 			 hash_value_iterator );
 
@@ -2202,7 +2202,7 @@ int info_handle_hash_values_fprint(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve the hash value for identifier: %s.\n",
+			 "%s: unable to retrieve the hash value for identifier: %s.",
 			 function,
 			 hash_identifier );
 

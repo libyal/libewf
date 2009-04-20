@@ -153,6 +153,361 @@ int libewf_write_io_handle_free(
 	return( 1 );
 }
 
+/* Initializes the write io handle value to start writing
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_write_io_handle_initialize_values(
+     libewf_write_io_handle_t *write_io_handle,
+     libewf_io_handle_t *io_handle,
+     libewf_media_values_t *media_values,
+     liberror_error_t **error )
+{
+	static char *function               = "libewf_write_io_handle_initialize_values";
+	int64_t required_amount_of_segments = 0;
+
+	if( write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid write io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( write_io_handle->values_initialized != 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: write values were initialized and cannot be initialized anymore.",
+		 function );
+
+		return( -1 );
+	}
+	if( write_io_handle->segment_file_size == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+		 "%s: invalid segment file size value out of range.",
+		 function );
+
+		return( -1 );
+	}
+	/* Determine the EWF file format
+	 */
+	if( io_handle->format == LIBEWF_FORMAT_LVF )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: writing format LVF currently not supported.",
+		 function );
+
+		return( -1 );
+	}
+	/* If no input write size was provided check if EWF file format allows for streaming
+	 */
+	if( media_values->media_size == 0 )
+	{
+		if( ( io_handle->format != LIBEWF_FORMAT_ENCASE2 )
+		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE3 )
+		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE4 )
+		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE5 )
+		 && ( io_handle->format != LIBEWF_FORMAT_ENCASE6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_LINEN5 )
+		 && ( io_handle->format != LIBEWF_FORMAT_LINEN6 )
+		 && ( io_handle->format != LIBEWF_FORMAT_FTK )
+		 && ( io_handle->format != LIBEWF_FORMAT_EWFX ) )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+			 "%s: EWF file format does not allow for streaming write.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	/* If an input write size was provided
+	 */
+	else if( media_values->media_size > 0 )
+	{
+		/* Determine the required amount of segments allowed to write
+		 */
+		required_amount_of_segments = (int64_t) media_values->media_size / (int64_t) write_io_handle->segment_file_size;
+
+		if( required_amount_of_segments > (int64_t) write_io_handle->maximum_amount_of_segments )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
+			 "%s: the maximum amount of allowed segment files will be exceeded with the segment file size: %" PRIu64 ".",
+			 function,
+			 write_io_handle->segment_file_size );
+
+			return( -1 );
+		}
+	}
+	/* Flag that the write values were initialized
+	 */
+	write_io_handle->values_initialized = 1;
+
+	return( 1 );
+}
+
+/* Initializes the write io handle to resume writing
+ * Returns 1 if successful or -1 on error
+ */
+int libewf_write_io_handle_initialize_resume(
+     libewf_write_io_handle_t *write_io_handle,
+     libewf_io_handle_t *io_handle,
+     libewf_media_values_t *media_values,
+     libewf_offset_table_t *offset_table,
+     libewf_segment_table_t *segment_table,
+     liberror_error_t **error )
+{
+	libewf_segment_file_handle_t *segment_file_handle = NULL;
+	libewf_section_list_values_t *last_section_values = NULL;
+	static char *function                             = "libewf_write_io_handle_initialize_resume";
+	uint16_t segment_number                           = 0;
+	uint8_t resume_in_chunks_section                  = 0;
+
+	if( write_io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid write io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( io_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid io handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( media_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid media values.",
+		 function );
+
+		return( -1 );
+	}
+	if( offset_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset table.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid segment table.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_table->segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid segment table - missing segment file handles.",
+		 function );
+
+		return( -1 );
+	}
+	segment_number = segment_table->amount - 1;
+
+	if( segment_number == 0 )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing segment files.",
+		 function );
+
+		return( -1 );
+	}
+	segment_file_handle = segment_table->segment_file_handle[ segment_number ];
+
+	if( segment_file_handle == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing segment file handle: %" PRIu16 ".",
+		 function,
+		 segment_number );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing section list.",
+		 function );
+
+		return( -1 );
+	}
+	if( segment_file_handle->section_list->last == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing last section list element.",
+		 function );
+
+		return( -1 );
+	}
+	last_section_values = (libewf_section_list_values_t * ) segment_file_handle->section_list->last->value;
+
+	if( last_section_values == NULL )
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing last section values.",
+		 function );
+
+		return( -1 );
+	}
+	/* TODO improve */
+	if( memory_compare(
+	     (void *) last_section_values->type,
+	     (void *) "next",
+	     5 ) == 0 )
+	{
+	}
+	else if( memory_compare(
+	          (void *) last_section_values->type,
+	          (void *) "sectors",
+	          8 ) == 0 )
+	{
+		resume_in_chunks_section = 1;
+	}
+	else
+	{
+		liberror_error_set(
+		 error,
+		 LIBERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: write resume from section: %s not supported.",
+		 function,
+		 (char *) last_section_values->type );
+
+		return( -1 );
+	}
+	/* Set offset into media data
+	 */
+	io_handle->current_chunk        = offset_table->last_chunk_offset_compared + 1;
+	io_handle->current_chunk_offset = 0;
+
+	/* Set write handle values
+	 */
+	write_io_handle->amount_of_chunks  = io_handle->current_chunk;
+	write_io_handle->input_write_count = write_io_handle->amount_of_chunks * media_values->chunk_size;
+
+	if( resume_in_chunks_section != 0 )
+	{
+		if( libbfio_pool_reopen(
+		     io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     LIBBFIO_OPEN_READ_WRITE,
+		     error ) != 1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to reopen segment file: %" PRIu16 ".",
+			 function,
+			 segment_number );
+
+			return( -1 );
+		}
+		if( libbfio_pool_seek_offset(
+		     io_handle->file_io_pool,
+		     segment_file_handle->file_io_pool_entry,
+		     last_section_values->start_offset,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			liberror_error_set(
+			 error,
+			 LIBERROR_ERROR_DOMAIN_IO,
+			 LIBERROR_IO_ERROR_OPEN_FAILED,
+			 "%s: unable to seek last section start offset: %" PRIu64 " in segment file: %" PRIu16 ".",
+			 function,
+			 last_section_values->start_offset,
+			 segment_number );
+
+			return( -1 );
+		}
+		segment_file_handle->write_open        = 1;
+		write_io_handle->create_chunks_section = 1;
+	}
+	return( 1 );
+}
+
 /* Check for empty block, a block that contains the same value for every byte
  * Returns 1 if block is empty, 0 if not or -1 on error
  */
@@ -2941,8 +3296,8 @@ ssize_t libewf_write_io_handle_finalize(
 	libewf_segment_file_handle_t *segment_file_handle = NULL;
 	void *reallocation                                = NULL;
 	static char *function                             = "libewf_write_io_handle_finalize";
-	ssize_t write_finalize_count                      = 0;
 	ssize_t write_count                               = 0;
+	ssize_t write_finalize_count                      = 0;
 	uint16_t segment_number                           = 0;
 
 	if( write_io_handle == NULL )
@@ -3214,14 +3569,13 @@ ssize_t libewf_write_io_handle_finalize(
 	 */
 	if( media_values->media_size == 0 )
 	{
-		/* Calculate the media values
+		/* Determine the media values
 		 */
 		media_values->amount_of_chunks  = write_io_handle->amount_of_chunks;
-		media_values->amount_of_sectors = (uint32_t) ( write_io_handle->input_write_count
-		                                / media_values->bytes_per_sector );
+		media_values->amount_of_sectors = (uint32_t) ( write_io_handle->input_write_count / media_values->bytes_per_sector );
 		media_values->media_size        = (size32_t) write_io_handle->input_write_count;
 
-		/* Make sure to flush the data section write cache
+		/* Flush the data section write cache
 		 */
 		memory_free(
 		 write_io_handle->data_section );
@@ -3247,7 +3601,7 @@ ssize_t libewf_write_io_handle_finalize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_WRITE_FAILED,
-			 "%s: unable to write corrections to segment files.",
+			 "%s: unable to write sections corrections to segment files.",
 			 function );
 
 			return( -1 );

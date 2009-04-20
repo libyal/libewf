@@ -233,7 +233,7 @@ ssize64_t ewfexport_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine the input chunk size.\n",
+		 "%s: unable to determine the input chunk size.",
 		 function );
 
 		return( -1 );
@@ -244,7 +244,7 @@ ssize64_t ewfexport_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid input chunk size.\n",
+		 "%s: invalid input chunk size.",
 		 function );
 
 		return( -1 );
@@ -257,7 +257,7 @@ ssize64_t ewfexport_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-		 "%s: invalid size value out of range.\n",
+		 "%s: invalid size value out of range.",
 		 function );
 
 		return( -1 );
@@ -281,7 +281,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: invalid offset.\n",
+			 "%s: invalid offset.",
 			 function );
 
 			return( -1 );
@@ -292,7 +292,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_VALUE_OUT_OF_RANGE,
-			 "%s: unable to export beyond size of media.\n",
+			 "%s: unable to export beyond size of media.",
 			 function );
 
 			return( -1 );
@@ -306,7 +306,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_SEEK_FAILED,
-			"%s: unable to seek offset.\n",
+			"%s: unable to seek offset.",
 			 function );
 
 			return( -1 );
@@ -355,7 +355,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to read data.\n",
+			"%s: unable to read data.",
 			 function );
 
 			storage_media_buffer_free(
@@ -370,7 +370,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unexpected end of data.\n",
+			 "%s: unexpected end of data.",
 			 function );
 
 			storage_media_buffer_free(
@@ -390,7 +390,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to prepare buffer after read.\n",
+			"%s: unable to prepare buffer after read.",
 			 function );
 
 			storage_media_buffer_free(
@@ -405,7 +405,7 @@ ssize64_t ewfexport_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.\n",
+			 "%s: more bytes read than requested.",
 			 function );
 
 			storage_media_buffer_free(
@@ -555,7 +555,7 @@ ssize64_t ewfexport_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_IO,
 		 LIBERROR_IO_ERROR_WRITE_FAILED,
-		 "%s: unable to finalize.\n",
+		 "%s: unable to finalize.",
 		 function );
 
 		return( -1 );

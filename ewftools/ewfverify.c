@@ -131,7 +131,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid process buffer size value exceeds maximum.\n",
+		 "%s: invalid process buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -157,7 +157,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to determine verification handle values.\n",
+		 "%s: unable to determine verification handle values.",
 		 function );
 
 		return( -1 );
@@ -168,7 +168,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid chunk size.\n",
+		 "%s: invalid chunk size.",
 		 function );
 
 		return( -1 );
@@ -179,7 +179,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid chunk size value exceeds maximum.\n",
+		 "%s: invalid chunk size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -193,7 +193,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set verification handle error handling values.\n",
+		 "%s: unable to set verification handle error handling values.",
 		 function );
 
 		return( -1 );
@@ -216,7 +216,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create storage media buffer.\n",
+		 "%s: unable to create storage media buffer.",
 		 function );
 
 		return( -1 );
@@ -242,7 +242,7 @@ ssize64_t ewfverify_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to read data.\n",
+			"%s: unable to read data.",
 			 function );
 
 			storage_media_buffer_free(
@@ -257,7 +257,7 @@ ssize64_t ewfverify_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: unexpected end of data.\n",
+			 "%s: unexpected end of data.",
 			 function );
 
 			storage_media_buffer_free(
@@ -277,7 +277,7 @@ ssize64_t ewfverify_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			"%s: unable to prepare buffer after read.\n",
+			"%s: unable to prepare buffer after read.",
 			 function );
 
 			storage_media_buffer_free(
@@ -292,7 +292,7 @@ ssize64_t ewfverify_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_IO,
 			 LIBERROR_IO_ERROR_READ_FAILED,
-			 "%s: more bytes read than requested.\n",
+			 "%s: more bytes read than requested.",
 			 function );
 
 			storage_media_buffer_free(
@@ -321,7 +321,7 @@ ssize64_t ewfverify_read_input(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to update integrity hash(es).\n",
+			 "%s: unable to update integrity hash(es).",
 			 function );
 
 			storage_media_buffer_free(
@@ -358,7 +358,7 @@ ssize64_t ewfverify_read_input(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free storage media buffer.\n",
+		 "%s: unable to free storage media buffer.",
 		 function );
 
 		return( -1 );

@@ -391,14 +391,6 @@ int libewf_internal_handle_set_format(
      uint8_t format,
      liberror_error_t **error );
 
-int libewf_internal_handle_write_initialize(
-     libewf_internal_handle_t *internal_handle,
-     liberror_error_t **error );
-
-int libewf_internal_handle_resume_write_initialize(
-     libewf_internal_handle_t *internal_handle,
-     liberror_error_t **error );
-
 #if defined( __cplusplus )
 }
 #endif

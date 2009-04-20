@@ -44,7 +44,7 @@ int storage_media_buffer_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -55,7 +55,7 @@ int storage_media_buffer_initialize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid buffer size value exceeds maximum.\n",
+		 "%s: invalid buffer size value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -71,7 +71,7 @@ int storage_media_buffer_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create buffer.\n",
+			 "%s: unable to create buffer.",
 			 function );
 
 			return( -1 );
@@ -85,7 +85,7 @@ int storage_media_buffer_initialize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_SET_FAILED,
-			 "%s: unable to clear buffer.\n",
+			 "%s: unable to clear buffer.",
 			 function );
 
 			memory_free(
@@ -106,7 +106,7 @@ int storage_media_buffer_initialize(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create raw buffer.\n",
+				 "%s: unable to create raw buffer.",
 				 function );
 
 				memory_free(
@@ -128,7 +128,7 @@ int storage_media_buffer_initialize(
 				 error,
 				 LIBERROR_ERROR_DOMAIN_MEMORY,
 				 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create compression buffer.\n",
+				 "%s: unable to create compression buffer.",
 				 function );
 
 				memory_free(
@@ -163,7 +163,7 @@ int storage_media_buffer_free(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -207,7 +207,7 @@ int storage_media_buffer_resize(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -224,7 +224,7 @@ int storage_media_buffer_resize(
 			 error,
 			 LIBERROR_ERROR_DOMAIN_MEMORY,
 			 LIBERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to reallocate read buffer.\n",
+			 "%s: unable to reallocate read buffer.",
 			 function );
 
 			return( -1 );
@@ -267,7 +267,7 @@ int storage_media_buffer_get_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid buffer.\n",
+		 "%s: invalid buffer.",
 		 function );
 
 		return( -1 );
@@ -278,7 +278,7 @@ int storage_media_buffer_get_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.\n",
+		 "%s: invalid data.",
 		 function );
 
 		return( -1 );
@@ -289,7 +289,7 @@ int storage_media_buffer_get_data(
 		 error,
 		 LIBERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid size.\n",
+		 "%s: invalid size.",
 		 function );
 
 		return( -1 );
